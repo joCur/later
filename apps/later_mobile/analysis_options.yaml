@@ -1,0 +1,77 @@
+# This file configures the analyzer, which statically analyzes Dart code to
+# check for errors, warnings, and lints.
+#
+# The issues identified by the analyzer are surfaced in the UI of Dart-enabled
+# IDEs (https://dart.dev/tools#ides-and-editors). The analyzer can also be
+# invoked from the command line by running `flutter analyze`.
+
+# The following line activates a set of recommended lints for Flutter apps,
+# packages, and plugins designed to encourage good coding practices.
+include: package:flutter_lints/flutter.yaml
+
+analyzer:
+  language:
+    strict-casts: true
+    strict-inference: true
+    strict-raw-types: true
+
+  errors:
+    unused_import: error
+    unused_local_variable: error
+    dead_code: error
+    missing_required_param: error
+    missing_return: error
+
+  exclude:
+    - "**/*.g.dart"
+    - "**/*.freezed.dart"
+    - "**/*.mocks.dart"
+
+linter:
+  # The lint rules applied to this project can be customized in the
+  # section below to disable rules from the `package:flutter_lints/flutter.yaml`
+  # included above or to enable additional rules. A list of all available lints
+  # and their documentation is published at https://dart.dev/lints.
+  #
+  # Instead of disabling a lint rule for the entire project in the
+  # section below, it can also be suppressed for a single line of code
+  # or a specific dart file by using the `// ignore: name_of_lint` and
+  # `// ignore_for_file: name_of_lint` syntax on the line or in the file
+  # producing the lint.
+  rules:
+    # Style rules
+    prefer_single_quotes: true
+    prefer_const_constructors: true
+    prefer_const_constructors_in_immutables: true
+    prefer_const_declarations: true
+    prefer_const_literals_to_create_immutables: true
+    prefer_final_fields: true
+    prefer_final_locals: true
+    prefer_final_in_for_each: true
+
+    # Error prevention rules
+    avoid_print: true
+    avoid_unnecessary_containers: true
+    avoid_web_libraries_in_flutter: true
+    no_logic_in_create_state: true
+    sized_box_for_whitespace: true
+    use_key_in_widget_constructors: true
+    use_build_context_synchronously: true
+
+    # Code quality rules
+    require_trailing_commas: true
+    sort_child_properties_last: true
+    sort_constructors_first: true
+    always_declare_return_types: true
+    annotate_overrides: true
+    avoid_redundant_argument_values: true
+    avoid_returning_null_for_void: true
+
+    # Pub rules
+    sort_pub_dependencies: true
+
+    # Documentation (disabled for now)
+    public_member_api_docs: false
+
+# Additional information about this file can be found at
+# https://dart.dev/guides/language/analysis-options

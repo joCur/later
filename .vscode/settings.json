@@ -1,0 +1,25 @@
+{
+  // Enable format on save for all files
+  "editor.formatOnSave": true,
+
+  // Run quick fixes on save
+  "editor.codeActionsOnSave": {
+    "source.fixAll": "explicit"
+  },
+
+  // Set default line length to 80 characters (Dart default)
+  "dart.lineLength": 80,
+
+  // Show visual line length guide
+  "editor.rulers": [80],
+
+  // Dart-specific settings
+  "[dart]": {
+    "editor.defaultFormatter": "Dart-Code.dart-code",
+    "editor.selectionHighlight": false,
+    "editor.suggest.snippetsPreventQuickSuggestions": false,
+    "editor.suggestSelection": "first",
+    "editor.tabCompletion": "onlySnippets",
+    "editor.wordBasedSuggestions": "off"
+  }
+}

@@ -1,0 +1,402 @@
+{
+  "$schema": "https://design-tokens.github.io/community-group/format/schema.json",
+  "name": "Later App Design Tokens",
+  "version": "1.0.0",
+  "description": "Complete design token specification for Later flexible organizer app",
+
+  "color": {
+    "primary": {
+      "$type": "color",
+      "light": { "$value": "#6366F1" },
+      "dark": { "$value": "#818CF8" }
+    },
+    "primary-dark": {
+      "$type": "color",
+      "light": { "$value": "#4F46E5" },
+      "dark": { "$value": "#6366F1" }
+    },
+    "primary-light": {
+      "$type": "color",
+      "light": { "$value": "#E0E7FF" },
+      "dark": { "$value": "#312E81" }
+    },
+
+    "secondary": {
+      "$type": "color",
+      "light": { "$value": "#8B5CF6" },
+      "dark": { "$value": "#A78BFA" }
+    },
+    "secondary-light": {
+      "$type": "color",
+      "light": { "$value": "#EDE9FE" },
+      "dark": { "$value": "#3B0764" }
+    },
+    "secondary-pale": {
+      "$type": "color",
+      "light": { "$value": "#F5F3FF" },
+      "dark": { "$value": "#2E1065" }
+    },
+
+    "accent-primary": {
+      "$type": "color",
+      "light": { "$value": "#F59E0B" },
+      "dark": { "$value": "#FCD34D" }
+    },
+    "accent-secondary": {
+      "$type": "color",
+      "light": { "$value": "#14B8A6" },
+      "dark": { "$value": "#5EEAD4" }
+    },
+
+    "success": {
+      "$type": "color",
+      "light": { "$value": "#10B981" },
+      "dark": { "$value": "#34D399" }
+    },
+    "success-light": {
+      "$type": "color",
+      "light": { "$value": "#D1FAE5" },
+      "dark": { "$value": "#065F46" }
+    },
+
+    "warning": {
+      "$type": "color",
+      "light": { "$value": "#F59E0B" },
+      "dark": { "$value": "#FBBF24" }
+    },
+    "warning-light": {
+      "$type": "color",
+      "light": { "$value": "#FEF3C7" },
+      "dark": { "$value": "#78350F" }
+    },
+
+    "error": {
+      "$type": "color",
+      "light": { "$value": "#EF4444" },
+      "dark": { "$value": "#F87171" }
+    },
+    "error-light": {
+      "$type": "color",
+      "light": { "$value": "#FEE2E2" },
+      "dark": { "$value": "#7F1D1D" }
+    },
+
+    "info": {
+      "$type": "color",
+      "light": { "$value": "#3B82F6" },
+      "dark": { "$value": "#60A5FA" }
+    },
+    "info-light": {
+      "$type": "color",
+      "light": { "$value": "#DBEAFE" },
+      "dark": { "$value": "#1E3A8A" }
+    },
+
+    "item-type": {
+      "task": {
+        "$type": "color",
+        "light": { "$value": "#3B82F6" },
+        "dark": { "$value": "#60A5FA" }
+      },
+      "note": {
+        "$type": "color",
+        "light": { "$value": "#F59E0B" },
+        "dark": { "$value": "#FBBF24" }
+      },
+      "list": {
+        "$type": "color",
+        "light": { "$value": "#8B5CF6" },
+        "dark": { "$value": "#A78BFA" }
+      }
+    },
+
+    "neutral": {
+      "50": {
+        "$type": "color",
+        "light": { "$value": "#FAFAFA" },
+        "dark": { "$value": "#18181B" }
+      },
+      "100": {
+        "$type": "color",
+        "light": { "$value": "#F5F5F5" },
+        "dark": { "$value": "#27272A" }
+      },
+      "200": {
+        "$type": "color",
+        "light": { "$value": "#E5E5E5" },
+        "dark": { "$value": "#3F3F46" }
+      },
+      "300": {
+        "$type": "color",
+        "light": { "$value": "#D4D4D4" },
+        "dark": { "$value": "#52525B" }
+      },
+      "400": {
+        "$type": "color",
+        "light": { "$value": "#A3A3A3" },
+        "dark": { "$value": "#71717A" }
+      },
+      "500": {
+        "$type": "color",
+        "light": { "$value": "#737373" },
+        "dark": { "$value": "#A1A1AA" }
+      },
+      "600": {
+        "$type": "color",
+        "light": { "$value": "#525252" },
+        "dark": { "$value": "#D4D4D8" }
+      },
+      "700": {
+        "$type": "color",
+        "light": { "$value": "#404040" },
+        "dark": { "$value": "#E4E4E7" }
+      },
+      "800": {
+        "$type": "color",
+        "light": { "$value": "#262626" },
+        "dark": { "$value": "#F4F4F5" }
+      },
+      "900": {
+        "$type": "color",
+        "light": { "$value": "#171717" },
+        "dark": { "$value": "#FAFAFA" }
+      }
+    }
+  },
+
+  "typography": {
+    "font-family": {
+      "primary": {
+        "$type": "fontFamily",
+        "$value": ["Inter", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "Roboto", "Helvetica Neue", "Arial", "sans-serif"]
+      },
+      "monospace": {
+        "$type": "fontFamily",
+        "$value": ["JetBrains Mono", "Fira Code", "Consolas", "SF Mono", "Roboto Mono", "monospace"]
+      }
+    },
+
+    "font-weight": {
+      "light": { "$type": "fontWeight", "$value": 300 },
+      "regular": { "$type": "fontWeight", "$value": 400 },
+      "medium": { "$type": "fontWeight", "$value": 500 },
+      "semibold": { "$type": "fontWeight", "$value": 600 },
+      "bold": { "$type": "fontWeight", "$value": 700 }
+    },
+
+    "font-size": {
+      "h1": {
+        "$type": "dimension",
+        "desktop": { "$value": "32px" },
+        "mobile": { "$value": "28px" }
+      },
+      "h2": {
+        "$type": "dimension",
+        "desktop": { "$value": "24px" },
+        "mobile": { "$value": "22px" }
+      },
+      "h3": {
+        "$type": "dimension",
+        "desktop": { "$value": "20px" },
+        "mobile": { "$value": "18px" }
+      },
+      "h4": {
+        "$type": "dimension",
+        "desktop": { "$value": "18px" },
+        "mobile": { "$value": "16px" }
+      },
+      "h5": {
+        "$type": "dimension",
+        "desktop": { "$value": "16px" },
+        "mobile": { "$value": "14px" }
+      },
+      "body-large": { "$type": "dimension", "$value": "16px" },
+      "body": { "$type": "dimension", "$value": "14px" },
+      "body-small": { "$type": "dimension", "$value": "12px" },
+      "caption": { "$type": "dimension", "$value": "11px" },
+      "label": { "$type": "dimension", "$value": "12px" },
+      "code": { "$type": "dimension", "$value": "13px" }
+    },
+
+    "line-height": {
+      "h1": {
+        "$type": "dimension",
+        "desktop": { "$value": "40px" },
+        "mobile": { "$value": "36px" }
+      },
+      "h2": {
+        "$type": "dimension",
+        "desktop": { "$value": "32px" },
+        "mobile": { "$value": "30px" }
+      },
+      "h3": {
+        "$type": "dimension",
+        "desktop": { "$value": "28px" },
+        "mobile": { "$value": "26px" }
+      },
+      "h4": {
+        "$type": "dimension",
+        "desktop": { "$value": "26px" },
+        "mobile": { "$value": "24px" }
+      },
+      "h5": {
+        "$type": "dimension",
+        "desktop": { "$value": "24px" },
+        "mobile": { "$value": "22px" }
+      },
+      "body-large": { "$type": "dimension", "$value": "24px" },
+      "body": { "$type": "dimension", "$value": "22px" },
+      "body-small": { "$type": "dimension", "$value": "18px" },
+      "caption": { "$type": "dimension", "$value": "16px" },
+      "label": { "$type": "dimension", "$value": "16px" },
+      "code": { "$type": "dimension", "$value": "20px" }
+    }
+  },
+
+  "spacing": {
+    "base-unit": { "$type": "dimension", "$value": "8px" },
+
+    "xs": { "$type": "dimension", "$value": "4px" },
+    "sm": { "$type": "dimension", "$value": "8px" },
+    "md": { "$type": "dimension", "$value": "16px" },
+    "lg": { "$type": "dimension", "$value": "24px" },
+    "xl": { "$type": "dimension", "$value": "32px" },
+    "2xl": { "$type": "dimension", "$value": "48px" },
+    "3xl": { "$type": "dimension", "$value": "64px" }
+  },
+
+  "border-radius": {
+    "xs": { "$type": "dimension", "$value": "4px" },
+    "sm": { "$type": "dimension", "$value": "6px" },
+    "md": { "$type": "dimension", "$value": "8px" },
+    "lg": { "$type": "dimension", "$value": "12px" },
+    "xl": { "$type": "dimension", "$value": "16px" },
+    "2xl": { "$type": "dimension", "$value": "24px" },
+    "full": { "$type": "dimension", "$value": "9999px" }
+  },
+
+  "shadow": {
+    "level-0": {
+      "$type": "shadow",
+      "$value": { "offsetX": 0, "offsetY": 0, "blur": 0, "spread": 0, "color": "transparent" }
+    },
+    "level-1": {
+      "$type": "shadow",
+      "light": {
+        "$value": [
+          { "offsetX": 0, "offsetY": 1, "blur": 3, "spread": 0, "color": "rgba(0, 0, 0, 0.1)" },
+          { "offsetX": 0, "offsetY": 1, "blur": 2, "spread": 0, "color": "rgba(0, 0, 0, 0.06)" }
+        ]
+      },
+      "dark": {
+        "$value": [
+          { "offsetX": 0, "offsetY": 1, "blur": 3, "spread": 0, "color": "rgba(0, 0, 0, 0.3)" },
+          { "offsetX": 0, "offsetY": 1, "blur": 2, "spread": 0, "color": "rgba(0, 0, 0, 0.2)" }
+        ]
+      }
+    },
+    "level-2": {
+      "$type": "shadow",
+      "light": {
+        "$value": [
+          { "offsetX": 0, "offsetY": 4, "blur": 6, "spread": 0, "color": "rgba(0, 0, 0, 0.07)" },
+          { "offsetX": 0, "offsetY": 2, "blur": 4, "spread": 0, "color": "rgba(0, 0, 0, 0.05)" }
+        ]
+      },
+      "dark": {
+        "$value": [
+          { "offsetX": 0, "offsetY": 4, "blur": 6, "spread": 0, "color": "rgba(0, 0, 0, 0.4)" },
+          { "offsetX": 0, "offsetY": 2, "blur": 4, "spread": 0, "color": "rgba(0, 0, 0, 0.3)" }
+        ]
+      }
+    },
+    "level-3": {
+      "$type": "shadow",
+      "light": {
+        "$value": [
+          { "offsetX": 0, "offsetY": 10, "blur": 15, "spread": 0, "color": "rgba(0, 0, 0, 0.1)" },
+          { "offsetX": 0, "offsetY": 4, "blur": 6, "spread": 0, "color": "rgba(0, 0, 0, 0.05)" }
+        ]
+      },
+      "dark": {
+        "$value": [
+          { "offsetX": 0, "offsetY": 10, "blur": 15, "spread": 0, "color": "rgba(0, 0, 0, 0.5)" },
+          { "offsetX": 0, "offsetY": 4, "blur": 6, "spread": 0, "color": "rgba(0, 0, 0, 0.3)" }
+        ]
+      }
+    },
+    "level-4": {
+      "$type": "shadow",
+      "light": {
+        "$value": [
+          { "offsetX": 0, "offsetY": 20, "blur": 25, "spread": 0, "color": "rgba(0, 0, 0, 0.1)" },
+          { "offsetX": 0, "offsetY": 10, "blur": 10, "spread": 0, "color": "rgba(0, 0, 0, 0.04)" }
+        ]
+      },
+      "dark": {
+        "$value": [
+          { "offsetX": 0, "offsetY": 20, "blur": 25, "spread": 0, "color": "rgba(0, 0, 0, 0.6)" },
+          { "offsetX": 0, "offsetY": 10, "blur": 10, "spread": 0, "color": "rgba(0, 0, 0, 0.4)" }
+        ]
+      }
+    },
+    "inset": {
+      "$type": "shadow",
+      "light": {
+        "$value": { "offsetX": 0, "offsetY": 2, "blur": 4, "spread": 0, "color": "rgba(0, 0, 0, 0.06)", "inset": true }
+      },
+      "dark": {
+        "$value": { "offsetX": 0, "offsetY": 2, "blur": 4, "spread": 0, "color": "rgba(0, 0, 0, 0.3)", "inset": true }
+      }
+    }
+  },
+
+  "animation": {
+    "duration": {
+      "micro": { "$type": "duration", "$value": "100ms" },
+      "short": { "$type": "duration", "$value": "200ms" },
+      "medium": { "$type": "duration", "$value": "300ms" },
+      "long": { "$type": "duration", "$value": "400ms" },
+      "extended": { "$type": "duration", "$value": "600ms" }
+    },
+
+    "easing": {
+      "ease-out": {
+        "$type": "cubicBezier",
+        "$value": [0.0, 0, 0.2, 1]
+      },
+      "ease-in-out": {
+        "$type": "cubicBezier",
+        "$value": [0.4, 0, 0.6, 1]
+      },
+      "ease-in": {
+        "$type": "cubicBezier",
+        "$value": [0.4, 0, 1, 1]
+      }
+    }
+  },
+
+  "breakpoint": {
+    "mobile": { "$type": "dimension", "$value": "320px" },
+    "mobile-max": { "$type": "dimension", "$value": "767px" },
+    "tablet": { "$type": "dimension", "$value": "768px" },
+    "tablet-max": { "$type": "dimension", "$value": "1023px" },
+    "desktop": { "$type": "dimension", "$value": "1024px" },
+    "desktop-max": { "$type": "dimension", "$value": "1439px" },
+    "wide": { "$type": "dimension", "$value": "1440px" }
+  },
+
+  "icon-size": {
+    "xs": { "$type": "dimension", "$value": "12px" },
+    "sm": { "$type": "dimension", "$value": "16px" },
+    "md": { "$type": "dimension", "$value": "20px" },
+    "lg": { "$type": "dimension", "$value": "24px" },
+    "xl": { "$type": "dimension", "$value": "32px" },
+    "2xl": { "$type": "dimension", "$value": "48px" }
+  },
+
+  "touch-target": {
+    "minimum": { "$type": "dimension", "$value": "44px" },
+    "comfortable": { "$type": "dimension", "$value": "48px" }
+  }
+}
