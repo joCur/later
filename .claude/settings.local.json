@@ -3,7 +3,9 @@
     "allow": [
       "Bash(mkdir:*)",
       "WebSearch",
-      "Bash(flutter analyze)"
+      "Bash(flutter analyze)",
+      "Bash(flutter test test/data/models/)",
+      "Bash(flutter test)"
     ],
     "deny": [],
     "ask": []

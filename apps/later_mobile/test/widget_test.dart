@@ -5,26 +5,33 @@
 // gestures. You can also use WidgetTester to find child widgets in the widget
 // tree, read text, and verify that the values of widget properties are correct.
 
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:later_mobile/main.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
+  testWidgets('Theme test screen loads', (WidgetTester tester) async {
     // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+    await tester.pumpWidget(const LaterApp());
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+    // Verify that the theme test screen loads
+    expect(find.text('Later - Theme Test'), findsOneWidget);
+    expect(find.text('Design System Test'), findsOneWidget);
+  });
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
+  testWidgets('Theme toggle button exists', (WidgetTester tester) async {
+    // Build our app and trigger a frame.
+    await tester.pumpWidget(const LaterApp());
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    // Find the theme toggle button (icon could be either dark_mode or light_mode)
+    final toggleButton = find.byTooltip('Toggle theme');
+    expect(toggleButton, findsOneWidget);
+
+    // Tap it and verify the app rebuilds
+    await tester.tap(toggleButton);
+    await tester.pumpAndSettle();
+
+    // Toggle button should still exist
+    expect(find.byTooltip('Toggle theme'), findsOneWidget);
   });
 }
