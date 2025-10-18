@@ -169,7 +169,7 @@ class _TextInputFieldState extends State<TextInputField> {
             boxShadow: _isFocused && widget.errorText == null
                 ? [
                     BoxShadow(
-                      color: AppColors.primaryAmber.withOpacity(0.2),
+                      color: AppColors.primaryAmber.withValues(alpha: 0.2),
                       blurRadius: 4,
                       offset: const Offset(0, 2),
                     ),
@@ -197,7 +197,7 @@ class _TextInputFieldState extends State<TextInputField> {
                 color: isDark ? AppColors.textDisabledDark : AppColors.textDisabledLight,
               ),
               border: InputBorder.none,
-              contentPadding: EdgeInsets.symmetric(
+              contentPadding: const EdgeInsets.symmetric(
                 horizontal: AppSpacing.inputPaddingHorizontal,
                 vertical: AppSpacing.inputPaddingVertical,
               ),

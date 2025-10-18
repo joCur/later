@@ -226,8 +226,8 @@ class _ItemCardState extends State<ItemCard> {
     Color backgroundColor;
     if (widget.isSelected) {
       backgroundColor = isDark
-          ? AppColors.primaryAmber.withOpacity(0.15)
-          : AppColors.primaryAmber.withOpacity(0.1);
+          ? AppColors.primaryAmber.withValues(alpha: 0.15)
+          : AppColors.primaryAmber.withValues(alpha: 0.1);
     } else if (_isPressed) {
       backgroundColor = isDark
           ? AppColors.neutralGray200

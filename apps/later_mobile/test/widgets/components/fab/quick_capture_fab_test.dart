@@ -97,7 +97,6 @@ void main() {
         MaterialApp(
           home: Scaffold(
             body: QuickCaptureFab(
-              icon: Icons.add,
               label: 'Create Item',
               onPressed: () {},
             ),
@@ -144,7 +143,6 @@ void main() {
         MaterialApp(
           home: Scaffold(
             body: QuickCaptureFab(
-              heroTag: 'quick-capture-fab',
               onPressed: () {},
             ),
           ),

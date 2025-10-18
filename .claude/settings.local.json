@@ -5,7 +5,8 @@
       "WebSearch",
       "Bash(flutter analyze)",
       "Bash(flutter test test/data/models/)",
-      "Bash(flutter test)"
+      "Bash(flutter test)",
+      "Bash(flutter test test/data/repositories/space_repository_test.dart --reporter expanded)"
     ],
     "deny": [],
     "ask": []

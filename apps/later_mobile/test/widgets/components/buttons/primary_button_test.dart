@@ -87,7 +87,6 @@ void main() {
           home: Scaffold(
             body: PrimaryButton(
               text: 'Medium',
-              size: ButtonSize.medium,
               onPressed: () {},
             ),
           ),

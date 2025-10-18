@@ -130,7 +130,6 @@ void main() {
         type: ItemType.task,
         title: 'Test Task',
         spaceId: 'space1',
-        isCompleted: false,
       );
 
       bool? checkboxValue;

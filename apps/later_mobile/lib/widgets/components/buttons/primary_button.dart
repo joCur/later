@@ -165,7 +165,7 @@ class _PrimaryButtonState extends State<PrimaryButton>
         ? AppColors.neutralBlack
         : (isDark ? AppColors.textDisabledDark : AppColors.textDisabledLight);
 
-    Widget buttonContent = widget.isLoading
+    final Widget buttonContent = widget.isLoading
         ? SizedBox(
             width: _iconSize,
             height: _iconSize,
@@ -184,7 +184,7 @@ class _PrimaryButtonState extends State<PrimaryButton>
                   size: _iconSize,
                   color: foregroundColor,
                 ),
-                SizedBox(width: AppSpacing.xxs),
+                const SizedBox(width: AppSpacing.xxs),
               ],
               Text(
                 widget.text,
@@ -196,7 +196,7 @@ class _PrimaryButtonState extends State<PrimaryButton>
             ],
           );
 
-    Widget button = ScaleTransition(
+    final Widget button = ScaleTransition(
       scale: _scaleAnimation,
       child: Container(
         height: _height,

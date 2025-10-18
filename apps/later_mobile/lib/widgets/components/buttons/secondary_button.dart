@@ -162,11 +162,11 @@ class _SecondaryButtonState extends State<SecondaryButton>
 
     final backgroundColor = _isPressed && _isEnabled
         ? (isDark
-            ? AppColors.primaryAmber.withOpacity(0.1)
-            : AppColors.primaryAmber.withOpacity(0.05))
+            ? AppColors.primaryAmber.withValues(alpha: 0.1)
+            : AppColors.primaryAmber.withValues(alpha: 0.05))
         : Colors.transparent;
 
-    Widget buttonContent = widget.isLoading
+    final Widget buttonContent = widget.isLoading
         ? SizedBox(
             width: _iconSize,
             height: _iconSize,
@@ -185,7 +185,7 @@ class _SecondaryButtonState extends State<SecondaryButton>
                   size: _iconSize,
                   color: foregroundColor,
                 ),
-                SizedBox(width: AppSpacing.xxs),
+                const SizedBox(width: AppSpacing.xxs),
               ],
               Text(
                 widget.text,
@@ -197,7 +197,7 @@ class _SecondaryButtonState extends State<SecondaryButton>
             ],
           );
 
-    Widget button = ScaleTransition(
+    final Widget button = ScaleTransition(
       scale: _scaleAnimation,
       child: Container(
         height: _height,

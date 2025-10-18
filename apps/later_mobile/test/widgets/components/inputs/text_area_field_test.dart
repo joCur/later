@@ -91,7 +91,6 @@ void main() {
           home: Scaffold(
             body: TextAreaField(
               label: 'Label',
-              minLines: 3,
             ),
           ),
         ),

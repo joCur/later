@@ -178,15 +178,15 @@ class _QuickCaptureFabState extends State<QuickCaptureFab>
                     // Level 3 elevation
                     BoxShadow(
                       color: isDark
-                          ? Colors.black.withOpacity(0.5)
-                          : Colors.black.withOpacity(0.1),
+                          ? Colors.black.withValues(alpha: 0.5)
+                          : Colors.black.withValues(alpha: 0.1),
                       blurRadius: 15,
                       offset: const Offset(0, 10),
                     ),
                     BoxShadow(
                       color: isDark
-                          ? Colors.black.withOpacity(0.3)
-                          : Colors.black.withOpacity(0.05),
+                          ? Colors.black.withValues(alpha: 0.3)
+                          : Colors.black.withValues(alpha: 0.05),
                       blurRadius: 6,
                       offset: const Offset(0, 4),
                     ),
