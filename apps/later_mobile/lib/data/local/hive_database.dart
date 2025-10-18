@@ -5,14 +5,15 @@ import '../models/space_model.dart';
 /// Wrapper for Hive database operations
 /// Provides a clean interface for box management and initialization
 class HiveDatabase {
+  // Singleton instance
+  factory HiveDatabase() => _instance;
+  HiveDatabase._internal();
+
+  static final HiveDatabase _instance = HiveDatabase._internal();
+
   // Box names
   static const String itemsBoxName = 'items';
   static const String spacesBoxName = 'spaces';
-
-  // Singleton instance
-  static final HiveDatabase _instance = HiveDatabase._internal();
-  factory HiveDatabase() => _instance;
-  HiveDatabase._internal();
 
   /// Initialize Hive and register adapters
   /// Must be called before using any Hive operations

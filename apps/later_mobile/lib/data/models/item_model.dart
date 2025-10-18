@@ -17,6 +17,43 @@ enum ItemType {
 /// Designed for both local storage (Hive) and future backend sync (Supabase)
 @HiveType(typeId: 1)
 class Item {
+  Item({
+    required this.id,
+    required this.type,
+    required this.title,
+    this.content,
+    required this.spaceId,
+    this.isCompleted = false,
+    this.dueDate,
+    List<String>? tags,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    this.syncStatus,
+  })  : tags = tags ?? [],
+        createdAt = createdAt ?? DateTime.now(),
+        updatedAt = updatedAt ?? DateTime.now();
+
+  /// Create from JSON for future API compatibility
+  factory Item.fromJson(Map<String, dynamic> json) {
+    return Item(
+      id: json['id'] as String,
+      type: ItemType.values.firstWhere(
+        (e) => e.toString().split('.').last == json['type'],
+      ),
+      title: json['title'] as String,
+      content: json['content'] as String?,
+      spaceId: json['spaceId'] as String,
+      isCompleted: json['isCompleted'] as bool? ?? false,
+      dueDate: json['dueDate'] != null
+          ? DateTime.parse(json['dueDate'] as String)
+          : null,
+      tags: (json['tags'] as List<dynamic>?)?.cast<String>() ?? [],
+      createdAt: DateTime.parse(json['createdAt'] as String),
+      updatedAt: DateTime.parse(json['updatedAt'] as String),
+      syncStatus: json['syncStatus'] as String?,
+    );
+  }
+
   /// Unique identifier (UUID for future sync compatibility)
   @HiveField(0)
   final String id;
@@ -62,22 +99,6 @@ class Item {
   @HiveField(10)
   final String? syncStatus;
 
-  Item({
-    required this.id,
-    required this.type,
-    required this.title,
-    this.content,
-    required this.spaceId,
-    this.isCompleted = false,
-    this.dueDate,
-    List<String>? tags,
-    DateTime? createdAt,
-    DateTime? updatedAt,
-    this.syncStatus,
-  })  : tags = tags ?? [],
-        createdAt = createdAt ?? DateTime.now(),
-        updatedAt = updatedAt ?? DateTime.now();
-
   /// Create a copy of this item with updated fields
   Item copyWith({
     String? id,
@@ -122,27 +143,6 @@ class Item {
       'updatedAt': updatedAt.toIso8601String(),
       'syncStatus': syncStatus,
     };
-  }
-
-  /// Create from JSON for future API compatibility
-  factory Item.fromJson(Map<String, dynamic> json) {
-    return Item(
-      id: json['id'] as String,
-      type: ItemType.values.firstWhere(
-        (e) => e.toString().split('.').last == json['type'],
-      ),
-      title: json['title'] as String,
-      content: json['content'] as String?,
-      spaceId: json['spaceId'] as String,
-      isCompleted: json['isCompleted'] as bool? ?? false,
-      dueDate: json['dueDate'] != null
-          ? DateTime.parse(json['dueDate'] as String)
-          : null,
-      tags: (json['tags'] as List<dynamic>?)?.cast<String>() ?? [],
-      createdAt: DateTime.parse(json['createdAt'] as String),
-      updatedAt: DateTime.parse(json['updatedAt'] as String),
-      syncStatus: json['syncStatus'] as String?,
-    );
   }
 
   @override

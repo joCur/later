@@ -24,7 +24,6 @@ void main() {
         icon: '💼',
         color: '#FF5733',
         itemCount: 5,
-        isArchived: false,
       );
 
       expect(space.icon, '💼');
@@ -59,7 +58,6 @@ void main() {
         icon: '💼',
         color: '#FF5733',
         itemCount: 10,
-        isArchived: false,
       );
 
       final json = space.toJson();
@@ -101,7 +99,6 @@ void main() {
         icon: '📁',
         color: '#9b59b6',
         itemCount: 15,
-        isArchived: false,
       );
 
       final json = original.toJson();
@@ -143,7 +140,6 @@ void main() {
         id: 'space-1',
         name: 'Work',
         itemCount: 8,
-        isArchived: false,
       );
 
       final string = space.toString();
@@ -158,7 +154,6 @@ void main() {
       final activeSpace = Space(
         id: 'space-1',
         name: 'Active',
-        isArchived: false,
       );
 
       final archivedSpace = Space(

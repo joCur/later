@@ -43,7 +43,6 @@ class AppTheme {
           borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
           side: const BorderSide(
             color: AppColors.borderLight,
-            width: AppSpacing.borderWidthThin,
           ),
         ),
       ),
@@ -80,7 +79,6 @@ class AppTheme {
           ),
           side: const BorderSide(
             color: AppColors.borderLight,
-            width: AppSpacing.borderWidthThin,
           ),
           minimumSize: const Size(0, AppSpacing.touchTargetMedium),
         ),
@@ -124,14 +122,12 @@ class AppTheme {
           borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
           borderSide: const BorderSide(
             color: AppColors.borderLight,
-            width: AppSpacing.borderWidthThin,
           ),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
           borderSide: const BorderSide(
             color: AppColors.borderLight,
-            width: AppSpacing.borderWidthThin,
           ),
         ),
         focusedBorder: OutlineInputBorder(
@@ -145,7 +141,6 @@ class AppTheme {
           borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
           borderSide: const BorderSide(
             color: AppColors.error,
-            width: AppSpacing.borderWidthThin,
           ),
         ),
         focusedErrorBorder: OutlineInputBorder(
@@ -183,10 +178,10 @@ class AppTheme {
       ),
 
       // Bottom sheet theme
-      bottomSheetTheme: BottomSheetThemeData(
+      bottomSheetTheme: const BottomSheetThemeData(
         backgroundColor: AppColors.surfaceLight,
         elevation: AppSpacing.elevation4,
-        shape: const RoundedRectangleBorder(
+        shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(
             top: Radius.circular(AppSpacing.modalRadius),
           ),
@@ -279,7 +274,6 @@ class AppTheme {
           borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
           side: const BorderSide(
             color: AppColors.borderDark,
-            width: AppSpacing.borderWidthThin,
           ),
         ),
       ),
@@ -316,7 +310,6 @@ class AppTheme {
           ),
           side: const BorderSide(
             color: AppColors.borderDark,
-            width: AppSpacing.borderWidthThin,
           ),
           minimumSize: const Size(0, AppSpacing.touchTargetMedium),
         ),
@@ -360,14 +353,12 @@ class AppTheme {
           borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
           borderSide: const BorderSide(
             color: AppColors.borderDark,
-            width: AppSpacing.borderWidthThin,
           ),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
           borderSide: const BorderSide(
             color: AppColors.borderDark,
-            width: AppSpacing.borderWidthThin,
           ),
         ),
         focusedBorder: OutlineInputBorder(
@@ -381,7 +372,6 @@ class AppTheme {
           borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
           borderSide: const BorderSide(
             color: AppColors.error,
-            width: AppSpacing.borderWidthThin,
           ),
         ),
         focusedErrorBorder: OutlineInputBorder(
@@ -421,10 +411,10 @@ class AppTheme {
       ),
 
       // Bottom sheet theme
-      bottomSheetTheme: BottomSheetThemeData(
+      bottomSheetTheme: const BottomSheetThemeData(
         backgroundColor: AppColors.surfaceDark,
         elevation: AppSpacing.elevation4,
-        shape: const RoundedRectangleBorder(
+        shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(
             top: Radius.circular(AppSpacing.modalRadius),
           ),

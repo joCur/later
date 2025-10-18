@@ -57,7 +57,7 @@ class Breakpoints {
   }
 
   /// Returns a value based on the current screen size
-  /// Usage: Breakpoints.valueWhen<double>(context, mobile: 16, tablet: 24, desktop: 32)
+  /// Usage: `Breakpoints.valueWhen<double>(context, mobile: 16, tablet: 24, desktop: 32)`
   static T valueWhen<T>({
     required BuildContext context,
     required T mobile,

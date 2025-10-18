@@ -45,12 +45,12 @@ class _LaterAppState extends State<LaterApp> {
 
 /// Test screen to verify theme implementation
 class ThemeTestScreen extends StatelessWidget {
-  final VoidCallback onToggleTheme;
-
   const ThemeTestScreen({
     super.key,
     required this.onToggleTheme,
   });
+
+  final VoidCallback onToggleTheme;
 
   @override
   Widget build(BuildContext context) {
@@ -150,17 +150,17 @@ class ThemeTestScreen extends StatelessWidget {
             _buildSection(
               context,
               'Input Fields',
-              Column(
+              const Column(
                 children: [
                   TextField(
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       labelText: 'Standard Input',
                       hintText: 'Enter text here',
                     ),
                   ),
-                  const SizedBox(height: 16),
+                  SizedBox(height: 16),
                   TextField(
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       labelText: 'Input with Error',
                       hintText: 'This has an error',
                       errorText: 'This field is required',
@@ -203,7 +203,7 @@ class ThemeTestScreen extends StatelessWidget {
             _buildSection(
               context,
               'Chips',
-              Wrap(
+              const Wrap(
                 spacing: 8,
                 children: [
                   Chip(label: Text('All')),
@@ -256,7 +256,10 @@ class ThemeTestScreen extends StatelessWidget {
 
   Color _getContrastColor(Color color) {
     // Simple luminance check for text contrast
-    final luminance = (0.299 * color.red + 0.587 * color.green + 0.114 * color.blue) / 255;
+    final r = (color.r * 255.0).round() & 0xff;
+    final g = (color.g * 255.0).round() & 0xff;
+    final b = (color.b * 255.0).round() & 0xff;
+    final luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
     return luminance > 0.5 ? Colors.black : Colors.white;
   }
 }

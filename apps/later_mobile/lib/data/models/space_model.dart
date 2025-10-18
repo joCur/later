@@ -6,6 +6,32 @@ part 'space_model.g.dart';
 /// Designed for both local storage (Hive) and future backend sync (Supabase)
 @HiveType(typeId: 2)
 class Space {
+  Space({
+    required this.id,
+    required this.name,
+    this.icon,
+    this.color,
+    this.itemCount = 0,
+    this.isArchived = false,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  })  : createdAt = createdAt ?? DateTime.now(),
+        updatedAt = updatedAt ?? DateTime.now();
+
+  /// Create from JSON for future API compatibility
+  factory Space.fromJson(Map<String, dynamic> json) {
+    return Space(
+      id: json['id'] as String,
+      name: json['name'] as String,
+      icon: json['icon'] as String?,
+      color: json['color'] as String?,
+      itemCount: json['itemCount'] as int? ?? 0,
+      isArchived: json['isArchived'] as bool? ?? false,
+      createdAt: DateTime.parse(json['createdAt'] as String),
+      updatedAt: DateTime.parse(json['updatedAt'] as String),
+    );
+  }
+
   /// Unique identifier (UUID for future sync compatibility)
   @HiveField(0)
   final String id;
@@ -37,18 +63,6 @@ class Space {
   /// When the space was last updated
   @HiveField(7)
   final DateTime updatedAt;
-
-  Space({
-    required this.id,
-    required this.name,
-    this.icon,
-    this.color,
-    this.itemCount = 0,
-    this.isArchived = false,
-    DateTime? createdAt,
-    DateTime? updatedAt,
-  })  : createdAt = createdAt ?? DateTime.now(),
-        updatedAt = updatedAt ?? DateTime.now();
 
   /// Create a copy of this space with updated fields
   Space copyWith({
@@ -85,20 +99,6 @@ class Space {
       'createdAt': createdAt.toIso8601String(),
       'updatedAt': updatedAt.toIso8601String(),
     };
-  }
-
-  /// Create from JSON for future API compatibility
-  factory Space.fromJson(Map<String, dynamic> json) {
-    return Space(
-      id: json['id'] as String,
-      name: json['name'] as String,
-      icon: json['icon'] as String?,
-      color: json['color'] as String?,
-      itemCount: json['itemCount'] as int? ?? 0,
-      isArchived: json['isArchived'] as bool? ?? false,
-      createdAt: DateTime.parse(json['createdAt'] as String),
-      updatedAt: DateTime.parse(json['updatedAt'] as String),
-    );
   }
 
   @override

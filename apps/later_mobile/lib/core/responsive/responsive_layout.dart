@@ -4,6 +4,14 @@ import 'breakpoints.dart';
 /// A responsive layout builder that provides different widgets
 /// based on the current screen size
 class ResponsiveLayout extends StatelessWidget {
+  const ResponsiveLayout({
+    super.key,
+    required this.mobile,
+    this.tablet,
+    this.desktop,
+    this.desktopLarge,
+  });
+
   /// Widget to show on mobile screens (< 768px)
   final Widget mobile;
 
@@ -18,14 +26,6 @@ class ResponsiveLayout extends StatelessWidget {
   /// Widget to show on large desktop screens (>= 1440px)
   /// Falls back to desktop, tablet, or mobile if not provided
   final Widget? desktopLarge;
-
-  const ResponsiveLayout({
-    super.key,
-    required this.mobile,
-    this.tablet,
-    this.desktop,
-    this.desktopLarge,
-  });
 
   @override
   Widget build(BuildContext context) {
@@ -50,13 +50,13 @@ class ResponsiveLayout extends StatelessWidget {
 /// A responsive builder that provides the screen size
 /// Useful when you need to customize parts of a widget based on screen size
 class ResponsiveBuilder extends StatelessWidget {
-  /// Builder function that receives the current screen size
-  final Widget Function(BuildContext context, ScreenSize screenSize) builder;
-
   const ResponsiveBuilder({
     super.key,
     required this.builder,
   });
+
+  /// Builder function that receives the current screen size
+  final Widget Function(BuildContext context, ScreenSize screenSize) builder;
 
   @override
   Widget build(BuildContext context) {
@@ -72,17 +72,17 @@ class ResponsiveBuilder extends StatelessWidget {
 /// A widget that provides different values based on screen size
 /// Useful for conditional styling
 class ResponsiveValue<T> {
-  final T mobile;
-  final T? tablet;
-  final T? desktop;
-  final T? desktopLarge;
-
   const ResponsiveValue({
     required this.mobile,
     this.tablet,
     this.desktop,
     this.desktopLarge,
   });
+
+  final T mobile;
+  final T? tablet;
+  final T? desktop;
+  final T? desktopLarge;
 
   T getValue(BuildContext context) {
     return Breakpoints.valueWhen<T>(
@@ -97,11 +97,6 @@ class ResponsiveValue<T> {
 
 /// A widget that conditionally shows or hides content based on screen size
 class ResponsiveVisibility extends StatelessWidget {
-  final Widget child;
-  final bool visibleOnMobile;
-  final bool visibleOnTablet;
-  final bool visibleOnDesktop;
-
   const ResponsiveVisibility({
     super.key,
     required this.child,
@@ -150,6 +145,11 @@ class ResponsiveVisibility extends StatelessWidget {
         visibleOnTablet = false,
         visibleOnDesktop = true;
 
+  final Widget child;
+  final bool visibleOnMobile;
+  final bool visibleOnTablet;
+  final bool visibleOnDesktop;
+
   @override
   Widget build(BuildContext context) {
     final screenSize = Breakpoints.getScreenSize(context);
@@ -178,13 +178,6 @@ class ResponsiveVisibility extends StatelessWidget {
 
 /// A responsive grid that automatically adjusts columns based on screen size
 class ResponsiveGrid extends StatelessWidget {
-  final List<Widget> children;
-  final double spacing;
-  final double runSpacing;
-  final int? mobileColumns;
-  final int? tabletColumns;
-  final int? desktopColumns;
-
   const ResponsiveGrid({
     super.key,
     required this.children,
@@ -194,6 +187,13 @@ class ResponsiveGrid extends StatelessWidget {
     this.tabletColumns,
     this.desktopColumns,
   });
+
+  final List<Widget> children;
+  final double spacing;
+  final double runSpacing;
+  final int? mobileColumns;
+  final int? tabletColumns;
+  final int? desktopColumns;
 
   @override
   Widget build(BuildContext context) {

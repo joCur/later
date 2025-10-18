@@ -105,8 +105,6 @@ class AppColors {
       secondary: accentBlue,
       onSecondary: neutralWhite,
       error: error,
-      onError: neutralWhite,
-      surface: surfaceLight,
       onSurface: textPrimaryLight,
     );
   }
@@ -114,11 +112,9 @@ class AppColors {
   static ColorScheme darkColorScheme() {
     return const ColorScheme.dark(
       primary: primaryAmber,
-      onPrimary: neutralBlack,
       secondary: accentBlue,
       onSecondary: neutralWhite,
       error: error,
-      onError: neutralWhite,
       surface: surfaceDark,
       onSurface: textPrimaryDark,
     );
