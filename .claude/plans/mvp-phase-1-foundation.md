@@ -135,9 +135,9 @@ Space {
   - Implement first-run detection logic
   - Test clean install experience (20 seed data tests passing)
 
-### Phase 1.3: Core UI Components
+### Phase 1.3: Core UI Components ✅ COMPLETED
 
-- [ ] **Task 1.3.1: Button Components**
+- [x] **Task 1.3.1: Button Components**
   - Create `lib/widgets/components/buttons/primary_button.dart`
   - Create `lib/widgets/components/buttons/secondary_button.dart`
   - Create `lib/widgets/components/buttons/ghost_button.dart`
@@ -145,16 +145,18 @@ Space {
   - Support sizes (small: 32px, medium: 40px, large: 48px)
   - Add haptic feedback for mobile
   - Test accessibility (semantic labels, focus indicators)
+  - 26 widget tests passing
 
-- [ ] **Task 1.3.2: Input Field Components**
+- [x] **Task 1.3.2: Input Field Components**
   - Create `lib/widgets/components/inputs/text_input_field.dart`
   - Implement states (default, focus, error, disabled)
   - Add validation feedback support
   - Create `lib/widgets/components/inputs/text_area_field.dart` for multiline
   - Support auto-focus and keyboard actions
   - Test with screen readers
+  - 22 widget tests passing
 
-- [ ] **Task 1.3.3: Item Card Component**
+- [x] **Task 1.3.3: Item Card Component**
   - Create `lib/widgets/components/cards/item_card.dart`
   - Implement three variants: TaskCard, NoteCard, ListCard
   - Add 4px colored left border (blue/amber/violet)
@@ -165,8 +167,9 @@ Space {
   - Implement all states (default, hover, selected, pressed)
   - Add gesture handlers (tap to open, long-press for future multi-select)
   - Test responsive behavior across breakpoints
+  - 12 widget tests passing
 
-- [ ] **Task 1.3.4: Floating Action Button (FAB)**
+- [x] **Task 1.3.4: Floating Action Button (FAB)**
   - Create `lib/widgets/components/fab/quick_capture_fab.dart`
   - Implement 56x56dp visual size with 64x64dp touch target
   - Use accent-primary amber color with gradient
@@ -175,6 +178,7 @@ Space {
   - Implement scale animation (0.95 on press)
   - Add hero animation for modal transition
   - Test visibility rules (hide on scroll, show on scroll up)
+  - 10 widget tests passing
 
 ### Phase 1.4: Main Screens & Navigation
 
