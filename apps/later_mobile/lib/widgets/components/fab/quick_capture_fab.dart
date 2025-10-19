@@ -156,10 +156,14 @@ class _QuickCaptureFabState extends State<QuickCaptureFab>
               onTapCancel: _handleTapCancel,
               onTap: _handleTap,
               child: Container(
-                constraints: BoxConstraints(
-                  minWidth: isExtended ? 80 : AppSpacing.touchTargetFAB,
-                  minHeight: AppSpacing.touchTargetFAB,
-                ),
+                width: isExtended ? null : AppSpacing.touchTargetFAB,
+                height: isExtended ? null : AppSpacing.touchTargetFAB,
+                constraints: isExtended
+                    ? BoxConstraints(
+                        minWidth: 80,
+                        minHeight: AppSpacing.touchTargetFAB,
+                      )
+                    : null,
                 padding: isExtended
                     ? const EdgeInsets.symmetric(
                         horizontal: AppSpacing.sm,
@@ -172,23 +176,19 @@ class _QuickCaptureFabState extends State<QuickCaptureFab>
                       : null,
                   color: widget.useGradient ? null : AppColors.primaryAmber,
                   borderRadius: BorderRadius.circular(
-                    isExtended ? AppSpacing.fabRadius : AppSpacing.radiusFull,
+                    isExtended ? AppSpacing.fabRadius : AppSpacing.touchTargetFAB / 2,
                   ),
                   boxShadow: [
-                    // Level 3 elevation
+                    // Level 3 elevation - Material Design standard
                     BoxShadow(
-                      color: isDark
-                          ? Colors.black.withValues(alpha: 0.5)
-                          : Colors.black.withValues(alpha: 0.1),
-                      blurRadius: 15,
-                      offset: const Offset(0, 10),
+                      color: Colors.black.withValues(alpha: 0.3),
+                      blurRadius: 8,
+                      offset: const Offset(0, 4),
                     ),
                     BoxShadow(
-                      color: isDark
-                          ? Colors.black.withValues(alpha: 0.3)
-                          : Colors.black.withValues(alpha: 0.05),
-                      blurRadius: 6,
-                      offset: const Offset(0, 4),
+                      color: Colors.black.withValues(alpha: 0.15),
+                      blurRadius: 3,
+                      offset: const Offset(0, 1),
                     ),
                   ],
                 ),
