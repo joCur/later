@@ -108,8 +108,6 @@ class _QuickCaptureFabState extends State<QuickCaptureFab>
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
     final isExtended = widget.label != null;
 
     // FAB content
@@ -159,7 +157,7 @@ class _QuickCaptureFabState extends State<QuickCaptureFab>
                 width: isExtended ? null : AppSpacing.touchTargetFAB,
                 height: isExtended ? null : AppSpacing.touchTargetFAB,
                 constraints: isExtended
-                    ? BoxConstraints(
+                    ? const BoxConstraints(
                         minWidth: 80,
                         minHeight: AppSpacing.touchTargetFAB,
                       )

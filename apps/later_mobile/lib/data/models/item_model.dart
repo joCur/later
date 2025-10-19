@@ -100,6 +100,8 @@ class Item {
   final String? syncStatus;
 
   /// Create a copy of this item with updated fields
+  ///
+  /// Note: To explicitly clear nullable fields like dueDate, use the clearDueDate parameter
   Item copyWith({
     String? id,
     ItemType? type,
@@ -108,6 +110,7 @@ class Item {
     String? spaceId,
     bool? isCompleted,
     DateTime? dueDate,
+    bool clearDueDate = false,
     List<String>? tags,
     DateTime? createdAt,
     DateTime? updatedAt,
@@ -120,7 +123,7 @@ class Item {
       content: content ?? this.content,
       spaceId: spaceId ?? this.spaceId,
       isCompleted: isCompleted ?? this.isCompleted,
-      dueDate: dueDate ?? this.dueDate,
+      dueDate: clearDueDate ? null : (dueDate ?? this.dueDate),
       tags: tags ?? this.tags,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,

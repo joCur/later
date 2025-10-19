@@ -189,16 +189,21 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
       _hasChanges = true;
     });
 
-    await context.read<ItemsProvider>().updateItem(updatedItem);
+    // Capture providers before async gap
+    final itemsProvider = context.read<ItemsProvider>();
+    final spacesProvider = context.read<SpacesProvider>();
+
+    await itemsProvider.updateItem(updatedItem);
 
     // Update space item counts
-    final spacesProvider = context.read<SpacesProvider>();
     await spacesProvider.decrementSpaceItemCount(oldSpaceId);
     await spacesProvider.incrementSpaceItemCount(newSpaceId);
 
-    setState(() {
-      _hasChanges = false;
-    });
+    if (mounted) {
+      setState(() {
+        _hasChanges = false;
+      });
+    }
   }
 
   /// Pick due date for tasks
@@ -212,7 +217,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
       lastDate: DateTime(2100),
     );
 
-    if (pickedDate != null) {
+    if (pickedDate != null && mounted) {
       final updatedItem = _currentItem.copyWith(
         dueDate: pickedDate,
         updatedAt: DateTime.now(),
@@ -223,18 +228,22 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
         _hasChanges = true;
       });
 
-      await context.read<ItemsProvider>().updateItem(updatedItem);
+      // Capture provider before async gap
+      final itemsProvider = context.read<ItemsProvider>();
+      await itemsProvider.updateItem(updatedItem);
 
-      setState(() {
-        _hasChanges = false;
-      });
+      if (mounted) {
+        setState(() {
+          _hasChanges = false;
+        });
+      }
     }
   }
 
   /// Clear due date
   Future<void> _clearDueDate() async {
     final updatedItem = _currentItem.copyWith(
-      dueDate: null,
+      clearDueDate: true,
       updatedAt: DateTime.now(),
     );
 
@@ -243,11 +252,15 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
       _hasChanges = true;
     });
 
-    await context.read<ItemsProvider>().updateItem(updatedItem);
+    // Capture provider before async gap
+    final itemsProvider = context.read<ItemsProvider>();
+    await itemsProvider.updateItem(updatedItem);
 
-    setState(() {
-      _hasChanges = false;
-    });
+    if (mounted) {
+      setState(() {
+        _hasChanges = false;
+      });
+    }
   }
 
   /// Show delete confirmation dialog
@@ -284,22 +297,26 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
 
   /// Delete the item
   Future<void> _deleteItem() async {
+    // Capture context and providers before async gap
+    final navigator = Navigator.of(context);
+    final scaffoldMessenger = ScaffoldMessenger.of(context);
+    final itemsProvider = context.read<ItemsProvider>();
+    final spacesProvider = context.read<SpacesProvider>();
+
     try {
       // Delete from provider
-      await context.read<ItemsProvider>().deleteItem(_currentItem.id);
+      await itemsProvider.deleteItem(_currentItem.id);
 
       // Decrement space item count
-      await context
-          .read<SpacesProvider>()
-          .decrementSpaceItemCount(_currentItem.spaceId);
+      await spacesProvider.decrementSpaceItemCount(_currentItem.spaceId);
 
       // Pop screen
       if (mounted) {
-        Navigator.of(context).pop();
+        navigator.pop();
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
+        scaffoldMessenger.showSnackBar(
           SnackBar(
             content: Text('Failed to delete: $e'),
             backgroundColor: AppColors.error,
@@ -408,7 +425,6 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
         borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
         border: Border.all(
           color: _getItemTypeBadgeColor(),
-          width: AppSpacing.borderWidthThin,
         ),
       ),
       child: Text(
@@ -478,7 +494,6 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
             borderRadius: BorderRadius.circular(AppSpacing.radiusSM),
             border: Border.all(
               color: isDark ? AppColors.borderDark : AppColors.borderLight,
-              width: AppSpacing.borderWidthThin,
             ),
           ),
           child: DropdownButtonHideUnderline(
@@ -551,7 +566,6 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
               borderRadius: BorderRadius.circular(AppSpacing.radiusSM),
               border: Border.all(
                 color: isDark ? AppColors.borderDark : AppColors.borderLight,
-                width: AppSpacing.borderWidthThin,
               ),
             ),
             child: Row(
@@ -748,7 +762,6 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return PopScope(
-      canPop: true,
       onPopInvokedWithResult: (didPop, result) {
         if (!didPop) {
           _onWillPop();

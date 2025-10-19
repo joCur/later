@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_typography.dart';
@@ -14,6 +15,7 @@ import '../components/empty_state.dart';
 import '../navigation/bottom_navigation_bar.dart';
 import '../navigation/app_sidebar.dart';
 import '../modals/space_switcher_modal.dart';
+import '../modals/quick_capture_modal.dart';
 import 'item_detail_screen.dart';
 
 /// Main home screen for the Later app
@@ -90,6 +92,46 @@ class _HomeScreenState extends State<HomeScreen> {
       case ItemFilter.lists:
         return items.where((item) => item.type == ItemType.list).toList();
     }
+  }
+
+  /// Show quick capture modal
+  void _showQuickCaptureModal() {
+    final isMobile = Breakpoints.isMobile(context);
+
+    if (isMobile) {
+      // Show as bottom sheet on mobile
+      showModalBottomSheet<void>(
+        context: context,
+        isScrollControlled: true,
+        backgroundColor: Colors.transparent,
+        builder: (context) => QuickCaptureModal(
+          onClose: () => Navigator.of(context).pop(),
+        ),
+      );
+    } else {
+      // Show as dialog on desktop/tablet
+      showDialog<void>(
+        context: context,
+        builder: (context) => QuickCaptureModal(
+          onClose: () => Navigator.of(context).pop(),
+        ),
+      );
+    }
+  }
+
+  /// Handle keyboard shortcuts
+  KeyEventResult _handleKeyEvent(FocusNode node, KeyEvent event) {
+    if (event is KeyDownEvent) {
+      final isNKey = event.logicalKey == LogicalKeyboardKey.keyN;
+
+      // Check for Cmd/Ctrl+N
+      if (isNKey && (HardwareKeyboard.instance.isControlPressed ||
+                     HardwareKeyboard.instance.isMetaPressed)) {
+        _showQuickCaptureModal();
+        return KeyEventResult.handled;
+      }
+    }
+    return KeyEventResult.ignored;
   }
 
   /// Build app bar
@@ -260,9 +302,7 @@ class _HomeScreenState extends State<HomeScreen> {
         title: 'No items yet',
         message: _getEmptyMessage(),
         actionLabel: 'Create Item',
-        onActionPressed: () {
-          debugPrint('Create item from empty state');
-        },
+        onActionPressed: _showQuickCaptureModal,
       );
     }
 
@@ -278,7 +318,7 @@ class _HomeScreenState extends State<HomeScreen> {
           item: item,
           onTap: () {
             Navigator.of(context).push(
-              MaterialPageRoute(
+              MaterialPageRoute<void>(
                 builder: (context) => ItemDetailScreen(item: item),
               ),
             );
@@ -346,9 +386,7 @@ class _HomeScreenState extends State<HomeScreen> {
         },
       ),
       floatingActionButton: QuickCaptureFab(
-        onPressed: () {
-          debugPrint('Quick capture tapped');
-        },
+        onPressed: _showQuickCaptureModal,
         tooltip: 'Quick capture',
       ),
     );
@@ -401,9 +439,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
       floatingActionButton: QuickCaptureFab(
-        onPressed: () {
-          debugPrint('Quick capture tapped');
-        },
+        onPressed: _showQuickCaptureModal,
         tooltip: 'Quick capture',
       ),
     );
@@ -415,9 +451,13 @@ class _HomeScreenState extends State<HomeScreen> {
     final itemsProvider = context.watch<ItemsProvider>();
     final spacesProvider = context.watch<SpacesProvider>();
 
-    return isDesktop
-        ? _buildDesktopLayout(context, itemsProvider, spacesProvider)
-        : _buildMobileLayout(context, itemsProvider, spacesProvider);
+    return Focus(
+      autofocus: true,
+      onKeyEvent: _handleKeyEvent,
+      child: isDesktop
+          ? _buildDesktopLayout(context, itemsProvider, spacesProvider)
+          : _buildMobileLayout(context, itemsProvider, spacesProvider),
+    );
   }
 }
 
