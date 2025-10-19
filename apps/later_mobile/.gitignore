@@ -36,6 +36,13 @@ migrate_working_dir/
 /build/
 /coverage/
 
+# Hive database test artifacts
+test_hive/
+**/hive_testing_path/
+**/*.hive
+**/*.lock
+!pubspec.lock
+
 # Symbolication related
 app.*.symbols
 

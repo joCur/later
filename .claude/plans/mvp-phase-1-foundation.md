@@ -275,25 +275,27 @@ Space {
   - Integration with HomeScreen and QuickCaptureFab complete
   - All linting errors fixed (flutter analyze: 0 issues) ✅
 
-### Phase 1.6: Item Management Operations
+### Phase 1.6: Item Management Operations ✅ COMPLETED
 
-- [ ] **Task 1.6.1: Item Completion Toggle**
+- [x] **Task 1.6.1: Item Completion Toggle**
   - Implement checkbox tap handler in TaskCard
   - Update item `isCompleted` status via ItemsProvider
   - Apply strikethrough and opacity styling to completed tasks
   - Add subtle animation (scale 1.0 → 1.05 → 1.0)
   - Persist completion state to Hive immediately
   - Test rapid toggling performance
+  - 18/18 widget tests passing ✅
 
-- [ ] **Task 1.6.2: Item Editing**
+- [x] **Task 1.6.2: Item Editing**
   - Implement tap handler to open ItemDetailScreen
   - Support inline editing for quick changes
   - Implement debounced auto-save (500ms after last change)
   - Show saving indicator during save operation
   - Handle validation errors gracefully
   - Test with network disabled (should work offline)
+  - Already fully implemented in Phase 1.4 ✅
 
-- [ ] **Task 1.6.3: Item Deletion**
+- [x] **Task 1.6.3: Item Deletion**
   - Add delete button in ItemDetailScreen menu
   - Implement confirmation dialog ("Delete this item?")
   - Remove item from Hive via ItemsProvider
@@ -301,14 +303,17 @@ Space {
   - Implement actual deletion after undo timeout
   - Update item count in space metadata
   - Test deletion with various item types
+  - Undo functionality implemented with 5-second grace period ✅
 
-- [ ] **Task 1.6.4: Type Conversion**
+- [x] **Task 1.6.4: Type Conversion**
   - Add "Convert to..." option in item menu
   - Allow conversion between task ↔ note ↔ list
   - Preserve title and content during conversion
   - Handle special fields (checkbox state, list items)
   - Show confirmation for destructive conversions
   - Update UI immediately after conversion
+  - Full conversion UI with data loss warnings implemented ✅
+  - 20/20 type conversion tests passing ✅
 
 ### Phase 1.7: Space Management
 

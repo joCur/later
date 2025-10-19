@@ -299,9 +299,9 @@ void main() {
       await tester.tap(find.byIcon(Icons.delete_outline));
       await tester.pumpAndSettle();
 
-      // Verify dialog appears
+      // Verify dialog appears with updated message about undo
       expect(find.text('Delete task?'), findsOneWidget);
-      expect(find.text('This action cannot be undone.'), findsOneWidget);
+      expect(find.text('You can undo this action within 5 seconds.'), findsOneWidget);
       expect(find.text('Cancel'), findsOneWidget);
       expect(find.text('Delete'), findsOneWidget);
     });
@@ -322,7 +322,7 @@ void main() {
       verifyNever(mockItemsProvider.deleteItem(any));
     });
 
-    testWidgets('deletes item when Delete is confirmed', (tester) async {
+    testWidgets('deletes item when Delete is confirmed and shows undo snackbar', (tester) async {
       await tester.pumpWidget(createTestWidget());
       await tester.pumpAndSettle();
 
@@ -334,9 +334,15 @@ void main() {
       await tester.tap(find.text('Delete'));
       await tester.pumpAndSettle();
 
-      // Verify deleteItem was called
+      // Verify item was deleted from UI immediately
       verify(mockItemsProvider.deleteItem('item-1')).called(1);
-      verify(mockSpacesProvider.decrementSpaceItemCount('space-1')).called(1);
+
+      // Verify undo snackbar is shown
+      expect(find.text('Item deleted'), findsOneWidget);
+      expect(find.text('Undo'), findsOneWidget);
+
+      // Space count should NOT be decremented yet (waiting for undo timeout)
+      verifyNever(mockSpacesProvider.decrementSpaceItemCount(any));
     });
 
     testWidgets('shows saving indicator when saving', (tester) async {
@@ -547,6 +553,754 @@ void main() {
       // Verify semantic label exists
       final dialog = tester.widget<AlertDialog>(find.byType(AlertDialog));
       expect(dialog.semanticLabel, 'Delete confirmation dialog');
+    });
+
+    group('Undo Deletion', () {
+      testWidgets('restores item when Undo is pressed', (tester) async {
+        await tester.pumpWidget(createTestWidget());
+        await tester.pumpAndSettle();
+
+        // Delete the item
+        await tester.tap(find.byIcon(Icons.delete_outline));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('Delete'));
+
+        // Pump frames to allow snackbar to appear
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 100));
+
+        // Screen should be popped
+        expect(find.byType(ItemDetailScreen), findsNothing);
+
+        // Verify undo snackbar is shown on parent screen
+        expect(find.text('Item deleted'), findsOneWidget);
+        expect(find.text('Undo'), findsOneWidget);
+
+        // Clear previous interactions to isolate undo call
+        clearInteractions(mockItemsProvider);
+
+        // Tap Undo in snackbar
+        await tester.tap(find.text('Undo'));
+        await tester.pumpAndSettle();
+
+        // Verify item was restored
+        verify(mockItemsProvider.addItem(testItem)).called(1);
+      });
+
+      testWidgets('performs actual deletion after 5-second timeout', (tester) async {
+        await tester.pumpWidget(createTestWidget());
+        await tester.pumpAndSettle();
+
+        // Delete the item
+        await tester.tap(find.byIcon(Icons.delete_outline));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('Delete'));
+
+        // Pump frames to allow snackbar to appear
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 100));
+
+        // Verify space count not decremented yet
+        verifyNever(mockSpacesProvider.decrementSpaceItemCount(any));
+
+        // Wait for 5-second timeout
+        await tester.pump(const Duration(seconds: 5));
+        await tester.pumpAndSettle();
+
+        // Verify space count was decremented after timeout
+        verify(mockSpacesProvider.decrementSpaceItemCount('space-1')).called(1);
+      });
+
+      testWidgets('does not perform actual deletion if undo is pressed', (tester) async {
+        await tester.pumpWidget(createTestWidget());
+        await tester.pumpAndSettle();
+
+        // Delete the item
+        await tester.tap(find.byIcon(Icons.delete_outline));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('Delete'));
+
+        // Pump frames to allow snackbar to appear
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 100));
+
+        // Press Undo before timeout
+        await tester.pump(const Duration(seconds: 2));
+        await tester.tap(find.text('Undo'));
+        await tester.pumpAndSettle();
+
+        // Wait for what would have been the timeout period
+        await tester.pump(const Duration(seconds: 4));
+        await tester.pumpAndSettle();
+
+        // Verify space count was NOT decremented
+        verifyNever(mockSpacesProvider.decrementSpaceItemCount(any));
+      });
+
+      testWidgets('snackbar disappears after 5 seconds', (tester) async {
+        await tester.pumpWidget(createTestWidget());
+        await tester.pumpAndSettle();
+
+        // Delete the item
+        await tester.tap(find.byIcon(Icons.delete_outline));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('Delete'));
+
+        // Pump frames to allow snackbar to appear
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 100));
+
+        // Verify snackbar is visible
+        expect(find.text('Item deleted'), findsOneWidget);
+        expect(find.text('Undo'), findsOneWidget);
+
+        // Wait for snackbar to disappear
+        await tester.pump(const Duration(seconds: 5));
+        await tester.pumpAndSettle();
+
+        // Snackbar should be gone
+        expect(find.text('Item deleted'), findsNothing);
+        expect(find.text('Undo'), findsNothing);
+      });
+
+      testWidgets('handles rapid delete and undo scenario', (tester) async {
+        await tester.pumpWidget(createTestWidget());
+        await tester.pumpAndSettle();
+
+        // Delete the item
+        await tester.tap(find.byIcon(Icons.delete_outline));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('Delete'));
+
+        // Pump frames to allow snackbar to appear
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 100));
+
+        // Immediately press Undo
+        await tester.tap(find.text('Undo'));
+        await tester.pumpAndSettle();
+
+        // Verify item was restored
+        verify(mockItemsProvider.addItem(testItem)).called(1);
+
+        // Verify space count was never decremented
+        verifyNever(mockSpacesProvider.decrementSpaceItemCount(any));
+      });
+
+      testWidgets('deletion timer completes after screen disposal', (tester) async {
+        await tester.pumpWidget(createTestWidget());
+        await tester.pumpAndSettle();
+
+        // Delete the item
+        await tester.tap(find.byIcon(Icons.delete_outline));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('Delete'));
+
+        // Pump frames and wait for async operations
+        await tester.pumpAndSettle();
+
+        // Screen should be popped after delete
+        expect(find.byType(ItemDetailScreen), findsNothing);
+
+        // Verify snackbar appeared
+        expect(find.text('Item deleted'), findsOneWidget);
+
+        // Wait for timer to fire (5 seconds)
+        await tester.pump(const Duration(seconds: 5));
+
+        // Pump a bit more to allow async operations
+        await tester.pump(const Duration(milliseconds: 100));
+
+        // Space decrement should have been attempted
+        // Note: The call might not be tracked properly because the widget is disposed
+        // but the timer still fires. This test mainly verifies no crash occurs.
+        verify(mockSpacesProvider.decrementSpaceItemCount('space-1')).called(1);
+      });
+
+      testWidgets('undo snackbar has correct properties', (tester) async {
+        await tester.pumpWidget(createTestWidget());
+        await tester.pumpAndSettle();
+
+        // Delete the item
+        await tester.tap(find.byIcon(Icons.delete_outline));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('Delete'));
+
+        // Pump frames to allow snackbar to appear
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 100));
+
+        // Verify snackbar content
+        expect(find.text('Item deleted'), findsOneWidget);
+        expect(find.text('Undo'), findsOneWidget);
+
+        // Find the snackbar widget
+        final snackBarFinder = find.byType(SnackBar);
+        expect(snackBarFinder, findsOneWidget);
+
+        final snackBar = tester.widget<SnackBar>(snackBarFinder);
+        expect(snackBar.duration, const Duration(seconds: 5));
+        expect(snackBar.action, isNotNull);
+        expect(snackBar.action!.label, 'Undo');
+      });
+
+      testWidgets('can undo deletion for different item types', (tester) async {
+        final noteItem = Item(
+          id: 'note-1',
+          type: ItemType.note,
+          title: 'Test Note',
+          spaceId: 'space-1',
+        );
+
+        await tester.pumpWidget(createTestWidget(item: noteItem));
+        await tester.pumpAndSettle();
+
+        // Delete the note
+        await tester.tap(find.byIcon(Icons.delete_outline));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('Delete'));
+
+        // Pump frames to allow snackbar to appear
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 100));
+
+        // Verify undo snackbar is shown
+        expect(find.text('Item deleted'), findsOneWidget);
+        expect(find.text('Undo'), findsOneWidget);
+
+        // Clear previous interactions to isolate undo call
+        clearInteractions(mockItemsProvider);
+
+        // Tap the Undo action directly from the snackbar
+        final snackBar = tester.widget<SnackBar>(find.byType(SnackBar));
+        snackBar.action!.onPressed();
+        await tester.pumpAndSettle();
+
+        // Verify note was restored
+        verify(mockItemsProvider.addItem(noteItem)).called(1);
+      });
+    });
+
+    group('Type Conversion', () {
+      testWidgets('displays convert button in app bar', (tester) async {
+        await tester.pumpWidget(createTestWidget());
+        await tester.pumpAndSettle();
+
+        // Verify convert button exists
+        expect(find.byIcon(Icons.swap_horiz), findsOneWidget);
+      });
+
+      testWidgets('opens conversion dialog when convert button tapped', (tester) async {
+        await tester.pumpWidget(createTestWidget());
+        await tester.pumpAndSettle();
+
+        // Tap convert button
+        await tester.tap(find.byIcon(Icons.swap_horiz));
+        await tester.pumpAndSettle();
+
+        // Verify dialog appears
+        expect(find.text('Convert to...'), findsOneWidget);
+        expect(find.text('Cancel'), findsOneWidget);
+      });
+
+      testWidgets('shows all conversion options except current type', (tester) async {
+        await tester.pumpWidget(createTestWidget());
+        await tester.pumpAndSettle();
+
+        // Tap convert button
+        await tester.tap(find.byIcon(Icons.swap_horiz));
+        await tester.pumpAndSettle();
+
+        // Should show Note and List options in the dialog
+        // Find them within ListTile widgets to avoid matching the badge
+        expect(find.descendant(
+          of: find.byType(ListTile),
+          matching: find.text('Note'),
+        ), findsOneWidget);
+        expect(find.descendant(
+          of: find.byType(ListTile),
+          matching: find.text('List'),
+        ), findsOneWidget);
+        // Task should not appear as a ListTile option
+        expect(find.descendant(
+          of: find.byType(ListTile),
+          matching: find.text('Task'),
+        ), findsNothing);
+      });
+
+      testWidgets('shows data loss warning when converting task with due date', (tester) async {
+        await tester.pumpWidget(createTestWidget());
+        await tester.pumpAndSettle();
+
+        // Tap convert button
+        await tester.tap(find.byIcon(Icons.swap_horiz));
+        await tester.pumpAndSettle();
+
+        // Verify warning is shown
+        expect(find.byIcon(Icons.warning_amber), findsOneWidget);
+        expect(find.textContaining('Warning:'), findsOneWidget);
+        expect(find.textContaining('due date'), findsOneWidget);
+      });
+
+      testWidgets('shows data loss warning when converting completed task', (tester) async {
+        final completedTask = Item(
+          id: 'task-1',
+          type: ItemType.task,
+          title: 'Completed Task',
+          spaceId: 'space-1',
+          isCompleted: true,
+        );
+
+        await tester.pumpWidget(createTestWidget(item: completedTask));
+        await tester.pumpAndSettle();
+
+        // Tap convert button
+        await tester.tap(find.byIcon(Icons.swap_horiz));
+        await tester.pumpAndSettle();
+
+        // Verify warning mentions completion status
+        expect(find.textContaining('Warning:'), findsOneWidget);
+        expect(find.textContaining('completion status'), findsOneWidget);
+      });
+
+      testWidgets('shows combined warning for completed task with due date', (tester) async {
+        final completedTaskWithDueDate = Item(
+          id: 'task-1',
+          type: ItemType.task,
+          title: 'Completed Task with Due Date',
+          spaceId: 'space-1',
+          isCompleted: true,
+          dueDate: DateTime(2025, 12, 31),
+        );
+
+        await tester.pumpWidget(createTestWidget(item: completedTaskWithDueDate));
+        await tester.pumpAndSettle();
+
+        // Tap convert button
+        await tester.tap(find.byIcon(Icons.swap_horiz));
+        await tester.pumpAndSettle();
+
+        // Verify warning mentions both
+        expect(find.textContaining('Warning:'), findsOneWidget);
+        expect(find.textContaining('due date and completion status'), findsOneWidget);
+      });
+
+      testWidgets('does not show warning when converting note', (tester) async {
+        final noteItem = Item(
+          id: 'note-1',
+          type: ItemType.note,
+          title: 'Test Note',
+          spaceId: 'space-1',
+        );
+
+        await tester.pumpWidget(createTestWidget(item: noteItem));
+        await tester.pumpAndSettle();
+
+        // Tap convert button
+        await tester.tap(find.byIcon(Icons.swap_horiz));
+        await tester.pumpAndSettle();
+
+        // No warning should appear
+        expect(find.byIcon(Icons.warning_amber), findsNothing);
+      });
+
+      testWidgets('converts task to note successfully', (tester) async {
+        await tester.pumpWidget(createTestWidget());
+        await tester.pumpAndSettle();
+
+        // Clear previous interactions
+        clearInteractions(mockItemsProvider);
+
+        // Tap convert button
+        await tester.tap(find.byIcon(Icons.swap_horiz));
+        await tester.pumpAndSettle();
+
+        // Select Note
+        await tester.tap(find.descendant(
+          of: find.byType(ListTile),
+          matching: find.text('Note'),
+        ));
+        await tester.pumpAndSettle();
+
+        // Verify updateItem was called
+        verify(mockItemsProvider.updateItem(argThat(
+          predicate<Item>((item) =>
+            item.type == ItemType.note &&
+            item.title == 'Test Task' &&
+            item.content == 'Test content' &&
+            item.dueDate == null // Due date should be cleared
+          ),
+        ))).called(1);
+
+        // Verify success message
+        expect(find.text('Converted to note'), findsOneWidget);
+      });
+
+      testWidgets('converts task to list successfully', (tester) async {
+        await tester.pumpWidget(createTestWidget());
+        await tester.pumpAndSettle();
+
+        // Clear previous interactions
+        clearInteractions(mockItemsProvider);
+
+        // Tap convert button
+        await tester.tap(find.byIcon(Icons.swap_horiz));
+        await tester.pumpAndSettle();
+
+        // Select List
+        await tester.tap(find.descendant(
+          of: find.byType(ListTile),
+          matching: find.text('List'),
+        ));
+        await tester.pumpAndSettle();
+
+        // Verify updateItem was called
+        verify(mockItemsProvider.updateItem(argThat(
+          predicate<Item>((item) =>
+            item.type == ItemType.list &&
+            item.title == 'Test Task' &&
+            item.content == 'Test content' &&
+            item.dueDate == null // Due date should be cleared
+          ),
+        ))).called(1);
+
+        // Verify success message
+        expect(find.text('Converted to list'), findsOneWidget);
+      });
+
+      testWidgets('converts note to task successfully', (tester) async {
+        final noteItem = Item(
+          id: 'note-1',
+          type: ItemType.note,
+          title: 'Test Note',
+          content: 'Note content',
+          spaceId: 'space-1',
+        );
+
+        await tester.pumpWidget(createTestWidget(item: noteItem));
+        await tester.pumpAndSettle();
+
+        // Clear previous interactions
+        clearInteractions(mockItemsProvider);
+
+        // Tap convert button
+        await tester.tap(find.byIcon(Icons.swap_horiz));
+        await tester.pumpAndSettle();
+
+        // Select Task
+        await tester.tap(find.descendant(
+          of: find.byType(ListTile),
+          matching: find.text('Task'),
+        ));
+        await tester.pumpAndSettle();
+
+        // Verify updateItem was called
+        verify(mockItemsProvider.updateItem(argThat(
+          predicate<Item>((item) =>
+            item.type == ItemType.task &&
+            item.title == 'Test Note' &&
+            item.content == 'Note content' &&
+            item.isCompleted == false // Should be set to false for new task
+          ),
+        ))).called(1);
+
+        // Verify success message
+        expect(find.text('Converted to task'), findsOneWidget);
+      });
+
+      testWidgets('converts note to list successfully', (tester) async {
+        final noteItem = Item(
+          id: 'note-1',
+          type: ItemType.note,
+          title: 'Test Note',
+          content: 'Note content',
+          spaceId: 'space-1',
+        );
+
+        await tester.pumpWidget(createTestWidget(item: noteItem));
+        await tester.pumpAndSettle();
+
+        // Clear previous interactions
+        clearInteractions(mockItemsProvider);
+
+        // Tap convert button
+        await tester.tap(find.byIcon(Icons.swap_horiz));
+        await tester.pumpAndSettle();
+
+        // Select List
+        await tester.tap(find.descendant(
+          of: find.byType(ListTile),
+          matching: find.text('List'),
+        ));
+        await tester.pumpAndSettle();
+
+        // Verify updateItem was called
+        verify(mockItemsProvider.updateItem(argThat(
+          predicate<Item>((item) =>
+            item.type == ItemType.list &&
+            item.title == 'Test Note' &&
+            item.content == 'Note content'
+          ),
+        ))).called(1);
+
+        // Verify success message
+        expect(find.text('Converted to list'), findsOneWidget);
+      });
+
+      testWidgets('converts list to task successfully', (tester) async {
+        final listItem = Item(
+          id: 'list-1',
+          type: ItemType.list,
+          title: 'Test List',
+          content: 'List content',
+          spaceId: 'space-1',
+        );
+
+        await tester.pumpWidget(createTestWidget(item: listItem));
+        await tester.pumpAndSettle();
+
+        // Clear previous interactions
+        clearInteractions(mockItemsProvider);
+
+        // Tap convert button
+        await tester.tap(find.byIcon(Icons.swap_horiz));
+        await tester.pumpAndSettle();
+
+        // Select Task
+        await tester.tap(find.descendant(
+          of: find.byType(ListTile),
+          matching: find.text('Task'),
+        ));
+        await tester.pumpAndSettle();
+
+        // Verify updateItem was called
+        verify(mockItemsProvider.updateItem(argThat(
+          predicate<Item>((item) =>
+            item.type == ItemType.task &&
+            item.title == 'Test List' &&
+            item.content == 'List content' &&
+            item.isCompleted == false
+          ),
+        ))).called(1);
+
+        // Verify success message
+        expect(find.text('Converted to task'), findsOneWidget);
+      });
+
+      testWidgets('converts list to note successfully', (tester) async {
+        final listItem = Item(
+          id: 'list-1',
+          type: ItemType.list,
+          title: 'Test List',
+          content: 'List content',
+          spaceId: 'space-1',
+        );
+
+        await tester.pumpWidget(createTestWidget(item: listItem));
+        await tester.pumpAndSettle();
+
+        // Clear previous interactions
+        clearInteractions(mockItemsProvider);
+
+        // Tap convert button
+        await tester.tap(find.byIcon(Icons.swap_horiz));
+        await tester.pumpAndSettle();
+
+        // Select Note
+        await tester.tap(find.descendant(
+          of: find.byType(ListTile),
+          matching: find.text('Note'),
+        ));
+        await tester.pumpAndSettle();
+
+        // Verify updateItem was called
+        verify(mockItemsProvider.updateItem(argThat(
+          predicate<Item>((item) =>
+            item.type == ItemType.note &&
+            item.title == 'Test List' &&
+            item.content == 'List content'
+          ),
+        ))).called(1);
+
+        // Verify success message
+        expect(find.text('Converted to note'), findsOneWidget);
+      });
+
+      testWidgets('preserves title and content during conversion', (tester) async {
+        await tester.pumpWidget(createTestWidget());
+        await tester.pumpAndSettle();
+
+        // Clear previous interactions
+        clearInteractions(mockItemsProvider);
+
+        // Tap convert button
+        await tester.tap(find.byIcon(Icons.swap_horiz));
+        await tester.pumpAndSettle();
+
+        // Select Note
+        await tester.tap(find.descendant(
+          of: find.byType(ListTile),
+          matching: find.text('Note'),
+        ));
+        await tester.pumpAndSettle();
+
+        // Verify title and content are preserved (called at least once)
+        verify(mockItemsProvider.updateItem(argThat(
+          predicate<Item>((item) =>
+            item.title == 'Test Task' &&
+            item.content == 'Test content'
+          ),
+        ))).called(greaterThan(0));
+      });
+
+      testWidgets('preserves tags during conversion', (tester) async {
+        await tester.pumpWidget(createTestWidget());
+        await tester.pumpAndSettle();
+
+        // Clear previous interactions
+        clearInteractions(mockItemsProvider);
+
+        // Tap convert button
+        await tester.tap(find.byIcon(Icons.swap_horiz));
+        await tester.pumpAndSettle();
+
+        // Select Note
+        await tester.tap(find.descendant(
+          of: find.byType(ListTile),
+          matching: find.text('Note'),
+        ));
+        await tester.pumpAndSettle();
+
+        // Verify tags are preserved (should be called at least once)
+        verify(mockItemsProvider.updateItem(argThat(
+          predicate<Item>((item) =>
+            item.tags.length == 2 &&
+            item.tags.contains('urgent') &&
+            item.tags.contains('work')
+          ),
+        ))).called(greaterThan(0));
+      });
+
+      testWidgets('cancels conversion when Cancel is tapped', (tester) async {
+        await tester.pumpWidget(createTestWidget());
+        await tester.pumpAndSettle();
+
+        // Tap convert button
+        await tester.tap(find.byIcon(Icons.swap_horiz));
+        await tester.pumpAndSettle();
+
+        // Clear interactions after dialog opens to ignore setup calls
+        clearInteractions(mockItemsProvider);
+
+        // Tap Cancel
+        await tester.tap(find.text('Cancel'));
+        await tester.pumpAndSettle();
+
+        // Verify updateItem was not called after cancel
+        verifyNever(mockItemsProvider.updateItem(any));
+
+        // No success message
+        expect(find.textContaining('Converted to'), findsNothing);
+      });
+
+      testWidgets('updates type badge after conversion', (tester) async {
+        await tester.pumpWidget(createTestWidget());
+        await tester.pumpAndSettle();
+
+        // Initially shows Task badge
+        expect(find.text('Task'), findsOneWidget);
+
+        // Convert to Note
+        await tester.tap(find.byIcon(Icons.swap_horiz));
+        await tester.pumpAndSettle();
+        await tester.tap(find.descendant(
+          of: find.byType(ListTile),
+          matching: find.text('Note'),
+        ));
+        await tester.pumpAndSettle();
+
+        // Should now show Note badge
+        expect(find.text('Note'), findsOneWidget);
+        expect(find.text('Task'), findsNothing);
+      });
+
+      testWidgets('handles conversion error gracefully', (tester) async {
+        // Create a fresh mock that throws errors
+        final errorMockProvider = MockItemsProvider();
+        when(errorMockProvider.updateItem(any))
+            .thenThrow(Exception('Conversion failed'));
+
+        await tester.pumpWidget(
+          MultiProvider(
+            providers: [
+              ChangeNotifierProvider<ItemsProvider>.value(value: errorMockProvider),
+              ChangeNotifierProvider<SpacesProvider>.value(value: mockSpacesProvider),
+            ],
+            child: MaterialApp(
+              home: ItemDetailScreen(item: testItem),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        // Tap convert button
+        await tester.tap(find.byIcon(Icons.swap_horiz));
+        await tester.pumpAndSettle();
+
+        // Select Note - this should trigger the error
+        await tester.tap(find.descendant(
+          of: find.byType(ListTile),
+          matching: find.text('Note'),
+        ));
+
+        // Pump to trigger the async conversion
+        await tester.pump();
+
+        // The error is caught and handled gracefully - verify no exception crashed the app
+        // by checking that we can still interact with the widget
+        expect(find.byType(ItemDetailScreen), findsOneWidget);
+
+        // Verify updateItem was called at least once and failed
+        verify(errorMockProvider.updateItem(any)).called(greaterThan(0));
+      });
+
+      testWidgets('saves pending changes before conversion', (tester) async {
+        await tester.pumpWidget(createTestWidget());
+        await tester.pumpAndSettle();
+
+        // Make a change to title
+        final titleField = find.widgetWithText(TextFormField, 'Test Task');
+        await tester.enterText(titleField, 'Modified Task');
+        await tester.pump();
+
+        // Clear previous interactions
+        clearInteractions(mockItemsProvider);
+
+        // Immediately convert (before auto-save)
+        await tester.tap(find.byIcon(Icons.swap_horiz));
+        await tester.pumpAndSettle();
+        await tester.tap(find.descendant(
+          of: find.byType(ListTile),
+          matching: find.text('Note'),
+        ));
+        await tester.pumpAndSettle();
+
+        // Verify updateItem was called (for both save and conversion)
+        verify(mockItemsProvider.updateItem(any)).called(greaterThan(1));
+      });
+
+      testWidgets('conversion dialog has proper semantic label', (tester) async {
+        await tester.pumpWidget(createTestWidget());
+        await tester.pumpAndSettle();
+
+        // Tap convert button
+        await tester.tap(find.byIcon(Icons.swap_horiz));
+        await tester.pumpAndSettle();
+
+        // Verify semantic label exists
+        final dialog = tester.widget<AlertDialog>(find.byType(AlertDialog));
+        expect(dialog.semanticLabel, 'Convert item type dialog');
+      });
     });
   });
 }

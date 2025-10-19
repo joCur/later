@@ -16,13 +16,14 @@ import '../../providers/spaces_provider.dart';
 /// - Full screen on mobile and desktop
 /// - Editable title (auto-focus) and content fields
 /// - Item type badge indicator
+/// - Type conversion (task ↔ note ↔ list) with data loss warnings
 /// - Space selector dropdown
 /// - Due date picker for tasks
 /// - Tags display (read-only chips)
 /// - Completion checkbox for tasks
 /// - Auto-save with 500ms debounce
 /// - Save on navigation away
-/// - Delete with confirmation dialog
+/// - Delete with confirmation dialog and undo functionality (5-second window)
 /// - Keyboard shortcuts (Esc, Cmd/Ctrl+S, Cmd/Ctrl+Backspace)
 /// - Form validation (title required)
 /// - Metadata footer (created/modified timestamps)
@@ -50,8 +51,10 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
   // Local state
   late Item _currentItem;
   Timer? _debounceTimer;
+  Timer? _deletionTimer;
   bool _isSaving = false;
   bool _hasChanges = false;
+  Item? _pendingDeletion;
 
   @override
   void initState() {
@@ -72,6 +75,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
   @override
   void dispose() {
     _debounceTimer?.cancel();
+    _deletionTimer?.cancel();
     _titleController.removeListener(_onTextChanged);
     _contentController.removeListener(_onTextChanged);
     _titleController.dispose();
@@ -271,7 +275,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
       context: context,
       builder: (context) => AlertDialog(
         title: Text('Delete $itemTypeName?'),
-        content: const Text('This action cannot be undone.'),
+        content: const Text('You can undo this action within 5 seconds.'),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
@@ -295,34 +299,235 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
     }
   }
 
-  /// Delete the item
+  /// Delete the item with undo functionality
   Future<void> _deleteItem() async {
+    // Store the item for potential undo
+    _pendingDeletion = _currentItem;
+
     // Capture context and providers before async gap
     final navigator = Navigator.of(context);
     final scaffoldMessenger = ScaffoldMessenger.of(context);
     final itemsProvider = context.read<ItemsProvider>();
     final spacesProvider = context.read<SpacesProvider>();
 
+    // Remove from UI immediately (optimistic deletion)
+    await itemsProvider.deleteItem(_currentItem.id);
+
+    // Pop screen immediately
+    if (mounted) {
+      navigator.pop();
+    }
+
+    // Show undo snackbar on parent screen
+    scaffoldMessenger.showSnackBar(
+      SnackBar(
+        content: const Text('Item deleted'),
+        backgroundColor: AppColors.accentGreen,
+        duration: const Duration(seconds: 5),
+        action: SnackBarAction(
+          label: 'Undo',
+          textColor: Colors.white,
+          onPressed: () {
+            _undoDeletion(itemsProvider);
+          },
+        ),
+      ),
+    );
+
+    // Set up timer for actual deletion after 5 seconds
+    _deletionTimer?.cancel();
+    _deletionTimer = Timer(const Duration(seconds: 5), () {
+      if (_pendingDeletion != null) {
+        _performActualDeletion(_pendingDeletion!, spacesProvider);
+        _pendingDeletion = null;
+      }
+    });
+  }
+
+  /// Undo the deletion by restoring the item
+  void _undoDeletion(ItemsProvider itemsProvider) {
+    if (_pendingDeletion == null) return;
+
+    // Cancel the actual deletion timer
+    _deletionTimer?.cancel();
+
+    // Restore the item to the provider
+    itemsProvider.addItem(_pendingDeletion!);
+
+    // Clear pending deletion
+    _pendingDeletion = null;
+  }
+
+  /// Perform the actual deletion (after undo timeout)
+  Future<void> _performActualDeletion(
+    Item item,
+    SpacesProvider spacesProvider,
+  ) async {
     try {
-      // Delete from provider
-      await itemsProvider.deleteItem(_currentItem.id);
-
       // Decrement space item count
-      await spacesProvider.decrementSpaceItemCount(_currentItem.spaceId);
+      await spacesProvider.decrementSpaceItemCount(item.spaceId);
+    } catch (e) {
+      // Silently handle errors in background deletion
+      debugPrint('Failed to update space count after deletion: $e');
+    }
+  }
 
-      // Pop screen
+  /// Show conversion dialog to convert item type
+  Future<void> _showConvertDialog() async {
+    // Get available conversion types (exclude current type)
+    final availableTypes = ItemType.values
+        .where((type) => type != _currentItem.type)
+        .toList();
+
+    // Check if conversion would lose data
+    final hasDataLoss = _currentItem.type == ItemType.task &&
+        (_currentItem.dueDate != null || _currentItem.isCompleted);
+
+    final selectedType = await showDialog<ItemType>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Convert to...'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (hasDataLoss)
+              Container(
+                padding: const EdgeInsets.all(AppSpacing.sm),
+                margin: const EdgeInsets.only(bottom: AppSpacing.sm),
+                decoration: BoxDecoration(
+                  color: AppColors.primaryAmber.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusSM),
+                  border: Border.all(
+                    color: AppColors.primaryAmber,
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(
+                      Icons.warning_amber,
+                      color: AppColors.primaryAmber,
+                      size: 20,
+                    ),
+                    const SizedBox(width: AppSpacing.xs),
+                    Expanded(
+                      child: Text(
+                        _getDataLossWarning(),
+                        style: AppTypography.bodySmall.copyWith(
+                          color: AppColors.primaryAmber,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ...availableTypes.map((type) {
+              return ListTile(
+                title: Text(_getItemTypeDisplayName(type)),
+                onTap: () {
+                  Navigator.of(context).pop(type);
+                },
+              );
+            }),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Cancel'),
+          ),
+        ],
+        semanticLabel: 'Convert item type dialog',
+      ),
+    );
+
+    if (selectedType != null && mounted) {
+      await _convertItemType(selectedType);
+    }
+  }
+
+  /// Convert item to a different type
+  Future<void> _convertItemType(ItemType newType) async {
+    // Capture context before any async gaps
+    final itemsProvider = context.read<ItemsProvider>();
+    final scaffoldMessenger = ScaffoldMessenger.of(context);
+
+    try {
+      // Save any pending changes first
+      if (_hasChanges) {
+        await _saveChanges();
+      }
+
+      // Create converted item
+      final convertedItem = _currentItem.copyWith(
+        type: newType,
+        // Reset type-specific fields based on conversion
+        isCompleted: newType == ItemType.task ? false : _currentItem.isCompleted,
+        dueDate: newType == ItemType.task
+            ? _currentItem.dueDate
+            : null, // Clear due date if not converting to task
+        clearDueDate: newType != ItemType.task && _currentItem.dueDate != null,
+        updatedAt: DateTime.now(),
+      );
+
+      // Update in provider
+      await itemsProvider.updateItem(convertedItem);
+
+      // Update local state
       if (mounted) {
-        navigator.pop();
+        setState(() {
+          _currentItem = convertedItem;
+        });
+
+        // Show success message
+        scaffoldMessenger.showSnackBar(
+          SnackBar(
+            content: Text(
+              'Converted to ${_getItemTypeDisplayName(newType).toLowerCase()}',
+            ),
+            backgroundColor: AppColors.accentGreen,
+            duration: const Duration(seconds: 2),
+          ),
+        );
       }
     } catch (e) {
       if (mounted) {
         scaffoldMessenger.showSnackBar(
           SnackBar(
-            content: Text('Failed to delete: $e'),
+            content: Text('Failed to convert: $e'),
             backgroundColor: AppColors.error,
           ),
         );
       }
+    }
+  }
+
+  /// Get data loss warning message for conversion
+  String _getDataLossWarning() {
+    if (_currentItem.type != ItemType.task) return '';
+
+    final warnings = <String>[];
+    if (_currentItem.dueDate != null) {
+      warnings.add('due date');
+    }
+    if (_currentItem.isCompleted) {
+      warnings.add('completion status');
+    }
+
+    if (warnings.isEmpty) return '';
+
+    return 'Warning: ${warnings.join(' and ')} will be lost';
+  }
+
+  /// Get display name for item type
+  String _getItemTypeDisplayName(ItemType type) {
+    switch (type) {
+      case ItemType.task:
+        return 'Task';
+      case ItemType.note:
+        return 'Note';
+      case ItemType.list:
+        return 'List';
     }
   }
 
@@ -392,6 +597,13 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
         tooltip: 'Back',
       ),
       actions: [
+        // Convert type button
+        IconButton(
+          icon: const Icon(Icons.swap_horiz),
+          onPressed: _showConvertDialog,
+          tooltip: 'Convert to...',
+        ),
+
         // Delete button
         IconButton(
           icon: const Icon(Icons.delete_outline),

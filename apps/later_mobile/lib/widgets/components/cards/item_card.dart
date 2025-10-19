@@ -52,8 +52,41 @@ class ItemCard extends StatefulWidget {
   State<ItemCard> createState() => _ItemCardState();
 }
 
-class _ItemCardState extends State<ItemCard> {
+class _ItemCardState extends State<ItemCard> with SingleTickerProviderStateMixin {
   bool _isPressed = false;
+  late AnimationController _checkboxAnimationController;
+  late Animation<double> _checkboxScaleAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Initialize checkbox animation controller
+    _checkboxAnimationController = AnimationController(
+      duration: const Duration(milliseconds: 150),
+      vsync: this,
+    );
+
+    // Create scale animation: 1.0 -> 1.05 -> 1.0
+    _checkboxScaleAnimation = TweenSequence<double>([
+      TweenSequenceItem(
+        tween: Tween<double>(begin: 1.0, end: 1.05)
+            .chain(CurveTween(curve: Curves.easeOut)),
+        weight: 50.0,
+      ),
+      TweenSequenceItem(
+        tween: Tween<double>(begin: 1.05, end: 1.0)
+            .chain(CurveTween(curve: Curves.easeIn)),
+        weight: 50.0,
+      ),
+    ]).animate(_checkboxAnimationController);
+  }
+
+  @override
+  void dispose() {
+    _checkboxAnimationController.dispose();
+    super.dispose();
+  }
 
   /// Get border color based on item type
   Color _getBorderColor() {
@@ -86,31 +119,77 @@ class _ItemCardState extends State<ItemCard> {
   /// Build leading element (checkbox for tasks, icon for notes/lists)
   Widget _buildLeadingElement() {
     if (widget.item.type == ItemType.task) {
-      return SizedBox(
-        width: 24,
-        height: 24,
-        child: Checkbox(
-          value: widget.item.isCompleted,
-          onChanged: widget.onCheckboxChanged != null
-              ? (value) {
-                  if (value != null) {
-                    HapticFeedback.lightImpact();
-                    widget.onCheckboxChanged?.call(value);
-                  }
-                }
-              : null,
-          activeColor: AppColors.accentGreen,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppSpacing.radiusSM),
+      // Wrap in GestureDetector to prevent tap events from propagating to card
+      return GestureDetector(
+        onTap: () {
+          // Absorb the tap event to prevent card's onTapDown from firing
+        },
+        onTapDown: (_) {
+          // Absorb the tap down event
+        },
+        onTapUp: (_) {
+          // Absorb the tap up event
+        },
+        child: SizedBox(
+          // Expanded touch target (48×48px) for accessibility compliance
+          // WCAG 2.5.5 requires 44×44dp minimum, 48×48px exceeds this
+          width: 48,
+          height: 48,
+          child: Center(
+            child: AnimatedBuilder(
+              animation: _checkboxScaleAnimation,
+              builder: (context, child) {
+                return Transform.scale(
+                  scale: _checkboxScaleAnimation.value,
+                  child: child,
+                );
+              },
+              child: SizedBox(
+                width: 24,
+                height: 24,
+                child: Checkbox(
+                  value: widget.item.isCompleted,
+                  onChanged: widget.onCheckboxChanged != null
+                      ? (value) {
+                          if (value != null) {
+                            // Trigger haptic feedback
+                            HapticFeedback.lightImpact();
+
+                            // Trigger scale animation
+                            _checkboxAnimationController.forward(from: 0.0);
+
+                            // Call the callback
+                            widget.onCheckboxChanged?.call(value);
+                          }
+                        }
+                      : null,
+                  activeColor: AppColors.accentGreen,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(AppSpacing.radiusSM),
+                  ),
+                  // Use standard Material touch target for better accessibility
+                  splashRadius: 20,
+                  materialTapTargetSize: MaterialTapTargetSize.padded,
+                  visualDensity: VisualDensity.standard,
+                ),
+              ),
+            ),
           ),
         ),
       );
     }
 
-    return Icon(
-      _getLeadingIcon(),
-      size: 20,
-      color: _getBorderColor(),
+    // For notes and lists, use same 48×48px container for alignment
+    return SizedBox(
+      width: 48,
+      height: 48,
+      child: Center(
+        child: Icon(
+          _getLeadingIcon(),
+          size: 20,
+          color: _getBorderColor(),
+        ),
+      ),
     );
   }
 
@@ -230,7 +309,7 @@ class _ItemCardState extends State<ItemCard> {
           : AppColors.primaryAmber.withValues(alpha: 0.1);
     } else if (_isPressed) {
       backgroundColor = isDark
-          ? AppColors.neutralGray200
+          ? AppColors.surfaceDarkVariant // Subtle dark gray for pressed state
           : AppColors.neutralGray100;
     } else {
       backgroundColor = isDark
@@ -291,7 +370,7 @@ class _ItemCardState extends State<ItemCard> {
                 children: [
                   // Leading element (checkbox or icon)
                   _buildLeadingElement(),
-                  const SizedBox(width: AppSpacing.xs),
+                  const SizedBox(width: AppSpacing.xxxs),
 
                   // Content
                   Expanded(
