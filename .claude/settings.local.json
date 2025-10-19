@@ -3,12 +3,18 @@
     "allow": [
       "Bash(mkdir:*)",
       "WebSearch",
-      "Bash(flutter analyze)",
-      "Bash(flutter test test/data/models/)",
-      "Bash(flutter test)",
-      "Bash(flutter test test/data/repositories/space_repository_test.dart --reporter expanded)"
+      "Bash(flutter:*)",
+      "mcp__dart__hot_reload",
+      "mcp__dart__get_widget_tree",
+      "mcp__dart__get_runtime_errors",
+      "mcp__dart__get_selected_widget",
+      "mcp__dart__set_widget_selection_mode"
     ],
     "deny": [],
     "ask": []
-  }
+  },
+  "enabledMcpjsonServers": [
+    "context7",
+    "dart"
+  ]
 }
