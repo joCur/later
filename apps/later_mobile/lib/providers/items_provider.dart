@@ -208,6 +208,11 @@ class ItemsProvider extends ChangeNotifier {
   /// an error is set.
   /// Implements automatic retry with exponential backoff for transient failures.
   ///
+  /// Special handling for space changes:
+  /// If the item's spaceId has changed, the item will be removed from the
+  /// local list instead of being updated, since it no longer belongs to
+  /// the current space view.
+  ///
   /// Parameters:
   ///   - [item]: The item to update with new values
   ///
@@ -229,11 +234,20 @@ class ItemsProvider extends ChangeNotifier {
       );
       final index = _items.indexWhere((i) => i.id == item.id);
       if (index != -1) {
-        _items = [
-          ..._items.sublist(0, index),
-          updatedItem,
-          ..._items.sublist(index + 1),
-        ];
+        final oldItem = _items[index];
+
+        // Check if spaceId has changed
+        if (oldItem.spaceId != updatedItem.spaceId) {
+          // Remove item from current list since it moved to a different space
+          _items = _items.where((i) => i.id != item.id).toList();
+        } else {
+          // Update item in place
+          _items = [
+            ..._items.sublist(0, index),
+            updatedItem,
+            ..._items.sublist(index + 1),
+          ];
+        }
       }
       _error = null;
       notifyListeners();
@@ -313,6 +327,24 @@ class ItemsProvider extends ChangeNotifier {
       }
       notifyListeners();
     }
+  }
+
+  /// Removes an item from the local list without deleting from the repository.
+  ///
+  /// This is useful when an item has been moved to a different space or
+  /// no longer belongs in the current view. This method only updates the
+  /// local state and does not persist the change to the repository.
+  ///
+  /// Parameters:
+  ///   - [id]: The ID of the item to remove from the local list
+  ///
+  /// Example:
+  /// ```dart
+  /// provider.removeItem('item-1');
+  /// ```
+  void removeItem(String id) {
+    _items = _items.where((item) => item.id != id).toList();
+    notifyListeners();
   }
 
   /// Clears any current error message.

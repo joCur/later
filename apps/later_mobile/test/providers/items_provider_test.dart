@@ -591,4 +591,199 @@ void main() {
       expect(notifyCount, 1);
     });
   });
+
+  group('ItemsProvider - Space Change Handling', () {
+    test('should remove item from list when spaceId changes', () async {
+      // Arrange - Load items for space-1
+      final item = Item(
+        id: '1',
+        type: ItemType.task,
+        title: 'Task',
+        spaceId: 'space-1',
+      );
+      mockRepository.mockItems = [item];
+      await provider.loadItemsBySpace('space-1');
+      expect(provider.items, hasLength(1));
+
+      // Act - Update item to move it to space-2
+      final updatedItem = item.copyWith(spaceId: 'space-2');
+      await provider.updateItem(updatedItem);
+
+      // Assert - Item should be removed from the current list
+      expect(provider.items, isEmpty);
+      expect(provider.error, isNull);
+    });
+
+    test('should keep item in list when spaceId does not change', () async {
+      // Arrange - Load items for space-1
+      final item = Item(
+        id: '1',
+        type: ItemType.task,
+        title: 'Task',
+        spaceId: 'space-1',
+      );
+      mockRepository.mockItems = [item];
+      await provider.loadItemsBySpace('space-1');
+      expect(provider.items, hasLength(1));
+
+      // Act - Update item without changing spaceId
+      final updatedItem = item.copyWith(title: 'Updated Task');
+      await provider.updateItem(updatedItem);
+
+      // Assert - Item should still be in the list with updated title
+      expect(provider.items, hasLength(1));
+      expect(provider.items.first.title, 'Updated Task');
+      expect(provider.items.first.spaceId, 'space-1');
+      expect(provider.error, isNull);
+    });
+
+    test('should remove correct item when multiple items exist', () async {
+      // Arrange - Load multiple items for space-1
+      final item1 = Item(
+        id: '1',
+        type: ItemType.task,
+        title: 'Task 1',
+        spaceId: 'space-1',
+      );
+      final item2 = Item(
+        id: '2',
+        type: ItemType.task,
+        title: 'Task 2',
+        spaceId: 'space-1',
+      );
+      final item3 = Item(
+        id: '3',
+        type: ItemType.note,
+        title: 'Note 1',
+        spaceId: 'space-1',
+      );
+      mockRepository.mockItems = [item1, item2, item3];
+      await provider.loadItemsBySpace('space-1');
+      expect(provider.items, hasLength(3));
+
+      // Act - Move item2 to space-2
+      final updatedItem = item2.copyWith(spaceId: 'space-2');
+      await provider.updateItem(updatedItem);
+
+      // Assert - Only item2 should be removed
+      expect(provider.items, hasLength(2));
+      expect(provider.items.any((i) => i.id == '1'), isTrue);
+      expect(provider.items.any((i) => i.id == '2'), isFalse);
+      expect(provider.items.any((i) => i.id == '3'), isTrue);
+    });
+
+    test('should notify listeners when item is removed due to space change', () async {
+      // Arrange
+      final item = Item(
+        id: '1',
+        type: ItemType.task,
+        title: 'Task',
+        spaceId: 'space-1',
+      );
+      mockRepository.mockItems = [item];
+      await provider.loadItemsBySpace('space-1');
+
+      int notifyCount = 0;
+      provider.addListener(() {
+        notifyCount++;
+      });
+
+      // Act - Move item to different space
+      final updatedItem = item.copyWith(spaceId: 'space-2');
+      await provider.updateItem(updatedItem);
+
+      // Assert - Should have notified listeners
+      expect(notifyCount, greaterThan(0));
+    });
+  });
+
+  group('ItemsProvider - removeItem', () {
+    test('should remove item from list by id', () async {
+      // Arrange
+      final item1 = Item(
+        id: '1',
+        type: ItemType.task,
+        title: 'Task 1',
+        spaceId: 'space-1',
+      );
+      final item2 = Item(
+        id: '2',
+        type: ItemType.task,
+        title: 'Task 2',
+        spaceId: 'space-1',
+      );
+      mockRepository.mockItems = [item1, item2];
+      await provider.loadItems();
+      expect(provider.items, hasLength(2));
+
+      // Act
+      provider.removeItem('1');
+
+      // Assert
+      expect(provider.items, hasLength(1));
+      expect(provider.items.first.id, '2');
+    });
+
+    test('should handle removing non-existent item gracefully', () async {
+      // Arrange
+      final item = Item(
+        id: '1',
+        type: ItemType.task,
+        title: 'Task',
+        spaceId: 'space-1',
+      );
+      mockRepository.mockItems = [item];
+      await provider.loadItems();
+
+      // Act - Try to remove non-existent item
+      provider.removeItem('999');
+
+      // Assert - Should not throw, original item should remain
+      expect(provider.items, hasLength(1));
+      expect(provider.items.first.id, '1');
+    });
+
+    test('should notify listeners when removing item', () async {
+      // Arrange
+      final item = Item(
+        id: '1',
+        type: ItemType.task,
+        title: 'Task',
+        spaceId: 'space-1',
+      );
+      mockRepository.mockItems = [item];
+      await provider.loadItems();
+
+      int notifyCount = 0;
+      provider.addListener(() {
+        notifyCount++;
+      });
+
+      // Act
+      provider.removeItem('1');
+
+      // Assert
+      expect(notifyCount, 1);
+    });
+
+    test('should not call repository when removing item', () async {
+      // Arrange
+      final item = Item(
+        id: '1',
+        type: ItemType.task,
+        title: 'Task',
+        spaceId: 'space-1',
+      );
+      mockRepository.mockItems = [item];
+      await provider.loadItems();
+
+      final initialDeleteCount = mockRepository.deleteItemCallCount;
+
+      // Act
+      provider.removeItem('1');
+
+      // Assert - Should not have called repository delete
+      expect(mockRepository.deleteItemCallCount, initialDeleteCount);
+    });
+  });
 }
