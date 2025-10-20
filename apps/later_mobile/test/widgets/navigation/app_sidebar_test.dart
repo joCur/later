@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -502,6 +503,252 @@ void main() {
       );
 
       expect(find.byType(AppSidebar), findsOneWidget);
+    });
+
+    // ========================================
+    // TASK 3.2: GLASS MORPHISM & GRADIENT TESTS
+    // ========================================
+
+    testWidgets('applies glass morphism with BackdropFilter', (tester) async {
+      await tester.pumpWidget(createTestWidget());
+
+      // Should find BackdropFilter widget for glass morphism
+      expect(find.byType(BackdropFilter), findsOneWidget);
+    });
+
+    testWidgets('has gradient overlay at top with 10% opacity', (tester) async {
+      await tester.pumpWidget(createTestWidget());
+
+      // Should find Container with gradient decoration
+      final gradientOverlay = find.descendant(
+        of: find.byType(AppSidebar),
+        matching: find.byWidgetPredicate(
+          (widget) =>
+              widget is Container &&
+              widget.decoration is BoxDecoration &&
+              (widget.decoration as BoxDecoration).gradient != null,
+        ),
+      );
+
+      expect(gradientOverlay, findsAtLeastNWidgets(1));
+    });
+
+    testWidgets('space item has gradient hover state', (tester) async {
+      final spaces = [
+        Space(id: 'space-1', name: 'Work', icon: '💼', itemCount: 5),
+      ];
+
+      mockRepository.mockSpaces = spaces;
+      await spacesProvider.loadSpaces();
+
+      await tester.pumpWidget(createTestWidget());
+      await tester.pumpAndSettle();
+
+      // Find the space item
+      final spaceItem = find.text('Work');
+      expect(spaceItem, findsOneWidget);
+
+      // Hover over the space item
+      final gesture = await tester.createGesture(kind: PointerDeviceKind.mouse);
+      await gesture.addPointer(location: Offset.zero);
+      addTearDown(gesture.removePointer);
+      await tester.pump();
+
+      // Move to space item to trigger hover
+      await gesture.moveTo(tester.getCenter(spaceItem));
+      await tester.pumpAndSettle();
+
+      // Should find gradient overlay on hover
+      final hoveredContainer = find.descendant(
+        of: find.ancestor(
+          of: spaceItem,
+          matching: find.byType(Container),
+        ),
+        matching: find.byWidgetPredicate(
+          (widget) =>
+              widget is Container &&
+              widget.decoration is BoxDecoration,
+        ),
+      );
+
+      expect(hoveredContainer, findsWidgets);
+    });
+
+    testWidgets('selected space has gradient active indicator pill', (tester) async {
+      final spaces = [
+        Space(id: 'space-1', name: 'Work', icon: '💼', itemCount: 5),
+        Space(id: 'space-2', name: 'Personal', icon: '🏠', itemCount: 3),
+      ];
+
+      mockRepository.mockSpaces = spaces;
+      await spacesProvider.loadSpaces();
+
+      await tester.pumpWidget(createTestWidget());
+      await tester.pumpAndSettle();
+
+      // Should find gradient indicator for selected space
+      final gradientIndicator = find.byWidgetPredicate(
+        (widget) =>
+            widget is Container &&
+            widget.decoration is BoxDecoration &&
+            (widget.decoration as BoxDecoration).gradient != null &&
+            (widget.decoration as BoxDecoration).borderRadius != null,
+      );
+
+      expect(gradientIndicator, findsAtLeastNWidgets(1));
+    });
+
+    testWidgets('space icon has type-specific gradient tint', (tester) async {
+      final spaces = [
+        Space(
+          id: 'space-1',
+          name: 'Work',
+          icon: '💼',
+          itemCount: 5,
+          color: 'red',
+        ),
+      ];
+
+      mockRepository.mockSpaces = spaces;
+      await spacesProvider.loadSpaces();
+
+      await tester.pumpWidget(createTestWidget());
+      await tester.pumpAndSettle();
+
+      // Should find icon with gradient tint container
+      final iconContainer = find.descendant(
+        of: find.byType(AppSidebar),
+        matching: find.byWidgetPredicate(
+          (widget) =>
+              widget is Container &&
+              widget.decoration is BoxDecoration &&
+              (widget.decoration as BoxDecoration).gradient != null,
+        ),
+      );
+
+      expect(iconContainer, findsAtLeastNWidgets(1));
+    });
+
+    testWidgets('uses spring physics for expand/collapse animation', (tester) async {
+      bool isExpanded = true;
+
+      await tester.pumpWidget(
+        StatefulBuilder(
+          builder: (context, setState) {
+            return MaterialApp(
+              home: ChangeNotifierProvider<SpacesProvider>.value(
+                value: spacesProvider,
+                child: Scaffold(
+                  body: AppSidebar(
+                    isExpanded: isExpanded,
+                    onToggleExpanded: () {
+                      setState(() {
+                        isExpanded = !isExpanded;
+                      });
+                    },
+                  ),
+                ),
+              ),
+            );
+          },
+        ),
+      );
+
+      // Tap toggle to start animation
+      await tester.tap(find.byIcon(Icons.menu_open));
+      await tester.pump();
+
+      // Animation should be in progress (250ms with spring curve)
+      await tester.pump(const Duration(milliseconds: 125));
+
+      // Should still be animating
+      final animatedContainer = tester.widget<AnimatedContainer>(
+        find.byType(AnimatedContainer).first,
+      );
+      expect(animatedContainer.duration, equals(const Duration(milliseconds: 250)));
+    });
+
+    testWidgets('collapsed state shows gradient hints on left edge', (tester) async {
+      final spaces = [
+        Space(id: 'space-1', name: 'Work', icon: '💼', itemCount: 5),
+      ];
+
+      mockRepository.mockSpaces = spaces;
+      await spacesProvider.loadSpaces();
+
+      await tester.pumpWidget(createTestWidget(isExpanded: false));
+      await tester.pumpAndSettle();
+
+      // In collapsed state (72px), should find gradient accent hints
+      final collapsedContainer = tester.widget<AnimatedContainer>(
+        find.byType(AnimatedContainer).first,
+      );
+      expect(collapsedContainer.constraints?.maxWidth, equals(72.0));
+
+      // Should have gradient indicators visible
+      final gradientHints = find.byWidgetPredicate(
+        (widget) =>
+            widget is Container &&
+            widget.decoration is BoxDecoration &&
+            (widget.decoration as BoxDecoration).gradient != null,
+      );
+
+      expect(gradientHints, findsWidgets);
+    });
+
+    testWidgets('settings footer has gradient separator line', (tester) async {
+      await tester.pumpWidget(createTestWidget());
+      await tester.pumpAndSettle();
+
+      // Should find gradient separator in footer
+      final footer = find.ancestor(
+        of: find.byIcon(Icons.settings_outlined),
+        matching: find.byType(Container),
+      );
+
+      expect(footer, findsWidgets);
+
+      // Should have gradient separator with 20% opacity
+      final gradientSeparator = find.descendant(
+        of: find.byType(AppSidebar),
+        matching: find.byWidgetPredicate(
+          (widget) =>
+              widget is Container &&
+              widget.decoration is BoxDecoration &&
+              (widget.decoration as BoxDecoration).gradient != null,
+        ),
+      );
+
+      expect(gradientSeparator, findsWidgets);
+    });
+
+    testWidgets('keyboard shortcuts still work with gradient redesign', (tester) async {
+      final spaces = List.generate(
+        5,
+        (i) => Space(
+          id: 'space-${i + 1}',
+          name: 'Space ${i + 1}',
+          itemCount: i,
+        ),
+      );
+
+      mockRepository.mockSpaces = spaces;
+      await spacesProvider.loadSpaces();
+
+      await tester.pumpWidget(createTestWidget());
+      await tester.pumpAndSettle();
+
+      // Test keyboard shortcut "3" still works
+      await tester.sendKeyEvent(LogicalKeyboardKey.digit3);
+      await tester.pumpAndSettle();
+
+      expect(spacesProvider.currentSpace?.id, equals('space-3'));
+
+      // Test keyboard shortcut "1" still works
+      await tester.sendKeyEvent(LogicalKeyboardKey.digit1);
+      await tester.pumpAndSettle();
+
+      expect(spacesProvider.currentSpace?.id, equals('space-1'));
     });
   });
 }

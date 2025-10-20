@@ -1,6 +1,8 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import '../../core/theme/app_animations.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_spacing.dart';
 import '../../data/models/space_model.dart';
@@ -113,36 +115,81 @@ class _AppSidebarState extends State<AppSidebar> {
         return KeyEventResult.handled;
       },
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        curve: Curves.easeInOut,
+        duration: AppAnimations.normal,
+        curve: AppAnimations.springCurve,
         width: widget.isExpanded ? 240.0 : 72.0,
-        decoration: BoxDecoration(
-          color: isDarkMode
-              ? AppColors.surfaceDark
-              : AppColors.surfaceLight,
-          border: const Border(
-            right: BorderSide(),
-          ),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: Stack(
           children: [
-            // Header with toggle button
-            _buildHeader(isDarkMode),
-
-            // Divider
-            const Divider(
-              height: 1,
-              thickness: AppSpacing.borderWidthThin,
+            // Base surface with glass morphism
+            ClipRect(
+              child: BackdropFilter(
+                filter: ImageFilter.blur(
+                  sigmaX: AppColors.glassBlurRadius,
+                  sigmaY: AppColors.glassBlurRadius,
+                ),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: (isDarkMode
+                            ? AppColors.surfaceDark
+                            : AppColors.surfaceLight)
+                        .withValues(alpha: 0.9),
+                    border: Border(
+                      right: BorderSide(
+                        color: isDarkMode
+                            ? AppColors.borderDark
+                            : AppColors.borderLight,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
             ),
 
-            // Spaces list
-            Expanded(
-              child: _buildSpacesList(spacesProvider, isDarkMode),
+            // Gradient overlay at top (10% opacity)
+            Positioned(
+              top: 0,
+              left: 0,
+              right: 0,
+              height: 120,
+              child: Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      (isDarkMode
+                              ? AppColors.primaryStartDark
+                              : AppColors.primaryStart)
+                          .withValues(alpha: 0.1),
+                      Colors.transparent,
+                    ],
+                  ),
+                ),
+              ),
             ),
 
-            // Footer with settings
-            _buildFooter(isDarkMode),
+            // Content
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Header with toggle button
+                _buildHeader(isDarkMode),
+
+                // Divider
+                const Divider(
+                  height: 1,
+                  thickness: AppSpacing.borderWidthThin,
+                ),
+
+                // Spaces list
+                Expanded(
+                  child: _buildSpacesList(spacesProvider, isDarkMode),
+                ),
+
+                // Footer with settings
+                _buildFooter(isDarkMode),
+              ],
+            ),
           ],
         ),
       ),
@@ -235,44 +282,60 @@ class _AppSidebarState extends State<AppSidebar> {
   }
 
   Widget _buildFooter(bool isDarkMode) {
-    return Container(
-      padding: const EdgeInsets.all(AppSpacing.xs),
-      decoration: const BoxDecoration(
-        border: Border(
-          top: BorderSide(),
-        ),
-      ),
-      child: Tooltip(
-        message: 'Settings',
-        child: InkWell(
-          onTap: () {
-            // Navigate to settings
-          },
-          borderRadius: const BorderRadius.all(
-            Radius.circular(AppSpacing.radiusSM),
-          ),
-          child: Container(
-            height: AppSpacing.minTouchTarget,
-            padding: EdgeInsets.symmetric(
-              horizontal: widget.isExpanded
-                  ? AppSpacing.sm
-                  : AppSpacing.xs,
-            ),
-            child: Row(
-              mainAxisAlignment: widget.isExpanded
-                  ? MainAxisAlignment.start
-                  : MainAxisAlignment.center,
-              children: [
-                const Icon(Icons.settings_outlined),
-                if (widget.isExpanded) ...[
-                  const SizedBox(width: AppSpacing.gapSM),
-                  const Text('Settings'),
-                ],
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        // Gradient separator line
+        Container(
+          height: 1,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                Colors.transparent,
+                (isDarkMode
+                        ? AppColors.primaryStartDark
+                        : AppColors.primaryStart)
+                    .withValues(alpha: 0.2),
+                Colors.transparent,
               ],
             ),
           ),
         ),
-      ),
+        Container(
+          padding: const EdgeInsets.all(AppSpacing.xs),
+          child: Tooltip(
+            message: 'Settings',
+            child: InkWell(
+              onTap: () {
+                // Navigate to settings
+              },
+              borderRadius: const BorderRadius.all(
+                Radius.circular(AppSpacing.radiusSM),
+              ),
+              child: Container(
+                height: AppSpacing.minTouchTarget,
+                padding: EdgeInsets.symmetric(
+                  horizontal: widget.isExpanded
+                      ? AppSpacing.sm
+                      : AppSpacing.xs,
+                ),
+                child: Row(
+                  mainAxisAlignment: widget.isExpanded
+                      ? MainAxisAlignment.start
+                      : MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.settings_outlined),
+                    if (widget.isExpanded) ...[
+                      const SizedBox(width: AppSpacing.gapSM),
+                      const Text('Settings'),
+                    ],
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
@@ -302,17 +365,29 @@ class _SpaceListItem extends StatefulWidget {
 class _SpaceListItemState extends State<_SpaceListItem> {
   bool _isHovered = false;
 
+  LinearGradient _getTypeGradient() {
+    // For now, use color field if available to determine gradient
+    // In the future, this could be based on a space type field
+    final spaceColor = widget.space.color;
+    if (spaceColor != null) {
+      // Map colors to gradients
+      if (spaceColor.contains('red') || spaceColor.contains('orange')) {
+        return AppColors.taskGradient;
+      } else if (spaceColor.contains('blue') || spaceColor.contains('cyan')) {
+        return AppColors.noteGradient;
+      } else if (spaceColor.contains('violet') || spaceColor.contains('purple')) {
+        return AppColors.listGradient;
+      }
+    }
+
+    return widget.isDarkMode
+        ? AppColors.primaryGradientDark
+        : AppColors.primaryGradient;
+  }
+
   @override
   Widget build(BuildContext context) {
-    final backgroundColor = widget.isSelected
-        ? (widget.isDarkMode
-            ? AppColors.selectedDark
-            : AppColors.selectedLight)
-        : (_isHovered
-            ? (widget.isDarkMode
-                ? AppColors.surfaceDarkVariant
-                : AppColors.surfaceLightVariant)
-            : Colors.transparent);
+    final gradient = _getTypeGradient();
 
     final textColor = widget.isSelected
         ? (widget.isDarkMode
@@ -347,96 +422,171 @@ class _SpaceListItemState extends State<_SpaceListItem> {
               borderRadius: const BorderRadius.all(
                 Radius.circular(AppSpacing.radiusSM),
               ),
-              child: Container(
-                height: AppSpacing.minTouchTarget,
-                padding: EdgeInsets.symmetric(
-                  horizontal: widget.isExpanded
-                      ? AppSpacing.sm
-                      : AppSpacing.xs,
-                ),
-                decoration: BoxDecoration(
-                  color: backgroundColor,
-                  borderRadius: const BorderRadius.all(
-                    Radius.circular(AppSpacing.radiusSM),
-                  ),
-                ),
-                child: Row(
-                  mainAxisAlignment: widget.isExpanded
-                      ? MainAxisAlignment.spaceBetween
-                      : MainAxisAlignment.center,
-                  children: [
-                    if (widget.isExpanded)
-                      Expanded(
-                        child: Row(
-                          children: [
-                            // Icon or emoji
-                            if (widget.space.icon != null) ...[
-                              Text(
-                                widget.space.icon!,
-                                style: const TextStyle(fontSize: 20),
-                              ),
-                              const SizedBox(width: AppSpacing.gapSM),
-                            ],
-                            // Space name
-                            Expanded(
-                              child: Text(
-                                widget.space.name,
-                                style: TextStyle(
-                                  color: textColor,
-                                  fontWeight: widget.isSelected
-                                      ? FontWeight.w600
-                                      : FontWeight.normal,
+              child: Stack(
+                children: [
+                  // Base container
+                  Container(
+                    height: AppSpacing.minTouchTarget,
+                    padding: EdgeInsets.symmetric(
+                      horizontal: widget.isExpanded
+                          ? AppSpacing.sm
+                          : AppSpacing.xs,
+                    ),
+                    decoration: BoxDecoration(
+                      color: widget.isSelected
+                          ? (widget.isDarkMode
+                              ? AppColors.selectedDark
+                              : AppColors.selectedLight)
+                          : (_isHovered
+                              ? (widget.isDarkMode
+                                  ? AppColors.surfaceDarkVariant
+                                  : AppColors.surfaceLightVariant)
+                              : Colors.transparent),
+                      borderRadius: const BorderRadius.all(
+                        Radius.circular(AppSpacing.radiusSM),
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: widget.isExpanded
+                          ? MainAxisAlignment.spaceBetween
+                          : MainAxisAlignment.center,
+                      children: [
+                        if (widget.isExpanded)
+                          Expanded(
+                            child: Row(
+                              children: [
+                                // Icon with gradient tint container
+                                if (widget.space.icon != null) ...[
+                                  Container(
+                                    padding: const EdgeInsets.all(2),
+                                    decoration: BoxDecoration(
+                                      gradient: gradient.scale(0.1),
+                                      borderRadius: BorderRadius.circular(
+                                        AppSpacing.radiusXS,
+                                      ),
+                                    ),
+                                    child: Text(
+                                      widget.space.icon!,
+                                      style: const TextStyle(fontSize: 20),
+                                    ),
+                                  ),
+                                  const SizedBox(width: AppSpacing.gapSM),
+                                ],
+                                // Space name
+                                Expanded(
+                                  child: Text(
+                                    widget.space.name,
+                                    style: TextStyle(
+                                      color: textColor,
+                                      fontWeight: widget.isSelected
+                                          ? FontWeight.w600
+                                          : FontWeight.normal,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
                                 ),
-                                overflow: TextOverflow.ellipsis,
+                              ],
+                            ),
+                          )
+                        else
+                          // Collapsed view - icon with gradient background
+                          Container(
+                            padding: const EdgeInsets.all(4),
+                            decoration: BoxDecoration(
+                              gradient: widget.isSelected
+                                  ? gradient.scale(0.15)
+                                  : null,
+                              borderRadius: BorderRadius.circular(
+                                AppSpacing.radiusXS,
                               ),
                             ),
-                          ],
-                        ),
-                      )
-                    else
-                      // Collapsed view - just show icon or first letter
-                      Text(
-                        widget.space.icon ?? widget.space.name[0].toUpperCase(),
-                        style: TextStyle(
-                          fontSize: widget.space.icon != null ? 20 : 16,
-                          color: textColor,
-                          fontWeight: widget.isSelected
-                              ? FontWeight.w600
-                              : FontWeight.normal,
+                            child: Text(
+                              widget.space.icon ?? widget.space.name[0].toUpperCase(),
+                              style: TextStyle(
+                                fontSize: widget.space.icon != null ? 20 : 16,
+                                color: textColor,
+                                fontWeight: widget.isSelected
+                                    ? FontWeight.w600
+                                    : FontWeight.normal,
+                              ),
+                            ),
+                          ),
+
+                        // Item count badge
+                        if (widget.isExpanded && widget.space.itemCount > 0)
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: AppSpacing.xs,
+                              vertical: AppSpacing.xxxs,
+                            ),
+                            decoration: BoxDecoration(
+                              color: widget.isDarkMode
+                                  ? AppColors.surfaceDarkVariant
+                                  : AppColors.surfaceLightVariant,
+                              borderRadius: BorderRadius.circular(
+                                AppSpacing.radiusFull,
+                              ),
+                            ),
+                            child: Text(
+                              widget.space.itemCount.toString(),
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: textColor,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+
+                  // Gradient hover overlay (5% opacity)
+                  if (_isHovered && !widget.isSelected)
+                    Positioned.fill(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          gradient: gradient.scale(0.05),
+                          borderRadius: const BorderRadius.all(
+                            Radius.circular(AppSpacing.radiusSM),
+                          ),
                         ),
                       ),
+                    ),
 
-                    // Item count badge
-                    if (widget.isExpanded && widget.space.itemCount > 0)
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: AppSpacing.xs,
-                          vertical: AppSpacing.xxxs,
-                        ),
+                  // Gradient active indicator pill (left-aligned)
+                  if (widget.isSelected)
+                    Positioned(
+                      left: 0,
+                      top: AppSpacing.xs,
+                      bottom: AppSpacing.xs,
+                      child: Container(
+                        width: 3,
                         decoration: BoxDecoration(
-                          color: widget.isDarkMode
-                              ? AppColors.surfaceDarkVariant
-                              : AppColors.surfaceLightVariant,
+                          gradient: gradient,
                           borderRadius: BorderRadius.circular(
                             AppSpacing.radiusFull,
                           ),
                         ),
-                        child: Text(
-                          widget.space.itemCount.toString(),
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: textColor,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
                       ),
-                  ],
-                ),
+                    ),
+                ],
               ),
             ),
           ),
         ),
       ),
+    );
+  }
+}
+
+// Extension to scale gradient opacity
+extension on LinearGradient {
+  // ignore: unused_element
+  LinearGradient scale(double opacity) {
+    return LinearGradient(
+      begin: begin,
+      end: end,
+      colors: colors.map((c) => c.withValues(alpha: opacity)).toList(),
     );
   }
 }

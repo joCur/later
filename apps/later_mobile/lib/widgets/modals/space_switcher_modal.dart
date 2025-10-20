@@ -1,7 +1,9 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../../core/responsive/breakpoints.dart';
+import '../../core/theme/app_animations.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_spacing.dart';
 import '../../core/theme/app_typography.dart';
@@ -248,6 +250,31 @@ class _SpaceSwitcherModalState extends State<SpaceSwitcherModal> {
     );
   }
 
+  /// Get gradient for space item based on index
+  LinearGradient _getSpaceGradient(int index, bool isDark) {
+    // Cycle through type gradients for visual variety
+    final gradients = isDark
+        ? [
+            AppColors.primaryGradientDark,
+            AppColors.secondaryGradientDark,
+            const LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [AppColors.accentCyanDark, AppColors.accentEmeraldDark],
+            ),
+          ]
+        : [
+            AppColors.primaryGradient,
+            AppColors.secondaryGradient,
+            const LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [AppColors.accentCyan, AppColors.accentEmerald],
+            ),
+          ];
+    return gradients[index % gradients.length];
+  }
+
   /// Build space list item
   Widget _buildSpaceItem({
     required BuildContext context,
@@ -259,6 +286,7 @@ class _SpaceSwitcherModalState extends State<SpaceSwitcherModal> {
   }) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final isArchived = space.isArchived;
+    final gradient = _getSpaceGradient(index, isDark);
 
     // Wrap entire item in Opacity if archived
     final itemContent = Semantics(
@@ -269,34 +297,49 @@ class _SpaceSwitcherModalState extends State<SpaceSwitcherModal> {
         onTap: isArchived ? null : onTap, // Disable tap for archived spaces
         onLongPress: () => _showSpaceOptionsMenu(context, space),
         borderRadius: BorderRadius.circular(AppSpacing.radiusMD),
-        child: Container(
-          constraints: const BoxConstraints(
-            minHeight: AppSpacing.minTouchTarget,
-          ),
-          padding: const EdgeInsets.symmetric(
-            horizontal: AppSpacing.sm,
-            vertical: AppSpacing.xs,
-          ),
-          decoration: BoxDecoration(
-            color: isSelected
-                ? (isDark
-                    ? AppColors.selectedDark
-                    : AppColors.selectedLight)
-                : (isKeyboardSelected
-                    ? (isDark
-                        ? AppColors.focusDark.withValues(alpha: 0.1)
-                        : AppColors.focusLight.withValues(alpha: 0.1))
-                    : Colors.transparent),
-            borderRadius: BorderRadius.circular(AppSpacing.radiusMD),
-            border: isSelected
-                ? Border.all(
-                    color: isDark
-                        ? AppColors.primaryAmberLight
-                        : AppColors.primaryAmber,
-                    width: AppSpacing.borderWidthMedium,
-                  )
-                : null,
-          ),
+        hoverColor: gradient.colors.first.withValues(alpha: 0.08),
+        splashColor: gradient.colors.last.withValues(alpha: 0.12),
+        child: AnimatedContainer(
+          duration: AppAnimations.normal,
+          curve: AppAnimations.springCurve,
+          child: Container(
+            constraints: const BoxConstraints(
+              minHeight: AppSpacing.minTouchTarget,
+            ),
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.sm,
+              vertical: AppSpacing.xs,
+            ),
+            decoration: BoxDecoration(
+              color: isSelected
+                  ? (isDark
+                      ? AppColors.selectedDark
+                      : AppColors.selectedLight)
+                  : (isKeyboardSelected
+                      ? (isDark
+                          ? AppColors.focusDark.withValues(alpha: 0.1)
+                          : AppColors.focusLight.withValues(alpha: 0.1))
+                      : Colors.transparent),
+              borderRadius: BorderRadius.circular(AppSpacing.radiusMD),
+              border: isSelected
+                  ? Border.all(
+                      color: isDark
+                          ? AppColors.primaryAmberLight
+                          : AppColors.primaryAmber,
+                      width: AppSpacing.borderWidthMedium,
+                    )
+                  : null,
+              gradient: isSelected
+                  ? LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        gradient.colors.first.withValues(alpha: 0.12),
+                        gradient.colors.last.withValues(alpha: 0.12),
+                      ],
+                    )
+                  : null,
+            ),
           child: Row(
             children: [
               // Number indicator for keyboard shortcuts (1-9)
@@ -423,6 +466,7 @@ class _SpaceSwitcherModalState extends State<SpaceSwitcherModal> {
                   ),
                 ),
             ],
+          ),
           ),
         ),
       ),
@@ -757,7 +801,7 @@ class _SpaceSwitcherModalState extends State<SpaceSwitcherModal> {
     );
   }
 
-  /// Build create space button
+  /// Build create space button with gradient styling
   Widget _buildCreateSpaceButton(bool isDark) {
     return Padding(
       padding: const EdgeInsets.symmetric(
@@ -767,28 +811,46 @@ class _SpaceSwitcherModalState extends State<SpaceSwitcherModal> {
       child: Semantics(
         button: true,
         label: 'Create new space',
-        child: ElevatedButton.icon(
-          onPressed: () async {
-            // Show create space modal
-            final result = await CreateSpaceModal.show(
-              context,
-              mode: SpaceModalMode.create,
-            );
+        child: Container(
+          decoration: BoxDecoration(
+            gradient: isDark
+                ? AppColors.primaryGradientDark
+                : AppColors.primaryGradient,
+            borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
+            boxShadow: [
+              BoxShadow(
+                color: isDark
+                    ? AppColors.primaryStartDark.withValues(alpha: 0.3)
+                    : AppColors.primaryStart.withValues(alpha: 0.3),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          child: ElevatedButton.icon(
+            onPressed: () async {
+              // Show create space modal
+              final result = await CreateSpaceModal.show(
+                context,
+                mode: SpaceModalMode.create,
+              );
 
-            // If space was created, close this modal and return true
-            // so the HomeScreen knows to reload items
-            if (result == true && mounted) {
-              Navigator.of(context).pop(true);
-            }
-          },
-          icon: const Icon(Icons.add),
-          label: const Text('Create New Space'),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: AppColors.primaryAmber,
-            foregroundColor: AppColors.neutralBlack,
-            minimumSize: const Size(double.infinity, AppSpacing.minTouchTarget),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
+              // If space was created, close this modal and return true
+              // so the HomeScreen knows to reload items
+              if (result == true && mounted) {
+                Navigator.of(context).pop(true);
+              }
+            },
+            icon: const Icon(Icons.add),
+            label: const Text('Create New Space'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.transparent,
+              foregroundColor: Colors.white,
+              shadowColor: Colors.transparent,
+              minimumSize: const Size(double.infinity, AppSpacing.minTouchTarget),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
+              ),
             ),
           ),
         ),
@@ -809,19 +871,34 @@ class _SpaceSwitcherModalState extends State<SpaceSwitcherModal> {
       onKeyEvent: (node, event) {
         return _handleKeyEvent(node, event, _filteredSpaces, currentSpaceId);
       },
-      child: Container(
-        constraints: BoxConstraints(
-          maxHeight: MediaQuery.of(context).size.height * 0.8,
-          maxWidth: isDesktop ? 500 : double.infinity,
-        ),
-        decoration: BoxDecoration(
-          color: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
-          borderRadius: isDesktop
-              ? BorderRadius.circular(AppSpacing.modalRadius)
-              : const BorderRadius.vertical(
-                  top: Radius.circular(AppSpacing.modalRadius),
-                ),
-        ),
+      child: ClipRRect(
+        borderRadius: isDesktop
+            ? BorderRadius.circular(AppSpacing.modalRadius)
+            : const BorderRadius.vertical(
+                top: Radius.circular(AppSpacing.modalRadius),
+              ),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+          child: Container(
+            constraints: BoxConstraints(
+              maxHeight: MediaQuery.of(context).size.height * 0.8,
+              maxWidth: isDesktop ? 500 : double.infinity,
+            ),
+            decoration: BoxDecoration(
+              color: isDark
+                  ? AppColors.glassDark
+                  : AppColors.glassLight,
+              borderRadius: isDesktop
+                  ? BorderRadius.circular(AppSpacing.modalRadius)
+                  : const BorderRadius.vertical(
+                      top: Radius.circular(AppSpacing.modalRadius),
+                    ),
+              border: Border.all(
+                color: isDark
+                    ? AppColors.glassBorderDark
+                    : AppColors.glassBorderLight,
+              ),
+            ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -938,6 +1015,8 @@ class _SpaceSwitcherModalState extends State<SpaceSwitcherModal> {
                     MediaQuery.of(context).viewInsets.bottom,
               ),
           ],
+        ),
+          ),
         ),
       ),
     );

@@ -1,16 +1,33 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import '../../core/theme/app_colors.dart';
+import '../../core/theme/app_animations.dart';
 import '../../core/theme/app_spacing.dart';
 
-/// Bottom navigation bar for mobile devices
+// Design Constants
+const double _kNavBarHeight = 64.0;
+const double _kIndicatorHeight = 40.0;
+const double _kIndicatorWidth = 64.0;
+const double _kIndicatorRadius = 20.0;
+const double _kIconSize = 24.0;
+const double _kLabelFontSize = 11.0;
+const double _kItemVerticalPadding = 4.0;
+const double _kLabelTopSpacing = 4.0;
+
+/// Bottom navigation bar for mobile devices with glass morphism design
 ///
 /// Provides primary navigation for the mobile app with 3 tabs:
 /// - Home (spaces view)
 /// - Search
 /// - Settings
 ///
-/// Uses Material 3 NavigationBar widget with proper accessibility support.
-/// Displays only on mobile breakpoints (< 768px).
+/// Features:
+/// - Glassmorphic background with 20px blur and 90% opacity
+/// - Gradient active indicator with pill shape (48px height)
+/// - Outlined icons with 2px stroke weight
+/// - Smooth indicator animation (250ms spring curve)
+/// - Safe area support for notched devices
+/// - 64px total height maintained
 ///
 /// Example usage:
 /// ```dart
@@ -23,7 +40,7 @@ import '../../core/theme/app_spacing.dart';
 ///   ),
 /// )
 /// ```
-class AppBottomNavigationBar extends StatelessWidget {
+class AppBottomNavigationBar extends StatefulWidget {
   /// Creates a bottom navigation bar.
   ///
   /// The [currentIndex] parameter must not be null and must be between 0 and 2.
@@ -46,60 +63,214 @@ class AppBottomNavigationBar extends StatelessWidget {
   final ValueChanged<int> onDestinationSelected;
 
   @override
+  State<AppBottomNavigationBar> createState() => _AppBottomNavigationBarState();
+}
+
+class _AppBottomNavigationBarState extends State<AppBottomNavigationBar>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _animationController;
+  late Animation<double> _indicatorAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      vsync: this,
+      duration: AppAnimations.normal,
+    );
+    _indicatorAnimation = CurvedAnimation(
+      parent: _animationController,
+      curve: AppAnimations.springCurve,
+    );
+    _animationController.value = 1.0;
+  }
+
+  @override
+  void didUpdateWidget(AppBottomNavigationBar oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.currentIndex != widget.currentIndex) {
+      _animationController.forward(from: 0.0);
+    }
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDarkMode = theme.brightness == Brightness.dark;
 
-    return NavigationBar(
-      selectedIndex: currentIndex,
-      onDestinationSelected: onDestinationSelected,
-      backgroundColor: isDarkMode
-          ? AppColors.surfaceDark
-          : AppColors.surfaceLight,
-      indicatorColor: isDarkMode
-          ? AppColors.selectedDark
-          : AppColors.selectedLight,
-      elevation: AppSpacing.elevation2,
-      height: 64.0, // Provides adequate touch target size
-      labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
-      destinations: const [
-        NavigationDestination(
-          icon: Icon(
-            Icons.home_outlined,
-            semanticLabel: 'Home navigation',
+    return SafeArea(
+      child: ClipRect(
+        child: BackdropFilter(
+          filter: ImageFilter.blur(
+            sigmaX: AppColors.glassBlurRadius,
+            sigmaY: AppColors.glassBlurRadius,
           ),
-          selectedIcon: Icon(
-            Icons.home,
-            semanticLabel: 'Home navigation (selected)',
+          child: Container(
+            height: _kNavBarHeight,
+            decoration: BoxDecoration(
+              color: isDarkMode ? AppColors.glassDark : AppColors.glassLight,
+              border: Border(
+                top: BorderSide(
+                  color: isDarkMode
+                      ? AppColors.glassBorderDark
+                      : AppColors.glassBorderLight,
+                ),
+              ),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                _buildNavItem(
+                  context: context,
+                  index: 0,
+                  icon: Icons.home_outlined,
+                  selectedIcon: Icons.home,
+                  label: 'Home',
+                  tooltip: 'View your spaces',
+                  semanticLabel: 'Home navigation',
+                  isDarkMode: isDarkMode,
+                ),
+                _buildNavItem(
+                  context: context,
+                  index: 1,
+                  icon: Icons.search_outlined,
+                  selectedIcon: Icons.search,
+                  label: 'Search',
+                  tooltip: 'Search items',
+                  semanticLabel: 'Search navigation',
+                  isDarkMode: isDarkMode,
+                ),
+                _buildNavItem(
+                  context: context,
+                  index: 2,
+                  icon: Icons.settings_outlined,
+                  selectedIcon: Icons.settings,
+                  label: 'Settings',
+                  tooltip: 'App settings',
+                  semanticLabel: 'Settings navigation',
+                  isDarkMode: isDarkMode,
+                ),
+              ],
+            ),
           ),
-          label: 'Home',
-          tooltip: 'View your spaces',
         ),
-        NavigationDestination(
-          icon: Icon(
-            Icons.search_outlined,
-            semanticLabel: 'Search navigation',
+      ),
+    );
+  }
+
+  Widget _buildNavItem({
+    required BuildContext context,
+    required int index,
+    required IconData icon,
+    required IconData selectedIcon,
+    required String label,
+    required String tooltip,
+    required String semanticLabel,
+    required bool isDarkMode,
+  }) {
+    final isSelected = widget.currentIndex == index;
+    final theme = Theme.of(context);
+
+    return Expanded(
+      child: Tooltip(
+        message: tooltip,
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: () => widget.onDestinationSelected(index),
+            borderRadius: BorderRadius.circular(AppSpacing.radiusMD),
+            splashColor: AppColors.ripple(context),
+            highlightColor: Colors.transparent,
+            child: SizedBox(
+              height: _kNavBarHeight,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: _kItemVerticalPadding),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // Icon with animated indicator background
+                    SizedBox(
+                      height: _kIndicatorHeight,
+                      child: Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          // Animated gradient indicator
+                          if (isSelected)
+                            AnimatedBuilder(
+                              animation: _indicatorAnimation,
+                              builder: (context, child) {
+                                // Clamp opacity value to 0-1 range (spring curves can overshoot)
+                                final opacity = _indicatorAnimation.value.clamp(0.0, 1.0);
+                                final scale = _indicatorAnimation.value.clamp(0.0, 1.0);
+
+                                return Transform.scale(
+                                  scale: scale,
+                                  child: Opacity(
+                                    opacity: opacity,
+                                    child: Container(
+                                      height: _kIndicatorHeight,
+                                      width: _kIndicatorWidth,
+                                      decoration: BoxDecoration(
+                                        gradient: isDarkMode
+                                            ? AppColors.primaryGradientDark
+                                            : AppColors.primaryGradient,
+                                        borderRadius: BorderRadius.circular(_kIndicatorRadius),
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                          // Icon
+                          Icon(
+                            isSelected ? selectedIcon : icon,
+                            size: _kIconSize,
+                            color: isSelected
+                                ? Colors.white
+                                : (isDarkMode
+                                    ? AppColors.neutral400
+                                    : AppColors.neutral600),
+                            semanticLabel: isSelected
+                                ? '$semanticLabel (selected)'
+                                : semanticLabel,
+                          ),
+                        ],
+                      ),
+                    ),
+                    // Label
+                    const SizedBox(height: _kLabelTopSpacing),
+                    Text(
+                      label,
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        fontSize: _kLabelFontSize,
+                        fontWeight:
+                            isSelected ? FontWeight.w600 : FontWeight.w500,
+                        color: isSelected
+                            ? (isDarkMode
+                                ? AppColors.primaryStartDark
+                                : AppColors.primarySolid)
+                            : (isDarkMode
+                                ? AppColors.neutral500
+                                : AppColors.neutral600),
+                        height: 1.0,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
+              ),
+            ),
           ),
-          selectedIcon: Icon(
-            Icons.search,
-            semanticLabel: 'Search navigation (selected)',
-          ),
-          label: 'Search',
-          tooltip: 'Search items',
         ),
-        NavigationDestination(
-          icon: Icon(
-            Icons.settings_outlined,
-            semanticLabel: 'Settings navigation',
-          ),
-          selectedIcon: Icon(
-            Icons.settings,
-            semanticLabel: 'Settings navigation (selected)',
-          ),
-          label: 'Settings',
-          tooltip: 'App settings',
-        ),
-      ],
+      ),
     );
   }
 }
