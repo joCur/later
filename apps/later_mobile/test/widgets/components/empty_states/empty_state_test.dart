@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:later_mobile/widgets/components/empty_states/empty_state.dart';
-import 'package:later_mobile/core/theme/app_colors.dart';
 
 void main() {
   group('EmptyState Base Component Tests', () {
@@ -170,9 +169,9 @@ void main() {
         ),
       );
 
-      // Assert
+      // Assert - icon now uses white color for ShaderMask gradient
       final iconWidget = tester.widget<Icon>(find.byType(Icon));
-      expect(iconWidget.color, AppColors.neutralGray300);
+      expect(iconWidget.color, Colors.white);
     });
 
     testWidgets('uses correct colors in dark mode',
@@ -192,9 +191,9 @@ void main() {
         ),
       );
 
-      // Assert
+      // Assert - icon now uses white color for ShaderMask gradient
       final iconWidget = tester.widget<Icon>(find.byType(Icon));
-      expect(iconWidget.color, AppColors.neutralGray600);
+      expect(iconWidget.color, Colors.white);
     });
 
     testWidgets('applies correct typography', (WidgetTester tester) async {
@@ -216,9 +215,9 @@ void main() {
       final titleText = tester.widget<Text>(find.text('Title'));
       expect(titleText.style?.fontSize, 40.0);
 
-      // Assert - description uses body large (17px)
+      // Assert - description uses body large (18px)
       final descriptionText = tester.widget<Text>(find.text('Description'));
-      expect(descriptionText.style?.fontSize, 16.0);
+      expect(descriptionText.style?.fontSize, 18.0);
     });
 
     testWidgets('applies correct spacing', (WidgetTester tester) async {
