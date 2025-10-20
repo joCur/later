@@ -58,8 +58,9 @@ void main() {
         ),
       );
 
-      expect(container.constraints?.minWidth, 56);
-      expect(container.constraints?.minHeight, 56);
+      // Temporal Flow: 64x64px squircle FAB
+      expect(container.constraints?.maxWidth, 64);
+      expect(container.constraints?.maxHeight, 64);
     });
 
     testWidgets('renders with custom icon', (tester) async {

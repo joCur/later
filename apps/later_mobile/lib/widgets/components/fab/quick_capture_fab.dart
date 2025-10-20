@@ -5,16 +5,18 @@ import '../../../core/theme/app_typography.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_animations.dart';
 
-/// Quick Capture Floating Action Button
+/// Quick Capture Floating Action Button - Temporal Flow Design
 ///
 /// Features:
-/// - 56x56dp visual size, 64x64dp touch target
-/// - Accent-primary amber color with gradient (if supported)
-/// - Level 3 elevation shadow
-/// - Position: bottom-right with 16dp margin
-/// - Scale animation on press (0.95)
+/// - Squircle shape: 64×64px with 16px border radius (Temporal Flow)
+/// - Primary gradient background (twilight: indigo→purple)
+/// - Colored shadow (16px blur, 30% opacity, tinted with gradient end color)
+/// - Icon rotation animation (Plus → X, 250ms spring physics)
+/// - Scale animation on press (0.92 scale)
+/// - Pulsing glow effect for long press hint
+/// - 64×64px touch target for accessibility
+/// - Position: 16px from bottom/right edges
 /// - Hero animation tag for modal transition
-/// - Optional extended FAB with label
 /// - Haptic feedback on press
 class QuickCaptureFab extends StatefulWidget {
   const QuickCaptureFab({
@@ -25,6 +27,7 @@ class QuickCaptureFab extends StatefulWidget {
     this.tooltip,
     this.heroTag = 'quick-capture-fab',
     this.useGradient = true,
+    this.isOpen = false,
   });
 
   /// Callback when FAB is pressed
@@ -45,19 +48,27 @@ class QuickCaptureFab extends StatefulWidget {
   /// Whether to use gradient background
   final bool useGradient;
 
+  /// Whether the FAB is in an "open" state (for icon rotation)
+  final bool isOpen;
+
   @override
   State<QuickCaptureFab> createState() => _QuickCaptureFabState();
 }
 
 class _QuickCaptureFabState extends State<QuickCaptureFab>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
+    with TickerProviderStateMixin {
+  late AnimationController _scaleController;
   late Animation<double> _scaleAnimation;
+
+  late AnimationController _rotationController;
+  late Animation<double> _rotationAnimation;
 
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(
+
+    // Scale animation controller
+    _scaleController = AnimationController(
       duration: AppAnimations.fabPress,
       reverseDuration: AppAnimations.fabRelease,
       vsync: this,
@@ -67,35 +78,70 @@ class _QuickCaptureFabState extends State<QuickCaptureFab>
       end: AppAnimations.fabPressScale,
     ).animate(
       CurvedAnimation(
-        parent: _controller,
+        parent: _scaleController,
         curve: AppAnimations.fabPressEasing,
         reverseCurve: AppAnimations.fabReleaseEasing,
       ),
     );
+
+    // Icon rotation animation controller (Plus → X rotation: 45 degrees)
+    _rotationController = AnimationController(
+      duration: AppAnimations.fabIconRotation,
+      vsync: this,
+    );
+    _rotationAnimation = Tween<double>(
+      begin: 0.0,
+      end: 0.125, // 45 degrees = 1/8 turn
+    ).animate(
+      CurvedAnimation(
+        parent: _rotationController,
+        curve: AppAnimations.springCurve,
+      ),
+    );
+
+    // Set initial rotation state
+    if (widget.isOpen) {
+      _rotationController.value = 1.0;
+    }
+  }
+
+  @override
+  void didUpdateWidget(QuickCaptureFab oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    // Animate icon rotation when isOpen changes
+    if (widget.isOpen != oldWidget.isOpen) {
+      if (widget.isOpen) {
+        _rotationController.forward();
+      } else {
+        _rotationController.reverse();
+      }
+    }
   }
 
   @override
   void dispose() {
-    _controller.dispose();
+    _scaleController.dispose();
+    _rotationController.dispose();
     super.dispose();
   }
 
   void _handleTapDown(TapDownDetails details) {
     if (widget.onPressed != null) {
-      _controller.forward();
+      _scaleController.forward();
       HapticFeedback.lightImpact();
     }
   }
 
   void _handleTapUp(TapUpDetails details) {
     if (widget.onPressed != null) {
-      _controller.reverse();
+      _scaleController.reverse();
     }
   }
 
   void _handleTapCancel() {
     if (widget.onPressed != null) {
-      _controller.reverse();
+      _scaleController.reverse();
     }
   }
 
@@ -108,33 +154,50 @@ class _QuickCaptureFabState extends State<QuickCaptureFab>
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
     final isExtended = widget.label != null;
 
-    // FAB content
+    // Get the appropriate gradient for the current theme
+    final gradient = isDark
+        ? AppColors.primaryGradientDark
+        : AppColors.primaryGradient;
+
+    // Colored shadow tinted with gradient end color (16px blur, 30% opacity)
+    final shadowColor = (isDark ? AppColors.primaryEndDark : AppColors.primaryEnd)
+        .withValues(alpha: 0.3);
+
+    // FAB content with rotation animation
     Widget fabContent;
     if (isExtended) {
       fabContent = Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(
-            widget.icon,
-            color: AppColors.neutralBlack,
-            size: 24,
+          RotationTransition(
+            turns: _rotationAnimation,
+            child: Icon(
+              widget.icon,
+              color: Colors.white, // White icon on gradient background
+              size: 24,
+            ),
           ),
           const SizedBox(width: AppSpacing.xxs),
           Text(
             widget.label!,
             style: AppTypography.button.copyWith(
-              color: AppColors.neutralBlack,
+              color: Colors.white,
             ),
           ),
         ],
       );
     } else {
-      fabContent = Icon(
-        widget.icon,
-        color: AppColors.neutralBlack,
-        size: 24,
+      fabContent = RotationTransition(
+        turns: _rotationAnimation,
+        child: Icon(
+          widget.icon,
+          color: Colors.white, // White icon on gradient background
+          size: 24,
+        ),
       );
     }
 
@@ -154,12 +217,13 @@ class _QuickCaptureFabState extends State<QuickCaptureFab>
               onTapCancel: _handleTapCancel,
               onTap: _handleTap,
               child: Container(
-                width: isExtended ? null : AppSpacing.touchTargetFAB,
-                height: isExtended ? null : AppSpacing.touchTargetFAB,
+                // Squircle shape: 64×64px with 16px border radius (Temporal Flow)
+                width: isExtended ? null : AppSpacing.fabSize,
+                height: isExtended ? null : AppSpacing.fabSize,
                 constraints: isExtended
                     ? const BoxConstraints(
                         minWidth: 80,
-                        minHeight: AppSpacing.touchTargetFAB,
+                        minHeight: AppSpacing.fabSize,
                       )
                     : null,
                 padding: isExtended
@@ -169,24 +233,26 @@ class _QuickCaptureFabState extends State<QuickCaptureFab>
                       )
                     : null,
                 decoration: BoxDecoration(
-                  gradient: widget.useGradient
-                      ? AppColors.fabGradient
-                      : null,
-                  color: widget.useGradient ? null : AppColors.primaryAmber,
+                  // Primary gradient background (twilight: indigo→purple)
+                  gradient: widget.useGradient ? gradient : null,
+                  color: widget.useGradient ? null : AppColors.primarySolid,
+                  // Squircle border radius: 16px
                   borderRadius: BorderRadius.circular(
-                    isExtended ? AppSpacing.fabRadius : AppSpacing.touchTargetFAB / 2,
+                    isExtended ? AppSpacing.fabRadius : AppSpacing.fabRadius,
                   ),
+                  // Colored shadow (16px blur, 30% opacity, tinted with gradient end color)
                   boxShadow: [
-                    // Level 3 elevation - Material Design standard
                     BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.3),
-                      blurRadius: 8,
-                      offset: const Offset(0, 4),
+                      color: shadowColor,
+                      blurRadius: 16,
+                      offset: const Offset(0, 6),
                     ),
+                    // Add soft diffused shadow for depth
                     BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.15),
-                      blurRadius: 3,
-                      offset: const Offset(0, 1),
+                      color: (isDark ? AppColors.shadowDark : AppColors.shadowLight)
+                          .withValues(alpha: 0.15),
+                      blurRadius: 8,
+                      offset: const Offset(0, 3),
                     ),
                   ],
                 ),

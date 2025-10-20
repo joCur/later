@@ -68,19 +68,19 @@ class _ItemCardState extends State<ItemCard> with SingleTickerProviderStateMixin
 
     // Initialize checkbox animation controller
     _checkboxAnimationController = AnimationController(
-      duration: const Duration(milliseconds: 150),
+      duration: const Duration(milliseconds: 250),
       vsync: this,
     );
 
-    // Create scale animation: 1.0 -> 1.05 -> 1.0
+    // Create scale animation: 1.0 -> 1.1 -> 1.0 (enhanced for Temporal Flow)
     _checkboxScaleAnimation = TweenSequence<double>([
       TweenSequenceItem(
-        tween: Tween<double>(begin: 1.0, end: 1.05)
+        tween: Tween<double>(begin: 1.0, end: 1.1)
             .chain(CurveTween(curve: Curves.easeOut)),
         weight: 50.0,
       ),
       TweenSequenceItem(
-        tween: Tween<double>(begin: 1.05, end: 1.0)
+        tween: Tween<double>(begin: 1.1, end: 1.0)
             .chain(CurveTween(curve: Curves.easeIn)),
         weight: 50.0,
       ),
@@ -93,20 +93,33 @@ class _ItemCardState extends State<ItemCard> with SingleTickerProviderStateMixin
     super.dispose();
   }
 
-  /// Get border color based on item type
-  Color _getBorderColor() {
-    if (widget.item.isCompleted && widget.item.type == ItemType.task) {
-      return AppColors.accentGreen;
+  /// Get border gradient based on item type
+  LinearGradient _getBorderGradient() {
+    final isCompleted = widget.item.isCompleted && widget.item.type == ItemType.task;
+
+    if (isCompleted) {
+      // Green gradient for completed tasks
+      return const LinearGradient(
+        colors: [AppColors.success, AppColors.successLight],
+      );
     }
 
     switch (widget.item.type) {
       case ItemType.task:
-        return AppColors.itemBorderTask;
+        return AppColors.taskGradient;
       case ItemType.note:
-        return AppColors.itemBorderNote;
+        return AppColors.noteGradient;
       case ItemType.list:
-        return AppColors.itemBorderList;
+        return AppColors.listGradient;
     }
+  }
+
+  /// Get background color with subtle gradient tint (5% opacity)
+  Color _getBackgroundTint(bool isDark) {
+    return AppColors.typeLightBg(
+      widget.item.type.toString().split('.').last,
+      isDark: isDark,
+    );
   }
 
   /// Get leading icon for notes and lists
@@ -185,14 +198,20 @@ class _ItemCardState extends State<ItemCard> with SingleTickerProviderStateMixin
     }
 
     // For notes and lists, use same 48×48px container for alignment
+    // Apply gradient shader to the icon
+    final gradient = _getBorderGradient();
+
     return SizedBox(
       width: 48,
       height: 48,
       child: Center(
-        child: Icon(
-          _getLeadingIcon(),
-          size: 20,
-          color: _getBorderColor(),
+        child: ShaderMask(
+          shaderCallback: (bounds) => gradient.createShader(bounds),
+          child: Icon(
+            _getLeadingIcon(),
+            size: 20,
+            color: Colors.white, // Base color for shader mask
+          ),
         ),
       ),
     );
@@ -305,32 +324,33 @@ class _ItemCardState extends State<ItemCard> with SingleTickerProviderStateMixin
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final isMobile = context.isMobile;
+    final isCompleted = widget.item.isCompleted && widget.item.type == ItemType.task;
 
-    // Background color based on state
+    // Base background color with subtle gradient tint (5% opacity)
+    final baseBgColor = isDark ? AppColors.surfaceDark : AppColors.surfaceLight;
+    final tintColor = _getBackgroundTint(isDark);
+
+    // Background color based on state with glass morphism for hover/selected
     Color backgroundColor;
     if (widget.isSelected) {
+      // Glass morphism overlay (3% opacity) for selected state
       backgroundColor = isDark
-          ? AppColors.primaryAmber.withValues(alpha: 0.15)
-          : AppColors.primaryAmber.withValues(alpha: 0.1);
+          ? AppColors.glass(context).withValues(alpha: 0.03)
+          : AppColors.glass(context).withValues(alpha: 0.03);
     } else if (_isPressed) {
       backgroundColor = isDark
-          ? AppColors.surfaceDarkVariant // Subtle dark gray for pressed state
+          ? AppColors.surfaceDarkVariant
           : AppColors.neutralGray100;
     } else {
-      backgroundColor = isDark
-          ? AppColors.surfaceDark
-          : AppColors.surfaceLight;
+      // Blend base color with subtle type-specific tint
+      backgroundColor = Color.alphaBlend(
+        tintColor.withValues(alpha: 0.05),
+        baseBgColor,
+      );
     }
 
-    // Border width
-    final borderWidth = widget.isSelected
-        ? AppSpacing.radiusSM
-        : AppSpacing.itemBorderWidth;
-
-    // Card opacity for completed tasks
-    final opacity = widget.item.isCompleted && widget.item.type == ItemType.task
-        ? 0.7
-        : 1.0;
+    // Card opacity for completed tasks (70% for Temporal Flow)
+    final opacity = isCompleted ? 0.7 : 1.0;
 
     // Wrap with RepaintBoundary to isolate repaints
     return RepaintBoundary(
@@ -351,59 +371,77 @@ class _ItemCardState extends State<ItemCard> with SingleTickerProviderStateMixin
               margin: const EdgeInsets.only(bottom: AppSpacing.xxs),
               decoration: BoxDecoration(
                 color: backgroundColor,
-                borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
-                border: Border(
-                  left: BorderSide(
-                    color: _getBorderColor(),
-                    width: borderWidth,
-                  ),
-                ),
+                borderRadius: BorderRadius.circular(AppSpacing.cardRadius), // 12px
+                // Add soft, diffused shadow (4px blur, 10% opacity)
                 boxShadow: _isPressed
                     ? null
                     : [
                         BoxShadow(
-                          color: isDark
-                              ? AppColors.shadowDark
-                              : AppColors.shadowLight,
-                          blurRadius: 3,
-                          offset: const Offset(0, 1),
+                          color: (isDark ? AppColors.shadowDark : AppColors.shadowLight)
+                              .withValues(alpha: 0.1),
+                          blurRadius: 4,
+                          offset: const Offset(0, 2),
                         ),
                       ],
               ),
-              child: Padding(
-                padding: EdgeInsets.all(isMobile ? 12 : AppSpacing.sm),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Leading element (checkbox or icon)
-                    _buildLeadingElement(),
-                    const SizedBox(width: AppSpacing.xxxs),
+              // Clip the content to follow the border radius
+              clipBehavior: Clip.antiAlias,
+              child: Stack(
+                children: [
+                  // Main content with top padding for the gradient border
+                  Padding(
+                    padding: EdgeInsets.only(
+                      top: 3.0, // Height of gradient border
+                      left: isMobile ? 12 : AppSpacing.sm,
+                      right: isMobile ? 12 : AppSpacing.sm,
+                      bottom: isMobile ? 12 : AppSpacing.sm,
+                    ),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Leading element (checkbox or icon)
+                        _buildLeadingElement(),
+                        const SizedBox(width: AppSpacing.xxxs),
 
-                    // Content
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          // Title
-                          _buildTitle(context),
+                        // Content
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              // Title
+                              _buildTitle(context),
 
-                          // Content preview (if available)
-                          if (_buildContentPreview(context) != null) ...[
-                            const SizedBox(height: AppSpacing.xxxs),
-                            _buildContentPreview(context)!,
-                          ],
+                              // Content preview (if available)
+                              if (_buildContentPreview(context) != null) ...[
+                                const SizedBox(height: AppSpacing.xxxs),
+                                _buildContentPreview(context)!,
+                              ],
 
-                          // Metadata
-                          if (_buildMetadata(context) != null) ...[
-                            const SizedBox(height: AppSpacing.xxs),
-                            _buildMetadata(context)!,
-                          ],
-                        ],
+                              // Metadata
+                              if (_buildMetadata(context) != null) ...[
+                                const SizedBox(height: AppSpacing.xxs),
+                                _buildMetadata(context)!,
+                              ],
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  // Top gradient border positioned absolutely
+                  Positioned(
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    child: Container(
+                      height: 3.0,
+                      decoration: BoxDecoration(
+                        gradient: _getBorderGradient(),
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           ),
