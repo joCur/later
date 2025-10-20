@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:later_mobile/widgets/components/buttons/ghost_button.dart';
+import 'package:later_mobile/core/theme/app_spacing.dart';
 
 void main() {
   group('GhostButton', () {
@@ -132,6 +133,117 @@ void main() {
       await tester.pump();
 
       expect(pressed, isFalse);
+    });
+
+    group('Temporal Flow Design Requirements', () {
+      testWidgets('has 10px border radius', (tester) async {
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              body: GhostButton(
+                text: 'Test',
+                onPressed: () {},
+              ),
+            ),
+          ),
+        );
+
+        final container = tester.widget<Container>(
+          find.descendant(
+            of: find.byType(GhostButton),
+            matching: find.byType(Container),
+          ).first,
+        );
+        final decoration = container.decoration as BoxDecoration;
+        final borderRadius = decoration.borderRadius as BorderRadius;
+        expect(borderRadius.topLeft.x, AppSpacing.buttonRadius);
+      });
+
+      testWidgets('animates to 0.92 scale on press', (tester) async {
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              body: GhostButton(
+                text: 'Test',
+                onPressed: () {},
+              ),
+            ),
+          ),
+        );
+
+        // Find the AnimatedScale widget
+        final animatedScale = tester.widget<AnimatedScale>(
+          find.descendant(
+            of: find.byType(GhostButton),
+            matching: find.byType(AnimatedScale),
+          ),
+        );
+        expect(animatedScale.scale, 1.0);
+
+        // Simulate tap down
+        await tester.press(find.byType(GhostButton));
+        await tester.pumpAndSettle();
+
+        // Scale should be 0.92 when pressed
+        final animatedScalePressed = tester.widget<AnimatedScale>(
+          find.descendant(
+            of: find.byType(GhostButton),
+            matching: find.byType(AnimatedScale),
+          ),
+        );
+        expect(animatedScalePressed.scale, 0.92);
+      });
+
+      testWidgets('disabled state has 40% opacity', (tester) async {
+        await tester.pumpWidget(
+          const MaterialApp(
+            home: Scaffold(
+              body: GhostButton(
+                text: 'Disabled',
+                onPressed: null,
+              ),
+            ),
+          ),
+        );
+
+        final opacity = tester.widget<Opacity>(
+          find.descendant(
+            of: find.byType(GhostButton),
+            matching: find.byType(Opacity),
+          ),
+        );
+        expect(opacity.opacity, 0.4);
+      });
+
+      testWidgets('icon and text have 8px gap', (tester) async {
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              body: GhostButton(
+                text: 'With Icon',
+                icon: Icons.delete,
+                onPressed: () {},
+              ),
+            ),
+          ),
+        );
+
+        // Find the icon
+        expect(find.byIcon(Icons.delete), findsOneWidget);
+
+        // Find the SizedBox that is between Icon and Text (should be 8px)
+        final row = tester.widget<Row>(
+          find.descendant(
+            of: find.byType(GhostButton),
+            matching: find.byType(Row),
+          ),
+        );
+
+        // The Row should have 3 children: Icon, SizedBox(width: 8), Text
+        expect(row.children.length, 3);
+        final sizedBox = row.children[1] as SizedBox;
+        expect(sizedBox.width, AppSpacing.xs);
+      });
     });
   });
 }

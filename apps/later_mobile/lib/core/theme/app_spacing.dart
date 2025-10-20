@@ -212,8 +212,8 @@ class AppSpacing {
   /// Spacing between form sections (32px)
   static const double formSectionSpacing = xl;
 
-  /// Input border radius (8px for Temporal Flow)
-  static const double inputRadius = xs;
+  /// Input border radius (10px for Temporal Flow)
+  static const double inputRadius = 10.0;
 
   // FAB Spacing
   /// FAB margin from screen edges (16px for Temporal Flow)

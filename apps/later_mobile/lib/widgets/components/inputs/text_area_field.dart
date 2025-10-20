@@ -2,13 +2,22 @@ import 'package:flutter/material.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../core/theme/app_spacing.dart';
+import '../../../core/theme/app_animations.dart';
 
-/// Multiline text input field component (text area)
+/// Multiline text input field component (text area) with Temporal Flow design system
 ///
 /// Features:
+/// - Glass background (3% opacity)
+/// - Gradient border on focus (30% opacity)
+/// - Glass effect overlay on focus (5% opacity)
+/// - Focus shadow with gradient tint (8px blur, 20% opacity)
+/// - Smooth focus/blur transitions (200ms)
+/// - Border radius: 10px
+/// - Padding: 12px horizontal, 16px vertical
+/// - Error state with red gradient border
+/// - Character counter with gradient warning colors
+/// - Softer placeholder colors (60% opacity)
 /// - States: default, focus, error, disabled
-/// - Border radius: 6px (radius-sm)
-/// - Focus: primary border with 0 2px 4px shadow
 /// - Configurable min/max lines
 /// - Validation feedback support
 /// - Accessibility: screen reader compatible
@@ -75,19 +84,36 @@ class TextAreaField extends StatefulWidget {
 
 class _TextAreaFieldState extends State<TextAreaField> {
   late FocusNode _focusNode;
+  late TextEditingController _controller;
   bool _isFocused = false;
+  bool _ownsController = false;
 
   @override
   void initState() {
     super.initState();
     _focusNode = FocusNode();
     _focusNode.addListener(_handleFocusChange);
+
+    // Create internal controller if not provided
+    if (widget.controller == null) {
+      _controller = TextEditingController(text: widget.initialValue);
+      _ownsController = true;
+    } else {
+      _controller = widget.controller!;
+    }
+
+    // Listen to text changes for character counter
+    _controller.addListener(_handleTextChange);
   }
 
   @override
   void dispose() {
     _focusNode.removeListener(_handleFocusChange);
     _focusNode.dispose();
+    _controller.removeListener(_handleTextChange);
+    if (_ownsController) {
+      _controller.dispose();
+    }
     super.dispose();
   }
 
@@ -97,27 +123,92 @@ class _TextAreaFieldState extends State<TextAreaField> {
     });
   }
 
+  void _handleTextChange() {
+    // Trigger rebuild for character counter
+    if (widget.maxLength != null) {
+      setState(() {});
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
-    // Determine border color based on state
-    Color borderColor;
-    if (widget.errorText != null) {
-      borderColor = AppColors.error;
+    // Determine if we should show error gradient
+    final hasError = widget.errorText != null;
+
+    // Determine gradient for border (30% opacity on focus as per plan)
+    LinearGradient? borderGradient;
+    if (hasError) {
+      // Error gradient
+      borderGradient = LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: isDark
+            ? [
+                const Color(0xFFF87171), // red-400
+                const Color(0xFFFBBF24), // yellow-400
+              ]
+            : [
+                const Color(0xFFEF4444), // red-500
+                const Color(0xFFFB923C), // orange-400
+              ],
+      );
     } else if (_isFocused) {
-      borderColor = AppColors.primaryAmber;
-    } else if (!widget.enabled) {
-      borderColor = isDark ? AppColors.neutralGray700 : AppColors.neutralGray300;
-    } else {
-      borderColor = isDark ? AppColors.borderDark : AppColors.borderLight;
+      // Focus gradient with 30% opacity
+      final gradientColors = isDark
+          ? [
+              AppColors.primaryStartDark.withValues(alpha: 0.3),
+              AppColors.primaryEndDark.withValues(alpha: 0.3),
+            ]
+          : [
+              AppColors.primaryStart.withValues(alpha: 0.3),
+              AppColors.primaryEnd.withValues(alpha: 0.3),
+            ];
+      borderGradient = LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: gradientColors,
+      );
     }
 
-    // Background color
-    final backgroundColor = widget.enabled
-        ? (isDark ? AppColors.surfaceDark : AppColors.surfaceLight)
-        : (isDark ? AppColors.surfaceDarkVariant : AppColors.surfaceLightVariant);
+    // Glass effect overlay on focus (5% opacity)
+    Color? glassOverlay;
+    if (_isFocused && !hasError) {
+      glassOverlay = isDark
+          ? AppColors.primaryStartDark.withValues(alpha: 0.05)
+          : AppColors.primaryStart.withValues(alpha: 0.05);
+    }
+
+    // Glass background color (3% opacity)
+    final backgroundColor = isDark
+        ? AppColors.surfaceDark.withValues(alpha: 0.03)
+        : AppColors.surfaceLight.withValues(alpha: 0.03);
+
+    // Standard border color (when not focused)
+    final standardBorderColor =
+        isDark ? AppColors.borderDark : AppColors.borderLight;
+
+    // Focus shadow
+    List<BoxShadow>? boxShadow;
+    if (_isFocused && !hasError) {
+      final shadowColor = isDark
+          ? AppColors.primaryEndDark.withValues(alpha: 0.2)
+          : AppColors.primaryEnd.withValues(alpha: 0.2);
+      boxShadow = [
+        BoxShadow(
+          color: shadowColor,
+          blurRadius: 8.0,
+          offset: const Offset(0, 2),
+        ),
+      ];
+    }
+
+    // Placeholder color (60% opacity)
+    final hintColor = isDark
+        ? AppColors.textSecondaryDark.withValues(alpha: 0.6)
+        : AppColors.textSecondaryLight.withValues(alpha: 0.6);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -130,78 +221,164 @@ class _TextAreaFieldState extends State<TextAreaField> {
             widget.label,
             style: AppTypography.labelMedium.copyWith(
               color: widget.enabled
-                  ? (isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight)
-                  : (isDark ? AppColors.textDisabledDark : AppColors.textDisabledLight),
+                  ? (isDark
+                      ? AppColors.textPrimaryDark
+                      : AppColors.textPrimaryLight)
+                  : (isDark
+                      ? AppColors.textDisabledDark
+                      : AppColors.textDisabledLight),
             ),
           ),
         ),
 
-        // Input field
-        Container(
+        // Input field with gradient border and smooth transitions
+        AnimatedContainer(
+          duration: AppAnimations.inputFocus, // 200ms transition
+          curve: Curves.easeInOut,
           decoration: BoxDecoration(
             color: backgroundColor,
-            borderRadius: BorderRadius.circular(AppSpacing.radiusSM),
-            border: Border.all(
-              color: borderColor,
-              width: _isFocused ? AppSpacing.borderWidthMedium : AppSpacing.borderWidthThin,
-            ),
-            boxShadow: _isFocused && widget.errorText == null
-                ? [
-                    BoxShadow(
-                      color: AppColors.primaryAmber.withValues(alpha: 0.2),
-                      blurRadius: 4,
-                      offset: const Offset(0, 2),
-                    ),
-                  ]
-                : null,
+            borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
+            gradient: borderGradient,
+            boxShadow: boxShadow,
           ),
-          child: TextField(
-            controller: widget.controller,
-            focusNode: _focusNode,
-            enabled: widget.enabled,
-            autofocus: widget.autofocus,
-            maxLength: widget.maxLength,
-            minLines: widget.minLines,
-            maxLines: widget.maxLines,
-            keyboardType: TextInputType.multiline,
-            textInputAction: TextInputAction.newline,
-            style: AppTypography.input.copyWith(
-              color: widget.enabled
-                  ? (isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight)
-                  : (isDark ? AppColors.textDisabledDark : AppColors.textDisabledLight),
+          child: AnimatedContainer(
+            duration: AppAnimations.inputFocus,
+            curve: Curves.easeInOut,
+            decoration: BoxDecoration(
+              color: backgroundColor,
+              borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
+              border: borderGradient == null
+                  ? Border.all(
+                      color: standardBorderColor,
+                    )
+                  : null,
             ),
-            decoration: InputDecoration(
-              hintText: widget.hintText,
-              hintStyle: AppTypography.input.copyWith(
-                color: isDark ? AppColors.textDisabledDark : AppColors.textDisabledLight,
+            // Add padding to create border effect when gradient is used
+            padding: borderGradient != null
+                ? const EdgeInsets.all(AppSpacing.borderWidthThin)
+                : null,
+            child: AnimatedContainer(
+              duration: AppAnimations.inputFocus,
+              curve: Curves.easeInOut,
+              decoration: BoxDecoration(
+                // Blend glass overlay with background when focused
+                color: glassOverlay != null
+                    ? Color.alphaBlend(glassOverlay, backgroundColor)
+                    : backgroundColor,
+                borderRadius: BorderRadius.circular(
+                  AppSpacing.inputRadius - AppSpacing.borderWidthThin,
+                ),
               ),
-              border: InputBorder.none,
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.inputPaddingHorizontal,
-                vertical: AppSpacing.inputPaddingVertical,
+              child: TextField(
+                controller: _controller,
+                focusNode: _focusNode,
+                enabled: widget.enabled,
+                autofocus: widget.autofocus,
+                minLines: widget.minLines,
+                maxLines: widget.maxLines,
+                keyboardType: TextInputType.multiline,
+                textInputAction: TextInputAction.newline,
+                style: AppTypography.input.copyWith(
+                  color: widget.enabled
+                      ? (isDark
+                          ? AppColors.textPrimaryDark
+                          : AppColors.textPrimaryLight)
+                      : (isDark
+                          ? AppColors.textDisabledDark
+                          : AppColors.textDisabledLight),
+                ),
+                decoration: InputDecoration(
+                  hintText: widget.hintText,
+                  hintStyle: AppTypography.input.copyWith(
+                    color: hintColor,
+                  ),
+                  border: InputBorder.none,
+                  // Updated padding: 12px horizontal, 16px vertical for multi-line
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 12.0,
+                    vertical: 16.0,
+                  ),
+                ),
+                onChanged: widget.onChanged,
+                onSubmitted: widget.onSubmitted,
               ),
-              counterText: '', // Hide character counter
             ),
-            onChanged: widget.onChanged,
-            onSubmitted: widget.onSubmitted,
           ),
         ),
 
-        // Error message
-        if (widget.errorText != null)
+        // Character counter or error message
+        if (widget.errorText != null || widget.maxLength != null)
           Padding(
             padding: const EdgeInsets.only(
               top: AppSpacing.xxxs,
               left: AppSpacing.xxs,
             ),
-            child: Text(
-              widget.errorText!,
-              style: AppTypography.bodySmall.copyWith(
-                color: AppColors.error,
-              ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                // Error message
+                if (widget.errorText != null)
+                  Expanded(
+                    child: Text(
+                      widget.errorText!,
+                      style: AppTypography.bodySmall.copyWith(
+                        color: AppColors.error,
+                      ),
+                    ),
+                  ),
+
+                // Character counter
+                if (widget.maxLength != null)
+                  _buildCharacterCounter(isDark),
+              ],
             ),
           ),
       ],
+    );
+  }
+
+  Widget _buildCharacterCounter(bool isDark) {
+    final currentLength = _controller.text.length;
+    final maxLength = widget.maxLength!;
+    final percentage = currentLength / maxLength;
+    final counterText = '$currentLength / $maxLength';
+
+    // Warning gradient for >80%
+    if (percentage > 0.8) {
+      final errorGradient = LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: isDark
+            ? [
+                const Color(0xFFF87171), // red-400
+                const Color(0xFFFBBF24), // yellow-400
+              ]
+            : [
+                const Color(0xFFEF4444), // red-500
+                const Color(0xFFFB923C), // orange-400
+              ],
+      );
+
+      return ShaderMask(
+        shaderCallback: (bounds) => errorGradient.createShader(bounds),
+        child: Text(
+          counterText,
+          style: AppTypography.labelSmall.copyWith(
+            color: Colors.white, // Required for ShaderMask
+            fontWeight: percentage > 0.9 ? FontWeight.bold : null,
+          ),
+        ),
+      );
+    }
+
+    // Normal counter
+    return Text(
+      counterText,
+      style: AppTypography.labelSmall.copyWith(
+        color: isDark
+            ? AppColors.textSecondaryDark
+            : AppColors.textSecondaryLight,
+      ),
     );
   }
 }
