@@ -1,0 +1,626 @@
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
+import 'package:uuid/uuid.dart';
+import '../../core/responsive/breakpoints.dart';
+import '../../core/theme/app_colors.dart';
+import '../../core/theme/app_spacing.dart';
+import '../../core/theme/app_typography.dart';
+import '../../data/models/space_model.dart';
+import '../../providers/spaces_provider.dart';
+
+/// Mode for the CreateSpaceModal
+enum SpaceModalMode {
+  /// Create a new space
+  create,
+
+  /// Edit an existing space
+  edit,
+}
+
+/// Modal for creating and editing spaces.
+///
+/// Displays as:
+/// - Bottom sheet on mobile (using showModalBottomSheet)
+/// - Dialog on desktop (using showDialog)
+///
+/// Features:
+/// - Name input with validation (required, 1-100 chars)
+/// - Icon picker with emoji/icon options
+/// - Color picker with predefined palette
+/// - Generate unique UUID for space ID
+/// - Save to Hive via SpacesProvider
+/// - Auto-switch to newly created space
+/// - Support for both create and edit modes
+class CreateSpaceModal extends StatefulWidget {
+  const CreateSpaceModal({
+    required this.mode,
+    this.initialSpace,
+    super.key,
+  });
+
+  /// The mode for the modal (create or edit)
+  final SpaceModalMode mode;
+
+  /// Initial space data for edit mode
+  final Space? initialSpace;
+
+  /// Shows the create/edit space modal with responsive layout
+  ///
+  /// Returns true if a space was created/updated, false if cancelled
+  static Future<bool?> show(
+    BuildContext context, {
+    required SpaceModalMode mode,
+    Space? initialSpace,
+  }) async {
+    final isDesktop = Breakpoints.isDesktopOrLarger(context);
+
+    if (isDesktop) {
+      return showDialog<bool>(
+        context: context,
+        builder: (_) => CreateSpaceModal(
+          mode: mode,
+          initialSpace: initialSpace,
+        ),
+      );
+    } else {
+      return showModalBottomSheet<bool>(
+        context: context,
+        isScrollControlled: true,
+        builder: (_) => CreateSpaceModal(
+          mode: mode,
+          initialSpace: initialSpace,
+        ),
+      );
+    }
+  }
+
+  @override
+  State<CreateSpaceModal> createState() => _CreateSpaceModalState();
+}
+
+class _CreateSpaceModalState extends State<CreateSpaceModal> {
+  late final TextEditingController _nameController;
+  late final FocusNode _nameFocusNode;
+  String? _selectedIcon;
+  String? _selectedColor;
+  String? _errorMessage;
+  bool _isSubmitting = false;
+
+  // Curated emoji icons for spaces
+  static const List<String> _iconOptions = [
+    '💼', // Work
+    '📚', // Study
+    '🏠', // Home
+    '💡', // Ideas
+    '🎯', // Goals
+    '⚡', // Energy
+    '🌟', // Star
+    '✨', // Sparkles
+    '🎨', // Art
+    '📝', // Notes
+    '💪', // Strength
+    '🚀', // Rocket
+    '❤️', // Love
+    '🎵', // Music
+    '🍕', // Food
+    '✈️', // Travel
+    '📱', // Tech
+    '💻', // Computer
+    '🎮', // Gaming
+    '📷', // Photography
+    '🏋️', // Fitness
+    '🧘', // Meditation
+    '🌱', // Growth
+    '🔥', // Fire
+    '💎', // Diamond
+    '🎓', // Education
+    '🏆', // Achievement
+    '🌈', // Rainbow
+    '🎭', // Theater
+    '🎪', // Circus
+  ];
+
+  // Color palette from design system
+  static const List<String> _colorOptions = [
+    '#6366F1', // Primary Indigo
+    '#8B5CF6', // Secondary Violet
+    '#F59E0B', // Accent Primary Amber
+    '#14B8A6', // Accent Secondary Teal
+    '#3B82F6', // Task Color Blue
+    '#10B981', // Success Emerald
+    '#EF4444', // Error Red
+    '#EC4899', // Pink
+    '#F97316', // Orange
+    '#84CC16', // Lime
+    '#06B6D4', // Cyan
+    '#A855F7', // Purple
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    _nameController = TextEditingController(
+      text: widget.initialSpace?.name ?? '',
+    );
+    _nameFocusNode = FocusNode();
+    _selectedIcon = widget.initialSpace?.icon;
+    _selectedColor = widget.initialSpace?.color ?? _colorOptions[0];
+
+    _nameController.addListener(_validateForm);
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _nameFocusNode.dispose();
+    super.dispose();
+  }
+
+  /// Validate form and update error message
+  void _validateForm() {
+    setState(() {
+      final name = _nameController.text.trim();
+      if (name.isEmpty) {
+        _errorMessage = 'Name is required';
+      } else if (name.length > 100) {
+        _errorMessage = 'Name must be between 1 and 100 characters';
+      } else {
+        _errorMessage = null;
+      }
+    });
+  }
+
+  /// Check if form is valid
+  bool get _isFormValid {
+    final name = _nameController.text.trim();
+    return name.isNotEmpty && name.length <= 100;
+  }
+
+  /// Handle form submission
+  Future<void> _handleSave() async {
+    if (!_isFormValid || _isSubmitting) return;
+
+    setState(() {
+      _isSubmitting = true;
+    });
+
+    final navigator = Navigator.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+    final spacesProvider = context.read<SpacesProvider>();
+
+    try {
+      final name = _nameController.text.trim();
+      final space = Space(
+        id: widget.mode == SpaceModalMode.edit
+            ? widget.initialSpace!.id
+            : const Uuid().v4(),
+        name: name,
+        icon: _selectedIcon,
+        color: _selectedColor,
+        itemCount: widget.initialSpace?.itemCount ?? 0,
+        isArchived: widget.initialSpace?.isArchived ?? false,
+        createdAt: widget.initialSpace?.createdAt,
+        updatedAt: DateTime.now(),
+      );
+
+      if (widget.mode == SpaceModalMode.edit) {
+        await spacesProvider.updateSpace(space);
+      } else {
+        await spacesProvider.addSpace(space);
+      }
+
+      if (mounted) {
+        navigator.pop(true);
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isSubmitting = false;
+        });
+        messenger.showSnackBar(
+          SnackBar(
+            content: Text(
+              widget.mode == SpaceModalMode.edit
+                  ? 'Failed to update space'
+                  : 'Failed to create space',
+            ),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    }
+  }
+
+  /// Build name input field
+  Widget _buildNameInput(bool isDark) {
+    final charCount = _nameController.text.length;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Semantics(
+          label: 'Space Name',
+          child: TextField(
+            controller: _nameController,
+            focusNode: _nameFocusNode,
+            decoration: InputDecoration(
+              labelText: 'Space Name',
+              hintText: 'Enter space name',
+              errorText: _errorMessage,
+              suffixText: '$charCount/100',
+              filled: true,
+              fillColor: isDark
+                  ? AppColors.surfaceDarkVariant
+                  : AppColors.surfaceLightVariant,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
+                borderSide: BorderSide.none,
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
+                borderSide: BorderSide(
+                  color: isDark
+                      ? AppColors.primaryAmberLight
+                      : AppColors.primaryAmber,
+                  width: AppSpacing.borderWidthMedium,
+                ),
+              ),
+              errorBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
+                borderSide: const BorderSide(
+                  color: AppColors.error,
+                  width: AppSpacing.borderWidthMedium,
+                ),
+              ),
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.inputPaddingHorizontal,
+                vertical: AppSpacing.inputPaddingVertical,
+              ),
+            ),
+            style: AppTypography.bodyLarge.copyWith(
+              color:
+                  isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
+            ),
+            textInputAction: TextInputAction.done,
+            maxLength: 100,
+            buildCounter: (context,
+                {required currentLength, required isFocused, maxLength}) {
+              return null; // Hide default counter, using suffixText instead
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// Build icon picker
+  Widget _buildIconPicker(bool isDark) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Icon',
+          style: AppTypography.labelLarge.copyWith(
+            color:
+                isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
+          ),
+        ),
+        const SizedBox(height: AppSpacing.xs),
+        Wrap(
+          spacing: AppSpacing.xs,
+          runSpacing: AppSpacing.xs,
+          children: _iconOptions.map((icon) {
+            final isSelected = _selectedIcon == icon;
+            return GestureDetector(
+              onTap: () {
+                setState(() {
+                  _selectedIcon = icon;
+                });
+              },
+              child: Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  color: isSelected
+                      ? (isDark
+                          ? AppColors.selectedDark
+                          : AppColors.selectedLight)
+                      : (isDark
+                          ? AppColors.surfaceDarkVariant
+                          : AppColors.surfaceLightVariant),
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusSM),
+                  border: isSelected
+                      ? Border.all(
+                          color: isDark
+                              ? AppColors.primaryAmberLight
+                              : AppColors.primaryAmber,
+                          width: AppSpacing.borderWidthMedium,
+                        )
+                      : null,
+                ),
+                child: Stack(
+                  children: [
+                    Center(
+                      child: Text(
+                        icon,
+                        style: const TextStyle(fontSize: 24),
+                      ),
+                    ),
+                    if (isSelected)
+                      const Positioned(
+                        top: 2,
+                        right: 2,
+                        child: Icon(
+                          Icons.check,
+                          size: 16,
+                          color: AppColors.primaryAmber,
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+            );
+          }).toList(),
+        ),
+      ],
+    );
+  }
+
+  /// Build color picker
+  Widget _buildColorPicker(bool isDark) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Color',
+          style: AppTypography.labelLarge.copyWith(
+            color:
+                isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
+          ),
+        ),
+        const SizedBox(height: AppSpacing.xs),
+        Wrap(
+          spacing: AppSpacing.xs,
+          runSpacing: AppSpacing.xs,
+          children: _colorOptions.map((colorHex) {
+            final isSelected = _selectedColor == colorHex;
+            final color = Color(
+              int.parse(colorHex.substring(1), radix: 16) + 0xFF000000,
+            );
+
+            return GestureDetector(
+              onTap: () {
+                setState(() {
+                  _selectedColor = colorHex;
+                });
+              },
+              child: Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  color: color,
+                  shape: BoxShape.circle,
+                  border: isSelected
+                      ? Border.all(
+                          color: isDark
+                              ? AppColors.primaryAmberLight
+                              : AppColors.primaryAmber,
+                          width: 3,
+                        )
+                      : Border.all(
+                          color: isDark
+                              ? AppColors.borderDark
+                              : AppColors.borderLight,
+                        ),
+                ),
+                child: isSelected
+                    ? const Center(
+                        child: Icon(
+                          Icons.check,
+                          color: Colors.white,
+                          size: 24,
+                        ),
+                      )
+                    : null,
+              ),
+            );
+          }).toList(),
+        ),
+      ],
+    );
+  }
+
+  /// Build modal content
+  Widget _buildContent(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDesktop = context.isDesktopOrLarger;
+
+    return Container(
+      constraints: BoxConstraints(
+        maxHeight: MediaQuery.of(context).size.height * 0.9,
+        maxWidth: isDesktop ? 600 : double.infinity,
+      ),
+      decoration: BoxDecoration(
+        color: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
+        borderRadius: isDesktop
+            ? BorderRadius.circular(AppSpacing.modalRadius)
+            : const BorderRadius.vertical(
+                top: Radius.circular(AppSpacing.modalRadius),
+              ),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          // Header
+          Padding(
+            padding: const EdgeInsets.all(AppSpacing.paddingSM),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    widget.mode == SpaceModalMode.edit
+                        ? 'Edit Space'
+                        : 'Create Space',
+                    style: AppTypography.h4.copyWith(
+                      color: isDark
+                          ? AppColors.textPrimaryDark
+                          : AppColors.textPrimaryLight,
+                    ),
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.close),
+                  onPressed: () => Navigator.of(context).pop(false),
+                  tooltip: 'Close',
+                  color: isDark
+                      ? AppColors.textSecondaryDark
+                      : AppColors.textSecondaryLight,
+                ),
+              ],
+            ),
+          ),
+
+          // Divider
+          Divider(
+            height: 1,
+            color: isDark ? AppColors.borderDark : AppColors.borderLight,
+          ),
+
+          // Form content
+          Flexible(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(AppSpacing.paddingSM),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Name input
+                  _buildNameInput(isDark),
+                  const SizedBox(height: AppSpacing.paddingMD),
+
+                  // Icon picker
+                  _buildIconPicker(isDark),
+                  const SizedBox(height: AppSpacing.paddingMD),
+
+                  // Color picker
+                  _buildColorPicker(isDark),
+                  const SizedBox(height: AppSpacing.paddingMD),
+                ],
+              ),
+            ),
+          ),
+
+          // Divider
+          Divider(
+            height: 1,
+            color: isDark ? AppColors.borderDark : AppColors.borderLight,
+          ),
+
+          // Action buttons
+          Padding(
+            padding: const EdgeInsets.all(AppSpacing.paddingSM),
+            child: Row(
+              children: [
+                // Cancel button
+                Expanded(
+                  child: Semantics(
+                    button: true,
+                    label: 'Cancel',
+                    child: OutlinedButton(
+                      onPressed: _isSubmitting
+                          ? null
+                          : () => Navigator.of(context).pop(false),
+                      style: OutlinedButton.styleFrom(
+                        minimumSize:
+                            const Size(double.infinity, AppSpacing.minTouchTarget),
+                        shape: RoundedRectangleBorder(
+                          borderRadius:
+                              BorderRadius.circular(AppSpacing.buttonRadius),
+                        ),
+                        side: BorderSide(
+                          color: isDark
+                              ? AppColors.borderDark
+                              : AppColors.borderLight,
+                        ),
+                      ),
+                      child: const Text('Cancel'),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: AppSpacing.paddingSM),
+
+                // Save/Create button
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: _isFormValid && !_isSubmitting
+                        ? _handleSave
+                        : null,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primaryAmber,
+                      foregroundColor: AppColors.neutralBlack,
+                      disabledBackgroundColor: isDark
+                          ? AppColors.surfaceDarkVariant
+                          : AppColors.surfaceLightVariant,
+                      minimumSize:
+                          const Size(double.infinity, AppSpacing.minTouchTarget),
+                      shape: RoundedRectangleBorder(
+                        borderRadius:
+                            BorderRadius.circular(AppSpacing.buttonRadius),
+                      ),
+                    ),
+                    child: _isSubmitting
+                        ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              valueColor:
+                                  AlwaysStoppedAnimation<Color>(Colors.black),
+                            ),
+                          )
+                        : Text(
+                            widget.mode == SpaceModalMode.edit
+                                ? 'Save'
+                                : 'Create',
+                          ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          // Bottom padding for mobile (safe area + keyboard)
+          if (!isDesktop)
+            SizedBox(
+              height: MediaQuery.of(context).padding.bottom +
+                  MediaQuery.of(context).viewInsets.bottom,
+            ),
+        ],
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isDesktop = context.isDesktopOrLarger;
+
+    return Focus(
+      onKeyEvent: (node, event) {
+        // Handle Escape key
+        if (event is KeyDownEvent &&
+            event.logicalKey == LogicalKeyboardKey.escape) {
+          Navigator.of(context).pop(false);
+          return KeyEventResult.handled;
+        }
+        return KeyEventResult.ignored;
+      },
+      child: isDesktop
+          ? Dialog(
+              backgroundColor: Colors.transparent,
+              child: _buildContent(context),
+            )
+          : _buildContent(context),
+    );
+  }
+}

@@ -7,6 +7,7 @@ import '../../core/theme/app_spacing.dart';
 import '../../core/theme/app_typography.dart';
 import '../../data/models/space_model.dart';
 import '../../providers/spaces_provider.dart';
+import 'create_space_modal.dart';
 
 /// Space switcher modal that allows users to switch between spaces and create new spaces.
 ///
@@ -55,6 +56,7 @@ class _SpaceSwitcherModalState extends State<SpaceSwitcherModal> {
   final FocusNode _listFocusNode = FocusNode();
   int _selectedIndex = -1; // -1 means no selection, keyboard navigation
   List<Space> _filteredSpaces = [];
+  bool _showArchivedSpaces = false; // Toggle state for showing archived spaces
 
   @override
   void initState() {
@@ -256,13 +258,16 @@ class _SpaceSwitcherModalState extends State<SpaceSwitcherModal> {
     required int index,
   }) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isArchived = space.isArchived;
 
-    return Semantics(
+    // Wrap entire item in Opacity if archived
+    final itemContent = Semantics(
       label: '${space.name}, ${space.itemCount} items',
       selected: isSelected,
       button: true,
       child: InkWell(
-        onTap: onTap,
+        onTap: isArchived ? null : onTap, // Disable tap for archived spaces
+        onLongPress: () => _showSpaceOptionsMenu(context, space),
         borderRadius: BorderRadius.circular(AppSpacing.radiusMD),
         child: Container(
           constraints: const BoxConstraints(
@@ -318,8 +323,16 @@ class _SpaceSwitcherModalState extends State<SpaceSwitcherModal> {
                   ),
                 ),
 
-              // Space icon
-              if (space.icon != null)
+              // Space icon - show archive icon for archived spaces
+              if (isArchived)
+                Icon(
+                  Icons.archive,
+                  size: 24,
+                  color: isDark
+                      ? AppColors.textSecondaryDark
+                      : AppColors.textSecondaryLight,
+                )
+              else if (space.icon != null)
                 Text(
                   space.icon!,
                   style: const TextStyle(fontSize: 24),
@@ -349,6 +362,31 @@ class _SpaceSwitcherModalState extends State<SpaceSwitcherModal> {
               ),
 
               const SizedBox(width: AppSpacing.xs),
+
+              // Archived badge
+              if (isArchived)
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.xs,
+                    vertical: AppSpacing.xxxs,
+                  ),
+                  decoration: BoxDecoration(
+                    color: isDark
+                        ? AppColors.textSecondaryDark.withValues(alpha: 0.2)
+                        : AppColors.textSecondaryLight.withValues(alpha: 0.2),
+                    borderRadius: BorderRadius.circular(AppSpacing.chipRadius),
+                  ),
+                  child: Text(
+                    'Archived',
+                    style: AppTypography.labelSmall.copyWith(
+                      color: isDark
+                          ? AppColors.textSecondaryDark
+                          : AppColors.textSecondaryLight,
+                    ),
+                  ),
+                ),
+
+              if (isArchived) const SizedBox(width: AppSpacing.xxxs),
 
               // Item count badge
               Container(
@@ -389,6 +427,334 @@ class _SpaceSwitcherModalState extends State<SpaceSwitcherModal> {
         ),
       ),
     );
+
+    // Return with opacity if archived
+    if (isArchived) {
+      return Opacity(
+        opacity: 0.5,
+        child: itemContent,
+      );
+    }
+
+    return itemContent;
+  }
+
+  /// Show space options menu (long-press menu)
+  Future<void> _showSpaceOptionsMenu(BuildContext context, Space space) async {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final spacesProvider = Provider.of<SpacesProvider>(context, listen: false);
+    final currentSpaceId = spacesProvider.currentSpace?.id ?? '';
+    final isCurrentSpace = space.id == currentSpaceId;
+
+    // Trigger haptic feedback
+    HapticFeedback.mediumImpact();
+
+    await showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (BuildContext bottomSheetContext) {
+        return Container(
+          decoration: BoxDecoration(
+            color: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
+            borderRadius: const BorderRadius.vertical(
+              top: Radius.circular(AppSpacing.modalRadius),
+            ),
+          ),
+          child: SafeArea(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Header with space info
+                Padding(
+                  padding: const EdgeInsets.all(AppSpacing.paddingSM),
+                  child: Row(
+                    children: [
+                      if (space.icon != null)
+                        Text(
+                          space.icon!,
+                          style: const TextStyle(fontSize: 24),
+                        )
+                      else
+                        Icon(
+                          Icons.folder_outlined,
+                          size: 24,
+                          color: isDark
+                              ? AppColors.textSecondaryDark
+                              : AppColors.textSecondaryLight,
+                        ),
+                      const SizedBox(width: AppSpacing.xs),
+                      Expanded(
+                        child: Text(
+                          space.name,
+                          style: AppTypography.titleMedium.copyWith(
+                            color: isDark
+                                ? AppColors.textPrimaryDark
+                                : AppColors.textPrimaryLight,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      Text(
+                        '${space.itemCount} items',
+                        style: AppTypography.labelMedium.copyWith(
+                          color: isDark
+                              ? AppColors.textSecondaryDark
+                              : AppColors.textSecondaryLight,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                Divider(
+                  height: 1,
+                  color: isDark ? AppColors.borderDark : AppColors.borderLight,
+                ),
+
+                // Menu options
+                ListTile(
+                  leading: const Icon(Icons.edit),
+                  title: const Text('Edit Space'),
+                  onTap: () {
+                    Navigator.of(bottomSheetContext).pop();
+                    _handleEditSpace(context, space);
+                  },
+                  iconColor: isDark
+                      ? AppColors.textSecondaryDark
+                      : AppColors.textSecondaryLight,
+                  textColor: isDark
+                      ? AppColors.textPrimaryDark
+                      : AppColors.textPrimaryLight,
+                  minTileHeight: AppSpacing.minTouchTarget,
+                ),
+
+                // Show either Archive or Restore based on space state
+                if (!space.isArchived)
+                  ListTile(
+                    leading: const Icon(Icons.archive),
+                    title: const Text('Archive Space'),
+                    subtitle: isCurrentSpace
+                        ? const Text('Switch to another space first')
+                        : (space.itemCount > 0
+                            ? Text('This space contains ${space.itemCount} items')
+                            : null),
+                    onTap: isCurrentSpace
+                        ? null
+                        : () {
+                            Navigator.of(bottomSheetContext).pop();
+                            _handleArchiveSpace(context, space);
+                          },
+                    iconColor: isCurrentSpace
+                        ? (isDark
+                            ? AppColors.textSecondaryDark.withValues(alpha: 0.5)
+                            : AppColors.textSecondaryLight.withValues(alpha: 0.5))
+                        : AppColors.error,
+                    textColor: isCurrentSpace
+                        ? (isDark
+                            ? AppColors.textSecondaryDark.withValues(alpha: 0.5)
+                            : AppColors.textSecondaryLight.withValues(alpha: 0.5))
+                        : AppColors.error,
+                    enabled: !isCurrentSpace,
+                    minTileHeight: AppSpacing.minTouchTarget,
+                  )
+                else
+                  ListTile(
+                    leading: const Icon(Icons.unarchive),
+                    title: const Text('Restore Space'),
+                    subtitle: const Text('Make this space active again'),
+                    onTap: () {
+                      Navigator.of(bottomSheetContext).pop();
+                      _handleRestoreSpace(context, space);
+                    },
+                    iconColor: isDark
+                        ? AppColors.textSecondaryDark
+                        : AppColors.textSecondaryLight,
+                    textColor: isDark
+                        ? AppColors.textPrimaryDark
+                        : AppColors.textPrimaryLight,
+                    minTileHeight: AppSpacing.minTouchTarget,
+                  ),
+
+                ListTile(
+                  leading: const Icon(Icons.close),
+                  title: const Text('Cancel'),
+                  onTap: () => Navigator.of(bottomSheetContext).pop(),
+                  iconColor: isDark
+                      ? AppColors.textSecondaryDark
+                      : AppColors.textSecondaryLight,
+                  textColor: isDark
+                      ? AppColors.textPrimaryDark
+                      : AppColors.textPrimaryLight,
+                  minTileHeight: AppSpacing.minTouchTarget,
+                ),
+
+                const SizedBox(height: AppSpacing.paddingSM),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  /// Handle edit space action
+  Future<void> _handleEditSpace(BuildContext context, Space space) async {
+    // Open CreateSpaceModal in edit mode
+    final result = await CreateSpaceModal.show(
+      context,
+      mode: SpaceModalMode.edit,
+      initialSpace: space,
+    );
+
+    // If space was updated, the provider will have been updated automatically
+    // Just need to refresh the UI
+    if (result == true && mounted) {
+      setState(() {
+        // Trigger rebuild to show updated space
+      });
+    }
+  }
+
+  /// Handle archive space action
+  Future<void> _handleArchiveSpace(BuildContext context, Space space) async {
+    final messenger = ScaffoldMessenger.of(context);
+    final spacesProvider = Provider.of<SpacesProvider>(context, listen: false);
+    final currentSpaceId = spacesProvider.currentSpace?.id ?? '';
+
+    // Prevent archiving current space
+    if (space.id == currentSpaceId) {
+      messenger.showSnackBar(
+        const SnackBar(
+          content: Text('Cannot archive the current space. Switch to another space first.'),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      return;
+    }
+
+    // Show confirmation dialog if space has items
+    if (space.itemCount > 0) {
+      final confirmed = await showDialog<bool>(
+        context: context,
+        builder: (dialogContext) => AlertDialog(
+          title: const Text('Archive Space?'),
+          content: Text(
+            'This space contains ${space.itemCount} items. '
+            'Archiving will hide the space but keep all items. '
+            'You can restore it later from archived spaces.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(false),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(true),
+              style: TextButton.styleFrom(
+                foregroundColor: AppColors.error,
+              ),
+              child: const Text('Archive'),
+            ),
+          ],
+        ),
+      );
+
+      if (confirmed != true) return;
+    }
+
+    // Archive the space (update with isArchived: true)
+    try {
+      final archivedSpace = space.copyWith(
+        isArchived: true,
+        updatedAt: DateTime.now(),
+      );
+      await spacesProvider.updateSpace(archivedSpace);
+
+      // Reload spaces without archived to hide the archived space
+      if (!_showArchivedSpaces) {
+        await spacesProvider.loadSpaces();
+      }
+
+      if (mounted) {
+        messenger.showSnackBar(
+          SnackBar(
+            content: Text('${space.name} has been archived'),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        messenger.showSnackBar(
+          SnackBar(
+            content: Text('Failed to archive space: ${e.toString()}'),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    }
+  }
+
+  /// Handle restore space action
+  Future<void> _handleRestoreSpace(BuildContext context, Space space) async {
+    final messenger = ScaffoldMessenger.of(context);
+    final spacesProvider = Provider.of<SpacesProvider>(context, listen: false);
+
+    // Restore the space (update with isArchived: false)
+    try {
+      final restoredSpace = space.copyWith(
+        isArchived: false,
+        updatedAt: DateTime.now(),
+      );
+      await spacesProvider.updateSpace(restoredSpace);
+
+      if (mounted) {
+        messenger.showSnackBar(
+          SnackBar(
+            content: Text('${space.name} has been restored'),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        messenger.showSnackBar(
+          SnackBar(
+            content: Text('Failed to restore space: ${e.toString()}'),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    }
+  }
+
+  /// Build show archived toggle
+  Widget _buildShowArchivedToggle(bool isDark) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.paddingSM,
+        vertical: AppSpacing.paddingXS,
+      ),
+      child: SwitchListTile(
+        title: Text(
+          'Show Archived Spaces',
+          style: AppTypography.bodyMedium.copyWith(
+            color: isDark
+                ? AppColors.textPrimaryDark
+                : AppColors.textPrimaryLight,
+          ),
+        ),
+        value: _showArchivedSpaces,
+        onChanged: (value) async {
+          setState(() {
+            _showArchivedSpaces = value;
+          });
+          final spacesProvider = context.read<SpacesProvider>();
+          await spacesProvider.loadSpaces(includeArchived: value);
+        },
+        contentPadding: EdgeInsets.zero,
+      ),
+    );
   }
 
   /// Build create space button
@@ -402,15 +768,18 @@ class _SpaceSwitcherModalState extends State<SpaceSwitcherModal> {
         button: true,
         label: 'Create new space',
         child: ElevatedButton.icon(
-          onPressed: () {
-            // Show placeholder message
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Create space feature coming soon'),
-                behavior: SnackBarBehavior.floating,
-                duration: Duration(seconds: 2),
-              ),
+          onPressed: () async {
+            // Show create space modal
+            final result = await CreateSpaceModal.show(
+              context,
+              mode: SpaceModalMode.create,
             );
+
+            // If space was created, close this modal and return true
+            // so the HomeScreen knows to reload items
+            if (result == true && mounted) {
+              Navigator.of(context).pop(true);
+            }
           },
           icon: const Icon(Icons.add),
           label: const Text('Create New Space'),
@@ -543,6 +912,15 @@ class _SpaceSwitcherModalState extends State<SpaceSwitcherModal> {
                       },
                     ),
             ),
+
+            // Divider
+            Divider(
+              height: 1,
+              color: isDark ? AppColors.borderDark : AppColors.borderLight,
+            ),
+
+            // Show archived toggle
+            _buildShowArchivedToggle(isDark),
 
             // Divider
             Divider(
