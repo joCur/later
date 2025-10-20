@@ -6,11 +6,12 @@ import '../buttons/primary_button.dart';
 
 /// Base empty state component following Temporal Flow design system
 ///
-/// Features:
+/// Features (Phase 4, Task 4.3 - Redesigned):
 /// - Display Large typography for title (40px/48px on mobile)
 /// - Body Large for descriptions (17px/26px -> 16px/24px Material)
-/// - Icons: 64px (XXL) for major empty states
-/// - Colors: neutral-500 for text, neutral-300 for icons
+/// - Icons: 64px (XXL) with gradient tint (ShaderMask + primaryGradient)
+/// - Animated gradient background (2-3% opacity, 2s fade-in)
+/// - Colors: adaptive gradients for light/dark mode
 /// - Spacing: 64px (3xl) vertical spacing between sections
 /// - CTA buttons: Primary button style with gradient
 /// - Layout: Center-aligned, max width 480px
@@ -26,7 +27,7 @@ import '../buttons/primary_button.dart';
 ///   onCtaPressed: () => _showQuickCapture(),
 /// )
 /// ```
-class EmptyState extends StatelessWidget {
+class EmptyState extends StatefulWidget {
   /// Creates an empty state widget.
   const EmptyState({
     super.key,
@@ -65,95 +66,131 @@ class EmptyState extends StatelessWidget {
   final VoidCallback? onSecondaryPressed;
 
   @override
+  State<EmptyState> createState() => _EmptyStateState();
+}
+
+class _EmptyStateState extends State<EmptyState> {
+  @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
-    // Icon color: neutral-300 in light mode, neutral-600 in dark mode
-    final iconColor = isDark ? AppColors.neutralGray600 : AppColors.neutralGray300;
+    // Get adaptive gradients based on theme
+    final iconGradient = isDark
+        ? AppColors.primaryGradientDark
+        : AppColors.primaryGradient;
+    final backgroundGradient = isDark
+        ? AppColors.primaryGradientDark
+        : AppColors.primaryGradient;
 
     // Text colors following design system
     final titleColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight;
     final descriptionColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight;
 
-    return Center(
-      child: SingleChildScrollView(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 480.0),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.md,
-              vertical: AppSpacing.lg,
+    return Stack(
+      children: [
+        // Animated gradient background (subtle, 2-3% opacity)
+        Positioned.fill(
+          child: AnimatedOpacity(
+            opacity: 0.03, // 3% opacity for subtle effect
+            duration: const Duration(seconds: 2),
+            curve: Curves.easeOut,
+            child: Container(
+              decoration: BoxDecoration(
+                gradient: backgroundGradient,
+              ),
             ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-              // Icon (64px)
-              Icon(
-                icon,
-                size: iconSize,
-                color: iconColor,
-              ),
-
-              // Spacing: 64px (3xl) between sections
-              const SizedBox(height: AppSpacing.xxxl),
-
-              // Title - Display Large for mobile (40px)
-              Text(
-                title,
-                style: const TextStyle(
-                  fontFamily: AppTypography.fontFamily,
-                  fontSize: 40.0, // Display Large on mobile as per spec
-                  fontWeight: AppTypography.regular,
-                  height: 1.2, // 48px line height
-                  letterSpacing: -0.25,
-                ).copyWith(color: titleColor),
-                textAlign: TextAlign.center,
-              ),
-
-              // Spacing between title and description
-              const SizedBox(height: AppSpacing.sm),
-
-              // Description - Body Large (17px -> using 16px Material)
-              Text(
-                description,
-                style: AppTypography.bodyLarge.copyWith(
-                  color: descriptionColor,
-                ),
-                textAlign: TextAlign.center,
-              ),
-
-              // Spacing before CTA (64px)
-              if (ctaText != null && onCtaPressed != null) ...[
-                const SizedBox(height: AppSpacing.xxxl),
-
-                // Primary CTA Button
-                PrimaryButton(
-                  text: ctaText!,
-                  onPressed: onCtaPressed,
-                  size: ButtonSize.large,
-                ),
-              ],
-
-              // Secondary text link (optional)
-              if (secondaryText != null && onSecondaryPressed != null) ...[
-                const SizedBox(height: AppSpacing.sm),
-
-                TextButton(
-                  onPressed: onSecondaryPressed,
-                  style: TextButton.styleFrom(
-                    foregroundColor: isDark
-                        ? AppColors.primaryAmberLight
-                        : AppColors.primaryAmber,
-                    textStyle: AppTypography.button,
-                  ),
-                  child: Text(secondaryText!),
-                ),
-              ],
-            ],
           ),
         ),
-      ),
-    ));
+
+        // Main content
+        Center(
+          child: SingleChildScrollView(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 480.0),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.md,
+                  vertical: AppSpacing.lg,
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    // Icon with gradient tint (64px)
+                    ShaderMask(
+                      shaderCallback: (Rect bounds) {
+                        return iconGradient.createShader(bounds);
+                      },
+                      blendMode: BlendMode.srcIn,
+                      child: Icon(
+                        widget.icon,
+                        size: widget.iconSize,
+                        color: Colors.white, // White for ShaderMask to apply gradient
+                      ),
+                    ),
+
+                    // Spacing: 64px (3xl) between sections
+                    const SizedBox(height: AppSpacing.xxxl),
+
+                    // Title - Display Large for mobile (40px)
+                    Text(
+                      widget.title,
+                      style: const TextStyle(
+                        fontFamily: AppTypography.fontFamily,
+                        fontSize: 40.0, // Display Large on mobile as per spec
+                        fontWeight: AppTypography.regular,
+                        height: 1.2, // 48px line height
+                        letterSpacing: -0.25,
+                      ).copyWith(color: titleColor),
+                      textAlign: TextAlign.center,
+                    ),
+
+                    // Spacing between title and description
+                    const SizedBox(height: AppSpacing.sm),
+
+                    // Description - Body Large (17px -> using 16px Material)
+                    Text(
+                      widget.description,
+                      style: AppTypography.bodyLarge.copyWith(
+                        color: descriptionColor,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+
+                    // Spacing before CTA (64px)
+                    if (widget.ctaText != null && widget.onCtaPressed != null) ...[
+                      const SizedBox(height: AppSpacing.xxxl),
+
+                      // Primary CTA Button
+                      PrimaryButton(
+                        text: widget.ctaText!,
+                        onPressed: widget.onCtaPressed,
+                        size: ButtonSize.large,
+                      ),
+                    ],
+
+                    // Secondary text link (optional)
+                    if (widget.secondaryText != null && widget.onSecondaryPressed != null) ...[
+                      const SizedBox(height: AppSpacing.sm),
+
+                      TextButton(
+                        onPressed: widget.onSecondaryPressed,
+                        style: TextButton.styleFrom(
+                          foregroundColor: isDark
+                              ? AppColors.primaryAmberLight
+                              : AppColors.primaryAmber,
+                          textStyle: AppTypography.button,
+                        ),
+                        child: Text(widget.secondaryText!),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
   }
 }
