@@ -988,7 +988,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
           body: Form(
             key: _formKey,
             child: SingleChildScrollView(
-              padding: const EdgeInsets.all(AppSpacing.paddingSM),
+              padding: const EdgeInsets.all(AppSpacing.sm),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [

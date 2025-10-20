@@ -92,19 +92,19 @@ class AppAnimations {
   // ============================================================
 
   /// Standard spring curve for most animations
-  static final Curve springCurve = _SpringCurve(defaultSpring);
+  static const Curve springCurve = _SpringCurve(defaultSpring);
 
   /// Gentle spring curve for soft animations
-  static final Curve gentleSpringCurve = _SpringCurve(gentleSpring);
+  static const Curve gentleSpringCurve = _SpringCurve(gentleSpring);
 
   /// Snappy spring curve for quick interactions
-  static final Curve snappySpringCurve = _SpringCurve(snappySpring);
+  static const Curve snappySpringCurve = _SpringCurve(snappySpring);
 
   /// Bouncy spring curve for playful interactions
-  static final Curve bouncySpringCurve = _SpringCurve(bouncySpring);
+  static const Curve bouncySpringCurve = _SpringCurve(bouncySpring);
 
   /// Smooth spring curve for fluid transitions
-  static final Curve smoothSpringCurve = _SpringCurve(smoothSpring);
+  static const Curve smoothSpringCurve = _SpringCurve(smoothSpring);
 
   // Legacy curves for gradual migration
   /// Standard easing curve (for non-spring contexts)
@@ -360,6 +360,7 @@ class AppAnimations {
   // ============================================================
 
   /// Fade in with scale animation (entrance)
+  // ignore: strict_raw_type
   static List<Effect> fadeInWithScale({
     Duration? duration,
     Duration? delay,
@@ -382,6 +383,7 @@ class AppAnimations {
   }
 
   /// Slide up with fade animation (modal entrance)
+  // ignore: strict_raw_type
   static List<Effect> slideUpWithFade({
     Duration? duration,
     Duration? delay,
@@ -404,6 +406,7 @@ class AppAnimations {
   }
 
   /// Scale pulse animation (for emphasis)
+  // ignore: strict_raw_type
   static List<Effect> scalePulse({
     Duration? duration,
     double peak = 1.05,
@@ -427,6 +430,7 @@ class AppAnimations {
   }
 
   /// Shake animation (for errors)
+  // ignore: strict_raw_type
   static List<Effect> shake({
     Duration? duration,
     double intensity = 10.0,
@@ -442,6 +446,7 @@ class AppAnimations {
   }
 
   /// Shimmer effect (for loading states)
+  // ignore: strict_raw_type
   static List<Effect> shimmer({
     Duration? duration,
   }) {
@@ -492,22 +497,22 @@ class AppAnimations {
   // ============================================================
 
   /// Button easing curve (use springCurve)
-  static final Curve buttonEasing = snappySpringCurve;
+  static const Curve buttonEasing = snappySpringCurve;
 
   /// FAB press easing (use snappySpringCurve)
-  static final Curve fabPressEasing = snappySpringCurve;
+  static const Curve fabPressEasing = snappySpringCurve;
 
   /// FAB release easing (use bouncySpringCurve)
-  static final Curve fabReleaseEasing = bouncySpringCurve;
+  static const Curve fabReleaseEasing = bouncySpringCurve;
 
   /// Fade easing (use springCurve)
-  static final Curve fadeEasing = springCurve;
+  static const Curve fadeEasing = springCurve;
 
   /// Modal enter easing (use smoothSpringCurve)
-  static final Curve modalEnterEasing = smoothSpringCurve;
+  static const Curve modalEnterEasing = smoothSpringCurve;
 
   /// Slide in easing (use springCurve)
-  static final Curve slideInEasing = springCurve;
+  static const Curve slideInEasing = springCurve;
 }
 
 // ============================================================

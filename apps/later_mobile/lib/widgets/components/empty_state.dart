@@ -65,13 +65,13 @@ class EmptyState extends StatelessWidget {
     final iconSize = isMobile ? 80.0 : 100.0;
 
     // Responsive padding
-    final horizontalPadding = isMobile ? AppSpacing.paddingMD : AppSpacing.paddingLG;
+    final horizontalPadding = isMobile ? AppSpacing.md : AppSpacing.lg;
 
     return Center(
       child: Padding(
         padding: EdgeInsets.symmetric(
           horizontal: horizontalPadding,
-          vertical: AppSpacing.paddingLG,
+          vertical: AppSpacing.lg,
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -129,8 +129,8 @@ class EmptyState extends StatelessWidget {
                   backgroundColor: AppColors.primaryAmber,
                   foregroundColor: AppColors.neutralBlack,
                   padding: const EdgeInsets.symmetric(
-                    horizontal: AppSpacing.paddingLG,
-                    vertical: AppSpacing.paddingSM,
+                    horizontal: AppSpacing.lg,
+                    vertical: AppSpacing.sm,
                   ),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(AppSpacing.radiusMD),

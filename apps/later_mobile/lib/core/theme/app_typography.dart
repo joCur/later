@@ -359,4 +359,12 @@ class AppTypography {
       labelSmall: labelSmall.copyWith(color: secondaryText),
     );
   }
+
+  // ============================================================
+  // BACKWARD COMPATIBILITY ALIASES
+  // ============================================================
+
+  /// Font family constant for backward compatibility
+  /// Returns 'Inter' as the primary font family
+  static const String fontFamily = 'Inter';
 }

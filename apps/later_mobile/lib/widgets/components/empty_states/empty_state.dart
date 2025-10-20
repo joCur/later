@@ -82,8 +82,8 @@ class EmptyState extends StatelessWidget {
           constraints: const BoxConstraints(maxWidth: 480.0),
           child: Padding(
             padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.paddingMD,
-              vertical: AppSpacing.paddingLG,
+              horizontal: AppSpacing.md,
+              vertical: AppSpacing.lg,
             ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,

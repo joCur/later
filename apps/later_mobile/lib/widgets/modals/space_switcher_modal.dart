@@ -274,8 +274,8 @@ class _SpaceSwitcherModalState extends State<SpaceSwitcherModal> {
             minHeight: AppSpacing.minTouchTarget,
           ),
           padding: const EdgeInsets.symmetric(
-            horizontal: AppSpacing.paddingSM,
-            vertical: AppSpacing.paddingXS,
+            horizontal: AppSpacing.sm,
+            vertical: AppSpacing.xs,
           ),
           decoration: BoxDecoration(
             color: isSelected
@@ -466,7 +466,7 @@ class _SpaceSwitcherModalState extends State<SpaceSwitcherModal> {
               children: [
                 // Header with space info
                 Padding(
-                  padding: const EdgeInsets.all(AppSpacing.paddingSM),
+                  padding: const EdgeInsets.all(AppSpacing.sm),
                   child: Row(
                     children: [
                       if (space.icon != null)
@@ -588,7 +588,7 @@ class _SpaceSwitcherModalState extends State<SpaceSwitcherModal> {
                   minTileHeight: AppSpacing.minTouchTarget,
                 ),
 
-                const SizedBox(height: AppSpacing.paddingSM),
+                const SizedBox(height: AppSpacing.sm),
               ],
             ),
           ),
@@ -732,8 +732,8 @@ class _SpaceSwitcherModalState extends State<SpaceSwitcherModal> {
   Widget _buildShowArchivedToggle(bool isDark) {
     return Padding(
       padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.paddingSM,
-        vertical: AppSpacing.paddingXS,
+        horizontal: AppSpacing.sm,
+        vertical: AppSpacing.xs,
       ),
       child: SwitchListTile(
         title: Text(
@@ -761,8 +761,8 @@ class _SpaceSwitcherModalState extends State<SpaceSwitcherModal> {
   Widget _buildCreateSpaceButton(bool isDark) {
     return Padding(
       padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.paddingSM,
-        vertical: AppSpacing.paddingXS,
+        horizontal: AppSpacing.sm,
+        vertical: AppSpacing.xs,
       ),
       child: Semantics(
         button: true,
@@ -828,7 +828,7 @@ class _SpaceSwitcherModalState extends State<SpaceSwitcherModal> {
           children: [
             // Header
             Padding(
-              padding: const EdgeInsets.all(AppSpacing.paddingSM),
+              padding: const EdgeInsets.all(AppSpacing.sm),
               child: Row(
                 children: [
                   Expanded(
@@ -856,12 +856,12 @@ class _SpaceSwitcherModalState extends State<SpaceSwitcherModal> {
             // Search field
             Padding(
               padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.paddingSM,
+                horizontal: AppSpacing.sm,
               ),
               child: _buildSearchField(isDark),
             ),
 
-            const SizedBox(height: AppSpacing.paddingSM),
+            const SizedBox(height: AppSpacing.sm),
 
             // Divider
             Divider(
@@ -873,7 +873,7 @@ class _SpaceSwitcherModalState extends State<SpaceSwitcherModal> {
             Flexible(
               child: _filteredSpaces.isEmpty
                   ? Padding(
-                      padding: const EdgeInsets.all(AppSpacing.paddingMD),
+                      padding: const EdgeInsets.all(AppSpacing.md),
                       child: Center(
                         child: Text(
                           _searchController.text.isNotEmpty
@@ -890,8 +890,8 @@ class _SpaceSwitcherModalState extends State<SpaceSwitcherModal> {
                   : ListView.separated(
                       shrinkWrap: true,
                       padding: const EdgeInsets.symmetric(
-                        horizontal: AppSpacing.paddingSM,
-                        vertical: AppSpacing.paddingXS,
+                        horizontal: AppSpacing.sm,
+                        vertical: AppSpacing.xs,
                       ),
                       itemCount: _filteredSpaces.length,
                       separatorBuilder: (context, index) =>

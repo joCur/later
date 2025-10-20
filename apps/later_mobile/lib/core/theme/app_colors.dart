@@ -561,27 +561,20 @@ class AppColors {
 
   /// Get Material ColorScheme for light theme
   static ColorScheme lightColorScheme() {
-    return ColorScheme.light(
+    return const ColorScheme.light(
       primary: primarySolid,
-      onPrimary: Colors.white,
       secondary: secondarySolid,
-      onSecondary: Colors.white,
       error: error,
-      onError: Colors.white,
-      surface: Colors.white,
       onSurface: neutral600,
     );
   }
 
   /// Get Material ColorScheme for dark theme
   static ColorScheme darkColorScheme() {
-    return ColorScheme.dark(
+    return const ColorScheme.dark(
       primary: primarySolid,
-      onPrimary: Colors.white,
       secondary: secondarySolid,
-      onSecondary: Colors.white,
       error: error,
-      onError: Colors.white,
       surface: neutral900,
       onSurface: neutral400,
     );
@@ -617,7 +610,7 @@ class AppColors {
 
   // Border colors
   static const Color borderLight = neutral200;
-  static const Color borderDarkCompat = neutral700;
+  static const Color borderDark = neutral700;
 
   // Text colors
   static const Color textPrimaryLight = neutral600;

@@ -154,8 +154,8 @@ class _AppSidebarState extends State<AppSidebar> {
       height: 64.0,
       padding: EdgeInsets.symmetric(
         horizontal: widget.isExpanded
-            ? AppSpacing.paddingSM
-            : AppSpacing.paddingXS,
+            ? AppSpacing.sm
+            : AppSpacing.xs,
       ),
       child: Row(
         mainAxisAlignment: widget.isExpanded
@@ -200,7 +200,7 @@ class _AppSidebarState extends State<AppSidebar> {
       return Center(
         child: widget.isExpanded
             ? const Padding(
-                padding: EdgeInsets.all(AppSpacing.paddingSM),
+                padding: EdgeInsets.all(AppSpacing.sm),
                 child: Text(
                   'No spaces yet',
                   textAlign: TextAlign.center,
@@ -213,7 +213,7 @@ class _AppSidebarState extends State<AppSidebar> {
     }
 
     return ListView.builder(
-      padding: const EdgeInsets.symmetric(vertical: AppSpacing.paddingXS),
+      padding: const EdgeInsets.symmetric(vertical: AppSpacing.xs),
       itemCount: spaces.length,
       itemBuilder: (context, index) {
         final space = spaces[index];
@@ -236,7 +236,7 @@ class _AppSidebarState extends State<AppSidebar> {
 
   Widget _buildFooter(bool isDarkMode) {
     return Container(
-      padding: const EdgeInsets.all(AppSpacing.paddingXS),
+      padding: const EdgeInsets.all(AppSpacing.xs),
       decoration: const BoxDecoration(
         border: Border(
           top: BorderSide(),
@@ -255,8 +255,8 @@ class _AppSidebarState extends State<AppSidebar> {
             height: AppSpacing.minTouchTarget,
             padding: EdgeInsets.symmetric(
               horizontal: widget.isExpanded
-                  ? AppSpacing.paddingSM
-                  : AppSpacing.paddingXS,
+                  ? AppSpacing.sm
+                  : AppSpacing.xs,
             ),
             child: Row(
               mainAxisAlignment: widget.isExpanded
@@ -324,7 +324,7 @@ class _SpaceListItemState extends State<_SpaceListItem> {
 
     return Padding(
       padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.paddingXS,
+        horizontal: AppSpacing.xs,
         vertical: AppSpacing.xxxs,
       ),
       child: Semantics(
@@ -351,8 +351,8 @@ class _SpaceListItemState extends State<_SpaceListItem> {
                 height: AppSpacing.minTouchTarget,
                 padding: EdgeInsets.symmetric(
                   horizontal: widget.isExpanded
-                      ? AppSpacing.paddingSM
-                      : AppSpacing.paddingXS,
+                      ? AppSpacing.sm
+                      : AppSpacing.xs,
                 ),
                 decoration: BoxDecoration(
                   color: backgroundColor,
@@ -410,7 +410,7 @@ class _SpaceListItemState extends State<_SpaceListItem> {
                     if (widget.isExpanded && widget.space.itemCount > 0)
                       Container(
                         padding: const EdgeInsets.symmetric(
-                          horizontal: AppSpacing.paddingXS,
+                          horizontal: AppSpacing.xs,
                           vertical: AppSpacing.xxxs,
                         ),
                         decoration: BoxDecoration(

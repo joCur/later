@@ -293,7 +293,7 @@ void main() {
       await tester.pumpAndSettle();
 
       // Reload spaces (without archived)
-      await spacesProvider.loadSpaces(includeArchived: false);
+      await spacesProvider.loadSpaces();
 
       // Verify archived space not in active list
       expect(spacesProvider.spaces.length, 1);

@@ -297,8 +297,8 @@ class _HomeScreenState extends State<HomeScreen> {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.paddingSM,
-        vertical: AppSpacing.paddingXS,
+        horizontal: AppSpacing.sm,
+        vertical: AppSpacing.xs,
       ),
       child: Wrap(
         spacing: AppSpacing.xs,
@@ -401,8 +401,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return ListView.builder(
       padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.paddingSM,
-        vertical: AppSpacing.paddingXS,
+        horizontal: AppSpacing.sm,
+        vertical: AppSpacing.xs,
       ),
       itemCount: itemCount,
       itemBuilder: (context, index) {
@@ -617,8 +617,8 @@ class _FilterChip extends StatelessWidget {
         fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
       ),
       padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.paddingSM,
-        vertical: AppSpacing.paddingXS,
+        horizontal: AppSpacing.sm,
+        vertical: AppSpacing.xs,
       ),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
