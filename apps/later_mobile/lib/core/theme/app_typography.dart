@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:later_mobile/widgets/components/text/gradient_text.dart';
 
 /// Temporal Flow Design System - Typography Tokens
 /// Uses Inter for interface and JetBrains Mono for monospace/code
@@ -368,3 +369,156 @@ class AppTypography {
   /// Returns 'Inter' as the primary font family
   static const String fontFamily = 'Inter';
 }
+
+// ============================================================
+// TEXT STYLE EXTENSIONS FOR GRADIENT TEXT
+// ============================================================
+
+/// Extension on TextStyle to create gradient text widgets.
+///
+/// This extension enables a fluent API for creating gradient text:
+/// ```dart
+/// AppTypography.displayLarge.gradient('Later')
+/// AppTypography.h1.gradient('Welcome', gradient: myGradient)
+/// ```
+extension GradientTextStyleExtension on TextStyle {
+  /// Create a gradient text widget with this style.
+  ///
+  /// [text] is the text content to display.
+  ///
+  /// [gradient] is the optional gradient to apply. If null, uses the
+  /// theme-adaptive primary gradient.
+  ///
+  /// Example:
+  /// ```dart
+  /// AppTypography.displayLarge.gradient('later')
+  /// AppTypography.h2.gradient('Welcome', gradient: AppColors.secondaryGradient)
+  /// ```
+  Widget gradient(
+    String text, {
+    Gradient? gradient,
+    TextAlign? textAlign,
+    int? maxLines,
+    TextOverflow? overflow,
+  }) {
+    return GradientText(
+      text,
+      gradient: gradient,
+      style: this,
+      textAlign: textAlign,
+      maxLines: maxLines,
+      overflow: overflow,
+    );
+  }
+
+  /// Create a gradient text widget with the primary gradient (indigo → purple).
+  ///
+  /// Ideal for brand text and primary headings.
+  Widget gradientPrimary(
+    String text, {
+    TextAlign? textAlign,
+    int? maxLines,
+    TextOverflow? overflow,
+  }) {
+    return GradientText.primary(
+      text,
+      style: this,
+      textAlign: textAlign,
+      maxLines: maxLines,
+      overflow: overflow,
+    );
+  }
+
+  /// Create a gradient text widget with the secondary gradient (amber → pink).
+  ///
+  /// Ideal for secondary headings and accent text.
+  Widget gradientSecondary(
+    String text, {
+    TextAlign? textAlign,
+    int? maxLines,
+    TextOverflow? overflow,
+  }) {
+    return GradientText.secondary(
+      text,
+      style: this,
+      textAlign: textAlign,
+      maxLines: maxLines,
+      overflow: overflow,
+    );
+  }
+
+  /// Create a gradient text widget with the task gradient (red → orange).
+  ///
+  /// Ideal for task-specific text and urgent indicators.
+  Widget gradientTask(
+    String text, {
+    TextAlign? textAlign,
+    int? maxLines,
+    TextOverflow? overflow,
+  }) {
+    return GradientText.task(
+      text,
+      style: this,
+      textAlign: textAlign,
+      maxLines: maxLines,
+      overflow: overflow,
+    );
+  }
+
+  /// Create a gradient text widget with the note gradient (blue → cyan).
+  ///
+  /// Ideal for note-specific text and knowledge indicators.
+  Widget gradientNote(
+    String text, {
+    TextAlign? textAlign,
+    int? maxLines,
+    TextOverflow? overflow,
+  }) {
+    return GradientText.note(
+      text,
+      style: this,
+      textAlign: textAlign,
+      maxLines: maxLines,
+      overflow: overflow,
+    );
+  }
+
+  /// Create a gradient text widget with the list gradient (violet).
+  ///
+  /// Ideal for list-specific text and organization indicators.
+  Widget gradientList(
+    String text, {
+    TextAlign? textAlign,
+    int? maxLines,
+    TextOverflow? overflow,
+  }) {
+    return GradientText.list(
+      text,
+      style: this,
+      textAlign: textAlign,
+      maxLines: maxLines,
+      overflow: overflow,
+    );
+  }
+
+  /// Create a gradient text widget with reduced opacity (subtle).
+  ///
+  /// Ideal for metadata, timestamps, and secondary information.
+  Widget gradientSubtle(
+    String text, {
+    Gradient? gradient,
+    TextAlign? textAlign,
+    int? maxLines,
+    TextOverflow? overflow,
+  }) {
+    return GradientText.subtle(
+      text,
+      gradient: gradient,
+      style: this,
+      textAlign: textAlign,
+      maxLines: maxLines,
+      overflow: overflow,
+    );
+  }
+}
+

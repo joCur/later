@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../core/theme/app_spacing.dart';
+import '../../../core/theme/app_animations.dart';
 import '../../../core/responsive/breakpoints.dart';
 import '../../../data/models/item_model.dart';
+import '../text/gradient_text.dart';
 import 'package:intl/intl.dart';
 
 /// Unified item card component for tasks, notes, and lists
@@ -33,6 +35,7 @@ class ItemCard extends StatefulWidget {
     this.onCheckboxChanged,
     this.isSelected = false,
     this.showMetadata = true,
+    this.index,
   });
 
   /// Item data to display
@@ -52,6 +55,10 @@ class ItemCard extends StatefulWidget {
 
   /// Whether to show metadata row
   final bool showMetadata;
+
+  /// Index in the list for staggered entrance animation
+  /// If null, no entrance animation is applied
+  final int? index;
 
   @override
   State<ItemCard> createState() => _ItemCardState();
@@ -170,10 +177,11 @@ class _ItemCardState extends State<ItemCard> with SingleTickerProviderStateMixin
                   onChanged: widget.onCheckboxChanged != null
                       ? (value) {
                           if (value != null) {
-                            // Trigger haptic feedback
-                            HapticFeedback.lightImpact();
+                            // Trigger medium haptic feedback for checkbox toggle
+                            // Medium haptic provides satisfying confirmation of state change
+                            AppAnimations.mediumHaptic();
 
-                            // Trigger scale animation
+                            // Trigger scale animation (1.0 → 1.1 → 1.0)
                             _checkboxAnimationController.forward(from: 0.0);
 
                             // Call the callback
@@ -259,37 +267,45 @@ class _ItemCardState extends State<ItemCard> with SingleTickerProviderStateMixin
   Widget? _buildMetadata(BuildContext context) {
     if (!widget.showMetadata) return null;
 
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     final dateFormat = DateFormat('MMM d, y');
 
     return Row(
       children: [
-        // Date
+        // Date - Use gradient text for visual emphasis
         if (widget.item.dueDate != null) ...[
-          Icon(
-            Icons.calendar_today,
-            size: 12,
-            color: isDark ? AppColors.textDisabledDark : AppColors.textDisabledLight,
+          // Icon with gradient tint for due dates
+          ShaderMask(
+            shaderCallback: (bounds) => AppColors.secondaryGradient.createShader(bounds),
+            blendMode: BlendMode.srcIn,
+            child: const Icon(
+              Icons.calendar_today,
+              size: 12,
+              color: Colors.white,
+            ),
           ),
           const SizedBox(width: AppSpacing.xxxs),
-          Text(
+          // Due date with subtle secondary gradient (amber→pink)
+          GradientText.subtle(
             dateFormat.format(widget.item.dueDate!),
-            style: AppTypography.metadata.copyWith(
-              color: isDark ? AppColors.textDisabledDark : AppColors.textDisabledLight,
-            ),
+            gradient: AppColors.secondaryGradient,
+            style: AppTypography.metadata,
           ),
         ] else ...[
-          Icon(
-            Icons.access_time,
-            size: 12,
-            color: isDark ? AppColors.textDisabledDark : AppColors.textDisabledLight,
+          // Icon with gradient tint for created dates
+          ShaderMask(
+            shaderCallback: (bounds) => AppColors.primaryGradientAdaptive(context).createShader(bounds),
+            blendMode: BlendMode.srcIn,
+            child: const Icon(
+              Icons.access_time,
+              size: 12,
+              color: Colors.white,
+            ),
           ),
           const SizedBox(width: AppSpacing.xxxs),
-          Text(
+          // Created date with subtle primary gradient
+          GradientText.subtle(
             dateFormat.format(widget.item.createdAt),
-            style: AppTypography.metadata.copyWith(
-              color: isDark ? AppColors.textDisabledDark : AppColors.textDisabledLight,
-            ),
+            style: AppTypography.metadata,
           ),
         ],
       ],
@@ -298,7 +314,8 @@ class _ItemCardState extends State<ItemCard> with SingleTickerProviderStateMixin
 
   void _handleTapDown(TapDownDetails details) {
     setState(() => _isPressed = true);
-    HapticFeedback.lightImpact();
+    // Light haptic on card press
+    AppAnimations.lightHaptic();
   }
 
   void _handleTapUp(TapUpDetails details) {
@@ -310,12 +327,12 @@ class _ItemCardState extends State<ItemCard> with SingleTickerProviderStateMixin
   }
 
   void _handleTap() {
-    HapticFeedback.lightImpact();
     widget.onTap?.call();
   }
 
   void _handleLongPress() {
-    HapticFeedback.mediumImpact();
+    // Medium haptic for long press (multi-select)
+    AppAnimations.mediumHaptic();
     widget.onLongPress?.call();
   }
 
@@ -352,8 +369,8 @@ class _ItemCardState extends State<ItemCard> with SingleTickerProviderStateMixin
     // Card opacity for completed tasks (70% for Temporal Flow)
     final opacity = isCompleted ? 0.7 : 1.0;
 
-    // Wrap with RepaintBoundary to isolate repaints
-    return RepaintBoundary(
+    // Build the card widget
+    final cardWidget = RepaintBoundary(
       child: Semantics(
         container: true,
         button: true,
@@ -448,5 +465,36 @@ class _ItemCardState extends State<ItemCard> with SingleTickerProviderStateMixin
         ),
       ),
     );
+
+    // Apply entrance animation if index is provided
+    if (widget.index != null) {
+      final delay = AppAnimations.itemEntranceStagger * widget.index!;
+      final duration = AppAnimations.getDuration(context, AppAnimations.itemEntrance);
+
+      return cardWidget
+          .animate()
+          .fadeIn(
+            duration: duration,
+            delay: delay,
+            curve: AppAnimations.springCurve,
+          )
+          .slideY(
+            begin: AppAnimations.itemEntranceSlideOffset.dy,
+            end: 0,
+            duration: duration,
+            delay: delay,
+            curve: AppAnimations.springCurve,
+          )
+          .scale(
+            begin: const Offset(AppAnimations.itemEntranceScale, AppAnimations.itemEntranceScale),
+            end: const Offset(1.0, 1.0),
+            duration: duration,
+            delay: delay,
+            curve: AppAnimations.springCurve,
+          );
+    }
+
+    // Return without entrance animation
+    return cardWidget;
   }
 }

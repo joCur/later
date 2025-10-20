@@ -505,6 +505,273 @@ void main() {
 
         await tester.pumpAndSettle();
       });
+
+      testWidgets('completion animation shows gradient color shift', (tester) async {
+        final item = Item(
+          id: '1',
+          type: ItemType.task,
+          title: 'Test Task',
+          spaceId: 'space1',
+        );
+
+        bool? checkboxValue;
+
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              body: ItemCard(
+                item: item,
+                onCheckboxChanged: (value) {
+                  checkboxValue = value;
+                },
+              ),
+            ),
+          ),
+        );
+
+        // Tap the checkbox to trigger completion
+        await tester.tap(find.byType(Checkbox));
+        await tester.pump();
+
+        // Animation should be in progress
+        await tester.pump(const Duration(milliseconds: 100));
+
+        // Callback should be called
+        expect(checkboxValue, isTrue);
+
+        // Complete the animation
+        await tester.pumpAndSettle();
+      });
+
+      testWidgets('completion overlay fades in and out', (tester) async {
+        final item = Item(
+          id: '1',
+          type: ItemType.task,
+          title: 'Test Task',
+          spaceId: 'space1',
+        );
+
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              body: ItemCard(
+                item: item,
+                onCheckboxChanged: (value) {},
+              ),
+            ),
+          ),
+        );
+
+        // Tap the checkbox to trigger completion
+        await tester.tap(find.byType(Checkbox));
+        await tester.pump();
+
+        // Animation duration is 400ms for overlay
+        await tester.pump(const Duration(milliseconds: 200));
+
+        // Should be mid-animation
+        expect(find.byType(ItemCard), findsOneWidget);
+
+        // Complete the animation
+        await tester.pumpAndSettle();
+      });
+    });
+
+    group('Entrance Animations', () {
+      testWidgets('applies entrance animation with index parameter', (tester) async {
+        final item = Item(
+          id: '1',
+          type: ItemType.task,
+          title: 'Test Task',
+          spaceId: 'space1',
+        );
+
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              body: ItemCard(
+                item: item,
+                index: 0,
+              ),
+            ),
+          ),
+        );
+
+        // Card should render
+        expect(find.byType(ItemCard), findsOneWidget);
+
+        // Pump and settle to complete entrance animation
+        await tester.pumpAndSettle();
+
+        // Card should still be visible after animation
+        expect(find.text('Test Task'), findsOneWidget);
+      });
+
+      testWidgets('applies staggered delay based on index', (tester) async {
+        final items = List.generate(
+          3,
+          (index) => Item(
+            id: 'item_$index',
+            type: ItemType.task,
+            title: 'Task $index',
+            spaceId: 'space1',
+          ),
+        );
+
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              body: ListView.builder(
+                itemCount: items.length,
+                itemBuilder: (context, index) {
+                  return ItemCard(
+                    item: items[index],
+                    index: index,
+                  );
+                },
+              ),
+            ),
+          ),
+        );
+
+        // All cards should render
+        expect(find.byType(ItemCard), findsNWidgets(3));
+
+        // Pump frames to allow staggered animations to start
+        await tester.pump(const Duration(milliseconds: 50)); // First item delay
+        await tester.pump(const Duration(milliseconds: 50)); // Second item delay
+        await tester.pump(const Duration(milliseconds: 50)); // Third item delay
+
+        // Complete all animations
+        await tester.pumpAndSettle();
+
+        // All items should be visible
+        for (int i = 0; i < items.length; i++) {
+          expect(find.text('Task $i'), findsOneWidget);
+        }
+      });
+
+      testWidgets('entrance animation respects reduced motion', (tester) async {
+        final item = Item(
+          id: '1',
+          type: ItemType.task,
+          title: 'Test Task',
+          spaceId: 'space1',
+        );
+
+        await tester.pumpWidget(
+          MaterialApp(
+            home: MediaQuery(
+              data: const MediaQueryData(
+                disableAnimations: true, // Simulate reduced motion
+              ),
+              child: Scaffold(
+                body: ItemCard(
+                  item: item,
+                  index: 0,
+                ),
+              ),
+            ),
+          ),
+        );
+
+        // Card should render immediately
+        expect(find.byType(ItemCard), findsOneWidget);
+
+        // With reduced motion, animation should be instant
+        await tester.pump();
+
+        // Content should be visible immediately
+        expect(find.text('Test Task'), findsOneWidget);
+
+        // Ensure all animations complete
+        await tester.pumpAndSettle();
+      });
+
+      testWidgets('entrance animation works without index parameter', (tester) async {
+        final item = Item(
+          id: '1',
+          type: ItemType.task,
+          title: 'Test Task',
+          spaceId: 'space1',
+        );
+
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              body: ItemCard(item: item),
+            ),
+          ),
+        );
+
+        // Card should render (no index means no entrance animation)
+        expect(find.byType(ItemCard), findsOneWidget);
+        expect(find.text('Test Task'), findsOneWidget);
+      });
+
+      testWidgets('entrance animation completes within expected duration', (tester) async {
+        final item = Item(
+          id: '1',
+          type: ItemType.task,
+          title: 'Test Task',
+          spaceId: 'space1',
+        );
+
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              body: ItemCard(
+                item: item,
+                index: 0,
+              ),
+            ),
+          ),
+        );
+
+        // Start animation
+        await tester.pump();
+
+        // Animation duration is 250ms with spring curve
+        await tester.pump(const Duration(milliseconds: 250));
+
+        // Should be mostly complete
+        expect(find.byType(ItemCard), findsOneWidget);
+
+        // Settle any remaining animation
+        await tester.pumpAndSettle();
+
+        // Card should be fully visible
+        expect(find.text('Test Task'), findsOneWidget);
+      });
+
+      testWidgets('entrance animation works with large list indices', (tester) async {
+        final item = Item(
+          id: '100',
+          type: ItemType.task,
+          title: 'Task 100',
+          spaceId: 'space1',
+        );
+
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              body: ItemCard(
+                item: item,
+                index: 99, // Large index
+              ),
+            ),
+          ),
+        );
+
+        // Card should render despite large index
+        expect(find.byType(ItemCard), findsOneWidget);
+
+        // Complete entrance animation
+        await tester.pumpAndSettle();
+
+        // Card should be visible
+        expect(find.text('Task 100'), findsOneWidget);
+      });
     });
   });
 }

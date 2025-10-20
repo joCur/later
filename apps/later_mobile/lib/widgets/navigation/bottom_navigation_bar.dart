@@ -89,6 +89,8 @@ class _AppBottomNavigationBarState extends State<AppBottomNavigationBar>
   void didUpdateWidget(AppBottomNavigationBar oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.currentIndex != widget.currentIndex) {
+      // Trigger selection haptic feedback on navigation change
+      AppAnimations.selectionHaptic();
       _animationController.forward(from: 0.0);
     }
   }
@@ -183,7 +185,13 @@ class _AppBottomNavigationBarState extends State<AppBottomNavigationBar>
         child: Material(
           color: Colors.transparent,
           child: InkWell(
-            onTap: () => widget.onDestinationSelected(index),
+            onTap: () {
+              // Only trigger haptic if actually changing tabs
+              if (widget.currentIndex != index) {
+                AppAnimations.selectionHaptic();
+              }
+              widget.onDestinationSelected(index);
+            },
             borderRadius: BorderRadius.circular(AppSpacing.radiusMD),
             splashColor: AppColors.ripple(context),
             highlightColor: Colors.transparent,

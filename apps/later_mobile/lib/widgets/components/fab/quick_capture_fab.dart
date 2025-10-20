@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../core/theme/app_spacing.dart';
@@ -129,7 +128,9 @@ class _QuickCaptureFabState extends State<QuickCaptureFab>
   void _handleTapDown(TapDownDetails details) {
     if (widget.onPressed != null) {
       _scaleController.forward();
-      HapticFeedback.lightImpact();
+      // Medium haptic feedback on FAB press
+      // Provides satisfying feedback for primary action button
+      AppAnimations.mediumHaptic();
     }
   }
 
@@ -147,7 +148,6 @@ class _QuickCaptureFabState extends State<QuickCaptureFab>
 
   void _handleTap() {
     if (widget.onPressed != null) {
-      HapticFeedback.mediumImpact();
       widget.onPressed?.call();
     }
   }

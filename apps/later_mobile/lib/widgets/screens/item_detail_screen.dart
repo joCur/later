@@ -9,6 +9,7 @@ import '../../core/theme/app_spacing.dart';
 import '../../data/models/item_model.dart';
 import '../../providers/items_provider.dart';
 import '../../providers/spaces_provider.dart';
+import '../components/text/gradient_text.dart';
 
 /// Item Detail Screen for viewing and editing item details
 ///
@@ -904,24 +905,36 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
         children: [
           Row(
             children: [
-              Icon(
-                Icons.add_circle_outline,
-                size: 14,
-                color: (isDark
-                        ? AppColors.textDisabledDark
-                        : AppColors.textDisabledLight)
-                    .withValues(alpha: 0.5),
+              // Created icon with subtle gradient tint
+              ShaderMask(
+                shaderCallback: (bounds) =>
+                    AppColors.primaryGradientAdaptive(context).createShader(bounds),
+                blendMode: BlendMode.srcIn,
+                child: const Icon(
+                  Icons.add_circle_outline,
+                  size: 14,
+                  color: Colors.white,
+                ),
               ),
               const SizedBox(width: AppSpacing.xs),
               Expanded(
-                child: Text(
-                  'Created: ${dateFormat.format(_currentItem.createdAt)}',
-                  style: AppTypography.caption.copyWith(
-                    color: (isDark
-                            ? AppColors.textSecondaryDark
-                            : AppColors.textSecondaryLight)
-                        .withValues(alpha: 0.7),
-                  ),
+                child: Row(
+                  children: [
+                    Text(
+                      'Created: ',
+                      style: AppTypography.caption.copyWith(
+                        color: (isDark
+                                ? AppColors.textSecondaryDark
+                                : AppColors.textSecondaryLight)
+                            .withValues(alpha: 0.7),
+                      ),
+                    ),
+                    // Date with subtle gradient
+                    GradientText.subtle(
+                      dateFormat.format(_currentItem.createdAt),
+                      style: AppTypography.caption,
+                    ),
+                  ],
                 ),
               ),
             ],
@@ -929,24 +942,37 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
           const SizedBox(height: AppSpacing.xs),
           Row(
             children: [
-              Icon(
-                Icons.update,
-                size: 14,
-                color: (isDark
-                        ? AppColors.textDisabledDark
-                        : AppColors.textDisabledLight)
-                    .withValues(alpha: 0.5),
+              // Updated icon with subtle gradient tint
+              ShaderMask(
+                shaderCallback: (bounds) =>
+                    AppColors.secondaryGradient.createShader(bounds),
+                blendMode: BlendMode.srcIn,
+                child: const Icon(
+                  Icons.update,
+                  size: 14,
+                  color: Colors.white,
+                ),
               ),
               const SizedBox(width: AppSpacing.xs),
               Expanded(
-                child: Text(
-                  'Modified: ${dateFormat.format(_currentItem.updatedAt)}',
-                  style: AppTypography.caption.copyWith(
-                    color: (isDark
-                            ? AppColors.textSecondaryDark
-                            : AppColors.textSecondaryLight)
-                        .withValues(alpha: 0.7),
-                  ),
+                child: Row(
+                  children: [
+                    Text(
+                      'Modified: ',
+                      style: AppTypography.caption.copyWith(
+                        color: (isDark
+                                ? AppColors.textSecondaryDark
+                                : AppColors.textSecondaryLight)
+                            .withValues(alpha: 0.7),
+                      ),
+                    ),
+                    // Date with subtle secondary gradient
+                    GradientText.subtle(
+                      dateFormat.format(_currentItem.updatedAt),
+                      gradient: AppColors.secondaryGradient,
+                      style: AppTypography.caption,
+                    ),
+                  ],
                 ),
               ),
             ],

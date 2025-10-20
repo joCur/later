@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../../core/theme/app_typography.dart';
+import '../text/gradient_text.dart';
 import 'empty_state.dart';
 
 /// Welcome state for first app launch
@@ -37,7 +39,34 @@ class WelcomeState extends StatelessWidget {
     return EmptyState(
       icon: Icons.auto_awesome, // sparkles icon
       iconSize: 64.0,
-      title: 'Welcome to later',
+      title: 'Welcome to later', // Fallback for accessibility
+      titleWidget: const Wrap(
+        alignment: WrapAlignment.center,
+        crossAxisAlignment: WrapCrossAlignment.center,
+        children: [
+          Text(
+            'Welcome to ',
+            style: TextStyle(
+              fontFamily: AppTypography.fontFamily,
+              fontSize: 40.0, // Display Large on mobile as per spec
+              fontWeight: AppTypography.regular,
+              height: 1.2, // 48px line height
+              letterSpacing: -0.25,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          GradientText(
+            'later',
+            style: TextStyle(
+              fontFamily: AppTypography.fontFamily,
+              fontSize: 40.0, // Display Large on mobile as per spec
+              fontWeight: AppTypography.regular,
+              height: 1.2, // 48px line height
+              letterSpacing: -0.25,
+            ),
+          ),
+        ],
+      ),
       description: 'Your peaceful place for thoughts, tasks, and everything in between',
       ctaText: 'Create your first item',
       onCtaPressed: onCreateFirstItem,

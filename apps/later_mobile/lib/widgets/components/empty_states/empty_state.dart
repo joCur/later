@@ -34,6 +34,7 @@ class EmptyState extends StatefulWidget {
     required this.icon,
     required this.iconSize,
     required this.title,
+    this.titleWidget,
     required this.description,
     this.ctaText,
     this.onCtaPressed,
@@ -48,7 +49,12 @@ class EmptyState extends StatefulWidget {
   final double iconSize;
 
   /// Title text for the empty state (Display Large)
+  /// If [titleWidget] is provided, this is ignored.
   final String title;
+
+  /// Optional custom widget for the title (e.g., gradient text)
+  /// If provided, this takes precedence over [title].
+  final Widget? titleWidget;
 
   /// Descriptive message explaining the empty state (Body Large)
   final String description;
@@ -133,7 +139,8 @@ class _EmptyStateState extends State<EmptyState> {
                     const SizedBox(height: AppSpacing.xxxl),
 
                     // Title - Display Large for mobile (40px)
-                    Text(
+                    // Use custom widget if provided, otherwise default text
+                    widget.titleWidget ?? Text(
                       widget.title,
                       style: const TextStyle(
                         fontFamily: AppTypography.fontFamily,

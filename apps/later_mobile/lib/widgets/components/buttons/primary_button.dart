@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../core/theme/app_spacing.dart';
@@ -121,7 +120,8 @@ class _PrimaryButtonState extends State<PrimaryButton> {
   void _handleTapDown(TapDownDetails details) {
     if (_isEnabled) {
       setState(() => _isPressed = true);
-      HapticFeedback.lightImpact();
+      // Light haptic feedback on button press
+      AppAnimations.lightHaptic();
     }
   }
 
@@ -139,7 +139,6 @@ class _PrimaryButtonState extends State<PrimaryButton> {
 
   void _handleTap() {
     if (_isEnabled) {
-      HapticFeedback.lightImpact();
       widget.onPressed?.call();
     }
   }

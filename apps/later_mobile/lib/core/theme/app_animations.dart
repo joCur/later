@@ -1,5 +1,7 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/physics.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
 /// Temporal Flow Design System - Animation Tokens
@@ -334,25 +336,62 @@ class AppAnimations {
   // HAPTIC FEEDBACK INTEGRATION
   // ============================================================
 
+  /// Check if haptic feedback is supported on this platform
+  /// Haptics are supported on iOS and Android
+  static bool supportsHaptics() {
+    return Platform.isIOS || Platform.isAndroid;
+  }
+
+  /// Conditionally trigger haptic feedback only on supported platforms
+  static Future<void> conditionalHaptic(Future<void> Function() hapticFn) async {
+    if (supportsHaptics()) {
+      try {
+        await hapticFn();
+      } catch (e) {
+        // Silently catch haptic errors (device may not support haptics)
+        // This ensures the app doesn't crash on devices without haptic support
+      }
+    }
+  }
+
   /// Light haptic feedback (for subtle interactions)
-  static void lightHaptic() {
-    // Will be implemented when HapticFeedback is integrated
-    // HapticFeedback.lightImpact();
+  /// Use for: button presses, minor UI feedback
+  static Future<void> lightHaptic() async {
+    await conditionalHaptic(() async {
+      await HapticFeedback.lightImpact();
+    });
   }
 
   /// Medium haptic feedback (for standard interactions)
-  static void mediumHaptic() {
-    // HapticFeedback.mediumImpact();
+  /// Use for: checkbox toggles, FAB presses, standard actions
+  static Future<void> mediumHaptic() async {
+    await conditionalHaptic(() async {
+      await HapticFeedback.mediumImpact();
+    });
   }
 
   /// Heavy haptic feedback (for important actions)
-  static void heavyHaptic() {
-    // HapticFeedback.heavyImpact();
+  /// Use for: swipe action completion, important confirmations
+  static Future<void> heavyHaptic() async {
+    await conditionalHaptic(() async {
+      await HapticFeedback.heavyImpact();
+    });
   }
 
-  /// Selection haptic feedback
-  static void selectionHaptic() {
-    // HapticFeedback.selectionClick();
+  /// Selection haptic feedback (for navigation and selection changes)
+  /// Use for: navigation tab changes, item selection
+  static Future<void> selectionHaptic() async {
+    await conditionalHaptic(() async {
+      await HapticFeedback.selectionClick();
+    });
+  }
+
+  /// Warning haptic feedback (for destructive or warning actions)
+  /// Use for: delete actions, error states, warnings
+  static Future<void> warningHaptic() async {
+    await conditionalHaptic(() async {
+      await HapticFeedback.vibrate();
+    });
   }
 
   // ============================================================

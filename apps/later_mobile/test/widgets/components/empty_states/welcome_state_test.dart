@@ -16,8 +16,9 @@ void main() {
         ),
       );
 
-      // Assert
-      expect(find.text('Welcome to later'), findsOneWidget);
+      // Assert - Now the title is split between regular text and gradient text
+      expect(find.text('Welcome to '), findsOneWidget);
+      expect(find.text('later'), findsOneWidget);
     });
 
     testWidgets('renders sparkles icon', (WidgetTester tester) async {
@@ -209,7 +210,9 @@ void main() {
         ),
       );
 
-      expect(find.text('Welcome to later'), findsOneWidget);
+      // Title is now split into two text widgets (regular + gradient)
+      expect(find.text('Welcome to '), findsOneWidget);
+      expect(find.text('later'), findsOneWidget);
 
       // Test dark mode
       await tester.pumpWidget(
@@ -223,7 +226,9 @@ void main() {
         ),
       );
 
-      expect(find.text('Welcome to later'), findsOneWidget);
+      // Title is now split into two text widgets (regular + gradient)
+      expect(find.text('Welcome to '), findsOneWidget);
+      expect(find.text('later'), findsOneWidget);
     });
 
     testWidgets('has proper semantic structure', (WidgetTester tester) async {
@@ -239,7 +244,9 @@ void main() {
       );
 
       // Assert - verify all key elements are accessible
-      expect(find.text('Welcome to later'), findsOneWidget);
+      // Title is now split into two text widgets (regular + gradient)
+      expect(find.text('Welcome to '), findsOneWidget);
+      expect(find.text('later'), findsOneWidget);
       expect(
         find.text(
           'Your peaceful place for thoughts, tasks, and everything in between',

@@ -7,6 +7,7 @@ import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_spacing.dart';
 import '../../data/models/space_model.dart';
 import '../../providers/spaces_provider.dart';
+import '../components/buttons/theme_toggle_button.dart';
 
 /// Desktop sidebar navigation component
 ///
@@ -81,24 +82,32 @@ class _AppSidebarState extends State<AppSidebar> {
     final key = event.logicalKey;
     final spaces = spacesProvider.spaces;
 
+    // Helper to switch space with haptic feedback
+    void switchWithHaptic(String spaceId) {
+      if (spacesProvider.currentSpace?.id != spaceId) {
+        AppAnimations.selectionHaptic();
+      }
+      spacesProvider.switchSpace(spaceId);
+    }
+
     if (key == LogicalKeyboardKey.digit1 && spaces.isNotEmpty) {
-      spacesProvider.switchSpace(spaces[0].id);
+      switchWithHaptic(spaces[0].id);
     } else if (key == LogicalKeyboardKey.digit2 && spaces.length > 1) {
-      spacesProvider.switchSpace(spaces[1].id);
+      switchWithHaptic(spaces[1].id);
     } else if (key == LogicalKeyboardKey.digit3 && spaces.length > 2) {
-      spacesProvider.switchSpace(spaces[2].id);
+      switchWithHaptic(spaces[2].id);
     } else if (key == LogicalKeyboardKey.digit4 && spaces.length > 3) {
-      spacesProvider.switchSpace(spaces[3].id);
+      switchWithHaptic(spaces[3].id);
     } else if (key == LogicalKeyboardKey.digit5 && spaces.length > 4) {
-      spacesProvider.switchSpace(spaces[4].id);
+      switchWithHaptic(spaces[4].id);
     } else if (key == LogicalKeyboardKey.digit6 && spaces.length > 5) {
-      spacesProvider.switchSpace(spaces[5].id);
+      switchWithHaptic(spaces[5].id);
     } else if (key == LogicalKeyboardKey.digit7 && spaces.length > 6) {
-      spacesProvider.switchSpace(spaces[6].id);
+      switchWithHaptic(spaces[6].id);
     } else if (key == LogicalKeyboardKey.digit8 && spaces.length > 7) {
-      spacesProvider.switchSpace(spaces[7].id);
+      switchWithHaptic(spaces[7].id);
     } else if (key == LogicalKeyboardKey.digit9 && spaces.length > 8) {
-      spacesProvider.switchSpace(spaces[8].id);
+      switchWithHaptic(spaces[8].id);
     }
   }
 
@@ -274,6 +283,10 @@ class _AppSidebarState extends State<AppSidebar> {
           isDarkMode: isDarkMode,
           keyboardShortcut: keyboardShortcut,
           onTap: () {
+            // Only trigger haptic if actually changing spaces
+            if (spacesProvider.currentSpace?.id != space.id) {
+              AppAnimations.selectionHaptic();
+            }
             spacesProvider.switchSpace(space.id);
           },
         );
@@ -303,38 +316,73 @@ class _AppSidebarState extends State<AppSidebar> {
         ),
         Container(
           padding: const EdgeInsets.all(AppSpacing.xs),
-          child: Tooltip(
-            message: 'Settings',
-            child: InkWell(
-              onTap: () {
-                // Navigate to settings
-              },
-              borderRadius: const BorderRadius.all(
-                Radius.circular(AppSpacing.radiusSM),
-              ),
-              child: Container(
-                height: AppSpacing.minTouchTarget,
-                padding: EdgeInsets.symmetric(
-                  horizontal: widget.isExpanded
-                      ? AppSpacing.sm
-                      : AppSpacing.xs,
+          child: Row(
+            mainAxisAlignment: widget.isExpanded
+                ? MainAxisAlignment.start
+                : MainAxisAlignment.center,
+            children: [
+              // Theme toggle button
+              const ThemeToggleButton(),
+
+              if (widget.isExpanded) ...[
+                const SizedBox(width: AppSpacing.gapSM),
+                // Settings button
+                Expanded(
+                  child: Tooltip(
+                    message: 'Settings',
+                    child: InkWell(
+                      onTap: () {
+                        // Navigate to settings
+                      },
+                      borderRadius: const BorderRadius.all(
+                        Radius.circular(AppSpacing.radiusSM),
+                      ),
+                      child: Container(
+                        height: AppSpacing.minTouchTarget,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: AppSpacing.sm,
+                        ),
+                        child: const Row(
+                          children: [
+                            Icon(Icons.settings_outlined),
+                            SizedBox(width: AppSpacing.gapSM),
+                            Text('Settings'),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
                 ),
-                child: Row(
-                  mainAxisAlignment: widget.isExpanded
-                      ? MainAxisAlignment.start
-                      : MainAxisAlignment.center,
-                  children: [
-                    const Icon(Icons.settings_outlined),
-                    if (widget.isExpanded) ...[
-                      const SizedBox(width: AppSpacing.gapSM),
-                      const Text('Settings'),
-                    ],
-                  ],
+              ] else ...[
+                // In collapsed state, show settings icon below
+                const SizedBox.shrink(),
+              ],
+            ],
+          ),
+        ),
+        // Show settings button below in collapsed mode
+        if (!widget.isExpanded)
+          Container(
+            padding: const EdgeInsets.all(AppSpacing.xs),
+            child: Tooltip(
+              message: 'Settings',
+              child: InkWell(
+                onTap: () {
+                  // Navigate to settings
+                },
+                borderRadius: const BorderRadius.all(
+                  Radius.circular(AppSpacing.radiusSM),
+                ),
+                child: Container(
+                  height: AppSpacing.minTouchTarget,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.xs,
+                  ),
+                  child: const Icon(Icons.settings_outlined),
                 ),
               ),
             ),
           ),
-        ),
       ],
     );
   }
