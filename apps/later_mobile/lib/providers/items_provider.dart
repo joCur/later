@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import '../core/error/app_error.dart';
 import '../data/models/item_model.dart';
 import '../data/repositories/item_repository.dart';
 
@@ -35,16 +36,23 @@ class ItemsProvider extends ChangeNotifier {
   /// Returns true if an async operation is in progress.
   bool get isLoading => _isLoading;
 
-  /// Current error message, if any.
-  String? _error;
+  /// Current error, if any.
+  AppError? _error;
 
-  /// Returns the current error message, or null if there is no error.
-  String? get error => _error;
+  /// Returns the current error, or null if there is no error.
+  AppError? get error => _error;
+
+  /// Maximum number of retry attempts for failed operations.
+  static const int _maxRetries = 3;
+
+  /// Base delay for exponential backoff (in milliseconds).
+  static const int _baseDelayMs = 300;
 
   /// Loads all items from the repository.
   ///
   /// Sets the loading state, fetches all items, and updates the state
   /// accordingly. If an error occurs, it is captured in the error state.
+  /// Implements automatic retry with exponential backoff for transient failures.
   ///
   /// Example:
   /// ```dart
@@ -59,10 +67,17 @@ class ItemsProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      _items = await _repository.getItems();
+      _items = await _executeWithRetry(
+        () => _repository.getItems(),
+        'loadItems',
+      );
       _error = null;
     } catch (e) {
-      _error = e.toString();
+      if (e is AppError) {
+        _error = e;
+      } else {
+        _error = AppError.fromException(e);
+      }
       _items = [];
     } finally {
       _isLoading = false;
@@ -74,6 +89,7 @@ class ItemsProvider extends ChangeNotifier {
   ///
   /// Sets the loading state, fetches items for the given space,
   /// and updates the state accordingly.
+  /// Implements automatic retry with exponential backoff for transient failures.
   ///
   /// Parameters:
   ///   - [spaceId]: The ID of the space to filter by
@@ -89,10 +105,17 @@ class ItemsProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      _items = await _repository.getItemsBySpace(spaceId);
+      _items = await _executeWithRetry(
+        () => _repository.getItemsBySpace(spaceId),
+        'loadItemsBySpace',
+      );
       _error = null;
     } catch (e) {
-      _error = e.toString();
+      if (e is AppError) {
+        _error = e;
+      } else {
+        _error = AppError.fromException(e);
+      }
       _items = [];
     } finally {
       _isLoading = false;
@@ -104,6 +127,7 @@ class ItemsProvider extends ChangeNotifier {
   ///
   /// Sets the loading state, fetches items of the given type,
   /// and updates the state accordingly.
+  /// Implements automatic retry with exponential backoff for transient failures.
   ///
   /// Parameters:
   ///   - [type]: The ItemType to filter by (task, note, or list)
@@ -119,10 +143,17 @@ class ItemsProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      _items = await _repository.getItemsByType(type);
+      _items = await _executeWithRetry(
+        () => _repository.getItemsByType(type),
+        'loadItemsByType',
+      );
       _error = null;
     } catch (e) {
-      _error = e.toString();
+      if (e is AppError) {
+        _error = e;
+      } else {
+        _error = AppError.fromException(e);
+      }
       _items = [];
     } finally {
       _isLoading = false;
@@ -134,6 +165,7 @@ class ItemsProvider extends ChangeNotifier {
   ///
   /// The item is added to the repository and then added to the local
   /// list of items. If an error occurs, the state is not updated.
+  /// Implements automatic retry with exponential backoff for transient failures.
   ///
   /// Parameters:
   ///   - [item]: The item to add
@@ -152,12 +184,19 @@ class ItemsProvider extends ChangeNotifier {
     _error = null;
 
     try {
-      final createdItem = await _repository.createItem(item);
+      final createdItem = await _executeWithRetry(
+        () => _repository.createItem(item),
+        'addItem',
+      );
       _items = [..._items, createdItem];
       _error = null;
       notifyListeners();
     } catch (e) {
-      _error = e.toString();
+      if (e is AppError) {
+        _error = e;
+      } else {
+        _error = AppError.fromException(e);
+      }
       notifyListeners();
     }
   }
@@ -167,6 +206,7 @@ class ItemsProvider extends ChangeNotifier {
   /// The item is updated in the repository and then the local list
   /// is updated to reflect the changes. If the item does not exist,
   /// an error is set.
+  /// Implements automatic retry with exponential backoff for transient failures.
   ///
   /// Parameters:
   ///   - [item]: The item to update with new values
@@ -183,7 +223,10 @@ class ItemsProvider extends ChangeNotifier {
     _error = null;
 
     try {
-      final updatedItem = await _repository.updateItem(item);
+      final updatedItem = await _executeWithRetry(
+        () => _repository.updateItem(item),
+        'updateItem',
+      );
       final index = _items.indexWhere((i) => i.id == item.id);
       if (index != -1) {
         _items = [
@@ -195,7 +238,11 @@ class ItemsProvider extends ChangeNotifier {
       _error = null;
       notifyListeners();
     } catch (e) {
-      _error = e.toString();
+      if (e is AppError) {
+        _error = e;
+      } else {
+        _error = AppError.fromException(e);
+      }
       notifyListeners();
     }
   }
@@ -204,6 +251,7 @@ class ItemsProvider extends ChangeNotifier {
   ///
   /// The item is removed from the repository and then removed from
   /// the local list of items. If an error occurs, the state is not updated.
+  /// Implements automatic retry with exponential backoff for transient failures.
   ///
   /// Parameters:
   ///   - [id]: The ID of the item to delete
@@ -216,12 +264,19 @@ class ItemsProvider extends ChangeNotifier {
     _error = null;
 
     try {
-      await _repository.deleteItem(id);
+      await _executeWithRetry(
+        () => _repository.deleteItem(id),
+        'deleteItem',
+      );
       _items = _items.where((item) => item.id != id).toList();
       _error = null;
       notifyListeners();
     } catch (e) {
-      _error = e.toString();
+      if (e is AppError) {
+        _error = e;
+      } else {
+        _error = AppError.fromException(e);
+      }
       notifyListeners();
     }
   }
@@ -230,6 +285,7 @@ class ItemsProvider extends ChangeNotifier {
   ///
   /// Finds the item by ID, flips its isCompleted status, and updates
   /// it in the repository. If the item is not found, an error is set.
+  /// Implements automatic retry with exponential backoff for transient failures.
   ///
   /// Parameters:
   ///   - [id]: The ID of the task item to toggle
@@ -250,7 +306,11 @@ class ItemsProvider extends ChangeNotifier {
       final updatedItem = item.copyWith(isCompleted: !item.isCompleted);
       await updateItem(updatedItem);
     } catch (e) {
-      _error = e.toString();
+      if (e is AppError) {
+        _error = e;
+      } else {
+        _error = AppError.fromException(e);
+      }
       notifyListeners();
     }
   }
@@ -266,5 +326,47 @@ class ItemsProvider extends ChangeNotifier {
   void clearError() {
     _error = null;
     notifyListeners();
+  }
+
+  /// Executes an operation with retry logic.
+  ///
+  /// Implements exponential backoff for transient failures.
+  /// Only retries operations that throw retryable errors.
+  ///
+  /// Parameters:
+  ///   - [operation]: The async operation to execute
+  ///   - [operationName]: Name of the operation for error logging
+  ///
+  /// Returns the result of the operation.
+  /// Throws the last error if all retry attempts fail.
+  Future<T> _executeWithRetry<T>(
+    Future<T> Function() operation,
+    String operationName,
+  ) async {
+    int attempts = 0;
+    AppError? lastError;
+
+    while (attempts < _maxRetries) {
+      try {
+        return await operation();
+      } catch (e) {
+        attempts++;
+        lastError = AppError.fromException(e);
+
+        // Only retry if the error is retryable and we have attempts left
+        if (lastError.isRetryable && attempts < _maxRetries) {
+          // Exponential backoff: delay increases with each attempt
+          final delayMs = _baseDelayMs * (1 << (attempts - 1));
+          await Future<void>.delayed(Duration(milliseconds: delayMs));
+          continue;
+        }
+
+        // Non-retryable error or max retries reached
+        throw lastError;
+      }
+    }
+
+    // This should never be reached, but throw the last error just in case
+    throw lastError ?? AppError.unknown(message: 'Unknown error in $operationName');
   }
 }

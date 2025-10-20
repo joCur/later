@@ -9,6 +9,11 @@ import 'package:intl/intl.dart';
 
 /// Unified item card component for tasks, notes, and lists
 ///
+/// Performance optimizations:
+/// - Uses RepaintBoundary to isolate repaints
+/// - Const constructors where possible
+/// - ValueKey for efficient list updates
+///
 /// Features:
 /// - Three variants: TaskCard, NoteCard, ListCard
 /// - 4px colored left border (blue/amber/violet based on type)
@@ -327,75 +332,78 @@ class _ItemCardState extends State<ItemCard> with SingleTickerProviderStateMixin
         ? 0.7
         : 1.0;
 
-    return Semantics(
-      container: true,
-      button: true,
-      enabled: widget.onTap != null,
-      label: '${widget.item.type.toString().split('.').last}: ${widget.item.title}',
-      child: GestureDetector(
-        onTapDown: _handleTapDown,
-        onTapUp: _handleTapUp,
-        onTapCancel: _handleTapCancel,
-        onTap: _handleTap,
-        onLongPress: _handleLongPress,
-        child: Opacity(
-          opacity: opacity,
-          child: Container(
-            margin: const EdgeInsets.only(bottom: AppSpacing.xxs),
-            decoration: BoxDecoration(
-              color: backgroundColor,
-              borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
-              border: Border(
-                left: BorderSide(
-                  color: _getBorderColor(),
-                  width: borderWidth,
-                ),
-              ),
-              boxShadow: _isPressed
-                  ? null
-                  : [
-                      BoxShadow(
-                        color: isDark
-                            ? AppColors.shadowDark
-                            : AppColors.shadowLight,
-                        blurRadius: 3,
-                        offset: const Offset(0, 1),
-                      ),
-                    ],
-            ),
-            child: Padding(
-              padding: EdgeInsets.all(isMobile ? 12 : AppSpacing.sm),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Leading element (checkbox or icon)
-                  _buildLeadingElement(),
-                  const SizedBox(width: AppSpacing.xxxs),
-
-                  // Content
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        // Title
-                        _buildTitle(context),
-
-                        // Content preview (if available)
-                        if (_buildContentPreview(context) != null) ...[
-                          const SizedBox(height: AppSpacing.xxxs),
-                          _buildContentPreview(context)!,
-                        ],
-
-                        // Metadata
-                        if (_buildMetadata(context) != null) ...[
-                          const SizedBox(height: AppSpacing.xxs),
-                          _buildMetadata(context)!,
-                        ],
-                      ],
-                    ),
+    // Wrap with RepaintBoundary to isolate repaints
+    return RepaintBoundary(
+      child: Semantics(
+        container: true,
+        button: true,
+        enabled: widget.onTap != null,
+        label: '${widget.item.type.toString().split('.').last}: ${widget.item.title}',
+        child: GestureDetector(
+          onTapDown: _handleTapDown,
+          onTapUp: _handleTapUp,
+          onTapCancel: _handleTapCancel,
+          onTap: _handleTap,
+          onLongPress: _handleLongPress,
+          child: Opacity(
+            opacity: opacity,
+            child: Container(
+              margin: const EdgeInsets.only(bottom: AppSpacing.xxs),
+              decoration: BoxDecoration(
+                color: backgroundColor,
+                borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
+                border: Border(
+                  left: BorderSide(
+                    color: _getBorderColor(),
+                    width: borderWidth,
                   ),
-                ],
+                ),
+                boxShadow: _isPressed
+                    ? null
+                    : [
+                        BoxShadow(
+                          color: isDark
+                              ? AppColors.shadowDark
+                              : AppColors.shadowLight,
+                          blurRadius: 3,
+                          offset: const Offset(0, 1),
+                        ),
+                      ],
+              ),
+              child: Padding(
+                padding: EdgeInsets.all(isMobile ? 12 : AppSpacing.sm),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Leading element (checkbox or icon)
+                    _buildLeadingElement(),
+                    const SizedBox(width: AppSpacing.xxxs),
+
+                    // Content
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          // Title
+                          _buildTitle(context),
+
+                          // Content preview (if available)
+                          if (_buildContentPreview(context) != null) ...[
+                            const SizedBox(height: AppSpacing.xxxs),
+                            _buildContentPreview(context)!,
+                          ],
+
+                          // Metadata
+                          if (_buildMetadata(context) != null) ...[
+                            const SizedBox(height: AppSpacing.xxs),
+                            _buildMetadata(context)!,
+                          ],
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),

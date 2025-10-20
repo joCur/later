@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import '../core/error/app_error.dart';
 import '../data/models/space_model.dart';
 import '../data/repositories/space_repository.dart';
 
@@ -42,11 +43,17 @@ class SpacesProvider extends ChangeNotifier {
   /// Returns true if an async operation is in progress.
   bool get isLoading => _isLoading;
 
-  /// Current error message, if any.
-  String? _error;
+  /// Current error, if any.
+  AppError? _error;
 
-  /// Returns the current error message, or null if there is no error.
-  String? get error => _error;
+  /// Returns the current error, or null if there is no error.
+  AppError? get error => _error;
+
+  /// Maximum number of retry attempts for failed operations.
+  static const int _maxRetries = 3;
+
+  /// Base delay for exponential backoff (in milliseconds).
+  static const int _baseDelayMs = 300;
 
   /// Loads spaces from the repository.
   ///
@@ -70,7 +77,10 @@ class SpacesProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      _spaces = await _repository.getSpaces(includeArchived: includeArchived);
+      _spaces = await _executeWithRetry(
+        () => _repository.getSpaces(includeArchived: includeArchived),
+        'loadSpaces',
+      );
 
       // Set first non-archived space as current if none is selected
       if (_currentSpace == null && _spaces.isNotEmpty) {
@@ -79,7 +89,11 @@ class SpacesProvider extends ChangeNotifier {
 
       _error = null;
     } catch (e) {
-      _error = e.toString();
+      if (e is AppError) {
+        _error = e;
+      } else {
+        _error = AppError.fromException(e);
+      }
       _spaces = [];
     } finally {
       _isLoading = false;
@@ -110,13 +124,20 @@ class SpacesProvider extends ChangeNotifier {
     _error = null;
 
     try {
-      final createdSpace = await _repository.createSpace(space);
+      final createdSpace = await _executeWithRetry(
+        () => _repository.createSpace(space),
+        'addSpace',
+      );
       _spaces = [..._spaces, createdSpace];
       _currentSpace = createdSpace;
       _error = null;
       notifyListeners();
     } catch (e) {
-      _error = e.toString();
+      if (e is AppError) {
+        _error = e;
+      } else {
+        _error = AppError.fromException(e);
+      }
       notifyListeners();
     }
   }
@@ -142,7 +163,10 @@ class SpacesProvider extends ChangeNotifier {
     _error = null;
 
     try {
-      final updatedSpace = await _repository.updateSpace(space);
+      final updatedSpace = await _executeWithRetry(
+        () => _repository.updateSpace(space),
+        'updateSpace',
+      );
       final index = _spaces.indexWhere((s) => s.id == space.id);
       if (index != -1) {
         _spaces = [
@@ -160,7 +184,11 @@ class SpacesProvider extends ChangeNotifier {
       _error = null;
       notifyListeners();
     } catch (e) {
-      _error = e.toString();
+      if (e is AppError) {
+        _error = e;
+      } else {
+        _error = AppError.fromException(e);
+      }
       notifyListeners();
     }
   }
@@ -185,18 +213,28 @@ class SpacesProvider extends ChangeNotifier {
 
     // Prevent deleting current space
     if (_currentSpace?.id == id) {
-      _error = 'Cannot delete the current space. Please switch to another space first.';
+      _error = AppError.validation(
+        message: 'Cannot delete the current space',
+        userMessage: 'Cannot delete the current space. Please switch to another space first.',
+      );
       notifyListeners();
       return;
     }
 
     try {
-      await _repository.deleteSpace(id);
+      await _executeWithRetry(
+        () => _repository.deleteSpace(id),
+        'deleteSpace',
+      );
       _spaces = _spaces.where((space) => space.id != id).toList();
       _error = null;
       notifyListeners();
     } catch (e) {
-      _error = e.toString();
+      if (e is AppError) {
+        _error = e;
+      } else {
+        _error = AppError.fromException(e);
+      }
       notifyListeners();
     }
   }
@@ -227,7 +265,11 @@ class SpacesProvider extends ChangeNotifier {
       _error = null;
       notifyListeners();
     } catch (e) {
-      _error = e.toString();
+      if (e is AppError) {
+        _error = e;
+      } else {
+        _error = AppError.fromException(e);
+      }
       notifyListeners();
     }
   }
@@ -248,10 +290,16 @@ class SpacesProvider extends ChangeNotifier {
     _error = null;
 
     try {
-      await _repository.incrementItemCount(spaceId);
+      await _executeWithRetry(
+        () => _repository.incrementItemCount(spaceId),
+        'incrementSpaceItemCount',
+      );
 
       // Reload the updated space
-      final updatedSpace = await _repository.getSpaceById(spaceId);
+      final updatedSpace = await _executeWithRetry(
+        () => _repository.getSpaceById(spaceId),
+        'getSpaceById',
+      );
       if (updatedSpace != null) {
         final index = _spaces.indexWhere((s) => s.id == spaceId);
         if (index != -1) {
@@ -271,7 +319,11 @@ class SpacesProvider extends ChangeNotifier {
       _error = null;
       notifyListeners();
     } catch (e) {
-      _error = e.toString();
+      if (e is AppError) {
+        _error = e;
+      } else {
+        _error = AppError.fromException(e);
+      }
       notifyListeners();
     }
   }
@@ -293,10 +345,16 @@ class SpacesProvider extends ChangeNotifier {
     _error = null;
 
     try {
-      await _repository.decrementItemCount(spaceId);
+      await _executeWithRetry(
+        () => _repository.decrementItemCount(spaceId),
+        'decrementSpaceItemCount',
+      );
 
       // Reload the updated space
-      final updatedSpace = await _repository.getSpaceById(spaceId);
+      final updatedSpace = await _executeWithRetry(
+        () => _repository.getSpaceById(spaceId),
+        'getSpaceById',
+      );
       if (updatedSpace != null) {
         final index = _spaces.indexWhere((s) => s.id == spaceId);
         if (index != -1) {
@@ -316,7 +374,11 @@ class SpacesProvider extends ChangeNotifier {
       _error = null;
       notifyListeners();
     } catch (e) {
-      _error = e.toString();
+      if (e is AppError) {
+        _error = e;
+      } else {
+        _error = AppError.fromException(e);
+      }
       notifyListeners();
     }
   }
@@ -332,5 +394,47 @@ class SpacesProvider extends ChangeNotifier {
   void clearError() {
     _error = null;
     notifyListeners();
+  }
+
+  /// Executes an operation with retry logic.
+  ///
+  /// Implements exponential backoff for transient failures.
+  /// Only retries operations that throw retryable errors.
+  ///
+  /// Parameters:
+  ///   - [operation]: The async operation to execute
+  ///   - [operationName]: Name of the operation for error logging
+  ///
+  /// Returns the result of the operation.
+  /// Throws the last error if all retry attempts fail.
+  Future<T> _executeWithRetry<T>(
+    Future<T> Function() operation,
+    String operationName,
+  ) async {
+    int attempts = 0;
+    AppError? lastError;
+
+    while (attempts < _maxRetries) {
+      try {
+        return await operation();
+      } catch (e) {
+        attempts++;
+        lastError = AppError.fromException(e);
+
+        // Only retry if the error is retryable and we have attempts left
+        if (lastError.isRetryable && attempts < _maxRetries) {
+          // Exponential backoff: delay increases with each attempt
+          final delayMs = _baseDelayMs * (1 << (attempts - 1));
+          await Future<void>.delayed(Duration(milliseconds: delayMs));
+          continue;
+        }
+
+        // Non-retryable error or max retries reached
+        throw lastError;
+      }
+    }
+
+    // This should never be reached, but throw the last error just in case
+    throw lastError ?? AppError.unknown(message: 'Unknown error in $operationName');
   }
 }

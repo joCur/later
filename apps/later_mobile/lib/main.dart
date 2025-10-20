@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'core/error/error_handler.dart';
 import 'core/theme/app_theme.dart';
 import 'data/local/hive_database.dart';
 import 'data/local/seed_data.dart';
@@ -12,6 +13,9 @@ import 'widgets/screens/home_screen.dart';
 void main() async {
   // Ensure Flutter bindings are initialized
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize global error handler
+  ErrorHandler.initialize();
 
   // Initialize Hive database
   await HiveDatabase.initialize();

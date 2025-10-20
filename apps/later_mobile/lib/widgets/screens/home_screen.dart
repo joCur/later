@@ -11,7 +11,8 @@ import '../../providers/items_provider.dart';
 import '../../providers/spaces_provider.dart';
 import '../components/cards/item_card.dart';
 import '../components/fab/quick_capture_fab.dart';
-import '../components/empty_state.dart';
+import '../components/empty_states/empty_space_state.dart';
+import '../components/empty_states/welcome_state.dart';
 import '../navigation/bottom_navigation_bar.dart';
 import '../navigation/app_sidebar.dart';
 import '../modals/space_switcher_modal.dart';
@@ -20,11 +21,16 @@ import 'item_detail_screen.dart';
 
 /// Main home screen for the Later app
 ///
+/// Performance optimizations:
+/// - Pagination: Initially loads 100 items, then loads more on demand
+/// - Keys: Uses ValueKey for efficient list updates
+/// - Efficient filtering: Filters items without rebuilding entire tree
+///
 /// Serves as the primary entry point showing all items in the current space.
 /// Features:
 /// - App bar with space switcher, search, and menu
 /// - Filter chips (All, Tasks, Notes, Lists)
-/// - Item list with pull-to-refresh
+/// - Item list with pull-to-refresh and pagination
 /// - Empty state when no items
 /// - Quick capture FAB
 /// - Responsive layout (bottom nav on mobile, sidebar on desktop)
@@ -46,6 +52,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
   // Filter state
   ItemFilter _selectedFilter = ItemFilter.all;
+
+  // Pagination state
+  int _currentItemCount = 100; // Initially load 100 items
+  bool _isLoadingMore = false;
 
   @override
   void initState() {
@@ -82,16 +92,51 @@ class _HomeScreenState extends State<HomeScreen> {
 
   /// Filter items based on selected filter
   List<Item> _getFilteredItems(List<Item> items) {
+    List<Item> filtered;
     switch (_selectedFilter) {
       case ItemFilter.all:
-        return items;
+        filtered = items;
+        break;
       case ItemFilter.tasks:
-        return items.where((item) => item.type == ItemType.task).toList();
+        filtered = items.where((item) => item.type == ItemType.task).toList();
+        break;
       case ItemFilter.notes:
-        return items.where((item) => item.type == ItemType.note).toList();
+        filtered = items.where((item) => item.type == ItemType.note).toList();
+        break;
       case ItemFilter.lists:
-        return items.where((item) => item.type == ItemType.list).toList();
+        filtered = items.where((item) => item.type == ItemType.list).toList();
+        break;
     }
+
+    // Apply pagination: return only the current page of items
+    return filtered.take(_currentItemCount).toList();
+  }
+
+  /// Load more items (pagination)
+  void _loadMoreItems(int totalItemCount) {
+    if (_isLoadingMore) return;
+
+    setState(() {
+      _isLoadingMore = true;
+    });
+
+    // Simulate loading delay for smooth UX
+    Future.delayed(const Duration(milliseconds: 100), () {
+      if (mounted) {
+        setState(() {
+          _currentItemCount = (_currentItemCount + 50) // Load 50 more items
+              .clamp(0, totalItemCount);
+          _isLoadingMore = false;
+        });
+      }
+    });
+  }
+
+  /// Reset pagination when filter or space changes
+  void _resetPagination() {
+    setState(() {
+      _currentItemCount = 100; // Reset to initial 100 items
+    });
   }
 
   /// Show quick capture modal
@@ -155,7 +200,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 if (!mounted) return;
 
                 if (result == true) {
-                  // Space was switched, reload items
+                  // Space was switched, reload items and reset pagination
+                  _resetPagination();
                   if (spacesProvider.currentSpace != null) {
                     await itemsProvider.loadItemsBySpace(
                       spacesProvider.currentSpace!.id,
@@ -261,7 +307,10 @@ class _HomeScreenState extends State<HomeScreen> {
             label: 'All',
             isSelected: _selectedFilter == ItemFilter.all,
             onSelected: () {
-              setState(() => _selectedFilter = ItemFilter.all);
+              setState(() {
+                _selectedFilter = ItemFilter.all;
+                _resetPagination();
+              });
             },
             isDark: isDark,
           ),
@@ -269,7 +318,10 @@ class _HomeScreenState extends State<HomeScreen> {
             label: 'Tasks',
             isSelected: _selectedFilter == ItemFilter.tasks,
             onSelected: () {
-              setState(() => _selectedFilter = ItemFilter.tasks);
+              setState(() {
+                _selectedFilter = ItemFilter.tasks;
+                _resetPagination();
+              });
             },
             isDark: isDark,
           ),
@@ -277,7 +329,10 @@ class _HomeScreenState extends State<HomeScreen> {
             label: 'Notes',
             isSelected: _selectedFilter == ItemFilter.notes,
             onSelected: () {
-              setState(() => _selectedFilter = ItemFilter.notes);
+              setState(() {
+                _selectedFilter = ItemFilter.notes;
+                _resetPagination();
+              });
             },
             isDark: isDark,
           ),
@@ -285,7 +340,10 @@ class _HomeScreenState extends State<HomeScreen> {
             label: 'Lists',
             isSelected: _selectedFilter == ItemFilter.lists,
             onSelected: () {
-              setState(() => _selectedFilter = ItemFilter.lists);
+              setState(() {
+                _selectedFilter = ItemFilter.lists;
+                _resetPagination();
+              });
             },
             isDark: isDark,
           ),
@@ -294,27 +352,89 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  /// Build item list
-  Widget _buildItemList(BuildContext context, List<Item> items) {
-    if (items.isEmpty) {
-      return EmptyState(
-        icon: Icons.inbox_outlined,
-        title: 'No items yet',
-        message: _getEmptyMessage(),
-        actionLabel: 'Create Item',
-        onActionPressed: _showQuickCaptureModal,
-      );
+  /// Build item list with pagination
+  Widget _buildItemList(
+    BuildContext context,
+    List<Item> items,
+    Space? currentSpace,
+    SpacesProvider spacesProvider,
+    ItemsProvider itemsProvider,
+  ) {
+    if (items.isEmpty && itemsProvider.items.isEmpty) {
+      // Check if this is a new user (welcome state)
+      // Welcome state: no items AND default space is the only space
+      final isNewUser = spacesProvider.spaces.length == 1 &&
+                        spacesProvider.spaces.first.name == 'Inbox';
+
+      if (isNewUser) {
+        // Show welcome state for first-time users
+        return WelcomeState(
+          onCreateFirstItem: _showQuickCaptureModal,
+        );
+      } else {
+        // Show empty space state for existing users with empty spaces
+        return EmptySpaceState(
+          spaceName: currentSpace?.name ?? 'space',
+          onQuickCapture: _showQuickCaptureModal,
+        );
+      }
     }
+
+    // Calculate if there are more items to load
+    final filteredItems = _selectedFilter == ItemFilter.all
+        ? itemsProvider.items
+        : itemsProvider.items.where((item) {
+            switch (_selectedFilter) {
+              case ItemFilter.tasks:
+                return item.type == ItemType.task;
+              case ItemFilter.notes:
+                return item.type == ItemType.note;
+              case ItemFilter.lists:
+                return item.type == ItemType.list;
+              case ItemFilter.all:
+                return true;
+            }
+          }).toList();
+
+    final hasMoreItems = items.length < filteredItems.length;
+    final itemCount = hasMoreItems ? items.length + 1 : items.length;
 
     return ListView.builder(
       padding: const EdgeInsets.symmetric(
         horizontal: AppSpacing.paddingSM,
         vertical: AppSpacing.paddingXS,
       ),
-      itemCount: items.length,
+      itemCount: itemCount,
       itemBuilder: (context, index) {
+        // Load more button at the end
+        if (hasMoreItems && index == items.length) {
+          return Padding(
+            padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
+            child: Center(
+              child: _isLoadingMore
+                  ? const CircularProgressIndicator()
+                  : ElevatedButton.icon(
+                      onPressed: () => _loadMoreItems(filteredItems.length),
+                      icon: const Icon(Icons.expand_more),
+                      label: Text(
+                        'Load More (${filteredItems.length - items.length} remaining)',
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: AppSpacing.lg,
+                          vertical: AppSpacing.sm,
+                        ),
+                      ),
+                    ),
+            ),
+          );
+        }
+
         final item = items[index];
+
+        // Use ValueKey for efficient list updates
         return ItemCard(
+          key: ValueKey<String>(item.id),
           item: item,
           onTap: () {
             Navigator.of(context).push(
@@ -334,20 +454,6 @@ class _HomeScreenState extends State<HomeScreen> {
         );
       },
     );
-  }
-
-  /// Get appropriate empty message based on filter
-  String _getEmptyMessage() {
-    switch (_selectedFilter) {
-      case ItemFilter.all:
-        return 'Create your first item to get started. Tap the + button below.';
-      case ItemFilter.tasks:
-        return 'No tasks yet. Create a task to track your to-dos.';
-      case ItemFilter.notes:
-        return 'No notes yet. Create a note to capture your thoughts.';
-      case ItemFilter.lists:
-        return 'No lists yet. Create a list to organize related items.';
-    }
   }
 
   /// Build mobile layout
@@ -374,7 +480,13 @@ class _HomeScreenState extends State<HomeScreen> {
               onRefresh: _handleRefresh,
               child: itemsProvider.isLoading
                   ? const Center(child: CircularProgressIndicator())
-                  : _buildItemList(context, filteredItems),
+                  : _buildItemList(
+                      context,
+                      filteredItems,
+                      spacesProvider.currentSpace,
+                      spacesProvider,
+                      itemsProvider,
+                    ),
             ),
           ),
         ],
@@ -430,7 +542,13 @@ class _HomeScreenState extends State<HomeScreen> {
                     onRefresh: _handleRefresh,
                     child: itemsProvider.isLoading
                         ? const Center(child: CircularProgressIndicator())
-                        : _buildItemList(context, filteredItems),
+                        : _buildItemList(
+                            context,
+                            filteredItems,
+                            spacesProvider.currentSpace,
+                            spacesProvider,
+                            itemsProvider,
+                          ),
                   ),
                 ),
               ],

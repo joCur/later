@@ -104,10 +104,11 @@ class AppSpacing {
   static const double elevation16 = 16.0;
 
   // Touch targets (minimum interactive area)
-  static const double minTouchTarget = 44.0; // 44x44dp minimum
-  static const double touchTargetSmall = 32.0; // 32px (for small buttons)
-  static const double touchTargetMedium = 40.0; // 40px (for medium buttons)
-  static const double touchTargetLarge = 48.0; // 48px (for large buttons)
+  // WCAG 2.5.5 requires 44x44dp minimum, Material Design recommends 48x48px
+  static const double minTouchTarget = 48.0; // 48x48px minimum (Material Design)
+  static const double touchTargetSmall = 48.0; // 48px (increased for accessibility)
+  static const double touchTargetMedium = 48.0; // 48px (meets WCAG AA)
+  static const double touchTargetLarge = 56.0; // 56px (comfortable size)
   static const double touchTargetFAB = 56.0; // 56px (visual size, 64px touch)
   static const double touchTargetFABArea = 64.0; // 64px (actual touch area)
 
