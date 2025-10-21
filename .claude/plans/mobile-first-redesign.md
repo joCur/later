@@ -194,51 +194,51 @@ The current "Temporal Flow" design is **desktop-first**:
   - Verify 48×48px touch targets with TalkBack
   - Test on devices with gesture bars (Android 10+)
 
-### Phase 3: FAB & Modals (Week 3 - 5 days)
+### Phase 3: FAB & Modals (Week 3 - 5 days) ✅ COMPLETE
 
 > **📖 Reference**: See "FAB Design" and "Modal Design" in `MOBILE-FIRST-BOLD-REDESIGN.md` (pages 21-25) and "Phase 3 Implementation" in `MOBILE_IMPLEMENTATION_QUICK_START.md` (pages 16-20) for circular FAB and bottom sheet code.
 
-- [ ] Task 3.1: Redesign FAB in `widgets/components/fab/quick_capture_fab.dart`
+- [x] Task 3.1: Redesign FAB in `widgets/components/fab/quick_capture_fab.dart` ✅
   - Change from 64-68px squircle to 56px circle
   - Border radius: 28px (perfect circle)
   - Background: gradient with 30% white overlay
   - Icon: 24px plus (+) icon, white color
   - Shadow: 8px offset, 16px blur, 15% opacity (single shadow)
 
-- [ ] Task 3.2: Simplify FAB animations
+- [x] Task 3.2: Simplify FAB animations ✅
   - Remove icon rotation (keep static plus icon)
   - Press animation: scale 0.9 → 1.0 (100ms)
   - Haptic: medium impact on press
   - Remove breathing/pulsing animation (performance)
   - Desktop hover: scale 1.05 (200ms)
 
-- [ ] Task 3.3: Update FAB positioning
+- [x] Task 3.3: Update FAB positioning ✅
   - Position: 16px from right edge, 16px from bottom (above nav)
   - Ensure doesn't overlap with bottom navigation (60px height + 16px = 76px from bottom)
   - Test on small screens (320px width)
   - Adjust position if needed for thumb reach
 
-- [ ] Task 3.4: Redesign QuickCaptureModal in `widgets/modals/quick_capture_modal.dart`
+- [x] Task 3.4: Redesign QuickCaptureModal in `widgets/modals/quick_capture_modal.dart` ✅
   - Mobile: full-width bottom sheet (not centered dialog)
   - Border radius: 24px on top corners only
   - Add 4px gradient border on top edge
   - Background: solid surface color (no glass)
   - Padding: 24px (generous touch zones)
 
-- [ ] Task 3.5: Update modal animations
+- [x] Task 3.5: Update modal animations ✅
   - Entrance: slide up from bottom (300ms, Curves.easeOut)
   - Exit: slide down to bottom (250ms, Curves.easeIn)
   - Backdrop: fade in/out (250ms)
   - Remove scale animations (keep simple for mobile)
 
-- [ ] Task 3.6: Update input fields in modal
+- [x] Task 3.6: Update input fields in modal ✅
   - Border radius: 12px (consistent with pill theme)
   - Border: 2px solid (gradient on focus)
   - Padding: 16px horizontal, 12px vertical
   - Font size: 16px (prevent zoom on iOS)
   - Height: 48px (touch-friendly)
 
-- [ ] Task 3.7: Test modal interactions
+- [x] Task 3.7: Test modal interactions ✅
   - Test bottom sheet on various screen heights
   - Verify keyboard doesn't hide input
   - Test swipe-to-dismiss gesture

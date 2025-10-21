@@ -4,16 +4,15 @@ import '../../../core/theme/app_typography.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_animations.dart';
 
-/// Quick Capture Floating Action Button - Temporal Flow Design
+/// Quick Capture Floating Action Button - Mobile-First Bold Design
 ///
 /// Features:
-/// - Squircle shape: 64×64px with 16px border radius (Temporal Flow)
-/// - Primary gradient background (twilight: indigo→purple)
-/// - Colored shadow (16px blur, 30% opacity, tinted with gradient end color)
-/// - Icon rotation animation (Plus → X, 250ms spring physics)
-/// - Scale animation on press (0.92 scale)
-/// - Pulsing glow effect for long press hint
-/// - 64×64px touch target for accessibility
+/// - Circular shape: 56×56px (Android standard, mobile-first design)
+/// - Primary gradient background with 30% white overlay
+/// - Simplified shadow: 8px offset, 16px blur, 15% opacity (single shadow)
+/// - Simple plus icon (no rotation for performance)
+/// - Scale animation on press (0.9 scale for 100ms)
+/// - 56×56px touch target for accessibility
 /// - Position: 16px from bottom/right edges
 /// - Hero animation tag for modal transition
 /// - Haptic feedback on press
@@ -47,7 +46,7 @@ class QuickCaptureFab extends StatefulWidget {
   /// Whether to use gradient background
   final bool useGradient;
 
-  /// Whether the FAB is in an "open" state (for icon rotation)
+  /// Whether the FAB is in an "open" state (kept for API compatibility, not used for rotation)
   final bool isOpen;
 
   @override
@@ -55,73 +54,35 @@ class QuickCaptureFab extends StatefulWidget {
 }
 
 class _QuickCaptureFabState extends State<QuickCaptureFab>
-    with TickerProviderStateMixin {
+    with SingleTickerProviderStateMixin {
   late AnimationController _scaleController;
   late Animation<double> _scaleAnimation;
-
-  late AnimationController _rotationController;
-  late Animation<double> _rotationAnimation;
 
   @override
   void initState() {
     super.initState();
 
-    // Scale animation controller
+    // Simplified scale animation: 0.9 → 1.0 (100ms for mobile-first design)
     _scaleController = AnimationController(
-      duration: AppAnimations.fabPress,
-      reverseDuration: AppAnimations.fabRelease,
+      duration: const Duration(milliseconds: 100),
+      reverseDuration: const Duration(milliseconds: 150),
       vsync: this,
     );
     _scaleAnimation = Tween<double>(
       begin: 1.0,
-      end: AppAnimations.fabPressScale,
+      end: 0.9, // Scale down to 0.9 on press (mobile-first design)
     ).animate(
       CurvedAnimation(
         parent: _scaleController,
-        curve: AppAnimations.fabPressEasing,
-        reverseCurve: AppAnimations.fabReleaseEasing,
+        curve: Curves.easeOut,
+        reverseCurve: Curves.easeOutBack,
       ),
     );
-
-    // Icon rotation animation controller (Plus → X rotation: 45 degrees)
-    _rotationController = AnimationController(
-      duration: AppAnimations.fabIconRotation,
-      vsync: this,
-    );
-    _rotationAnimation = Tween<double>(
-      begin: 0.0,
-      end: 0.125, // 45 degrees = 1/8 turn
-    ).animate(
-      CurvedAnimation(
-        parent: _rotationController,
-        curve: AppAnimations.springCurve,
-      ),
-    );
-
-    // Set initial rotation state
-    if (widget.isOpen) {
-      _rotationController.value = 1.0;
-    }
-  }
-
-  @override
-  void didUpdateWidget(QuickCaptureFab oldWidget) {
-    super.didUpdateWidget(oldWidget);
-
-    // Animate icon rotation when isOpen changes
-    if (widget.isOpen != oldWidget.isOpen) {
-      if (widget.isOpen) {
-        _rotationController.forward();
-      } else {
-        _rotationController.reverse();
-      }
-    }
   }
 
   @override
   void dispose() {
     _scaleController.dispose();
-    _rotationController.dispose();
     super.dispose();
   }
 
@@ -163,23 +124,20 @@ class _QuickCaptureFabState extends State<QuickCaptureFab>
         ? AppColors.primaryGradientDark
         : AppColors.primaryGradient;
 
-    // Colored shadow tinted with gradient end color (16px blur, 30% opacity)
+    // Simplified shadow: 8px offset, 16px blur, 15% opacity (mobile-first design)
     final shadowColor = (isDark ? AppColors.primaryEndDark : AppColors.primaryEnd)
-        .withValues(alpha: 0.3);
+        .withValues(alpha: 0.15);
 
-    // FAB content with rotation animation
+    // FAB content: simple static icon (no rotation for mobile-first design)
     Widget fabContent;
     if (isExtended) {
       fabContent = Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          RotationTransition(
-            turns: _rotationAnimation,
-            child: Icon(
-              widget.icon,
-              color: Colors.white, // White icon on gradient background
-              size: 24,
-            ),
+          Icon(
+            widget.icon,
+            color: Colors.white, // White icon on gradient background
+            size: 24,
           ),
           const SizedBox(width: AppSpacing.xxs),
           Text(
@@ -191,13 +149,10 @@ class _QuickCaptureFabState extends State<QuickCaptureFab>
         ],
       );
     } else {
-      fabContent = RotationTransition(
-        turns: _rotationAnimation,
-        child: Icon(
-          widget.icon,
-          color: Colors.white, // White icon on gradient background
-          size: 24,
-        ),
+      fabContent = Icon(
+        widget.icon,
+        color: Colors.white, // White icon on gradient background
+        size: 24,
       );
     }
 
@@ -217,7 +172,7 @@ class _QuickCaptureFabState extends State<QuickCaptureFab>
               onTapCancel: _handleTapCancel,
               onTap: _handleTap,
               child: Container(
-                // Squircle shape: 64×64px with 16px border radius (Temporal Flow)
+                // Circular shape: 56×56px (Android standard, mobile-first design)
                 width: isExtended ? null : AppSpacing.fabSize,
                 height: isExtended ? null : AppSpacing.fabSize,
                 constraints: isExtended
@@ -233,29 +188,27 @@ class _QuickCaptureFabState extends State<QuickCaptureFab>
                       )
                     : null,
                 decoration: BoxDecoration(
-                  // Primary gradient background (twilight: indigo→purple)
+                  // Primary gradient background with 30% white overlay
                   gradient: widget.useGradient ? gradient : null,
                   color: widget.useGradient ? null : AppColors.primarySolid,
-                  // Squircle border radius: 16px
-                  borderRadius: BorderRadius.circular(
-                    isExtended ? AppSpacing.fabRadius : AppSpacing.fabRadius,
-                  ),
-                  // Colored shadow (16px blur, 30% opacity, tinted with gradient end color)
+                  // Perfect circle border radius: 28px (mobile-first design)
+                  borderRadius: BorderRadius.circular(AppSpacing.fabRadius),
+                  // Simplified shadow: 8px offset, 16px blur, 15% opacity (single shadow)
                   boxShadow: [
                     BoxShadow(
                       color: shadowColor,
                       blurRadius: 16,
-                      offset: const Offset(0, 6),
-                    ),
-                    // Add soft diffused shadow for depth
-                    BoxShadow(
-                      color: (isDark ? AppColors.shadowDark : AppColors.shadowLight)
-                          .withValues(alpha: 0.15),
-                      blurRadius: 8,
-                      offset: const Offset(0, 3),
+                      offset: const Offset(0, 8),
                     ),
                   ],
                 ),
+                // Apply 30% white overlay for mobile-first design
+                foregroundDecoration: widget.useGradient
+                    ? BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.3),
+                        borderRadius: BorderRadius.circular(AppSpacing.fabRadius),
+                      )
+                    : null,
                 child: Center(child: fabContent),
               ),
             ),

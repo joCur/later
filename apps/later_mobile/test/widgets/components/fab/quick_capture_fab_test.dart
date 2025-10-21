@@ -58,9 +58,9 @@ void main() {
         ),
       );
 
-      // Temporal Flow: 64x64px squircle FAB
-      expect(container.constraints?.maxWidth, 64);
-      expect(container.constraints?.maxHeight, 64);
+      // Mobile-First Bold Design: 56x56px circular FAB
+      expect(container.constraints?.maxWidth, 56);
+      expect(container.constraints?.maxHeight, 56);
     });
 
     testWidgets('renders with custom icon', (tester) async {

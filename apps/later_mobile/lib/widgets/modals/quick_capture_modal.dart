@@ -105,32 +105,37 @@ class _QuickCaptureModalState extends State<QuickCaptureModal>
       ); // Rebuild when focus changes for input field glass effect
     });
 
-    // Initialize modal entrance animations with spring physics
+    // Simplified modal animations for mobile-first design
     _animationController = AnimationController(
-      duration: AppAnimations.modalEnter,
+      duration: const Duration(milliseconds: 300), // 300ms entrance (mobile-first)
+      reverseDuration: const Duration(milliseconds: 250), // 250ms exit
       vsync: this,
     );
 
     _scaleAnimation =
-        Tween<double>(begin: AppAnimations.modalScaleStart, end: 1.0).animate(
+        Tween<double>(begin: 0.95, end: 1.0).animate(
           CurvedAnimation(
             parent: _animationController,
-            curve: AppAnimations.springCurve, // Updated to spring physics
+            curve: Curves.easeOut, // Simplified curve
           ),
         );
 
     _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _animationController, curve: Curves.easeOut),
+      CurvedAnimation(
+        parent: _animationController,
+        curve: Curves.easeOut,
+      ),
     );
 
     _slideAnimation =
         Tween<Offset>(
-          begin: AppAnimations.modalSlideOffset,
+          begin: const Offset(0, 1), // Slide up from bottom
           end: Offset.zero,
         ).animate(
           CurvedAnimation(
             parent: _animationController,
-            curve: AppAnimations.springCurve, // Updated to spring physics
+            curve: Curves.easeOut, // Smooth entrance
+            reverseCurve: Curves.easeIn, // Smooth exit
           ),
         );
 
@@ -435,6 +440,9 @@ class _QuickCaptureModalState extends State<QuickCaptureModal>
     final surfaceColor = isDark
         ? AppColors.surfaceDark
         : AppColors.surfaceLight;
+    final primaryGradient = isDark
+        ? AppColors.primaryGradientDark
+        : AppColors.primaryGradient;
     final keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
 
     return SlideTransition(
@@ -450,27 +458,23 @@ class _QuickCaptureModalState extends State<QuickCaptureModal>
           },
           child: Padding(
             padding: EdgeInsets.only(bottom: keyboardHeight),
-            child: ClipRRect(
-              borderRadius: const BorderRadius.vertical(
-                top: Radius.circular(AppSpacing.modalRadius),
-              ),
-              child: BackdropFilter(
-                filter: ImageFilter.blur(
-                  sigmaX: AppSpacing.glassBlurRadius,
-                  sigmaY: AppSpacing.glassBlurRadius,
+            child: Container(
+              width: double.infinity,
+              decoration: BoxDecoration(
+                // Solid surface background (mobile-first bold design, no glass)
+                color: surfaceColor,
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(24.0), // 24px for mobile-first design
                 ),
-                child: Container(
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    // Glass morphism: semi-transparent background
-                    color: surfaceColor.withValues(alpha: 0.85),
-                    borderRadius: const BorderRadius.vertical(
-                      top: Radius.circular(AppSpacing.modalRadius),
-                    ),
+                // 4px gradient border on top edge
+                border: Border(
+                  top: BorderSide(
+                    width: 4.0,
+                    color: primaryGradient.colors[0],
                   ),
-                  child: _buildModalContent(isMobile: true),
                 ),
               ),
+              child: _buildModalContent(isMobile: true),
             ),
           ),
         ),
@@ -588,11 +592,12 @@ class _QuickCaptureModalState extends State<QuickCaptureModal>
 
   Widget _buildHeader() {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isMobile = context.isMobile;
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(
-        AppSpacing.md,
-        AppSpacing.md,
+      padding: EdgeInsets.fromLTRB(
+        isMobile ? AppSpacing.lg : AppSpacing.md, // 24px on mobile (mobile-first design)
+        isMobile ? AppSpacing.lg : AppSpacing.md, // 24px on mobile
         AppSpacing.xs,
         AppSpacing.sm,
       ),
@@ -637,15 +642,18 @@ class _QuickCaptureModalState extends State<QuickCaptureModal>
 
   Widget _buildInputField() {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isMobile = context.isMobile;
     final primaryGradient = isDark
         ? AppColors.primaryGradientDark
         : AppColors.primaryGradient;
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+      padding: EdgeInsets.symmetric(
+        horizontal: isMobile ? AppSpacing.lg : AppSpacing.md, // 24px on mobile
+      ),
       child: Container(
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
+          borderRadius: BorderRadius.circular(12.0), // 12px for mobile-first design
           gradient: _focusNode.hasFocus
               ? LinearGradient(
                   begin: Alignment.topLeft,
@@ -697,25 +705,30 @@ class _QuickCaptureModalState extends State<QuickCaptureModal>
                       ? AppColors.surfaceDarkVariant
                       : AppColors.surfaceLightVariant),
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
+              borderRadius: BorderRadius.circular(12.0), // 12px for mobile-first design
               borderSide: BorderSide(
+                width: 2.0, // 2px solid border (mobile-first design)
                 color: isDark ? AppColors.borderDark : AppColors.borderLight,
               ),
             ),
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
+              borderRadius: BorderRadius.circular(12.0),
               borderSide: BorderSide(
+                width: 2.0, // 2px solid border
                 color: isDark ? AppColors.borderDark : AppColors.borderLight,
               ),
             ),
             focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
+              borderRadius: BorderRadius.circular(12.0),
               borderSide: BorderSide(
-                width: AppSpacing.borderWidthMedium,
+                width: 2.0, // 2px gradient border on focus
                 color: primaryGradient.colors[0],
               ),
             ),
-            contentPadding: const EdgeInsets.all(AppSpacing.sm),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 16.0, // 16px horizontal padding (mobile-first design)
+              vertical: 12.0, // 12px vertical padding
+            ),
           ),
         ),
       ),
@@ -724,12 +737,13 @@ class _QuickCaptureModalState extends State<QuickCaptureModal>
 
   Widget _buildToolbar() {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isMobile = context.isMobile;
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(
-        AppSpacing.md,
+      padding: EdgeInsets.fromLTRB(
+        isMobile ? AppSpacing.lg : AppSpacing.md, // 24px on mobile
         AppSpacing.sm,
-        AppSpacing.md,
+        isMobile ? AppSpacing.lg : AppSpacing.md, // 24px on mobile
         0,
       ),
       child: Row(
@@ -971,10 +985,10 @@ class _QuickCaptureModalState extends State<QuickCaptureModal>
     }
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(
-        AppSpacing.md,
+      padding: EdgeInsets.fromLTRB(
+        isMobile ? AppSpacing.lg : AppSpacing.md, // 24px on mobile
         AppSpacing.xs,
-        AppSpacing.md,
+        isMobile ? AppSpacing.lg : AppSpacing.md, // 24px on mobile
         0,
       ),
       child: Column(
