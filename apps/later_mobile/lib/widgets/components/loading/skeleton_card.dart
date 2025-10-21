@@ -7,16 +7,18 @@ import 'skeleton_line.dart';
 
 /// A skeleton card component that mimics the ItemCard layout
 ///
-/// Features:
+/// Features (Mobile-First Phase 4):
 /// - Shimmer animation with 1200ms duration
 /// - Matches ItemCard structure (leading element, title, content, metadata)
 /// - Automatic color adaptation for light/dark mode
 /// - Respects reduce-motion accessibility preferences
 /// - Smooth 60fps animation performance
 ///
-/// Design Specifications:
+/// Design Specifications (Mobile-First):
 /// - Shimmer duration: 1200ms
-/// - Border radius: 12px (AppSpacing.cardRadius)
+/// - Border radius: 20px (pill shape, matching cards)
+/// - Height: ~120px (typical card height)
+/// - Spacing: 16px between skeletons
 /// - Base color: AppColors.neutralGray200 (light) / surfaceDarkVariant (dark)
 /// - Highlight color: AppColors.neutralGray100 (light) / surfaceDark (dark)
 ///
@@ -59,10 +61,10 @@ class SkeletonCard extends StatelessWidget {
         : AppColors.surfaceLight;
 
     return Container(
-      margin: const EdgeInsets.only(bottom: AppSpacing.xxs),
+      margin: const EdgeInsets.only(bottom: 16), // Mobile-first: 16px spacing between skeletons
       decoration: BoxDecoration(
         color: backgroundColor,
-        borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
+        borderRadius: BorderRadius.circular(20), // Mobile-first: 20px border radius (pill shape)
         boxShadow: [
           BoxShadow(
             color: isDark
@@ -74,7 +76,7 @@ class SkeletonCard extends StatelessWidget {
         ],
       ),
       child: Padding(
-        padding: EdgeInsets.all(isMobile ? 12 : AppSpacing.sm),
+        padding: const EdgeInsets.all(20), // Mobile-first: 20px padding matching cards
         child: disableAnimations
             ? _buildCardContent(context, isMobile)
             : Shimmer(

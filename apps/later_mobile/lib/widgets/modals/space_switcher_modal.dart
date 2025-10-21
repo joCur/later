@@ -304,11 +304,11 @@ class _SpaceSwitcherModalState extends State<SpaceSwitcherModal> {
           curve: AppAnimations.springCurve,
           child: Container(
             constraints: const BoxConstraints(
-              minHeight: AppSpacing.minTouchTarget,
+              minHeight: 56, // Mobile-first: 56px height for comfortable tapping
             ),
             padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.sm,
-              vertical: AppSpacing.xs,
+              horizontal: 20, // Mobile-first: 20px padding
+              vertical: 12,
             ),
             decoration: BoxDecoration(
               color: isSelected
@@ -321,12 +321,13 @@ class _SpaceSwitcherModalState extends State<SpaceSwitcherModal> {
                           : AppColors.focusLight.withValues(alpha: 0.1))
                       : Colors.transparent),
               borderRadius: BorderRadius.circular(AppSpacing.radiusMD),
+              // Mobile-first: 3px gradient left border for current space
               border: isSelected
-                  ? Border.all(
-                      color: isDark
-                          ? AppColors.primaryAmberLight
-                          : AppColors.primaryAmber,
-                      width: AppSpacing.borderWidthMedium,
+                  ? Border(
+                      left: BorderSide(
+                        width: 3,
+                        color: gradient.colors.first,
+                      ),
                     )
                   : null,
               gradient: isSelected
@@ -366,7 +367,7 @@ class _SpaceSwitcherModalState extends State<SpaceSwitcherModal> {
                   ),
                 ),
 
-              // Space icon - show archive icon for archived spaces
+              // Space icon - Mobile-first: 24px with gradient tint
               if (isArchived)
                 Icon(
                   Icons.archive,
@@ -381,12 +382,15 @@ class _SpaceSwitcherModalState extends State<SpaceSwitcherModal> {
                   style: const TextStyle(fontSize: 24),
                 )
               else
-                Icon(
-                  Icons.folder_outlined,
-                  size: 24,
-                  color: isDark
-                      ? AppColors.textSecondaryDark
-                      : AppColors.textSecondaryLight,
+                // Gradient-tinted icon for default folder
+                ShaderMask(
+                  shaderCallback: (bounds) => gradient.createShader(bounds),
+                  blendMode: BlendMode.srcIn,
+                  child: const Icon(
+                    Icons.folder_outlined,
+                    size: 24,
+                    color: Colors.white,
+                  ),
                 ),
               const SizedBox(width: AppSpacing.xs),
 

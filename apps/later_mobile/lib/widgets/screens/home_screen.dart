@@ -183,10 +183,23 @@ class _HomeScreenState extends State<HomeScreen> {
   PreferredSizeWidget _buildAppBar(BuildContext context, Space? currentSpace) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
+    // Mobile-first Phase 4: Flat app bar with 1px bottom border
+    // - No glass effect (solid background)
+    // - 1px bottom border (neutral, 10% opacity)
+    // - Elevation: 0 (flat, modern look)
+    // - Height: 56px (Android standard - default AppBar)
     return AppBar(
             backgroundColor: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
-            elevation: AppSpacing.elevation1,
+            elevation: 0, // Flat design
             automaticallyImplyLeading: false,
+            shape: Border(
+              bottom: BorderSide(
+                color: isDark
+                    ? AppColors.neutral600.withValues(alpha: 0.1)
+                    : AppColors.neutral400.withValues(alpha: 0.1),
+                width: 1,
+              ),
+            ),
             title: Row(
               children: [
                 // Space switcher button
@@ -662,42 +675,46 @@ class _FilterChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Use gradient background when selected
+    // Mobile-first Phase 4: Pill-shaped chips with gradient border when selected
+    // Selected: 2px gradient border (not full background)
+    // Unselected: 1px solid border (neutral)
+    // Height: 36px, padding: 16px horizontal
+    // Font: 14px medium weight
+
     if (isSelected) {
       return Container(
+        height: 36,
         decoration: BoxDecoration(
           gradient: isDark
               ? AppColors.primaryGradientDark
               : AppColors.primaryGradient,
-          borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
+          borderRadius: BorderRadius.circular(20), // Pill shape
         ),
-        child: Material(
-          color: Colors.transparent,
-          child: InkWell(
-            onTap: onSelected,
-            borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.md,
-                vertical: AppSpacing.xs,
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Icon(
-                    Icons.check,
-                    size: 16,
-                    color: Colors.white,
-                  ),
-                  const SizedBox(width: AppSpacing.xxs),
-                  Text(
+        child: Container(
+          margin: const EdgeInsets.all(2), // 2px border width
+          decoration: BoxDecoration(
+            color: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
+            borderRadius: BorderRadius.circular(18), // 20 - 2 = 18
+          ),
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: onSelected,
+              borderRadius: BorderRadius.circular(18),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Center(
+                  child: Text(
                     label,
                     style: AppTypography.bodyMedium.copyWith(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w600,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500, // medium weight
+                      color: isDark
+                          ? AppColors.textPrimaryDark
+                          : AppColors.textPrimaryLight,
                     ),
                   ),
-                ],
+                ),
               ),
             ),
           ),
@@ -705,26 +722,39 @@ class _FilterChip extends StatelessWidget {
       );
     }
 
-    // Unselected state - flat background
-    return FilterChip(
-      label: Text(label),
-      selected: isSelected,
-      onSelected: (_) => onSelected(),
-      backgroundColor: isDark
-          ? AppColors.surfaceDarkVariant
-          : AppColors.surfaceLightVariant,
-      labelStyle: AppTypography.bodyMedium.copyWith(
-        color: isDark
-            ? AppColors.textSecondaryDark
-            : AppColors.textSecondaryLight,
-        fontWeight: FontWeight.normal,
+    // Unselected state - 1px solid border
+    return Container(
+      height: 36,
+      decoration: BoxDecoration(
+        border: Border.all(
+          color: isDark
+              ? AppColors.neutral600.withValues(alpha: 0.3)
+              : AppColors.neutral400.withValues(alpha: 0.3),
+          width: 1,
+        ),
+        borderRadius: BorderRadius.circular(20), // Pill shape
       ),
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.sm,
-        vertical: AppSpacing.xs,
-      ),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onSelected,
+          borderRadius: BorderRadius.circular(20),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Center(
+              child: Text(
+                label,
+                style: AppTypography.bodyMedium.copyWith(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500, // medium weight
+                  color: isDark
+                      ? AppColors.textSecondaryDark
+                      : AppColors.textSecondaryLight,
+                ),
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }

@@ -48,10 +48,10 @@ class WelcomeState extends StatelessWidget {
             'Welcome to ',
             style: TextStyle(
               fontFamily: AppTypography.fontFamily,
-              fontSize: 40.0, // Display Large on mobile as per spec
-              fontWeight: AppTypography.regular,
-              height: 1.2, // 48px line height
-              letterSpacing: -0.25,
+              fontSize: 20.0, // Mobile-first: 20px bold title
+              fontWeight: FontWeight.bold,
+              height: 1.3,
+              letterSpacing: -0.15,
             ),
             textAlign: TextAlign.center,
           ),
@@ -59,10 +59,10 @@ class WelcomeState extends StatelessWidget {
             'later',
             style: TextStyle(
               fontFamily: AppTypography.fontFamily,
-              fontSize: 40.0, // Display Large on mobile as per spec
-              fontWeight: AppTypography.regular,
-              height: 1.2, // 48px line height
-              letterSpacing: -0.25,
+              fontSize: 20.0, // Mobile-first: 20px bold title
+              fontWeight: FontWeight.bold,
+              height: 1.3,
+              letterSpacing: -0.15,
             ),
           ),
         ],

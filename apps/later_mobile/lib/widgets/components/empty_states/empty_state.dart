@@ -2,19 +2,17 @@ import 'package:flutter/material.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../core/theme/app_spacing.dart';
-import '../buttons/primary_button.dart';
 
-/// Base empty state component following Temporal Flow design system
+/// Base empty state component following mobile-first redesign
 ///
-/// Features (Phase 4, Task 4.3 - Redesigned):
-/// - Display Large typography for title (40px/48px on mobile)
-/// - Body Large for descriptions (17px/26px -> 16px/24px Material)
+/// Features (Phase 4, Task 4.3 - Mobile-First):
+/// - Bold typography: 20px title (bold weight), 15px body
 /// - Icons: 64px (XXL) with gradient tint (ShaderMask + primaryGradient)
 /// - Animated gradient background (2-3% opacity, 2s fade-in)
 /// - Colors: adaptive gradients for light/dark mode
-/// - Spacing: 64px (3xl) vertical spacing between sections
-/// - CTA buttons: Primary button style with gradient
-/// - Layout: Center-aligned, max width 480px
+/// - Generous spacing: 24px between elements
+/// - CTA button: gradient background, 48px height
+/// - Layout: Center-aligned, max width 280px (mobile-first)
 ///
 /// Example usage:
 /// ```dart
@@ -109,11 +107,11 @@ class _EmptyStateState extends State<EmptyState> {
           ),
         ),
 
-        // Main content
+        // Main content - Mobile-first: max width 280px, 24px spacing
         Center(
           child: SingleChildScrollView(
             child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 480.0),
+              constraints: const BoxConstraints(maxWidth: 280.0), // Mobile-first
               child: Padding(
                 padding: const EdgeInsets.symmetric(
                   horizontal: AppSpacing.md,
@@ -135,44 +133,78 @@ class _EmptyStateState extends State<EmptyState> {
                       ),
                     ),
 
-                    // Spacing: 64px (3xl) between sections
-                    const SizedBox(height: AppSpacing.xxxl),
+                    // Spacing: 24px between elements (mobile-first)
+                    const SizedBox(height: 24),
 
-                    // Title - Display Large for mobile (40px)
+                    // Title - Bold 20px for mobile-first
                     // Use custom widget if provided, otherwise default text
                     widget.titleWidget ?? Text(
                       widget.title,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontFamily: AppTypography.fontFamily,
-                        fontSize: 40.0, // Display Large on mobile as per spec
-                        fontWeight: AppTypography.regular,
-                        height: 1.2, // 48px line height
-                        letterSpacing: -0.25,
-                      ).copyWith(color: titleColor),
+                        fontSize: 20.0, // Mobile-first: 20px
+                        fontWeight: FontWeight.bold, // Bold weight
+                        height: 1.3, // Good line height
+                        letterSpacing: -0.15,
+                        color: titleColor,
+                      ),
                       textAlign: TextAlign.center,
                     ),
 
-                    // Spacing between title and description
-                    const SizedBox(height: AppSpacing.sm),
+                    // Spacing between title and description: 24px
+                    const SizedBox(height: 24),
 
-                    // Description - Body Large (17px -> using 16px Material)
+                    // Description - 15px body text
                     Text(
                       widget.description,
-                      style: AppTypography.bodyLarge.copyWith(
+                      style: TextStyle(
+                        fontFamily: AppTypography.fontFamily,
+                        fontSize: 15.0, // Mobile-first: 15px
+                        fontWeight: FontWeight.normal,
+                        height: 1.5,
                         color: descriptionColor,
                       ),
                       textAlign: TextAlign.center,
                     ),
 
-                    // Spacing before CTA (64px)
+                    // Spacing before CTA: 24px
                     if (widget.ctaText != null && widget.onCtaPressed != null) ...[
-                      const SizedBox(height: AppSpacing.xxxl),
+                      const SizedBox(height: 24),
 
-                      // Primary CTA Button
-                      PrimaryButton(
-                        text: widget.ctaText!,
-                        onPressed: widget.onCtaPressed,
-                        size: ButtonSize.large,
+                      // Primary CTA Button - 48px height for mobile-first
+                      // Create custom container to ensure exact 48px height
+                      GestureDetector(
+                        onTap: widget.onCtaPressed,
+                        child: Container(
+                          height: 48, // Mobile-first: 48px height
+                          padding: const EdgeInsets.symmetric(horizontal: 24),
+                          decoration: BoxDecoration(
+                            gradient: isDark
+                                ? AppColors.primaryGradientDark
+                                : AppColors.primaryGradient,
+                            borderRadius: BorderRadius.circular(12),
+                            boxShadow: [
+                              BoxShadow(
+                                color: isDark
+                                    ? AppColors.shadowDark
+                                    : AppColors.shadowLight,
+                                blurRadius: 4.0,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          child: Center(
+                            child: Text(
+                              widget.ctaText!,
+                              style: const TextStyle(
+                                fontFamily: AppTypography.fontFamily,
+                                fontSize: 15,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ),
                       ),
                     ],
 

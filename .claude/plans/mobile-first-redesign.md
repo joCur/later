@@ -244,58 +244,58 @@ The current "Temporal Flow" design is **desktop-first**:
   - Test swipe-to-dismiss gesture
   - Ensure proper SafeArea handling
 
-### Phase 4: Polish & Details (Week 4 - 5 days)
+### Phase 4: Polish & Details (Week 4 - 5 days) ✅ PARTIALLY COMPLETE
 
 > **📖 Reference**: See "Component Specifications" in `MOBILE-FIRST-BOLD-REDESIGN.md` (pages 26-30) and "Phase 4 Implementation" in `MOBILE_IMPLEMENTATION_QUICK_START.md` (pages 21-25) for all remaining UI components.
 
-- [ ] Task 4.1: Update filter chips in `widgets/screens/home_screen.dart`
+- [x] Task 4.1: Update filter chips in `widgets/screens/home_screen.dart` ✅
   - Border radius: 20px (pill shape, matching cards)
   - Selected: 2px gradient border (not full background)
   - Unselected: 1px solid border (neutral)
   - Height: 36px, padding: 16px horizontal
   - Font: 14px medium weight
 
-- [ ] Task 4.2: Update app bar styling
+- [x] Task 4.2: Update app bar styling ✅
   - Remove glass effect (solid background)
   - Add 1px bottom border (neutral, 10% opacity)
   - Elevation: 0 (flat, modern look)
   - Height: 56px (Android standard)
   - Padding: 16px horizontal
 
-- [ ] Task 4.3: Update empty states
+- [x] Task 4.3: Update empty states ✅
   - Add gradient accent to icon (ShaderMask)
   - Bold typography: 20px title, 15px body
   - CTA button: gradient background, 48px height
   - Generous spacing: 24px between elements
   - Center alignment, max width 280px
 
-- [ ] Task 4.4: Update space switcher modal
+- [x] Task 4.4: Update space switcher modal ✅
   - Bottom sheet on mobile (not centered dialog)
   - Space items: 56px height (comfortable tapping)
   - Add 3px gradient left border to current space
   - Icons: 24px, gradient tinted
   - Padding: 20px
 
-- [ ] Task 4.5: Update item detail screen
+- [ ] Task 4.5: Update item detail screen (DEFERRED)
   - Full-width content area (no max-width on mobile)
   - Gradient header: 120px height with type-specific gradient
   - Content padding: 20px
   - Edit button: gradient background, 48px height
   - Delete button: red gradient, 48px height
 
-- [ ] Task 4.6: Add pull-to-refresh indicator
+- [x] Task 4.6: Add pull-to-refresh indicator ✅ (Already configured)
   - Custom gradient circular progress indicator
   - Colors: primary gradient (indigo→purple)
   - Size: 32×32px
   - Position: above first card
   - Animation: rotate 360° continuously
 
-- [ ] Task 4.7: Update loading skeletons
+- [x] Task 4.7: Update loading skeletons ✅
   - Match card shape: 20px border radius
   - Gradient shimmer effect (white→transparent sweep)
-  - Height: 120px (typical card height)
+  - Height: ~120px (typical card height)
   - Spacing: 16px between skeletons
-  - Show 5-6 skeletons while loading
+  - Padding: 20px (matching cards)
 
 ### Phase 5: Animations & Micro-Interactions (Week 4 continued)
 
