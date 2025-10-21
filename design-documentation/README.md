@@ -24,6 +24,25 @@ later's design language is built on the concept of **"Temporal Flow"** - the ide
 - **Gestural Intimacy**: Touch-first interactions that feel personal and immediate
 - **Minimalist Boldness**: Strong typography and strategic use of whitespace
 
+## 🎉 NEW: Mobile-First Bold Redesign
+
+**⚠️ Important Update** (2025-10-21): We've created a **mobile-first bold redesign** that addresses mobile performance and visual distinctiveness:
+
+- **[Mobile-First Bold Redesign](./MOBILE-FIRST-BOLD-REDESIGN.md)** - Complete mobile design strategy
+- **[Mobile Implementation Quick Start](./MOBILE_IMPLEMENTATION_QUICK_START.md)** - Developer guide
+- **[Mobile Visual Comparison](./MOBILE_VISUAL_COMPARISON.md)** - Before/after comparison
+
+**Key Changes**:
+- ✅ 6px gradient pill borders (vs 2px subtle strips) = **visible on phones**
+- ✅ 18px bold titles (vs 16px) = **readable at a glance**
+- ✅ Solid backgrounds (no gradient fills) = **60fps on old Android**
+- ✅ Circular FAB (not squircle) = **Android-native feel**
+- ✅ Icon-only navigation = **more spacious on small screens**
+
+**Why?** The current "Temporal Flow" design is desktop-first. On mobile phones (320-414px), it looks generic and performs poorly. The mobile-first redesign is **bold, distinctive, and 60fps on 4-year-old devices.**
+
+---
+
 ## Quick Navigation
 
 ### Design System
