@@ -107,7 +107,7 @@ The current "Temporal Flow" design is **desktop-first**:
 
 > **📖 Reference**: See "Card Design Specifications" section in `MOBILE-FIRST-BOLD-REDESIGN.md` (pages 10-15) and "Phase 1 Implementation" in `MOBILE_IMPLEMENTATION_QUICK_START.md` (pages 5-10) for detailed code examples.
 
-- [ ] Task 1.1: Update spacing constants in `app_spacing.dart`
+- [x] Task 1.1: Update spacing constants in `app_spacing.dart` ✅
   - Change `cardRadius` from 12.0 to 20.0 (pill shape)
   - Change `cardSpacing` from 8.0 to 16.0 (more breathing room)
   - Change `cardPadding` from 16.0 to 20.0 (comfortable touch zones)
@@ -115,21 +115,21 @@ The current "Temporal Flow" design is **desktop-first**:
   - Add `screenMargin`: 16.0 (consistent edge margins)
   - Update `fabSize` to 56.0 (Android standard circular)
 
-- [ ] Task 1.2: Update typography in `app_typography.dart`
+- [x] Task 1.2: Update typography in `app_typography.dart` ✅
   - Change `itemTitle` from 16px to 18px with FontWeight.bold
   - Change `itemContent` from 14px to 15px
   - Add `maxLines: 2` constant for title truncation
   - Update letter spacing for bold titles: -0.2px
   - Ensure proper line height: 1.3 for titles, 1.5 for content
 
-- [ ] Task 1.3: Create GradientPillBorder widget in `widgets/components/borders/`
+- [x] Task 1.3: Create GradientPillBorder widget in `widgets/components/borders/` ✅
   - Custom painter for 6px gradient border
   - Takes gradient and border radius as parameters
   - Draws border stroke on outside of content area
   - Optimized with RepaintBoundary
   - Usage: wraps card Container
 
-- [ ] Task 1.4: Redesign ItemCard in `widgets/components/cards/item_card.dart`
+- [x] Task 1.4: Redesign ItemCard in `widgets/components/cards/item_card.dart` ✅
   - **Remove** 2px top gradient border completely
   - **Add** GradientPillBorder wrapping entire card (6px stroke)
   - Update border radius to 20px (pill shape)
@@ -137,14 +137,14 @@ The current "Temporal Flow" design is **desktop-first**:
   - Update padding to 20px
   - Apply type-specific gradient to border based on item.type
 
-- [ ] Task 1.5: Update card shadows for mobile
+- [x] Task 1.5: Update card shadows for mobile ✅
   - Replace dual shadows with single optimized shadow
   - Shadow: 4px offset, 8px blur, 12% opacity (gray only, no color)
   - Remove colored shadows (performance)
   - Hover state (desktop only): increase to 6px offset, 12px blur
   - Press state: reduce to 2px offset, 4px blur
 
-- [ ] Task 1.6: Test card performance
+- [x] Task 1.6: Test card performance ✅
   - Profile card rendering with Flutter DevTools
   - Ensure <16ms frame time (60fps)
   - Test scrolling with 50+ cards

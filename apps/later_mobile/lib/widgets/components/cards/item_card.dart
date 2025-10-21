@@ -4,28 +4,33 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_animations.dart';
-import '../../../core/responsive/breakpoints.dart';
 import '../../../data/models/item_model.dart';
 import '../text/gradient_text.dart';
+import '../borders/gradient_pill_border.dart';
 import 'package:intl/intl.dart';
 
 /// Unified item card component for tasks, notes, and lists
+/// Mobile-First Bold Redesign
 ///
 /// Performance optimizations:
 /// - Uses RepaintBoundary to isolate repaints
 /// - Const constructors where possible
 /// - ValueKey for efficient list updates
+/// - Optimized 6px gradient border for 60fps performance
 ///
-/// Features:
-/// - Three variants: TaskCard, NoteCard, ListCard
-/// - 4px colored left border (blue/amber/violet based on type)
+/// Mobile-First Bold Design Features:
+/// - 6px gradient pill border (3× more visible than 2px) wrapping entire card
+/// - 20px border radius (pill shape, not 12px rounded)
+/// - 18px bold title (12.5% larger + bold weight for scannability)
+/// - 15px content preview (improved readability)
+/// - 20px card padding (comfortable thumb zones)
+/// - Solid background (no gradient overlay for 60fps performance)
+/// - Type-specific gradient colors: Red→Orange (tasks), Blue→Cyan (notes), Purple→Lavender (lists)
 /// - Leading element: checkbox for tasks, icon for notes/lists
-/// - Title: H4 typography, max 2 lines with ellipsis
-/// - Content preview: 2 lines mobile, 3 lines desktop
-/// - Metadata row: space indicator, date, item count for lists
-/// - All states: default, hover, selected, pressed, completed (tasks)
+/// - Content preview: 2 lines with ellipsis for consistent height
+/// - Metadata row: date with gradient text
+/// - All states: default, pressed, selected, completed (tasks)
 /// - Gesture handlers: tap to open, long-press for multi-select
-/// - Responsive behavior across breakpoints
 class ItemCard extends StatefulWidget {
   const ItemCard({
     super.key,
@@ -238,7 +243,7 @@ class _ItemCardState extends State<ItemCard> with SingleTickerProviderStateMixin
             : (isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight),
         decoration: isCompleted ? TextDecoration.lineThrough : null,
       ),
-      maxLines: 2,
+      maxLines: AppTypography.itemTitleMaxLines,
       overflow: TextOverflow.ellipsis,
     );
   }
@@ -250,15 +255,13 @@ class _ItemCardState extends State<ItemCard> with SingleTickerProviderStateMixin
     }
 
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final isMobile = context.isMobile;
-    final maxLines = isMobile ? 2 : 3;
 
     return Text(
       widget.item.content!,
       style: AppTypography.itemContent.copyWith(
         color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
       ),
-      maxLines: maxLines,
+      maxLines: 2, // Fixed 2 lines for consistent card height (mobile-first design)
       overflow: TextOverflow.ellipsis,
     );
   }
@@ -340,7 +343,6 @@ class _ItemCardState extends State<ItemCard> with SingleTickerProviderStateMixin
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final isMobile = context.isMobile;
     final isCompleted = widget.item.isCompleted && widget.item.type == ItemType.task;
 
     // Base background color with subtle gradient tint (5% opacity)
@@ -369,7 +371,7 @@ class _ItemCardState extends State<ItemCard> with SingleTickerProviderStateMixin
     // Card opacity for completed tasks (70% for Temporal Flow)
     final opacity = isCompleted ? 0.7 : 1.0;
 
-    // Build the card widget
+    // Build the card widget with mobile-first bold design
     final cardWidget = RepaintBoundary(
       child: Semantics(
         container: true,
@@ -385,80 +387,63 @@ class _ItemCardState extends State<ItemCard> with SingleTickerProviderStateMixin
           child: Opacity(
             opacity: opacity,
             child: Container(
-              margin: const EdgeInsets.only(bottom: AppSpacing.xxs),
-              decoration: BoxDecoration(
-                color: backgroundColor,
-                borderRadius: BorderRadius.circular(AppSpacing.cardRadius), // 12px
-                // Add soft, diffused shadow (4px blur, 10% opacity)
-                boxShadow: _isPressed
-                    ? null
-                    : [
-                        BoxShadow(
-                          color: (isDark ? AppColors.shadowDark : AppColors.shadowLight)
-                              .withValues(alpha: 0.1),
-                          blurRadius: 4,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
-              ),
-              // Clip the content to follow the border radius
-              clipBehavior: Clip.antiAlias,
-              child: Stack(
-                children: [
-                  // Main content with top padding for the gradient border
-                  Padding(
-                    padding: EdgeInsets.only(
-                      top: 3.0, // Height of gradient border
-                      left: isMobile ? 12 : AppSpacing.sm,
-                      right: isMobile ? 12 : AppSpacing.sm,
-                      bottom: isMobile ? 12 : AppSpacing.sm,
-                    ),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Leading element (checkbox or icon)
-                        _buildLeadingElement(),
-                        const SizedBox(width: AppSpacing.xxxs),
+              margin: const EdgeInsets.only(bottom: AppSpacing.cardSpacing), // 16px spacing
+              // Wrap entire card with gradient pill border (6px width, 20px radius)
+              child: GradientPillBorder(
+                gradient: _getBorderGradient(),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: backgroundColor,
+                    borderRadius: BorderRadius.circular(AppSpacing.cardRadius), // 20px pill shape
+                    // Mobile-optimized shadow: 4px offset, 8px blur, 12% opacity
+                    boxShadow: _isPressed
+                        ? null
+                        : [
+                            BoxShadow(
+                              color: (isDark ? AppColors.shadowDark : AppColors.shadowLight)
+                                  .withValues(alpha: 0.12),
+                              blurRadius: 8,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
+                  ),
+                  // Clip the content to follow the border radius
+                  clipBehavior: Clip.antiAlias,
+                  // Main content with 20px padding (mobile-first comfortable touch zones)
+                  padding: const EdgeInsets.all(AppSpacing.cardPaddingMobile), // 20px
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Leading element (checkbox or icon)
+                      _buildLeadingElement(),
+                      const SizedBox(width: AppSpacing.xs), // 8px
 
-                        // Content
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              // Title
-                              _buildTitle(context),
+                      // Content
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            // Title (18px bold, max 2 lines)
+                            _buildTitle(context),
 
-                              // Content preview (if available)
-                              if (_buildContentPreview(context) != null) ...[
-                                const SizedBox(height: AppSpacing.xxxs),
-                                _buildContentPreview(context)!,
-                              ],
-
-                              // Metadata
-                              if (_buildMetadata(context) != null) ...[
-                                const SizedBox(height: AppSpacing.xxs),
-                                _buildMetadata(context)!,
-                              ],
+                            // Content preview (15px, 2 lines)
+                            if (_buildContentPreview(context) != null) ...[
+                              const SizedBox(height: AppSpacing.xxs), // 4px
+                              _buildContentPreview(context)!,
                             ],
-                          ),
+
+                            // Metadata (gradient text)
+                            if (_buildMetadata(context) != null) ...[
+                              const SizedBox(height: AppSpacing.xs), // 8px
+                              _buildMetadata(context)!,
+                            ],
+                          ],
                         ),
-                      ],
-                    ),
-                  ),
-                  // Top gradient border positioned absolutely
-                  Positioned(
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    child: Container(
-                      height: 3.0,
-                      decoration: BoxDecoration(
-                        gradient: _getBorderGradient(),
                       ),
-                    ),
+                    ],
                   ),
-                ],
+                ),
               ),
             ),
           ),

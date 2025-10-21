@@ -201,16 +201,24 @@ class AppTypography {
   static TextStyle get h4 => titleLarge; // 20px
   static TextStyle get h5 => titleMedium; // 18px
 
-  /// Item card title: 16px, Medium
+  /// Item card title: 18px, Bold - Mobile-first bold design
   static TextStyle get itemTitle => GoogleFonts.inter(
-        fontSize: 16,
-        height: 1.50,
-        fontWeight: medium,
+        fontSize: 18,
+        height: 1.33, // ~24px line height (1.3 for better scannability)
+        fontWeight: bold,
+        letterSpacing: -0.2, // Tighter tracking for bold text
+      );
+
+  /// Item card content preview: 15px, Regular - Mobile-first bold design
+  static TextStyle get itemContent => GoogleFonts.inter(
+        fontSize: 15,
+        height: 1.47, // ~22px line height (1.5 for readability)
+        fontWeight: regular,
         letterSpacing: 0,
       );
 
-  /// Item card content preview: 14px, Regular
-  static TextStyle get itemContent => bodySmall;
+  /// Maximum lines for item titles (2 lines for consistent card height)
+  static const int itemTitleMaxLines = 2;
 
   /// Metadata text: 12px, Medium - Timestamps, counts
   static TextStyle get metadata => labelMedium;

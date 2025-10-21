@@ -140,17 +140,20 @@ class AppSpacing {
   // ============================================================
 
   // Card Spacing
-  /// Card padding on mobile (16px)
-  static const double cardPaddingMobile = md;
+  /// Card padding on mobile (20px - Mobile-first bold design)
+  static const double cardPaddingMobile = 20.0;
 
   /// Card padding on tablet/desktop (24px)
   static const double cardPaddingDesktop = lg;
 
-  /// Spacing between cards (12px default, 16px comfortable)
-  static const double cardSpacing = sm;
+  /// Spacing between cards (16px - Mobile-first bold design)
+  static const double cardSpacing = md;
 
-  /// Border radius for cards (12px)
-  static const double cardRadius = sm;
+  /// Border radius for cards (20px - Pill shape for mobile-first bold design)
+  static const double cardRadius = 20.0;
+
+  /// Card border width (6px - Bold gradient border for mobile-first design)
+  static const double cardBorderWidth = 6.0;
 
   // List Item Spacing
   /// Compact list item spacing (8px)
@@ -219,14 +222,14 @@ class AppSpacing {
   /// FAB margin from screen edges (16px for Temporal Flow)
   static const double fabMargin = md;
 
-  /// FAB size (64×64px for Temporal Flow squircle)
-  static const double fabSize = 64.0;
+  /// FAB size (56×56px - Android standard circular for mobile-first design)
+  static const double fabSize = 56.0;
 
-  /// FAB border radius (16px for squircle effect)
-  static const double fabRadius = md;
+  /// FAB border radius (28px - Perfect circle for mobile-first design)
+  static const double fabRadius = 28.0;
 
-  /// FAB touch target size (64px, same as visual)
-  static const double fabTouchTarget = 64.0;
+  /// FAB touch target size (56px, same as visual)
+  static const double fabTouchTarget = 56.0;
 
   // Modal/Dialog Spacing
   /// Modal internal padding (24px)
@@ -242,6 +245,9 @@ class AppSpacing {
   static const double modalMaxWidth = 560.0;
 
   // Screen Spacing
+  /// Screen margin from edges (16px - Mobile-first bold design)
+  static const double screenMargin = md;
+
   /// Screen padding on mobile (16px)
   static const double screenPaddingMobile = md;
 
