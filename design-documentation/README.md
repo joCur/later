@@ -1,8 +1,8 @@
 ---
 title: later - Design Documentation
-description: Complete design system and specifications for the later productivity app
-last-updated: 2025-10-19
-version: 1.0.0
+description: Mobile-first design system and specifications for the later productivity app
+last-updated: 2025-10-21
+version: 2.0.0
 status: approved
 ---
 
@@ -14,144 +14,143 @@ status: approved
 
 This documentation contains the complete design system, specifications, and implementation guidelines for "later" - a productivity app that unifies tasks, notes, and lists in a single fluid interface.
 
-## Design Philosophy
-
-later's design language is built on the concept of **"Temporal Flow"** - the idea that productivity tools should feel like extensions of thought rather than rigid organizational systems. Our design emphasizes:
-
-- **Fluid Motion**: Smooth, physics-based animations that feel natural and responsive
-- **Adaptive Depth**: Subtle use of elevation and blur to create spatial hierarchy
-- **Chromatic Intelligence**: Dynamic color system that adapts to context and content type
-- **Gestural Intimacy**: Touch-first interactions that feel personal and immediate
-- **Minimalist Boldness**: Strong typography and strategic use of whitespace
-
-## 🎉 NEW: Mobile-First Bold Redesign
-
-**⚠️ Important Update** (2025-10-21): We've created a **mobile-first bold redesign** that addresses mobile performance and visual distinctiveness:
-
-- **[Mobile-First Bold Redesign](./MOBILE-FIRST-BOLD-REDESIGN.md)** - Complete mobile design strategy
-- **[Mobile Implementation Quick Start](./MOBILE_IMPLEMENTATION_QUICK_START.md)** - Developer guide
-- **[Mobile Visual Comparison](./MOBILE_VISUAL_COMPARISON.md)** - Before/after comparison
-
-**Key Changes**:
-- ✅ 6px gradient pill borders (vs 2px subtle strips) = **visible on phones**
-- ✅ 18px bold titles (vs 16px) = **readable at a glance**
-- ✅ Solid backgrounds (no gradient fills) = **60fps on old Android**
-- ✅ Circular FAB (not squircle) = **Android-native feel**
-- ✅ Icon-only navigation = **more spacious on small screens**
-
-**Why?** The current "Temporal Flow" design is desktop-first. On mobile phones (320-414px), it looks generic and performs poorly. The mobile-first redesign is **bold, distinctive, and 60fps on 4-year-old devices.**
-
----
+**Current Focus**: Mobile-First Bold Redesign - optimized for performance and visual distinctiveness on small screens.
 
 ## Quick Navigation
 
-### Design System
-- [Style Guide](./design-system/style-guide.md) - Complete visual specifications
-- [Design Tokens](./design-system/tokens/) - Foundational design elements
-  - [Colors](./design-system/tokens/colors.md)
-  - [Typography](./design-system/tokens/typography.md)
-  - [Spacing](./design-system/tokens/spacing.md)
-  - [Animations](./design-system/tokens/animations.md)
-- [Components](./design-system/components/) - Component library
-  - [Item Cards](./design-system/components/item-cards.md)
-  - [Quick Capture](./design-system/components/quick-capture.md)
-  - [Navigation](./design-system/components/navigation.md)
-  - [Buttons](./design-system/components/buttons.md)
-  - [Forms](./design-system/components/forms.md)
+### Primary Documentation
 
-### Platform Guidelines
-- [iOS Adaptations](./design-system/platform-adaptations/ios.md)
-- [Android Adaptations](./design-system/platform-adaptations/android.md)
-- [Web/Tablet Adaptations](./design-system/platform-adaptations/web.md)
+**[📱 Mobile-First Bold Redesign](./MOBILE-FIRST-BOLD-REDESIGN.md)**
+Complete mobile design strategy with visual specifications, component details, and design rationale.
 
-### Features
-- [Quick Capture Feature](./features/quick-capture/)
-- [Item Management](./features/item-management/)
-- [Spaces & Organization](./features/spaces/)
+**[🚀 Mobile Implementation Quick Start](./MOBILE_IMPLEMENTATION_QUICK_START.md)**
+Developer guide with code examples, setup instructions, and implementation patterns.
 
-### Accessibility
-- [Accessibility Guidelines](./accessibility/guidelines.md)
-- [Testing Procedures](./accessibility/testing.md)
-- [WCAG Compliance](./accessibility/compliance.md)
+**[📋 Mobile Design Cheat Sheet](./MOBILE_DESIGN_CHEAT_SHEET.md)**
+Quick reference for common patterns, values, and design decisions.
 
-## Design Principles
+**[🎨 Design Tokens Reference](./DESIGN_TOKENS_REFERENCE.md)**
+Complete token reference including colors, typography, spacing, and animations.
 
-### 1. Fluid Over Fixed
-Every interaction should feel continuous and natural. We avoid abrupt transitions and favor smooth, physics-based animations that respect user intent.
+**[👀 Mobile Visual Comparison](./MOBILE_VISUAL_COMPARISON.md)**
+Before/after comparison showing the evolution from desktop-first to mobile-first design.
 
-### 2. Content First, Always
-Chrome is minimal. Content is hero. Every pixel of UI should serve the user's productivity goals.
+**[📦 Flutter Packages](./FLUTTER-PACKAGES.md)**
+Curated list of recommended packages for implementing the design system.
 
-### 3. Adaptive Intelligence
-The interface adapts to context - colors shift based on item type, spacing adjusts to content density, and interactions respond to user patterns.
+---
 
-### 4. Gestural Intimacy
-Touch is conversation. Every tap, swipe, and long-press should feel responsive and purposeful, with immediate visual and haptic feedback.
+## Design Philosophy
 
-### 5. Luminous Depth
-We use light, shadow, and blur to create depth without heaviness. Layers feel distinct but connected, like sheets of glass.
+later's mobile-first design emphasizes:
+
+- **Bold & Distinctive**: Thick gradient borders, strong typography, and clear visual hierarchy
+- **Performance First**: Solid backgrounds, optimized animations, 60fps on older devices
+- **Mobile Native**: Circular FAB, icon-only navigation, thumb-friendly interactions
+- **Clear Hierarchy**: 6px gradient pill borders that are actually visible on phones
+- **Readable Content**: 18px bold titles, generous spacing, high contrast
+
+## Key Design Principles
+
+### 1. Mobile-First, Always
+Every design decision prioritizes the mobile experience. Desktop is an enhancement, not the baseline.
+
+### 2. Performance is Non-Negotiable
+We choose solid colors over gradients, simple animations over complex effects, and native patterns over custom solutions.
+
+### 3. Boldness Over Subtlety
+If it's not visible on a 320px screen at arm's length, it's too subtle. Our designs are confident and clear.
+
+### 4. Content First
+Minimal chrome, maximum content. Every pixel serves the user's productivity goals.
+
+### 5. Gestural Intimacy
+Touch is conversation. Swipes, taps, and long-presses feel responsive with immediate visual and haptic feedback.
+
+## What Changed from v1.0
+
+**v1.0 (Temporal Flow)** was desktop-first with glass morphism, subtle borders, and gradient-heavy designs. It looked generic on mobile and performed poorly on older devices.
+
+**v2.0 (Mobile-First Bold)** addresses these issues:
+
+- ✅ **6px gradient pill borders** (vs 2px subtle strips) = visible on phones
+- ✅ **18px bold titles** (vs 16px) = readable at a glance
+- ✅ **Solid backgrounds** (no gradient fills) = 60fps on old Android
+- ✅ **Circular FAB** (not squircle) = Android-native feel
+- ✅ **Icon-only navigation** = more spacious on small screens
 
 ## Visual Identity
 
 **later** is distinguished by:
-- **Gradient-infused interfaces** with subtle chromatic transitions
+
+- **Thick gradient pill borders** on all cards (6px width)
+- **Bold, confident typography** with clear size hierarchy
 - **Generous whitespace** that gives content room to breathe
-- **Bold, confident typography** using Inter and JetBrains Mono
-- **Soft, rounded corners** throughout (12-20px radii)
-- **Glass morphism effects** for overlays and elevated surfaces
-- **Physics-based micro-interactions** that feel alive
-
-## Design System Version
-
-**Version 1.0.0** - Initial comprehensive design system
-- Complete color palette with light/dark modes
-- Typography system with responsive scaling
-- Component library with 15+ core components
-- Animation system with standardized timings
-- Platform-specific adaptations for iOS/Android/Web
-
-## Implementation Status
-
-| Component | Design | iOS | Android | Web |
-|-----------|--------|-----|---------|-----|
-| Item Cards | ✓ | Pending | Pending | Pending |
-| Quick Capture | ✓ | Pending | Pending | Pending |
-| Navigation | ✓ | Pending | Pending | Pending |
-| Buttons | ✓ | Pending | Pending | Pending |
-| Forms | ✓ | Pending | Pending | Pending |
+- **Solid color backgrounds** for performance
+- **Circular floating action button** with gradient
+- **Icon-only bottom navigation** with gradient underline indicators
+- **Spring-physics animations** that feel alive
 
 ## Getting Started
 
 ### For Designers
-1. Read the [Design Philosophy](./design-system/style-guide.md#design-philosophy)
-2. Familiarize yourself with [Design Tokens](./design-system/tokens/)
-3. Review [Component Specifications](./design-system/components/)
+
+1. Start with **[Mobile-First Bold Redesign](./MOBILE-FIRST-BOLD-REDESIGN.md)** to understand the complete design system
+2. Reference **[Design Tokens Reference](./DESIGN_TOKENS_REFERENCE.md)** for exact values
+3. Use **[Mobile Design Cheat Sheet](./MOBILE_DESIGN_CHEAT_SHEET.md)** for quick lookups
 
 ### For Developers
-1. Review [Implementation Notes](./design-system/style-guide.md#implementation-notes)
-2. Check [Platform Adaptations](./design-system/platform-adaptations/) for your target
-3. Reference [Component Specifications](./design-system/components/) during development
+
+1. Begin with **[Mobile Implementation Quick Start](./MOBILE_IMPLEMENTATION_QUICK_START.md)** for setup and code examples
+2. Check **[Flutter Packages](./FLUTTER-PACKAGES.md)** for recommended dependencies
+3. Reference **[Design Tokens Reference](./DESIGN_TOKENS_REFERENCE.md)** for implementation values
 
 ### For Product Managers
-1. Understand [Design Principles](#design-principles)
-2. Review [Feature Documentation](./features/)
-3. Check [Accessibility Guidelines](./accessibility/guidelines.md)
+
+1. Read the **[Mobile Visual Comparison](./MOBILE_VISUAL_COMPARISON.md)** to understand the evolution
+2. Review **[Mobile-First Bold Redesign](./MOBILE-FIRST-BOLD-REDESIGN.md)** for the complete strategy
+3. Reference **[Mobile Design Cheat Sheet](./MOBILE_DESIGN_CHEAT_SHEET.md)** for quick decisions
+
+## Implementation Status
+
+| Component | Design | Implementation |
+|-----------|--------|----------------|
+| Item Cards | ✓ Complete | Phase 1 Complete |
+| Navigation | ✓ Complete | Phase 2 Complete |
+| FAB & Modal | ✓ Complete | Phase 3 Complete |
+| Polish & Details | ✓ Complete | Phase 4 Complete |
+
+**Status**: Mobile-first redesign fully implemented (Phases 1-4 complete)
 
 ## Resources
 
-### Design Tools
-- Figma component library (coming soon)
-- Design tokens JSON export
-- Icon library
+### Design Assets
+- Color palette and gradients
+- Typography scale and weights
+- Component specifications
+- Animation timing functions
 
 ### Development Tools
-- Flutter implementation packages
-- Design token parser
+- Flutter packages list
+- Design token constants
 - Animation presets
+- Code examples
 
-## Contact & Contribution
+## Version History
 
-This is a living design system. As later evolves, so will these specifications.
+**v2.0.0** (October 2025) - Mobile-First Bold Redesign
+- Complete mobile-first redesign
+- Performance optimizations
+- Bold visual language
+- Removed glassmorphism and Temporal Flow references
 
-**Last Updated**: October 19, 2025
+**v1.0.0** (October 2025) - Initial Temporal Flow Design
+- Desktop-first design system
+- Glass morphism effects
+- Gradient-heavy interfaces
+
+---
+
+**Last Updated**: October 21, 2025
+**Current Version**: 2.0.0 (Mobile-First Bold)
 **Maintained By**: later Design Team
