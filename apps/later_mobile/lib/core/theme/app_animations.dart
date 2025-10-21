@@ -176,8 +176,8 @@ class AppAnimations {
   /// Item card hover duration (50ms)
   static const Duration itemHover = instant;
 
-  /// Item card entrance stagger delay (50ms per item)
-  static const Duration itemEntranceStagger = instant;
+  /// Item card entrance stagger delay (30ms per item for Phase 5 - faster than 50ms)
+  static const Duration itemEntranceStagger = Duration(milliseconds: 30);
 
   /// Item card entrance duration (250ms)
   static const Duration itemEntrance = normal;
@@ -185,11 +185,20 @@ class AppAnimations {
   /// Item card entrance spring
   static const SpringDescription itemEntranceSpring = defaultSpring;
 
-  /// Item card entrance slide offset
-  static const Offset itemEntranceSlideOffset = Offset(0, 0.05);
+  /// Item card entrance slide offset (8px distance for Phase 5 mobile-first)
+  static const double itemEntranceSlideDistance = 8.0;
 
   /// Item card entrance scale
   static const double itemEntranceScale = 0.97;
+
+  /// Item card press scale (0.98 for Phase 5 micro-interaction)
+  static const double itemPressScale = 0.98;
+
+  /// Item card press duration (100ms)
+  static const Duration itemPress = Duration(milliseconds: 100);
+
+  /// Item card release duration (150ms with spring back)
+  static const Duration itemRelease = Duration(milliseconds: 150);
 
   // Completion Toggle Animation
   /// Completion toggle duration (250ms)

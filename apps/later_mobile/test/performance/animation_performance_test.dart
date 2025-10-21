@@ -589,7 +589,7 @@ class _StaggeredListItemState extends State<_StaggeredListItem>
     );
     _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(_controller);
     _slideAnimation = Tween<Offset>(
-      begin: AppAnimations.itemEntranceSlideOffset,
+      begin: const Offset(0, 0.05), // Use Offset directly instead of removed constant
       end: Offset.zero,
     ).animate(_controller);
 

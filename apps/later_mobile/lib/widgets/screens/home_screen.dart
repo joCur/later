@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_typography.dart';
 import '../../core/theme/app_spacing.dart';
+import '../../core/theme/app_animations.dart';
 import '../../core/responsive/breakpoints.dart';
 import '../../data/models/item_model.dart';
 import '../../data/models/space_model.dart';
@@ -660,7 +661,7 @@ class _HomeScreenState extends State<HomeScreen> {
 }
 
 /// Filter chip widget with gradient active state
-class _FilterChip extends StatelessWidget {
+class _FilterChip extends StatefulWidget {
   const _FilterChip({
     required this.label,
     required this.isSelected,
@@ -674,14 +675,77 @@ class _FilterChip extends StatelessWidget {
   final bool isDark;
 
   @override
+  State<_FilterChip> createState() => _FilterChipState();
+}
+
+class _FilterChipState extends State<_FilterChip> with SingleTickerProviderStateMixin {
+  late AnimationController _animationController;
+  late Animation<double> _scaleAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Phase 5: Initialize animation controller for selection animation
+    _animationController = AnimationController(
+      duration: const Duration(milliseconds: 200),
+      vsync: this,
+    );
+
+    // Create scale animation: 1.0 -> 1.05 -> 1.0
+    _scaleAnimation = TweenSequence<double>([
+      TweenSequenceItem(
+        tween: Tween<double>(begin: 1.0, end: 1.05)
+            .chain(CurveTween(curve: Curves.easeOut)),
+        weight: 50.0,
+      ),
+      TweenSequenceItem(
+        tween: Tween<double>(begin: 1.05, end: 1.0)
+            .chain(CurveTween(curve: Curves.easeIn)),
+        weight: 50.0,
+      ),
+    ]).animate(_animationController);
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
+
+  void _handleTap() {
+    // Phase 5: Trigger scale animation and haptic feedback on selection
+    _animationController.forward(from: 0.0);
+    AppAnimations.lightHaptic();
+    widget.onSelected();
+  }
+
+  @override
   Widget build(BuildContext context) {
     // Mobile-first Phase 4: Pill-shaped chips with gradient border when selected
+    // Phase 5: Added scale animation and haptic feedback
     // Selected: 2px gradient border (not full background)
     // Unselected: 1px solid border (neutral)
     // Height: 36px, padding: 16px horizontal
     // Font: 14px medium weight
 
-    if (isSelected) {
+    // Wrap with AnimatedBuilder for scale animation
+    return AnimatedBuilder(
+      animation: _scaleAnimation,
+      builder: (context, child) {
+        return Transform.scale(
+          scale: _scaleAnimation.value,
+          child: child,
+        );
+      },
+      child: _buildChipContent(),
+    );
+  }
+
+  Widget _buildChipContent() {
+    final isDark = widget.isDark;
+
+    if (widget.isSelected) {
       return Container(
         height: 36,
         decoration: BoxDecoration(
@@ -699,13 +763,13 @@ class _FilterChip extends StatelessWidget {
           child: Material(
             color: Colors.transparent,
             child: InkWell(
-              onTap: onSelected,
+              onTap: _handleTap, // Phase 5: Use new handler with animation
               borderRadius: BorderRadius.circular(18),
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Center(
                   child: Text(
-                    label,
+                    widget.label,
                     style: AppTypography.bodyMedium.copyWith(
                       fontSize: 14,
                       fontWeight: FontWeight.w500, // medium weight
@@ -737,13 +801,13 @@ class _FilterChip extends StatelessWidget {
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          onTap: onSelected,
+          onTap: _handleTap, // Phase 5: Use new handler with animation
           borderRadius: BorderRadius.circular(20),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Center(
               child: Text(
-                label,
+                widget.label,
                 style: AppTypography.bodyMedium.copyWith(
                   fontSize: 14,
                   fontWeight: FontWeight.w500, // medium weight

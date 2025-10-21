@@ -69,10 +69,12 @@ class ItemCard extends StatefulWidget {
   State<ItemCard> createState() => _ItemCardState();
 }
 
-class _ItemCardState extends State<ItemCard> with SingleTickerProviderStateMixin {
+class _ItemCardState extends State<ItemCard> with TickerProviderStateMixin {
   bool _isPressed = false;
   late AnimationController _checkboxAnimationController;
   late Animation<double> _checkboxScaleAnimation;
+  late AnimationController _pressAnimationController;
+  late Animation<double> _pressScaleAnimation;
 
   @override
   void initState() {
@@ -97,11 +99,28 @@ class _ItemCardState extends State<ItemCard> with SingleTickerProviderStateMixin
         weight: 50.0,
       ),
     ]).animate(_checkboxAnimationController);
+
+    // Initialize press animation controller for Phase 5 micro-interaction
+    _pressAnimationController = AnimationController(
+      duration: AppAnimations.itemPress,
+      vsync: this,
+    );
+
+    // Create press scale animation: 1.0 -> 0.98 (scale down on press)
+    _pressScaleAnimation = Tween<double>(
+      begin: 1.0,
+      end: AppAnimations.itemPressScale,
+    ).animate(CurvedAnimation(
+      parent: _pressAnimationController,
+      curve: Curves.easeOut,
+      reverseCurve: Curves.easeOutBack,
+    ));
   }
 
   @override
   void dispose() {
     _checkboxAnimationController.dispose();
+    _pressAnimationController.dispose();
     super.dispose();
   }
 
@@ -317,16 +336,22 @@ class _ItemCardState extends State<ItemCard> with SingleTickerProviderStateMixin
 
   void _handleTapDown(TapDownDetails details) {
     setState(() => _isPressed = true);
+    // Phase 5: Animate scale down on press (100ms)
+    _pressAnimationController.forward();
     // Light haptic on card press
     AppAnimations.lightHaptic();
   }
 
   void _handleTapUp(TapUpDetails details) {
     setState(() => _isPressed = false);
+    // Phase 5: Spring back animation (150ms with easeOutBack curve)
+    _pressAnimationController.reverse();
   }
 
   void _handleTapCancel() {
     setState(() => _isPressed = false);
+    // Reset animation on cancel
+    _pressAnimationController.reverse();
   }
 
   void _handleTap() {
@@ -372,21 +397,30 @@ class _ItemCardState extends State<ItemCard> with SingleTickerProviderStateMixin
     final opacity = isCompleted ? 0.7 : 1.0;
 
     // Build the card widget with mobile-first bold design
+    // Phase 5: Wrap with AnimatedBuilder for press scale animation
     final cardWidget = RepaintBoundary(
-      child: Semantics(
-        container: true,
-        button: true,
-        enabled: widget.onTap != null,
-        label: '${widget.item.type.toString().split('.').last}: ${widget.item.title}',
-        child: GestureDetector(
-          onTapDown: _handleTapDown,
-          onTapUp: _handleTapUp,
-          onTapCancel: _handleTapCancel,
-          onTap: _handleTap,
-          onLongPress: _handleLongPress,
-          child: Opacity(
-            opacity: opacity,
-            child: Container(
+      child: AnimatedBuilder(
+        animation: _pressScaleAnimation,
+        builder: (context, child) {
+          return Transform.scale(
+            scale: _pressScaleAnimation.value,
+            child: child,
+          );
+        },
+        child: Semantics(
+          container: true,
+          button: true,
+          enabled: widget.onTap != null,
+          label: '${widget.item.type.toString().split('.').last}: ${widget.item.title}',
+          child: GestureDetector(
+            onTapDown: _handleTapDown,
+            onTapUp: _handleTapUp,
+            onTapCancel: _handleTapCancel,
+            onTap: _handleTap,
+            onLongPress: _handleLongPress,
+            child: Opacity(
+              opacity: opacity,
+              child: Container(
               margin: const EdgeInsets.only(bottom: AppSpacing.cardSpacing), // 16px spacing
               // Wrap entire card with gradient pill border (6px width, 20px radius)
               child: GradientPillBorder(
@@ -449,9 +483,10 @@ class _ItemCardState extends State<ItemCard> with SingleTickerProviderStateMixin
           ),
         ),
       ),
+      ),
     );
 
-    // Apply entrance animation if index is provided
+    // Apply entrance animation if index is provided (Phase 5 optimized)
     if (widget.index != null) {
       final delay = AppAnimations.itemEntranceStagger * widget.index!;
       final duration = AppAnimations.getDuration(context, AppAnimations.itemEntrance);
@@ -461,21 +496,21 @@ class _ItemCardState extends State<ItemCard> with SingleTickerProviderStateMixin
           .fadeIn(
             duration: duration,
             delay: delay,
-            curve: AppAnimations.springCurve,
+            curve: Curves.easeOut, // Phase 5: Use easeOut instead of springCurve for entrance
           )
           .slideY(
-            begin: AppAnimations.itemEntranceSlideOffset.dy,
+            begin: AppAnimations.itemEntranceSlideDistance, // Phase 5: Use 8px distance instead of percentage
             end: 0,
             duration: duration,
             delay: delay,
-            curve: AppAnimations.springCurve,
+            curve: Curves.easeOut,
           )
           .scale(
             begin: const Offset(AppAnimations.itemEntranceScale, AppAnimations.itemEntranceScale),
             end: const Offset(1.0, 1.0),
             duration: duration,
             delay: delay,
-            curve: AppAnimations.springCurve,
+            curve: Curves.easeOut,
           );
     }
 
