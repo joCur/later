@@ -65,7 +65,7 @@ class SkeletonItemCard extends StatelessWidget {
         .fadeIn(duration: AppAnimations.quick)
         .shimmer(
           duration: AppAnimations.shimmerDuration,
-          color: Colors.white.withOpacity(0.3),
+          color: Colors.white.withValues(alpha: 0.3),
         );
   }
 
@@ -82,9 +82,9 @@ class SkeletonItemCard extends StatelessWidget {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            Colors.white.withOpacity(isDark ? 0.05 : 0.1),
-            Colors.white.withOpacity(isDark ? 0.15 : 0.3),
-            Colors.white.withOpacity(isDark ? 0.05 : 0.1),
+            Colors.white.withValues(alpha: isDark ? 0.05 : 0.1),
+            Colors.white.withValues(alpha: isDark ? 0.15 : 0.3),
+            Colors.white.withValues(alpha: isDark ? 0.05 : 0.1),
           ],
         ),
         borderRadius: BorderRadius.circular(4),
@@ -158,8 +158,8 @@ class SkeletonDetailView extends StatelessWidget {
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
                 colors: [
-                  AppColors.primaryStart.withOpacity(0.3),
-                  AppColors.primaryEnd.withOpacity(0.3),
+                  AppColors.primaryStart.withValues(alpha: 0.3),
+                  AppColors.primaryEnd.withValues(alpha: 0.3),
                 ],
               ),
             ),
@@ -241,9 +241,9 @@ class SkeletonDetailView extends StatelessWidget {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            Colors.white.withOpacity(isDark ? 0.05 : 0.1),
-            Colors.white.withOpacity(isDark ? 0.15 : 0.3),
-            Colors.white.withOpacity(isDark ? 0.05 : 0.1),
+            Colors.white.withValues(alpha: isDark ? 0.05 : 0.1),
+            Colors.white.withValues(alpha: isDark ? 0.15 : 0.3),
+            Colors.white.withValues(alpha: isDark ? 0.05 : 0.1),
           ],
         ),
         borderRadius: BorderRadius.circular(4),
@@ -288,8 +288,8 @@ class SkeletonSidebar extends StatelessWidget {
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [
-                    AppColors.primaryStart.withOpacity(0.1),
-                    AppColors.primaryEnd.withOpacity(0.05),
+                    AppColors.primaryStart.withValues(alpha: 0.1),
+                    AppColors.primaryEnd.withValues(alpha: 0.05),
                   ],
                 ),
               ),
@@ -339,9 +339,9 @@ class SkeletonSidebar extends StatelessWidget {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            Colors.white.withOpacity(isDark ? 0.05 : 0.1),
-            Colors.white.withOpacity(isDark ? 0.15 : 0.3),
-            Colors.white.withOpacity(isDark ? 0.05 : 0.1),
+            Colors.white.withValues(alpha: isDark ? 0.05 : 0.1),
+            Colors.white.withValues(alpha: isDark ? 0.15 : 0.3),
+            Colors.white.withValues(alpha: isDark ? 0.05 : 0.1),
           ],
         ),
         borderRadius: BorderRadius.circular(8),

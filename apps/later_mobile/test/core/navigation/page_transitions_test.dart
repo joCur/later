@@ -9,7 +9,7 @@ void main() {
         body: Center(child: Text('Test Page')),
       );
 
-      final route = SharedAxisPageRoute(page: testPage);
+      final route = SharedAxisPageRoute<void>(page: testPage);
 
       await tester.pumpWidget(
         MaterialApp(
@@ -45,7 +45,7 @@ void main() {
         body: Center(child: Text('Test Page')),
       );
 
-      final route = SharedAxisPageRoute(page: testPage);
+      final route = SharedAxisPageRoute<void>(page: testPage);
 
       await tester.pumpWidget(
         MaterialApp(
@@ -80,7 +80,7 @@ void main() {
         body: Center(child: Text('Test Page')),
       );
 
-      final route = SharedAxisPageRoute(page: testPage);
+      final route = SharedAxisPageRoute<void>(page: testPage);
 
       await tester.pumpWidget(
         MaterialApp(
@@ -116,7 +116,7 @@ void main() {
         body: Center(child: Text('Fade Page')),
       );
 
-      final route = FadePageRoute(page: testPage);
+      final route = FadePageRoute<void>(page: testPage);
 
       await tester.pumpWidget(
         MaterialApp(
@@ -144,7 +144,7 @@ void main() {
         body: Center(child: Text('Fade Page')),
       );
 
-      final route = FadePageRoute(page: testPage);
+      final route = FadePageRoute<void>(page: testPage);
 
       await tester.pumpWidget(
         MaterialApp(
@@ -180,7 +180,7 @@ void main() {
         body: Center(child: Text('Scale Page')),
       );
 
-      final route = ScalePageRoute(page: testPage);
+      final route = ScalePageRoute<void>(page: testPage);
 
       await tester.pumpWidget(
         MaterialApp(
@@ -209,7 +209,7 @@ void main() {
         body: Center(child: Text('Scale Page')),
       );
 
-      final route = ScalePageRoute(page: testPage);
+      final route = ScalePageRoute<void>(page: testPage);
 
       expect(route.opaque, isFalse);
     });
@@ -221,9 +221,9 @@ void main() {
         body: Center(child: Text('Extension Page')),
       );
 
-      final route = testPage.toSharedAxisRoute();
+      final route = testPage.toSharedAxisRoute<void>();
 
-      expect(route, isA<SharedAxisPageRoute>());
+      expect(route, isA<SharedAxisPageRoute<void>>());
 
       await tester.pumpWidget(
         MaterialApp(
@@ -251,9 +251,9 @@ void main() {
         body: Center(child: Text('Fade Extension')),
       );
 
-      final route = testPage.toFadeRoute();
+      final route = testPage.toFadeRoute<void>();
 
-      expect(route, isA<FadePageRoute>());
+      expect(route, isA<FadePageRoute<void>>());
 
       await tester.pumpWidget(
         MaterialApp(
@@ -281,9 +281,9 @@ void main() {
         body: Center(child: Text('Scale Extension')),
       );
 
-      final route = testPage.toScaleRoute();
+      final route = testPage.toScaleRoute<void>();
 
-      expect(route, isA<ScalePageRoute>());
+      expect(route, isA<ScalePageRoute<void>>());
 
       await tester.pumpWidget(
         MaterialApp(
