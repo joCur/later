@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:later_mobile/core/responsive/breakpoints.dart';
 import 'package:later_mobile/widgets/navigation/app_sidebar.dart';
-import 'package:later_mobile/widgets/navigation/bottom_navigation_bar.dart';
+import 'package:later_mobile/widgets/navigation/icon_only_bottom_nav.dart';
 import 'package:hive/hive.dart';
 
 /// Responsive Behavior Test Suite: Orientation Tests
@@ -126,7 +126,7 @@ void main() {
                 return Scaffold(
                   body: const Center(child: Text('Content')),
                   bottomNavigationBar: showBottomNav
-                      ? AppBottomNavigationBar(
+                      ? IconOnlyBottomNav(
                           currentIndex: 0,
                           onDestinationSelected: (_) {},
                         )
@@ -140,7 +140,7 @@ void main() {
 
       // At 812px width (landscape phone), it crosses into tablet breakpoint
       // so bottom nav should be hidden
-      expect(find.byType(AppBottomNavigationBar), findsNothing,
+      expect(find.byType(IconOnlyBottomNav), findsNothing,
           reason: 'Bottom nav should hide when landscape width exceeds mobile breakpoint');
     });
 
@@ -438,7 +438,7 @@ void main() {
                   leading: const Icon(Icons.star),
                 ),
               ),
-              bottomNavigationBar: AppBottomNavigationBar(
+              bottomNavigationBar: IconOnlyBottomNav(
                 currentIndex: 0,
                 onDestinationSelected: (_) {},
               ),

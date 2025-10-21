@@ -3,7 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:later_mobile/core/responsive/breakpoints.dart';
 import 'package:later_mobile/core/responsive/responsive_layout.dart';
 import 'package:later_mobile/widgets/navigation/app_sidebar.dart';
-import 'package:later_mobile/widgets/navigation/bottom_navigation_bar.dart';
+import 'package:later_mobile/widgets/navigation/icon_only_bottom_nav.dart';
 import 'package:later_mobile/widgets/components/fab/quick_capture_fab.dart';
 import 'package:hive/hive.dart';
 
@@ -85,7 +85,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            bottomNavigationBar: AppBottomNavigationBar(
+            bottomNavigationBar: IconOnlyBottomNav(
               currentIndex: 0,
               onDestinationSelected: (int index) {},
             ),
@@ -94,10 +94,10 @@ void main() {
       );
 
       // Verify bottom navigation is present
-      expect(find.byType(AppBottomNavigationBar), findsOneWidget);
+      expect(find.byType(IconOnlyBottomNav), findsOneWidget);
 
       // Check actual rendered size
-      final size = tester.getSize(find.byType(AppBottomNavigationBar));
+      final size = tester.getSize(find.byType(IconOnlyBottomNav));
       expect(size.height, equals(64.0),
           reason: 'Bottom navigation should be 64px tall');
       expect(size.width, equals(testWidth),
@@ -285,7 +285,7 @@ void main() {
           ),
           child: MaterialApp(
             home: Scaffold(
-              bottomNavigationBar: AppBottomNavigationBar(
+              bottomNavigationBar: IconOnlyBottomNav(
                 currentIndex: 0,
                 onDestinationSelected: (_) {},
               ),
@@ -294,9 +294,9 @@ void main() {
         ),
       );
 
-      expect(find.byType(AppBottomNavigationBar), findsOneWidget);
+      expect(find.byType(IconOnlyBottomNav), findsOneWidget);
 
-      final size = tester.getSize(find.byType(AppBottomNavigationBar));
+      final size = tester.getSize(find.byType(IconOnlyBottomNav));
       expect(size.width, equals(testWidth),
           reason: 'Bottom nav should span full width');
     });
@@ -310,7 +310,7 @@ void main() {
           ),
           child: MaterialApp(
             home: Scaffold(
-              bottomNavigationBar: AppBottomNavigationBar(
+              bottomNavigationBar: IconOnlyBottomNav(
                 currentIndex: 0,
                 onDestinationSelected: (_) {},
               ),
@@ -341,7 +341,7 @@ void main() {
                   );
                 },
               ),
-              bottomNavigationBar: AppBottomNavigationBar(
+              bottomNavigationBar: IconOnlyBottomNav(
                 currentIndex: 0,
                 onDestinationSelected: (_) {},
               ),
@@ -420,7 +420,7 @@ void main() {
           ),
           child: MaterialApp(
             home: Scaffold(
-              bottomNavigationBar: AppBottomNavigationBar(
+              bottomNavigationBar: IconOnlyBottomNav(
                 currentIndex: 0,
                 onDestinationSelected: (_) {},
               ),
@@ -429,7 +429,7 @@ void main() {
         ),
       );
 
-      final size = tester.getSize(find.byType(AppBottomNavigationBar));
+      final size = tester.getSize(find.byType(IconOnlyBottomNav));
       expect(size.width, equals(testWidth));
     });
 
@@ -442,7 +442,7 @@ void main() {
           ),
           child: MaterialApp(
             home: Scaffold(
-              bottomNavigationBar: AppBottomNavigationBar(
+              bottomNavigationBar: IconOnlyBottomNav(
                 currentIndex: 0,
                 onDestinationSelected: (_) {},
               ),
@@ -583,7 +583,7 @@ void main() {
                   title: Text('Item $index'),
                 ),
               ),
-              bottomNavigationBar: AppBottomNavigationBar(
+              bottomNavigationBar: IconOnlyBottomNav(
                 currentIndex: 0,
                 onDestinationSelected: (_) {},
               ),

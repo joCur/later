@@ -13,7 +13,7 @@ import '../components/cards/item_card.dart';
 import '../components/fab/quick_capture_fab.dart';
 import '../components/empty_states/empty_space_state.dart';
 import '../components/empty_states/welcome_state.dart';
-import '../navigation/bottom_navigation_bar.dart';
+import '../navigation/icon_only_bottom_nav.dart';
 import '../navigation/app_sidebar.dart';
 import '../modals/space_switcher_modal.dart';
 import '../modals/quick_capture_modal.dart';
@@ -527,7 +527,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
-      bottomNavigationBar: AppBottomNavigationBar(
+      bottomNavigationBar: IconOnlyBottomNav(
         currentIndex: _selectedNavIndex,
         onDestinationSelected: (index) {
           setState(() => _selectedNavIndex = index);

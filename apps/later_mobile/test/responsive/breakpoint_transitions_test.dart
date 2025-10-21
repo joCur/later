@@ -3,7 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:later_mobile/core/responsive/breakpoints.dart';
 import 'package:later_mobile/core/responsive/responsive_layout.dart';
 import 'package:later_mobile/widgets/navigation/app_sidebar.dart';
-import 'package:later_mobile/widgets/navigation/bottom_navigation_bar.dart';
+import 'package:later_mobile/widgets/navigation/icon_only_bottom_nav.dart';
 import 'package:hive/hive.dart';
 
 /// Responsive Behavior Test Suite: Breakpoint Transitions
@@ -126,7 +126,7 @@ void main() {
                 return Scaffold(
                   body: const Center(child: Text('Content')),
                   bottomNavigationBar: showBottomNav
-                      ? AppBottomNavigationBar(
+                      ? IconOnlyBottomNav(
                           currentIndex: 0,
                           onDestinationSelected: (_) {},
                         )
@@ -138,7 +138,7 @@ void main() {
         ),
       );
 
-      expect(find.byType(AppBottomNavigationBar), findsOneWidget,
+      expect(find.byType(IconOnlyBottomNav), findsOneWidget,
           reason: 'Bottom nav should be visible at 767px');
 
       // Test at 768px (tablet)
@@ -154,7 +154,7 @@ void main() {
                 return Scaffold(
                   body: const Center(child: Text('Content')),
                   bottomNavigationBar: showBottomNav
-                      ? AppBottomNavigationBar(
+                      ? IconOnlyBottomNav(
                           currentIndex: 0,
                           onDestinationSelected: (_) {},
                         )
@@ -168,7 +168,7 @@ void main() {
 
       await tester.pump();
 
-      expect(find.byType(AppBottomNavigationBar), findsNothing,
+      expect(find.byType(IconOnlyBottomNav), findsNothing,
           reason: 'Bottom nav should be hidden at 768px');
     });
 

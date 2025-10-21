@@ -5,7 +5,7 @@ import 'package:later_mobile/widgets/components/empty_state.dart';
 import 'package:later_mobile/widgets/components/cards/item_card.dart';
 import 'package:later_mobile/widgets/components/fab/quick_capture_fab.dart';
 import 'package:later_mobile/widgets/components/empty_states/welcome_state.dart';
-import 'package:later_mobile/widgets/navigation/bottom_navigation_bar.dart';
+import 'package:later_mobile/widgets/navigation/icon_only_bottom_nav.dart';
 import 'package:later_mobile/widgets/navigation/app_sidebar.dart';
 import 'package:later_mobile/data/models/item_model.dart';
 import 'package:later_mobile/data/models/space_model.dart';
@@ -174,7 +174,7 @@ void main() {
       // Assert
       expect(find.byType(HomeScreen), findsOneWidget);
       expect(find.byType(EmptyState), findsOneWidget);
-      expect(find.byType(AppBottomNavigationBar), findsOneWidget);
+      expect(find.byType(IconOnlyBottomNav), findsOneWidget);
       expect(find.byType(QuickCaptureFab), findsOneWidget);
     });
 
@@ -239,7 +239,7 @@ void main() {
 
       // Assert
       expect(find.byType(AppSidebar), findsOneWidget);
-      expect(find.byType(AppBottomNavigationBar), findsNothing);
+      expect(find.byType(IconOnlyBottomNav), findsNothing);
     });
 
     testWidgets('displays space name in app bar', (WidgetTester tester) async {
@@ -509,8 +509,8 @@ void main() {
       await tester.pumpAndSettle();
 
       // Find navigation bar
-      final navBar = tester.widget<AppBottomNavigationBar>(
-        find.byType(AppBottomNavigationBar),
+      final navBar = tester.widget<IconOnlyBottomNav>(
+        find.byType(IconOnlyBottomNav),
       );
       expect(navBar.currentIndex, 0);
 
@@ -519,8 +519,8 @@ void main() {
       await tester.pumpAndSettle();
 
       // Check updated index
-      final updatedNavBar = tester.widget<AppBottomNavigationBar>(
-        find.byType(AppBottomNavigationBar),
+      final updatedNavBar = tester.widget<IconOnlyBottomNav>(
+        find.byType(IconOnlyBottomNav),
       );
       expect(updatedNavBar.currentIndex, 1);
     });
