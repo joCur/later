@@ -1,20 +1,22 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_animations.dart';
 import 'primary_button.dart';
 
-/// Ghost button component for minimal emphasis actions
+/// Ghost button component for minimal emphasis actions with Temporal Flow design
 ///
 /// Features:
-/// - Three sizes: small (32px), medium (40px), large (48px)
+/// - Transparent background with gradient overlay on hover (5% opacity)
+/// - Three sizes: small (36px), medium (44px), large (52px)
+/// - Spring press animation (scale 1.0 → 0.92)
+/// - 10px border radius
 /// - States: default, hover, pressed, disabled, loading
 /// - Haptic feedback on mobile
-/// - No border, transparent background, minimal visual weight
 /// - Accessibility: semantic labels, focus indicators
-/// - Optional icon support
+/// - Optional icon support with 8px gap
+/// - Disabled state: 40% opacity
 class GhostButton extends StatefulWidget {
   const GhostButton({
     super.key,
@@ -48,49 +50,29 @@ class GhostButton extends StatefulWidget {
   State<GhostButton> createState() => _GhostButtonState();
 }
 
-class _GhostButtonState extends State<GhostButton>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  late Animation<double> _scaleAnimation;
+class _GhostButtonState extends State<GhostButton> {
   bool _isPressed = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      duration: AppAnimations.buttonPress,
-      vsync: this,
-    );
-    _scaleAnimation = Tween<double>(begin: 1.0, end: 0.98).animate(
-      CurvedAnimation(parent: _controller, curve: AppAnimations.buttonEasing),
-    );
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
+  bool _isHovered = false;
 
   double get _height {
     switch (widget.size) {
       case ButtonSize.small:
-        return AppSpacing.touchTargetSmall;
+        return 36.0;
       case ButtonSize.medium:
-        return AppSpacing.touchTargetMedium;
+        return 44.0;
       case ButtonSize.large:
-        return AppSpacing.touchTargetLarge;
+        return 52.0;
     }
   }
 
   double get _horizontalPadding {
     switch (widget.size) {
       case ButtonSize.small:
-        return AppSpacing.sm;
+        return 12.0;
       case ButtonSize.medium:
-        return AppSpacing.md;
+        return 16.0;
       case ButtonSize.large:
-        return AppSpacing.md;
+        return 24.0;
     }
   }
 
@@ -116,33 +98,41 @@ class _GhostButtonState extends State<GhostButton>
     }
   }
 
+  double get _loadingSize {
+    switch (widget.size) {
+      case ButtonSize.small:
+        return 16;
+      case ButtonSize.medium:
+        return 20;
+      case ButtonSize.large:
+        return 20;
+    }
+  }
+
   bool get _isEnabled => widget.onPressed != null && !widget.isLoading;
 
   void _handleTapDown(TapDownDetails details) {
     if (_isEnabled) {
       setState(() => _isPressed = true);
-      _controller.forward();
-      HapticFeedback.lightImpact();
+      // Light haptic feedback on button press
+      AppAnimations.lightHaptic();
     }
   }
 
   void _handleTapUp(TapUpDetails details) {
     if (_isEnabled) {
       setState(() => _isPressed = false);
-      _controller.reverse();
     }
   }
 
   void _handleTapCancel() {
     if (_isEnabled) {
       setState(() => _isPressed = false);
-      _controller.reverse();
     }
   }
 
   void _handleTap() {
     if (_isEnabled) {
-      HapticFeedback.lightImpact();
       widget.onPressed?.call();
     }
   }
@@ -152,20 +142,15 @@ class _GhostButtonState extends State<GhostButton>
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
-    final foregroundColor = _isEnabled
-        ? AppColors.primaryAmber
-        : (isDark ? AppColors.textDisabledDark : AppColors.textDisabledLight);
-
-    final backgroundColor = _isPressed && _isEnabled
-        ? (isDark
-            ? AppColors.primaryAmber.withValues(alpha: 0.08)
-            : AppColors.primaryAmber.withValues(alpha: 0.05))
-        : Colors.transparent;
+    // Foreground color - use gradient colors
+    final foregroundColor = isDark
+        ? AppColors.primaryStartDark
+        : AppColors.primaryStart;
 
     final Widget buttonContent = widget.isLoading
         ? SizedBox(
-            width: _iconSize,
-            height: _iconSize,
+            width: _loadingSize,
+            height: _loadingSize,
             child: CircularProgressIndicator(
               strokeWidth: 2,
               valueColor: AlwaysStoppedAnimation<Color>(foregroundColor),
@@ -181,7 +166,7 @@ class _GhostButtonState extends State<GhostButton>
                   size: _iconSize,
                   color: foregroundColor,
                 ),
-                const SizedBox(width: AppSpacing.xxs),
+                const SizedBox(width: AppSpacing.xs),
               ],
               Text(
                 widget.text,
@@ -193,18 +178,50 @@ class _GhostButtonState extends State<GhostButton>
             ],
           );
 
-    final Widget button = ScaleTransition(
-      scale: _scaleAnimation,
-      child: Container(
-        height: _height,
-        padding: EdgeInsets.symmetric(horizontal: _horizontalPadding),
-        decoration: BoxDecoration(
-          color: backgroundColor,
-          borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
+    // Background with hover gradient overlay (5% opacity)
+    final backgroundColor = (_isHovered || _isPressed) && _isEnabled
+        ? LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              (isDark ? AppColors.primaryStartDark : AppColors.primaryStart)
+                  .withValues(alpha: 0.05),
+              (isDark ? AppColors.primaryEndDark : AppColors.primaryEnd)
+                  .withValues(alpha: 0.05),
+            ],
+          )
+        : null;
+
+    final Widget button = MouseRegion(
+      onEnter: (_) {
+        if (_isEnabled) setState(() => _isHovered = true);
+      },
+      onExit: (_) {
+        if (_isEnabled) setState(() => _isHovered = false);
+      },
+      child: AnimatedScale(
+        scale: _isPressed ? AppAnimations.fabPressScale : 1.0,
+        duration: AppAnimations.quick,
+        curve: AppAnimations.springCurve,
+        child: Container(
+          height: _height,
+          padding: EdgeInsets.symmetric(horizontal: _horizontalPadding),
+          decoration: BoxDecoration(
+            gradient: backgroundColor,
+            borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
+          ),
+          child: Center(child: buttonContent),
         ),
-        child: Center(child: buttonContent),
       ),
     );
+
+    // Wrap in Opacity for disabled state
+    final Widget finalButton = _isEnabled
+        ? button
+        : Opacity(
+            opacity: AppColors.disabledOpacity,
+            child: IgnorePointer(child: button),
+          );
 
     return Semantics(
       button: true,
@@ -217,8 +234,8 @@ class _GhostButtonState extends State<GhostButton>
         onTap: _handleTap,
         child: Focus(
           child: widget.isExpanded
-              ? SizedBox(width: double.infinity, child: button)
-              : button,
+              ? SizedBox(width: double.infinity, child: finalButton)
+              : finalButton,
         ),
       ),
     );

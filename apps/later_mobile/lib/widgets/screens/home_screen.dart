@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_typography.dart';
 import '../../core/theme/app_spacing.dart';
+import '../../core/theme/app_animations.dart';
 import '../../core/responsive/breakpoints.dart';
 import '../../data/models/item_model.dart';
 import '../../data/models/space_model.dart';
@@ -13,7 +14,7 @@ import '../components/cards/item_card.dart';
 import '../components/fab/quick_capture_fab.dart';
 import '../components/empty_states/empty_space_state.dart';
 import '../components/empty_states/welcome_state.dart';
-import '../navigation/bottom_navigation_bar.dart';
+import '../navigation/icon_only_bottom_nav.dart';
 import '../navigation/app_sidebar.dart';
 import '../modals/space_switcher_modal.dart';
 import '../modals/quick_capture_modal.dart';
@@ -183,111 +184,129 @@ class _HomeScreenState extends State<HomeScreen> {
   PreferredSizeWidget _buildAppBar(BuildContext context, Space? currentSpace) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
+    // Mobile-first Phase 4: Flat app bar with 1px bottom border
+    // - No glass effect (solid background)
+    // - 1px bottom border (neutral, 10% opacity)
+    // - Elevation: 0 (flat, modern look)
+    // - Height: 56px (Android standard - default AppBar)
     return AppBar(
-      backgroundColor: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
-      elevation: AppSpacing.elevation1,
-      automaticallyImplyLeading: false,
-      title: Row(
-        children: [
-          // Space switcher button
-          Expanded(
-            child: InkWell(
-              onTap: () async {
-                final spacesProvider = context.read<SpacesProvider>();
-                final itemsProvider = context.read<ItemsProvider>();
-
-                final result = await SpaceSwitcherModal.show(context);
-                if (!mounted) return;
-
-                if (result == true) {
-                  // Space was switched, reload items and reset pagination
-                  _resetPagination();
-                  if (spacesProvider.currentSpace != null) {
-                    await itemsProvider.loadItemsBySpace(
-                      spacesProvider.currentSpace!.id,
-                    );
-                  }
-                }
-              },
-              borderRadius: BorderRadius.circular(AppSpacing.radiusMD),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.xs,
-                  vertical: AppSpacing.xxs,
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    // Space icon
-                    if (currentSpace?.icon != null)
-                      Text(
-                        currentSpace!.icon!,
-                        style: const TextStyle(fontSize: 24),
-                      )
-                    else
-                      Icon(
-                        Icons.folder_outlined,
-                        size: 24,
-                        color: isDark
-                            ? AppColors.textPrimaryDark
-                            : AppColors.textPrimaryLight,
-                      ),
-                    const SizedBox(width: AppSpacing.xs),
-
-                    // Space name
-                    Flexible(
-                      child: Text(
-                        currentSpace?.name ?? 'No Space',
-                        style: AppTypography.h4.copyWith(
-                          color: isDark
-                              ? AppColors.textPrimaryDark
-                              : AppColors.textPrimaryLight,
-                        ),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-
-                    // Dropdown icon
-                    const SizedBox(width: AppSpacing.xxxs),
-                    Icon(
-                      Icons.arrow_drop_down,
-                      color: isDark
-                          ? AppColors.textSecondaryDark
-                          : AppColors.textSecondaryLight,
-                    ),
-                  ],
-                ),
+            backgroundColor: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
+            elevation: 0, // Flat design
+            automaticallyImplyLeading: false,
+            shape: Border(
+              bottom: BorderSide(
+                color: isDark
+                    ? AppColors.neutral600.withValues(alpha: 0.1)
+                    : AppColors.neutral400.withValues(alpha: 0.1),
+                width: 1,
               ),
             ),
-          ),
-        ],
-      ),
-      actions: [
-        // Search button
-        IconButton(
-          icon: const Icon(Icons.search),
-          onPressed: () {
-            debugPrint('Search tapped');
-          },
-          tooltip: 'Search',
-          color: isDark
-              ? AppColors.textSecondaryDark
-              : AppColors.textSecondaryLight,
-        ),
+            title: Row(
+              children: [
+                // Space switcher button
+                Expanded(
+                  child: InkWell(
+                    onTap: () async {
+                      final spacesProvider = context.read<SpacesProvider>();
+                      final itemsProvider = context.read<ItemsProvider>();
 
-        // Menu button
-        IconButton(
-          icon: const Icon(Icons.more_vert),
-          onPressed: () {
-            debugPrint('Menu tapped');
-          },
-          tooltip: 'Menu',
-          color: isDark
-              ? AppColors.textSecondaryDark
-              : AppColors.textSecondaryLight,
-        ),
-      ],
-    );
+                      final result = await SpaceSwitcherModal.show(context);
+                      if (!mounted) return;
+
+                      if (result == true) {
+                        // Space was switched, reload items and reset pagination
+                        _resetPagination();
+                        if (spacesProvider.currentSpace != null) {
+                          await itemsProvider.loadItemsBySpace(
+                            spacesProvider.currentSpace!.id,
+                          );
+                        }
+                      }
+                    },
+                    borderRadius: BorderRadius.circular(AppSpacing.radiusMD),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.xs,
+                        vertical: AppSpacing.xxs,
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          // Space icon with gradient (if no emoji)
+                          if (currentSpace?.icon != null)
+                            Text(
+                              currentSpace!.icon!,
+                              style: const TextStyle(fontSize: 24),
+                            )
+                          else
+                            ShaderMask(
+                              shaderCallback: (bounds) => AppColors
+                                  .primaryGradientAdaptive(context)
+                                  .createShader(bounds),
+                              child: Icon(
+                                Icons.folder_outlined,
+                                size: 24,
+                                color: isDark
+                                    ? AppColors.textPrimaryDark
+                                    : AppColors.textPrimaryLight,
+                              ),
+                            ),
+                          const SizedBox(width: AppSpacing.xs),
+
+                          // Space name
+                          Flexible(
+                            child: Text(
+                              currentSpace?.name ?? 'No Space',
+                              style: AppTypography.h4.copyWith(
+                                color: isDark
+                                    ? AppColors.textPrimaryDark
+                                    : AppColors.textPrimaryLight,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+
+                          // Dropdown icon
+                          const SizedBox(width: AppSpacing.xxxs),
+                          Icon(
+                            Icons.arrow_drop_down,
+                            color: isDark
+                                ? AppColors.textSecondaryDark
+                                : AppColors.textSecondaryLight,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            actions: [
+              // Search button
+              IconButton(
+                icon: const Icon(Icons.search),
+                onPressed: () {
+                  debugPrint('Search tapped');
+                },
+                tooltip: 'Search',
+                color: isDark
+                    ? AppColors.textSecondaryDark
+                    : AppColors.textSecondaryLight,
+              ),
+
+              // Menu button
+              IconButton(
+                icon: const Icon(Icons.more_vert),
+                onPressed: () {
+                  debugPrint('Menu tapped');
+                },
+                tooltip: 'Menu',
+                color: isDark
+                    ? AppColors.textSecondaryDark
+                    : AppColors.textSecondaryLight,
+              ),
+            ],
+          );
   }
 
   /// Build filter chips
@@ -297,8 +316,8 @@ class _HomeScreenState extends State<HomeScreen> {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.paddingSM,
-        vertical: AppSpacing.paddingXS,
+        horizontal: AppSpacing.sm,
+        vertical: AppSpacing.xs,
       ),
       child: Wrap(
         spacing: AppSpacing.xs,
@@ -401,8 +420,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return ListView.builder(
       padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.paddingSM,
-        vertical: AppSpacing.paddingXS,
+        horizontal: AppSpacing.sm,
+        vertical: AppSpacing.xs,
       ),
       itemCount: itemCount,
       itemBuilder: (context, index) {
@@ -463,35 +482,66 @@ class _HomeScreenState extends State<HomeScreen> {
     SpacesProvider spacesProvider,
   ) {
     final filteredItems = _getFilteredItems(itemsProvider.items);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
       appBar: _buildAppBar(context, spacesProvider.currentSpace),
-      body: Column(
+      body: Stack(
         children: [
-          // Filter chips
-          _buildFilterChips(context),
+          // Main content
+          Column(
+            children: [
+              // Filter chips
+              _buildFilterChips(context),
 
-          // Divider
-          const Divider(height: 1),
+              // Divider
+              const Divider(height: 1),
 
-          // Item list
-          Expanded(
-            child: RefreshIndicator(
-              onRefresh: _handleRefresh,
-              child: itemsProvider.isLoading
-                  ? const Center(child: CircularProgressIndicator())
-                  : _buildItemList(
-                      context,
-                      filteredItems,
-                      spacesProvider.currentSpace,
-                      spacesProvider,
-                      itemsProvider,
-                    ),
+              // Item list
+              Expanded(
+                child: RefreshIndicator(
+                  onRefresh: _handleRefresh,
+                  color: isDark ? AppColors.primaryStartDark : AppColors.primaryStart,
+                  backgroundColor: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
+                  child: itemsProvider.isLoading
+                      ? const Center(child: CircularProgressIndicator())
+                      : _buildItemList(
+                          context,
+                          filteredItems,
+                          spacesProvider.currentSpace,
+                          spacesProvider,
+                          itemsProvider,
+                        ),
+                ),
+              ),
+            ],
+          ),
+
+          // Gradient overlay at top (2% opacity)
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            child: IgnorePointer(
+              child: Container(
+                height: 100,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      (isDark ? AppColors.primaryStartDark : AppColors.primaryStart)
+                          .withValues(alpha: 0.02),
+                      Colors.transparent,
+                    ],
+                  ),
+                ),
+              ),
             ),
           ),
         ],
       ),
-      bottomNavigationBar: AppBottomNavigationBar(
+      bottomNavigationBar: IconOnlyBottomNav(
         currentIndex: _selectedNavIndex,
         onDestinationSelected: (index) {
           setState(() => _selectedNavIndex = index);
@@ -511,6 +561,7 @@ class _HomeScreenState extends State<HomeScreen> {
     SpacesProvider spacesProvider,
   ) {
     final filteredItems = _getFilteredItems(itemsProvider.items);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
       body: Row(
@@ -525,30 +576,60 @@ class _HomeScreenState extends State<HomeScreen> {
 
           // Main content
           Expanded(
-            child: Column(
+            child: Stack(
               children: [
-                // App bar
-                _buildAppBar(context, spacesProvider.currentSpace),
+                // Main content column
+                Column(
+                  children: [
+                    // App bar
+                    _buildAppBar(context, spacesProvider.currentSpace),
 
-                // Filter chips
-                _buildFilterChips(context),
+                    // Filter chips
+                    _buildFilterChips(context),
 
-                // Divider
-                const Divider(height: 1),
+                    // Divider
+                    const Divider(height: 1),
 
-                // Item list
-                Expanded(
-                  child: RefreshIndicator(
-                    onRefresh: _handleRefresh,
-                    child: itemsProvider.isLoading
-                        ? const Center(child: CircularProgressIndicator())
-                        : _buildItemList(
-                            context,
-                            filteredItems,
-                            spacesProvider.currentSpace,
-                            spacesProvider,
-                            itemsProvider,
-                          ),
+                    // Item list
+                    Expanded(
+                      child: RefreshIndicator(
+                        onRefresh: _handleRefresh,
+                        color: isDark ? AppColors.primaryStartDark : AppColors.primaryStart,
+                        backgroundColor: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
+                        child: itemsProvider.isLoading
+                            ? const Center(child: CircularProgressIndicator())
+                            : _buildItemList(
+                                context,
+                                filteredItems,
+                                spacesProvider.currentSpace,
+                                spacesProvider,
+                                itemsProvider,
+                              ),
+                      ),
+                    ),
+                  ],
+                ),
+
+                // Gradient overlay at top (2% opacity)
+                Positioned(
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  child: IgnorePointer(
+                    child: Container(
+                      height: 100,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [
+                            (isDark ? AppColors.primaryStartDark : AppColors.primaryStart)
+                                .withValues(alpha: 0.02),
+                            Colors.transparent,
+                          ],
+                        ),
+                      ),
+                    ),
                   ),
                 ),
               ],
@@ -579,8 +660,8 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
-/// Filter chip widget
-class _FilterChip extends StatelessWidget {
+/// Filter chip widget with gradient active state
+class _FilterChip extends StatefulWidget {
   const _FilterChip({
     required this.label,
     required this.isSelected,
@@ -594,34 +675,150 @@ class _FilterChip extends StatelessWidget {
   final bool isDark;
 
   @override
+  State<_FilterChip> createState() => _FilterChipState();
+}
+
+class _FilterChipState extends State<_FilterChip> with SingleTickerProviderStateMixin {
+  late AnimationController _animationController;
+  late Animation<double> _scaleAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Phase 5: Initialize animation controller for selection animation
+    _animationController = AnimationController(
+      duration: const Duration(milliseconds: 200),
+      vsync: this,
+    );
+
+    // Create scale animation: 1.0 -> 1.05 -> 1.0
+    _scaleAnimation = TweenSequence<double>([
+      TweenSequenceItem(
+        tween: Tween<double>(begin: 1.0, end: 1.05)
+            .chain(CurveTween(curve: Curves.easeOut)),
+        weight: 50.0,
+      ),
+      TweenSequenceItem(
+        tween: Tween<double>(begin: 1.05, end: 1.0)
+            .chain(CurveTween(curve: Curves.easeIn)),
+        weight: 50.0,
+      ),
+    ]).animate(_animationController);
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
+
+  void _handleTap() {
+    // Phase 5: Trigger scale animation and haptic feedback on selection
+    _animationController.forward(from: 0.0);
+    AppAnimations.lightHaptic();
+    widget.onSelected();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return FilterChip(
-      label: Text(label),
-      selected: isSelected,
-      onSelected: (_) => onSelected(),
-      selectedColor: isDark
-          ? AppColors.primaryAmber.withValues(alpha: 0.2)
-          : AppColors.primaryAmber.withValues(alpha: 0.15),
-      backgroundColor: isDark
-          ? AppColors.surfaceDarkVariant
-          : AppColors.surfaceLightVariant,
-      checkmarkColor: isDark
-          ? AppColors.textPrimaryDark
-          : AppColors.textPrimaryLight,
-      labelStyle: AppTypography.bodyMedium.copyWith(
-        color: isSelected
-            ? (isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight)
-            : (isDark
-                ? AppColors.textSecondaryDark
-                : AppColors.textSecondaryLight),
-        fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+    // Mobile-first Phase 4: Pill-shaped chips with gradient border when selected
+    // Phase 5: Added scale animation and haptic feedback
+    // Selected: 2px gradient border (not full background)
+    // Unselected: 1px solid border (neutral)
+    // Height: 36px, padding: 16px horizontal
+    // Font: 14px medium weight
+
+    // Wrap with AnimatedBuilder for scale animation
+    return AnimatedBuilder(
+      animation: _scaleAnimation,
+      builder: (context, child) {
+        return Transform.scale(
+          scale: _scaleAnimation.value,
+          child: child,
+        );
+      },
+      child: _buildChipContent(),
+    );
+  }
+
+  Widget _buildChipContent() {
+    final isDark = widget.isDark;
+
+    if (widget.isSelected) {
+      return Container(
+        height: 36,
+        decoration: BoxDecoration(
+          gradient: isDark
+              ? AppColors.primaryGradientDark
+              : AppColors.primaryGradient,
+          borderRadius: BorderRadius.circular(20), // Pill shape
+        ),
+        child: Container(
+          margin: const EdgeInsets.all(2), // 2px border width
+          decoration: BoxDecoration(
+            color: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
+            borderRadius: BorderRadius.circular(18), // 20 - 2 = 18
+          ),
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: _handleTap, // Phase 5: Use new handler with animation
+              borderRadius: BorderRadius.circular(18),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Center(
+                  child: Text(
+                    widget.label,
+                    style: AppTypography.bodyMedium.copyWith(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500, // medium weight
+                      color: isDark
+                          ? AppColors.textPrimaryDark
+                          : AppColors.textPrimaryLight,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+
+    // Unselected state - 1px solid border
+    return Container(
+      height: 36,
+      decoration: BoxDecoration(
+        border: Border.all(
+          color: isDark
+              ? AppColors.neutral600.withValues(alpha: 0.3)
+              : AppColors.neutral400.withValues(alpha: 0.3),
+          width: 1,
+        ),
+        borderRadius: BorderRadius.circular(20), // Pill shape
       ),
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.paddingSM,
-        vertical: AppSpacing.paddingXS,
-      ),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: _handleTap, // Phase 5: Use new handler with animation
+          borderRadius: BorderRadius.circular(20),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Center(
+              child: Text(
+                widget.label,
+                style: AppTypography.bodyMedium.copyWith(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500, // medium weight
+                  color: isDark
+                      ? AppColors.textSecondaryDark
+                      : AppColors.textSecondaryLight,
+                ),
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }

@@ -58,8 +58,9 @@ void main() {
         ),
       );
 
-      expect(container.constraints?.minWidth, 56);
-      expect(container.constraints?.minHeight, 56);
+      // Mobile-First Bold Design: 56x56px circular FAB
+      expect(container.constraints?.maxWidth, 56);
+      expect(container.constraints?.maxHeight, 56);
     });
 
     testWidgets('renders with custom icon', (tester) async {

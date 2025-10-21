@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../core/theme/app_spacing.dart';
@@ -7,19 +6,24 @@ import '../../../core/theme/app_animations.dart';
 
 /// Button size enum
 enum ButtonSize {
-  small, // 32px height
-  medium, // 40px height
-  large, // 48px height
+  small, // 36px height
+  medium, // 44px height
+  large, // 52px height
 }
 
-/// Primary button component for main CTAs
+/// Primary button component for main CTAs with Temporal Flow design
 ///
 /// Features:
-/// - Three sizes: small (32px), medium (40px), large (48px)
-/// - States: default, hover, pressed, disabled, loading
+/// - Gradient background (primary gradient, adapts to dark mode)
+/// - Three sizes: small (36px), medium (44px), large (52px)
+/// - Spring press animation (scale 1.0 → 0.92)
+/// - Soft, diffused shadows (4px blur, 10% opacity)
+/// - 10px border radius
+/// - States: default, pressed, disabled, loading
 /// - Haptic feedback on mobile
 /// - Accessibility: semantic labels, focus indicators
-/// - Optional icon support
+/// - Optional icon support with 8px gap
+/// - Disabled state: 40% opacity
 class PrimaryButton extends StatefulWidget {
   const PrimaryButton({
     super.key,
@@ -53,49 +57,28 @@ class PrimaryButton extends StatefulWidget {
   State<PrimaryButton> createState() => _PrimaryButtonState();
 }
 
-class _PrimaryButtonState extends State<PrimaryButton>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  late Animation<double> _scaleAnimation;
+class _PrimaryButtonState extends State<PrimaryButton> {
   bool _isPressed = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      duration: AppAnimations.buttonPress,
-      vsync: this,
-    );
-    _scaleAnimation = Tween<double>(begin: 1.0, end: 0.98).animate(
-      CurvedAnimation(parent: _controller, curve: AppAnimations.buttonEasing),
-    );
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
 
   double get _height {
     switch (widget.size) {
       case ButtonSize.small:
-        return AppSpacing.touchTargetSmall;
+        return 36.0;
       case ButtonSize.medium:
-        return AppSpacing.touchTargetMedium;
+        return 44.0;
       case ButtonSize.large:
-        return AppSpacing.touchTargetLarge;
+        return 52.0;
     }
   }
 
   double get _horizontalPadding {
     switch (widget.size) {
       case ButtonSize.small:
-        return AppSpacing.sm;
+        return 12.0;
       case ButtonSize.medium:
-        return AppSpacing.md;
+        return 16.0;
       case ButtonSize.large:
-        return AppSpacing.md;
+        return 24.0;
     }
   }
 
@@ -121,33 +104,41 @@ class _PrimaryButtonState extends State<PrimaryButton>
     }
   }
 
+  double get _loadingSize {
+    switch (widget.size) {
+      case ButtonSize.small:
+        return 16;
+      case ButtonSize.medium:
+        return 20;
+      case ButtonSize.large:
+        return 20;
+    }
+  }
+
   bool get _isEnabled => widget.onPressed != null && !widget.isLoading;
 
   void _handleTapDown(TapDownDetails details) {
     if (_isEnabled) {
       setState(() => _isPressed = true);
-      _controller.forward();
-      HapticFeedback.lightImpact();
+      // Light haptic feedback on button press
+      AppAnimations.lightHaptic();
     }
   }
 
   void _handleTapUp(TapUpDetails details) {
     if (_isEnabled) {
       setState(() => _isPressed = false);
-      _controller.reverse();
     }
   }
 
   void _handleTapCancel() {
     if (_isEnabled) {
       setState(() => _isPressed = false);
-      _controller.reverse();
     }
   }
 
   void _handleTap() {
     if (_isEnabled) {
-      HapticFeedback.lightImpact();
       widget.onPressed?.call();
     }
   }
@@ -157,21 +148,21 @@ class _PrimaryButtonState extends State<PrimaryButton>
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
-    final backgroundColor = _isEnabled
-        ? AppColors.primaryAmber
-        : (isDark ? AppColors.neutralGray700 : AppColors.neutralGray300);
+    // Get gradient based on theme
+    final gradient = isDark
+        ? AppColors.primaryGradientDark
+        : AppColors.primaryGradient;
 
-    final foregroundColor = _isEnabled
-        ? AppColors.neutralBlack
-        : (isDark ? AppColors.textDisabledDark : AppColors.textDisabledLight);
+    // Foreground color (white for both light and dark)
+    const foregroundColor = Colors.white;
 
     final Widget buttonContent = widget.isLoading
         ? SizedBox(
-            width: _iconSize,
-            height: _iconSize,
-            child: CircularProgressIndicator(
+            width: _loadingSize,
+            height: _loadingSize,
+            child: const CircularProgressIndicator(
               strokeWidth: 2,
-              valueColor: AlwaysStoppedAnimation<Color>(foregroundColor),
+              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
             ),
           )
         : Row(
@@ -184,7 +175,7 @@ class _PrimaryButtonState extends State<PrimaryButton>
                   size: _iconSize,
                   color: foregroundColor,
                 ),
-                const SizedBox(width: AppSpacing.xxs),
+                const SizedBox(width: AppSpacing.xs),
               ],
               Text(
                 widget.text,
@@ -196,13 +187,15 @@ class _PrimaryButtonState extends State<PrimaryButton>
             ],
           );
 
-    final Widget button = ScaleTransition(
-      scale: _scaleAnimation,
+    final Widget button = AnimatedScale(
+      scale: _isPressed ? AppAnimations.fabPressScale : 1.0,
+      duration: AppAnimations.quick,
+      curve: AppAnimations.springCurve,
       child: Container(
         height: _height,
         padding: EdgeInsets.symmetric(horizontal: _horizontalPadding),
         decoration: BoxDecoration(
-          color: backgroundColor,
+          gradient: gradient,
           borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
           boxShadow: _isEnabled && !_isPressed
               ? [
@@ -210,8 +203,8 @@ class _PrimaryButtonState extends State<PrimaryButton>
                     color: isDark
                         ? AppColors.shadowDark
                         : AppColors.shadowLight,
-                    blurRadius: 3,
-                    offset: const Offset(0, 1),
+                    blurRadius: 4.0,
+                    offset: const Offset(0, 2),
                   ),
                 ]
               : null,
@@ -219,6 +212,14 @@ class _PrimaryButtonState extends State<PrimaryButton>
         child: Center(child: buttonContent),
       ),
     );
+
+    // Wrap in Opacity for disabled state
+    final Widget finalButton = _isEnabled
+        ? button
+        : Opacity(
+            opacity: AppColors.disabledOpacity,
+            child: IgnorePointer(child: button),
+          );
 
     return Semantics(
       button: true,
@@ -231,8 +232,8 @@ class _PrimaryButtonState extends State<PrimaryButton>
         onTap: _handleTap,
         child: Focus(
           child: widget.isExpanded
-              ? SizedBox(width: double.infinity, child: button)
-              : button,
+              ? SizedBox(width: double.infinity, child: finalButton)
+              : finalButton,
         ),
       ),
     );

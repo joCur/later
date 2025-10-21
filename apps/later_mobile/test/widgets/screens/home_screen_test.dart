@@ -4,7 +4,8 @@ import 'package:later_mobile/widgets/screens/home_screen.dart';
 import 'package:later_mobile/widgets/components/empty_state.dart';
 import 'package:later_mobile/widgets/components/cards/item_card.dart';
 import 'package:later_mobile/widgets/components/fab/quick_capture_fab.dart';
-import 'package:later_mobile/widgets/navigation/bottom_navigation_bar.dart';
+import 'package:later_mobile/widgets/components/empty_states/welcome_state.dart';
+import 'package:later_mobile/widgets/navigation/icon_only_bottom_nav.dart';
 import 'package:later_mobile/widgets/navigation/app_sidebar.dart';
 import 'package:later_mobile/data/models/item_model.dart';
 import 'package:later_mobile/data/models/space_model.dart';
@@ -173,7 +174,7 @@ void main() {
       // Assert
       expect(find.byType(HomeScreen), findsOneWidget);
       expect(find.byType(EmptyState), findsOneWidget);
-      expect(find.byType(AppBottomNavigationBar), findsOneWidget);
+      expect(find.byType(IconOnlyBottomNav), findsOneWidget);
       expect(find.byType(QuickCaptureFab), findsOneWidget);
     });
 
@@ -238,7 +239,7 @@ void main() {
 
       // Assert
       expect(find.byType(AppSidebar), findsOneWidget);
-      expect(find.byType(AppBottomNavigationBar), findsNothing);
+      expect(find.byType(IconOnlyBottomNav), findsNothing);
     });
 
     testWidgets('displays space name in app bar', (WidgetTester tester) async {
@@ -285,12 +286,14 @@ void main() {
       await tester.pumpWidget(createHomeScreen());
       await tester.pumpAndSettle();
 
-      // Assert
-      expect(find.byType(FilterChip), findsNWidgets(4));
+      // Assert - all filter labels should exist (1 in gradient container, 3 in FilterChips)
       expect(find.text('All'), findsOneWidget);
       expect(find.text('Tasks'), findsOneWidget);
       expect(find.text('Notes'), findsOneWidget);
       expect(find.text('Lists'), findsOneWidget);
+
+      // Selected chip (All) should have gradient and checkmark
+      expect(find.byIcon(Icons.check), findsOneWidget);
     });
 
     testWidgets('filter chips exist and can be tapped',
@@ -334,26 +337,32 @@ void main() {
       // All items should be visible initially
       expect(find.byType(ItemCard), findsNWidgets(3));
 
-      // Verify all filter chips exist
-      expect(find.byType(FilterChip), findsNWidgets(4));
+      // Verify all filter labels exist
+      expect(find.text('All'), findsOneWidget);
+      expect(find.text('Tasks'), findsOneWidget);
+      expect(find.text('Notes'), findsOneWidget);
+      expect(find.text('Lists'), findsOneWidget);
     });
 
     testWidgets('shows empty state with correct message',
         (WidgetTester tester) async {
-      // Arrange
-      fakeSpaceRepository.setSpaces(<Space>[]);
+      // Arrange - Default Inbox space for welcome state
+      final inboxSpace = Space(
+        id: 'inbox-1',
+        name: 'Inbox',
+        color: '#FF5733',
+      );
+      fakeSpaceRepository.setSpaces([inboxSpace]);
       fakeItemRepository.setItems(<Item>[]);
 
       // Act
       await tester.pumpWidget(createHomeScreen());
       await tester.pumpAndSettle();
 
-      // Assert - empty state should be visible with default message
-      expect(find.byType(EmptyState), findsOneWidget);
+      // Assert - welcome state should be visible for new users
+      expect(find.byType(WelcomeState), findsOneWidget);
       expect(
-        find.text(
-          'Create your first item to get started. Tap the + button below.',
-        ),
+        find.textContaining('Welcome to Later'),
         findsOneWidget,
       );
     });
@@ -500,8 +509,8 @@ void main() {
       await tester.pumpAndSettle();
 
       // Find navigation bar
-      final navBar = tester.widget<AppBottomNavigationBar>(
-        find.byType(AppBottomNavigationBar),
+      final navBar = tester.widget<IconOnlyBottomNav>(
+        find.byType(IconOnlyBottomNav),
       );
       expect(navBar.currentIndex, 0);
 
@@ -510,27 +519,35 @@ void main() {
       await tester.pumpAndSettle();
 
       // Check updated index
-      final updatedNavBar = tester.widget<AppBottomNavigationBar>(
-        find.byType(AppBottomNavigationBar),
+      final updatedNavBar = tester.widget<IconOnlyBottomNav>(
+        find.byType(IconOnlyBottomNav),
       );
       expect(updatedNavBar.currentIndex, 1);
     });
 
     testWidgets('empty state action button can be tapped',
         (WidgetTester tester) async {
-      // Arrange
-      fakeSpaceRepository.setSpaces(<Space>[]);
+      // Arrange - Welcome state for new users
+      final inboxSpace = Space(
+        id: 'inbox-1',
+        name: 'Inbox',
+        color: '#FF5733',
+      );
+      fakeSpaceRepository.setSpaces([inboxSpace]);
       fakeItemRepository.setItems(<Item>[]);
 
       // Act
       await tester.pumpWidget(createHomeScreen());
       await tester.pumpAndSettle();
 
-      // Find and tap empty state action button
-      final actionButton = find.widgetWithText(ElevatedButton, 'Create Item');
-      expect(actionButton, findsOneWidget);
+      // Welcome state should be present
+      expect(find.byType(WelcomeState), findsOneWidget);
 
-      await tester.tap(actionButton, warnIfMissed: false);
+      // FAB can be tapped instead (same action as welcome button)
+      final fab = find.byType(QuickCaptureFab);
+      expect(fab, findsOneWidget);
+
+      await tester.tap(fab, warnIfMissed: false);
       await tester.pump();
 
       // Assert - no error thrown

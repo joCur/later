@@ -1,4 +1,7 @@
 import 'dart:async';
+import 'dart:io' show Platform;
+import 'dart:ui' show ImageFilter;
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -42,10 +45,7 @@ class TypeOption {
 /// - Voice and image input buttons (placeholders)
 /// - Space selector
 class QuickCaptureModal extends StatefulWidget {
-  const QuickCaptureModal({
-    super.key,
-    required this.onClose,
-  });
+  const QuickCaptureModal({super.key, required this.onClose});
 
   /// Callback when modal is closed
   final VoidCallback onClose;
@@ -55,7 +55,7 @@ class QuickCaptureModal extends StatefulWidget {
 }
 
 class _QuickCaptureModalState extends State<QuickCaptureModal>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   final TextEditingController _textController = TextEditingController();
   final FocusNode _focusNode = FocusNode();
   Timer? _debounceTimer;
@@ -65,11 +65,7 @@ class _QuickCaptureModalState extends State<QuickCaptureModal>
 
   // Type options
   static const List<TypeOption> _typeOptions = [
-    TypeOption(
-      label: 'Auto',
-      icon: Icons.auto_awesome,
-      type: null,
-    ),
+    TypeOption(label: 'Auto', icon: Icons.auto_awesome, type: null),
     TypeOption(
       label: 'Task',
       icon: Icons.check_box_outlined,
@@ -91,47 +87,82 @@ class _QuickCaptureModalState extends State<QuickCaptureModal>
   ];
 
   ItemType? _selectedType; // null = Auto
+  ItemType? _detectedType; // Tracks auto-detected type
   late AnimationController _animationController;
   late Animation<double> _scaleAnimation;
   late Animation<double> _fadeAnimation;
   late Animation<Offset> _slideAnimation;
+  late AnimationController _typeIconAnimationController;
+  late Animation<double> _typeIconScaleAnimation;
 
   @override
   void initState() {
     super.initState();
     _textController.addListener(_onTextChanged);
+    _focusNode.addListener(() {
+      setState(
+        () {},
+      ); // Rebuild when focus changes for input field glass effect
+    });
 
-    // Initialize animations
+    // Simplified modal animations for mobile-first design
     _animationController = AnimationController(
-      duration: AppAnimations.modalEnter,
+      duration: const Duration(milliseconds: 300), // 300ms entrance (mobile-first)
+      reverseDuration: const Duration(milliseconds: 250), // 250ms exit
       vsync: this,
     );
 
-    _scaleAnimation = Tween<double>(begin: 0.9, end: 1.0).animate(
-      CurvedAnimation(
-        parent: _animationController,
-        curve: AppAnimations.modalEnterEasing,
-      ),
-    );
+    _scaleAnimation =
+        Tween<double>(begin: 0.95, end: 1.0).animate(
+          CurvedAnimation(
+            parent: _animationController,
+            curve: Curves.easeOut, // Simplified curve
+          ),
+        );
 
     _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(
         parent: _animationController,
-        curve: AppAnimations.fadeEasing,
+        curve: Curves.easeOut,
       ),
     );
 
-    _slideAnimation = Tween<Offset>(
-      begin: const Offset(0, 1),
-      end: Offset.zero,
-    ).animate(
-      CurvedAnimation(
-        parent: _animationController,
-        curve: AppAnimations.slideInEasing,
-      ),
+    _slideAnimation =
+        Tween<Offset>(
+          begin: const Offset(0, 1), // Slide up from bottom
+          end: Offset.zero,
+        ).animate(
+          CurvedAnimation(
+            parent: _animationController,
+            curve: Curves.easeOut, // Smooth entrance
+            reverseCurve: Curves.easeIn, // Smooth exit
+          ),
+        );
+
+    // Initialize type icon animation controller
+    _typeIconAnimationController = AnimationController(
+      duration: AppAnimations.normal,
+      vsync: this,
     );
 
-    // Start animation
+    _typeIconScaleAnimation = TweenSequence<double>([
+      TweenSequenceItem(
+        tween: Tween<double>(
+          begin: 1.0,
+          end: 1.1,
+        ).chain(CurveTween(curve: AppAnimations.springCurve)),
+        weight: 50,
+      ),
+      TweenSequenceItem(
+        tween: Tween<double>(
+          begin: 1.1,
+          end: 1.0,
+        ).chain(CurveTween(curve: AppAnimations.springCurve)),
+        weight: 50,
+      ),
+    ]).animate(_typeIconAnimationController);
+
+    // Start entrance animation
     _animationController.forward();
   }
 
@@ -141,6 +172,7 @@ class _QuickCaptureModalState extends State<QuickCaptureModal>
     _textController.dispose();
     _focusNode.dispose();
     _animationController.dispose();
+    _typeIconAnimationController.dispose();
     super.dispose();
   }
 
@@ -207,10 +239,7 @@ class _QuickCaptureModalState extends State<QuickCaptureModal>
       );
 
       await itemsProvider.updateItem(
-        existingItem.copyWith(
-          title: text,
-          type: itemType,
-        ),
+        existingItem.copyWith(title: text, type: itemType),
       );
     }
 
@@ -222,7 +251,15 @@ class _QuickCaptureModalState extends State<QuickCaptureModal>
 
   ItemType _detectType(String text) {
     // Use ItemTypeDetector for smart type detection
-    return ItemTypeDetector.detectType(text);
+    final detectedType = ItemTypeDetector.detectType(text);
+
+    // Trigger animation if type changed and we're in auto mode
+    if (_selectedType == null && _detectedType != detectedType) {
+      _detectedType = detectedType;
+      _typeIconAnimationController.forward(from: 0.0);
+    }
+
+    return detectedType;
   }
 
   Future<void> _handleKeyEvent(KeyEvent event) async {
@@ -235,7 +272,8 @@ class _QuickCaptureModalState extends State<QuickCaptureModal>
 
       // Cmd/Ctrl + Enter to save and close
       if (event.logicalKey == LogicalKeyboardKey.enter) {
-        final isModifierPressed = HardwareKeyboard.instance.isMetaPressed ||
+        final isModifierPressed =
+            HardwareKeyboard.instance.isMetaPressed ||
             HardwareKeyboard.instance.isControlPressed;
 
         if (isModifierPressed) {
@@ -281,41 +319,91 @@ class _QuickCaptureModalState extends State<QuickCaptureModal>
 
   Future<bool?> _showCloseConfirmation() async {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final surfaceColor = isDark
+        ? AppColors.surfaceDark
+        : AppColors.surfaceLight;
 
     return showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
-        title: Text(
-          'Save changes?',
-          style: AppTypography.h4.copyWith(
-            color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
-          ),
+      barrierColor: (isDark ? AppColors.overlayDark : AppColors.overlayLight),
+      builder: (context) => BackdropFilter(
+        filter: ImageFilter.blur(
+          sigmaX: AppSpacing.glassBlurRadius,
+          sigmaY: AppSpacing.glassBlurRadius,
         ),
-        content: Text(
-          'You have unsaved changes. Would you like to save them before closing?',
-          style: AppTypography.bodyMedium.copyWith(
-            color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: Text(
-              'Discard',
-              style: TextStyle(
-                color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
+        child: Dialog(
+          backgroundColor: Colors.transparent,
+          child: Container(
+            decoration: BoxDecoration(
+              // Glass morphism: semi-transparent background for frosted glass effect
+              color: surfaceColor.withValues(alpha: 0.92),
+              borderRadius: BorderRadius.circular(AppSpacing.modalRadius),
+              border: Border.all(
+                color:
+                    (isDark
+                            ? AppColors.primaryStartDark
+                            : AppColors.primaryStart)
+                        .withValues(alpha: 0.3),
               ),
+              boxShadow: [
+                BoxShadow(
+                  color: isDark ? AppColors.shadowDark : AppColors.shadowLight,
+                  blurRadius: 24,
+                  offset: const Offset(0, 8),
+                ),
+              ],
+            ),
+            padding: const EdgeInsets.all(AppSpacing.lg),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Save changes?',
+                  style: AppTypography.h4.copyWith(
+                    color: isDark
+                        ? AppColors.textPrimaryDark
+                        : AppColors.textPrimaryLight,
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.md),
+                Text(
+                  'You have unsaved changes. Would you like to save them before closing?',
+                  style: AppTypography.bodyMedium.copyWith(
+                    color: isDark
+                        ? AppColors.textSecondaryDark
+                        : AppColors.textSecondaryLight,
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.lg),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    TextButton(
+                      onPressed: () => Navigator.of(context).pop(false),
+                      child: Text(
+                        'Discard',
+                        style: TextStyle(
+                          color: isDark
+                              ? AppColors.textSecondaryDark
+                              : AppColors.textSecondaryLight,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: AppSpacing.xs),
+                    TextButton(
+                      onPressed: () => Navigator.of(context).pop(true),
+                      child: const Text(
+                        'Save',
+                        style: TextStyle(color: AppColors.primaryAmber),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ),
           ),
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            child: const Text(
-              'Save',
-              style: TextStyle(color: AppColors.primaryAmber),
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
@@ -333,9 +421,14 @@ class _QuickCaptureModalState extends State<QuickCaptureModal>
         child: Container(
           color: isMobile
               ? Colors.transparent
-              : (isDark ? AppColors.overlayDark : AppColors.overlayLight).withValues(
-                  alpha: _fadeAnimation.value * (isDark ? AppColors.overlayDark.a : AppColors.overlayLight.a),
-                ),
+              : (isDark ? AppColors.overlayDark : AppColors.overlayLight)
+                    .withValues(
+                      alpha:
+                          _fadeAnimation.value *
+                          (isDark
+                              ? AppColors.overlayDark.a
+                              : AppColors.overlayLight.a),
+                    ),
           child: isMobile ? _buildMobileLayout() : _buildDesktopLayout(),
         ),
       ),
@@ -344,6 +437,12 @@ class _QuickCaptureModalState extends State<QuickCaptureModal>
 
   Widget _buildMobileLayout() {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final surfaceColor = isDark
+        ? AppColors.surfaceDark
+        : AppColors.surfaceLight;
+    final primaryGradient = isDark
+        ? AppColors.primaryGradientDark
+        : AppColors.primaryGradient;
     final keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
 
     return SlideTransition(
@@ -362,9 +461,17 @@ class _QuickCaptureModalState extends State<QuickCaptureModal>
             child: Container(
               width: double.infinity,
               decoration: BoxDecoration(
-                color: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
+                // Solid surface background (mobile-first bold design, no glass)
+                color: surfaceColor,
                 borderRadius: const BorderRadius.vertical(
-                  top: Radius.circular(AppSpacing.modalRadius),
+                  top: Radius.circular(24.0), // 24px for mobile-first design
+                ),
+                // 4px gradient border on top edge
+                border: Border(
+                  top: BorderSide(
+                    width: 4.0,
+                    color: primaryGradient.colors[0],
+                  ),
                 ),
               ),
               child: _buildModalContent(isMobile: true),
@@ -377,6 +484,12 @@ class _QuickCaptureModalState extends State<QuickCaptureModal>
 
   Widget _buildDesktopLayout() {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final surfaceColor = isDark
+        ? AppColors.surfaceDark
+        : AppColors.surfaceLight;
+    final primaryGradient = isDark
+        ? AppColors.primaryGradientDark
+        : AppColors.primaryGradient;
 
     return ScaleTransition(
       scale: _scaleAnimation,
@@ -386,21 +499,48 @@ class _QuickCaptureModalState extends State<QuickCaptureModal>
           child: GestureDetector(
             onTap: () {}, // Prevent tap through
             child: Container(
-              key: const Key('modal_container'),
-              constraints: const BoxConstraints(maxWidth: 600),
+              key: const Key('glass_modal_container'),
+              constraints: const BoxConstraints(
+                maxWidth: AppSpacing.modalMaxWidth,
+              ), // 560px
               margin: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
               decoration: BoxDecoration(
-                color: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
                 borderRadius: BorderRadius.circular(AppSpacing.modalRadius),
+                border: Border.all(
+                  color: primaryGradient.colors[0].withValues(alpha: 0.3),
+                ),
                 boxShadow: [
                   BoxShadow(
-                    color: isDark ? AppColors.shadowDark : AppColors.shadowLight,
+                    color: isDark
+                        ? AppColors.shadowDark
+                        : AppColors.shadowLight,
                     blurRadius: 24,
                     offset: const Offset(0, 8),
                   ),
+                  // Gradient shadow for glass effect
+                  BoxShadow(
+                    color: primaryGradient.colors[0].withValues(alpha: 0.2),
+                    blurRadius: 8,
+                    offset: const Offset(0, 4),
+                  ),
                 ],
               ),
-              child: _buildModalContent(isMobile: false),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(AppSpacing.modalRadius),
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(
+                    sigmaX: AppSpacing.glassBlurRadius,
+                    sigmaY: AppSpacing.glassBlurRadius,
+                  ),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      // Glass morphism: semi-transparent background
+                      color: surfaceColor.withValues(alpha: 0.85),
+                    ),
+                    child: _buildModalContent(isMobile: false),
+                  ),
+                ),
+              ),
             ),
           ),
         ),
@@ -452,11 +592,12 @@ class _QuickCaptureModalState extends State<QuickCaptureModal>
 
   Widget _buildHeader() {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isMobile = context.isMobile;
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(
-        AppSpacing.md,
-        AppSpacing.md,
+      padding: EdgeInsets.fromLTRB(
+        isMobile ? AppSpacing.lg : AppSpacing.md, // 24px on mobile (mobile-first design)
+        isMobile ? AppSpacing.lg : AppSpacing.md, // 24px on mobile
         AppSpacing.xs,
         AppSpacing.sm,
       ),
@@ -468,7 +609,9 @@ class _QuickCaptureModalState extends State<QuickCaptureModal>
               child: Text(
                 'Quick Capture',
                 style: AppTypography.h3.copyWith(
-                  color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
+                  color: isDark
+                      ? AppColors.textPrimaryDark
+                      : AppColors.textPrimaryLight,
                 ),
               ),
             ),
@@ -480,7 +623,9 @@ class _QuickCaptureModalState extends State<QuickCaptureModal>
               key: const Key('close_button'),
               icon: Icon(
                 Icons.close,
-                color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
+                color: isDark
+                    ? AppColors.textSecondaryDark
+                    : AppColors.textSecondaryLight,
               ),
               onPressed: _handleClose,
               iconSize: 24,
@@ -497,48 +642,94 @@ class _QuickCaptureModalState extends State<QuickCaptureModal>
 
   Widget _buildInputField() {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isMobile = context.isMobile;
+    final primaryGradient = isDark
+        ? AppColors.primaryGradientDark
+        : AppColors.primaryGradient;
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
-      child: TextField(
-        key: const Key('capture_input'),
-        controller: _textController,
-        focusNode: _focusNode,
-        autofocus: true,
-        minLines: 3,
-        maxLines: 10,
-        keyboardType: TextInputType.multiline,
-        textInputAction: TextInputAction.newline,
-        style: AppTypography.input.copyWith(
-          color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
+      padding: EdgeInsets.symmetric(
+        horizontal: isMobile ? AppSpacing.lg : AppSpacing.md, // 24px on mobile
+      ),
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(12.0), // 12px for mobile-first design
+          gradient: _focusNode.hasFocus
+              ? LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    primaryGradient.colors[0].withValues(alpha: 0.1),
+                    primaryGradient.colors[1].withValues(alpha: 0.1),
+                  ],
+                )
+              : null,
+          boxShadow: _focusNode.hasFocus
+              ? [
+                  BoxShadow(
+                    color: primaryGradient.colors[0].withValues(alpha: 0.2),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  ),
+                ]
+              : null,
         ),
-        decoration: InputDecoration(
-          hintText: 'What\'s on your mind?',
-          hintStyle: AppTypography.input.copyWith(
-            color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
+        child: TextField(
+          key: const Key('capture_input'),
+          controller: _textController,
+          focusNode: _focusNode,
+          autofocus: true,
+          minLines: 3,
+          maxLines: 10,
+          keyboardType: TextInputType.multiline,
+          textInputAction: TextInputAction.newline,
+          style: AppTypography.input.copyWith(
+            color: isDark
+                ? AppColors.textPrimaryDark
+                : AppColors.textPrimaryLight,
           ),
-          filled: true,
-          fillColor: isDark ? AppColors.surfaceDarkVariant : AppColors.surfaceLightVariant,
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
-            borderSide: BorderSide(
-              color: isDark ? AppColors.borderDark : AppColors.borderLight,
+          decoration: InputDecoration(
+            hintText: 'What\'s on your mind?',
+            hintStyle: AppTypography.input.copyWith(
+              color: isDark
+                  ? AppColors.textSecondaryDark
+                  : AppColors.textSecondaryLight,
+            ),
+            filled: true,
+            fillColor: _focusNode.hasFocus
+                ? (isDark
+                          ? AppColors.surfaceDarkVariant
+                          : AppColors.surfaceLightVariant)
+                      .withValues(alpha: 0.5)
+                : (isDark
+                      ? AppColors.surfaceDarkVariant
+                      : AppColors.surfaceLightVariant),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12.0), // 12px for mobile-first design
+              borderSide: BorderSide(
+                width: 2.0, // 2px solid border (mobile-first design)
+                color: isDark ? AppColors.borderDark : AppColors.borderLight,
+              ),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12.0),
+              borderSide: BorderSide(
+                width: 2.0, // 2px solid border
+                color: isDark ? AppColors.borderDark : AppColors.borderLight,
+              ),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12.0),
+              borderSide: BorderSide(
+                width: 2.0, // 2px gradient border on focus
+                color: primaryGradient.colors[0],
+              ),
+            ),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 16.0, // 16px horizontal padding (mobile-first design)
+              vertical: 12.0, // 12px vertical padding
             ),
           ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
-            borderSide: BorderSide(
-              color: isDark ? AppColors.borderDark : AppColors.borderLight,
-            ),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
-            borderSide: const BorderSide(
-              color: AppColors.primaryAmber,
-              width: AppSpacing.borderWidthMedium,
-            ),
-          ),
-          contentPadding: const EdgeInsets.all(AppSpacing.sm),
         ),
       ),
     );
@@ -546,12 +737,13 @@ class _QuickCaptureModalState extends State<QuickCaptureModal>
 
   Widget _buildToolbar() {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isMobile = context.isMobile;
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(
-        AppSpacing.md,
+      padding: EdgeInsets.fromLTRB(
+        isMobile ? AppSpacing.lg : AppSpacing.md, // 24px on mobile
         AppSpacing.sm,
-        AppSpacing.md,
+        isMobile ? AppSpacing.lg : AppSpacing.md, // 24px on mobile
         0,
       ),
       child: Row(
@@ -564,7 +756,9 @@ class _QuickCaptureModalState extends State<QuickCaptureModal>
               key: const Key('voice_button'),
               icon: Icon(
                 Icons.mic_outlined,
-                color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
+                color: isDark
+                    ? AppColors.textSecondaryDark
+                    : AppColors.textSecondaryLight,
               ),
               onPressed: () {
                 // TODO: Implement voice input
@@ -585,7 +779,9 @@ class _QuickCaptureModalState extends State<QuickCaptureModal>
               key: const Key('image_button'),
               icon: Icon(
                 Icons.image_outlined,
-                color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
+                color: isDark
+                    ? AppColors.textSecondaryDark
+                    : AppColors.textSecondaryLight,
               ),
               onPressed: () {
                 // TODO: Implement image attachment
@@ -635,23 +831,36 @@ class _QuickCaptureModalState extends State<QuickCaptureModal>
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              selectedOption.icon,
-              size: 16,
-              color: selectedOption.color ?? (isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight),
+            // Animated icon for type detection feedback
+            ScaleTransition(
+              key: const Key('type_icon_animated'),
+              scale: _typeIconScaleAnimation,
+              child: Icon(
+                selectedOption.icon,
+                size: 16,
+                color:
+                    selectedOption.color ??
+                    (isDark
+                        ? AppColors.textPrimaryDark
+                        : AppColors.textPrimaryLight),
+              ),
             ),
             const SizedBox(width: AppSpacing.xxxs),
             Text(
               selectedOption.label,
               style: AppTypography.labelMedium.copyWith(
-                color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
+                color: isDark
+                    ? AppColors.textPrimaryDark
+                    : AppColors.textPrimaryLight,
               ),
             ),
             const SizedBox(width: AppSpacing.xxxs),
             Icon(
               Icons.arrow_drop_down,
               size: 16,
-              color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
+              color: isDark
+                  ? AppColors.textSecondaryDark
+                  : AppColors.textSecondaryLight,
             ),
           ],
         ),
@@ -666,7 +875,11 @@ class _QuickCaptureModalState extends State<QuickCaptureModal>
                   option.icon,
                   key: Key('type_icon_${option.label.toLowerCase()}'),
                   size: 20,
-                  color: option.color ?? (isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight),
+                  color:
+                      option.color ??
+                      (isDark
+                          ? AppColors.textPrimaryDark
+                          : AppColors.textPrimaryLight),
                 ),
                 const SizedBox(width: AppSpacing.xs),
                 Text(option.label),
@@ -715,14 +928,18 @@ class _QuickCaptureModalState extends State<QuickCaptureModal>
                 Text(
                   currentSpace.name,
                   style: AppTypography.labelMedium.copyWith(
-                    color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
+                    color: isDark
+                        ? AppColors.textPrimaryDark
+                        : AppColors.textPrimaryLight,
                   ),
                 ),
                 const SizedBox(width: AppSpacing.xxxs),
                 Icon(
                   Icons.arrow_drop_down,
                   size: 16,
-                  color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
+                  color: isDark
+                      ? AppColors.textSecondaryDark
+                      : AppColors.textSecondaryLight,
                 ),
               ],
             ),
@@ -734,10 +951,7 @@ class _QuickCaptureModalState extends State<QuickCaptureModal>
                 child: Row(
                   children: [
                     if (space.icon != null)
-                      Text(
-                        space.icon!,
-                        style: const TextStyle(fontSize: 20),
-                      ),
+                      Text(space.icon!, style: const TextStyle(fontSize: 20)),
                     const SizedBox(width: AppSpacing.xs),
                     Text(space.name),
                   ],
@@ -754,53 +968,89 @@ class _QuickCaptureModalState extends State<QuickCaptureModal>
   }
 
   Widget _buildAutoSaveIndicator() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isMobile = context.isMobile;
+
+    // Platform-aware keyboard shortcut text
+    String getKeyboardShortcutText() {
+      try {
+        final isMacOS = Platform.isMacOS;
+        return isMacOS
+            ? '⌘+Enter to save • Esc to close'
+            : 'Ctrl+Enter to save • Esc to close';
+      } catch (e) {
+        // Fallback for web or platforms without Platform API
+        return 'Ctrl+Enter to save • Esc to close';
+      }
+    }
+
     return Padding(
-      padding: const EdgeInsets.fromLTRB(
-        AppSpacing.md,
+      padding: EdgeInsets.fromLTRB(
+        isMobile ? AppSpacing.lg : AppSpacing.md, // 24px on mobile
         AppSpacing.xs,
-        AppSpacing.md,
+        isMobile ? AppSpacing.lg : AppSpacing.md, // 24px on mobile
         0,
       ),
-      child: Row(
-        key: const Key('autosave_indicator'),
-        mainAxisAlignment: MainAxisAlignment.end,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          if (_isSaving || _isSaved)
-            Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.xs,
-                vertical: AppSpacing.xxxs,
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  if (_isSaving)
-                    const SizedBox(
-                      width: 12,
-                      height: 12,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        valueColor: AlwaysStoppedAnimation<Color>(
-                          AppColors.textSecondaryLight,
+          Row(
+            key: const Key('autosave_indicator'),
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              if (_isSaving || _isSaved)
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.xs,
+                    vertical: AppSpacing.xxxs,
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (_isSaving)
+                        const SizedBox(
+                          width: 12,
+                          height: 12,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              AppColors.textSecondaryLight,
+                            ),
+                          ),
+                        )
+                      else if (_isSaved)
+                        const Icon(
+                          Icons.check,
+                          size: 12,
+                          color: AppColors.success,
+                        ),
+                      const SizedBox(width: AppSpacing.xxxs),
+                      Text(
+                        _isSaving ? 'Saving...' : 'Saved',
+                        style: AppTypography.labelSmall.copyWith(
+                          color: _isSaving
+                              ? AppColors.textSecondaryLight
+                              : AppColors.success,
                         ),
                       ),
-                    )
-                  else if (_isSaved)
-                    const Icon(
-                      Icons.check,
-                      size: 12,
-                      color: AppColors.success,
-                    ),
-                  const SizedBox(width: AppSpacing.xxxs),
-                  Text(
-                    _isSaving ? 'Saving...' : 'Saved',
-                    style: AppTypography.labelSmall.copyWith(
-                      color: _isSaving
-                          ? AppColors.textSecondaryLight
-                          : AppColors.success,
-                    ),
+                    ],
                   ),
-                ],
+                ),
+            ],
+          ),
+          // Keyboard shortcuts hint (visible when focused, desktop only)
+          if (!isMobile && _focusNode.hasFocus)
+            Padding(
+              padding: const EdgeInsets.only(top: AppSpacing.xxxs),
+              child: Text(
+                getKeyboardShortcutText(),
+                key: const Key('keyboard_hints'),
+                textAlign: TextAlign.right,
+                style: AppTypography.labelSmall.copyWith(
+                  color: isDark
+                      ? AppColors.textSecondaryDark
+                      : AppColors.textSecondaryLight,
+                ),
               ),
             ),
         ],

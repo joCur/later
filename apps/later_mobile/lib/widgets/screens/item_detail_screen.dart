@@ -9,6 +9,7 @@ import '../../core/theme/app_spacing.dart';
 import '../../data/models/item_model.dart';
 import '../../providers/items_provider.dart';
 import '../../providers/spaces_provider.dart';
+import '../components/text/gradient_text.dart';
 
 /// Item Detail Screen for viewing and editing item details
 ///
@@ -267,7 +268,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
     }
   }
 
-  /// Show delete confirmation dialog
+  /// Show delete confirmation dialog with gradient button
   Future<void> _showDeleteConfirmation() async {
     final itemTypeName = _currentItem.type.toString().split('.').last;
 
@@ -281,13 +282,38 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
             onPressed: () => Navigator.of(context).pop(false),
             child: const Text('Cancel'),
           ),
-          ElevatedButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.error,
-              foregroundColor: Colors.white,
+          Container(
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  AppColors.error,
+                  AppColors.errorDark,
+                ],
+              ),
+              borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.error.withValues(alpha: 0.4),
+                  blurRadius: 8,
+                  offset: const Offset(0, 4),
+                ),
+              ],
             ),
-            child: const Text('Delete'),
+            child: ElevatedButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.transparent,
+                foregroundColor: Colors.white,
+                shadowColor: Colors.transparent,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.lg,
+                  vertical: AppSpacing.sm,
+                ),
+              ),
+              child: const Text('Delete'),
+            ),
           ),
         ],
         semanticLabel: 'Delete confirmation dialog',
@@ -584,97 +610,89 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
     }
   }
 
-  /// Build app bar
-  PreferredSizeWidget _buildAppBar(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
-    return AppBar(
-      backgroundColor: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
-      elevation: AppSpacing.elevation1,
-      leading: IconButton(
-        icon: const Icon(Icons.arrow_back),
-        onPressed: () => Navigator.of(context).pop(),
-        tooltip: 'Back',
-      ),
-      actions: [
-        // Convert type button
-        IconButton(
-          icon: const Icon(Icons.swap_horiz),
-          onPressed: _showConvertDialog,
-          tooltip: 'Convert to...',
-        ),
-
-        // Delete button
-        IconButton(
-          icon: const Icon(Icons.delete_outline),
-          onPressed: _showDeleteConfirmation,
-          tooltip: 'Delete',
-          color: AppColors.error,
-        ),
-
-        // Save button (optional, mainly for explicit save)
-        if (_hasChanges)
-          IconButton(
-            icon: const Icon(Icons.save_outlined),
-            onPressed: _saveChanges,
-            tooltip: 'Save',
-          ),
-      ],
-    );
+  /// Get gradient for item type
+  LinearGradient _getTypeGradient() {
+    switch (_currentItem.type) {
+      case ItemType.task:
+        return AppColors.taskGradient;
+      case ItemType.note:
+        return AppColors.noteGradient;
+      case ItemType.list:
+        return AppColors.listGradient;
+    }
   }
 
-  /// Build item type badge
+  /// Build item type badge with gradient background
   Widget _buildItemTypeBadge() {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
     return Container(
       padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.xs,
-        vertical: AppSpacing.xxxs,
+        horizontal: AppSpacing.sm,
+        vertical: AppSpacing.xxs,
       ),
       decoration: BoxDecoration(
-        color: _getItemTypeBadgeColor().withValues(alpha: 0.2),
+        gradient: _getTypeGradient(),
         borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
-        border: Border.all(
-          color: _getItemTypeBadgeColor(),
-        ),
+        boxShadow: [
+          BoxShadow(
+            color: _getItemTypeBadgeColor().withValues(alpha: 0.3),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Text(
         _getItemTypeBadgeText(),
         style: AppTypography.labelSmall.copyWith(
-          color: isDark
-              ? AppColors.textPrimaryDark
-              : AppColors.textPrimaryLight,
-          fontWeight: FontWeight.w600,
+          color: Colors.white,
+          fontWeight: FontWeight.w700,
+          letterSpacing: 0.5,
         ),
       ),
     );
   }
 
-  /// Build completion checkbox for tasks
+  /// Build completion checkbox for tasks with gradient styling
   Widget? _buildCompletionCheckbox() {
     if (_currentItem.type != ItemType.task) return null;
 
     final isDark = Theme.of(context).brightness == Brightness.dark;
-
-    return CheckboxListTile(
-      title: Text(
-        'Mark as complete',
-        style: AppTypography.bodyMedium.copyWith(
-          color: isDark
-              ? AppColors.textPrimaryDark
-              : AppColors.textPrimaryLight,
+    return Container(
+      decoration: BoxDecoration(
+        gradient: _currentItem.isCompleted
+            ? LinearGradient(
+                colors: [
+                  AppColors.success.withValues(alpha: 0.1),
+                  AppColors.successLight.withValues(alpha: 0.05),
+                ],
+              )
+            : null,
+        borderRadius: BorderRadius.circular(AppSpacing.radiusMD),
+      ),
+      child: CheckboxListTile(
+        title: Text(
+          'Mark as complete',
+          style: AppTypography.bodyMedium.copyWith(
+            color: isDark
+                ? AppColors.textPrimaryDark
+                : AppColors.textPrimaryLight,
+            decoration:
+                _currentItem.isCompleted ? TextDecoration.lineThrough : null,
+          ),
+        ),
+        value: _currentItem.isCompleted,
+        onChanged: (value) {
+          if (value != null) {
+            _toggleCompletion(value);
+          }
+        },
+        activeColor: AppColors.success,
+        checkColor: Colors.white,
+        controlAffinity: ListTileControlAffinity.leading,
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.sm,
+          vertical: AppSpacing.xs,
         ),
       ),
-      value: _currentItem.isCompleted,
-      onChanged: (value) {
-        if (value != null) {
-          _toggleCompletion(value);
-        }
-      },
-      activeColor: AppColors.accentGreen,
-      controlAffinity: ListTileControlAffinity.leading,
-      contentPadding: EdgeInsets.zero,
     );
   }
 
@@ -865,59 +883,96 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
     );
   }
 
-  /// Build metadata footer
+  /// Build metadata footer with softer visual hierarchy
   Widget _buildMetadataFooter() {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final dateFormat = DateFormat('MMM d, y \'at\' h:mm a');
 
     return Container(
-      padding: const EdgeInsets.all(AppSpacing.sm),
+      padding: const EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
-        color: isDark
-            ? AppColors.surfaceDarkVariant
-            : AppColors.surfaceLightVariant,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusSM),
+        color: (isDark ? AppColors.glassDark : AppColors.glassLight)
+            .withValues(alpha: 0.3),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusMD),
+        border: Border.all(
+          color: isDark
+              ? AppColors.glassBorderDark
+              : AppColors.glassBorderLight,
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Icon(
-                Icons.add_circle_outline,
-                size: 16,
-                color: isDark
-                    ? AppColors.textDisabledDark
-                    : AppColors.textDisabledLight,
+              // Created icon with subtle gradient tint
+              ShaderMask(
+                shaderCallback: (bounds) =>
+                    AppColors.primaryGradientAdaptive(context).createShader(bounds),
+                blendMode: BlendMode.srcIn,
+                child: const Icon(
+                  Icons.add_circle_outline,
+                  size: 14,
+                  color: Colors.white,
+                ),
               ),
-              const SizedBox(width: AppSpacing.xxs),
-              Text(
-                'Created: ${dateFormat.format(_currentItem.createdAt)}',
-                style: AppTypography.bodySmall.copyWith(
-                  color: isDark
-                      ? AppColors.textDisabledDark
-                      : AppColors.textDisabledLight,
+              const SizedBox(width: AppSpacing.xs),
+              Expanded(
+                child: Row(
+                  children: [
+                    Text(
+                      'Created: ',
+                      style: AppTypography.caption.copyWith(
+                        color: (isDark
+                                ? AppColors.textSecondaryDark
+                                : AppColors.textSecondaryLight)
+                            .withValues(alpha: 0.7),
+                      ),
+                    ),
+                    // Date with subtle gradient
+                    GradientText.subtle(
+                      dateFormat.format(_currentItem.createdAt),
+                      style: AppTypography.caption,
+                    ),
+                  ],
                 ),
               ),
             ],
           ),
-          const SizedBox(height: AppSpacing.xxxs),
+          const SizedBox(height: AppSpacing.xs),
           Row(
             children: [
-              Icon(
-                Icons.update,
-                size: 16,
-                color: isDark
-                    ? AppColors.textDisabledDark
-                    : AppColors.textDisabledLight,
+              // Updated icon with subtle gradient tint
+              ShaderMask(
+                shaderCallback: (bounds) =>
+                    AppColors.secondaryGradient.createShader(bounds),
+                blendMode: BlendMode.srcIn,
+                child: const Icon(
+                  Icons.update,
+                  size: 14,
+                  color: Colors.white,
+                ),
               ),
-              const SizedBox(width: AppSpacing.xxs),
-              Text(
-                'Modified: ${dateFormat.format(_currentItem.updatedAt)}',
-                style: AppTypography.bodySmall.copyWith(
-                  color: isDark
-                      ? AppColors.textDisabledDark
-                      : AppColors.textDisabledLight,
+              const SizedBox(width: AppSpacing.xs),
+              Expanded(
+                child: Row(
+                  children: [
+                    Text(
+                      'Modified: ',
+                      style: AppTypography.caption.copyWith(
+                        color: (isDark
+                                ? AppColors.textSecondaryDark
+                                : AppColors.textSecondaryLight)
+                            .withValues(alpha: 0.7),
+                      ),
+                    ),
+                    // Date with subtle secondary gradient
+                    GradientText.subtle(
+                      dateFormat.format(_currentItem.updatedAt),
+                      gradient: AppColors.secondaryGradient,
+                      style: AppTypography.caption,
+                    ),
+                  ],
                 ),
               ),
             ],
@@ -969,6 +1024,96 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
     );
   }
 
+  /// Build gradient separator
+  Widget _buildGradientSeparator() {
+    return Container(
+      height: 1,
+      margin: const EdgeInsets.symmetric(vertical: AppSpacing.md),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            Colors.transparent,
+            _getItemTypeBadgeColor().withValues(alpha: 0.3),
+            Colors.transparent,
+          ],
+          stops: const [0.0, 0.5, 1.0],
+        ),
+      ),
+    );
+  }
+
+  /// Build gradient header
+  Widget _buildGradientHeader(bool isDark) {
+    return Container(
+      decoration: BoxDecoration(
+        gradient: _getTypeGradient(),
+      ),
+      child: SafeArea(
+        bottom: false,
+        child: SizedBox(
+          height: 80, // Fixed height for the action bar
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                // Back button
+                IconButton(
+                  icon: const Icon(Icons.arrow_back, color: Colors.white),
+                  onPressed: () => Navigator.of(context).pop(),
+                  tooltip: 'Back',
+                ),
+                // Actions
+                Row(
+                  children: [
+                    // Convert type button
+                    IconButton(
+                      icon: const Icon(Icons.swap_horiz, color: Colors.white),
+                      onPressed: _showConvertDialog,
+                      tooltip: 'Convert to...',
+                    ),
+                    // Delete button
+                    IconButton(
+                      icon: const Icon(Icons.delete_outline, color: Colors.white),
+                      onPressed: _showDeleteConfirmation,
+                      tooltip: 'Delete',
+                    ),
+                    // Save button (optional)
+                    if (_hasChanges)
+                      IconButton(
+                        icon: const Icon(Icons.save_outlined, color: Colors.white),
+                        onPressed: _saveChanges,
+                        tooltip: 'Save',
+                      ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// Build glass container wrapper
+  Widget _buildGlassContainer({required Widget child, EdgeInsets? padding}) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return Container(
+      padding: padding ?? const EdgeInsets.all(AppSpacing.md),
+      decoration: BoxDecoration(
+        color: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
+        borderRadius: BorderRadius.circular(AppSpacing.radiusMD),
+        border: Border.all(
+          color: isDark
+              ? AppColors.glassBorderDark
+              : AppColors.glassBorderLight,
+        ),
+      ),
+      child: child,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -984,108 +1129,144 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
         child: Scaffold(
           backgroundColor:
               isDark ? AppColors.backgroundDark : AppColors.backgroundLight,
-          appBar: _buildAppBar(context),
-          body: Form(
-            key: _formKey,
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(AppSpacing.paddingSM),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Type badge and saving indicator
-                  Row(
-                    children: [
-                      _buildItemTypeBadge(),
-                      const SizedBox(width: AppSpacing.xs),
-                      if (_buildSavingIndicator() != null)
-                        _buildSavingIndicator()!,
-                    ],
+          body: Column(
+            children: [
+              // Gradient header
+              _buildGradientHeader(isDark),
+
+              // Content
+              Expanded(
+                child: Form(
+                  key: _formKey,
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.all(AppSpacing.md),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Type badge and saving indicator in glass container
+                        _buildGlassContainer(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: AppSpacing.md,
+                            vertical: AppSpacing.sm,
+                          ),
+                          child: Row(
+                            children: [
+                              _buildItemTypeBadge(),
+                              const SizedBox(width: AppSpacing.xs),
+                              if (_buildSavingIndicator() != null)
+                                _buildSavingIndicator()!,
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: AppSpacing.md),
+
+                        // Completion checkbox (tasks only) in glass container
+                        if (_buildCompletionCheckbox() != null) ...[
+                          _buildGlassContainer(
+                            padding: EdgeInsets.zero,
+                            child: _buildCompletionCheckbox()!,
+                          ),
+                          const SizedBox(height: AppSpacing.md),
+                        ],
+
+                        // Title and content fields in glass container
+                        _buildGlassContainer(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // Title field
+                              TextFormField(
+                                controller: _titleController,
+                                autofocus: true,
+                                style: AppTypography.h3.copyWith(
+                                  color: isDark
+                                      ? AppColors.textPrimaryDark
+                                      : AppColors.textPrimaryLight,
+                                ),
+                                decoration: InputDecoration(
+                                  hintText: 'Title',
+                                  hintStyle: AppTypography.h3.copyWith(
+                                    color: isDark
+                                        ? AppColors.textDisabledDark
+                                        : AppColors.textDisabledLight,
+                                  ),
+                                  border: InputBorder.none,
+                                  contentPadding: EdgeInsets.zero,
+                                ),
+                                validator: (value) {
+                                  if (value == null || value.trim().isEmpty) {
+                                    return 'Title is required';
+                                  }
+                                  return null;
+                                },
+                                textInputAction: TextInputAction.next,
+                              ),
+
+                              _buildGradientSeparator(),
+
+                              // Content field
+                              TextFormField(
+                                controller: _contentController,
+                                style: AppTypography.bodyLarge.copyWith(
+                                  color: isDark
+                                      ? AppColors.textPrimaryDark
+                                      : AppColors.textPrimaryLight,
+                                ),
+                                decoration: InputDecoration(
+                                  hintText: 'Add content...',
+                                  hintStyle: AppTypography.bodyLarge.copyWith(
+                                    color: isDark
+                                        ? AppColors.textDisabledDark
+                                        : AppColors.textDisabledLight,
+                                  ),
+                                  border: InputBorder.none,
+                                  contentPadding: EdgeInsets.zero,
+                                ),
+                                maxLines: null,
+                                minLines: 3,
+                                keyboardType: TextInputType.multiline,
+                                textInputAction: TextInputAction.newline,
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: AppSpacing.md),
+
+                        // Metadata section in glass container
+                        _buildGlassContainer(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // Space selector
+                              _buildSpaceSelector(context),
+
+                              // Due date picker (tasks only)
+                              if (_buildDueDatePicker() != null) ...[
+                                _buildGradientSeparator(),
+                                _buildDueDatePicker()!,
+                              ],
+
+                              // Tags display (if any)
+                              if (_buildTagsDisplay() != null) ...[
+                                _buildGradientSeparator(),
+                                _buildTagsDisplay()!,
+                              ],
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: AppSpacing.md),
+
+                        // Metadata footer
+                        _buildMetadataFooter(),
+
+                        // Extra padding at bottom for comfortable scrolling
+                        const SizedBox(height: AppSpacing.xxl),
+                      ],
+                    ),
                   ),
-                  const SizedBox(height: AppSpacing.md),
-
-                  // Completion checkbox (tasks only)
-                  if (_buildCompletionCheckbox() != null) ...[
-                    _buildCompletionCheckbox()!,
-                    const SizedBox(height: AppSpacing.sm),
-                  ],
-
-                  // Title field
-                  TextFormField(
-                    controller: _titleController,
-                    autofocus: true,
-                    style: AppTypography.h3.copyWith(
-                      color: isDark
-                          ? AppColors.textPrimaryDark
-                          : AppColors.textPrimaryLight,
-                    ),
-                    decoration: InputDecoration(
-                      hintText: 'Title',
-                      hintStyle: AppTypography.h3.copyWith(
-                        color: isDark
-                            ? AppColors.textDisabledDark
-                            : AppColors.textDisabledLight,
-                      ),
-                      border: InputBorder.none,
-                      contentPadding: EdgeInsets.zero,
-                    ),
-                    validator: (value) {
-                      if (value == null || value.trim().isEmpty) {
-                        return 'Title is required';
-                      }
-                      return null;
-                    },
-                    textInputAction: TextInputAction.next,
-                  ),
-                  const SizedBox(height: AppSpacing.sm),
-
-                  // Content field
-                  TextFormField(
-                    controller: _contentController,
-                    style: AppTypography.bodyLarge.copyWith(
-                      color: isDark
-                          ? AppColors.textPrimaryDark
-                          : AppColors.textPrimaryLight,
-                    ),
-                    decoration: InputDecoration(
-                      hintText: 'Add content...',
-                      hintStyle: AppTypography.bodyLarge.copyWith(
-                        color: isDark
-                            ? AppColors.textDisabledDark
-                            : AppColors.textDisabledLight,
-                      ),
-                      border: InputBorder.none,
-                      contentPadding: EdgeInsets.zero,
-                    ),
-                    maxLines: null,
-                    minLines: 3,
-                    keyboardType: TextInputType.multiline,
-                    textInputAction: TextInputAction.newline,
-                  ),
-                  const SizedBox(height: AppSpacing.md),
-
-                  // Space selector
-                  _buildSpaceSelector(context),
-                  const SizedBox(height: AppSpacing.sm),
-
-                  // Due date picker (tasks only)
-                  if (_buildDueDatePicker() != null) ...[
-                    _buildDueDatePicker()!,
-                    const SizedBox(height: AppSpacing.sm),
-                  ],
-
-                  // Tags display (if any)
-                  if (_buildTagsDisplay() != null) ...[
-                    _buildTagsDisplay()!,
-                    const SizedBox(height: AppSpacing.sm),
-                  ],
-
-                  const SizedBox(height: AppSpacing.md),
-
-                  // Metadata footer
-                  _buildMetadataFooter(),
-                ],
+                ),
               ),
-            ),
+            ],
           ),
         ),
       ),

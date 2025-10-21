@@ -8,6 +8,8 @@ status: Verified with latest 2025 package versions
 
 # Recommended Flutter Packages
 
+> **Note**: This package list has been updated for the mobile-first bold redesign. Glassmorphism packages have been removed as we no longer use glass effects for performance reasons.
+
 This document lists all recommended Flutter packages for implementing the later design system, organized by purpose with implementation notes.
 
 **✅ All versions verified as of October 2025** - Latest stable releases confirmed via pub.dev
@@ -230,105 +232,6 @@ SvgPicture.asset(
 - Color filtering and theming
 - Multi-platform support (all platforms)
 - Performance optimized with caching
-
-### Glassmorphism Packages ✅ **VERIFIED LATEST 2025**
-
-**Choose ONE of these modern glassmorphism implementations:**
-
-#### liquid_glassmorphism `^1.0.0` **RECOMMENDED**
-
-```yaml
-dependencies:
-  liquid_glassmorphism: ^1.0.0  # iOS 18-style, June 2025
-```
-
-**Status**: ✅ Latest update June 2025 (most recent)
-
-**Purpose**: iOS 18-style liquid glass effects
-**Usage**:
-```dart
-LiquidGlass(
-  blur: 20,
-  opacity: 0.95,
-  tintColor: Colors.white.withOpacity(0.1),
-  child: YourContent(),
-)
-```
-
-**Why**: Replicates Apple's latest translucent glass aesthetic with modern iOS 18 styling. Most recently updated glassmorphism package.
-
-**Features**:
-- iOS 18-style liquid glass aesthetic
-- Adjustable blur intensity
-- Customizable opacity and tint
-- Full platform support
-
----
-
-#### flutter_glass_morphism `^1.0.1` (Alternative)
-
-```yaml
-dependencies:
-  flutter_glass_morphism: ^1.0.1  # June 2025
-```
-
-**Status**: ✅ Latest update June 2025
-
-**Purpose**: Advanced glass morphism with dynamic effects
-**Features**:
-- Translucent, dynamic glass-like UI components
-- Advanced blur and opacity controls
-- Visual effects library
-
----
-
-#### glass_ui_kit `^1.0.0` (Alternative - Comprehensive)
-
-```yaml
-dependencies:
-  glass_ui_kit: ^1.0.0  # May 2025
-```
-
-**Status**: ✅ Latest update May 2025
-
-**Purpose**: Complete glassmorphism UI component kit
-**Features**:
-- Pre-built glass containers and components
-- Custom clipping shapes (wave, blob, star, etc.)
-- Modern blur effects
-- Comprehensive widget set
-
----
-
-#### Custom BackdropFilter Implementation (No dependency)
-
-**Purpose**: Native Flutter glassmorphism
-**Usage**:
-```dart
-ClipRRect(
-  borderRadius: BorderRadius.circular(12),
-  child: BackdropFilter(
-    filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-    child: Container(
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: Colors.white.withOpacity(0.2),
-          width: 1,
-        ),
-      ),
-      child: YourContent(),
-    ),
-  ),
-)
-```
-
-**Why**: No external dependency, full control, works on all platforms.
-
-**Note**: For better performance on lower-end devices, consider implementing device capability detection and fallback to solid backgrounds.
-
----
 
 ### lottie `^3.3.1` ✅ **VERIFIED LATEST**
 
@@ -643,36 +546,6 @@ await launchUrl(Uri.parse('https://example.com'));
 ```
 
 **Why**: Open links, email support, share functionality.
-
----
-
-## Glass Morphism Effect
-
-### Custom Implementation Recommended
-
-Instead of a package, implement glass morphism using Flutter's built-in `BackdropFilter`:
-
-```dart
-ClipRRect(
-  borderRadius: BorderRadius.circular(20),
-  child: BackdropFilter(
-    filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-    child: Container(
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.95),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: Colors.white.withOpacity(0.3),
-          width: 1,
-        ),
-      ),
-      child: YourContent(),
-    ),
-  ),
-)
-```
-
-**Why**: More control, better performance, no additional dependencies.
 
 ---
 

@@ -8,6 +8,7 @@ import 'data/repositories/item_repository.dart';
 import 'data/repositories/space_repository.dart';
 import 'providers/items_provider.dart';
 import 'providers/spaces_provider.dart';
+import 'providers/theme_provider.dart';
 import 'widgets/screens/home_screen.dart';
 
 void main() async {
@@ -34,12 +35,13 @@ class LaterApp extends StatefulWidget {
 }
 
 class _LaterAppState extends State<LaterApp> {
-  final ThemeMode _themeMode = ThemeMode.system;
-
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
+        ChangeNotifierProvider(
+          create: (_) => ThemeProvider()..loadThemePreference(),
+        ),
         ChangeNotifierProvider(
           create: (_) => SpacesProvider(SpaceRepository())..loadSpaces(),
         ),
@@ -47,13 +49,20 @@ class _LaterAppState extends State<LaterApp> {
           create: (_) => ItemsProvider(ItemRepository())..loadItems(),
         ),
       ],
-      child: MaterialApp(
-        title: 'Later',
-        debugShowCheckedModeBanner: false,
-        theme: AppTheme.lightTheme,
-        darkTheme: AppTheme.darkTheme,
-        themeMode: _themeMode,
-        home: const HomeScreen(),
+      child: Consumer<ThemeProvider>(
+        builder: (context, themeProvider, _) {
+          return MaterialApp(
+            title: 'Later',
+            debugShowCheckedModeBanner: false,
+            theme: AppTheme.lightTheme,
+            darkTheme: AppTheme.darkTheme,
+            themeMode: themeProvider.themeMode,
+            // Add theme animation for smooth transitions
+            themeAnimationDuration: const Duration(milliseconds: 250),
+            themeAnimationCurve: Curves.easeInOut,
+            home: const HomeScreen(),
+          );
+        },
       ),
     );
   }

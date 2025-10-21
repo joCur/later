@@ -455,7 +455,7 @@ class _CreateSpaceModalState extends State<CreateSpaceModal> {
         children: [
           // Header
           Padding(
-            padding: const EdgeInsets.all(AppSpacing.paddingSM),
+            padding: const EdgeInsets.all(AppSpacing.sm),
             child: Row(
               children: [
                 Expanded(
@@ -491,21 +491,21 @@ class _CreateSpaceModalState extends State<CreateSpaceModal> {
           // Form content
           Flexible(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.all(AppSpacing.paddingSM),
+              padding: const EdgeInsets.all(AppSpacing.sm),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Name input
                   _buildNameInput(isDark),
-                  const SizedBox(height: AppSpacing.paddingMD),
+                  const SizedBox(height: AppSpacing.md),
 
                   // Icon picker
                   _buildIconPicker(isDark),
-                  const SizedBox(height: AppSpacing.paddingMD),
+                  const SizedBox(height: AppSpacing.md),
 
                   // Color picker
                   _buildColorPicker(isDark),
-                  const SizedBox(height: AppSpacing.paddingMD),
+                  const SizedBox(height: AppSpacing.md),
                 ],
               ),
             ),
@@ -519,7 +519,7 @@ class _CreateSpaceModalState extends State<CreateSpaceModal> {
 
           // Action buttons
           Padding(
-            padding: const EdgeInsets.all(AppSpacing.paddingSM),
+            padding: const EdgeInsets.all(AppSpacing.sm),
             child: Row(
               children: [
                 // Cancel button
@@ -548,7 +548,7 @@ class _CreateSpaceModalState extends State<CreateSpaceModal> {
                     ),
                   ),
                 ),
-                const SizedBox(width: AppSpacing.paddingSM),
+                const SizedBox(width: AppSpacing.sm),
 
                 // Save/Create button
                 Expanded(

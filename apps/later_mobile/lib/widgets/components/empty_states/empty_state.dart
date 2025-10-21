@@ -2,18 +2,17 @@ import 'package:flutter/material.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../core/theme/app_spacing.dart';
-import '../buttons/primary_button.dart';
 
-/// Base empty state component following Temporal Flow design system
+/// Base empty state component following mobile-first redesign
 ///
-/// Features:
-/// - Display Large typography for title (40px/48px on mobile)
-/// - Body Large for descriptions (17px/26px -> 16px/24px Material)
-/// - Icons: 64px (XXL) for major empty states
-/// - Colors: neutral-500 for text, neutral-300 for icons
-/// - Spacing: 64px (3xl) vertical spacing between sections
-/// - CTA buttons: Primary button style with gradient
-/// - Layout: Center-aligned, max width 480px
+/// Features (Phase 4, Task 4.3 - Mobile-First):
+/// - Bold typography: 20px title (bold weight), 15px body
+/// - Icons: 64px (XXL) with gradient tint (ShaderMask + primaryGradient)
+/// - Animated gradient background (2-3% opacity, 2s fade-in)
+/// - Colors: adaptive gradients for light/dark mode
+/// - Generous spacing: 24px between elements
+/// - CTA button: gradient background, 48px height
+/// - Layout: Center-aligned, max width 280px (mobile-first)
 ///
 /// Example usage:
 /// ```dart
@@ -26,13 +25,14 @@ import '../buttons/primary_button.dart';
 ///   onCtaPressed: () => _showQuickCapture(),
 /// )
 /// ```
-class EmptyState extends StatelessWidget {
+class EmptyState extends StatefulWidget {
   /// Creates an empty state widget.
   const EmptyState({
     super.key,
     required this.icon,
     required this.iconSize,
     required this.title,
+    this.titleWidget,
     required this.description,
     this.ctaText,
     this.onCtaPressed,
@@ -47,7 +47,12 @@ class EmptyState extends StatelessWidget {
   final double iconSize;
 
   /// Title text for the empty state (Display Large)
+  /// If [titleWidget] is provided, this is ignored.
   final String title;
+
+  /// Optional custom widget for the title (e.g., gradient text)
+  /// If provided, this takes precedence over [title].
+  final Widget? titleWidget;
 
   /// Descriptive message explaining the empty state (Body Large)
   final String description;
@@ -65,95 +70,166 @@ class EmptyState extends StatelessWidget {
   final VoidCallback? onSecondaryPressed;
 
   @override
+  State<EmptyState> createState() => _EmptyStateState();
+}
+
+class _EmptyStateState extends State<EmptyState> {
+  @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
-    // Icon color: neutral-300 in light mode, neutral-600 in dark mode
-    final iconColor = isDark ? AppColors.neutralGray600 : AppColors.neutralGray300;
+    // Get adaptive gradients based on theme
+    final iconGradient = isDark
+        ? AppColors.primaryGradientDark
+        : AppColors.primaryGradient;
+    final backgroundGradient = isDark
+        ? AppColors.primaryGradientDark
+        : AppColors.primaryGradient;
 
     // Text colors following design system
     final titleColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight;
     final descriptionColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight;
 
-    return Center(
-      child: SingleChildScrollView(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 480.0),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.paddingMD,
-              vertical: AppSpacing.paddingLG,
+    return Stack(
+      children: [
+        // Animated gradient background (subtle, 2-3% opacity)
+        Positioned.fill(
+          child: AnimatedOpacity(
+            opacity: 0.03, // 3% opacity for subtle effect
+            duration: const Duration(seconds: 2),
+            curve: Curves.easeOut,
+            child: Container(
+              decoration: BoxDecoration(
+                gradient: backgroundGradient,
+              ),
             ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-              // Icon (64px)
-              Icon(
-                icon,
-                size: iconSize,
-                color: iconColor,
-              ),
-
-              // Spacing: 64px (3xl) between sections
-              const SizedBox(height: AppSpacing.xxxl),
-
-              // Title - Display Large for mobile (40px)
-              Text(
-                title,
-                style: const TextStyle(
-                  fontFamily: AppTypography.fontFamily,
-                  fontSize: 40.0, // Display Large on mobile as per spec
-                  fontWeight: AppTypography.regular,
-                  height: 1.2, // 48px line height
-                  letterSpacing: -0.25,
-                ).copyWith(color: titleColor),
-                textAlign: TextAlign.center,
-              ),
-
-              // Spacing between title and description
-              const SizedBox(height: AppSpacing.sm),
-
-              // Description - Body Large (17px -> using 16px Material)
-              Text(
-                description,
-                style: AppTypography.bodyLarge.copyWith(
-                  color: descriptionColor,
-                ),
-                textAlign: TextAlign.center,
-              ),
-
-              // Spacing before CTA (64px)
-              if (ctaText != null && onCtaPressed != null) ...[
-                const SizedBox(height: AppSpacing.xxxl),
-
-                // Primary CTA Button
-                PrimaryButton(
-                  text: ctaText!,
-                  onPressed: onCtaPressed,
-                  size: ButtonSize.large,
-                ),
-              ],
-
-              // Secondary text link (optional)
-              if (secondaryText != null && onSecondaryPressed != null) ...[
-                const SizedBox(height: AppSpacing.sm),
-
-                TextButton(
-                  onPressed: onSecondaryPressed,
-                  style: TextButton.styleFrom(
-                    foregroundColor: isDark
-                        ? AppColors.primaryAmberLight
-                        : AppColors.primaryAmber,
-                    textStyle: AppTypography.button,
-                  ),
-                  child: Text(secondaryText!),
-                ),
-              ],
-            ],
           ),
         ),
-      ),
-    ));
+
+        // Main content - Mobile-first: max width 280px, 24px spacing
+        Center(
+          child: SingleChildScrollView(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 280.0), // Mobile-first
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.md,
+                  vertical: AppSpacing.lg,
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    // Icon with gradient tint (64px)
+                    ShaderMask(
+                      shaderCallback: (Rect bounds) {
+                        return iconGradient.createShader(bounds);
+                      },
+                      blendMode: BlendMode.srcIn,
+                      child: Icon(
+                        widget.icon,
+                        size: widget.iconSize,
+                        color: Colors.white, // White for ShaderMask to apply gradient
+                      ),
+                    ),
+
+                    // Spacing: 24px between elements (mobile-first)
+                    const SizedBox(height: 24),
+
+                    // Title - Bold 20px for mobile-first
+                    // Use custom widget if provided, otherwise default text
+                    widget.titleWidget ?? Text(
+                      widget.title,
+                      style: TextStyle(
+                        fontFamily: AppTypography.fontFamily,
+                        fontSize: 20.0, // Mobile-first: 20px
+                        fontWeight: FontWeight.bold, // Bold weight
+                        height: 1.3, // Good line height
+                        letterSpacing: -0.15,
+                        color: titleColor,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+
+                    // Spacing between title and description: 24px
+                    const SizedBox(height: 24),
+
+                    // Description - 15px body text
+                    Text(
+                      widget.description,
+                      style: TextStyle(
+                        fontFamily: AppTypography.fontFamily,
+                        fontSize: 15.0, // Mobile-first: 15px
+                        fontWeight: FontWeight.normal,
+                        height: 1.5,
+                        color: descriptionColor,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+
+                    // Spacing before CTA: 24px
+                    if (widget.ctaText != null && widget.onCtaPressed != null) ...[
+                      const SizedBox(height: 24),
+
+                      // Primary CTA Button - 48px height for mobile-first
+                      // Create custom container to ensure exact 48px height
+                      GestureDetector(
+                        onTap: widget.onCtaPressed,
+                        child: Container(
+                          height: 48, // Mobile-first: 48px height
+                          padding: const EdgeInsets.symmetric(horizontal: 24),
+                          decoration: BoxDecoration(
+                            gradient: isDark
+                                ? AppColors.primaryGradientDark
+                                : AppColors.primaryGradient,
+                            borderRadius: BorderRadius.circular(12),
+                            boxShadow: [
+                              BoxShadow(
+                                color: isDark
+                                    ? AppColors.shadowDark
+                                    : AppColors.shadowLight,
+                                blurRadius: 4.0,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          child: Center(
+                            child: Text(
+                              widget.ctaText!,
+                              style: const TextStyle(
+                                fontFamily: AppTypography.fontFamily,
+                                fontSize: 15,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+
+                    // Secondary text link (optional)
+                    if (widget.secondaryText != null && widget.onSecondaryPressed != null) ...[
+                      const SizedBox(height: AppSpacing.sm),
+
+                      TextButton(
+                        onPressed: widget.onSecondaryPressed,
+                        style: TextButton.styleFrom(
+                          foregroundColor: isDark
+                              ? AppColors.primaryAmberLight
+                              : AppColors.primaryAmber,
+                          textStyle: AppTypography.button,
+                        ),
+                        child: Text(widget.secondaryText!),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
   }
 }

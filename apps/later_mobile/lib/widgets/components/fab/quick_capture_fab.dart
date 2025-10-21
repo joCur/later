@@ -1,20 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_animations.dart';
 
-/// Quick Capture Floating Action Button
+/// Quick Capture Floating Action Button - Mobile-First Bold Design
 ///
 /// Features:
-/// - 56x56dp visual size, 64x64dp touch target
-/// - Accent-primary amber color with gradient (if supported)
-/// - Level 3 elevation shadow
-/// - Position: bottom-right with 16dp margin
-/// - Scale animation on press (0.95)
+/// - Circular shape: 56×56px (Android standard, mobile-first design)
+/// - Primary gradient background with 30% white overlay
+/// - Simplified shadow: 8px offset, 16px blur, 15% opacity (single shadow)
+/// - Simple plus icon (no rotation for performance)
+/// - Scale animation on press (0.9 scale for 100ms)
+/// - 56×56px touch target for accessibility
+/// - Position: 16px from bottom/right edges
 /// - Hero animation tag for modal transition
-/// - Optional extended FAB with label
 /// - Haptic feedback on press
 class QuickCaptureFab extends StatefulWidget {
   const QuickCaptureFab({
@@ -25,6 +25,7 @@ class QuickCaptureFab extends StatefulWidget {
     this.tooltip,
     this.heroTag = 'quick-capture-fab',
     this.useGradient = true,
+    this.isOpen = false,
   });
 
   /// Callback when FAB is pressed
@@ -45,72 +46,89 @@ class QuickCaptureFab extends StatefulWidget {
   /// Whether to use gradient background
   final bool useGradient;
 
+  /// Whether the FAB is in an "open" state (kept for API compatibility, not used for rotation)
+  final bool isOpen;
+
   @override
   State<QuickCaptureFab> createState() => _QuickCaptureFabState();
 }
 
 class _QuickCaptureFabState extends State<QuickCaptureFab>
     with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
+  late AnimationController _scaleController;
   late Animation<double> _scaleAnimation;
 
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(
-      duration: AppAnimations.fabPress,
-      reverseDuration: AppAnimations.fabRelease,
+
+    // Simplified scale animation: 0.9 → 1.0 (100ms for mobile-first design)
+    _scaleController = AnimationController(
+      duration: const Duration(milliseconds: 100),
+      reverseDuration: const Duration(milliseconds: 150),
       vsync: this,
     );
     _scaleAnimation = Tween<double>(
       begin: 1.0,
-      end: AppAnimations.fabPressScale,
+      end: 0.9, // Scale down to 0.9 on press (mobile-first design)
     ).animate(
       CurvedAnimation(
-        parent: _controller,
-        curve: AppAnimations.fabPressEasing,
-        reverseCurve: AppAnimations.fabReleaseEasing,
+        parent: _scaleController,
+        curve: Curves.easeOut,
+        reverseCurve: Curves.easeOutBack,
       ),
     );
   }
 
   @override
   void dispose() {
-    _controller.dispose();
+    _scaleController.dispose();
     super.dispose();
   }
 
   void _handleTapDown(TapDownDetails details) {
     if (widget.onPressed != null) {
-      _controller.forward();
-      HapticFeedback.lightImpact();
+      _scaleController.forward();
+      // Medium haptic feedback on FAB press
+      // Provides satisfying feedback for primary action button
+      AppAnimations.mediumHaptic();
     }
   }
 
   void _handleTapUp(TapUpDetails details) {
     if (widget.onPressed != null) {
-      _controller.reverse();
+      _scaleController.reverse();
     }
   }
 
   void _handleTapCancel() {
     if (widget.onPressed != null) {
-      _controller.reverse();
+      _scaleController.reverse();
     }
   }
 
   void _handleTap() {
     if (widget.onPressed != null) {
-      HapticFeedback.mediumImpact();
       widget.onPressed?.call();
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
     final isExtended = widget.label != null;
 
-    // FAB content
+    // Get the appropriate gradient for the current theme
+    final gradient = isDark
+        ? AppColors.primaryGradientDark
+        : AppColors.primaryGradient;
+
+    // Simplified shadow: 8px offset, 16px blur, 15% opacity (mobile-first design)
+    final shadowColor = (isDark ? AppColors.primaryEndDark : AppColors.primaryEnd)
+        .withValues(alpha: 0.15);
+
+    // FAB content: simple static icon (no rotation for mobile-first design)
     Widget fabContent;
     if (isExtended) {
       fabContent = Row(
@@ -118,14 +136,14 @@ class _QuickCaptureFabState extends State<QuickCaptureFab>
         children: [
           Icon(
             widget.icon,
-            color: AppColors.neutralBlack,
+            color: Colors.white, // White icon on gradient background
             size: 24,
           ),
           const SizedBox(width: AppSpacing.xxs),
           Text(
             widget.label!,
             style: AppTypography.button.copyWith(
-              color: AppColors.neutralBlack,
+              color: Colors.white,
             ),
           ),
         ],
@@ -133,7 +151,7 @@ class _QuickCaptureFabState extends State<QuickCaptureFab>
     } else {
       fabContent = Icon(
         widget.icon,
-        color: AppColors.neutralBlack,
+        color: Colors.white, // White icon on gradient background
         size: 24,
       );
     }
@@ -154,12 +172,13 @@ class _QuickCaptureFabState extends State<QuickCaptureFab>
               onTapCancel: _handleTapCancel,
               onTap: _handleTap,
               child: Container(
-                width: isExtended ? null : AppSpacing.touchTargetFAB,
-                height: isExtended ? null : AppSpacing.touchTargetFAB,
+                // Circular shape: 56×56px (Android standard, mobile-first design)
+                width: isExtended ? null : AppSpacing.fabSize,
+                height: isExtended ? null : AppSpacing.fabSize,
                 constraints: isExtended
                     ? const BoxConstraints(
                         minWidth: 80,
-                        minHeight: AppSpacing.touchTargetFAB,
+                        minHeight: AppSpacing.fabSize,
                       )
                     : null,
                 padding: isExtended
@@ -169,27 +188,27 @@ class _QuickCaptureFabState extends State<QuickCaptureFab>
                       )
                     : null,
                 decoration: BoxDecoration(
-                  gradient: widget.useGradient
-                      ? AppColors.fabGradient
-                      : null,
-                  color: widget.useGradient ? null : AppColors.primaryAmber,
-                  borderRadius: BorderRadius.circular(
-                    isExtended ? AppSpacing.fabRadius : AppSpacing.touchTargetFAB / 2,
-                  ),
+                  // Primary gradient background with 30% white overlay
+                  gradient: widget.useGradient ? gradient : null,
+                  color: widget.useGradient ? null : AppColors.primarySolid,
+                  // Perfect circle border radius: 28px (mobile-first design)
+                  borderRadius: BorderRadius.circular(AppSpacing.fabRadius),
+                  // Simplified shadow: 8px offset, 16px blur, 15% opacity (single shadow)
                   boxShadow: [
-                    // Level 3 elevation - Material Design standard
                     BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.3),
-                      blurRadius: 8,
-                      offset: const Offset(0, 4),
-                    ),
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.15),
-                      blurRadius: 3,
-                      offset: const Offset(0, 1),
+                      color: shadowColor,
+                      blurRadius: 16,
+                      offset: const Offset(0, 8),
                     ),
                   ],
                 ),
+                // Apply 30% white overlay for mobile-first design
+                foregroundDecoration: widget.useGradient
+                    ? BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.3),
+                        borderRadius: BorderRadius.circular(AppSpacing.fabRadius),
+                      )
+                    : null,
                 child: Center(child: fabContent),
               ),
             ),
