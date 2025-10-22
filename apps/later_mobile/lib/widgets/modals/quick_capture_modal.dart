@@ -62,6 +62,7 @@ class _QuickCaptureModalState extends State<QuickCaptureModal>
   String? _currentItemId;
   bool _isSaving = false;
   bool _isSaved = false;
+  String? _selectedSpaceId; // Local state for space selection (modal-only)
 
   // Type options
   static const List<TypeOption> _typeOptions = [
@@ -98,6 +99,11 @@ class _QuickCaptureModalState extends State<QuickCaptureModal>
   @override
   void initState() {
     super.initState();
+
+    // Initialize local space selection with current space
+    final spacesProvider = context.read<SpacesProvider>();
+    _selectedSpaceId = spacesProvider.currentSpace?.id;
+
     _textController.addListener(_onTextChanged);
     _focusNode.addListener(() {
       setState(
@@ -107,24 +113,22 @@ class _QuickCaptureModalState extends State<QuickCaptureModal>
 
     // Simplified modal animations for mobile-first design
     _animationController = AnimationController(
-      duration: const Duration(milliseconds: 300), // 300ms entrance (mobile-first)
+      duration: const Duration(
+        milliseconds: 300,
+      ), // 300ms entrance (mobile-first)
       reverseDuration: const Duration(milliseconds: 250), // 250ms exit
       vsync: this,
     );
 
-    _scaleAnimation =
-        Tween<double>(begin: 0.95, end: 1.0).animate(
-          CurvedAnimation(
-            parent: _animationController,
-            curve: Curves.easeOut, // Simplified curve
-          ),
-        );
-
-    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+    _scaleAnimation = Tween<double>(begin: 0.95, end: 1.0).animate(
       CurvedAnimation(
         parent: _animationController,
-        curve: Curves.easeOut,
+        curve: Curves.easeOut, // Simplified curve
       ),
+    );
+
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeOut),
     );
 
     _slideAnimation =
@@ -212,29 +216,45 @@ class _QuickCaptureModalState extends State<QuickCaptureModal>
 
     if (currentSpace == null) return;
 
+    // Safety check: Ensure selected space ID is valid
+    if (_selectedSpaceId == null) return;
+
+    // Verify the selected space still exists
+    final spaceExists = spacesProvider.spaces.any(
+      (s) => s.id == _selectedSpaceId,
+    );
+    final targetSpaceId = spaceExists ? _selectedSpaceId! : currentSpace.id;
+
+    // Log fallback if space was deleted
+    if (!spaceExists) {
+      debugPrint(
+        'Warning: Selected space no longer exists, falling back to current space',
+      );
+    }
+
     // Detect or use selected type
     final itemType = _selectedType ?? _detectType(text);
 
     if (_currentItemId == null) {
-      // Create new item
+      // Create new item in the selected space
       final item = Item(
         id: const Uuid().v4(),
         type: itemType,
         title: text,
-        spaceId: currentSpace.id,
+        spaceId: targetSpaceId,
       );
 
       await itemsProvider.addItem(item);
       _currentItemId = item.id;
     } else {
-      // Update existing item
+      // Update existing item (preserve existing spaceId for updates)
       final existingItem = itemsProvider.items.firstWhere(
         (item) => item.id == _currentItemId,
         orElse: () => Item(
           id: _currentItemId!,
           type: itemType,
           title: text,
-          spaceId: currentSpace.id,
+          spaceId: targetSpaceId,
         ),
       );
 
@@ -468,10 +488,7 @@ class _QuickCaptureModalState extends State<QuickCaptureModal>
                 ),
                 // 4px gradient border on top edge
                 border: Border(
-                  top: BorderSide(
-                    width: 4.0,
-                    color: primaryGradient.colors[0],
-                  ),
+                  top: BorderSide(width: 4.0, color: primaryGradient.colors[0]),
                 ),
               ),
               child: _buildModalContent(isMobile: true),
@@ -596,7 +613,9 @@ class _QuickCaptureModalState extends State<QuickCaptureModal>
 
     return Padding(
       padding: EdgeInsets.fromLTRB(
-        isMobile ? AppSpacing.lg : AppSpacing.md, // 24px on mobile (mobile-first design)
+        isMobile
+            ? AppSpacing.lg
+            : AppSpacing.md, // 24px on mobile (mobile-first design)
         isMobile ? AppSpacing.lg : AppSpacing.md, // 24px on mobile
         AppSpacing.xs,
         AppSpacing.sm,
@@ -653,7 +672,9 @@ class _QuickCaptureModalState extends State<QuickCaptureModal>
       ),
       child: Container(
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12.0), // 12px for mobile-first design
+          borderRadius: BorderRadius.circular(
+            12.0,
+          ), // 12px for mobile-first design
           gradient: _focusNode.hasFocus
               ? LinearGradient(
                   begin: Alignment.topLeft,
@@ -705,7 +726,9 @@ class _QuickCaptureModalState extends State<QuickCaptureModal>
                       ? AppColors.surfaceDarkVariant
                       : AppColors.surfaceLightVariant),
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12.0), // 12px for mobile-first design
+              borderRadius: BorderRadius.circular(
+                12.0,
+              ), // 12px for mobile-first design
               borderSide: BorderSide(
                 width: 2.0, // 2px solid border (mobile-first design)
                 color: isDark ? AppColors.borderDark : AppColors.borderLight,
@@ -903,6 +926,12 @@ class _QuickCaptureModalState extends State<QuickCaptureModal>
         final currentSpace = spacesProvider.currentSpace;
         if (currentSpace == null) return const SizedBox.shrink();
 
+        // Use local state to find the selected space for display
+        final selectedSpace = spacesProvider.spaces.firstWhere(
+          (s) => s.id == _selectedSpaceId,
+          orElse: () => currentSpace,
+        );
+
         return PopupMenuButton<String>(
           key: const Key('space_selector'),
           child: Container(
@@ -919,14 +948,14 @@ class _QuickCaptureModalState extends State<QuickCaptureModal>
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                if (currentSpace.icon != null)
+                if (selectedSpace.icon != null)
                   Text(
-                    currentSpace.icon!,
+                    selectedSpace.icon!,
                     style: const TextStyle(fontSize: 16),
                   ),
                 const SizedBox(width: AppSpacing.xxxs),
                 Text(
-                  currentSpace.name,
+                  selectedSpace.name,
                   style: AppTypography.labelMedium.copyWith(
                     color: isDark
                         ? AppColors.textPrimaryDark
@@ -960,7 +989,10 @@ class _QuickCaptureModalState extends State<QuickCaptureModal>
             }).toList();
           },
           onSelected: (spaceId) {
-            spacesProvider.switchSpace(spaceId);
+            // Update only local state, not global provider
+            setState(() {
+              _selectedSpaceId = spaceId;
+            });
           },
         );
       },
