@@ -103,6 +103,9 @@ class _QuickCaptureModalState extends State<QuickCaptureModal>
     // Initialize local space selection with current space
     final spacesProvider = context.read<SpacesProvider>();
     _selectedSpaceId = spacesProvider.currentSpace?.id;
+    debugPrint(
+      'QuickCapture: initState - _selectedSpaceId initialized to: $_selectedSpaceId',
+    );
 
     _textController.addListener(_onTextChanged);
     _focusNode.addListener(() {
@@ -214,16 +217,28 @@ class _QuickCaptureModalState extends State<QuickCaptureModal>
     final spacesProvider = context.read<SpacesProvider>();
     final currentSpace = spacesProvider.currentSpace;
 
-    if (currentSpace == null) return;
+    if (currentSpace == null) {
+      debugPrint('QuickCapture: Cannot save - no current space');
+      return;
+    }
 
     // Safety check: Ensure selected space ID is valid
-    if (_selectedSpaceId == null) return;
+    if (_selectedSpaceId == null) {
+      debugPrint('QuickCapture: Cannot save - _selectedSpaceId is null');
+      return;
+    }
 
     // Verify the selected space still exists
     final spaceExists = spacesProvider.spaces.any(
       (s) => s.id == _selectedSpaceId,
     );
     final targetSpaceId = spaceExists ? _selectedSpaceId! : currentSpace.id;
+
+    debugPrint(
+      'QuickCapture: Creating item - _selectedSpaceId: $_selectedSpaceId, '
+      'currentSpace: ${currentSpace.id}, targetSpaceId: $targetSpaceId, '
+      'spaceExists: $spaceExists',
+    );
 
     // Log fallback if space was deleted
     if (!spaceExists) {
@@ -990,9 +1005,17 @@ class _QuickCaptureModalState extends State<QuickCaptureModal>
           },
           onSelected: (spaceId) {
             // Update only local state, not global provider
-            setState(() {
-              _selectedSpaceId = spaceId;
-            });
+            debugPrint(
+              'QuickCapture: Space selected in dropdown - spaceId: $spaceId',
+            );
+            if (mounted) {
+              setState(() {
+                _selectedSpaceId = spaceId;
+                debugPrint(
+                  'QuickCapture: _selectedSpaceId updated to: $_selectedSpaceId',
+                );
+              });
+            }
           },
         );
       },
