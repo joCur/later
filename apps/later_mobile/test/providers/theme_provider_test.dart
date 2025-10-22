@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:later_mobile/data/local/preferences_service.dart';
 import 'package:later_mobile/providers/theme_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  setUp(() {
+  setUp(() async {
     // Reset shared preferences before each test
     SharedPreferences.setMockInitialValues({});
+    // Initialize PreferencesService for each test
+    await PreferencesService.initialize();
   });
 
   group('ThemeProvider', () {
@@ -25,6 +28,7 @@ void main() {
     test('should load theme preference from storage', () async {
       // Setup: save a theme preference
       SharedPreferences.setMockInitialValues({'themeMode': 'dark'});
+      await PreferencesService.initialize();
 
       final provider = ThemeProvider();
       await provider.loadThemePreference();
@@ -34,6 +38,7 @@ void main() {
 
     test('should load light theme preference from storage', () async {
       SharedPreferences.setMockInitialValues({'themeMode': 'light'});
+      await PreferencesService.initialize();
 
       final provider = ThemeProvider();
       await provider.loadThemePreference();
@@ -51,33 +56,24 @@ void main() {
     });
 
     test('should save theme preference when setThemeMode is called', () async {
-      SharedPreferences.setMockInitialValues({});
-
       final provider = ThemeProvider();
       await provider.setThemeMode(ThemeMode.dark);
 
-      final prefs = await SharedPreferences.getInstance();
-      expect(prefs.getString('themeMode'), 'dark');
+      expect(PreferencesService().getThemeMode(), 'dark');
     });
 
     test('should save light theme preference correctly', () async {
-      SharedPreferences.setMockInitialValues({});
-
       final provider = ThemeProvider();
       await provider.setThemeMode(ThemeMode.light);
 
-      final prefs = await SharedPreferences.getInstance();
-      expect(prefs.getString('themeMode'), 'light');
+      expect(PreferencesService().getThemeMode(), 'light');
     });
 
     test('should save system theme preference correctly', () async {
-      SharedPreferences.setMockInitialValues({});
-
       final provider = ThemeProvider();
       await provider.setThemeMode(ThemeMode.system);
 
-      final prefs = await SharedPreferences.getInstance();
-      expect(prefs.getString('themeMode'), 'system');
+      expect(PreferencesService().getThemeMode(), 'system');
     });
 
     test('should update themeMode when setThemeMode is called', () async {
@@ -125,6 +121,7 @@ void main() {
 
     test('should not change theme if new mode is same as current', () async {
       SharedPreferences.setMockInitialValues({'themeMode': 'dark'});
+      await PreferencesService.initialize();
 
       final provider = ThemeProvider();
       await provider.loadThemePreference();

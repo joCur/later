@@ -12,6 +12,7 @@ class PreferencesService {
 
   // Preference keys
   static const String _lastSelectedSpaceIdKey = 'last_selected_space_id';
+  static const String _themeModeKey = 'themeMode';
 
   // SharedPreferences instance
   SharedPreferences? _prefs;
@@ -57,6 +58,29 @@ class PreferencesService {
     await _prefs!.remove(_lastSelectedSpaceIdKey);
   }
 
+  /// Get the saved theme mode
+  /// Returns null if no theme mode has been persisted
+  /// Throws StateError if not initialized
+  String? getThemeMode() {
+    if (_prefs == null) {
+      throw StateError(
+        'PreferencesService not initialized. Call PreferencesService.initialize() first.',
+      );
+    }
+    return _prefs!.getString(_themeModeKey);
+  }
+
+  /// Save the theme mode
+  /// Throws StateError if not initialized
+  Future<void> setThemeMode(String themeMode) async {
+    if (_prefs == null) {
+      throw StateError(
+        'PreferencesService not initialized. Call PreferencesService.initialize() first.',
+      );
+    }
+    await _prefs!.setString(_themeModeKey, themeMode);
+  }
+
   /// Check if the service has been initialized
   bool get isInitialized => _prefs != null;
 
@@ -69,6 +93,7 @@ class PreferencesService {
     }
     return {
       'lastSelectedSpaceId': _prefs!.getString(_lastSelectedSpaceIdKey),
+      'themeMode': _prefs!.getString(_themeModeKey),
     };
   }
 

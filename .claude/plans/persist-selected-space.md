@@ -38,11 +38,13 @@ Implement persistence for the currently selected space so users return to their 
   - Add proper error handling for all preference operations
   - **Status**: Completed - PreferencesService created with full test coverage (37 passing tests)
 
-### Phase 3: Initialize Preferences in App Startup
-- [ ] Task 3.1: Add preferences initialization to main.dart
+### Phase 3: Initialize Preferences in App Startup ✅
+- [x] Task 3.1: Add preferences initialization to main.dart
   - Import the new PreferencesService in `apps/later_mobile/lib/main.dart`
   - Call `await PreferencesService.initialize()` in `main()` function after HiveDatabase initialization
   - Ensure initialization happens before `runApp()` is called
+  - **Status**: Completed - PreferencesService initialized in main.dart after HiveDatabase
+  - **Bonus**: Migrated existing ThemeProvider to use PreferencesService instead of SharedPreferences directly, improving consistency
 
 ### Phase 4: Update SpacesProvider to Persist Selection
 - [ ] Task 4.1: Modify switchSpace method to persist the selection

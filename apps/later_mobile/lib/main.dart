@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'core/error/error_handler.dart';
 import 'core/theme/app_theme.dart';
 import 'data/local/hive_database.dart';
+import 'data/local/preferences_service.dart';
 import 'data/local/seed_data.dart';
 import 'data/repositories/item_repository.dart';
 import 'data/repositories/space_repository.dart';
@@ -20,6 +21,9 @@ void main() async {
 
   // Initialize Hive database
   await HiveDatabase.initialize();
+
+  // Initialize preferences service for app settings
+  await PreferencesService.initialize();
 
   // Initialize seed data for first run
   await SeedData.initialize();

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import '../data/local/preferences_service.dart';
 
 /// Theme provider with animated transitions and persistent storage
 ///
 /// Manages application theme mode (light, dark, system) with:
 /// - Smooth 250ms transitions with animation state tracking
-/// - Persistent storage using SharedPreferences
+/// - Persistent storage using PreferencesService
 /// - Toggle between light/dark modes (skipping system)
 /// - System brightness detection for auto-theme
 ///
@@ -45,13 +45,12 @@ class ThemeProvider extends ChangeNotifier {
     return _themeMode == ThemeMode.dark;
   }
 
-  /// Load saved theme preference from SharedPreferences
+  /// Load saved theme preference from PreferencesService
   ///
   /// Called on app startup to restore user's theme choice.
   /// Defaults to system theme if no preference is saved.
   Future<void> loadThemePreference() async {
-    final prefs = await SharedPreferences.getInstance();
-    final themeModeString = prefs.getString('themeMode') ?? 'system';
+    final themeModeString = PreferencesService().getThemeMode() ?? 'system';
     _themeMode = _parseThemeMode(themeModeString);
     notifyListeners();
   }
@@ -69,8 +68,7 @@ class ThemeProvider extends ChangeNotifier {
   Future<void> setThemeMode(ThemeMode mode) async {
     if (_themeMode == mode) {
       // Still save preference even if mode hasn't changed
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setString('themeMode', mode.toString().split('.').last);
+      await PreferencesService().setThemeMode(mode.toString().split('.').last);
       return;
     }
 
@@ -84,8 +82,7 @@ class ThemeProvider extends ChangeNotifier {
     notifyListeners();
 
     // Save preference
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('themeMode', mode.toString().split('.').last);
+    await PreferencesService().setThemeMode(mode.toString().split('.').last);
 
     // Wait for transition to complete (250ms total)
     await Future<void>.delayed(const Duration(milliseconds: 200));
