@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import '../core/error/app_error.dart';
+import '../data/local/preferences_service.dart';
 import '../data/models/space_model.dart';
 import '../data/repositories/space_repository.dart';
 
@@ -60,8 +61,9 @@ class SpacesProvider extends ChangeNotifier {
   /// By default, only non-archived spaces are loaded. Set [includeArchived]
   /// to true to load all spaces including archived ones.
   ///
-  /// If no current space is set and spaces are loaded, the first
-  /// non-archived space will be set as the current space.
+  /// If no current space is set and spaces are loaded, attempts to restore
+  /// the last selected space from preferences. If the persisted space is not
+  /// found (e.g., it was deleted), falls back to the first non-archived space.
   ///
   /// Parameters:
   ///   - [includeArchived]: If true, includes archived spaces. Defaults to false.
@@ -82,9 +84,30 @@ class SpacesProvider extends ChangeNotifier {
         'loadSpaces',
       );
 
-      // Set first non-archived space as current if none is selected
+      // Restore persisted space selection if no current space is set
       if (_currentSpace == null && _spaces.isNotEmpty) {
-        _currentSpace = _spaces.first;
+        try {
+          final lastSpaceId = PreferencesService().getLastSelectedSpaceId();
+
+          if (lastSpaceId != null) {
+            // Try to find the persisted space in the loaded spaces
+            try {
+              _currentSpace = _spaces.firstWhere((s) => s.id == lastSpaceId);
+            } catch (e) {
+              // Persisted space not found (was deleted), clear the stale preference
+              await PreferencesService().clearLastSelectedSpaceId();
+              // Fall back to first space
+              _currentSpace = _spaces.first;
+            }
+          } else {
+            // No persisted space, use first space
+            _currentSpace = _spaces.first;
+          }
+        } catch (e) {
+          // If preference loading fails, fall back to first space
+          debugPrint('Failed to restore persisted space selection: $e');
+          _currentSpace = _spaces.first;
+        }
       }
 
       _error = null;
@@ -105,7 +128,7 @@ class SpacesProvider extends ChangeNotifier {
   ///
   /// The space is added to the repository and then added to the local
   /// list of spaces. The newly added space is automatically set as the
-  /// current space. If an error occurs, the state is not updated.
+  /// current space and persisted to preferences. If an error occurs, the state is not updated.
   ///
   /// Parameters:
   ///   - [space]: The space to add
@@ -130,6 +153,15 @@ class SpacesProvider extends ChangeNotifier {
       );
       _spaces = [..._spaces, createdSpace];
       _currentSpace = createdSpace;
+
+      // Persist the newly created space as the current selection
+      try {
+        await PreferencesService().setLastSelectedSpaceId(createdSpace.id);
+      } catch (e) {
+        // Log error but don't fail the operation if persistence fails
+        debugPrint('Failed to persist space selection: $e');
+      }
+
       _error = null;
       notifyListeners();
     } catch (e) {
@@ -147,6 +179,12 @@ class SpacesProvider extends ChangeNotifier {
   /// The space is updated in the repository and then the local list
   /// is updated to reflect the changes. If the updated space is the
   /// current space, the current space is also updated.
+  ///
+  /// **Archival behavior**: When archiving a space, the persisted space ID
+  /// is kept (not cleared). This allows archived spaces to be restored on
+  /// next app start if `includeArchived: true` is used when loading spaces.
+  /// This design prioritizes consistency over forcing users to select a new
+  /// space after archiving.
   ///
   /// Parameters:
   ///   - [space]: The space to update with new values
@@ -196,7 +234,9 @@ class SpacesProvider extends ChangeNotifier {
   /// Deletes a space from the repository and updates the state.
   ///
   /// The space is removed from the repository and then removed from
-  /// the local list of spaces. If an error occurs, the state is not updated.
+  /// the local list of spaces. If the deleted space was persisted as the
+  /// last selected space, the persisted ID is cleared to prevent attempting
+  /// to restore a deleted space on next app start.
   ///
   /// IMPORTANT: Cannot delete the current space. Either switch to a different
   /// space first, or the operation will fail with an error.
@@ -227,6 +267,18 @@ class SpacesProvider extends ChangeNotifier {
         'deleteSpace',
       );
       _spaces = _spaces.where((space) => space.id != id).toList();
+
+      // Clear persisted space ID if we're deleting the persisted space
+      try {
+        final persistedSpaceId = PreferencesService().getLastSelectedSpaceId();
+        if (persistedSpaceId == id) {
+          await PreferencesService().clearLastSelectedSpaceId();
+        }
+      } catch (e) {
+        // Log error but don't fail the operation if preference cleanup fails
+        debugPrint('Failed to clear persisted space ID: $e');
+      }
+
       _error = null;
       notifyListeners();
     } catch (e) {
@@ -241,8 +293,8 @@ class SpacesProvider extends ChangeNotifier {
 
   /// Switches the current active space.
   ///
-  /// Changes the current space to the space with the given ID.
-  /// If the space does not exist in the loaded spaces, an error is set.
+  /// Changes the current space to the space with the given ID and persists
+  /// the selection. If the space does not exist in the loaded spaces, an error is set.
   ///
   /// Parameters:
   ///   - [spaceId]: The ID of the space to switch to
@@ -262,6 +314,15 @@ class SpacesProvider extends ChangeNotifier {
       );
 
       _currentSpace = space;
+
+      // Persist the space selection
+      try {
+        await PreferencesService().setLastSelectedSpaceId(spaceId);
+      } catch (e) {
+        // Log error but don't fail the operation if persistence fails
+        debugPrint('Failed to persist space selection: $e');
+      }
+
       _error = null;
       notifyListeners();
     } catch (e) {
