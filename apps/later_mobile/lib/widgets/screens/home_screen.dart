@@ -198,7 +198,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 color: isDark
                     ? AppColors.neutral600.withValues(alpha: 0.1)
                     : AppColors.neutral400.withValues(alpha: 0.1),
-                width: 1,
               ),
             ),
             title: Row(
@@ -794,7 +793,6 @@ class _FilterChipState extends State<_FilterChip> with SingleTickerProviderState
           color: isDark
               ? AppColors.neutral600.withValues(alpha: 0.3)
               : AppColors.neutral400.withValues(alpha: 0.3),
-          width: 1,
         ),
         borderRadius: BorderRadius.circular(20), // Pill shape
       ),

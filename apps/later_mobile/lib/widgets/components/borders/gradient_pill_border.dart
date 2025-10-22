@@ -49,7 +49,10 @@ class GradientPillBorder extends StatelessWidget {
           borderWidth: borderWidth,
           borderRadius: borderRadius,
         ),
-        child: child,
+        child: Padding(
+          padding: EdgeInsets.all(borderWidth),
+          child: child,
+        ),
       ),
     );
   }

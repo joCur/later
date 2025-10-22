@@ -152,8 +152,8 @@ class AppSpacing {
   /// Border radius for cards (20px - Pill shape for mobile-first bold design)
   static const double cardRadius = 20.0;
 
-  /// Card border width (6px - Bold gradient border for mobile-first design)
-  static const double cardBorderWidth = 6.0;
+  /// Card border width (2px - Subtle gradient border for mobile-first design)
+  static const double cardBorderWidth = 2.0;
 
   // List Item Spacing
   /// Compact list item spacing (8px)
