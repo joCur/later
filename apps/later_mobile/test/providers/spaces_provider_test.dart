@@ -1,7 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:later_mobile/data/local/preferences_service.dart';
 import 'package:later_mobile/data/models/space_model.dart';
 import 'package:later_mobile/data/repositories/space_repository.dart';
 import 'package:later_mobile/providers/spaces_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 /// Mock implementation of SpaceRepository for testing
 class MockSpaceRepository extends SpaceRepository {
@@ -125,6 +127,7 @@ void main() {
 
   tearDown(() {
     mockRepository.reset();
+    PreferencesService().reset();
   });
 
   group('SpacesProvider - Initial State', () {
@@ -321,6 +324,22 @@ void main() {
       expect(provider.currentSpace?.id, '1');
     });
 
+    test('should persist new space as current selection', () async {
+      // Arrange
+      SharedPreferences.setMockInitialValues({});
+      await PreferencesService.initialize();
+
+      final newSpace = Space(id: '1', name: 'Work');
+
+      // Act
+      await provider.addSpace(newSpace);
+
+      // Assert
+      expect(provider.currentSpace?.id, '1');
+      final persistedSpaceId = PreferencesService().getLastSelectedSpaceId();
+      expect(persistedSpaceId, '1');
+    });
+
     test('should handle error when adding space fails', () async {
       // Arrange
       mockRepository.shouldThrowError = true;
@@ -333,6 +352,23 @@ void main() {
       expect(provider.error, isNotNull);
       expect(provider.spaces, isEmpty);
       expect(provider.currentSpace, isNull);
+    });
+
+    test('should not persist space when adding fails', () async {
+      // Arrange
+      SharedPreferences.setMockInitialValues({});
+      await PreferencesService.initialize();
+
+      mockRepository.shouldThrowError = true;
+      final newSpace = Space(id: '1', name: 'Work');
+
+      // Act
+      await provider.addSpace(newSpace);
+
+      // Assert
+      expect(provider.error, isNotNull);
+      final persistedSpaceId = PreferencesService().getLastSelectedSpaceId();
+      expect(persistedSpaceId, isNull);
     });
 
     test('should notify listeners when adding space', () async {
@@ -502,6 +538,25 @@ void main() {
       expect(provider.currentSpace?.name, 'Personal');
     });
 
+    test('should persist space selection when switching space', () async {
+      // Arrange
+      SharedPreferences.setMockInitialValues({});
+      await PreferencesService.initialize();
+
+      final space1 = Space(id: '1', name: 'Work');
+      final space2 = Space(id: '2', name: 'Personal');
+      mockRepository.mockSpaces = [space1, space2];
+      await provider.loadSpaces();
+
+      // Act
+      await provider.switchSpace('2');
+
+      // Assert
+      expect(provider.currentSpace?.id, '2');
+      final persistedSpaceId = PreferencesService().getLastSelectedSpaceId();
+      expect(persistedSpaceId, '2');
+    });
+
     test('should handle switching to non-existent space', () async {
       // Arrange
       final space = Space(id: '1', name: 'Work');
@@ -534,6 +589,25 @@ void main() {
 
       // Assert
       expect(notifyCount, 1);
+    });
+
+    test('should not persist space selection when switch fails', () async {
+      // Arrange
+      SharedPreferences.setMockInitialValues({});
+      await PreferencesService.initialize();
+
+      final space = Space(id: '1', name: 'Work');
+      mockRepository.mockSpaces = [space];
+      await provider.loadSpaces();
+
+      // Act
+      await provider.switchSpace('999'); // Non-existent space
+
+      // Assert
+      expect(provider.error, isNotNull);
+      // Should still have the original space ID persisted (from loadSpaces)
+      final persistedSpaceId = PreferencesService().getLastSelectedSpaceId();
+      expect(persistedSpaceId, isNull); // No persistence on failed switch
     });
   });
 

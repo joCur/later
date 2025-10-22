@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import '../core/error/app_error.dart';
+import '../data/local/preferences_service.dart';
 import '../data/models/space_model.dart';
 import '../data/repositories/space_repository.dart';
 
@@ -105,7 +106,7 @@ class SpacesProvider extends ChangeNotifier {
   ///
   /// The space is added to the repository and then added to the local
   /// list of spaces. The newly added space is automatically set as the
-  /// current space. If an error occurs, the state is not updated.
+  /// current space and persisted to preferences. If an error occurs, the state is not updated.
   ///
   /// Parameters:
   ///   - [space]: The space to add
@@ -130,6 +131,15 @@ class SpacesProvider extends ChangeNotifier {
       );
       _spaces = [..._spaces, createdSpace];
       _currentSpace = createdSpace;
+
+      // Persist the newly created space as the current selection
+      try {
+        await PreferencesService().setLastSelectedSpaceId(createdSpace.id);
+      } catch (e) {
+        // Log error but don't fail the operation if persistence fails
+        debugPrint('Failed to persist space selection: $e');
+      }
+
       _error = null;
       notifyListeners();
     } catch (e) {
@@ -241,8 +251,8 @@ class SpacesProvider extends ChangeNotifier {
 
   /// Switches the current active space.
   ///
-  /// Changes the current space to the space with the given ID.
-  /// If the space does not exist in the loaded spaces, an error is set.
+  /// Changes the current space to the space with the given ID and persists
+  /// the selection. If the space does not exist in the loaded spaces, an error is set.
   ///
   /// Parameters:
   ///   - [spaceId]: The ID of the space to switch to
@@ -262,6 +272,15 @@ class SpacesProvider extends ChangeNotifier {
       );
 
       _currentSpace = space;
+
+      // Persist the space selection
+      try {
+        await PreferencesService().setLastSelectedSpaceId(spaceId);
+      } catch (e) {
+        // Log error but don't fail the operation if persistence fails
+        debugPrint('Failed to persist space selection: $e');
+      }
+
       _error = null;
       notifyListeners();
     } catch (e) {

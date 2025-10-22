@@ -46,15 +46,19 @@ Implement persistence for the currently selected space so users return to their 
   - **Status**: Completed - PreferencesService initialized in main.dart after HiveDatabase
   - **Bonus**: Migrated existing ThemeProvider to use PreferencesService instead of SharedPreferences directly, improving consistency
 
-### Phase 4: Update SpacesProvider to Persist Selection
-- [ ] Task 4.1: Modify switchSpace method to persist the selection
+### Phase 4: Update SpacesProvider to Persist Selection ✅
+- [x] Task 4.1: Modify switchSpace method to persist the selection
   - Import PreferencesService in `apps/later_mobile/lib/providers/spaces_provider.dart`
   - In `switchSpace()` method, after successfully setting `_currentSpace`, call `await PreferencesService().setLastSelectedSpaceId(spaceId)`
   - Add error handling to ensure preference save failures don't break space switching
+  - **Status**: Completed - switchSpace now persists selection with proper error handling
+  - **Test Coverage**: Added tests for successful persistence and failure scenarios
 
-- [ ] Task 4.2: Modify addSpace method to persist new space selection
+- [x] Task 4.2: Modify addSpace method to persist new space selection
   - In `addSpace()` method, after setting `_currentSpace = createdSpace`, call `await PreferencesService().setLastSelectedSpaceId(createdSpace.id)`
   - This ensures newly created spaces are persisted as the current selection
+  - **Status**: Completed - addSpace now persists new spaces as the current selection
+  - **Test Coverage**: Added tests for successful persistence and failure scenarios
 
 ### Phase 5: Restore Last Selected Space on App Start
 - [ ] Task 5.1: Update loadSpaces to restore persisted space selection
