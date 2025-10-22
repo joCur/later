@@ -30,6 +30,10 @@ class ItemsProvider extends ChangeNotifier {
   /// Returns an unmodifiable view of the current items.
   List<Item> get items => List.unmodifiable(_items);
 
+  /// The spaceId currently being viewed, if any.
+  /// Used to determine if newly added items should be shown in the current view.
+  String? _currentSpaceId;
+
   /// Indicates whether an async operation is currently in progress.
   bool _isLoading = false;
 
@@ -64,6 +68,7 @@ class ItemsProvider extends ChangeNotifier {
   Future<void> loadItems() async {
     _isLoading = true;
     _error = null;
+    _currentSpaceId = null; // Clear space filter when loading all items
     notifyListeners();
 
     try {
@@ -102,6 +107,7 @@ class ItemsProvider extends ChangeNotifier {
   Future<void> loadItemsBySpace(String spaceId) async {
     _isLoading = true;
     _error = null;
+    _currentSpaceId = spaceId; // Track which space we're viewing
     notifyListeners();
 
     try {
@@ -140,6 +146,7 @@ class ItemsProvider extends ChangeNotifier {
   Future<void> loadItemsByType(ItemType type) async {
     _isLoading = true;
     _error = null;
+    _currentSpaceId = null; // Clear space filter when loading by type
     notifyListeners();
 
     try {
@@ -163,8 +170,10 @@ class ItemsProvider extends ChangeNotifier {
 
   /// Adds a new item to the repository and updates the state.
   ///
-  /// The item is added to the repository and then added to the local
-  /// list of items. If an error occurs, the state is not updated.
+  /// The item is added to the repository. If we're currently viewing a specific
+  /// space, the item is only added to the local list if it belongs to that space.
+  /// This prevents items from appearing in the wrong space view.
+  /// If an error occurs, the state is not updated.
   /// Implements automatic retry with exponential backoff for transient failures.
   ///
   /// Parameters:
@@ -188,7 +197,12 @@ class ItemsProvider extends ChangeNotifier {
         () => _repository.createItem(item),
         'addItem',
       );
-      _items = [..._items, createdItem];
+
+      // Only add to local list if we're viewing all items or the item's space
+      if (_currentSpaceId == null || createdItem.spaceId == _currentSpaceId) {
+        _items = [..._items, createdItem];
+      }
+
       _error = null;
       notifyListeners();
     } catch (e) {
@@ -278,10 +292,7 @@ class ItemsProvider extends ChangeNotifier {
     _error = null;
 
     try {
-      await _executeWithRetry(
-        () => _repository.deleteItem(id),
-        'deleteItem',
-      );
+      await _executeWithRetry(() => _repository.deleteItem(id), 'deleteItem');
       _items = _items.where((item) => item.id != id).toList();
       _error = null;
       notifyListeners();
@@ -399,6 +410,7 @@ class ItemsProvider extends ChangeNotifier {
     }
 
     // This should never be reached, but throw the last error just in case
-    throw lastError ?? AppError.unknown(message: 'Unknown error in $operationName');
+    throw lastError ??
+        AppError.unknown(message: 'Unknown error in $operationName');
   }
 }
