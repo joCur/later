@@ -76,16 +76,21 @@ Implement persistence for the currently selected space so users return to their 
     - Prioritizing persisted space over first space
     - Handling null persisted space ID gracefully
 
-### Phase 6: Handle Edge Cases
-- [ ] Task 6.1: Handle space deletion cleanup
+### Phase 6: Handle Edge Cases ✅
+- [x] Task 6.1: Handle space deletion cleanup
   - In `deleteSpace()` method in SpacesProvider, check if the deleted space ID matches the persisted space ID
   - If it matches, call `await PreferencesService().clearLastSelectedSpaceId()` to clear stale preference
   - This prevents attempting to restore a deleted space on next app start
+  - **Status**: Completed - deleteSpace now clears persisted space ID when deleting a persisted space
+  - **Test Coverage**: Added 2 tests covering deletion of persisted and non-persisted spaces
 
-- [ ] Task 6.2: Handle space archival
+- [x] Task 6.2: Handle space archival
   - In `updateSpace()` method, check if the updated space is being archived AND is the current space
   - If both conditions are true, optionally clear the persisted space ID or let it restore (design decision needed)
   - Document the chosen behavior in code comments
+  - **Status**: Completed - updateSpace documentation updated with archival behavior
+  - **Design Decision**: Chose Option B - Keep persisted space ID when archiving (allows archived spaces to be restored)
+  - **Test Coverage**: Added 2 tests covering archival of current and non-current spaces
 
 ### Phase 7: Testing
 - [ ] Task 7.1: Add unit tests for PreferencesService

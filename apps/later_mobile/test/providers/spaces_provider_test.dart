@@ -546,6 +546,48 @@ void main() {
       expect(provider.error, isNotNull);
       expect(provider.error, contains('does not exist'));
     });
+
+    test('should keep persisted space ID when archiving current space', () async {
+      // Arrange
+      final space = Space(id: '1', name: 'Work');
+      mockRepository.mockSpaces = [space];
+      await provider.loadSpaces();
+
+      // Manually persist the space (in real usage, switchSpace or addSpace would do this)
+      await PreferencesService().setLastSelectedSpaceId('1');
+      expect(PreferencesService().getLastSelectedSpaceId(), '1');
+
+      // Act - archive the current space
+      final archivedSpace = space.copyWith(isArchived: true);
+      await provider.updateSpace(archivedSpace);
+
+      // Assert
+      expect(provider.currentSpace?.isArchived, true);
+      // Design decision: Keep the persisted space ID even when archiving
+      // This allows the archived space to be restored on next app start
+      expect(PreferencesService().getLastSelectedSpaceId(), '1');
+    });
+
+    test('should keep persisted space ID when archiving non-current space', () async {
+      // Arrange
+      final space1 = Space(id: '1', name: 'Work');
+      final space2 = Space(id: '2', name: 'Personal');
+      mockRepository.mockSpaces = [space1, space2];
+      await provider.loadSpaces();
+
+      // Manually persist space1 (in real usage, switchSpace or addSpace would do this)
+      await PreferencesService().setLastSelectedSpaceId('1');
+      expect(PreferencesService().getLastSelectedSpaceId(), '1');
+
+      // Act - archive space2 (not the current space)
+      final archivedSpace2 = space2.copyWith(isArchived: true);
+      await provider.updateSpace(archivedSpace2);
+
+      // Assert
+      expect(provider.currentSpace?.id, '1'); // Current space unchanged
+      // Persisted space ID should remain unchanged
+      expect(PreferencesService().getLastSelectedSpaceId(), '1');
+    });
   });
 
   group('SpacesProvider - deleteSpace', () {
@@ -618,6 +660,52 @@ void main() {
 
       // Assert
       expect(notifyCount, greaterThan(0));
+    });
+
+    test('should clear persisted space ID when deleting a persisted space', () async {
+      // Arrange
+      final space1 = Space(id: '1', name: 'Work');
+      final space2 = Space(id: '2', name: 'Personal');
+      final space3 = Space(id: '3', name: 'Hobby');
+      mockRepository.mockSpaces = [space1, space2, space3];
+      await provider.loadSpaces();
+
+      // Switch to space2 (this will persist '2')
+      await provider.switchSpace('2');
+      expect(PreferencesService().getLastSelectedSpaceId(), '2');
+
+      // Manually set the persisted space to space3 (simulating a previous session)
+      await PreferencesService().setLastSelectedSpaceId('3');
+      expect(PreferencesService().getLastSelectedSpaceId(), '3');
+
+      // Act - delete space3 (the persisted one, but not the current one)
+      await provider.deleteSpace('3');
+
+      // Assert
+      expect(provider.spaces, hasLength(2));
+      // The persisted space ID should be cleared since we deleted the persisted space
+      expect(PreferencesService().getLastSelectedSpaceId(), isNull);
+    });
+
+    test('should not clear persisted space ID when deleting a non-persisted space', () async {
+      // Arrange
+      final space1 = Space(id: '1', name: 'Work');
+      final space2 = Space(id: '2', name: 'Personal');
+      final space3 = Space(id: '3', name: 'Hobby');
+      mockRepository.mockSpaces = [space1, space2, space3];
+      await provider.loadSpaces();
+
+      // Switch to space2 (this will persist '2')
+      await provider.switchSpace('2');
+      expect(PreferencesService().getLastSelectedSpaceId(), '2');
+
+      // Act - delete space3 (neither current nor persisted)
+      await provider.deleteSpace('3');
+
+      // Assert
+      expect(provider.spaces, hasLength(2));
+      // The persisted space ID should still be '2' since we didn't delete it
+      expect(PreferencesService().getLastSelectedSpaceId(), '2');
     });
   });
 

@@ -180,6 +180,12 @@ class SpacesProvider extends ChangeNotifier {
   /// is updated to reflect the changes. If the updated space is the
   /// current space, the current space is also updated.
   ///
+  /// **Archival behavior**: When archiving a space, the persisted space ID
+  /// is kept (not cleared). This allows archived spaces to be restored on
+  /// next app start if `includeArchived: true` is used when loading spaces.
+  /// This design prioritizes consistency over forcing users to select a new
+  /// space after archiving.
+  ///
   /// Parameters:
   ///   - [space]: The space to update with new values
   ///
@@ -228,7 +234,9 @@ class SpacesProvider extends ChangeNotifier {
   /// Deletes a space from the repository and updates the state.
   ///
   /// The space is removed from the repository and then removed from
-  /// the local list of spaces. If an error occurs, the state is not updated.
+  /// the local list of spaces. If the deleted space was persisted as the
+  /// last selected space, the persisted ID is cleared to prevent attempting
+  /// to restore a deleted space on next app start.
   ///
   /// IMPORTANT: Cannot delete the current space. Either switch to a different
   /// space first, or the operation will fail with an error.
@@ -259,6 +267,18 @@ class SpacesProvider extends ChangeNotifier {
         'deleteSpace',
       );
       _spaces = _spaces.where((space) => space.id != id).toList();
+
+      // Clear persisted space ID if we're deleting the persisted space
+      try {
+        final persistedSpaceId = PreferencesService().getLastSelectedSpaceId();
+        if (persistedSpaceId == id) {
+          await PreferencesService().clearLastSelectedSpaceId();
+        }
+      } catch (e) {
+        // Log error but don't fail the operation if preference cleanup fails
+        debugPrint('Failed to clear persisted space ID: $e');
+      }
+
       _error = null;
       notifyListeners();
     } catch (e) {
