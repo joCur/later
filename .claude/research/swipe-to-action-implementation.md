@@ -47,7 +47,7 @@ This research investigates the best swipe-to-action patterns and implementation 
 - Items belong to spaces (workspace concept)
 
 **Current ItemCard Component (lib/widgets/components/cards/item_card.dart):**
-- Mobile-first bold design with 6px gradient pill border
+- Mobile-first bold design with 2px gradient pill border
 - Optimized with RepaintBoundary for 60fps performance
 - Existing gesture handlers:
   - `onTap`: Opens detail view
