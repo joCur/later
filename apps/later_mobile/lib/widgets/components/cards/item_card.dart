@@ -428,7 +428,7 @@ class _ItemCardState extends State<ItemCard> with TickerProviderStateMixin {
                 child: Container(
                   decoration: BoxDecoration(
                     color: backgroundColor,
-                    borderRadius: BorderRadius.circular(AppSpacing.cardRadius - AppSpacing.cardBorderWidth), // Inner radius accounts for border padding
+                    borderRadius: BorderRadius.circular(AppSpacing.cardRadius - AppSpacing.cardBorderWidth), // Inner radius reduced by border width to maintain consistent corner appearance
                     // Mobile-optimized shadow: 4px offset, 8px blur, 12% opacity
                     boxShadow: _isPressed
                         ? null
