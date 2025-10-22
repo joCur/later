@@ -61,8 +61,9 @@ class SpacesProvider extends ChangeNotifier {
   /// By default, only non-archived spaces are loaded. Set [includeArchived]
   /// to true to load all spaces including archived ones.
   ///
-  /// If no current space is set and spaces are loaded, the first
-  /// non-archived space will be set as the current space.
+  /// If no current space is set and spaces are loaded, attempts to restore
+  /// the last selected space from preferences. If the persisted space is not
+  /// found (e.g., it was deleted), falls back to the first non-archived space.
   ///
   /// Parameters:
   ///   - [includeArchived]: If true, includes archived spaces. Defaults to false.
@@ -83,9 +84,30 @@ class SpacesProvider extends ChangeNotifier {
         'loadSpaces',
       );
 
-      // Set first non-archived space as current if none is selected
+      // Restore persisted space selection if no current space is set
       if (_currentSpace == null && _spaces.isNotEmpty) {
-        _currentSpace = _spaces.first;
+        try {
+          final lastSpaceId = PreferencesService().getLastSelectedSpaceId();
+
+          if (lastSpaceId != null) {
+            // Try to find the persisted space in the loaded spaces
+            try {
+              _currentSpace = _spaces.firstWhere((s) => s.id == lastSpaceId);
+            } catch (e) {
+              // Persisted space not found (was deleted), clear the stale preference
+              await PreferencesService().clearLastSelectedSpaceId();
+              // Fall back to first space
+              _currentSpace = _spaces.first;
+            }
+          } else {
+            // No persisted space, use first space
+            _currentSpace = _spaces.first;
+          }
+        } catch (e) {
+          // If preference loading fails, fall back to first space
+          debugPrint('Failed to restore persisted space selection: $e');
+          _currentSpace = _spaces.first;
+        }
       }
 
       _error = null;

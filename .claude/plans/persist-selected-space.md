@@ -60,14 +60,21 @@ Implement persistence for the currently selected space so users return to their 
   - **Status**: Completed - addSpace now persists new spaces as the current selection
   - **Test Coverage**: Added tests for successful persistence and failure scenarios
 
-### Phase 5: Restore Last Selected Space on App Start
-- [ ] Task 5.1: Update loadSpaces to restore persisted space selection
+### Phase 5: Restore Last Selected Space on App Start ✅
+- [x] Task 5.1: Update loadSpaces to restore persisted space selection
   - In `loadSpaces()` method in SpacesProvider, before the default "first space" logic
-  - Call `final lastSpaceId = await PreferencesService().getLastSelectedSpaceId()`
+  - Call `final lastSpaceId = PreferencesService().getLastSelectedSpaceId()`
   - If `lastSpaceId` is not null, search for the space in `_spaces` list
   - If found, set `_currentSpace` to that space
   - If not found (space was deleted), fall back to first space and clear the persisted ID
   - Keep existing fallback logic: if no persisted space and `_currentSpace == null`, use first space
+  - **Status**: Completed - loadSpaces now restores persisted space selection with proper fallback handling
+  - **Test Coverage**: Added 5 comprehensive tests covering all restoration scenarios:
+    - Restoring valid persisted space
+    - Falling back when persisted space doesn't exist
+    - Clearing stale persisted space ID
+    - Prioritizing persisted space over first space
+    - Handling null persisted space ID gracefully
 
 ### Phase 6: Handle Edge Cases
 - [ ] Task 6.1: Handle space deletion cleanup
