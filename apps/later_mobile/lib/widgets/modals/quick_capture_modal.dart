@@ -99,14 +99,6 @@ class _QuickCaptureModalState extends State<QuickCaptureModal>
   @override
   void initState() {
     super.initState();
-
-    // Initialize local space selection with current space
-    final spacesProvider = context.read<SpacesProvider>();
-    _selectedSpaceId = spacesProvider.currentSpace?.id;
-    debugPrint(
-      'QuickCapture: initState - _selectedSpaceId initialized to: $_selectedSpaceId',
-    );
-
     _textController.addListener(_onTextChanged);
     _focusNode.addListener(() {
       setState(
@@ -171,6 +163,21 @@ class _QuickCaptureModalState extends State<QuickCaptureModal>
 
     // Start entrance animation
     _animationController.forward();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    // Initialize local space selection with current space
+    // Safe to use context.read here as BuildContext is ready
+    if (_selectedSpaceId == null) {
+      final spacesProvider = context.read<SpacesProvider>();
+      _selectedSpaceId = spacesProvider.currentSpace?.id;
+      debugPrint(
+        'QuickCapture: didChangeDependencies - _selectedSpaceId initialized to: $_selectedSpaceId',
+      );
+    }
   }
 
   @override
@@ -942,8 +949,9 @@ class _QuickCaptureModalState extends State<QuickCaptureModal>
         if (currentSpace == null) return const SizedBox.shrink();
 
         // Use local state to find the selected space for display
+        // If _selectedSpaceId is null, fall back to currentSpace.id
         final selectedSpace = spacesProvider.spaces.firstWhere(
-          (s) => s.id == _selectedSpaceId,
+          (s) => s.id == (_selectedSpaceId ?? currentSpace.id),
           orElse: () => currentSpace,
         );
 

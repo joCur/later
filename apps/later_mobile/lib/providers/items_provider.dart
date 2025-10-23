@@ -201,6 +201,8 @@ class ItemsProvider extends ChangeNotifier {
       // Only add to local list if we're viewing all items or the item's space
       if (_currentSpaceId == null || createdItem.spaceId == _currentSpaceId) {
         _items = [..._items, createdItem];
+      } else {
+        // Skip adding to local list if item belongs to a different space than currently viewed
       }
 
       _error = null;
