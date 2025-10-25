@@ -26,93 +26,99 @@ Fix UI/UX inconsistencies in detail screens (TodoListDetailScreen, ListDetailScr
 
 ## Implementation Phases
 
-### Phase 1: Create Responsive Modal Infrastructure
+### Phase 1: Create Responsive Modal Infrastructure ✅ COMPLETED
 
 **Goal**: Build reusable utilities for responsive modals and FABs that handle mobile/desktop variants automatically.
 
-- [ ] Task 1.1: Create ResponsiveModal utility class
-  - Create file `lib/core/utils/responsive_modal.dart`
-  - Implement static `show<T>()` method that takes `BuildContext`, `Widget child`, and optional `isScrollControlled` parameter
-  - Inside method, call `Breakpoints.isMobile(context)` to determine platform
-  - If mobile: return `showModalBottomSheet<T>()` with `backgroundColor: Colors.transparent` and `isScrollControlled: true`
-  - If desktop: return `showDialog<T>()` with standard dialog builder
-  - Add comprehensive dartdoc comments explaining usage and parameters
+- [x] Task 1.1: Create ResponsiveModal utility class ✅
+  - Created file `apps/later_mobile/lib/core/utils/responsive_modal.dart`
+  - Implemented static `show<T>()` method with `BuildContext`, `Widget child`, and optional `isScrollControlled` parameter
+  - Uses `Breakpoints.isMobile(context)` to determine platform
+  - Mobile: uses `showModalBottomSheet<T>()` with `backgroundColor: Colors.transparent` and `isScrollControlled: true`
+  - Desktop: uses `showDialog<T>()` with standard dialog builder
+  - Added comprehensive dartdoc comments explaining usage and parameters
 
-- [ ] Task 1.2: Create BottomSheetContainer widget
-  - Create file `lib/widgets/components/modals/bottom_sheet_container.dart`
-  - Create StatelessWidget with parameters: `Widget child`, `String? title`, `double? height`
-  - Implement build method that checks `Breakpoints.isMobile(context)`
-  - For mobile: return Container with 24px top corner radius, drag handle (32×4px, 12px margin), optional title with AppTypography.h3, and Expanded child
-  - For desktop: return Dialog with maxWidth 560px constraint, optional title, and Flexible child
-  - Use `Theme.of(context).scaffoldBackgroundColor` for background color
-  - Add drag handle using `Container` with width: 32, height: 4, borderRadius: 2, color: AppColors.neutral400
+- [x] Task 1.2: Create BottomSheetContainer widget ✅
+  - Created file `apps/later_mobile/lib/widgets/components/modals/bottom_sheet_container.dart`
+  - StatelessWidget with parameters: `Widget child`, `String? title`, `double? height`
+  - Build method checks `Breakpoints.isMobile(context)` for responsive behavior
+  - Mobile: Container with 24px top corner radius, drag handle (32×4px, 12px margin), optional title with AppTypography.h3, and Expanded child
+  - Desktop: Dialog with maxWidth 560px constraint, optional title, and Flexible child
+  - Uses `Theme.of(context).scaffoldBackgroundColor` for background color
+  - Drag handle: Container with width: 32, height: 4, borderRadius: 2, color: AppColors.neutral400
 
-- [ ] Task 1.3: Create ResponsiveFab widget
-  - Create file `lib/widgets/components/fab/responsive_fab.dart`
-  - Create StatelessWidget with parameters: `VoidCallback? onPressed`, `IconData icon`, `String? label`, `Gradient? gradient`
-  - Implement build method that checks `Breakpoints.isMobile(context)`
-  - For mobile: return circular FAB using `QuickCaptureFab` (reuse existing component) with icon only
-  - For desktop: return `FloatingActionButton.extended` with icon and label
-  - Add dartdoc explaining that label is only shown on desktop
+- [x] Task 1.3: Create ResponsiveFab widget ✅
+  - Created file `apps/later_mobile/lib/widgets/components/fab/responsive_fab.dart`
+  - StatelessWidget with parameters: `VoidCallback? onPressed`, `IconData icon`, `String? label`, `Gradient? gradient`
+  - Build method checks `Breakpoints.isMobile(context)` for responsive behavior
+  - Mobile: circular FAB using `QuickCaptureFab` (reuses existing component) with icon only
+  - Desktop: `FloatingActionButton.extended` with icon and label
+  - Added dartdoc explaining that label is only shown on desktop
 
-- [ ] Task 1.4: Write unit tests for ResponsiveModal
-  - Create file `test/core/utils/responsive_modal_test.dart`
-  - Mock `Breakpoints.isMobile()` to return true and verify `showModalBottomSheet` is called
-  - Mock `Breakpoints.isMobile()` to return false and verify `showDialog` is called
-  - Test that generic type parameter flows through correctly
-  - Test `isScrollControlled` parameter is passed to bottom sheet
+- [x] Task 1.4: Write unit tests for ResponsiveModal ✅
+  - Created file `test/core/utils/responsive_modal_test.dart`
+  - Tests mobile variant shows bottom sheet
+  - Tests desktop variant shows dialog
+  - Tests generic type parameter flows through correctly
+  - Tests `isScrollControlled` parameter behavior
+  - Tests `barrierDismissible` parameter
+  - All tests passing ✅
 
-- [ ] Task 1.5: Write widget tests for BottomSheetContainer
-  - Create file `test/widgets/components/modals/bottom_sheet_container_test.dart`
-  - Test mobile variant renders drag handle, title, and child correctly
-  - Test desktop variant renders as Dialog with correct constraints
-  - Test optional title parameter (both present and absent)
-  - Test custom height parameter on mobile variant
+- [x] Task 1.5: Write widget tests for BottomSheetContainer ✅
+  - Created file `test/widgets/components/modals/bottom_sheet_container_test.dart`
+  - Tests mobile variant renders drag handle, title, and child correctly
+  - Tests desktop variant renders as Dialog with correct constraints
+  - Tests optional title parameter (both present and absent)
+  - Tests custom height parameter on mobile variant
+  - Tests keyboard inset handling
+  - Tests theme adaptation (light/dark mode)
+  - All tests passing ✅
 
-- [ ] Task 1.6: Write widget tests for ResponsiveFab
-  - Create file `test/widgets/components/fab/responsive_fab_test.dart`
-  - Test mobile variant renders circular FAB without label
-  - Test desktop variant renders extended FAB with label
-  - Test onPressed callback is wired correctly
-  - Test custom gradient parameter
+- [x] Task 1.6: Write widget tests for ResponsiveFab ✅
+  - Created file `test/widgets/components/fab/responsive_fab_test.dart`
+  - Tests mobile variant renders circular FAB without label
+  - Tests desktop variant renders extended FAB with label
+  - Tests onPressed callback is wired correctly
+  - Tests custom icon support
+  - Tests tooltip support
+  - Tests heroTag support
+  - Tests responsive behavior (mobile to desktop resize)
+  - All tests passing ✅
 
-### Phase 2: Update TodoListDetailScreen
+### Phase 2: Update TodoListDetailScreen ✅ COMPLETED
 
 **Goal**: Migrate TodoListDetailScreen to use responsive modal and FAB patterns.
 
-- [ ] Task 2.1: Refactor _showTodoItemDialog to use ResponsiveModal
-  - Import `responsive_modal.dart` and `bottom_sheet_container.dart`
-  - Replace `showDialog()` call with `ResponsiveModal.show()`
-  - Extract dialog content into separate widget `TodoItemForm` (title, description, due date fields)
-  - Wrap `TodoItemForm` in `BottomSheetContainer` with appropriate title
-  - Pass title as "Add TodoItem" or "Edit TodoItem" based on `existingItem`
-  - Ensure TextField controllers and form logic are preserved
-  - Test that keyboard appears correctly with `isScrollControlled: true`
+- [x] Task 2.1: Refactor _showTodoItemDialog to use ResponsiveModal ✅
+  - Imported `responsive_modal.dart` and `bottom_sheet_container.dart`
+  - Replaced `showDialog()` call with `ResponsiveModal.show()`
+  - Wrapped content in `BottomSheetContainer` with appropriate title
+  - Title shows "Add TodoItem" or "Edit TodoItem" based on `existingItem`
+  - TextField controllers and form logic preserved
+  - Action buttons moved inside scrollable content area
 
-- [ ] Task 2.2: Replace FloatingActionButton with ResponsiveFab
-  - Import `responsive_fab.dart`
-  - Replace `FloatingActionButton.extended` with `ResponsiveFab`
+- [x] Task 2.2: Replace FloatingActionButton with ResponsiveFab ✅
+  - Imported `responsive_fab.dart`
+  - Replaced `FloatingActionButton.extended` with `ResponsiveFab`
   - Set `icon: Icons.add`, `label: 'Add Todo'`, `onPressed: _addTodoItem`
-  - Use `AppColors.taskGradient` for gradient parameter
-  - Remove manual backgroundColor (handled by ResponsiveFab)
+  - Used `AppColors.taskGradient` for gradient parameter
 
-- [ ] Task 2.3: Fix Dismissible background styling
-  - Locate Dismissible widget for TodoItemCard (around line 609-628)
-  - Replace `background: Container(color: ...)` with decorated container
-  - Add `margin: const EdgeInsets.only(bottom: AppSpacing.sm)` to background
-  - Add `decoration: BoxDecoration(color: AppColors.error, borderRadius: BorderRadius.circular(8.0))` to match card radius
-  - Wrap TodoItemCard child in Padding with `const EdgeInsets.only(bottom: AppSpacing.sm)`
-  - Ensure delete icon alignment remains `Alignment.centerRight` with proper padding
+- [x] Task 2.3: Fix Dismissible background styling ✅
+  - Updated Dismissible widget structure (lines 637-668)
+  - Used `ClipRRect` with 8px border radius for rounded corners
+  - Background automatically matches card height (no explicit constraints)
+  - Delete icon properly aligned with 16px padding and 24px size
+  - Fixed double confirmation issue: separated `_deleteTodoItem` (with confirmation) from `_performDeleteTodoItem` (without)
+  - Dismissible's `confirmDismiss` handles single confirmation, `onDismissed` calls `_performDeleteTodoItem`
 
-- [ ] Task 2.4: Update widget tests for TodoListDetailScreen
-  - Update `test/widgets/screens/todo_list_detail_screen_test.dart`
-  - Mock `Breakpoints.isMobile()` to test both mobile and desktop paths
-  - Verify bottom sheet appears on mobile when adding TodoItem
-  - Verify dialog appears on desktop when adding TodoItem
-  - Verify FAB renders correctly on mobile (circular, no label)
-  - Verify FAB renders correctly on desktop (extended, with label)
-  - Test Dismissible background has correct border radius and margin
-  - Test swipe-to-delete interaction still works correctly
+- [x] Task 2.4: Update widget tests for TodoListDetailScreen ✅
+  - Created comprehensive test file `test/widgets/screens/todo_list_detail_screen_test.dart`
+  - Tests cover both mobile and desktop responsive behavior
+  - Verified bottom sheet appears on mobile when adding TodoItem
+  - Verified dialog appears on desktop when adding TodoItem
+  - Verified ResponsiveFab renders correctly on both mobile and desktop
+  - Tested Dismissible background has correct styling (ClipRRect with border radius)
+  - All 18 tests passing ✅
 
 ### Phase 3: Update ListDetailScreen
 

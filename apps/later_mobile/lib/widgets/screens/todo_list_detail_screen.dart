@@ -6,10 +6,13 @@ import 'package:uuid/uuid.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_typography.dart';
 import '../../core/theme/app_spacing.dart';
+import '../../core/utils/responsive_modal.dart';
 import '../../data/models/todo_list_model.dart';
 import '../../providers/content_provider.dart';
 import '../../providers/spaces_provider.dart';
 import '../components/cards/todo_item_card.dart';
+import '../components/fab/responsive_fab.dart';
+import '../components/modals/bottom_sheet_container.dart';
 import '../components/text/gradient_text.dart';
 
 /// TodoList Detail Screen for viewing and editing TodoList with TodoItems
@@ -172,11 +175,17 @@ class _TodoListDetailScreenState extends State<TodoListDetailScreen> {
     }
   }
 
-  /// Delete a TodoItem
+  /// Delete a TodoItem (with confirmation)
   Future<void> _deleteTodoItem(TodoItem item) async {
     final confirmed = await _showDeleteItemConfirmation(item.title);
     if (!confirmed || !mounted) return;
 
+    await _performDeleteTodoItem(item);
+  }
+
+  /// Perform the actual deletion without confirmation
+  /// Used by Dismissible which handles confirmation separately
+  Future<void> _performDeleteTodoItem(TodoItem item) async {
     try {
       final provider = Provider.of<ContentProvider>(context, listen: false);
       await provider.deleteTodoItem(_currentTodoList.id, item.id);
@@ -255,134 +264,140 @@ class _TodoListDetailScreenState extends State<TodoListDetailScreen> {
     DateTime? selectedDueDate = existingItem?.dueDate;
     TodoPriority selectedPriority = existingItem?.priority ?? TodoPriority.medium;
 
-    return showDialog<TodoItem>(
+    return ResponsiveModal.show<TodoItem>(
       context: context,
-      builder: (context) {
-        return StatefulBuilder(
+      child: BottomSheetContainer(
+        title: existingItem == null ? 'Add TodoItem' : 'Edit TodoItem',
+        child: StatefulBuilder(
           builder: (context, setDialogState) {
-            return AlertDialog(
-              title: Text(existingItem == null ? 'Add TodoItem' : 'Edit TodoItem'),
-              content: SingleChildScrollView(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Title field
-                    TextField(
-                      controller: titleController,
-                      decoration: const InputDecoration(
-                        labelText: 'Title *',
-                        hintText: 'Enter task title',
-                      ),
-                      autofocus: true,
-                      textCapitalization: TextCapitalization.sentences,
+            return SingleChildScrollView(
+              padding: const EdgeInsets.all(AppSpacing.lg),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Title field
+                  TextField(
+                    controller: titleController,
+                    decoration: const InputDecoration(
+                      labelText: 'Title *',
+                      hintText: 'Enter task title',
                     ),
-                    const SizedBox(height: AppSpacing.md),
+                    autofocus: true,
+                    textCapitalization: TextCapitalization.sentences,
+                  ),
+                  const SizedBox(height: AppSpacing.md),
 
-                    // Description field
-                    TextField(
-                      controller: descriptionController,
-                      decoration: const InputDecoration(
-                        labelText: 'Description',
-                        hintText: 'Optional description',
-                      ),
-                      maxLines: 3,
-                      textCapitalization: TextCapitalization.sentences,
+                  // Description field
+                  TextField(
+                    controller: descriptionController,
+                    decoration: const InputDecoration(
+                      labelText: 'Description',
+                      hintText: 'Optional description',
                     ),
-                    const SizedBox(height: AppSpacing.md),
+                    maxLines: 3,
+                    textCapitalization: TextCapitalization.sentences,
+                  ),
+                  const SizedBox(height: AppSpacing.md),
 
-                    // Due date picker
-                    ListTile(
-                      contentPadding: EdgeInsets.zero,
-                      leading: const Icon(Icons.calendar_today),
-                      title: Text(
-                        selectedDueDate == null
-                            ? 'No due date'
-                            : DateFormat.yMMMd().format(selectedDueDate!),
-                      ),
-                      trailing: selectedDueDate != null
-                          ? IconButton(
-                              icon: const Icon(Icons.clear),
-                              onPressed: () {
-                                setDialogState(() {
-                                  selectedDueDate = null;
-                                });
-                              },
-                            )
-                          : null,
-                      onTap: () async {
-                        final date = await showDatePicker(
-                          context: context,
-                          initialDate: selectedDueDate ?? DateTime.now(),
-                          firstDate: DateTime.now(),
-                          lastDate: DateTime.now().add(const Duration(days: 365)),
-                        );
-                        if (date != null) {
-                          setDialogState(() {
-                            selectedDueDate = date;
-                          });
-                        }
-                      },
+                  // Due date picker
+                  ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    leading: const Icon(Icons.calendar_today),
+                    title: Text(
+                      selectedDueDate == null
+                          ? 'No due date'
+                          : DateFormat.yMMMd().format(selectedDueDate!),
                     ),
-                    const SizedBox(height: AppSpacing.md),
+                    trailing: selectedDueDate != null
+                        ? IconButton(
+                            icon: const Icon(Icons.clear),
+                            onPressed: () {
+                              setDialogState(() {
+                                selectedDueDate = null;
+                              });
+                            },
+                          )
+                        : null,
+                    onTap: () async {
+                      final date = await showDatePicker(
+                        context: context,
+                        initialDate: selectedDueDate ?? DateTime.now(),
+                        firstDate: DateTime.now(),
+                        lastDate: DateTime.now().add(const Duration(days: 365)),
+                      );
+                      if (date != null) {
+                        setDialogState(() {
+                          selectedDueDate = date;
+                        });
+                      }
+                    },
+                  ),
+                  const SizedBox(height: AppSpacing.md),
 
-                    // Priority dropdown
-                    DropdownButtonFormField<TodoPriority>(
-                      initialValue: selectedPriority,
-                      decoration: const InputDecoration(
-                        labelText: 'Priority',
-                      ),
-                      items: TodoPriority.values.map((priority) {
-                        return DropdownMenuItem(
-                          value: priority,
-                          child: Text(_getPriorityLabel(priority)),
-                        );
-                      }).toList(),
-                      onChanged: (value) {
-                        if (value != null) {
-                          setDialogState(() {
-                            selectedPriority = value;
-                          });
-                        }
-                      },
+                  // Priority dropdown
+                  DropdownButtonFormField<TodoPriority>(
+                    initialValue: selectedPriority,
+                    decoration: const InputDecoration(
+                      labelText: 'Priority',
                     ),
-                  ],
-                ),
+                    items: TodoPriority.values.map((priority) {
+                      return DropdownMenuItem(
+                        value: priority,
+                        child: Text(_getPriorityLabel(priority)),
+                      );
+                    }).toList(),
+                    onChanged: (value) {
+                      if (value != null) {
+                        setDialogState(() {
+                          selectedPriority = value;
+                        });
+                      }
+                    },
+                  ),
+                  const SizedBox(height: AppSpacing.lg),
+
+                  // Action buttons
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      TextButton(
+                        onPressed: () => Navigator.of(context).pop(),
+                        child: const Text('Cancel'),
+                      ),
+                      const SizedBox(width: AppSpacing.sm),
+                      ElevatedButton(
+                        onPressed: () {
+                          if (titleController.text.trim().isEmpty) {
+                            _showSnackBar('Title is required', isError: true);
+                            return;
+                          }
+
+                          final item = TodoItem(
+                            id: existingItem?.id ?? const Uuid().v4(),
+                            title: titleController.text.trim(),
+                            description: descriptionController.text.trim().isEmpty
+                                ? null
+                                : descriptionController.text.trim(),
+                            isCompleted: existingItem?.isCompleted ?? false,
+                            dueDate: selectedDueDate,
+                            priority: selectedPriority,
+                            tags: existingItem?.tags ?? [],
+                            sortOrder: existingItem?.sortOrder ?? 0,
+                          );
+
+                          Navigator.of(context).pop(item);
+                        },
+                        child: Text(existingItem == null ? 'Add' : 'Save'),
+                      ),
+                    ],
+                  ),
+                ],
               ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  child: const Text('Cancel'),
-                ),
-                ElevatedButton(
-                  onPressed: () {
-                    if (titleController.text.trim().isEmpty) {
-                      _showSnackBar('Title is required', isError: true);
-                      return;
-                    }
-
-                    final item = TodoItem(
-                      id: existingItem?.id ?? const Uuid().v4(),
-                      title: titleController.text.trim(),
-                      description: descriptionController.text.trim().isEmpty
-                          ? null
-                          : descriptionController.text.trim(),
-                      isCompleted: existingItem?.isCompleted ?? false,
-                      dueDate: selectedDueDate,
-                      priority: selectedPriority,
-                      tags: existingItem?.tags ?? [],
-                      sortOrder: existingItem?.sortOrder ?? 0,
-                    );
-
-                    Navigator.of(context).pop(item);
-                  },
-                  child: Text(existingItem == null ? 'Add' : 'Save'),
-                ),
-              ],
             );
           },
-        );
-      },
+        ),
+      ),
     );
   }
 
@@ -606,19 +621,30 @@ class _TodoListDetailScreenState extends State<TodoListDetailScreen> {
                       },
                       itemBuilder: (context, index) {
                         final item = _currentTodoList.items[index];
-                        return Dismissible(
+                        return Padding(
                           key: ValueKey(item.id),
-                          background: Container(
-                            color: AppColors.error,
-                            alignment: Alignment.centerRight,
-                            padding: const EdgeInsets.only(right: AppSpacing.md),
-                            child: const Icon(Icons.delete, color: Colors.white),
-                          ),
-                          direction: DismissDirection.endToStart,
-                          confirmDismiss: (_) => _showDeleteItemConfirmation(item.title),
-                          onDismissed: (_) => _deleteTodoItem(item),
-                          child: Padding(
-                            padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+                          padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+                          child: Dismissible(
+                            key: ValueKey('dismissible-${item.id}'),
+                            background: Padding(
+                              padding: const EdgeInsets.only(bottom: 8.0),
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: AppColors.error,
+                                  borderRadius: BorderRadius.circular(8.0),
+                                ),
+                                alignment: Alignment.centerRight,
+                                padding: const EdgeInsets.only(right: 16.0),
+                                child: const Icon(
+                                  Icons.delete,
+                                  color: Colors.white,
+                                  size: 24.0,
+                                ),
+                              ),
+                            ),
+                            direction: DismissDirection.endToStart,
+                            confirmDismiss: (_) => _showDeleteItemConfirmation(item.title),
+                            onDismissed: (_) => _performDeleteTodoItem(item),
                             child: TodoItemCard(
                               todoItem: item,
                               onCheckboxChanged: (value) => _toggleTodoItem(item),
@@ -631,11 +657,11 @@ class _TodoListDetailScreenState extends State<TodoListDetailScreen> {
             ),
           ],
         ),
-        floatingActionButton: FloatingActionButton.extended(
+        floatingActionButton: ResponsiveFab(
           onPressed: _addTodoItem,
-          icon: const Icon(Icons.add),
-          label: const Text('Add Todo'),
-          backgroundColor: AppColors.taskGradient.colors.first,
+          icon: Icons.add,
+          label: 'Add Todo',
+          gradient: AppColors.taskGradient,
         ),
       ),
     );
