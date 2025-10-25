@@ -28,7 +28,8 @@ void main() {
         final item = Item(
           id: 'note-2',
           title: 'Project Documentation',
-          content: 'Comprehensive documentation for the authentication system. '
+          content:
+              'Comprehensive documentation for the authentication system. '
               'Includes API endpoints, security considerations, and usage examples.',
           spaceId: 'space-2',
           tags: ['documentation', 'api', 'security'],
@@ -48,11 +49,7 @@ void main() {
       });
 
       test('defaults tags to empty list when null', () {
-        final item = Item(
-          id: 'note-3',
-          title: 'Note',
-          spaceId: 'space-3',
-        );
+        final item = Item(id: 'note-3', title: 'Note', spaceId: 'space-3');
 
         expect(item.tags, isEmpty);
         expect(item.tags, isA<List<String>>());
@@ -60,17 +57,25 @@ void main() {
 
       test('defaults createdAt and updatedAt to now when null', () {
         final before = DateTime.now();
-        final item = Item(
-          id: 'note-4',
-          title: 'Note',
-          spaceId: 'space-4',
-        );
+        final item = Item(id: 'note-4', title: 'Note', spaceId: 'space-4');
         final after = DateTime.now();
 
-        expect(item.createdAt.isAfter(before.subtract(const Duration(seconds: 1))), true);
-        expect(item.createdAt.isBefore(after.add(const Duration(seconds: 1))), true);
-        expect(item.updatedAt.isAfter(before.subtract(const Duration(seconds: 1))), true);
-        expect(item.updatedAt.isBefore(after.add(const Duration(seconds: 1))), true);
+        expect(
+          item.createdAt.isAfter(before.subtract(const Duration(seconds: 1))),
+          true,
+        );
+        expect(
+          item.createdAt.isBefore(after.add(const Duration(seconds: 1))),
+          true,
+        );
+        expect(
+          item.updatedAt.isAfter(before.subtract(const Duration(seconds: 1))),
+          true,
+        );
+        expect(
+          item.updatedAt.isBefore(after.add(const Duration(seconds: 1))),
+          true,
+        );
       });
     });
 
@@ -94,7 +99,10 @@ void main() {
 
         expect(json['id'], 'note-5');
         expect(json['title'], 'Design System');
-        expect(json['content'], 'Color palette, typography, and component guidelines');
+        expect(
+          json['content'],
+          'Color palette, typography, and component guidelines',
+        );
         expect(json['spaceId'], 'space-5');
         expect(json['tags'], ['design', 'ui', 'components']);
         expect(json['createdAt'], createdAt.toIso8601String());
@@ -163,7 +171,8 @@ void main() {
         final original = Item(
           id: 'note-9',
           title: 'Architecture Decisions',
-          content: 'Key architectural decisions and their rationale:\n'
+          content:
+              'Key architectural decisions and their rationale:\n'
               '1. Use dual-model architecture for content types\n'
               '2. Implement ContentProvider for unified access\n'
               '3. Use Hive for local storage\n'
@@ -298,11 +307,7 @@ void main() {
       });
 
       test('can update all fields', () {
-        final original = Item(
-          id: 'note-16',
-          title: 'Old',
-          spaceId: 'space-16',
-        );
+        final original = Item(id: 'note-16', title: 'Old', spaceId: 'space-16');
 
         final newCreatedAt = DateTime(2025);
         final newUpdatedAt = DateTime(2025, 10, 26);
@@ -354,27 +359,15 @@ void main() {
       });
 
       test('different ids are not equal', () {
-        final item1 = Item(
-          id: 'id-1',
-          title: 'Same title',
-          spaceId: 'space-1',
-        );
+        final item1 = Item(id: 'id-1', title: 'Same title', spaceId: 'space-1');
 
-        final item2 = Item(
-          id: 'id-2',
-          title: 'Same title',
-          spaceId: 'space-1',
-        );
+        final item2 = Item(id: 'id-2', title: 'Same title', spaceId: 'space-1');
 
         expect(item1, isNot(equals(item2)));
       });
 
       test('identical items are equal', () {
-        final item = Item(
-          id: 'note-18',
-          title: 'Note',
-          spaceId: 'space-18',
-        );
+        final item = Item(id: 'note-18', title: 'Note', spaceId: 'space-18');
 
         expect(item, equals(item));
       });
@@ -399,11 +392,7 @@ void main() {
       });
 
       test('has readable format', () {
-        final item = Item(
-          id: 'note-20',
-          title: 'Note',
-          spaceId: 'space-20',
-        );
+        final item = Item(id: 'note-20', title: 'Note', spaceId: 'space-20');
 
         final string = item.toString();
 
@@ -417,22 +406,14 @@ void main() {
 
     group('edge cases', () {
       test('handles empty string title', () {
-        final item = Item(
-          id: 'note-21',
-          title: '',
-          spaceId: 'space-21',
-        );
+        final item = Item(id: 'note-21', title: '', spaceId: 'space-21');
 
         expect(item.title, '');
       });
 
       test('handles very long title', () {
         final longTitle = 'A' * 1000;
-        final item = Item(
-          id: 'note-22',
-          title: longTitle,
-          spaceId: 'space-22',
-        );
+        final item = Item(id: 'note-22', title: longTitle, spaceId: 'space-22');
 
         expect(item.title, longTitle);
       });
@@ -525,7 +506,10 @@ And it should all be preserved.
           spaceId: 'space-29',
         );
 
-        expect(item.content, 'Special chars in content: @#\$%^&*()_+-=[]{}|;:,.<>?/~`');
+        expect(
+          item.content,
+          'Special chars in content: @#\$%^&*()_+-=[]{}|;:,.<>?/~`',
+        );
       });
 
       test('handles unicode and emoji in title', () {
@@ -669,7 +653,8 @@ Our API uses JWT tokens for authentication.
         final item = Item(
           id: 'tagged-1',
           title: 'Q4 Planning Meeting Notes',
-          content: 'Key decisions and action items from today\'s planning session',
+          content:
+              'Key decisions and action items from today\'s planning session',
           spaceId: 'work',
           tags: ['meeting', 'planning', 'q4', 'important'],
         );

@@ -4,12 +4,12 @@ import 'package:provider/provider.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_typography.dart';
 import '../../core/theme/app_spacing.dart';
-import '../../core/utils/responsive_modal.dart';
 import '../../data/models/item_model.dart';
 import '../../providers/content_provider.dart';
 import '../../providers/spaces_provider.dart';
 import '../components/text/gradient_text.dart';
 import '../components/modals/bottom_sheet_container.dart';
+import '../../core/utils/responsive_modal.dart';
 
 /// Note Detail Screen for viewing and editing Note content
 ///
@@ -249,45 +249,23 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
       context: context,
       child: BottomSheetContainer(
         title: 'Add Tag',
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(AppSpacing.lg),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              TextField(
-                controller: _tagController,
-                decoration: const InputDecoration(
-                  labelText: 'Tag name',
-                  hintText: 'Enter tag name',
-                ),
-                autofocus: true,
-                textCapitalization: TextCapitalization.words,
-                onSubmitted: (value) {
-                  Navigator.of(context).pop();
-                  _addTag(value);
-                },
-              ),
-              const SizedBox(height: AppSpacing.lg),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  TextButton(
-                    onPressed: () => Navigator.of(context).pop(),
-                    child: const Text('Cancel'),
-                  ),
-                  const SizedBox(width: AppSpacing.sm),
-                  ElevatedButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                      _addTag(_tagController.text);
-                    },
-                    child: const Text('Add'),
-                  ),
-                ],
-              ),
-            ],
-          ),
+        primaryButtonText: 'Add',
+        onPrimaryPressed: () {
+          Navigator.of(context).pop();
+          _addTag(_tagController.text);
+        },
+        child: TextField(
+        controller: _tagController,
+        decoration: const InputDecoration(
+          labelText: 'Tag name',
+          hintText: 'Enter tag name',
+        ),
+        autofocus: true,
+        textCapitalization: TextCapitalization.words,
+        onSubmitted: (value) {
+          Navigator.of(context).pop();
+          _addTag(value);
+        },
         ),
       ),
     );

@@ -261,134 +261,120 @@ class _TodoListDetailScreenState extends State<TodoListDetailScreen> {
       context: context,
       child: BottomSheetContainer(
         title: existingItem == null ? 'Add TodoItem' : 'Edit TodoItem',
+        primaryButtonText: existingItem == null ? 'Add' : 'Save',
+        onPrimaryPressed: () {
+          if (titleController.text.trim().isEmpty) {
+            _showSnackBar('Title is required', isError: true);
+            return;
+          }
+
+          final item = TodoItem(
+            id: existingItem?.id ?? const Uuid().v4(),
+            title: titleController.text.trim(),
+            description: descriptionController.text.trim().isEmpty
+                ? null
+                : descriptionController.text.trim(),
+            isCompleted: existingItem?.isCompleted ?? false,
+            dueDate: selectedDueDate,
+            priority: selectedPriority,
+            tags: existingItem?.tags ?? [],
+            sortOrder: existingItem?.sortOrder ?? 0,
+          );
+
+          Navigator.of(context).pop(item);
+        },
         child: StatefulBuilder(
-          builder: (context, setDialogState) {
-            return SingleChildScrollView(
-              padding: const EdgeInsets.all(AppSpacing.lg),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Title field
-                  TextField(
-                    controller: titleController,
-                    decoration: const InputDecoration(
-                      labelText: 'Title *',
-                      hintText: 'Enter task title',
-                    ),
-                    autofocus: true,
-                    textCapitalization: TextCapitalization.sentences,
-                  ),
-                  const SizedBox(height: AppSpacing.md),
-
-                  // Description field
-                  TextField(
-                    controller: descriptionController,
-                    decoration: const InputDecoration(
-                      labelText: 'Description',
-                      hintText: 'Optional description',
-                    ),
-                    maxLines: 3,
-                    textCapitalization: TextCapitalization.sentences,
-                  ),
-                  const SizedBox(height: AppSpacing.md),
-
-                  // Due date picker
-                  ListTile(
-                    contentPadding: EdgeInsets.zero,
-                    leading: const Icon(Icons.calendar_today),
-                    title: Text(
-                      selectedDueDate == null
-                          ? 'No due date'
-                          : DateFormat.yMMMd().format(selectedDueDate!),
-                    ),
-                    trailing: selectedDueDate != null
-                        ? IconButton(
-                            icon: const Icon(Icons.clear),
-                            onPressed: () {
-                              setDialogState(() {
-                                selectedDueDate = null;
-                              });
-                            },
-                          )
-                        : null,
-                    onTap: () async {
-                      final date = await showDatePicker(
-                        context: context,
-                        initialDate: selectedDueDate ?? DateTime.now(),
-                        firstDate: DateTime.now(),
-                        lastDate: DateTime.now().add(const Duration(days: 365)),
-                      );
-                      if (date != null) {
-                        setDialogState(() {
-                          selectedDueDate = date;
-                        });
-                      }
-                    },
-                  ),
-                  const SizedBox(height: AppSpacing.md),
-
-                  // Priority dropdown
-                  DropdownButtonFormField<TodoPriority>(
-                    initialValue: selectedPriority,
-                    decoration: const InputDecoration(
-                      labelText: 'Priority',
-                    ),
-                    items: TodoPriority.values.map((priority) {
-                      return DropdownMenuItem(
-                        value: priority,
-                        child: Text(_getPriorityLabel(priority)),
-                      );
-                    }).toList(),
-                    onChanged: (value) {
-                      if (value != null) {
-                        setDialogState(() {
-                          selectedPriority = value;
-                        });
-                      }
-                    },
-                  ),
-                  const SizedBox(height: AppSpacing.lg),
-
-                  // Action buttons
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      TextButton(
-                        onPressed: () => Navigator.of(context).pop(),
-                        child: const Text('Cancel'),
-                      ),
-                      const SizedBox(width: AppSpacing.sm),
-                      ElevatedButton(
-                        onPressed: () {
-                          if (titleController.text.trim().isEmpty) {
-                            _showSnackBar('Title is required', isError: true);
-                            return;
-                          }
-
-                          final item = TodoItem(
-                            id: existingItem?.id ?? const Uuid().v4(),
-                            title: titleController.text.trim(),
-                            description: descriptionController.text.trim().isEmpty
-                                ? null
-                                : descriptionController.text.trim(),
-                            isCompleted: existingItem?.isCompleted ?? false,
-                            dueDate: selectedDueDate,
-                            priority: selectedPriority,
-                            tags: existingItem?.tags ?? [],
-                            sortOrder: existingItem?.sortOrder ?? 0,
-                          );
-
-                          Navigator.of(context).pop(item);
-                        },
-                        child: Text(existingItem == null ? 'Add' : 'Save'),
-                      ),
-                    ],
-                  ),
-                ],
+        builder: (context, setDialogState) {
+          return Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Title field
+              TextField(
+                controller: titleController,
+                decoration: const InputDecoration(
+                  labelText: 'Title *',
+                  hintText: 'Enter task title',
+                ),
+                autofocus: true,
+                textCapitalization: TextCapitalization.sentences,
+                onChanged: (_) {
+                  // Force rebuild to enable/disable button
+                  setDialogState(() {});
+                },
               ),
-            );
-          },
+              const SizedBox(height: AppSpacing.md),
+
+              // Description field
+              TextField(
+                controller: descriptionController,
+                decoration: const InputDecoration(
+                  labelText: 'Description',
+                  hintText: 'Optional description',
+                ),
+                maxLines: 3,
+                textCapitalization: TextCapitalization.sentences,
+              ),
+              const SizedBox(height: AppSpacing.md),
+
+              // Due date picker
+              ListTile(
+                contentPadding: EdgeInsets.zero,
+                leading: const Icon(Icons.calendar_today),
+                title: Text(
+                  selectedDueDate == null
+                      ? 'No due date'
+                      : DateFormat.yMMMd().format(selectedDueDate!),
+                ),
+                trailing: selectedDueDate != null
+                    ? IconButton(
+                        icon: const Icon(Icons.clear),
+                        onPressed: () {
+                          setDialogState(() {
+                            selectedDueDate = null;
+                          });
+                        },
+                      )
+                    : null,
+                onTap: () async {
+                  final date = await showDatePicker(
+                    context: context,
+                    initialDate: selectedDueDate ?? DateTime.now(),
+                    firstDate: DateTime.now(),
+                    lastDate: DateTime.now().add(const Duration(days: 365)),
+                  );
+                  if (date != null) {
+                    setDialogState(() {
+                      selectedDueDate = date;
+                    });
+                  }
+                },
+              ),
+              const SizedBox(height: AppSpacing.md),
+
+              // Priority dropdown
+              DropdownButtonFormField<TodoPriority>(
+                initialValue: selectedPriority,
+                decoration: const InputDecoration(
+                  labelText: 'Priority',
+                ),
+                items: TodoPriority.values.map((priority) {
+                  return DropdownMenuItem(
+                    value: priority,
+                    child: Text(_getPriorityLabel(priority)),
+                  );
+                }).toList(),
+                onChanged: (value) {
+                  if (value != null) {
+                    setDialogState(() {
+                      selectedPriority = value;
+                    });
+                  }
+                },
+              ),
+            ],
+          );
+        },
         ),
       ),
     );

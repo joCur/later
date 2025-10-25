@@ -368,14 +368,18 @@ void main() {
       await tester.drag(dismissible, const Offset(-200, 0));
       await tester.pump();
 
-      // Find the background container with error color and border radius
+      // Find the ClipRRect with border radius
+      final clipRRect = find.byWidgetPredicate(
+        (widget) => widget is ClipRRect &&
+                     widget.borderRadius == BorderRadius.circular(8.0),
+      );
+      expect(clipRRect, findsAtLeastNWidgets(1));
+
+      // Find the background container with error color
       final backgroundContainer = find.byWidgetPredicate(
         (widget) => widget is Container &&
-                     widget.decoration is BoxDecoration &&
-                     (widget.decoration as BoxDecoration).color == AppColors.error &&
-                     (widget.decoration as BoxDecoration).borderRadius == BorderRadius.circular(8.0),
+                     widget.color == AppColors.error,
       );
-
       expect(backgroundContainer, findsAtLeastNWidgets(1));
     });
   });

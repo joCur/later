@@ -5,13 +5,13 @@ import 'package:uuid/uuid.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_typography.dart';
 import '../../core/theme/app_spacing.dart';
-import '../../core/utils/responsive_modal.dart';
 import '../../data/models/list_model.dart';
 import '../../providers/content_provider.dart';
 import '../../providers/spaces_provider.dart';
 import '../components/cards/list_item_card.dart';
 import '../components/fab/responsive_fab.dart';
 import '../components/modals/bottom_sheet_container.dart';
+import '../../core/utils/responsive_modal.dart';
 import '../components/text/gradient_text.dart';
 
 /// List Detail Screen for viewing and editing List with ListItems
@@ -298,74 +298,54 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
       context: context,
       child: BottomSheetContainer(
         title: existingItem == null ? 'Add Item' : 'Edit Item',
-        child: SingleChildScrollView(
-          padding: EdgeInsets.only(
-            bottom: MediaQuery.of(context).viewInsets.bottom,
+        primaryButtonText: existingItem == null ? 'Add' : 'Save',
+        onPrimaryPressed: () {
+          if (titleController.text.trim().isEmpty) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Title is required')),
+            );
+            return;
+          }
+
+          final item = ListItem(
+            id: existingItem?.id ?? const Uuid().v4(),
+            title: titleController.text.trim(),
+            notes: notesController.text.trim().isEmpty
+                ? null
+                : notesController.text.trim(),
+            isChecked: existingItem?.isChecked ?? false,
+            sortOrder: existingItem?.sortOrder ?? 0,
+          );
+
+          Navigator.of(context).pop(item);
+        },
+        child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Title field
+          TextField(
+            controller: titleController,
+            decoration: const InputDecoration(
+              labelText: 'Title *',
+              hintText: 'Enter item title',
+            ),
+            autofocus: true,
+            textCapitalization: TextCapitalization.sentences,
           ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Title field
-              TextField(
-                controller: titleController,
-                decoration: const InputDecoration(
-                  labelText: 'Title *',
-                  hintText: 'Enter item title',
-                ),
-                autofocus: true,
-                textCapitalization: TextCapitalization.sentences,
-              ),
-              const SizedBox(height: AppSpacing.md),
+          const SizedBox(height: AppSpacing.md),
 
-              // Notes field
-              TextField(
-                controller: notesController,
-                decoration: const InputDecoration(
-                  labelText: 'Notes',
-                  hintText: 'Optional notes',
-                ),
-                maxLines: 3,
-                textCapitalization: TextCapitalization.sentences,
-              ),
-              const SizedBox(height: AppSpacing.lg),
-
-              // Action buttons
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  TextButton(
-                    onPressed: () => Navigator.of(context).pop(),
-                    child: const Text('Cancel'),
-                  ),
-                  const SizedBox(width: AppSpacing.sm),
-                  ElevatedButton(
-                    onPressed: () {
-                      if (titleController.text.trim().isEmpty) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Title is required')),
-                        );
-                        return;
-                      }
-
-                      final item = ListItem(
-                        id: existingItem?.id ?? const Uuid().v4(),
-                        title: titleController.text.trim(),
-                        notes: notesController.text.trim().isEmpty
-                            ? null
-                            : notesController.text.trim(),
-                        isChecked: existingItem?.isChecked ?? false,
-                        sortOrder: existingItem?.sortOrder ?? 0,
-                      );
-
-                      Navigator.of(context).pop(item);
-                    },
-                    child: Text(existingItem == null ? 'Add' : 'Save'),
-                  ),
-                ],
-              ),
-            ],
+          // Notes field
+          TextField(
+            controller: notesController,
+            decoration: const InputDecoration(
+              labelText: 'Notes',
+              hintText: 'Optional notes',
+            ),
+            maxLines: 3,
+            textCapitalization: TextCapitalization.sentences,
           ),
+        ],
         ),
       ),
     );
@@ -378,33 +358,27 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
       child: BottomSheetContainer(
         title: 'Select Style',
         child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ListTile(
-              leading: const Icon(Icons.circle, size: 8),
-              title: const Text('Bullets'),
-              subtitle: const Text('Simple bullet points'),
-              onTap: () => Navigator.of(context).pop(ListStyle.bullets),
-            ),
-            ListTile(
-              leading: const Text('1.', style: TextStyle(fontWeight: FontWeight.bold)),
-              title: const Text('Numbered'),
-              subtitle: const Text('Numbered list items'),
-              onTap: () => Navigator.of(context).pop(ListStyle.numbered),
-            ),
-            ListTile(
-              leading: const Icon(Icons.check_box_outline_blank),
-              title: const Text('Checkboxes'),
-              subtitle: const Text('Checkable task items'),
-              onTap: () => Navigator.of(context).pop(ListStyle.checkboxes),
-            ),
-            const SizedBox(height: AppSpacing.md),
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Cancel'),
-            ),
-            const SizedBox(height: AppSpacing.sm),
-          ],
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          ListTile(
+            leading: const Icon(Icons.circle, size: 8),
+            title: const Text('Bullets'),
+            subtitle: const Text('Simple bullet points'),
+            onTap: () => Navigator.of(context).pop(ListStyle.bullets),
+          ),
+          ListTile(
+            leading: const Text('1.', style: TextStyle(fontWeight: FontWeight.bold)),
+            title: const Text('Numbered'),
+            subtitle: const Text('Numbered list items'),
+            onTap: () => Navigator.of(context).pop(ListStyle.numbered),
+          ),
+          ListTile(
+            leading: const Icon(Icons.check_box_outline_blank),
+            title: const Text('Checkboxes'),
+            subtitle: const Text('Checkable task items'),
+            onTap: () => Navigator.of(context).pop(ListStyle.checkboxes),
+          ),
+        ],
         ),
       ),
     );
@@ -421,46 +395,35 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
       context: context,
       child: BottomSheetContainer(
         title: 'Select Icon',
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            GridView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 4,
-                crossAxisSpacing: AppSpacing.sm,
-                mainAxisSpacing: AppSpacing.sm,
-                mainAxisExtent: 56, // Minimum 48px touch target + padding
+        child: GridView.builder(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 4,
+          crossAxisSpacing: AppSpacing.sm,
+          mainAxisSpacing: AppSpacing.sm,
+          mainAxisExtent: 56, // Minimum 48px touch target + padding
+        ),
+        itemCount: commonIcons.length,
+        itemBuilder: (context, index) {
+          final icon = commonIcons[index];
+          return InkWell(
+            onTap: () => Navigator.of(context).pop(icon),
+            borderRadius: BorderRadius.circular(AppSpacing.xs),
+            child: Container(
+              decoration: BoxDecoration(
+                border: Border.all(color: AppColors.border(context)),
+                borderRadius: BorderRadius.circular(AppSpacing.xs),
               ),
-              itemCount: commonIcons.length,
-              itemBuilder: (context, index) {
-                final icon = commonIcons[index];
-                return InkWell(
-                  onTap: () => Navigator.of(context).pop(icon),
-                  borderRadius: BorderRadius.circular(AppSpacing.xs),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      border: Border.all(color: AppColors.border(context)),
-                      borderRadius: BorderRadius.circular(AppSpacing.xs),
-                    ),
-                    child: Center(
-                      child: Text(
-                        icon,
-                        style: const TextStyle(fontSize: 32),
-                      ),
-                    ),
-                  ),
-                );
-              },
+              child: Center(
+                child: Text(
+                  icon,
+                  style: const TextStyle(fontSize: 32),
+                ),
+              ),
             ),
-            const SizedBox(height: AppSpacing.md),
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Cancel'),
-            ),
-            const SizedBox(height: AppSpacing.sm),
-          ],
+          );
+        },
         ),
       ),
     );
