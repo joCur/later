@@ -1,19 +1,17 @@
 import 'package:uuid/uuid.dart';
 import '../models/item_model.dart';
 import '../models/space_model.dart';
-import '../repositories/item_repository.dart';
+import '../repositories/note_repository.dart';
 import '../repositories/space_repository.dart';
 
 /// Utility class for seeding the database with initial data on first run.
 ///
 /// This class provides methods to detect first run and initialize the app
-/// with a default "Personal" space and sample items to help users get started.
+/// with a default "Personal" space and sample notes to help users get started.
 ///
 /// The seed data includes:
 /// - 1 default "Personal" space
-/// - 2 tasks (one completed, one with due date)
-/// - 1 note with getting started information
-/// - 1 list with feature ideas
+/// - 1 welcome note with getting started information
 ///
 /// Example usage:
 /// ```dart
@@ -24,7 +22,7 @@ import '../repositories/space_repository.dart';
 class SeedData {
   static const Uuid _uuid = Uuid();
   static final SpaceRepository _spaceRepository = SpaceRepository();
-  static final ItemRepository _itemRepository = ItemRepository();
+  static final NoteRepository _noteRepository = NoteRepository();
 
   /// Check if this is the first run by checking if any spaces exist.
   ///
@@ -148,10 +146,10 @@ class SeedData {
       tags: ['ideas'],
     );
 
-    // Create all items in the repository
+    // Create all notes in the repository
     // Note: Item count is 3 (updated from 4)
-    await _itemRepository.createItem(welcomeNote);
-    await _itemRepository.createItem(gettingStartedNote);
-    await _itemRepository.createItem(featureIdeasNote);
+    await _noteRepository.create(welcomeNote);
+    await _noteRepository.create(gettingStartedNote);
+    await _noteRepository.create(featureIdeasNote);
   }
 }

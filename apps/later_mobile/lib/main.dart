@@ -5,13 +5,11 @@ import 'core/theme/app_theme.dart';
 import 'data/local/hive_database.dart';
 import 'data/local/preferences_service.dart';
 import 'data/local/seed_data.dart';
-import 'data/repositories/item_repository.dart';
 import 'data/repositories/list_repository.dart';
 import 'data/repositories/note_repository.dart';
 import 'data/repositories/space_repository.dart';
 import 'data/repositories/todo_list_repository.dart';
 import 'providers/content_provider.dart';
-import 'providers/items_provider.dart';
 import 'providers/spaces_provider.dart';
 import 'providers/theme_provider.dart';
 import 'widgets/screens/home_screen.dart';
@@ -52,9 +50,6 @@ class _LaterAppState extends State<LaterApp> {
         ),
         ChangeNotifierProvider(
           create: (_) => SpacesProvider(SpaceRepository())..loadSpaces(),
-        ),
-        ChangeNotifierProvider(
-          create: (_) => ItemsProvider(ItemRepository())..loadItems(),
         ),
         ChangeNotifierProvider(
           create: (_) => ContentProvider(
