@@ -175,13 +175,6 @@ class _TodoListDetailScreenState extends State<TodoListDetailScreen> {
     }
   }
 
-  /// Delete a TodoItem (with confirmation)
-  Future<void> _deleteTodoItem(TodoItem item) async {
-    final confirmed = await _showDeleteItemConfirmation(item.title);
-    if (!confirmed || !mounted) return;
-
-    await _performDeleteTodoItem(item);
-  }
 
   /// Perform the actual deletion without confirmation
   /// Used by Dismissible which handles confirmation separately

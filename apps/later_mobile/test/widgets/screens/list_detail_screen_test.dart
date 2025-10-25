@@ -3,6 +3,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:later_mobile/widgets/screens/list_detail_screen.dart';
 import 'package:later_mobile/widgets/components/cards/list_item_card.dart';
 import 'package:later_mobile/widgets/components/text/gradient_text.dart';
+import 'package:later_mobile/widgets/components/fab/responsive_fab.dart';
+import 'package:later_mobile/widgets/components/modals/bottom_sheet_container.dart';
 import 'package:later_mobile/data/models/list_model.dart';
 import 'package:later_mobile/providers/content_provider.dart';
 import 'package:later_mobile/providers/spaces_provider.dart';
@@ -248,8 +250,8 @@ void main() {
     ]);
   });
 
-  Widget createTestWidget(ListModel list) {
-    return MultiProvider(
+  Widget createTestWidget(ListModel list, {Size? screenSize}) {
+    Widget widget = MultiProvider(
       providers: [
         ChangeNotifierProvider<ContentProvider>.value(value: contentProvider),
         ChangeNotifierProvider<SpacesProvider>.value(value: spacesProvider),
@@ -258,6 +260,26 @@ void main() {
         home: ListDetailScreen(list: list),
       ),
     );
+
+    // Wrap with MediaQuery if custom screen size is provided
+    if (screenSize != null) {
+      widget = MediaQuery(
+        data: MediaQueryData(size: screenSize),
+        child: widget,
+      );
+    }
+
+    return widget;
+  }
+
+  /// Helper to set mobile viewport size (< 768px)
+  Widget createMobileTestWidget(ListModel list) {
+    return createTestWidget(list, screenSize: const Size(375, 812)); // iPhone size
+  }
+
+  /// Helper to set desktop viewport size (>= 1024px)
+  Widget createDesktopTestWidget(ListModel list) {
+    return createTestWidget(list, screenSize: const Size(1200, 800));
   }
 
   group('ListDetailScreen - Rendering', () {
@@ -377,7 +399,7 @@ void main() {
       expect(find.byType(Checkbox), findsNWidgets(2));
     });
 
-    testWidgets('renders FAB for adding items', (WidgetTester tester) async {
+    testWidgets('renders ResponsiveFab for adding items', (WidgetTester tester) async {
       final list = ListModel(
         id: 'list-1',
         spaceId: 'space-1',
@@ -389,9 +411,8 @@ void main() {
       await tester.pumpWidget(createTestWidget(list));
       await tester.pumpAndSettle();
 
-      // Check for FAB
-      expect(find.byType(FloatingActionButton), findsOneWidget);
-      expect(find.text('Add Item'), findsOneWidget);
+      // Check for ResponsiveFab
+      expect(find.byType(ResponsiveFab), findsOneWidget);
     });
 
     testWidgets('renders menu button in AppBar', (WidgetTester tester) async {
@@ -513,7 +534,7 @@ void main() {
   });
 
   group('ListDetailScreen - Item Management', () {
-    testWidgets('opens dialog to add new item', (WidgetTester tester) async {
+    testWidgets('opens modal to add new item', (WidgetTester tester) async {
       final list = ListModel(
         id: 'list-1',
         spaceId: 'space-1',
@@ -526,11 +547,13 @@ void main() {
       await tester.pumpAndSettle();
 
       // Tap FAB to add item
-      await tester.tap(find.byType(FloatingActionButton));
+      await tester.tap(find.byType(ResponsiveFab));
       await tester.pumpAndSettle();
 
-      // Should show dialog (note: FAB also has "Add Item" text)
-      expect(find.text('Add Item'), findsNWidgets(2)); // One in dialog title, one in FAB
+      // Should show modal with BottomSheetContainer
+      expect(find.byType(BottomSheetContainer), findsOneWidget);
+      // Note: "Add Item" appears twice - once in FAB label on desktop, once in modal title
+      expect(find.text('Add Item'), findsAtLeastNWidgets(1));
       expect(find.text('Title *'), findsOneWidget);
       expect(find.text('Notes'), findsOneWidget);
     });
@@ -551,7 +574,7 @@ void main() {
       expect(find.text('No items yet'), findsOneWidget);
 
       // Tap FAB
-      await tester.tap(find.byType(FloatingActionButton));
+      await tester.tap(find.byType(ResponsiveFab));
       await tester.pumpAndSettle();
 
       // We have dialog open, enter text in the title field
@@ -737,7 +760,7 @@ void main() {
       await tester.pumpAndSettle();
 
       // Should show style dialog
-      expect(find.text('Choose List Style'), findsOneWidget);
+      expect(find.text('Select Style'), findsOneWidget);
       expect(find.text('Bullets'), findsOneWidget);
       expect(find.text('Numbered'), findsOneWidget);
       expect(find.text('Checkboxes'), findsOneWidget);
@@ -764,7 +787,7 @@ void main() {
       await tester.pumpAndSettle();
 
       // Should show icon dialog
-      expect(find.text('Choose Icon'), findsOneWidget);
+      expect(find.text('Select Icon'), findsOneWidget);
     });
 
     testWidgets('deletes list with confirmation', (WidgetTester tester) async {
@@ -859,7 +882,7 @@ void main() {
       fakeListRepository.setShouldThrowError(true);
 
       // Try to add an item (which should fail)
-      await tester.tap(find.byType(FloatingActionButton));
+      await tester.tap(find.byType(ResponsiveFab));
       await tester.pumpAndSettle();
 
       // Enter title
@@ -923,6 +946,471 @@ void main() {
 
       // Check for semantic labels
       expect(find.bySemanticsLabel(RegExp('.*Item 1.*')), findsOneWidget);
+    });
+  });
+
+  group('ListDetailScreen - Responsive FAB', () {
+    testWidgets('renders ResponsiveFab on mobile', (WidgetTester tester) async {
+      final list = ListModel(
+        id: 'list-1',
+        spaceId: 'space-1',
+        name: 'List',
+        items: [],
+      );
+      fakeListRepository.setLists([list]);
+
+      await tester.pumpWidget(createMobileTestWidget(list));
+      await tester.pumpAndSettle();
+
+      // Should have ResponsiveFab
+      expect(find.byType(ResponsiveFab), findsOneWidget);
+
+      // On mobile, FAB should be circular (QuickCaptureFab style)
+      // The label "Add Item" should not be visible on mobile (icon only)
+      final fab = tester.widget<ResponsiveFab>(find.byType(ResponsiveFab));
+      expect(fab.label, 'Add Item');
+      expect(fab.icon, Icons.add);
+    });
+
+    testWidgets('renders extended FAB on desktop', (WidgetTester tester) async {
+      final list = ListModel(
+        id: 'list-1',
+        spaceId: 'space-1',
+        name: 'List',
+        items: [],
+      );
+      fakeListRepository.setLists([list]);
+
+      await tester.pumpWidget(createDesktopTestWidget(list));
+      await tester.pumpAndSettle();
+
+      // Should have ResponsiveFab
+      expect(find.byType(ResponsiveFab), findsOneWidget);
+
+      // On desktop, FAB should be extended with visible label
+      expect(find.text('Add Item'), findsOneWidget);
+
+      // Should also have the icon
+      expect(find.byIcon(Icons.add), findsOneWidget);
+    });
+
+    testWidgets('FAB opens modal on mobile', (WidgetTester tester) async {
+      final list = ListModel(
+        id: 'list-1',
+        spaceId: 'space-1',
+        name: 'List',
+        items: [],
+      );
+      fakeListRepository.setLists([list]);
+
+      await tester.pumpWidget(createMobileTestWidget(list));
+      await tester.pumpAndSettle();
+
+      // Tap FAB
+      await tester.tap(find.byType(ResponsiveFab));
+      await tester.pumpAndSettle();
+
+      // Modal should open
+      expect(find.byType(BottomSheetContainer), findsOneWidget);
+      expect(find.text('Add Item'), findsOneWidget);
+    });
+
+    testWidgets('FAB opens modal on desktop', (WidgetTester tester) async {
+      final list = ListModel(
+        id: 'list-1',
+        spaceId: 'space-1',
+        name: 'List',
+        items: [],
+      );
+      fakeListRepository.setLists([list]);
+
+      await tester.pumpWidget(createDesktopTestWidget(list));
+      await tester.pumpAndSettle();
+
+      // Tap FAB
+      await tester.tap(find.byType(ResponsiveFab));
+      await tester.pumpAndSettle();
+
+      // Modal should open
+      expect(find.byType(BottomSheetContainer), findsOneWidget);
+      expect(find.text('Add Item'), findsAtLeastNWidgets(1));
+    });
+  });
+
+  group('ListDetailScreen - Responsive Modals (Add/Edit Item)', () {
+    testWidgets('shows bottom sheet on mobile when adding item', (WidgetTester tester) async {
+      final list = ListModel(
+        id: 'list-1',
+        spaceId: 'space-1',
+        name: 'List',
+        items: [],
+      );
+      fakeListRepository.setLists([list]);
+
+      await tester.pumpWidget(createMobileTestWidget(list));
+      await tester.pumpAndSettle();
+
+      // Open add item modal
+      await tester.tap(find.byType(ResponsiveFab));
+      await tester.pumpAndSettle();
+
+      // Should show BottomSheetContainer with title
+      expect(find.byType(BottomSheetContainer), findsOneWidget);
+      expect(find.text('Add Item'), findsOneWidget);
+
+      // Should have drag handle on mobile (Container with specific dimensions)
+      final dragHandle = find.byWidgetPredicate(
+        (widget) => widget is Container &&
+                     widget.constraints?.maxWidth == 32,
+      );
+      expect(dragHandle, findsAtLeastNWidgets(1));
+
+      // Should have form fields
+      expect(find.text('Title *'), findsOneWidget);
+      expect(find.text('Notes'), findsOneWidget);
+    });
+
+    testWidgets('shows dialog on desktop when adding item', (WidgetTester tester) async {
+      final list = ListModel(
+        id: 'list-1',
+        spaceId: 'space-1',
+        name: 'List',
+        items: [],
+      );
+      fakeListRepository.setLists([list]);
+
+      await tester.pumpWidget(createDesktopTestWidget(list));
+      await tester.pumpAndSettle();
+
+      // Open add item modal
+      await tester.tap(find.byType(ResponsiveFab));
+      await tester.pumpAndSettle();
+
+      // Should show Dialog containing BottomSheetContainer
+      expect(find.byType(Dialog), findsOneWidget);
+      expect(find.byType(BottomSheetContainer), findsOneWidget);
+      expect(find.text('Add Item'), findsAtLeastNWidgets(1));
+
+      // Should have form fields
+      expect(find.text('Title *'), findsOneWidget);
+      expect(find.text('Notes'), findsOneWidget);
+    });
+
+    testWidgets('shows bottom sheet on mobile when editing item', (WidgetTester tester) async {
+      final list = ListModel(
+        id: 'list-1',
+        spaceId: 'space-1',
+        name: 'List',
+        items: [
+          ListItem(id: 'item-1', title: 'Existing Item', sortOrder: 0),
+        ],
+      );
+      fakeListRepository.setLists([list]);
+
+      await tester.pumpWidget(createMobileTestWidget(list));
+      await tester.pumpAndSettle();
+
+      // Long press to edit
+      await tester.longPress(find.text('Existing Item'));
+      await tester.pumpAndSettle();
+
+      // Should show BottomSheetContainer with "Edit Item" title
+      expect(find.byType(BottomSheetContainer), findsOneWidget);
+      expect(find.text('Edit Item'), findsOneWidget);
+
+      // Should have drag handle on mobile
+      final dragHandle = find.byWidgetPredicate(
+        (widget) => widget is Container &&
+                     widget.constraints?.maxWidth == 32,
+      );
+      expect(dragHandle, findsAtLeastNWidgets(1));
+    });
+
+    testWidgets('shows dialog on desktop when editing item', (WidgetTester tester) async {
+      final list = ListModel(
+        id: 'list-1',
+        spaceId: 'space-1',
+        name: 'List',
+        items: [
+          ListItem(id: 'item-1', title: 'Existing Item', sortOrder: 0),
+        ],
+      );
+      fakeListRepository.setLists([list]);
+
+      await tester.pumpWidget(createDesktopTestWidget(list));
+      await tester.pumpAndSettle();
+
+      // Long press to edit
+      await tester.longPress(find.text('Existing Item'));
+      await tester.pumpAndSettle();
+
+      // Should show Dialog containing BottomSheetContainer
+      expect(find.byType(Dialog), findsOneWidget);
+      expect(find.byType(BottomSheetContainer), findsOneWidget);
+      expect(find.text('Edit Item'), findsOneWidget);
+    });
+  });
+
+  group('ListDetailScreen - Responsive Modals (Style Selection)', () {
+    testWidgets('shows bottom sheet on mobile for style selection', (WidgetTester tester) async {
+      final list = ListModel(
+        id: 'list-1',
+        spaceId: 'space-1',
+        name: 'List',
+        items: [],
+      );
+      fakeListRepository.setLists([list]);
+
+      await tester.pumpWidget(createMobileTestWidget(list));
+      await tester.pumpAndSettle();
+
+      // Open menu and select "Change Style"
+      await tester.tap(find.byType(PopupMenuButton<String>));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Change Style'));
+      await tester.pumpAndSettle();
+
+      // Should show BottomSheetContainer
+      expect(find.byType(BottomSheetContainer), findsOneWidget);
+      expect(find.text('Select Style'), findsOneWidget);
+
+      // Should have drag handle on mobile
+      final dragHandle = find.byWidgetPredicate(
+        (widget) => widget is Container &&
+                     widget.constraints?.maxWidth == 32,
+      );
+      expect(dragHandle, findsAtLeastNWidgets(1));
+
+      // Should have style options
+      expect(find.text('Bullets'), findsOneWidget);
+      expect(find.text('Numbered'), findsOneWidget);
+      expect(find.text('Checkboxes'), findsOneWidget);
+    });
+
+    testWidgets('shows dialog on desktop for style selection', (WidgetTester tester) async {
+      final list = ListModel(
+        id: 'list-1',
+        spaceId: 'space-1',
+        name: 'List',
+        items: [],
+      );
+      fakeListRepository.setLists([list]);
+
+      await tester.pumpWidget(createDesktopTestWidget(list));
+      await tester.pumpAndSettle();
+
+      // Open menu and select "Change Style"
+      await tester.tap(find.byType(PopupMenuButton<String>));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Change Style'));
+      await tester.pumpAndSettle();
+
+      // Should show Dialog containing BottomSheetContainer
+      expect(find.byType(Dialog), findsOneWidget);
+      expect(find.byType(BottomSheetContainer), findsOneWidget);
+      expect(find.text('Select Style'), findsOneWidget);
+
+      // Should have style options
+      expect(find.text('Bullets'), findsOneWidget);
+      expect(find.text('Numbered'), findsOneWidget);
+      expect(find.text('Checkboxes'), findsOneWidget);
+    });
+  });
+
+  group('ListDetailScreen - Responsive Modals (Icon Selection)', () {
+    testWidgets('shows bottom sheet on mobile for icon selection', (WidgetTester tester) async {
+      final list = ListModel(
+        id: 'list-1',
+        spaceId: 'space-1',
+        name: 'List',
+        items: [],
+      );
+      fakeListRepository.setLists([list]);
+
+      await tester.pumpWidget(createMobileTestWidget(list));
+      await tester.pumpAndSettle();
+
+      // Open menu and select "Change Icon"
+      await tester.tap(find.byType(PopupMenuButton<String>));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Change Icon'));
+      await tester.pumpAndSettle();
+
+      // Should show BottomSheetContainer
+      expect(find.byType(BottomSheetContainer), findsOneWidget);
+      expect(find.text('Select Icon'), findsOneWidget);
+
+      // Should have drag handle on mobile
+      final dragHandle = find.byWidgetPredicate(
+        (widget) => widget is Container &&
+                     widget.constraints?.maxWidth == 32,
+      );
+      expect(dragHandle, findsAtLeastNWidgets(1));
+
+      // Should have icon grid
+      expect(find.text('📝'), findsOneWidget);
+      expect(find.text('📋'), findsOneWidget);
+    });
+
+    testWidgets('shows dialog on desktop for icon selection', (WidgetTester tester) async {
+      final list = ListModel(
+        id: 'list-1',
+        spaceId: 'space-1',
+        name: 'List',
+        items: [],
+      );
+      fakeListRepository.setLists([list]);
+
+      await tester.pumpWidget(createDesktopTestWidget(list));
+      await tester.pumpAndSettle();
+
+      // Open menu and select "Change Icon"
+      await tester.tap(find.byType(PopupMenuButton<String>));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Change Icon'));
+      await tester.pumpAndSettle();
+
+      // Should show Dialog containing BottomSheetContainer
+      expect(find.byType(Dialog), findsOneWidget);
+      expect(find.byType(BottomSheetContainer), findsOneWidget);
+      expect(find.text('Select Icon'), findsOneWidget);
+
+      // Should have icon grid
+      expect(find.text('📝'), findsOneWidget);
+      expect(find.text('📋'), findsOneWidget);
+    });
+  });
+
+  group('ListDetailScreen - Dismissible Background Styling', () {
+    testWidgets('Dismissible background has ClipRRect with correct borderRadius', (WidgetTester tester) async {
+      final list = ListModel(
+        id: 'list-1',
+        spaceId: 'space-1',
+        name: 'List',
+        items: [
+          ListItem(id: 'item-1', title: 'Test Item', sortOrder: 0),
+        ],
+      );
+      fakeListRepository.setLists([list]);
+
+      await tester.pumpWidget(createTestWidget(list));
+      await tester.pumpAndSettle();
+
+      // Find the dismissible
+      final dismissible = find.byType(Dismissible);
+      expect(dismissible, findsOneWidget);
+
+      // Start swipe to reveal background
+      await tester.drag(dismissible, const Offset(-200, 0));
+      await tester.pump();
+
+      // Should have ClipRRect with 8px borderRadius
+      final clipRRect = find.byWidgetPredicate(
+        (widget) => widget is ClipRRect &&
+                     widget.borderRadius == BorderRadius.circular(8.0),
+      );
+      expect(clipRRect, findsAtLeastNWidgets(1));
+    });
+
+    testWidgets('Dismissible background has Padding with bottom: 8px', (WidgetTester tester) async {
+      final list = ListModel(
+        id: 'list-1',
+        spaceId: 'space-1',
+        name: 'List',
+        items: [
+          ListItem(id: 'item-1', title: 'Test Item', sortOrder: 0),
+        ],
+      );
+      fakeListRepository.setLists([list]);
+
+      await tester.pumpWidget(createTestWidget(list));
+      await tester.pumpAndSettle();
+
+      // Find the dismissible
+      final dismissible = find.byType(Dismissible);
+
+      // Start swipe to reveal background
+      await tester.drag(dismissible, const Offset(-200, 0));
+      await tester.pump();
+
+      // Should have Padding with bottom: 8.0
+      final padding = find.byWidgetPredicate(
+        (widget) => widget is Padding &&
+                     widget.padding == const EdgeInsets.only(bottom: 8.0),
+      );
+      expect(padding, findsAtLeastNWidgets(1));
+    });
+
+    testWidgets('Dismissible background shows delete icon with proper alignment', (WidgetTester tester) async {
+      final list = ListModel(
+        id: 'list-1',
+        spaceId: 'space-1',
+        name: 'List',
+        items: [
+          ListItem(id: 'item-1', title: 'Test Item', sortOrder: 0),
+        ],
+      );
+      fakeListRepository.setLists([list]);
+
+      await tester.pumpWidget(createTestWidget(list));
+      await tester.pumpAndSettle();
+
+      // Find the dismissible
+      final dismissible = find.byType(Dismissible);
+
+      // Start swipe to reveal background
+      await tester.drag(dismissible, const Offset(-200, 0));
+      await tester.pump();
+
+      // Should show delete icon
+      expect(find.byIcon(Icons.delete), findsAtLeastNWidgets(1));
+
+      // Container should have centerRight alignment
+      final alignedContainer = find.byWidgetPredicate(
+        (widget) => widget is Container &&
+                     widget.alignment == Alignment.centerRight,
+      );
+      expect(alignedContainer, findsAtLeastNWidgets(1));
+    });
+
+    testWidgets('Dismissible background has correct container structure', (WidgetTester tester) async {
+      final list = ListModel(
+        id: 'list-1',
+        spaceId: 'space-1',
+        name: 'List',
+        items: [
+          ListItem(id: 'item-1', title: 'Test Item', sortOrder: 0),
+        ],
+      );
+      fakeListRepository.setLists([list]);
+
+      await tester.pumpWidget(createTestWidget(list));
+      await tester.pumpAndSettle();
+
+      // Find the dismissible
+      final dismissible = find.byType(Dismissible);
+
+      // Start swipe to reveal background
+      await tester.drag(dismissible, const Offset(-200, 0));
+      await tester.pump();
+
+      // Verify the structure: Padding > ClipRRect > Container
+      // Find Padding containing ClipRRect
+      final paddingWithClipRRect = find.ancestor(
+        of: find.byWidgetPredicate(
+          (widget) => widget is ClipRRect &&
+                       widget.borderRadius == BorderRadius.circular(8.0),
+        ),
+        matching: find.byWidgetPredicate(
+          (widget) => widget is Padding &&
+                       widget.padding == const EdgeInsets.only(bottom: 8.0),
+        ),
+      );
+      expect(paddingWithClipRRect, findsAtLeastNWidgets(1));
     });
   });
 }

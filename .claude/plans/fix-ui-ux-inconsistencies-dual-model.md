@@ -26,9 +26,14 @@ Fix UI/UX inconsistencies in detail screens (TodoListDetailScreen, ListDetailScr
 
 ## Implementation Phases
 
-### Phase 1: Create Responsive Modal Infrastructure ✅ COMPLETED
+### Phase 1: Create Responsive Modal Infrastructure ✅ COMPLETED (Updated)
 
 **Goal**: Build reusable utilities for responsive modals and FABs that handle mobile/desktop variants automatically.
+
+**Update (Phase 3 Post-Implementation)**:
+- Fixed BottomSheetContainer full-screen issue by changing `Expanded` to `Flexible` in mobile layout
+- This allows bottom sheets to size to content instead of filling all available space
+- All tests still pass (61 tests across ListDetailScreen and TodoListDetailScreen)
 
 - [x] Task 1.1: Create ResponsiveModal utility class ✅
   - Created file `apps/later_mobile/lib/core/utils/responsive_modal.dart`
@@ -120,47 +125,54 @@ Fix UI/UX inconsistencies in detail screens (TodoListDetailScreen, ListDetailScr
   - Tested Dismissible background has correct styling (ClipRRect with border radius)
   - All 18 tests passing ✅
 
-### Phase 3: Update ListDetailScreen
+### Phase 3: Update ListDetailScreen ✅ COMPLETED
 
 **Goal**: Migrate ListDetailScreen to use responsive modal and FAB patterns.
 
-- [ ] Task 3.1: Refactor _showListItemDialog to use ResponsiveModal
-  - Import `responsive_modal.dart` and `bottom_sheet_container.dart`
-  - Replace `showDialog()` call with `ResponsiveModal.show()`
-  - Extract dialog content into separate widget `ListItemForm`
-  - Wrap `ListItemForm` in `BottomSheetContainer` with title "Add Item" or "Edit Item"
-  - Preserve TextField controllers and form validation logic
+- [x] Task 3.1: Refactor _showListItemDialog to use ResponsiveModal ✅
+  - Imported `responsive_modal.dart` and `bottom_sheet_container.dart`
+  - Replaced `showDialog()` call with `ResponsiveModal.show()`
+  - Wrapped content in `BottomSheetContainer` with title "Add Item" or "Edit Item"
+  - Moved action buttons inside scrollable content area
+  - Preserved TextField controllers and form validation logic
 
-- [ ] Task 3.2: Refactor _showStyleSelectionDialog to use ResponsiveModal
-  - Replace `showDialog()` call with `ResponsiveModal.show()`
-  - Extract content into `StyleSelectionSheet` widget
-  - Use `BottomSheetContainer` with title "Select Style"
-  - Keep existing ListTile options (Bullet List, Numbered List, Checklist)
-  - Ensure selection callback works correctly
+- [x] Task 3.2: Refactor _showStyleSelectionDialog to use ResponsiveModal ✅
+  - Replaced `showDialog()` call with `ResponsiveModal.show()`
+  - Used `BottomSheetContainer` with title "Select Style"
+  - Kept existing ListTile options (Bullets, Numbered, Checkboxes)
+  - Selection callback works correctly
 
-- [ ] Task 3.3: Refactor _showIconSelectionDialog to use ResponsiveModal
-  - Replace `showDialog()` call with `ResponsiveModal.show()`
-  - Extract content into `IconSelectionSheet` widget
-  - Use `BottomSheetContainer` with title "Select Icon"
-  - Keep existing emoji GridView layout
-  - Ensure larger touch targets on mobile (min 48×48px per Material guidelines)
+- [x] Task 3.3: Refactor _showIconSelectionDialog to use ResponsiveModal ✅
+  - Replaced `showDialog()` call with `ResponsiveModal.show()`
+  - Used `BottomSheetContainer` with title "Select Icon"
+  - Kept existing emoji GridView layout
+  - Set mainAxisExtent to 56px for proper touch targets (48px minimum + padding)
+  - Added NeverScrollableScrollPhysics for GridView inside scrollable container
 
-- [ ] Task 3.4: Replace FloatingActionButton with ResponsiveFab
-  - Replace `FloatingActionButton.extended` with `ResponsiveFab`
+- [x] Task 3.4: Replace FloatingActionButton with ResponsiveFab ✅
+  - Replaced `FloatingActionButton.extended` with `ResponsiveFab`
   - Set `icon: Icons.add`, `label: 'Add Item'`, `onPressed: _addListItem`
-  - Use `AppColors.listGradient` for gradient parameter
+  - Used `AppColors.listGradient` for gradient parameter
 
-- [ ] Task 3.5: Fix Dismissible background styling
-  - Locate Dismissible widget for ListItemCard (around line 711-731)
-  - Apply same fix as TodoListDetailScreen: margin, borderRadius, padding
-  - Ensure visual consistency with TodoListDetailScreen
+- [x] Task 3.5: Fix Dismissible background styling ✅
+  - Updated Dismissible background at line 725-740
+  - Applied ClipRRect with 8px border radius for rounded corners
+  - Added Padding with bottom: 8px to match card margin
+  - Background automatically matches card height
+  - Delete icon properly aligned with 16px padding and 24px size
+  - **Bug Fix**: Removed double confirmation dialog issue by separating `_performDeleteListItem` (no confirmation) from `_deleteListItem` (with confirmation), following TodoListDetailScreen pattern
 
-- [ ] Task 3.6: Update widget tests for ListDetailScreen
-  - Update `test/widgets/screens/list_detail_screen_test.dart`
-  - Test all three modal variants (add item, style selection, icon selection) on mobile and desktop
-  - Test FAB responsive behavior
-  - Test Dismissible background styling
-  - Test all user interactions (add, edit, delete, style change, icon change)
+- [x] Task 3.6: Update widget tests for ListDetailScreen ✅
+  - Updated `test/widgets/screens/list_detail_screen_test.dart`
+  - Added helper methods: `createMobileTestWidget()` and `createDesktopTestWidget()`
+  - Added 16 new tests covering responsive behavior:
+    - 4 tests for ResponsiveFab (mobile/desktop rendering and functionality)
+    - 4 tests for Add/Edit Item modal (mobile/desktop bottom sheet vs dialog)
+    - 2 tests for Style Selection modal (mobile/desktop)
+    - 2 tests for Icon Selection modal (mobile/desktop)
+    - 4 tests for Dismissible background styling (ClipRRect, Padding, alignment)
+  - Updated 3 existing tests to use ResponsiveFab instead of FloatingActionButton
+  - All 43 tests passing ✅
 
 ### Phase 4: Update NoteDetailScreen
 

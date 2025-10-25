@@ -5,10 +5,13 @@ import 'package:uuid/uuid.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_typography.dart';
 import '../../core/theme/app_spacing.dart';
+import '../../core/utils/responsive_modal.dart';
 import '../../data/models/list_model.dart';
 import '../../providers/content_provider.dart';
 import '../../providers/spaces_provider.dart';
 import '../components/cards/list_item_card.dart';
+import '../components/fab/responsive_fab.dart';
+import '../components/modals/bottom_sheet_container.dart';
 import '../components/text/gradient_text.dart';
 
 /// List Detail Screen for viewing and editing List with ListItems
@@ -168,11 +171,9 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
     }
   }
 
-  /// Delete a ListItem
-  Future<void> _deleteListItem(ListItem item) async {
-    final confirmed = await _showDeleteItemConfirmation(item.title);
-    if (!confirmed || !mounted) return;
-
+  /// Perform ListItem deletion without confirmation
+  /// Used by Dismissible after confirmDismiss has already shown confirmation
+  Future<void> _performDeleteListItem(ListItem item) async {
     try {
       final provider = Provider.of<ContentProvider>(context, listen: false);
       await provider.deleteListItem(_currentList.id, item.id);
@@ -293,113 +294,119 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
     final titleController = TextEditingController(text: existingItem?.title ?? '');
     final notesController = TextEditingController(text: existingItem?.notes ?? '');
 
-    return showDialog<ListItem>(
+    return ResponsiveModal.show<ListItem>(
       context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Text(existingItem == null ? 'Add Item' : 'Edit Item'),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Title field
-                TextField(
-                  controller: titleController,
-                  decoration: const InputDecoration(
-                    labelText: 'Title *',
-                    hintText: 'Enter item title',
-                  ),
-                  autofocus: true,
-                  textCapitalization: TextCapitalization.sentences,
-                ),
-                const SizedBox(height: AppSpacing.md),
-
-                // Notes field
-                TextField(
-                  controller: notesController,
-                  decoration: const InputDecoration(
-                    labelText: 'Notes',
-                    hintText: 'Optional notes',
-                  ),
-                  maxLines: 3,
-                  textCapitalization: TextCapitalization.sentences,
-                ),
-              ],
-            ),
+      child: BottomSheetContainer(
+        title: existingItem == null ? 'Add Item' : 'Edit Item',
+        child: SingleChildScrollView(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom,
           ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Cancel'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                if (titleController.text.trim().isEmpty) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Title is required')),
-                  );
-                  return;
-                }
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Title field
+              TextField(
+                controller: titleController,
+                decoration: const InputDecoration(
+                  labelText: 'Title *',
+                  hintText: 'Enter item title',
+                ),
+                autofocus: true,
+                textCapitalization: TextCapitalization.sentences,
+              ),
+              const SizedBox(height: AppSpacing.md),
 
-                final item = ListItem(
-                  id: existingItem?.id ?? const Uuid().v4(),
-                  title: titleController.text.trim(),
-                  notes: notesController.text.trim().isEmpty
-                      ? null
-                      : notesController.text.trim(),
-                  isChecked: existingItem?.isChecked ?? false,
-                  sortOrder: existingItem?.sortOrder ?? 0,
-                );
+              // Notes field
+              TextField(
+                controller: notesController,
+                decoration: const InputDecoration(
+                  labelText: 'Notes',
+                  hintText: 'Optional notes',
+                ),
+                maxLines: 3,
+                textCapitalization: TextCapitalization.sentences,
+              ),
+              const SizedBox(height: AppSpacing.lg),
 
-                Navigator.of(context).pop(item);
-              },
-              child: Text(existingItem == null ? 'Add' : 'Save'),
-            ),
-          ],
-        );
-      },
+              // Action buttons
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    child: const Text('Cancel'),
+                  ),
+                  const SizedBox(width: AppSpacing.sm),
+                  ElevatedButton(
+                    onPressed: () {
+                      if (titleController.text.trim().isEmpty) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Title is required')),
+                        );
+                        return;
+                      }
+
+                      final item = ListItem(
+                        id: existingItem?.id ?? const Uuid().v4(),
+                        title: titleController.text.trim(),
+                        notes: notesController.text.trim().isEmpty
+                            ? null
+                            : notesController.text.trim(),
+                        isChecked: existingItem?.isChecked ?? false,
+                        sortOrder: existingItem?.sortOrder ?? 0,
+                      );
+
+                      Navigator.of(context).pop(item);
+                    },
+                    child: Text(existingItem == null ? 'Add' : 'Save'),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 
   /// Show style selection dialog
   Future<ListStyle?> _showStyleSelectionDialog() async {
-    return showDialog<ListStyle>(
+    return ResponsiveModal.show<ListStyle>(
       context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text('Choose List Style'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ListTile(
-                leading: const Icon(Icons.circle, size: 8),
-                title: const Text('Bullets'),
-                subtitle: const Text('Simple bullet points'),
-                onTap: () => Navigator.of(context).pop(ListStyle.bullets),
-              ),
-              ListTile(
-                leading: const Text('1.', style: TextStyle(fontWeight: FontWeight.bold)),
-                title: const Text('Numbered'),
-                subtitle: const Text('Numbered list items'),
-                onTap: () => Navigator.of(context).pop(ListStyle.numbered),
-              ),
-              ListTile(
-                leading: const Icon(Icons.check_box_outline_blank),
-                title: const Text('Checkboxes'),
-                subtitle: const Text('Checkable task items'),
-                onTap: () => Navigator.of(context).pop(ListStyle.checkboxes),
-              ),
-            ],
-          ),
-          actions: [
+      child: BottomSheetContainer(
+        title: 'Select Style',
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.circle, size: 8),
+              title: const Text('Bullets'),
+              subtitle: const Text('Simple bullet points'),
+              onTap: () => Navigator.of(context).pop(ListStyle.bullets),
+            ),
+            ListTile(
+              leading: const Text('1.', style: TextStyle(fontWeight: FontWeight.bold)),
+              title: const Text('Numbered'),
+              subtitle: const Text('Numbered list items'),
+              onTap: () => Navigator.of(context).pop(ListStyle.numbered),
+            ),
+            ListTile(
+              leading: const Icon(Icons.check_box_outline_blank),
+              title: const Text('Checkboxes'),
+              subtitle: const Text('Checkable task items'),
+              onTap: () => Navigator.of(context).pop(ListStyle.checkboxes),
+            ),
+            const SizedBox(height: AppSpacing.md),
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
               child: const Text('Cancel'),
             ),
+            const SizedBox(height: AppSpacing.sm),
           ],
-        );
-      },
+        ),
+      ),
     );
   }
 
@@ -410,25 +417,28 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
       '❤️', '🏠', '💼', '🎯', '🔖', '📚',
     ];
 
-    return showDialog<String>(
+    return ResponsiveModal.show<String>(
       context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text('Choose Icon'),
-          content: SizedBox(
-            width: double.maxFinite,
-            child: GridView.builder(
+      child: BottomSheetContainer(
+        title: 'Select Icon',
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            GridView.builder(
               shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 4,
                 crossAxisSpacing: AppSpacing.sm,
                 mainAxisSpacing: AppSpacing.sm,
+                mainAxisExtent: 56, // Minimum 48px touch target + padding
               ),
               itemCount: commonIcons.length,
               itemBuilder: (context, index) {
                 final icon = commonIcons[index];
                 return InkWell(
                   onTap: () => Navigator.of(context).pop(icon),
+                  borderRadius: BorderRadius.circular(AppSpacing.xs),
                   child: Container(
                     decoration: BoxDecoration(
                       border: Border.all(color: AppColors.border(context)),
@@ -444,15 +454,15 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
                 );
               },
             ),
-          ),
-          actions: [
+            const SizedBox(height: AppSpacing.md),
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
               child: const Text('Cancel'),
             ),
+            const SizedBox(height: AppSpacing.sm),
           ],
-        );
-      },
+        ),
+      ),
     );
   }
 
@@ -710,15 +720,25 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
                         final item = _currentList.items[index];
                         return Dismissible(
                           key: ValueKey(item.id),
-                          background: Container(
-                            color: AppColors.error,
-                            alignment: Alignment.centerRight,
-                            padding: const EdgeInsets.only(right: AppSpacing.md),
-                            child: const Icon(Icons.delete, color: Colors.white),
+                          background: Padding(
+                            padding: const EdgeInsets.only(bottom: 8.0),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(8.0),
+                              child: Container(
+                                color: AppColors.error,
+                                alignment: Alignment.centerRight,
+                                padding: const EdgeInsets.only(right: 16.0),
+                                child: const Icon(
+                                  Icons.delete,
+                                  color: Colors.white,
+                                  size: 24,
+                                ),
+                              ),
+                            ),
                           ),
                           direction: DismissDirection.endToStart,
                           confirmDismiss: (_) => _showDeleteItemConfirmation(item.title),
-                          onDismissed: (_) => _deleteListItem(item),
+                          onDismissed: (_) => _performDeleteListItem(item),
                           child: ListItemCard(
                             listItem: item,
                             listStyle: _currentList.style,
@@ -734,11 +754,11 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
             ),
           ],
         ),
-        floatingActionButton: FloatingActionButton.extended(
+        floatingActionButton: ResponsiveFab(
+          icon: Icons.add,
+          label: 'Add Item',
           onPressed: _addListItem,
-          icon: const Icon(Icons.add),
-          label: const Text('Add Item'),
-          backgroundColor: AppColors.listGradient.colors.first,
+          gradient: AppColors.listGradient,
         ),
       ),
     );

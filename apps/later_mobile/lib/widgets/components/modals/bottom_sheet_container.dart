@@ -108,7 +108,7 @@ class BottomSheetContainer extends StatelessWidget {
             ],
 
             // Content
-            Expanded(
+            Flexible(
               child: child,
             ),
           ],

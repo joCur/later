@@ -7,12 +7,12 @@ void main() {
     testWidgets('renders mobile bottom sheet with drag handle on mobile',
         (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: MediaQuery(
-            data: const MediaQueryData(size: Size(375, 812)), // Mobile size
+            data: MediaQueryData(size: Size(375, 812)), // Mobile size
             child: Scaffold(
               body: BottomSheetContainer(
-                child: const Text('Test Content'),
+                child: Text('Test Content'),
               ),
             ),
           ),
@@ -30,13 +30,13 @@ void main() {
     testWidgets('renders mobile bottom sheet with title when provided',
         (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: MediaQuery(
-            data: const MediaQueryData(size: Size(375, 812)), // Mobile size
+            data: MediaQueryData(size: Size(375, 812)), // Mobile size
             child: Scaffold(
               body: BottomSheetContainer(
                 title: 'Test Title',
-                child: const Text('Test Content'),
+                child: Text('Test Content'),
               ),
             ),
           ),
@@ -52,12 +52,12 @@ void main() {
 
     testWidgets('renders desktop dialog on desktop', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: MediaQuery(
-            data: const MediaQueryData(size: Size(1440, 900)), // Desktop size
+            data: MediaQueryData(size: Size(1440, 900)), // Desktop size
             child: Scaffold(
               body: BottomSheetContainer(
-                child: const Text('Test Content'),
+                child: Text('Test Content'),
               ),
             ),
           ),
@@ -74,13 +74,13 @@ void main() {
     testWidgets('renders desktop dialog with title when provided',
         (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: MediaQuery(
-            data: const MediaQueryData(size: Size(1440, 900)), // Desktop size
+            data: MediaQueryData(size: Size(1440, 900)), // Desktop size
             child: Scaffold(
               body: BottomSheetContainer(
                 title: 'Test Title',
-                child: const Text('Test Content'),
+                child: Text('Test Content'),
               ),
             ),
           ),
@@ -100,12 +100,12 @@ void main() {
     testWidgets('renders without title when not provided on mobile',
         (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: MediaQuery(
-            data: const MediaQueryData(size: Size(375, 812)), // Mobile size
+            data: MediaQueryData(size: Size(375, 812)), // Mobile size
             child: Scaffold(
               body: BottomSheetContainer(
-                child: const Text('Test Content'),
+                child: Text('Test Content'),
               ),
             ),
           ),
@@ -122,12 +122,12 @@ void main() {
     testWidgets('renders without title when not provided on desktop',
         (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: MediaQuery(
-            data: const MediaQueryData(size: Size(1440, 900)), // Desktop size
+            data: MediaQueryData(size: Size(1440, 900)), // Desktop size
             child: Scaffold(
               body: BottomSheetContainer(
-                child: const Text('Test Content'),
+                child: Text('Test Content'),
               ),
             ),
           ),
@@ -143,13 +143,13 @@ void main() {
 
     testWidgets('respects custom height on mobile', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: MediaQuery(
-            data: const MediaQueryData(size: Size(375, 812)), // Mobile size
+            data: MediaQueryData(size: Size(375, 812)), // Mobile size
             child: Scaffold(
               body: BottomSheetContainer(
                 height: 400,
-                child: const Text('Test Content'),
+                child: Text('Test Content'),
               ),
             ),
           ),
@@ -165,15 +165,15 @@ void main() {
 
     testWidgets('adapts to keyboard insets on mobile', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: MediaQuery(
-            data: const MediaQueryData(
+            data: MediaQueryData(
               size: Size(375, 812),
               viewInsets: EdgeInsets.only(bottom: 300), // Keyboard height
             ),
             child: Scaffold(
               body: BottomSheetContainer(
-                child: const Text('Test Content'),
+                child: Text('Test Content'),
               ),
             ),
           ),
@@ -191,11 +191,11 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           theme: ThemeData.light(),
-          home: MediaQuery(
-            data: const MediaQueryData(size: Size(375, 812)), // Mobile size
+          home: const MediaQuery(
+            data: MediaQueryData(size: Size(375, 812)), // Mobile size
             child: Scaffold(
               body: BottomSheetContainer(
-                child: const Text('Test Content'),
+                child: Text('Test Content'),
               ),
             ),
           ),
@@ -210,11 +210,11 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           theme: ThemeData.dark(),
-          home: MediaQuery(
-            data: const MediaQueryData(size: Size(375, 812)), // Mobile size
+          home: const MediaQuery(
+            data: MediaQueryData(size: Size(375, 812)), // Mobile size
             child: Scaffold(
               body: BottomSheetContainer(
-                child: const Text('Test Content'),
+                child: Text('Test Content'),
               ),
             ),
           ),

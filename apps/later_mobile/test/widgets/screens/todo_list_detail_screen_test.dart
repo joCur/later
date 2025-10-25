@@ -92,7 +92,6 @@ void main() {
           id: 'item-1',
           title: 'Test Item 1',
           description: 'Description 1',
-          isCompleted: false,
           priority: TodoPriority.high,
           sortOrder: 0,
         ),
