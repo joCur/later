@@ -4,10 +4,12 @@ import 'package:provider/provider.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_typography.dart';
 import '../../core/theme/app_spacing.dart';
+import '../../core/utils/responsive_modal.dart';
 import '../../data/models/item_model.dart';
 import '../../providers/content_provider.dart';
 import '../../providers/spaces_provider.dart';
 import '../components/text/gradient_text.dart';
+import '../components/modals/bottom_sheet_container.dart';
 
 /// Note Detail Screen for viewing and editing Note content
 ///
@@ -243,39 +245,51 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
   Future<void> _showAddTagDialog() async {
     _tagController.clear();
 
-    return showDialog<void>(
+    return ResponsiveModal.show<void>(
       context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text('Add Tag'),
-          content: TextField(
-            controller: _tagController,
-            decoration: const InputDecoration(
-              labelText: 'Tag name',
-              hintText: 'Enter tag name',
-            ),
-            autofocus: true,
-            textCapitalization: TextCapitalization.words,
-            onSubmitted: (value) {
-              Navigator.of(context).pop();
-              _addTag(value);
-            },
+      child: BottomSheetContainer(
+        title: 'Add Tag',
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(AppSpacing.lg),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              TextField(
+                controller: _tagController,
+                decoration: const InputDecoration(
+                  labelText: 'Tag name',
+                  hintText: 'Enter tag name',
+                ),
+                autofocus: true,
+                textCapitalization: TextCapitalization.words,
+                onSubmitted: (value) {
+                  Navigator.of(context).pop();
+                  _addTag(value);
+                },
+              ),
+              const SizedBox(height: AppSpacing.lg),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    child: const Text('Cancel'),
+                  ),
+                  const SizedBox(width: AppSpacing.sm),
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                      _addTag(_tagController.text);
+                    },
+                    child: const Text('Add'),
+                  ),
+                ],
+              ),
+            ],
           ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Cancel'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-                _addTag(_tagController.text);
-              },
-              child: const Text('Add'),
-            ),
-          ],
-        );
-      },
+        ),
+      ),
     );
   }
 

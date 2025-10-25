@@ -174,22 +174,29 @@ Fix UI/UX inconsistencies in detail screens (TodoListDetailScreen, ListDetailScr
   - Updated 3 existing tests to use ResponsiveFab instead of FloatingActionButton
   - All 43 tests passing ✅
 
-### Phase 4: Update NoteDetailScreen
+### Phase 4: Update NoteDetailScreen ✅ COMPLETED
 
 **Goal**: Migrate NoteDetailScreen to use responsive modal pattern.
 
-- [ ] Task 4.1: Refactor _showAddTagDialog to use ResponsiveModal
-  - Import `responsive_modal.dart` and `bottom_sheet_container.dart`
-  - Replace `showDialog()` call with `ResponsiveModal.show()`
-  - Extract dialog content into `AddTagSheet` widget with TextField
-  - Wrap in `BottomSheetContainer` with title "Add Tag"
-  - Preserve existing tag validation and creation logic
+- [x] Task 4.1: Refactor _showAddTagDialog to use ResponsiveModal ✅
+  - Imported `responsive_modal.dart` and `bottom_sheet_container.dart`
+  - Replaced `showDialog()` call with `ResponsiveModal.show()`
+  - Wrapped content in `BottomSheetContainer` with title "Add Tag"
+  - Content wrapped in `SingleChildScrollView` for keyboard handling
+  - TextField and action buttons moved inside scrollable content area
+  - Preserved existing tag validation and creation logic
+  - Implementation at lines 245-294 in note_detail_screen.dart
 
-- [ ] Task 4.2: Update widget tests for NoteDetailScreen
-  - Update `test/widgets/screens/note_detail_screen_test.dart`
-  - Test add tag modal on both mobile and desktop
-  - Verify TextField and submit button work correctly
-  - Test tag creation flow end-to-end
+- [x] Task 4.2: Update widget tests for NoteDetailScreen ✅
+  - Updated `test/widgets/screens/note_detail_screen_test.dart`
+  - Added helper methods: `createMobileTestWidget()` and `createDesktopTestWidget()`
+  - Updated existing test "should show dialog to add tag" to "should show modal to add tag"
+  - Added 4 new tests in "Responsive Modal" group:
+    - Test bottom sheet appears on mobile when adding tag
+    - Test dialog appears on desktop when adding tag
+    - Test tag addition works from mobile bottom sheet
+    - Test tag addition works from desktop dialog
+  - All 34 tests passing ✅
 
 ### Phase 5: Integration Testing and Polish
 

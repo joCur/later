@@ -40,8 +40,8 @@ void main() {
         .thenAnswer((_) async => Future.value());
   });
 
-  Widget createTestWidget(Item note) {
-    return MultiProvider(
+  Widget createTestWidget(Item note, {Size? screenSize}) {
+    Widget widget = MultiProvider(
       providers: [
         ChangeNotifierProvider<ContentProvider>.value(
           value: mockContentProvider,
@@ -54,6 +54,26 @@ void main() {
         home: NoteDetailScreen(note: note),
       ),
     );
+
+    // Wrap with MediaQuery if custom screen size is provided
+    if (screenSize != null) {
+      widget = MediaQuery(
+        data: MediaQueryData(size: screenSize),
+        child: widget,
+      );
+    }
+
+    return widget;
+  }
+
+  /// Helper to set mobile viewport size (< 768px)
+  Widget createMobileTestWidget(Item note) {
+    return createTestWidget(note, screenSize: const Size(375, 812)); // iPhone size
+  }
+
+  /// Helper to set desktop viewport size (>= 1024px)
+  Widget createDesktopTestWidget(Item note) {
+    return createTestWidget(note, screenSize: const Size(1200, 800));
   }
 
   group('NoteDetailScreen - UI Elements', () {
@@ -199,7 +219,7 @@ void main() {
       expect(find.byIcon(Icons.add), findsWidgets);
     });
 
-    testWidgets('should show dialog to add tag', (tester) async {
+    testWidgets('should show modal to add tag', (tester) async {
       await tester.pumpWidget(createTestWidget(testNote));
       await tester.pumpAndSettle();
 
@@ -208,9 +228,9 @@ void main() {
       await tester.tap(addButton);
       await tester.pumpAndSettle();
 
-      // Should show dialog
-      expect(find.byType(AlertDialog), findsOneWidget);
+      // Should show modal (responsive based on screen size)
       expect(find.text('Add Tag'), findsOneWidget);
+      expect(find.byType(TextField), findsWidgets);
     });
 
     testWidgets('should add new tag', (tester) async {
@@ -518,6 +538,77 @@ void main() {
       final contentField = find.byKey(const Key('note_content_field'));
       final semantics = tester.getSemantics(contentField);
       expect(semantics, isNotNull);
+    });
+  });
+
+  group('NoteDetailScreen - Responsive Modal', () {
+    testWidgets('should show bottom sheet on mobile when adding tag',
+        (tester) async {
+      await tester.pumpWidget(createMobileTestWidget(testNote));
+      await tester.pumpAndSettle();
+
+      // Tap add tag button
+      final addButton = find.widgetWithIcon(IconButton, Icons.add).first;
+      await tester.tap(addButton);
+      await tester.pumpAndSettle();
+
+      // On mobile, should show BottomSheetContainer (no AlertDialog)
+      expect(find.byType(AlertDialog), findsNothing);
+      // Bottom sheet content should be visible
+      expect(find.text('Add Tag'), findsOneWidget);
+    });
+
+    testWidgets('should show dialog on desktop when adding tag',
+        (tester) async {
+      await tester.pumpWidget(createDesktopTestWidget(testNote));
+      await tester.pumpAndSettle();
+
+      // Tap add tag button
+      final addButton = find.widgetWithIcon(IconButton, Icons.add).first;
+      await tester.tap(addButton);
+      await tester.pumpAndSettle();
+
+      // On desktop, should show Dialog
+      expect(find.byType(Dialog), findsOneWidget);
+      expect(find.text('Add Tag'), findsOneWidget);
+    });
+
+    testWidgets('should add tag successfully from mobile bottom sheet',
+        (tester) async {
+      await tester.pumpWidget(createMobileTestWidget(testNote));
+      await tester.pumpAndSettle();
+
+      // Open add tag modal
+      final addButton = find.widgetWithIcon(IconButton, Icons.add).first;
+      await tester.tap(addButton);
+      await tester.pumpAndSettle();
+
+      // Enter tag name and submit
+      await tester.enterText(find.byType(TextField).last, 'newtag');
+      await tester.tap(find.text('Add'));
+      await tester.pumpAndSettle();
+
+      // Should call updateNote
+      verify(mockContentProvider.updateNote(any)).called(greaterThan(0));
+    });
+
+    testWidgets('should add tag successfully from desktop dialog',
+        (tester) async {
+      await tester.pumpWidget(createDesktopTestWidget(testNote));
+      await tester.pumpAndSettle();
+
+      // Open add tag modal
+      final addButton = find.widgetWithIcon(IconButton, Icons.add).first;
+      await tester.tap(addButton);
+      await tester.pumpAndSettle();
+
+      // Enter tag name and submit
+      await tester.enterText(find.byType(TextField).last, 'newtag');
+      await tester.tap(find.text('Add'));
+      await tester.pumpAndSettle();
+
+      // Should call updateNote
+      verify(mockContentProvider.updateNote(any)).called(greaterThan(0));
     });
   });
 }
