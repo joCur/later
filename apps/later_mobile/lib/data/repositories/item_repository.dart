@@ -4,10 +4,10 @@ import '../models/item_model.dart';
 /// Repository for managing Item entities in Hive local storage.
 ///
 /// Provides CRUD operations and filtering capabilities for items.
-/// Uses Hive box 'items' for persistence.
+/// Uses Hive box 'notes' for persistence.
 class ItemRepository {
-  /// Gets the Hive box for items
-  Box<Item> get _box => Hive.box<Item>('items');
+  /// Gets the Hive box for items (stored in 'notes' box)
+  Box<Item> get _box => Hive.box<Item>('notes');
 
   /// Creates a new item in the local storage.
   ///
