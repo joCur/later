@@ -75,7 +75,6 @@ class _TodoItemCardState extends State<TodoItemCard> {
   static const double _cardMaxHeight = 72.0;
   static const double _cardHorizontalPadding = 12.0;
   static const double _cardVerticalPadding = 12.0;
-  static const double _cardBottomMargin = 8.0;
 
   // Priority badge constants
   static const double _priorityBadgeHorizontalPadding = 6.0;
@@ -323,10 +322,7 @@ class _TodoItemCardState extends State<TodoItemCard> {
             onLongPress: _handleLongPress,
             child: Opacity(
               opacity: widget.todoItem.isCompleted ? AppColors.completedOpacity : 1.0,
-              child: Padding(
-                padding: const EdgeInsets.only(bottom: _cardBottomMargin),
-                child: cardContent,
-              ),
+              child: cardContent,
             ),
           ),
         ),

@@ -614,35 +614,31 @@ class _TodoListDetailScreenState extends State<TodoListDetailScreen> {
                       },
                       itemBuilder: (context, index) {
                         final item = _currentTodoList.items[index];
-                        return Padding(
+                        return Dismissible(
                           key: ValueKey(item.id),
-                          padding: const EdgeInsets.only(bottom: AppSpacing.sm),
-                          child: Dismissible(
-                            key: ValueKey('dismissible-${item.id}'),
-                            background: Padding(
-                              padding: const EdgeInsets.only(bottom: 8.0),
+                          background: Padding(
+                            padding: const EdgeInsets.only(bottom: 8.0),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(8.0),
                               child: Container(
-                                decoration: BoxDecoration(
-                                  color: AppColors.error,
-                                  borderRadius: BorderRadius.circular(8.0),
-                                ),
+                                color: AppColors.error,
                                 alignment: Alignment.centerRight,
                                 padding: const EdgeInsets.only(right: 16.0),
                                 child: const Icon(
                                   Icons.delete,
                                   color: Colors.white,
-                                  size: 24.0,
+                                  size: 24,
                                 ),
                               ),
                             ),
-                            direction: DismissDirection.endToStart,
-                            confirmDismiss: (_) => _showDeleteItemConfirmation(item.title),
-                            onDismissed: (_) => _performDeleteTodoItem(item),
-                            child: TodoItemCard(
-                              todoItem: item,
-                              onCheckboxChanged: (value) => _toggleTodoItem(item),
-                              onLongPress: () => _editTodoItem(item),
-                            ),
+                          ),
+                          direction: DismissDirection.endToStart,
+                          confirmDismiss: (_) => _showDeleteItemConfirmation(item.title),
+                          onDismissed: (_) => _performDeleteTodoItem(item),
+                          child: TodoItemCard(
+                            todoItem: item,
+                            onCheckboxChanged: (value) => _toggleTodoItem(item),
+                            onLongPress: () => _editTodoItem(item),
                           ),
                         );
                       },
