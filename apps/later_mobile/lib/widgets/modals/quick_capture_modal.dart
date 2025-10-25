@@ -17,7 +17,10 @@ import '../../data/models/item_model.dart';
 import '../../providers/items_provider.dart';
 import '../../providers/spaces_provider.dart';
 
-/// Type option for the type selector
+// DEPRECATED: Type selector removed in dual-model architecture migration
+// Quick Capture now creates Notes (Item model) only
+// Use ContentProvider for TodoList and ListModel creation
+/*
 class TypeOption {
   const TypeOption({
     required this.label,
@@ -28,9 +31,10 @@ class TypeOption {
 
   final String label;
   final IconData icon;
-  final ItemType? type; // null for "Auto"
+  final ContentType? type; // null for "Auto"
   final Color? color;
 }
+*/
 
 /// Quick Capture Modal widget
 ///
@@ -64,31 +68,34 @@ class _QuickCaptureModalState extends State<QuickCaptureModal>
   bool _isSaved = false;
   String? _selectedSpaceId; // Local state for space selection (modal-only)
 
-  // Type options
+  // DEPRECATED: Type selection removed - Quick Capture creates Notes (Item) only
+  // Future: Use ContentProvider to create TodoList/ListModel based on content analysis
+  /*
   static const List<TypeOption> _typeOptions = [
     TypeOption(label: 'Auto', icon: Icons.auto_awesome, type: null),
     TypeOption(
       label: 'Task',
       icon: Icons.check_box_outlined,
-      type: ItemType.task,
+      type: ContentType.todoList,
       color: AppColors.accentBlue,
     ),
     TypeOption(
       label: 'Note',
       icon: Icons.description_outlined,
-      type: ItemType.note,
+      type: ContentType.note,
       color: AppColors.accentGreen,
     ),
     TypeOption(
       label: 'List',
       icon: Icons.list,
-      type: ItemType.list,
+      type: ContentType.list,
       color: AppColors.accentViolet,
     ),
   ];
 
-  ItemType? _selectedType; // null = Auto
-  ItemType? _detectedType; // Tracks auto-detected type
+  ContentType? _selectedType; // null = Auto
+  ContentType? _detectedType; // Tracks auto-detected type
+  */
   late AnimationController _animationController;
   late Animation<double> _scaleAnimation;
   late Animation<double> _fadeAnimation;
@@ -254,14 +261,13 @@ class _QuickCaptureModalState extends State<QuickCaptureModal>
       );
     }
 
-    // Detect or use selected type
-    final itemType = _selectedType ?? _detectType(text);
+    // Note: Type detection removed - Quick Capture creates Notes (Item) only
+    // Future: Enhance with ContentProvider to auto-create TodoList/ListModel
 
     if (_currentItemId == null) {
-      // Create new item in the selected space
+      // Create new item (Note) in the selected space
       final item = Item(
         id: const Uuid().v4(),
-        type: itemType,
         title: text,
         spaceId: targetSpaceId,
       );
@@ -274,14 +280,13 @@ class _QuickCaptureModalState extends State<QuickCaptureModal>
         (item) => item.id == _currentItemId,
         orElse: () => Item(
           id: _currentItemId!,
-          type: itemType,
           title: text,
           spaceId: targetSpaceId,
         ),
       );
 
       await itemsProvider.updateItem(
-        existingItem.copyWith(title: text, type: itemType),
+        existingItem.copyWith(title: text),
       );
     }
 
@@ -291,18 +296,18 @@ class _QuickCaptureModalState extends State<QuickCaptureModal>
     });
   }
 
-  ItemType _detectType(String text) {
-    // Use ItemTypeDetector for smart type detection
+  // DEPRECATED: Type detection removed in dual-model architecture
+  // Quick Capture creates Notes only
+  /*
+  ContentType _detectType(String text) {
     final detectedType = ItemTypeDetector.detectType(text);
-
-    // Trigger animation if type changed and we're in auto mode
     if (_selectedType == null && _detectedType != detectedType) {
       _detectedType = detectedType;
       _typeIconAnimationController.forward(from: 0.0);
     }
-
     return detectedType;
   }
+  */
 
   Future<void> _handleKeyEvent(KeyEvent event) async {
     if (event is KeyDownEvent) {
@@ -841,10 +846,10 @@ class _QuickCaptureModalState extends State<QuickCaptureModal>
 
           const Spacer(),
 
-          // Type selector
-          _buildTypeSelector(),
-
-          const SizedBox(width: AppSpacing.xs),
+          // Type selector - REMOVED in dual-model architecture
+          // Quick Capture creates Notes only
+          // _buildTypeSelector(),
+          // const SizedBox(width: AppSpacing.xs),
 
           // Space selector
           _buildSpaceSelector(),
@@ -853,6 +858,9 @@ class _QuickCaptureModalState extends State<QuickCaptureModal>
     );
   }
 
+  // DEPRECATED: Type selector removed in dual-model architecture
+  // Quick Capture creates Notes only
+  /*
   Widget _buildTypeSelector() {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final selectedOption = _typeOptions.firstWhere(
@@ -876,7 +884,6 @@ class _QuickCaptureModalState extends State<QuickCaptureModal>
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Animated icon for type detection feedback
             ScaleTransition(
               key: const Key('type_icon_animated'),
               scale: _typeIconScaleAnimation,
@@ -940,6 +947,7 @@ class _QuickCaptureModalState extends State<QuickCaptureModal>
       },
     );
   }
+  */
 
   Widget _buildSpaceSelector() {
     return Consumer<SpacesProvider>(

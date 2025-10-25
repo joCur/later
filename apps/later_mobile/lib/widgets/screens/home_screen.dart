@@ -92,22 +92,12 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   /// Filter items based on selected filter
+  /// NOTE: In dual-model architecture, Items represent Notes only
+  /// Filtering by type is deprecated - will be removed in future phases
   List<Item> _getFilteredItems(List<Item> items) {
-    List<Item> filtered;
-    switch (_selectedFilter) {
-      case ItemFilter.all:
-        filtered = items;
-        break;
-      case ItemFilter.tasks:
-        filtered = items.where((item) => item.type == ItemType.task).toList();
-        break;
-      case ItemFilter.notes:
-        filtered = items.where((item) => item.type == ItemType.note).toList();
-        break;
-      case ItemFilter.lists:
-        filtered = items.where((item) => item.type == ItemType.list).toList();
-        break;
-    }
+    // All Items are Notes in dual-model architecture
+    // Filtering disabled during transition period
+    final filtered = items;
 
     // Apply pagination: return only the current page of items
     return filtered.take(_currentItemCount).toList();
@@ -309,7 +299,14 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   /// Build filter chips
+  /// NOTE: Type filtering hidden in dual-model architecture (Items are Notes only)
+  /// This will be replaced with proper filtering for TodoList/ListModel in future phases
   Widget _buildFilterChips(BuildContext context) {
+    // Filter chips temporarily disabled during dual-model migration
+    // Items are all Notes, so filtering by type doesn't make sense
+    return const SizedBox.shrink();
+
+    /* DEPRECATED - Will be replaced with proper dual-model filtering
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return SingleChildScrollView(
@@ -333,17 +330,6 @@ class _HomeScreenState extends State<HomeScreen> {
             isDark: isDark,
           ),
           _FilterChip(
-            label: 'Tasks',
-            isSelected: _selectedFilter == ItemFilter.tasks,
-            onSelected: () {
-              setState(() {
-                _selectedFilter = ItemFilter.tasks;
-                _resetPagination();
-              });
-            },
-            isDark: isDark,
-          ),
-          _FilterChip(
             label: 'Notes',
             isSelected: _selectedFilter == ItemFilter.notes,
             onSelected: () {
@@ -354,20 +340,10 @@ class _HomeScreenState extends State<HomeScreen> {
             },
             isDark: isDark,
           ),
-          _FilterChip(
-            label: 'Lists',
-            isSelected: _selectedFilter == ItemFilter.lists,
-            onSelected: () {
-              setState(() {
-                _selectedFilter = ItemFilter.lists;
-                _resetPagination();
-              });
-            },
-            isDark: isDark,
-          ),
         ],
       ),
     );
+    */
   }
 
   /// Build item list with pagination
@@ -399,20 +375,8 @@ class _HomeScreenState extends State<HomeScreen> {
     }
 
     // Calculate if there are more items to load
-    final filteredItems = _selectedFilter == ItemFilter.all
-        ? itemsProvider.items
-        : itemsProvider.items.where((item) {
-            switch (_selectedFilter) {
-              case ItemFilter.tasks:
-                return item.type == ItemType.task;
-              case ItemFilter.notes:
-                return item.type == ItemType.note;
-              case ItemFilter.lists:
-                return item.type == ItemType.list;
-              case ItemFilter.all:
-                return true;
-            }
-          }).toList();
+    // NOTE: Type filtering disabled in dual-model architecture (Items are Notes only)
+    final filteredItems = itemsProvider.items;
 
     final hasMoreItems = items.length < filteredItems.length;
     final itemCount = hasMoreItems ? items.length + 1 : items.length;
@@ -464,11 +428,8 @@ class _HomeScreenState extends State<HomeScreen> {
           onLongPress: () {
             debugPrint('Item long-pressed: ${item.id}');
           },
-          onCheckboxChanged: item.type == ItemType.task
-              ? (value) {
-                  context.read<ItemsProvider>().toggleCompletion(item.id);
-                }
-              : null,
+          // onCheckboxChanged removed - Items (Notes) don't have completion status
+          // TodoList model handles task completion in dual-model architecture
         );
       },
     );
@@ -490,11 +451,9 @@ class _HomeScreenState extends State<HomeScreen> {
           // Main content
           Column(
             children: [
-              // Filter chips
-              _buildFilterChips(context),
-
-              // Divider
-              const Divider(height: 1),
+              // Filter chips - Hidden in dual-model architecture
+              // _buildFilterChips(context),
+              // const Divider(height: 1),
 
               // Item list
               Expanded(
@@ -583,11 +542,9 @@ class _HomeScreenState extends State<HomeScreen> {
                     // App bar
                     _buildAppBar(context, spacesProvider.currentSpace),
 
-                    // Filter chips
-                    _buildFilterChips(context),
-
-                    // Divider
-                    const Divider(height: 1),
+                    // Filter chips - Hidden in dual-model architecture
+                    // _buildFilterChips(context),
+                    // const Divider(height: 1),
 
                     // Item list
                     Expanded(

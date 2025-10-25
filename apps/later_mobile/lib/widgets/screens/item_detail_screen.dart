@@ -11,23 +11,27 @@ import '../../providers/items_provider.dart';
 import '../../providers/spaces_provider.dart';
 import '../components/text/gradient_text.dart';
 
-/// Item Detail Screen for viewing and editing item details
+/// Item Detail Screen for viewing and editing Note details (dual-model architecture)
+///
+/// IMPORTANT: This screen is for the Item model (Notes) only in the dual-model architecture.
+/// TodoList and ListModel will have their own dedicated detail screens.
 ///
 /// Features:
 /// - Full screen on mobile and desktop
 /// - Editable title (auto-focus) and content fields
-/// - Item type badge indicator
-/// - Type conversion (task ↔ note ↔ list) with data loss warnings
 /// - Space selector dropdown
-/// - Due date picker for tasks
 /// - Tags display (read-only chips)
-/// - Completion checkbox for tasks
 /// - Auto-save with 500ms debounce
 /// - Save on navigation away
 /// - Delete with confirmation dialog and undo functionality (5-second window)
 /// - Keyboard shortcuts (Esc, Cmd/Ctrl+S, Cmd/Ctrl+Backspace)
 /// - Form validation (title required)
 /// - Metadata footer (created/modified timestamps)
+///
+/// Removed in dual-model migration:
+/// - Type conversion (Notes are Notes only)
+/// - Due date picker (Notes don't have due dates)
+/// - Completion checkbox (Notes don't have completion status)
 class ItemDetailScreen extends StatefulWidget {
   const ItemDetailScreen({
     super.key,
@@ -160,7 +164,9 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
     return true;
   }
 
-  /// Toggle completion status for tasks
+  // DEPRECATED: Removed in dual-model architecture
+  // Item model (Notes) no longer has isCompleted field
+  /*
   Future<void> _toggleCompletion(bool value) async {
     final updatedItem = _currentItem.copyWith(
       isCompleted: value,
@@ -178,6 +184,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
       _hasChanges = false;
     });
   }
+  */
 
   /// Change space
   Future<void> _changeSpace(String newSpaceId) async {
@@ -211,32 +218,28 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
     }
   }
 
-  /// Pick due date for tasks
+  // DEPRECATED: Removed in dual-model architecture
+  // Item model (Notes) no longer has dueDate field
+  /*
   Future<void> _pickDueDate() async {
     final initialDate = _currentItem.dueDate ?? DateTime.now();
-
     final pickedDate = await showDatePicker(
       context: context,
       initialDate: initialDate,
       firstDate: DateTime(2020),
       lastDate: DateTime(2100),
     );
-
     if (pickedDate != null && mounted) {
       final updatedItem = _currentItem.copyWith(
         dueDate: pickedDate,
         updatedAt: DateTime.now(),
       );
-
       setState(() {
         _currentItem = updatedItem;
         _hasChanges = true;
       });
-
-      // Capture provider before async gap
       final itemsProvider = context.read<ItemsProvider>();
       await itemsProvider.updateItem(updatedItem);
-
       if (mounted) {
         setState(() {
           _hasChanges = false;
@@ -245,32 +248,29 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
     }
   }
 
-  /// Clear due date
   Future<void> _clearDueDate() async {
     final updatedItem = _currentItem.copyWith(
       clearDueDate: true,
       updatedAt: DateTime.now(),
     );
-
     setState(() {
       _currentItem = updatedItem;
       _hasChanges = true;
     });
-
-    // Capture provider before async gap
     final itemsProvider = context.read<ItemsProvider>();
     await itemsProvider.updateItem(updatedItem);
-
     if (mounted) {
       setState(() {
         _hasChanges = false;
       });
     }
   }
+  */
 
   /// Show delete confirmation dialog with gradient button
   Future<void> _showDeleteConfirmation() async {
-    final itemTypeName = _currentItem.type.toString().split('.').last;
+    // Item model represents Notes in dual-model architecture
+    const itemTypeName = 'note';
 
     final confirmed = await showDialog<bool>(
       context: context,
@@ -398,17 +398,15 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
     }
   }
 
-  /// Show conversion dialog to convert item type
+  // DEPRECATED: Removed in dual-model architecture
+  // Item model represents Notes only - no type conversion needed
+  /*
   Future<void> _showConvertDialog() async {
-    // Get available conversion types (exclude current type)
     final availableTypes = ItemType.values
         .where((type) => type != _currentItem.type)
         .toList();
-
-    // Check if conversion would lose data
     final hasDataLoss = _currentItem.type == ItemType.task &&
         (_currentItem.dueDate != null || _currentItem.isCompleted);
-
     final selectedType = await showDialog<ItemType>(
       context: context,
       builder: (context) => AlertDialog(
@@ -472,40 +470,27 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
     }
   }
 
-  /// Convert item to a different type
   Future<void> _convertItemType(ItemType newType) async {
-    // Capture context before any async gaps
     final itemsProvider = context.read<ItemsProvider>();
     final scaffoldMessenger = ScaffoldMessenger.of(context);
-
     try {
-      // Save any pending changes first
       if (_hasChanges) {
         await _saveChanges();
       }
-
-      // Create converted item
       final convertedItem = _currentItem.copyWith(
         type: newType,
-        // Reset type-specific fields based on conversion
         isCompleted: newType == ItemType.task ? false : _currentItem.isCompleted,
         dueDate: newType == ItemType.task
             ? _currentItem.dueDate
-            : null, // Clear due date if not converting to task
+            : null,
         clearDueDate: newType != ItemType.task && _currentItem.dueDate != null,
         updatedAt: DateTime.now(),
       );
-
-      // Update in provider
       await itemsProvider.updateItem(convertedItem);
-
-      // Update local state
       if (mounted) {
         setState(() {
           _currentItem = convertedItem;
         });
-
-        // Show success message
         scaffoldMessenger.showSnackBar(
           SnackBar(
             content: Text(
@@ -528,10 +513,8 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
     }
   }
 
-  /// Get data loss warning message for conversion
   String _getDataLossWarning() {
     if (_currentItem.type != ItemType.task) return '';
-
     final warnings = <String>[];
     if (_currentItem.dueDate != null) {
       warnings.add('due date');
@@ -539,13 +522,10 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
     if (_currentItem.isCompleted) {
       warnings.add('completion status');
     }
-
     if (warnings.isEmpty) return '';
-
     return 'Warning: ${warnings.join(' and ')} will be lost';
   }
 
-  /// Get display name for item type
   String _getItemTypeDisplayName(ItemType type) {
     switch (type) {
       case ItemType.task:
@@ -556,6 +536,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
         return 'List';
     }
   }
+  */
 
   /// Handle keyboard shortcuts
   KeyEventResult _handleKeyEvent(FocusNode node, KeyEvent event) {
@@ -586,40 +567,19 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
     return KeyEventResult.ignored;
   }
 
-  /// Get item type badge color
+  /// Get item type badge color (Notes only in dual-model architecture)
   Color _getItemTypeBadgeColor() {
-    switch (_currentItem.type) {
-      case ItemType.task:
-        return AppColors.itemBorderTask;
-      case ItemType.note:
-        return AppColors.itemBorderNote;
-      case ItemType.list:
-        return AppColors.itemBorderList;
-    }
+    return AppColors.itemBorderNote;
   }
 
-  /// Get item type badge text
+  /// Get item type badge text (Notes only in dual-model architecture)
   String _getItemTypeBadgeText() {
-    switch (_currentItem.type) {
-      case ItemType.task:
-        return 'Task';
-      case ItemType.note:
-        return 'Note';
-      case ItemType.list:
-        return 'List';
-    }
+    return 'Note';
   }
 
-  /// Get gradient for item type
+  /// Get gradient for item type (Notes only in dual-model architecture)
   LinearGradient _getTypeGradient() {
-    switch (_currentItem.type) {
-      case ItemType.task:
-        return AppColors.taskGradient;
-      case ItemType.note:
-        return AppColors.noteGradient;
-      case ItemType.list:
-        return AppColors.listGradient;
-    }
+    return AppColors.noteGradient;
   }
 
   /// Build item type badge with gradient background
@@ -651,10 +611,11 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
     );
   }
 
-  /// Build completion checkbox for tasks with gradient styling
+  // DEPRECATED: Removed in dual-model architecture
+  // Item model (Notes) no longer has isCompleted field
+  /*
   Widget? _buildCompletionCheckbox() {
     if (_currentItem.type != ItemType.task) return null;
-
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       decoration: BoxDecoration(
@@ -695,6 +656,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
       ),
     );
   }
+  */
 
   /// Build space selector dropdown
   Widget _buildSpaceSelector(BuildContext context) {
@@ -764,13 +726,13 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
     );
   }
 
-  /// Build due date picker for tasks
+  // DEPRECATED: Removed in dual-model architecture
+  // Item model (Notes) no longer has dueDate field
+  /*
   Widget? _buildDueDatePicker() {
     if (_currentItem.type != ItemType.task) return null;
-
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final dateFormat = DateFormat('MMM d, y');
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -838,6 +800,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
       ],
     );
   }
+  */
 
   /// Build tags display (read-only)
   Widget? _buildTagsDisplay() {
@@ -1066,12 +1029,12 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                 // Actions
                 Row(
                   children: [
-                    // Convert type button
-                    IconButton(
-                      icon: const Icon(Icons.swap_horiz, color: Colors.white),
-                      onPressed: _showConvertDialog,
-                      tooltip: 'Convert to...',
-                    ),
+                    // Convert type button - REMOVED (Notes don't convert)
+                    // IconButton(
+                    //   icon: const Icon(Icons.swap_horiz, color: Colors.white),
+                    //   onPressed: _showConvertDialog,
+                    //   tooltip: 'Convert to...',
+                    // ),
                     // Delete button
                     IconButton(
                       icon: const Icon(Icons.delete_outline, color: Colors.white),
@@ -1160,14 +1123,14 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                         ),
                         const SizedBox(height: AppSpacing.md),
 
-                        // Completion checkbox (tasks only) in glass container
-                        if (_buildCompletionCheckbox() != null) ...[
-                          _buildGlassContainer(
-                            padding: EdgeInsets.zero,
-                            child: _buildCompletionCheckbox()!,
-                          ),
-                          const SizedBox(height: AppSpacing.md),
-                        ],
+                        // Completion checkbox - REMOVED (Notes don't have completion)
+                        // if (_buildCompletionCheckbox() != null) ...[
+                        //   _buildGlassContainer(
+                        //     padding: EdgeInsets.zero,
+                        //     child: _buildCompletionCheckbox()!,
+                        //   ),
+                        //   const SizedBox(height: AppSpacing.md),
+                        // ],
 
                         // Title and content fields in glass container
                         _buildGlassContainer(
@@ -1240,11 +1203,11 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                               // Space selector
                               _buildSpaceSelector(context),
 
-                              // Due date picker (tasks only)
-                              if (_buildDueDatePicker() != null) ...[
-                                _buildGradientSeparator(),
-                                _buildDueDatePicker()!,
-                              ],
+                              // Due date picker - REMOVED (Notes don't have due dates)
+                              // if (_buildDueDatePicker() != null) ...[
+                              //   _buildGradientSeparator(),
+                              //   _buildDueDatePicker()!,
+                              // ],
 
                               // Tags display (if any)
                               if (_buildTagsDisplay() != null) ...[

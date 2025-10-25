@@ -129,24 +129,14 @@ class ItemsProvider extends ChangeNotifier {
     }
   }
 
-  /// Loads items filtered by a specific type.
-  ///
-  /// Sets the loading state, fetches items of the given type,
-  /// and updates the state accordingly.
-  /// Implements automatic retry with exponential backoff for transient failures.
-  ///
-  /// Parameters:
-  ///   - [type]: The ItemType to filter by (task, note, or list)
-  ///
-  /// Example:
-  /// ```dart
-  /// await provider.loadItemsByType(ItemType.task);
-  /// print('Found ${provider.items.length} tasks');
-  /// ```
+  // DEPRECATED: Removed in dual-model architecture migration
+  // ItemType enum no longer exists - Items now represent Notes only
+  // Use loadItemsBySpace instead, or filter locally if needed
+  /*
   Future<void> loadItemsByType(ItemType type) async {
     _isLoading = true;
     _error = null;
-    _currentSpaceId = null; // Clear space filter when loading by type
+    _currentSpaceId = null;
     notifyListeners();
 
     try {
@@ -167,6 +157,7 @@ class ItemsProvider extends ChangeNotifier {
       notifyListeners();
     }
   }
+  */
 
   /// Adds a new item to the repository and updates the state.
   ///
@@ -308,19 +299,10 @@ class ItemsProvider extends ChangeNotifier {
     }
   }
 
-  /// Toggles the completion status of a task item.
-  ///
-  /// Finds the item by ID, flips its isCompleted status, and updates
-  /// it in the repository. If the item is not found, an error is set.
-  /// Implements automatic retry with exponential backoff for transient failures.
-  ///
-  /// Parameters:
-  ///   - [id]: The ID of the task item to toggle
-  ///
-  /// Example:
-  /// ```dart
-  /// await provider.toggleCompletion('item-1');
-  /// ```
+  // DEPRECATED: Removed in dual-model architecture migration
+  // Item model (Notes) no longer has isCompleted field
+  // TodoList model should be used for task completion instead
+  /*
   Future<void> toggleCompletion(String id) async {
     _error = null;
 
@@ -341,6 +323,7 @@ class ItemsProvider extends ChangeNotifier {
       notifyListeners();
     }
   }
+  */
 
   /// Removes an item from the local list without deleting from the repository.
   ///

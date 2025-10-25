@@ -9,8 +9,11 @@ import '../text/gradient_text.dart';
 import '../borders/gradient_pill_border.dart';
 import 'package:intl/intl.dart';
 
-/// Unified item card component for tasks, notes, and lists
+/// Item card component for Notes (dual-model architecture)
 /// Mobile-First Bold Redesign
+///
+/// IMPORTANT: This card is for the Item model (Notes) only in the dual-model architecture.
+/// TodoList and ListModel will have their own dedicated card components.
 ///
 /// Performance optimizations:
 /// - Uses RepaintBoundary to isolate repaints
@@ -25,11 +28,11 @@ import 'package:intl/intl.dart';
 /// - 15px content preview (improved readability)
 /// - 20px card padding (comfortable thumb zones)
 /// - Solid background (no gradient overlay for 60fps performance)
-/// - Type-specific gradient colors: Red→Orange (tasks), Blue→Cyan (notes), Purple→Lavender (lists)
-/// - Leading element: checkbox for tasks, icon for notes/lists
+/// - Note gradient colors: Blue→Cyan
+/// - Leading element: note icon
 /// - Content preview: 2 lines with ellipsis for consistent height
 /// - Metadata row: date with gradient text
-/// - All states: default, pressed, selected, completed (tasks)
+/// - States: default, pressed, selected
 /// - Gesture handlers: tap to open, long-press for multi-select
 class ItemCard extends StatefulWidget {
   const ItemCard({
@@ -37,7 +40,6 @@ class ItemCard extends StatefulWidget {
     required this.item,
     this.onTap,
     this.onLongPress,
-    this.onCheckboxChanged,
     this.isSelected = false,
     this.showMetadata = true,
     this.index,
@@ -51,9 +53,6 @@ class ItemCard extends StatefulWidget {
 
   /// Callback when card is long-pressed
   final VoidCallback? onLongPress;
-
-  /// Callback when checkbox is changed (tasks only)
-  final ValueChanged<bool>? onCheckboxChanged;
 
   /// Whether card is in selected state
   final bool isSelected;
@@ -124,113 +123,28 @@ class _ItemCardState extends State<ItemCard> with TickerProviderStateMixin {
     super.dispose();
   }
 
-  /// Get border gradient based on item type
+  /// Get border gradient for notes
   LinearGradient _getBorderGradient() {
-    final isCompleted = widget.item.isCompleted && widget.item.type == ItemType.task;
-
-    if (isCompleted) {
-      // Green gradient for completed tasks
-      return const LinearGradient(
-        colors: [AppColors.success, AppColors.successLight],
-      );
-    }
-
-    switch (widget.item.type) {
-      case ItemType.task:
-        return AppColors.taskGradient;
-      case ItemType.note:
-        return AppColors.noteGradient;
-      case ItemType.list:
-        return AppColors.listGradient;
-    }
+    // Item model represents Notes in dual-model architecture
+    return AppColors.noteGradient;
   }
 
   /// Get background color with subtle gradient tint (5% opacity)
   Color _getBackgroundTint(bool isDark) {
     return AppColors.typeLightBg(
-      widget.item.type.toString().split('.').last,
+      'note',
       isDark: isDark,
     );
   }
 
-  /// Get leading icon for notes and lists
+  /// Get leading icon for notes
   IconData _getLeadingIcon() {
-    switch (widget.item.type) {
-      case ItemType.task:
-        return Icons.check_box_outline_blank;
-      case ItemType.note:
-        return Icons.description_outlined;
-      case ItemType.list:
-        return Icons.list_alt;
-    }
+    return Icons.description_outlined;
   }
 
-  /// Build leading element (checkbox for tasks, icon for notes/lists)
+  /// Build leading element (icon for notes)
   Widget _buildLeadingElement() {
-    if (widget.item.type == ItemType.task) {
-      // Wrap in GestureDetector to prevent tap events from propagating to card
-      return GestureDetector(
-        onTap: () {
-          // Absorb the tap event to prevent card's onTapDown from firing
-        },
-        onTapDown: (_) {
-          // Absorb the tap down event
-        },
-        onTapUp: (_) {
-          // Absorb the tap up event
-        },
-        child: SizedBox(
-          // Expanded touch target (48×48px) for accessibility compliance
-          // WCAG 2.5.5 requires 44×44dp minimum, 48×48px exceeds this
-          width: 48,
-          height: 48,
-          child: Center(
-            child: AnimatedBuilder(
-              animation: _checkboxScaleAnimation,
-              builder: (context, child) {
-                return Transform.scale(
-                  scale: _checkboxScaleAnimation.value,
-                  child: child,
-                );
-              },
-              child: SizedBox(
-                width: 24,
-                height: 24,
-                child: Checkbox(
-                  value: widget.item.isCompleted,
-                  onChanged: widget.onCheckboxChanged != null
-                      ? (value) {
-                          if (value != null) {
-                            // Trigger medium haptic feedback for checkbox toggle
-                            // Medium haptic provides satisfying confirmation of state change
-                            AppAnimations.mediumHaptic();
-
-                            // Trigger scale animation (1.0 → 1.1 → 1.0)
-                            _checkboxAnimationController.forward(from: 0.0);
-
-                            // Call the callback
-                            widget.onCheckboxChanged?.call(value);
-                          }
-                        }
-                      : null,
-                  activeColor: AppColors.accentGreen,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(AppSpacing.radiusSM),
-                  ),
-                  // Use standard Material touch target for better accessibility
-                  splashRadius: 20,
-                  materialTapTargetSize: MaterialTapTargetSize.padded,
-                  visualDensity: VisualDensity.standard,
-                ),
-              ),
-            ),
-          ),
-        ),
-      );
-    }
-
-    // For notes and lists, use same 48×48px container for alignment
-    // Apply gradient shader to the icon
+    // Item model represents Notes - use note icon
     final gradient = _getBorderGradient();
 
     return SizedBox(
@@ -252,15 +166,11 @@ class _ItemCardState extends State<ItemCard> with TickerProviderStateMixin {
   /// Build title with proper styling
   Widget _buildTitle(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final isCompleted = widget.item.isCompleted && widget.item.type == ItemType.task;
 
     return Text(
       widget.item.title,
       style: AppTypography.itemTitle.copyWith(
-        color: isCompleted
-            ? (isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight)
-            : (isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight),
-        decoration: isCompleted ? TextDecoration.lineThrough : null,
+        color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
       ),
       maxLines: AppTypography.itemTitleMaxLines,
       overflow: TextOverflow.ellipsis,
@@ -293,43 +203,22 @@ class _ItemCardState extends State<ItemCard> with TickerProviderStateMixin {
 
     return Row(
       children: [
-        // Date - Use gradient text for visual emphasis
-        if (widget.item.dueDate != null) ...[
-          // Icon with gradient tint for due dates
-          ShaderMask(
-            shaderCallback: (bounds) => AppColors.secondaryGradient.createShader(bounds),
-            blendMode: BlendMode.srcIn,
-            child: const Icon(
-              Icons.calendar_today,
-              size: 12,
-              color: Colors.white,
-            ),
+        // Icon with gradient tint for created dates
+        ShaderMask(
+          shaderCallback: (bounds) => AppColors.primaryGradientAdaptive(context).createShader(bounds),
+          blendMode: BlendMode.srcIn,
+          child: const Icon(
+            Icons.access_time,
+            size: 12,
+            color: Colors.white,
           ),
-          const SizedBox(width: AppSpacing.xxxs),
-          // Due date with subtle secondary gradient (amber→pink)
-          GradientText.subtle(
-            dateFormat.format(widget.item.dueDate!),
-            gradient: AppColors.secondaryGradient,
-            style: AppTypography.metadata,
-          ),
-        ] else ...[
-          // Icon with gradient tint for created dates
-          ShaderMask(
-            shaderCallback: (bounds) => AppColors.primaryGradientAdaptive(context).createShader(bounds),
-            blendMode: BlendMode.srcIn,
-            child: const Icon(
-              Icons.access_time,
-              size: 12,
-              color: Colors.white,
-            ),
-          ),
-          const SizedBox(width: AppSpacing.xxxs),
-          // Created date with subtle primary gradient
-          GradientText.subtle(
-            dateFormat.format(widget.item.createdAt),
-            style: AppTypography.metadata,
-          ),
-        ],
+        ),
+        const SizedBox(width: AppSpacing.xxxs),
+        // Created date with subtle primary gradient
+        GradientText.subtle(
+          dateFormat.format(widget.item.createdAt),
+          style: AppTypography.metadata,
+        ),
       ],
     );
   }
@@ -368,7 +257,6 @@ class _ItemCardState extends State<ItemCard> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final isCompleted = widget.item.isCompleted && widget.item.type == ItemType.task;
 
     // Base background color with subtle gradient tint (5% opacity)
     final baseBgColor = isDark ? AppColors.surfaceDark : AppColors.surfaceLight;
@@ -393,8 +281,8 @@ class _ItemCardState extends State<ItemCard> with TickerProviderStateMixin {
       );
     }
 
-    // Card opacity for completed tasks (70% for Temporal Flow)
-    final opacity = isCompleted ? 0.7 : 1.0;
+    // Notes don't have completion status - always full opacity
+    final opacity = 1.0;
 
     // Build the card widget with mobile-first bold design
     // Phase 5: Wrap with AnimatedBuilder for press scale animation
@@ -411,7 +299,7 @@ class _ItemCardState extends State<ItemCard> with TickerProviderStateMixin {
           container: true,
           button: true,
           enabled: widget.onTap != null,
-          label: '${widget.item.type.toString().split('.').last}: ${widget.item.title}',
+          label: 'Note: ${widget.item.title}',
           child: GestureDetector(
             onTapDown: _handleTapDown,
             onTapUp: _handleTapUp,

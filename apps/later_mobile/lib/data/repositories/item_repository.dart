@@ -66,24 +66,9 @@ class ItemRepository {
     return _box.values.where((item) => item.spaceId == spaceId).toList();
   }
 
-  /// Retrieves all items of a specific type.
-  ///
-  /// Filters items by their ItemType (task, note, or list).
-  ///
-  /// Parameters:
-  ///   - [type]: The ItemType to filter by
-  ///
-  /// Returns:
-  ///   A list of items matching the specified type
-  ///
-  /// Example:
-  /// ```dart
-  /// final tasks = await repository.getItemsByType(ItemType.task);
-  /// final notes = await repository.getItemsByType(ItemType.note);
-  /// ```
-  Future<List<Item>> getItemsByType(ItemType type) async {
-    return _box.values.where((item) => item.type == type).toList();
-  }
+  // Note: getItemsByType removed as part of dual-model architecture migration.
+  // Item model now represents Notes only. Use ContentProvider for filtering
+  // across TodoLists, Lists, and Notes.
 
   /// Updates an existing item in local storage.
   ///
