@@ -43,6 +43,9 @@ class HiveDatabase {
       if (!Hive.isAdapterRegistered(21)) {
         Hive.registerAdapter(TodoItemAdapter());
       }
+      if (!Hive.isAdapterRegistered(25)) {
+        Hive.registerAdapter(TodoPriorityAdapter());
+      }
 
       // Register type adapters for ListModel
       if (!Hive.isAdapterRegistered(22)) {

@@ -40,7 +40,6 @@ class TodoListDetailScreen extends StatefulWidget {
 
 class _TodoListDetailScreenState extends State<TodoListDetailScreen> {
   // Form key for validation
-  final _formKey = GlobalKey<FormState>();
 
   // Text controllers
   late TextEditingController _nameController;
@@ -52,7 +51,6 @@ class _TodoListDetailScreenState extends State<TodoListDetailScreen> {
   bool _isSaving = false;
   bool _hasChanges = false;
   bool _isEditingName = false;
-  TodoList? _pendingDeletion;
 
   @override
   void initState() {
@@ -295,7 +293,7 @@ class _TodoListDetailScreenState extends State<TodoListDetailScreen> {
                       title: Text(
                         selectedDueDate == null
                             ? 'No due date'
-                            : DateFormat.yMMMd().format(selectedDueDate),
+                            : DateFormat.yMMMd().format(selectedDueDate!),
                       ),
                       trailing: selectedDueDate != null
                           ? IconButton(
@@ -649,14 +647,14 @@ class _TodoListDetailScreenState extends State<TodoListDetailScreen> {
             Text(
               'No tasks yet',
               style: AppTypography.h3.copyWith(
-                color: AppColors.textSecondary,
+                color: AppColors.textSecondary(context),
               ),
             ),
             const SizedBox(height: AppSpacing.sm),
             Text(
               'Tap the + button to add your first task',
               style: AppTypography.bodyMedium.copyWith(
-                color: AppColors.textSecondary,
+                color: AppColors.textSecondary(context),
               ),
               textAlign: TextAlign.center,
             ),

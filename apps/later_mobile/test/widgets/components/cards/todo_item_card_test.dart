@@ -14,7 +14,7 @@ void main() {
       description: 'Write comprehensive docs',
       isCompleted: false,
       dueDate: DateTime(2025, 3, 15),
-      priority: 'high',
+      priority: TodoPriority.high,
       tags: ['urgent', 'docs'],
       sortOrder: 0,
     );
@@ -143,7 +143,7 @@ void main() {
       });
 
       testWidgets('shows priority badge for medium priority', (tester) async {
-        final mediumPriorityItem = testTodoItem.copyWith(priority: 'medium');
+        final mediumPriorityItem = testTodoItem.copyWith(priority: TodoPriority.medium);
         await tester.pumpWidget(
           makeTestableWidget(
             TodoItemCard(todoItem: mediumPriorityItem),
@@ -154,7 +154,7 @@ void main() {
       });
 
       testWidgets('shows priority badge for low priority', (tester) async {
-        final lowPriorityItem = testTodoItem.copyWith(priority: 'low');
+        final lowPriorityItem = testTodoItem.copyWith(priority: TodoPriority.low);
         await tester.pumpWidget(
           makeTestableWidget(
             TodoItemCard(todoItem: lowPriorityItem),
@@ -220,7 +220,7 @@ void main() {
       });
 
       testWidgets('medium priority badge has amber background', (tester) async {
-        final mediumPriorityItem = testTodoItem.copyWith(priority: 'medium');
+        final mediumPriorityItem = testTodoItem.copyWith(priority: TodoPriority.medium);
         await tester.pumpWidget(
           makeTestableWidget(
             TodoItemCard(todoItem: mediumPriorityItem),
@@ -239,7 +239,7 @@ void main() {
       });
 
       testWidgets('low priority badge has neutral background', (tester) async {
-        final lowPriorityItem = testTodoItem.copyWith(priority: 'low');
+        final lowPriorityItem = testTodoItem.copyWith(priority: TodoPriority.low);
         await tester.pumpWidget(
           makeTestableWidget(
             TodoItemCard(todoItem: lowPriorityItem),

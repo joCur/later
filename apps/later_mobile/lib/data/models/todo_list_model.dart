@@ -2,6 +2,17 @@ import 'package:hive/hive.dart';
 
 part 'todo_list_model.g.dart';
 
+/// Priority levels for todo items
+@HiveType(typeId: 25)
+enum TodoPriority {
+  @HiveField(0)
+  low,
+  @HiveField(1)
+  medium,
+  @HiveField(2)
+  high,
+}
+
 /// TodoItem model representing an individual task within a todo list
 @HiveType(typeId: 21)
 class TodoItem {
@@ -26,7 +37,12 @@ class TodoItem {
       dueDate: json['dueDate'] != null
           ? DateTime.parse(json['dueDate'] as String)
           : null,
-      priority: json['priority'] as String?,
+      priority: json['priority'] != null
+          ? TodoPriority.values.firstWhere(
+              (e) => e.toString().split('.').last == json['priority'],
+              orElse: () => TodoPriority.medium,
+            )
+          : null,
       tags: (json['tags'] as List<dynamic>?)?.cast<String>() ?? [],
       sortOrder: json['sortOrder'] as int,
     );
@@ -52,9 +68,9 @@ class TodoItem {
   @HiveField(4)
   final DateTime? dueDate;
 
-  /// Optional priority level ("high", "medium", "low")
+  /// Optional priority level
   @HiveField(5)
-  final String? priority;
+  final TodoPriority? priority;
 
   /// Tags associated with the todo item
   @HiveField(6)
@@ -74,7 +90,7 @@ class TodoItem {
     bool? isCompleted,
     DateTime? dueDate,
     bool clearDueDate = false,
-    String? priority,
+    TodoPriority? priority,
     bool clearPriority = false,
     List<String>? tags,
     int? sortOrder,
@@ -99,7 +115,7 @@ class TodoItem {
       'description': description,
       'isCompleted': isCompleted,
       'dueDate': dueDate?.toIso8601String(),
-      'priority': priority,
+      'priority': priority?.toString().split('.').last,
       'tags': tags,
       'sortOrder': sortOrder,
     };

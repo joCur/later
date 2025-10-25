@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_typography.dart';
-import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_animations.dart';
 import '../../../data/models/todo_list_model.dart';
 
@@ -96,30 +95,26 @@ class _TodoItemCardState extends State<TodoItemCard> {
   bool _isHovered = false;
 
   /// Get priority badge color based on priority level
-  Color _getPriorityColor(String priority) {
-    switch (priority.toLowerCase()) {
-      case 'high':
+  Color _getPriorityColor(TodoPriority priority) {
+    switch (priority) {
+      case TodoPriority.high:
         return AppColors.error;
-      case 'medium':
+      case TodoPriority.medium:
         return AppColors.warning;
-      case 'low':
-        return AppColors.neutral300;
-      default:
+      case TodoPriority.low:
         return AppColors.neutral300;
     }
   }
 
   /// Get priority badge label
-  String _getPriorityLabel(String priority) {
-    switch (priority.toLowerCase()) {
-      case 'high':
+  String _getPriorityLabel(TodoPriority priority) {
+    switch (priority) {
+      case TodoPriority.high:
         return 'HIGH';
-      case 'medium':
+      case TodoPriority.medium:
         return 'MED';
-      case 'low':
+      case TodoPriority.low:
         return 'LOW';
-      default:
-        return priority.toUpperCase();
     }
   }
 
@@ -130,7 +125,7 @@ class _TodoItemCardState extends State<TodoItemCard> {
   }
 
   /// Build priority badge with appropriate color and label
-  Widget _buildPriorityBadge(String priority) {
+  Widget _buildPriorityBadge(TodoPriority priority) {
     return Container(
       padding: const EdgeInsets.symmetric(
         horizontal: _priorityBadgeHorizontalPadding,
@@ -185,8 +180,9 @@ class _TodoItemCardState extends State<TodoItemCard> {
     }
 
     // Add priority if present
-    if (widget.todoItem.priority != null && widget.todoItem.priority!.isNotEmpty) {
-      buffer.write(', priority: ${widget.todoItem.priority}');
+    if (widget.todoItem.priority != null) {
+      final priorityName = widget.todoItem.priority!.toString().split('.').last;
+      buffer.write(', priority: $priorityName');
     }
 
     return buffer.toString();
@@ -241,7 +237,6 @@ class _TodoItemCardState extends State<TodoItemCard> {
         borderRadius: BorderRadius.circular(_cardBorderRadius),
         border: Border.all(
           color: isDark ? AppColors.borderDark : AppColors.borderLight,
-          width: 1,
         ),
       ),
       child: Row(
@@ -281,7 +276,7 @@ class _TodoItemCardState extends State<TodoItemCard> {
 
                 // Metadata row (due date, priority) - only show if present
                 if (widget.todoItem.dueDate != null ||
-                    (widget.todoItem.priority != null && widget.todoItem.priority!.isNotEmpty)) ...[
+                    widget.todoItem.priority != null) ...[
                   const SizedBox(height: _metadataSpacing),
                   Row(
                     children: [
@@ -292,8 +287,7 @@ class _TodoItemCardState extends State<TodoItemCard> {
                       ],
 
                       // Priority badge
-                      if (widget.todoItem.priority != null &&
-                          widget.todoItem.priority!.isNotEmpty)
+                      if (widget.todoItem.priority != null)
                         _buildPriorityBadge(widget.todoItem.priority!),
                     ],
                   ),

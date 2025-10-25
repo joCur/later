@@ -22,7 +22,7 @@ class TodoItemAdapter extends TypeAdapter<TodoItem> {
       description: fields[2] as String?,
       isCompleted: fields[3] as bool,
       dueDate: fields[4] as DateTime?,
-      priority: fields[5] as String?,
+      priority: fields[5] as TodoPriority?,
       tags: (fields[6] as List?)?.cast<String>(),
       sortOrder: fields[7] as int,
     );
@@ -109,6 +109,50 @@ class TodoListAdapter extends TypeAdapter<TodoList> {
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is TodoListAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
+}
+
+class TodoPriorityAdapter extends TypeAdapter<TodoPriority> {
+  @override
+  final int typeId = 25;
+
+  @override
+  TodoPriority read(BinaryReader reader) {
+    switch (reader.readByte()) {
+      case 0:
+        return TodoPriority.low;
+      case 1:
+        return TodoPriority.medium;
+      case 2:
+        return TodoPriority.high;
+      default:
+        return TodoPriority.low;
+    }
+  }
+
+  @override
+  void write(BinaryWriter writer, TodoPriority obj) {
+    switch (obj) {
+      case TodoPriority.low:
+        writer.writeByte(0);
+        break;
+      case TodoPriority.medium:
+        writer.writeByte(1);
+        break;
+      case TodoPriority.high:
+        writer.writeByte(2);
+        break;
+    }
+  }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is TodoPriorityAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }

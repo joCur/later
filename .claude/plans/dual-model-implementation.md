@@ -296,7 +296,37 @@ Since the app is not yet in production:
 
 **Known Issues:** None - all components are production-ready
 
-### Phase 5: UI Components - Detail Screens (Week 3)
+### Phase 5: UI Components - Detail Screens (Week 3) 🚧 IN PROGRESS
+
+**IMPORTANT: Compilation Errors Fixed** ✅
+During Phase 4 implementation, ItemType enum was removed from Item model as part of the dual-model architecture migration. This caused compilation errors in legacy code. The following fixes were applied:
+
+- Removed/commented out all ItemType references in legacy code:
+  - item_repository.dart (getItemsByType method)
+  - items_provider.dart (loadItemsByType, toggleCompletion methods)
+  - item_type_detector.dart (already migrated to ContentType enum)
+  - quick_capture_modal.dart (type selection UI)
+  - item_detail_screen.dart (type conversion methods)
+  - home_screen.dart (filter logic)
+  - item_card.dart (already migrated to Notes-only)
+- Fixed test files to remove ItemType, isCompleted, and dueDate references:
+  - item_card_test.dart (used sed to batch-remove type: ItemType.*, onCheckboxChanged, isCompleted lines)
+  - quick_capture_modal_test.dart (removed ItemTypeAdapter, commented out type assertions)
+  - home_screen_test.dart (removed ItemType parameters from Item() constructors)
+- All Phase 4 card component tests now passing (178+ tests)
+
+**Phase 4 Status Verification:** All 5 card components completed with 178 passing tests:
+- TodoListCard: 28 tests ✅
+- ListCard: 34 tests ✅
+- NoteCard: 38 tests ✅
+- TodoItemCard: 38 tests ✅
+- ListItemCard: 40 tests ✅
+
+**Known Technical Debt:**
+- Old Item model code (for Notes) still exists alongside new models
+- ItemRepository and ItemsProvider marked for removal in Phase 7
+- Legacy test files (quick_capture_modal_test.dart, home_screen_test.dart) have commented-out assertions
+- These will be cleaned up after Phase 6 (HomeScreen migration to ContentProvider)
 
 - [ ] Task 5.1: Create TodoListDetailScreen
   - Create `lib/widgets/screens/todo_list_detail_screen.dart`
