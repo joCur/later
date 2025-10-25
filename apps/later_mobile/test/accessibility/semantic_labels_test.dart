@@ -363,7 +363,6 @@ void main() {
       final testItem = Item(
         id: 'test-1',
         title: 'Complete accessibility audit',
-        type: ItemType.task,
         spaceId: 'space-1',
       );
 
@@ -407,7 +406,6 @@ void main() {
       final testItem = Item(
         id: 'test-2',
         title: 'Write unit tests',
-        type: ItemType.task,
         spaceId: 'space-1',
       );
 
@@ -416,7 +414,6 @@ void main() {
           home: Scaffold(
             body: ItemCard(
               item: testItem,
-              onCheckboxChanged: (_) {},
             ),
           ),
         ),

@@ -72,16 +72,6 @@ class MockItemsProvider extends _i1.Mock implements _i2.ItemsProvider {
       ) as _i4.Future<void>);
 
   @override
-  _i4.Future<void> loadItemsByType(dynamic type) => (super.noSuchMethod(
-        Invocation.method(
-          #loadItemsByType,
-          [type],
-        ),
-        returnValue: _i4.Future<void>.value(),
-        returnValueForMissingStub: _i4.Future<void>.value(),
-      ) as _i4.Future<void>);
-
-  @override
   _i4.Future<void> addItem(_i3.Item? item) => (super.noSuchMethod(
         Invocation.method(
           #addItem,
@@ -105,16 +95,6 @@ class MockItemsProvider extends _i1.Mock implements _i2.ItemsProvider {
   _i4.Future<void> deleteItem(String? id) => (super.noSuchMethod(
         Invocation.method(
           #deleteItem,
-          [id],
-        ),
-        returnValue: _i4.Future<void>.value(),
-        returnValueForMissingStub: _i4.Future<void>.value(),
-      ) as _i4.Future<void>);
-
-  @override
-  _i4.Future<void> toggleCompletion(String? id) => (super.noSuchMethod(
-        Invocation.method(
-          #toggleCompletion,
           [id],
         ),
         returnValue: _i4.Future<void>.value(),

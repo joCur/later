@@ -12,7 +12,6 @@ import '../../core/theme/app_animations.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_spacing.dart';
 import '../../core/theme/app_typography.dart';
-import '../../core/utils/item_type_detector.dart';
 import '../../data/models/item_model.dart';
 import '../../providers/items_provider.dart';
 import '../../providers/spaces_provider.dart';
@@ -101,7 +100,6 @@ class _QuickCaptureModalState extends State<QuickCaptureModal>
   late Animation<double> _fadeAnimation;
   late Animation<Offset> _slideAnimation;
   late AnimationController _typeIconAnimationController;
-  late Animation<double> _typeIconScaleAnimation;
 
   @override
   void initState() {
@@ -151,22 +149,6 @@ class _QuickCaptureModalState extends State<QuickCaptureModal>
       vsync: this,
     );
 
-    _typeIconScaleAnimation = TweenSequence<double>([
-      TweenSequenceItem(
-        tween: Tween<double>(
-          begin: 1.0,
-          end: 1.1,
-        ).chain(CurveTween(curve: AppAnimations.springCurve)),
-        weight: 50,
-      ),
-      TweenSequenceItem(
-        tween: Tween<double>(
-          begin: 1.1,
-          end: 1.0,
-        ).chain(CurveTween(curve: AppAnimations.springCurve)),
-        weight: 50,
-      ),
-    ]).animate(_typeIconAnimationController);
 
     // Start entrance animation
     _animationController.forward();

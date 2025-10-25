@@ -33,10 +33,14 @@ class FakeItemRepository implements ItemRepository {
     return _items.where((item) => item.spaceId == spaceId).toList();
   }
 
+  // Note: getItemsByType removed in dual-model architecture
+  // Item model (Notes) no longer has type field
+  /*
   @override
   Future<List<Item>> getItemsByType(ItemType type) async {
     return _items.where((item) => item.type == type).toList();
   }
+  */
 
   @override
   Future<Item> createItem(Item item) async {
@@ -188,16 +192,15 @@ void main() {
         color: '#FF5733',
       );
 
+      // Note: Items represent Notes only in dual-model architecture (no type field)
       final items = [
         Item(
           id: '1',
-          type: ItemType.task,
           title: 'Task 1',
           spaceId: 'space-1',
         ),
         Item(
           id: '2',
-          type: ItemType.note,
           title: 'Note 1',
           spaceId: 'space-1',
         ),
@@ -306,22 +309,20 @@ void main() {
         color: '#FF5733',
       );
 
+      // Note: Items represent Notes only in dual-model architecture (no type field)
       final items = [
         Item(
           id: '1',
-          type: ItemType.task,
           title: 'Task 1',
           spaceId: 'space-1',
         ),
         Item(
           id: '2',
-          type: ItemType.note,
           title: 'Note 1',
           spaceId: 'space-1',
         ),
         Item(
           id: '3',
-          type: ItemType.list,
           title: 'List 1',
           spaceId: 'space-1',
         ),
@@ -470,9 +471,9 @@ void main() {
         color: '#FF5733',
       );
 
+      // Note: Items represent Notes only in dual-model architecture (no type field)
       final task = Item(
         id: '1',
-        type: ItemType.task,
         title: 'Task 1',
         spaceId: 'space-1',
       );
@@ -563,10 +564,10 @@ void main() {
         color: '#FF5733',
       );
 
+      // Note: Items represent Notes only in dual-model architecture (no type field)
       final items = [
         Item(
           id: '1',
-          type: ItemType.task,
           title: 'Task 1',
           spaceId: 'space-1',
         ),

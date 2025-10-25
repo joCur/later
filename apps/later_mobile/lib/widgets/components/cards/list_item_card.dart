@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+
+import '../../../core/theme/app_animations.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_typography.dart';
-import '../../../core/theme/app_spacing.dart';
-import '../../../core/theme/app_animations.dart';
 import '../../../data/models/list_model.dart';
 
 /// ListItem card component for displaying individual items within a List
@@ -110,7 +110,9 @@ class _ListItemCardState extends State<ListItemCard> {
               '•',
               style: TextStyle(
                 fontSize: 20,
-                color: isDark ? AppColors.listGradientEnd : AppColors.listGradientStart,
+                color: isDark
+                    ? AppColors.listGradientEnd
+                    : AppColors.listGradientStart,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -131,7 +133,9 @@ class _ListItemCardState extends State<ListItemCard> {
             child: Text(
               '${widget.itemIndex}.',
               style: AppTypography.labelMedium.copyWith(
-                color: isDark ? AppColors.listGradientEnd : AppColors.listGradientStart,
+                color: isDark
+                    ? AppColors.listGradientEnd
+                    : AppColors.listGradientStart,
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -164,7 +168,9 @@ class _ListItemCardState extends State<ListItemCard> {
     return Text(
       widget.listItem.notes!,
       style: AppTypography.bodySmall.copyWith(
-        color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
+        color: isDark
+            ? AppColors.textSecondaryDark
+            : AppColors.textSecondaryLight,
       ),
       maxLines: _notesMaxLines,
       overflow: TextOverflow.ellipsis,
@@ -205,7 +211,8 @@ class _ListItemCardState extends State<ListItemCard> {
     // If onTap is provided, call it; otherwise toggle checkbox for checkboxes style
     if (widget.onTap != null) {
       widget.onTap!();
-    } else if (widget.listStyle == ListStyle.checkboxes && widget.onCheckboxChanged != null) {
+    } else if (widget.listStyle == ListStyle.checkboxes &&
+        widget.onCheckboxChanged != null) {
       widget.onCheckboxChanged!(!widget.listItem.isChecked);
     }
   }
@@ -239,13 +246,12 @@ class _ListItemCardState extends State<ListItemCard> {
     final notesWidget = _buildNotes(isDark);
 
     // Determine if item is checked (only relevant for checkboxes style)
-    final isChecked = widget.listStyle == ListStyle.checkboxes && widget.listItem.isChecked;
+    final isChecked =
+        widget.listStyle == ListStyle.checkboxes && widget.listItem.isChecked;
 
     // Build the card content with consistent spacing
     final cardContent = Container(
-      constraints: const BoxConstraints(
-        minHeight: _cardMinHeight,
-      ),
+      constraints: const BoxConstraints(minHeight: _cardMinHeight),
       padding: const EdgeInsets.symmetric(
         horizontal: _cardHorizontalPadding,
         vertical: _cardVerticalPadding,
@@ -255,7 +261,6 @@ class _ListItemCardState extends State<ListItemCard> {
         borderRadius: BorderRadius.circular(_cardBorderRadius),
         border: Border.all(
           color: isDark ? AppColors.borderDark : AppColors.borderLight,
-          width: 1,
         ),
       ),
       child: Row(
@@ -275,7 +280,9 @@ class _ListItemCardState extends State<ListItemCard> {
                 Text(
                   widget.listItem.title,
                   style: AppTypography.titleSmall.copyWith(
-                    color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
+                    color: isDark
+                        ? AppColors.textPrimaryDark
+                        : AppColors.textPrimaryLight,
                     decoration: isChecked ? TextDecoration.lineThrough : null,
                   ),
                   maxLines: 1,

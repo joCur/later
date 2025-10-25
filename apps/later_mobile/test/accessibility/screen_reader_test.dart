@@ -135,7 +135,6 @@ void main() {
                         item: Item(
                           id: '1',
                           title: 'Task 1',
-                          type: ItemType.task,
                           spaceId: 'space-1',
                         ),
                         onTap: () {},
@@ -144,7 +143,6 @@ void main() {
                         item: Item(
                           id: '2',
                           title: 'Task 2',
-                          type: ItemType.task,
                           spaceId: 'space-1',
                         ),
                         onTap: () {},
@@ -311,7 +309,6 @@ void main() {
     testWidgets('Checkbox state changes are announced',
         (WidgetTester tester) async {
       // Arrange: Create task card with checkbox
-      bool isCompleted = false;
 
       await tester.pumpWidget(
         MaterialApp(
@@ -322,15 +319,8 @@ void main() {
                   item: Item(
                     id: 'test-1',
                     title: 'Test Task',
-                    type: ItemType.task,
                     spaceId: 'space-1',
-                    isCompleted: isCompleted,
                   ),
-                  onCheckboxChanged: (value) {
-                    setState(() {
-                      isCompleted = value;
-                    });
-                  },
                 );
               },
             ),
@@ -425,7 +415,6 @@ void main() {
       final testItem = Item(
         id: 'test-1',
         title: 'Test Note Title',
-        type: ItemType.note,
         spaceId: 'space-1',
         content: 'This is the note content that should be accessible',
       );
@@ -645,7 +634,6 @@ void main() {
       final testItem = Item(
         id: 'test-1',
         title: 'Task with checkbox',
-        type: ItemType.task,
         spaceId: 'space-1',
       );
 
@@ -654,7 +642,6 @@ void main() {
           home: Scaffold(
             body: ItemCard(
               item: testItem,
-              onCheckboxChanged: (_) {},
             ),
           ),
         ),
