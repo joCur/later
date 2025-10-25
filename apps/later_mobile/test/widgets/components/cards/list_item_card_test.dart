@@ -11,7 +11,6 @@ void main() {
       id: 'test-item-1',
       title: 'Buy groceries',
       notes: 'Milk, eggs, bread, and cheese',
-      isChecked: false,
       sortOrder: 0,
     );
 

@@ -85,7 +85,6 @@ void main() {
         // Arrange
         final todoList = createTestTodoList(
           id: 'todo-1',
-          name: 'Weekly Tasks',
         );
 
         // Act
@@ -127,12 +126,10 @@ void main() {
         // Arrange
         final todoList1 = createTestTodoList(
           id: 'todo-1',
-          spaceId: 'space-1',
           name: 'List 1',
         );
         final todoList2 = createTestTodoList(
           id: 'todo-2',
-          spaceId: 'space-1',
           name: 'List 2',
         );
         final todoList3 = createTestTodoList(
@@ -227,7 +224,6 @@ void main() {
         final item = createTestTodoItem(
           id: 'item-1',
           title: 'Fix bug #123',
-          sortOrder: 0,
         );
 
         // Act
@@ -256,7 +252,6 @@ void main() {
         final item1 = createTestTodoItem(
           id: 'item-1',
           title: 'Original Title',
-          sortOrder: 0,
         );
         final todoList = createTestTodoList(
           id: 'todo-1',
@@ -301,7 +296,7 @@ void main() {
 
       test('deleteItem() removes TodoItem from TodoList', () async {
         // Arrange
-        final item1 = createTestTodoItem(id: 'item-1', sortOrder: 0);
+        final item1 = createTestTodoItem(id: 'item-1');
         final item2 = createTestTodoItem(id: 'item-2', sortOrder: 1);
         final todoList = createTestTodoList(
           id: 'todo-1',
@@ -330,8 +325,6 @@ void main() {
         // Arrange
         final item = createTestTodoItem(
           id: 'item-1',
-          isCompleted: false,
-          sortOrder: 0,
         );
         final todoList = createTestTodoList(
           id: 'todo-1',
@@ -374,7 +367,7 @@ void main() {
 
       test('reorderItems() reorders items and updates sortOrder', () async {
         // Arrange
-        final item1 = createTestTodoItem(id: 'item-1', title: 'First', sortOrder: 0);
+        final item1 = createTestTodoItem(id: 'item-1', title: 'First');
         final item2 = createTestTodoItem(id: 'item-2', title: 'Second', sortOrder: 1);
         final item3 = createTestTodoItem(id: 'item-3', title: 'Third', sortOrder: 2);
         final todoList = createTestTodoList(
@@ -397,7 +390,7 @@ void main() {
 
       test('reorderItems() throws exception for invalid oldIndex', () async {
         // Arrange
-        final item = createTestTodoItem(id: 'item-1', sortOrder: 0);
+        final item = createTestTodoItem(id: 'item-1');
         final todoList = createTestTodoList(
           id: 'todo-1',
           items: [item],
@@ -417,7 +410,7 @@ void main() {
 
       test('reorderItems() throws exception for invalid newIndex', () async {
         // Arrange
-        final item = createTestTodoItem(id: 'item-1', sortOrder: 0);
+        final item = createTestTodoItem(id: 'item-1');
         final todoList = createTestTodoList(
           id: 'todo-1',
           items: [item],
@@ -437,7 +430,7 @@ void main() {
 
       test('reorderItems() handles single item list', () async {
         // Arrange
-        final item = createTestTodoItem(id: 'item-1', sortOrder: 0);
+        final item = createTestTodoItem(id: 'item-1');
         final todoList = createTestTodoList(
           id: 'todo-1',
           items: [item],
@@ -458,11 +451,9 @@ void main() {
         // Arrange
         final todoList1 = createTestTodoList(
           id: 'todo-1',
-          spaceId: 'space-1',
         );
         final todoList2 = createTestTodoList(
           id: 'todo-2',
-          spaceId: 'space-1',
         );
         final todoList3 = createTestTodoList(
           id: 'todo-3',
@@ -485,11 +476,9 @@ void main() {
         // Arrange
         final todoList1 = createTestTodoList(
           id: 'todo-1',
-          spaceId: 'space-1',
         );
         final todoList2 = createTestTodoList(
           id: 'todo-2',
-          spaceId: 'space-1',
         );
 
         await repository.create(todoList1);
@@ -515,11 +504,9 @@ void main() {
         // Arrange
         final todoList1 = createTestTodoList(
           id: 'todo-1',
-          spaceId: 'space-1',
         );
         final todoList2 = createTestTodoList(
           id: 'todo-2',
-          spaceId: 'space-1',
         );
         final todoList3 = createTestTodoList(
           id: 'todo-3',
@@ -552,7 +539,7 @@ void main() {
       test('create TodoList with multiple items', () async {
         // Arrange
         final items = [
-          createTestTodoItem(id: 'item-1', title: 'Task 1', sortOrder: 0),
+          createTestTodoItem(id: 'item-1', title: 'Task 1'),
           createTestTodoItem(id: 'item-2', title: 'Task 2', sortOrder: 1),
           createTestTodoItem(id: 'item-3', title: 'Task 3', sortOrder: 2),
         ];
@@ -576,7 +563,6 @@ void main() {
           title: 'Important task',
           priority: TodoPriority.high,
           tags: ['urgent', 'work'],
-          sortOrder: 0,
         );
         final todoList = createTestTodoList(
           id: 'todo-1',
@@ -598,7 +584,6 @@ void main() {
         final item = createTestTodoItem(
           id: 'item-1',
           dueDate: dueDate,
-          sortOrder: 0,
         );
         final todoList = createTestTodoList(
           id: 'todo-1',
@@ -616,9 +601,9 @@ void main() {
       test('progress calculation with completed items', () async {
         // Arrange
         final items = [
-          createTestTodoItem(id: 'item-1', isCompleted: true, sortOrder: 0),
+          createTestTodoItem(id: 'item-1', isCompleted: true),
           createTestTodoItem(id: 'item-2', isCompleted: true, sortOrder: 1),
-          createTestTodoItem(id: 'item-3', isCompleted: false, sortOrder: 2),
+          createTestTodoItem(id: 'item-3', sortOrder: 2),
         ];
         final todoList = createTestTodoList(
           id: 'todo-1',
@@ -649,7 +634,7 @@ void main() {
 
       test('update preserves other fields', () async {
         // Arrange
-        final item = createTestTodoItem(id: 'item-1', sortOrder: 0);
+        final item = createTestTodoItem(id: 'item-1');
         final todoList = createTestTodoList(
           id: 'todo-1',
           name: 'Original Name',
@@ -674,7 +659,7 @@ void main() {
         await repository.create(todoList);
 
         // Act
-        await repository.addItem('todo-1', createTestTodoItem(id: 'item-1', sortOrder: 0));
+        await repository.addItem('todo-1', createTestTodoItem(id: 'item-1'));
         await repository.addItem('todo-1', createTestTodoItem(id: 'item-2', sortOrder: 1));
         await repository.addItem('todo-1', createTestTodoItem(id: 'item-3', sortOrder: 2));
 
@@ -685,7 +670,7 @@ void main() {
 
       test('deleteItem on non-existent item does not throw', () async {
         // Arrange
-        final item = createTestTodoItem(id: 'item-1', sortOrder: 0);
+        final item = createTestTodoItem(id: 'item-1');
         final todoList = createTestTodoList(
           id: 'todo-1',
           items: [item],
@@ -703,7 +688,6 @@ void main() {
         // Arrange
         final todoList = createTestTodoList(
           id: 'todo-1',
-          description: null,
         );
 
         // Act

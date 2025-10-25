@@ -232,7 +232,7 @@ void main() {
       });
 
       testWidgets('shows default icon when icon is null', (tester) async {
-        final listModel = createListModel(icon: null);
+        final listModel = createListModel();
 
         await tester.pumpWidget(
           MaterialApp(
@@ -265,7 +265,6 @@ void main() {
     group('List Styles', () {
       testWidgets('handles bullets style', (tester) async {
         final listModel = createListModel(
-          style: ListStyle.bullets,
           items: [
             createListItem(id: '1', title: 'Item 1'),
           ],
@@ -390,7 +389,6 @@ void main() {
     group('Accessibility', () {
       testWidgets('has correct semantic label', (tester) async {
         final listModel = createListModel(
-          name: 'Shopping List',
           items: [
             createListItem(id: '1', title: 'Milk'),
             createListItem(id: '2', title: 'Eggs'),

@@ -70,34 +70,12 @@ class ItemCard extends StatefulWidget {
 
 class _ItemCardState extends State<ItemCard> with TickerProviderStateMixin {
   bool _isPressed = false;
-  late AnimationController _checkboxAnimationController;
-  late Animation<double> _checkboxScaleAnimation;
   late AnimationController _pressAnimationController;
   late Animation<double> _pressScaleAnimation;
 
   @override
   void initState() {
     super.initState();
-
-    // Initialize checkbox animation controller
-    _checkboxAnimationController = AnimationController(
-      duration: const Duration(milliseconds: 250),
-      vsync: this,
-    );
-
-    // Create scale animation: 1.0 -> 1.1 -> 1.0 (enhanced for Temporal Flow)
-    _checkboxScaleAnimation = TweenSequence<double>([
-      TweenSequenceItem(
-        tween: Tween<double>(begin: 1.0, end: 1.1)
-            .chain(CurveTween(curve: Curves.easeOut)),
-        weight: 50.0,
-      ),
-      TweenSequenceItem(
-        tween: Tween<double>(begin: 1.1, end: 1.0)
-            .chain(CurveTween(curve: Curves.easeIn)),
-        weight: 50.0,
-      ),
-    ]).animate(_checkboxAnimationController);
 
     // Initialize press animation controller for Phase 5 micro-interaction
     _pressAnimationController = AnimationController(
@@ -118,7 +96,6 @@ class _ItemCardState extends State<ItemCard> with TickerProviderStateMixin {
 
   @override
   void dispose() {
-    _checkboxAnimationController.dispose();
     _pressAnimationController.dispose();
     super.dispose();
   }
@@ -282,7 +259,7 @@ class _ItemCardState extends State<ItemCard> with TickerProviderStateMixin {
     }
 
     // Notes don't have completion status - always full opacity
-    final opacity = 1.0;
+    const opacity = 1.0;
 
     // Build the card widget with mobile-first bold design
     // Phase 5: Wrap with AnimatedBuilder for press scale animation

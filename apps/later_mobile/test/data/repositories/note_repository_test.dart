@@ -58,7 +58,6 @@ void main() {
         // Arrange
         final note = createTestNote(
           id: 'note-1',
-          title: 'Meeting Notes',
           content: 'Discussion about project roadmap',
         );
 
@@ -104,12 +103,10 @@ void main() {
         // Arrange
         final note1 = createTestNote(
           id: 'note-1',
-          spaceId: 'space-1',
           title: 'Note 1',
         );
         final note2 = createTestNote(
           id: 'note-2',
-          spaceId: 'space-1',
           title: 'Note 2',
         );
         final note3 = createTestNote(
@@ -203,11 +200,9 @@ void main() {
         // Arrange
         final note1 = createTestNote(
           id: 'note-1',
-          spaceId: 'space-1',
         );
         final note2 = createTestNote(
           id: 'note-2',
-          spaceId: 'space-1',
         );
         final note3 = createTestNote(
           id: 'note-3',
@@ -230,11 +225,9 @@ void main() {
         // Arrange
         final note1 = createTestNote(
           id: 'note-1',
-          spaceId: 'space-1',
         );
         final note2 = createTestNote(
           id: 'note-2',
-          spaceId: 'space-1',
         );
 
         await repository.create(note1);
@@ -260,11 +253,9 @@ void main() {
         // Arrange
         final note1 = createTestNote(
           id: 'note-1',
-          spaceId: 'space-1',
         );
         final note2 = createTestNote(
           id: 'note-2',
-          spaceId: 'space-1',
         );
         final note3 = createTestNote(
           id: 'note-3',
@@ -423,7 +414,6 @@ void main() {
         // Arrange
         final note = createTestNote(
           id: 'note-1',
-          title: 'Meeting Notes',
           content: 'Discussion points',
         );
         await repository.create(note);
@@ -469,8 +459,6 @@ void main() {
         // Arrange
         final note = createTestNote(
           id: 'note-1',
-          title: 'Meeting Notes',
-          content: null,
         );
         await repository.create(note);
 
@@ -516,7 +504,6 @@ void main() {
         final note = createTestNote(
           id: 'note-1',
           title: 'Title Only Note',
-          content: null,
         );
 
         // Act
@@ -621,17 +608,14 @@ void main() {
         // Arrange
         final note1 = createTestNote(
           id: 'note-1',
-          spaceId: 'space-1',
           tags: ['work'],
         );
         final note2 = createTestNote(
           id: 'note-2',
-          spaceId: 'space-1',
           tags: ['personal'],
         );
         final note3 = createTestNote(
           id: 'note-3',
-          spaceId: 'space-1',
           tags: ['work', 'personal'],
         );
 
@@ -662,7 +646,6 @@ void main() {
         );
         final note3 = createTestNote(
           id: 'note-3',
-          syncStatus: null,
         );
 
         // Act
@@ -761,7 +744,6 @@ void main() {
           id: 'note-1',
           title: 'Complete Note',
           content: 'Full content here',
-          spaceId: 'space-1',
           tags: ['tag1', 'tag2'],
           syncStatus: 'synced',
         );

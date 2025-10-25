@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import 'package:uuid/uuid.dart';
@@ -130,7 +129,7 @@ class _TodoListDetailScreenState extends State<TodoListDetailScreen> {
   /// Add a new TodoItem
   Future<void> _addTodoItem() async {
     final result = await _showTodoItemDialog();
-    if (result == null) return;
+    if (result == null || !mounted) return;
 
     try {
       final provider = Provider.of<ContentProvider>(context, listen: false);
@@ -138,20 +137,22 @@ class _TodoListDetailScreenState extends State<TodoListDetailScreen> {
 
       // Reload current todo list
       final updated = provider.todoLists.firstWhere((tl) => tl.id == _currentTodoList.id);
-      setState(() {
-        _currentTodoList = updated;
-      });
+      if (mounted) {
+        setState(() {
+          _currentTodoList = updated;
+        });
+      }
 
-      _showSnackBar('TodoItem added');
+      if (mounted) _showSnackBar('TodoItem added');
     } catch (e) {
-      _showSnackBar('Failed to add item: $e', isError: true);
+      if (mounted) _showSnackBar('Failed to add item: $e', isError: true);
     }
   }
 
   /// Edit a TodoItem
   Future<void> _editTodoItem(TodoItem item) async {
     final result = await _showTodoItemDialog(existingItem: item);
-    if (result == null) return;
+    if (result == null || !mounted) return;
 
     try {
       final provider = Provider.of<ContentProvider>(context, listen: false);
@@ -159,20 +160,22 @@ class _TodoListDetailScreenState extends State<TodoListDetailScreen> {
 
       // Reload current todo list
       final updated = provider.todoLists.firstWhere((tl) => tl.id == _currentTodoList.id);
-      setState(() {
-        _currentTodoList = updated;
-      });
+      if (mounted) {
+        setState(() {
+          _currentTodoList = updated;
+        });
+      }
 
-      _showSnackBar('TodoItem updated');
+      if (mounted) _showSnackBar('TodoItem updated');
     } catch (e) {
-      _showSnackBar('Failed to update item: $e', isError: true);
+      if (mounted) _showSnackBar('Failed to update item: $e', isError: true);
     }
   }
 
   /// Delete a TodoItem
   Future<void> _deleteTodoItem(TodoItem item) async {
     final confirmed = await _showDeleteItemConfirmation(item.title);
-    if (!confirmed) return;
+    if (!confirmed || !mounted) return;
 
     try {
       final provider = Provider.of<ContentProvider>(context, listen: false);
@@ -180,13 +183,15 @@ class _TodoListDetailScreenState extends State<TodoListDetailScreen> {
 
       // Reload current todo list
       final updated = provider.todoLists.firstWhere((tl) => tl.id == _currentTodoList.id);
-      setState(() {
-        _currentTodoList = updated;
-      });
+      if (mounted) {
+        setState(() {
+          _currentTodoList = updated;
+        });
+      }
 
-      _showSnackBar('TodoItem deleted');
+      if (mounted) _showSnackBar('TodoItem deleted');
     } catch (e) {
-      _showSnackBar('Failed to delete item: $e', isError: true);
+      if (mounted) _showSnackBar('Failed to delete item: $e', isError: true);
     }
   }
 
@@ -225,7 +230,7 @@ class _TodoListDetailScreenState extends State<TodoListDetailScreen> {
   /// Delete the entire TodoList
   Future<void> _deleteTodoList() async {
     final confirmed = await _showDeleteListConfirmation();
-    if (!confirmed) return;
+    if (!confirmed || !mounted) return;
 
     try {
       final provider = Provider.of<ContentProvider>(context, listen: false);
@@ -237,9 +242,9 @@ class _TodoListDetailScreenState extends State<TodoListDetailScreen> {
         Navigator.of(context).pop();
       }
 
-      _showSnackBar('TodoList deleted');
+      if (mounted) _showSnackBar('TodoList deleted');
     } catch (e) {
-      _showSnackBar('Failed to delete list: $e', isError: true);
+      if (mounted) _showSnackBar('Failed to delete list: $e', isError: true);
     }
   }
 
@@ -323,7 +328,7 @@ class _TodoListDetailScreenState extends State<TodoListDetailScreen> {
 
                     // Priority dropdown
                     DropdownButtonFormField<TodoPriority>(
-                      value: selectedPriority,
+                      initialValue: selectedPriority,
                       decoration: const InputDecoration(
                         labelText: 'Priority',
                       ),
@@ -468,11 +473,16 @@ class _TodoListDetailScreenState extends State<TodoListDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async {
-        // Save before leaving
-        await _saveChanges();
-        return true;
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) async {
+        if (!didPop) {
+          // Save before leaving
+          await _saveChanges();
+          if (mounted && context.mounted) {
+            Navigator.of(context).pop();
+          }
+        }
       },
       child: Scaffold(
         appBar: AppBar(
@@ -553,7 +563,7 @@ class _TodoListDetailScreenState extends State<TodoListDetailScreen> {
                 gradient: AppColors.taskGradient,
                 boxShadow: [
                   BoxShadow(
-                    color: AppColors.taskGradient.colors.first.withOpacity(0.3),
+                    color: AppColors.taskGradient.colors.first.withValues(alpha: 0.3),
                     blurRadius: 8,
                     offset: const Offset(0, 2),
                   ),
@@ -572,7 +582,7 @@ class _TodoListDetailScreenState extends State<TodoListDetailScreen> {
                   const SizedBox(height: AppSpacing.sm),
                   LinearProgressIndicator(
                     value: _currentTodoList.progress,
-                    backgroundColor: Colors.white.withOpacity(0.3),
+                    backgroundColor: Colors.white.withValues(alpha: 0.3),
                     valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
                     minHeight: 8,
                     borderRadius: BorderRadius.circular(4),
@@ -641,7 +651,7 @@ class _TodoListDetailScreenState extends State<TodoListDetailScreen> {
             Icon(
               Icons.check_circle_outline,
               size: 64,
-              color: AppColors.taskGradient.colors.first.withOpacity(0.3),
+              color: AppColors.taskGradient.colors.first.withValues(alpha: 0.3),
             ),
             const SizedBox(height: AppSpacing.md),
             Text(

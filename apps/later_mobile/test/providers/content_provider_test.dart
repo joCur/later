@@ -425,6 +425,8 @@ class MockSpaceRepository extends SpaceRepository {
 
 /// Mock implementation of SpacesProvider for testing
 class MockSpacesProvider extends SpacesProvider {
+
+  MockSpacesProvider(this.mockRepo) : super(mockRepo);
   final MockSpaceRepository mockRepo;
 
   bool shouldThrowError = false;
@@ -434,8 +436,6 @@ class MockSpacesProvider extends SpacesProvider {
   int incrementSpaceItemCountCallCount = 0;
   int decrementSpaceItemCountCallCount = 0;
   Map<String, int> spaceItemCounts = {};
-
-  MockSpacesProvider(this.mockRepo) : super(mockRepo);
 
   void reset() {
     shouldThrowError = false;
@@ -885,7 +885,7 @@ void main() {
 
     test('should toggle todo item completion status', () async {
       // Arrange
-      final item = TodoItem(id: 'item-1', title: 'Task 1', sortOrder: 0, isCompleted: false);
+      final item = TodoItem(id: 'item-1', title: 'Task 1', sortOrder: 0);
       final todoList = TodoList(
         id: 'todo-1',
         spaceId: 'space-1',
@@ -1144,7 +1144,7 @@ void main() {
 
     test('should toggle list item checked status', () async {
       // Arrange
-      final item = ListItem(id: 'item-1', title: 'Item 1', sortOrder: 0, isChecked: false);
+      final item = ListItem(id: 'item-1', title: 'Item 1', sortOrder: 0);
       final list = ListModel(
         id: 'list-1',
         spaceId: 'space-1',
@@ -1488,8 +1488,8 @@ void main() {
 
     test('should filter by day only, ignoring time', () async {
       // Arrange
-      final morning = DateTime(2025, 1, 15, 8, 0);
-      final evening = DateTime(2025, 1, 15, 20, 0);
+      final morning = DateTime(2025, 1, 15, 8);
+      final evening = DateTime(2025, 1, 15, 20);
 
       final item1 = TodoItem(
         id: 'item-1',
@@ -1511,7 +1511,7 @@ void main() {
       await provider.loadSpaceContent('space-1');
 
       // Act - search using noon time (should match both)
-      final noon = DateTime(2025, 1, 15, 12, 0);
+      final noon = DateTime(2025, 1, 15, 12);
       final results = provider.getTodosWithDueDate(noon);
 
       // Assert - both should be found since they're on the same day

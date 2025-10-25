@@ -22,7 +22,7 @@ void main() {
       });
 
       test('creates with all optional fields', () {
-        final createdAt = DateTime(2025, 1, 1, 10, 0);
+        final createdAt = DateTime(2025, 1, 1, 10);
         final updatedAt = DateTime(2025, 10, 25, 14, 30);
 
         final item = Item(
@@ -52,7 +52,6 @@ void main() {
           id: 'note-3',
           title: 'Note',
           spaceId: 'space-3',
-          tags: null,
         );
 
         expect(item.tags, isEmpty);
@@ -68,10 +67,10 @@ void main() {
         );
         final after = DateTime.now();
 
-        expect(item.createdAt.isAfter(before.subtract(Duration(seconds: 1))), true);
-        expect(item.createdAt.isBefore(after.add(Duration(seconds: 1))), true);
-        expect(item.updatedAt.isAfter(before.subtract(Duration(seconds: 1))), true);
-        expect(item.updatedAt.isBefore(after.add(Duration(seconds: 1))), true);
+        expect(item.createdAt.isAfter(before.subtract(const Duration(seconds: 1))), true);
+        expect(item.createdAt.isBefore(after.add(const Duration(seconds: 1))), true);
+        expect(item.updatedAt.isAfter(before.subtract(const Duration(seconds: 1))), true);
+        expect(item.updatedAt.isBefore(after.add(const Duration(seconds: 1))), true);
       });
     });
 
@@ -158,7 +157,7 @@ void main() {
       });
 
       test('roundtrip JSON serialization preserves data', () {
-        final createdAt = DateTime(2025, 2, 14, 15, 0);
+        final createdAt = DateTime(2025, 2, 14, 15);
         final updatedAt = DateTime(2025, 10, 25, 16, 20);
 
         final original = Item(
@@ -232,7 +231,7 @@ void main() {
       });
 
       test('preserves unchanged fields', () {
-        final createdAt = DateTime(2025, 1, 1);
+        final createdAt = DateTime(2025);
         final updatedAt = DateTime(2025, 10, 25);
 
         final original = Item(
@@ -305,7 +304,7 @@ void main() {
           spaceId: 'space-16',
         );
 
-        final newCreatedAt = DateTime(2025, 1, 1);
+        final newCreatedAt = DateTime(2025);
         final newUpdatedAt = DateTime(2025, 10, 26);
 
         final updated = original.copyWith(
@@ -463,7 +462,7 @@ void main() {
       });
 
       test('handles multiline content', () {
-        final multilineContent = '''
+        const multilineContent = '''
 This is a note with multiple lines.
 
 It includes:
@@ -569,7 +568,6 @@ And it should all be preserved.
           id: 'note-34',
           title: 'Note',
           spaceId: 'space-34',
-          syncStatus: null,
         );
 
         expect(pendingItem.syncStatus, 'pending');
@@ -578,7 +576,7 @@ And it should all be preserved.
       });
 
       test('handles past timestamps', () {
-        final pastDate = DateTime(2020, 1, 1);
+        final pastDate = DateTime(2020);
         final item = Item(
           id: 'note-35',
           title: 'Old Note',
@@ -606,7 +604,7 @@ And it should all be preserved.
       });
 
       test('handles createdAt and updatedAt being different', () {
-        final createdAt = DateTime(2025, 1, 1);
+        final createdAt = DateTime(2025);
         final updatedAt = DateTime(2025, 10, 25);
         final item = Item(
           id: 'note-37',
@@ -699,7 +697,6 @@ Our API uses JWT tokens for authentication.
           title: 'Private Note',
           content: 'This note stays on device only',
           spaceId: 'personal',
-          syncStatus: null,
         );
 
         expect(item.syncStatus, isNull);

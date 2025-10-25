@@ -81,7 +81,6 @@ void main() {
         // Arrange
         final list = createTestList(
           id: 'list-1',
-          name: 'Shopping List',
           style: ListStyle.checkboxes,
         );
 
@@ -127,12 +126,10 @@ void main() {
         // Arrange
         final list1 = createTestList(
           id: 'list-1',
-          spaceId: 'space-1',
           name: 'List 1',
         );
         final list2 = createTestList(
           id: 'list-2',
-          spaceId: 'space-1',
           name: 'List 2',
         );
         final list3 = createTestList(
@@ -227,7 +224,6 @@ void main() {
         final item = createTestListItem(
           id: 'item-1',
           title: 'Bread',
-          sortOrder: 0,
         );
 
         // Act
@@ -256,7 +252,6 @@ void main() {
         final item1 = createTestListItem(
           id: 'item-1',
           title: 'Original Title',
-          sortOrder: 0,
         );
         final list = createTestList(
           id: 'list-1',
@@ -301,7 +296,7 @@ void main() {
 
       test('deleteItem() removes ListItem from ListModel', () async {
         // Arrange
-        final item1 = createTestListItem(id: 'item-1', sortOrder: 0);
+        final item1 = createTestListItem(id: 'item-1');
         final item2 = createTestListItem(id: 'item-2', sortOrder: 1);
         final list = createTestList(
           id: 'list-1',
@@ -330,8 +325,6 @@ void main() {
         // Arrange
         final item = createTestListItem(
           id: 'item-1',
-          isChecked: false,
-          sortOrder: 0,
         );
         final list = createTestList(
           id: 'list-1',
@@ -375,7 +368,7 @@ void main() {
 
       test('reorderItems() reorders items and updates sortOrder', () async {
         // Arrange
-        final item1 = createTestListItem(id: 'item-1', title: 'First', sortOrder: 0);
+        final item1 = createTestListItem(id: 'item-1', title: 'First');
         final item2 = createTestListItem(id: 'item-2', title: 'Second', sortOrder: 1);
         final item3 = createTestListItem(id: 'item-3', title: 'Third', sortOrder: 2);
         final list = createTestList(
@@ -398,7 +391,7 @@ void main() {
 
       test('reorderItems() throws exception for invalid oldIndex', () async {
         // Arrange
-        final item = createTestListItem(id: 'item-1', sortOrder: 0);
+        final item = createTestListItem(id: 'item-1');
         final list = createTestList(
           id: 'list-1',
           items: [item],
@@ -418,7 +411,7 @@ void main() {
 
       test('reorderItems() throws exception for invalid newIndex', () async {
         // Arrange
-        final item = createTestListItem(id: 'item-1', sortOrder: 0);
+        final item = createTestListItem(id: 'item-1');
         final list = createTestList(
           id: 'list-1',
           items: [item],
@@ -438,7 +431,7 @@ void main() {
 
       test('reorderItems() handles single item list', () async {
         // Arrange
-        final item = createTestListItem(id: 'item-1', sortOrder: 0);
+        final item = createTestListItem(id: 'item-1');
         final list = createTestList(
           id: 'list-1',
           items: [item],
@@ -459,11 +452,9 @@ void main() {
         // Arrange
         final list1 = createTestList(
           id: 'list-1',
-          spaceId: 'space-1',
         );
         final list2 = createTestList(
           id: 'list-2',
-          spaceId: 'space-1',
         );
         final list3 = createTestList(
           id: 'list-3',
@@ -486,11 +477,9 @@ void main() {
         // Arrange
         final list1 = createTestList(
           id: 'list-1',
-          spaceId: 'space-1',
         );
         final list2 = createTestList(
           id: 'list-2',
-          spaceId: 'space-1',
         );
 
         await repository.create(list1);
@@ -516,11 +505,9 @@ void main() {
         // Arrange
         final list1 = createTestList(
           id: 'list-1',
-          spaceId: 'space-1',
         );
         final list2 = createTestList(
           id: 'list-2',
-          spaceId: 'space-1',
         );
         final list3 = createTestList(
           id: 'list-3',
@@ -555,7 +542,6 @@ void main() {
         final list = createTestList(
           id: 'list-1',
           name: 'Notes',
-          style: ListStyle.bullets,
         );
 
         // Act
@@ -599,7 +585,6 @@ void main() {
         // Arrange
         final list = createTestList(
           id: 'list-1',
-          style: ListStyle.bullets,
         );
         await repository.create(list);
 
@@ -616,7 +601,7 @@ void main() {
       test('create ListModel with multiple items', () async {
         // Arrange
         final items = [
-          createTestListItem(id: 'item-1', title: 'Item 1', sortOrder: 0),
+          createTestListItem(id: 'item-1', title: 'Item 1'),
           createTestListItem(id: 'item-2', title: 'Item 2', sortOrder: 1),
           createTestListItem(id: 'item-3', title: 'Item 3', sortOrder: 2),
         ];
@@ -639,7 +624,6 @@ void main() {
           id: 'item-1',
           title: 'Important item',
           notes: 'This is a detailed note about the item',
-          sortOrder: 0,
         );
         final list = createTestList(
           id: 'list-1',
@@ -657,9 +641,9 @@ void main() {
       test('progress calculation with checked items', () async {
         // Arrange
         final items = [
-          createTestListItem(id: 'item-1', isChecked: true, sortOrder: 0),
+          createTestListItem(id: 'item-1', isChecked: true),
           createTestListItem(id: 'item-2', isChecked: true, sortOrder: 1),
-          createTestListItem(id: 'item-3', isChecked: false, sortOrder: 2),
+          createTestListItem(id: 'item-3', sortOrder: 2),
         ];
         final list = createTestList(
           id: 'list-1',
@@ -691,13 +675,12 @@ void main() {
 
       test('update preserves other fields', () async {
         // Arrange
-        final item = createTestListItem(id: 'item-1', sortOrder: 0);
+        final item = createTestListItem(id: 'item-1');
         final list = createTestList(
           id: 'list-1',
           name: 'Original Name',
           icon: '📝',
           items: [item],
-          style: ListStyle.bullets,
         );
         await repository.create(list);
 
@@ -718,7 +701,7 @@ void main() {
         await repository.create(list);
 
         // Act
-        await repository.addItem('list-1', createTestListItem(id: 'item-1', sortOrder: 0));
+        await repository.addItem('list-1', createTestListItem(id: 'item-1'));
         await repository.addItem('list-1', createTestListItem(id: 'item-2', sortOrder: 1));
         await repository.addItem('list-1', createTestListItem(id: 'item-3', sortOrder: 2));
 
@@ -729,7 +712,7 @@ void main() {
 
       test('deleteItem on non-existent item does not throw', () async {
         // Arrange
-        final item = createTestListItem(id: 'item-1', sortOrder: 0);
+        final item = createTestListItem(id: 'item-1');
         final list = createTestList(
           id: 'list-1',
           items: [item],
@@ -762,7 +745,6 @@ void main() {
         // Arrange
         final list = createTestList(
           id: 'list-1',
-          icon: null,
         );
 
         // Act
@@ -795,13 +777,10 @@ void main() {
         // Arrange
         final item = createTestListItem(
           id: 'item-1',
-          isChecked: false,
-          sortOrder: 0,
         );
         final list = createTestList(
           id: 'list-1',
           items: [item],
-          style: ListStyle.bullets, // Not checkbox style
         );
         await repository.create(list);
 
@@ -817,8 +796,6 @@ void main() {
         // Arrange
         final item = createTestListItem(
           id: 'item-1',
-          notes: null,
-          sortOrder: 0,
         );
         final list = createTestList(
           id: 'list-1',

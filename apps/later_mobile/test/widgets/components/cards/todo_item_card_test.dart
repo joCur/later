@@ -3,7 +3,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:later_mobile/widgets/components/cards/todo_item_card.dart';
 import 'package:later_mobile/data/models/todo_list_model.dart';
 import 'package:later_mobile/core/theme/app_colors.dart';
-import 'package:later_mobile/core/theme/app_animations.dart';
 
 void main() {
   group('TodoItemCard', () {
@@ -12,7 +11,6 @@ void main() {
       id: 'test-item-1',
       title: 'Complete project documentation',
       description: 'Write comprehensive docs',
-      isCompleted: false,
       dueDate: DateTime(2025, 3, 15),
       priority: TodoPriority.high,
       tags: ['urgent', 'docs'],

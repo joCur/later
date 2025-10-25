@@ -207,7 +207,6 @@ class _NoteCardState extends State<NoteCard> with TickerProviderStateMixin {
           color: isDark
               ? AppColors.noteGradientStart.withValues(alpha: 0.3)
               : AppColors.noteGradientStart.withValues(alpha: 0.2),
-          width: 1,
         ),
       ),
       child: Text(
@@ -238,7 +237,6 @@ class _NoteCardState extends State<NoteCard> with TickerProviderStateMixin {
           color: isDark
               ? AppColors.neutral600
               : AppColors.neutral300,
-          width: 1,
         ),
       ),
       child: Text(

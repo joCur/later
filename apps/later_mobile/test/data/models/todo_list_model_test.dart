@@ -65,7 +65,6 @@ void main() {
         final item = TodoItem(
           id: 'todo-3',
           title: 'Test task',
-          tags: null,
           sortOrder: 0,
         );
 
@@ -91,7 +90,6 @@ void main() {
           id: 'todo-5',
           title: 'Review pull request',
           description: 'Check the new authentication feature',
-          isCompleted: false,
           dueDate: dueDate,
           priority: TodoPriority.medium,
           tags: ['development', 'review'],
@@ -192,12 +190,11 @@ void main() {
       });
 
       test('roundtrip JSON serialization preserves data', () {
-        final dueDate = DateTime(2025, 6, 1, 9, 0);
+        final dueDate = DateTime(2025, 6, 1, 9);
         final original = TodoItem(
           id: 'todo-11',
           title: 'Team meeting',
           description: 'Discuss Q2 goals and objectives',
-          isCompleted: false,
           dueDate: dueDate,
           priority: TodoPriority.high,
           tags: ['meeting', 'team', 'planning'],
@@ -240,7 +237,6 @@ void main() {
           id: 'todo-13',
           title: 'Original title',
           description: 'Original description',
-          isCompleted: false,
           priority: TodoPriority.low,
           tags: ['tag1'],
           sortOrder: 0,
@@ -261,7 +257,7 @@ void main() {
       });
 
       test('preserves unchanged fields', () {
-        final dueDate = DateTime(2025, 12, 1);
+        final dueDate = DateTime(2025, 12);
         final original = TodoItem(
           id: 'todo-14',
           title: 'Task',
@@ -289,11 +285,11 @@ void main() {
         final original = TodoItem(
           id: 'todo-15',
           title: 'Task',
-          dueDate: DateTime(2025, 10, 1),
+          dueDate: DateTime(2025, 10),
           sortOrder: 0,
         );
 
-        final newDueDate = DateTime(2025, 11, 1);
+        final newDueDate = DateTime(2025, 11);
         final updated = original.copyWith(dueDate: newDueDate);
 
         expect(updated.dueDate, newDueDate);
@@ -303,7 +299,7 @@ void main() {
         final original = TodoItem(
           id: 'todo-16',
           title: 'Task',
-          dueDate: DateTime(2025, 10, 1),
+          dueDate: DateTime(2025, 10),
           sortOrder: 0,
         );
 
@@ -329,12 +325,12 @@ void main() {
         final original = TodoItem(
           id: 'todo-18',
           title: 'Task',
-          dueDate: DateTime(2025, 10, 1),
+          dueDate: DateTime(2025, 10),
           sortOrder: 0,
         );
 
         final updated = original.copyWith(
-          dueDate: DateTime(2025, 11, 1),
+          dueDate: DateTime(2025, 11),
           clearDueDate: true,
         );
 
@@ -393,7 +389,6 @@ void main() {
           id: 'same-id',
           title: 'Title 1',
           description: 'Description 1',
-          isCompleted: false,
           priority: TodoPriority.low,
           sortOrder: 0,
         );
@@ -493,7 +488,7 @@ void main() {
       });
 
       test('handles past due date', () {
-        final pastDate = DateTime(2020, 1, 1);
+        final pastDate = DateTime(2020);
         final item = TodoItem(
           id: 'todo-27',
           title: 'Task',
@@ -581,7 +576,7 @@ void main() {
       });
 
       test('creates with all optional fields', () {
-        final createdAt = DateTime(2025, 1, 1);
+        final createdAt = DateTime(2025);
         final updatedAt = DateTime(2025, 10, 25);
         final items = [
           TodoItem(id: 'item-1', title: 'Task 1', sortOrder: 0),
@@ -612,7 +607,6 @@ void main() {
           id: 'list-3',
           spaceId: 'space-3',
           name: 'Empty List',
-          items: null,
         );
 
         expect(list.items, isEmpty);
@@ -628,10 +622,10 @@ void main() {
         );
         final after = DateTime.now();
 
-        expect(list.createdAt.isAfter(before.subtract(Duration(seconds: 1))), true);
-        expect(list.createdAt.isBefore(after.add(Duration(seconds: 1))), true);
-        expect(list.updatedAt.isAfter(before.subtract(Duration(seconds: 1))), true);
-        expect(list.updatedAt.isBefore(after.add(Duration(seconds: 1))), true);
+        expect(list.createdAt.isAfter(before.subtract(const Duration(seconds: 1))), true);
+        expect(list.createdAt.isBefore(after.add(const Duration(seconds: 1))), true);
+        expect(list.updatedAt.isAfter(before.subtract(const Duration(seconds: 1))), true);
+        expect(list.updatedAt.isBefore(after.add(const Duration(seconds: 1))), true);
       });
     });
 
@@ -644,7 +638,6 @@ void main() {
             id: 'item-1',
             title: 'First task',
             description: 'Complete by Friday',
-            isCompleted: false,
             priority: TodoPriority.high,
             tags: ['urgent'],
             sortOrder: 0,
@@ -673,7 +666,7 @@ void main() {
         expect(json['spaceId'], 'space-5');
         expect(json['name'], 'Q4 Goals');
         expect(json['description'], 'Fourth quarter objectives');
-        expect(json['items'], isA<List>());
+        expect(json['items'], isA<List<dynamic>>());
         expect(json['items'].length, 2);
         expect(json['createdAt'], createdAt.toIso8601String());
         expect(json['updatedAt'], updatedAt.toIso8601String());
@@ -701,7 +694,7 @@ void main() {
         final json = list.toJson();
 
         expect(json['items'], isEmpty);
-        expect(json['items'], isA<List>());
+        expect(json['items'], isA<List<dynamic>>());
       });
 
       test('fromJson deserializes correctly', () {
@@ -760,15 +753,14 @@ void main() {
       });
 
       test('roundtrip JSON serialization preserves data', () {
-        final createdAt = DateTime(2025, 5, 10, 9, 0);
+        final createdAt = DateTime(2025, 5, 10, 9);
         final updatedAt = DateTime(2025, 10, 25, 15, 30);
         final items = [
           TodoItem(
             id: 'item-1',
             title: 'Design mockups',
             description: 'Create wireframes for homepage',
-            isCompleted: false,
-            dueDate: DateTime(2025, 11, 1),
+            dueDate: DateTime(2025, 11),
             priority: TodoPriority.high,
             tags: ['design', 'ux'],
             sortOrder: 0,
@@ -828,7 +820,7 @@ void main() {
       });
 
       test('preserves unchanged fields', () {
-        final createdAt = DateTime(2025, 1, 1);
+        final createdAt = DateTime(2025);
         final updatedAt = DateTime(2025, 10, 25);
         final items = [
           TodoItem(id: 'item-1', title: 'Task', sortOrder: 0),
@@ -863,7 +855,7 @@ void main() {
           name: 'Old',
         );
 
-        final newCreatedAt = DateTime(2025, 1, 1);
+        final newCreatedAt = DateTime(2025);
         final newUpdatedAt = DateTime(2025, 10, 26);
         final newItems = [
           TodoItem(id: 'new-item', title: 'New Task', sortOrder: 0),
@@ -919,8 +911,8 @@ void main() {
 
       test('completedItems returns correct count when no items completed', () {
         final items = [
-          TodoItem(id: 'item-1', title: 'Task 1', isCompleted: false, sortOrder: 0),
-          TodoItem(id: 'item-2', title: 'Task 2', isCompleted: false, sortOrder: 1),
+          TodoItem(id: 'item-1', title: 'Task 1', sortOrder: 0),
+          TodoItem(id: 'item-2', title: 'Task 2', sortOrder: 1),
         ];
 
         final list = TodoList(
@@ -936,9 +928,9 @@ void main() {
       test('completedItems returns correct count when some items completed', () {
         final items = [
           TodoItem(id: 'item-1', title: 'Task 1', isCompleted: true, sortOrder: 0),
-          TodoItem(id: 'item-2', title: 'Task 2', isCompleted: false, sortOrder: 1),
+          TodoItem(id: 'item-2', title: 'Task 2', sortOrder: 1),
           TodoItem(id: 'item-3', title: 'Task 3', isCompleted: true, sortOrder: 2),
-          TodoItem(id: 'item-4', title: 'Task 4', isCompleted: false, sortOrder: 3),
+          TodoItem(id: 'item-4', title: 'Task 4', sortOrder: 3),
         ];
 
         final list = TodoList(
@@ -979,8 +971,8 @@ void main() {
 
       test('progress returns 0.0 when no items completed', () {
         final items = [
-          TodoItem(id: 'item-1', title: 'Task 1', isCompleted: false, sortOrder: 0),
-          TodoItem(id: 'item-2', title: 'Task 2', isCompleted: false, sortOrder: 1),
+          TodoItem(id: 'item-1', title: 'Task 1', sortOrder: 0),
+          TodoItem(id: 'item-2', title: 'Task 2', sortOrder: 1),
         ];
 
         final list = TodoList(
@@ -1012,9 +1004,9 @@ void main() {
       test('progress calculates correctly for partial completion', () {
         final items = [
           TodoItem(id: 'item-1', title: 'Task 1', isCompleted: true, sortOrder: 0),
-          TodoItem(id: 'item-2', title: 'Task 2', isCompleted: false, sortOrder: 1),
-          TodoItem(id: 'item-3', title: 'Task 3', isCompleted: false, sortOrder: 2),
-          TodoItem(id: 'item-4', title: 'Task 4', isCompleted: false, sortOrder: 3),
+          TodoItem(id: 'item-2', title: 'Task 2', sortOrder: 1),
+          TodoItem(id: 'item-3', title: 'Task 3', sortOrder: 2),
+          TodoItem(id: 'item-4', title: 'Task 4', sortOrder: 3),
         ];
 
         final list = TodoList(
@@ -1031,8 +1023,8 @@ void main() {
         final items = [
           TodoItem(id: 'item-1', title: 'Task 1', isCompleted: true, sortOrder: 0),
           TodoItem(id: 'item-2', title: 'Task 2', isCompleted: true, sortOrder: 1),
-          TodoItem(id: 'item-3', title: 'Task 3', isCompleted: false, sortOrder: 2),
-          TodoItem(id: 'item-4', title: 'Task 4', isCompleted: false, sortOrder: 3),
+          TodoItem(id: 'item-3', title: 'Task 3', sortOrder: 2),
+          TodoItem(id: 'item-4', title: 'Task 4', sortOrder: 3),
         ];
 
         final list = TodoList(
@@ -1109,7 +1101,7 @@ void main() {
       test('includes key identifying fields', () {
         final items = [
           TodoItem(id: 'item-1', title: 'Task 1', isCompleted: true, sortOrder: 0),
-          TodoItem(id: 'item-2', title: 'Task 2', isCompleted: false, sortOrder: 1),
+          TodoItem(id: 'item-2', title: 'Task 2', sortOrder: 1),
         ];
 
         final list = TodoList(

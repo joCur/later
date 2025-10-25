@@ -242,7 +242,6 @@ void main() {
         id: 'space-1',
         name: 'Test Space',
         icon: '🏠',
-        itemCount: 0,
         createdAt: DateTime.now(),
         updatedAt: DateTime.now(),
       ),
@@ -267,7 +266,6 @@ void main() {
         id: 'list-1',
         spaceId: 'space-1',
         name: 'Shopping List',
-        style: ListStyle.bullets,
         items: [],
       );
       fakeListRepository.setLists([list]);
@@ -286,7 +284,6 @@ void main() {
         spaceId: 'space-1',
         name: 'Shopping List',
         icon: '🛒',
-        style: ListStyle.bullets,
         items: [],
       );
       fakeListRepository.setLists([list]);
@@ -303,7 +300,6 @@ void main() {
         id: 'list-1',
         spaceId: 'space-1',
         name: 'Empty List',
-        style: ListStyle.bullets,
         items: [],
       );
       fakeListRepository.setLists([list]);
@@ -321,7 +317,6 @@ void main() {
         id: 'list-1',
         spaceId: 'space-1',
         name: 'Shopping List',
-        style: ListStyle.bullets,
         items: [
           ListItem(id: 'item-1', title: 'Milk', sortOrder: 0),
           ListItem(id: 'item-2', title: 'Eggs', sortOrder: 1),
@@ -367,7 +362,7 @@ void main() {
         name: 'Tasks',
         style: ListStyle.checkboxes,
         items: [
-          ListItem(id: 'item-1', title: 'Task 1', isChecked: false, sortOrder: 0),
+          ListItem(id: 'item-1', title: 'Task 1', sortOrder: 0),
           ListItem(id: 'item-2', title: 'Task 2', isChecked: true, sortOrder: 1),
         ],
       );
@@ -387,7 +382,6 @@ void main() {
         id: 'list-1',
         spaceId: 'space-1',
         name: 'List',
-        style: ListStyle.bullets,
         items: [],
       );
       fakeListRepository.setLists([list]);
@@ -405,7 +399,6 @@ void main() {
         id: 'list-1',
         spaceId: 'space-1',
         name: 'List',
-        style: ListStyle.bullets,
         items: [],
       );
       fakeListRepository.setLists([list]);
@@ -424,7 +417,6 @@ void main() {
         id: 'list-1',
         spaceId: 'space-1',
         name: 'Original Name',
-        style: ListStyle.bullets,
         items: [],
       );
       fakeListRepository.setLists([list]);
@@ -460,7 +452,6 @@ void main() {
         id: 'list-1',
         spaceId: 'space-1',
         name: 'Original Name',
-        style: ListStyle.bullets,
         items: [],
       );
       fakeListRepository.setLists([list]);
@@ -494,7 +485,6 @@ void main() {
         id: 'list-1',
         spaceId: 'space-1',
         name: 'Original Name',
-        style: ListStyle.bullets,
         items: [],
       );
       fakeListRepository.setLists([list]);
@@ -528,7 +518,6 @@ void main() {
         id: 'list-1',
         spaceId: 'space-1',
         name: 'List',
-        style: ListStyle.bullets,
         items: [],
       );
       fakeListRepository.setLists([list]);
@@ -551,7 +540,6 @@ void main() {
         id: 'list-1',
         spaceId: 'space-1',
         name: 'List',
-        style: ListStyle.bullets,
         items: [],
       );
       fakeListRepository.setLists([list]);
@@ -586,7 +574,6 @@ void main() {
         id: 'list-1',
         spaceId: 'space-1',
         name: 'List',
-        style: ListStyle.bullets,
         items: [
           ListItem(id: 'item-1', title: 'Existing Item', sortOrder: 0),
         ],
@@ -611,7 +598,7 @@ void main() {
         name: 'Tasks',
         style: ListStyle.checkboxes,
         items: [
-          ListItem(id: 'item-1', title: 'Task', isChecked: false, sortOrder: 0),
+          ListItem(id: 'item-1', title: 'Task', sortOrder: 0),
         ],
       );
       fakeListRepository.setLists([list]);
@@ -636,7 +623,6 @@ void main() {
         id: 'list-1',
         spaceId: 'space-1',
         name: 'List',
-        style: ListStyle.bullets,
         items: [
           ListItem(id: 'item-1', title: 'Item to Delete', sortOrder: 0),
         ],
@@ -663,7 +649,6 @@ void main() {
         id: 'list-1',
         spaceId: 'space-1',
         name: 'List',
-        style: ListStyle.bullets,
         items: [
           ListItem(id: 'item-1', title: 'Item to Delete', sortOrder: 0),
         ],
@@ -692,7 +677,6 @@ void main() {
         id: 'list-1',
         spaceId: 'space-1',
         name: 'List',
-        style: ListStyle.bullets,
         items: [
           ListItem(id: 'item-1', title: 'First', sortOrder: 0),
           ListItem(id: 'item-2', title: 'Second', sortOrder: 1),
@@ -715,7 +699,6 @@ void main() {
         id: 'list-1',
         spaceId: 'space-1',
         name: 'List',
-        style: ListStyle.bullets,
         items: [],
       );
       fakeListRepository.setLists([list]);
@@ -738,7 +721,6 @@ void main() {
         id: 'list-1',
         spaceId: 'space-1',
         name: 'List',
-        style: ListStyle.bullets,
         items: [],
       );
       fakeListRepository.setLists([list]);
@@ -766,7 +748,6 @@ void main() {
         id: 'list-1',
         spaceId: 'space-1',
         name: 'List',
-        style: ListStyle.bullets,
         items: [],
       );
       fakeListRepository.setLists([list]);
@@ -791,7 +772,6 @@ void main() {
         id: 'list-1',
         spaceId: 'space-1',
         name: 'List to Delete',
-        style: ListStyle.bullets,
         items: [
           ListItem(id: 'item-1', title: 'Item', sortOrder: 0),
         ],
@@ -825,7 +805,7 @@ void main() {
         style: ListStyle.checkboxes,
         items: [
           ListItem(id: 'item-1', title: 'Task 1', isChecked: true, sortOrder: 0),
-          ListItem(id: 'item-2', title: 'Task 2', isChecked: false, sortOrder: 1),
+          ListItem(id: 'item-2', title: 'Task 2', sortOrder: 1),
           ListItem(id: 'item-3', title: 'Task 3', isChecked: true, sortOrder: 2),
         ],
       );
@@ -846,7 +826,6 @@ void main() {
         id: 'list-1',
         spaceId: 'space-1',
         name: 'List',
-        style: ListStyle.bullets,
         items: [
           ListItem(id: 'item-1', title: 'Item 1', sortOrder: 0),
           ListItem(id: 'item-2', title: 'Item 2', sortOrder: 1),
@@ -869,7 +848,6 @@ void main() {
         id: 'list-1',
         spaceId: 'space-1',
         name: 'List',
-        style: ListStyle.bullets,
         items: [],
       );
       fakeListRepository.setLists([list]);
@@ -904,7 +882,6 @@ void main() {
         id: 'list-1',
         spaceId: 'space-1',
         name: 'Original',
-        style: ListStyle.bullets,
         items: [],
       );
       fakeListRepository.setLists([list]);
@@ -936,7 +913,7 @@ void main() {
         name: 'Accessible List',
         style: ListStyle.checkboxes,
         items: [
-          ListItem(id: 'item-1', title: 'Item 1', isChecked: false, sortOrder: 0),
+          ListItem(id: 'item-1', title: 'Item 1', sortOrder: 0),
         ],
       );
       fakeListRepository.setLists([list]);

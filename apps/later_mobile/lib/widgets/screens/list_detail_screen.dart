@@ -125,7 +125,7 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
   /// Add a new ListItem
   Future<void> _addListItem() async {
     final result = await _showListItemDialog();
-    if (result == null) return;
+    if (result == null || !mounted) return;
 
     try {
       final provider = Provider.of<ContentProvider>(context, listen: false);
@@ -133,20 +133,22 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
 
       // Reload current list
       final updated = provider.lists.firstWhere((l) => l.id == _currentList.id);
-      setState(() {
-        _currentList = updated;
-      });
+      if (mounted) {
+        setState(() {
+          _currentList = updated;
+        });
+      }
 
-      _showSnackBar('Item added');
+      if (mounted) _showSnackBar('Item added');
     } catch (e) {
-      _showSnackBar('Failed to add item: $e', isError: true);
+      if (mounted) _showSnackBar('Failed to add item: $e', isError: true);
     }
   }
 
   /// Edit a ListItem
   Future<void> _editListItem(ListItem item) async {
     final result = await _showListItemDialog(existingItem: item);
-    if (result == null) return;
+    if (result == null || !mounted) return;
 
     try {
       final provider = Provider.of<ContentProvider>(context, listen: false);
@@ -154,20 +156,22 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
 
       // Reload current list
       final updated = provider.lists.firstWhere((l) => l.id == _currentList.id);
-      setState(() {
-        _currentList = updated;
-      });
+      if (mounted) {
+        setState(() {
+          _currentList = updated;
+        });
+      }
 
-      _showSnackBar('Item updated');
+      if (mounted) _showSnackBar('Item updated');
     } catch (e) {
-      _showSnackBar('Failed to update item: $e', isError: true);
+      if (mounted) _showSnackBar('Failed to update item: $e', isError: true);
     }
   }
 
   /// Delete a ListItem
   Future<void> _deleteListItem(ListItem item) async {
     final confirmed = await _showDeleteItemConfirmation(item.title);
-    if (!confirmed) return;
+    if (!confirmed || !mounted) return;
 
     try {
       final provider = Provider.of<ContentProvider>(context, listen: false);
@@ -175,13 +179,15 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
 
       // Reload current list
       final updated = provider.lists.firstWhere((l) => l.id == _currentList.id);
-      setState(() {
-        _currentList = updated;
-      });
+      if (mounted) {
+        setState(() {
+          _currentList = updated;
+        });
+      }
 
-      _showSnackBar('Item deleted');
+      if (mounted) _showSnackBar('Item deleted');
     } catch (e) {
-      _showSnackBar('Failed to delete item: $e', isError: true);
+      if (mounted) _showSnackBar('Failed to delete item: $e', isError: true);
     }
   }
 
@@ -220,47 +226,51 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
   /// Change list style
   Future<void> _changeListStyle() async {
     final result = await _showStyleSelectionDialog();
-    if (result == null) return;
+    if (result == null || !mounted) return;
 
     try {
       final provider = Provider.of<ContentProvider>(context, listen: false);
       final updated = _currentList.copyWith(style: result);
       await provider.updateList(updated);
 
-      setState(() {
-        _currentList = updated;
-      });
+      if (mounted) {
+        setState(() {
+          _currentList = updated;
+        });
+      }
 
-      _showSnackBar('List style updated');
+      if (mounted) _showSnackBar('List style updated');
     } catch (e) {
-      _showSnackBar('Failed to change style: $e', isError: true);
+      if (mounted) _showSnackBar('Failed to change style: $e', isError: true);
     }
   }
 
   /// Change list icon
   Future<void> _changeListIcon() async {
     final result = await _showIconSelectionDialog();
-    if (result == null) return;
+    if (result == null || !mounted) return;
 
     try {
       final provider = Provider.of<ContentProvider>(context, listen: false);
       final updated = _currentList.copyWith(icon: result);
       await provider.updateList(updated);
 
-      setState(() {
-        _currentList = updated;
-      });
+      if (mounted) {
+        setState(() {
+          _currentList = updated;
+        });
+      }
 
-      _showSnackBar('List icon updated');
+      if (mounted) _showSnackBar('List icon updated');
     } catch (e) {
-      _showSnackBar('Failed to change icon: $e', isError: true);
+      if (mounted) _showSnackBar('Failed to change icon: $e', isError: true);
     }
   }
 
   /// Delete the entire List
   Future<void> _deleteList() async {
     final confirmed = await _showDeleteListConfirmation();
-    if (!confirmed) return;
+    if (!confirmed || !mounted) return;
 
     try {
       final provider = Provider.of<ContentProvider>(context, listen: false);
@@ -272,9 +282,9 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
         Navigator.of(context).pop();
       }
 
-      _showSnackBar('List deleted');
+      if (mounted) _showSnackBar('List deleted');
     } catch (e) {
-      _showSnackBar('Failed to delete list: $e', isError: true);
+      if (mounted) _showSnackBar('Failed to delete list: $e', isError: true);
     }
   }
 
@@ -411,7 +421,6 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
               shrinkWrap: true,
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 4,
-                childAspectRatio: 1,
                 crossAxisSpacing: AppSpacing.sm,
                 mainAxisSpacing: AppSpacing.sm,
               ),
@@ -520,25 +529,19 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
     );
   }
 
-  /// Get style label
-  String _getStyleLabel(ListStyle style) {
-    switch (style) {
-      case ListStyle.bullets:
-        return 'Bullets';
-      case ListStyle.numbered:
-        return 'Numbered';
-      case ListStyle.checkboxes:
-        return 'Checkboxes';
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async {
-        // Save before leaving
-        await _saveChanges();
-        return true;
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) async {
+        if (!didPop) {
+          // Save before leaving
+          await _saveChanges();
+          if (mounted && context.mounted) {
+            Navigator.of(context).pop();
+          }
+        }
       },
       child: Scaffold(
         appBar: AppBar(
@@ -662,7 +665,7 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
                   gradient: AppColors.listGradient,
                   boxShadow: [
                     BoxShadow(
-                      color: AppColors.listGradient.colors.first.withOpacity(0.3),
+                      color: AppColors.listGradient.colors.first.withValues(alpha: 0.3),
                       blurRadius: 8,
                       offset: const Offset(0, 2),
                     ),
@@ -681,7 +684,7 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
                     const SizedBox(height: AppSpacing.sm),
                     LinearProgressIndicator(
                       value: _currentList.progress,
-                      backgroundColor: Colors.white.withOpacity(0.3),
+                      backgroundColor: Colors.white.withValues(alpha: 0.3),
                       valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
                       minHeight: 8,
                       borderRadius: BorderRadius.circular(4),
@@ -751,7 +754,7 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
             Icon(
               Icons.list_alt,
               size: 64,
-              color: AppColors.listGradient.colors.first.withOpacity(0.3),
+              color: AppColors.listGradient.colors.first.withValues(alpha: 0.3),
             ),
             const SizedBox(height: AppSpacing.md),
             Text(

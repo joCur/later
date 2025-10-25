@@ -196,7 +196,7 @@ void main() {
       });
 
       testWidgets('handles empty content (no preview shown)', (tester) async {
-        final note = createNote(content: null);
+        final note = createNote();
 
         await tester.pumpWidget(
           MaterialApp(
@@ -358,7 +358,7 @@ void main() {
 
     group('Accessibility', () {
       testWidgets('has correct semantic label', (tester) async {
-        final note = createNote(title: 'Meeting Notes');
+        final note = createNote();
 
         await tester.pumpWidget(
           MaterialApp(
@@ -702,7 +702,7 @@ void main() {
       });
 
       testWidgets('handles null tags list', (tester) async {
-        final note = createNote(tags: null);
+        final note = createNote();
 
         await tester.pumpWidget(
           MaterialApp(
@@ -725,7 +725,6 @@ void main() {
             home: Scaffold(
               body: NoteCard(
                 item: note,
-                showMetadata: true,
               ),
             ),
           ),

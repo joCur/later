@@ -78,7 +78,6 @@ void main() {
           id: 'item-4',
           title: 'Review pull request',
           notes: 'Check for security issues',
-          isChecked: false,
           sortOrder: 2,
         );
 
@@ -189,7 +188,6 @@ void main() {
           id: 'item-11',
           title: 'Original title',
           notes: 'Original notes',
-          isChecked: false,
           sortOrder: 0,
         );
 
@@ -294,7 +292,6 @@ void main() {
           id: 'same-id',
           title: 'Title 1',
           notes: 'Notes 1',
-          isChecked: false,
           sortOrder: 0,
         );
 
@@ -445,7 +442,7 @@ void main() {
       });
 
       test('creates with all optional fields', () {
-        final createdAt = DateTime(2025, 1, 1);
+        final createdAt = DateTime(2025);
         final updatedAt = DateTime(2025, 10, 25);
         final items = [
           ListItem(id: 'item-1', title: 'Item 1', sortOrder: 0),
@@ -478,7 +475,6 @@ void main() {
           id: 'list-3',
           spaceId: 'space-3',
           name: 'Empty List',
-          items: null,
         );
 
         expect(list.items, isEmpty);
@@ -504,10 +500,10 @@ void main() {
         );
         final after = DateTime.now();
 
-        expect(list.createdAt.isAfter(before.subtract(Duration(seconds: 1))), true);
-        expect(list.createdAt.isBefore(after.add(Duration(seconds: 1))), true);
-        expect(list.updatedAt.isAfter(before.subtract(Duration(seconds: 1))), true);
-        expect(list.updatedAt.isBefore(after.add(Duration(seconds: 1))), true);
+        expect(list.createdAt.isAfter(before.subtract(const Duration(seconds: 1))), true);
+        expect(list.createdAt.isBefore(after.add(const Duration(seconds: 1))), true);
+        expect(list.updatedAt.isAfter(before.subtract(const Duration(seconds: 1))), true);
+        expect(list.updatedAt.isBefore(after.add(const Duration(seconds: 1))), true);
       });
     });
 
@@ -520,7 +516,6 @@ void main() {
             id: 'item-1',
             title: 'First item',
             notes: 'Important notes',
-            isChecked: false,
             sortOrder: 0,
           ),
           ListItem(
@@ -548,7 +543,7 @@ void main() {
         expect(json['spaceId'], 'space-6');
         expect(json['name'], 'Meeting Agenda');
         expect(json['icon'], 'meeting');
-        expect(json['items'], isA<List>());
+        expect(json['items'], isA<List<dynamic>>());
         expect(json['items'].length, 2);
         expect(json['style'], 'numbered');
         expect(json['createdAt'], createdAt.toIso8601String());
@@ -577,7 +572,7 @@ void main() {
         final json = list.toJson();
 
         expect(json['items'], isEmpty);
-        expect(json['items'], isA<List>());
+        expect(json['items'], isA<List<dynamic>>());
       });
 
       test('toJson serializes all list styles correctly', () {
@@ -585,7 +580,6 @@ void main() {
           id: 'list-9',
           spaceId: 'space-9',
           name: 'Bullet List',
-          style: ListStyle.bullets,
         );
 
         final numberedList = ListModel(
@@ -679,14 +673,13 @@ void main() {
       });
 
       test('roundtrip JSON serialization preserves data', () {
-        final createdAt = DateTime(2025, 5, 10, 9, 0);
+        final createdAt = DateTime(2025, 5, 10, 9);
         final updatedAt = DateTime(2025, 10, 25, 15, 30);
         final items = [
           ListItem(
             id: 'item-1',
             title: 'Design wireframes',
             notes: 'Mobile-first approach',
-            isChecked: false,
             sortOrder: 0,
           ),
           ListItem(
@@ -746,7 +739,7 @@ void main() {
       });
 
       test('preserves unchanged fields', () {
-        final createdAt = DateTime(2025, 1, 1);
+        final createdAt = DateTime(2025);
         final updatedAt = DateTime(2025, 10, 25);
         final items = [
           ListItem(id: 'item-1', title: 'Item', sortOrder: 0),
@@ -825,7 +818,7 @@ void main() {
           name: 'Old',
         );
 
-        final newCreatedAt = DateTime(2025, 1, 1);
+        final newCreatedAt = DateTime(2025);
         final newUpdatedAt = DateTime(2025, 10, 26);
         final newItems = [
           ListItem(id: 'new-item', title: 'New Item', sortOrder: 0),
@@ -883,8 +876,8 @@ void main() {
 
       test('checkedItems returns correct count when no items checked', () {
         final items = [
-          ListItem(id: 'item-1', title: 'Item 1', isChecked: false, sortOrder: 0),
-          ListItem(id: 'item-2', title: 'Item 2', isChecked: false, sortOrder: 1),
+          ListItem(id: 'item-1', title: 'Item 1', sortOrder: 0),
+          ListItem(id: 'item-2', title: 'Item 2', sortOrder: 1),
         ];
 
         final list = ListModel(
@@ -901,9 +894,9 @@ void main() {
       test('checkedItems returns correct count when some items checked', () {
         final items = [
           ListItem(id: 'item-1', title: 'Item 1', isChecked: true, sortOrder: 0),
-          ListItem(id: 'item-2', title: 'Item 2', isChecked: false, sortOrder: 1),
+          ListItem(id: 'item-2', title: 'Item 2', sortOrder: 1),
           ListItem(id: 'item-3', title: 'Item 3', isChecked: true, sortOrder: 2),
-          ListItem(id: 'item-4', title: 'Item 4', isChecked: false, sortOrder: 3),
+          ListItem(id: 'item-4', title: 'Item 4', sortOrder: 3),
         ];
 
         final list = ListModel(
@@ -937,7 +930,7 @@ void main() {
       test('checkedItems works for non-checkbox styles', () {
         final items = [
           ListItem(id: 'item-1', title: 'Item 1', isChecked: true, sortOrder: 0),
-          ListItem(id: 'item-2', title: 'Item 2', isChecked: false, sortOrder: 1),
+          ListItem(id: 'item-2', title: 'Item 2', sortOrder: 1),
         ];
 
         final list = ListModel(
@@ -945,7 +938,6 @@ void main() {
           spaceId: 'space-28',
           name: 'List',
           items: items,
-          style: ListStyle.bullets,
         );
 
         expect(list.checkedItems, 1);
@@ -964,8 +956,8 @@ void main() {
 
       test('progress returns 0.0 when no items checked', () {
         final items = [
-          ListItem(id: 'item-1', title: 'Item 1', isChecked: false, sortOrder: 0),
-          ListItem(id: 'item-2', title: 'Item 2', isChecked: false, sortOrder: 1),
+          ListItem(id: 'item-1', title: 'Item 1', sortOrder: 0),
+          ListItem(id: 'item-2', title: 'Item 2', sortOrder: 1),
         ];
 
         final list = ListModel(
@@ -999,9 +991,9 @@ void main() {
       test('progress calculates correctly for partial completion', () {
         final items = [
           ListItem(id: 'item-1', title: 'Item 1', isChecked: true, sortOrder: 0),
-          ListItem(id: 'item-2', title: 'Item 2', isChecked: false, sortOrder: 1),
-          ListItem(id: 'item-3', title: 'Item 3', isChecked: false, sortOrder: 2),
-          ListItem(id: 'item-4', title: 'Item 4', isChecked: false, sortOrder: 3),
+          ListItem(id: 'item-2', title: 'Item 2', sortOrder: 1),
+          ListItem(id: 'item-3', title: 'Item 3', sortOrder: 2),
+          ListItem(id: 'item-4', title: 'Item 4', sortOrder: 3),
         ];
 
         final list = ListModel(
@@ -1019,8 +1011,8 @@ void main() {
         final items = [
           ListItem(id: 'item-1', title: 'Item 1', isChecked: true, sortOrder: 0),
           ListItem(id: 'item-2', title: 'Item 2', isChecked: true, sortOrder: 1),
-          ListItem(id: 'item-3', title: 'Item 3', isChecked: false, sortOrder: 2),
-          ListItem(id: 'item-4', title: 'Item 4', isChecked: false, sortOrder: 3),
+          ListItem(id: 'item-3', title: 'Item 3', sortOrder: 2),
+          ListItem(id: 'item-4', title: 'Item 4', sortOrder: 3),
         ];
 
         final list = ListModel(
@@ -1048,7 +1040,7 @@ void main() {
       test('progress works for non-checkbox styles', () {
         final items = [
           ListItem(id: 'item-1', title: 'Item 1', isChecked: true, sortOrder: 0),
-          ListItem(id: 'item-2', title: 'Item 2', isChecked: false, sortOrder: 1),
+          ListItem(id: 'item-2', title: 'Item 2', sortOrder: 1),
         ];
 
         final list = ListModel(
@@ -1056,7 +1048,6 @@ void main() {
           spaceId: 'space-35',
           name: 'List',
           items: items,
-          style: ListStyle.bullets,
         );
 
         expect(list.progress, 0.5);
@@ -1071,7 +1062,6 @@ void main() {
           name: 'Name 1',
           icon: 'icon-1',
           items: [ListItem(id: 'item-1', title: 'Item', sortOrder: 0)],
-          style: ListStyle.bullets,
         );
 
         final list2 = ListModel(
@@ -1117,7 +1107,7 @@ void main() {
       test('includes key identifying fields', () {
         final items = [
           ListItem(id: 'item-1', title: 'Item 1', isChecked: true, sortOrder: 0),
-          ListItem(id: 'item-2', title: 'Item 2', isChecked: false, sortOrder: 1),
+          ListItem(id: 'item-2', title: 'Item 2', sortOrder: 1),
         ];
 
         final list = ListModel(
@@ -1225,7 +1215,6 @@ void main() {
           id: 'list-44',
           spaceId: 'space-44',
           name: 'Bullet',
-          style: ListStyle.bullets,
         );
 
         final numberedList = ListModel(

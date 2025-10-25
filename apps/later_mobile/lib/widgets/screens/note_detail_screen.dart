@@ -282,7 +282,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
   /// Delete the note
   Future<void> _deleteNote() async {
     final confirmed = await _showDeleteConfirmation();
-    if (!confirmed) return;
+    if (!confirmed || !mounted) return;
 
     try {
       final provider = Provider.of<ContentProvider>(context, listen: false);
@@ -295,9 +295,9 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
         Navigator.of(context).pop();
       }
 
-      _showSnackBar('Note deleted');
+      if (mounted) _showSnackBar('Note deleted');
     } catch (e) {
-      _showSnackBar('Failed to delete note: $e', isError: true);
+      if (mounted) _showSnackBar('Failed to delete note: $e', isError: true);
     }
   }
 
@@ -347,11 +347,16 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async {
-        // Save before leaving
-        await _saveChanges();
-        return true;
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) async {
+        if (!didPop) {
+          // Save before leaving
+          await _saveChanges();
+          if (mounted && context.mounted) {
+            Navigator.of(context).pop();
+          }
+        }
       },
       child: Scaffold(
         appBar: AppBar(
@@ -483,7 +488,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
                             deleteIcon: const Icon(Icons.close, size: 16),
                             onDeleted: () => _removeTag(tag),
                             backgroundColor:
-                                AppColors.noteLight.withOpacity(0.3),
+                                AppColors.noteLight.withValues(alpha: 0.3),
                           );
                         }).toList(),
                       )

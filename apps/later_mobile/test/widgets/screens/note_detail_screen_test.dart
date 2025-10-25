@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:later_mobile/core/theme/app_colors.dart';
-import 'package:later_mobile/core/theme/app_spacing.dart';
-import 'package:later_mobile/core/theme/app_typography.dart';
 import 'package:later_mobile/data/models/item_model.dart';
 import 'package:later_mobile/providers/content_provider.dart';
 import 'package:later_mobile/providers/spaces_provider.dart';
@@ -30,8 +27,8 @@ void main() {
       content: 'This is the test content',
       spaceId: 'space-1',
       tags: ['tag1', 'tag2'],
-      createdAt: DateTime(2024, 1, 1),
-      updatedAt: DateTime(2024, 1, 1),
+      createdAt: DateTime(2024),
+      updatedAt: DateTime(2024),
     );
 
     // Setup default mock behavior
@@ -370,7 +367,6 @@ void main() {
       final emptyNote = Item(
         id: 'note-2',
         title: 'Empty Note',
-        content: null,
         spaceId: 'space-1',
         tags: [],
       );
@@ -391,7 +387,6 @@ void main() {
       final emptyNote = Item(
         id: 'note-2',
         title: 'Empty Note',
-        content: null,
         spaceId: 'space-1',
         tags: [],
       );

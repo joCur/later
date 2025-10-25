@@ -5,6 +5,7 @@
 /// - TodoList: Actionable tasks with checkboxes
 /// - List: Reference collections (shopping lists, watch lists, etc.)
 /// - Note: Free-form documentation
+library;
 
 /// Content type enum for dual-model architecture
 enum ContentType {

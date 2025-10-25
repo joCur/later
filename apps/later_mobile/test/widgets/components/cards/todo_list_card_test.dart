@@ -200,8 +200,8 @@ void main() {
       testWidgets('shows correct progress for no completed items', (tester) async {
         final todoList = createTodoList(
           items: [
-            createTodoItem(id: '1', title: 'Task 1', isCompleted: false),
-            createTodoItem(id: '2', title: 'Task 2', isCompleted: false),
+            createTodoItem(id: '1', title: 'Task 1'),
+            createTodoItem(id: '2', title: 'Task 2'),
           ],
         );
 
@@ -286,7 +286,7 @@ void main() {
 
     group('Accessibility', () {
       testWidgets('has correct semantic label', (tester) async {
-        final todoList = createTodoList(name: 'Shopping List');
+        final todoList = createTodoList();
 
         await tester.pumpWidget(
           MaterialApp(
