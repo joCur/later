@@ -3,7 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:later_mobile/core/theme/app_theme.dart';
 import 'package:later_mobile/data/local/preferences_service.dart';
 import 'package:later_mobile/providers/theme_provider.dart';
-import 'package:later_mobile/widgets/components/buttons/theme_toggle_button.dart';
+import 'package:later_mobile/design_system/atoms/buttons/theme_toggle_button.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 

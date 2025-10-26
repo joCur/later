@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:later_mobile/design_system/tokens/tokens.dart';
 import '../../../core/error/app_error.dart';
-import '../../../core/theme/app_typography.dart';
 import '../buttons/primary_button.dart';
 import '../buttons/ghost_button.dart';
 

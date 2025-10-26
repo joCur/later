@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:later_mobile/widgets/components/empty_states/empty_state.dart';
+import 'package:later_mobile/design_system/organisms/empty_states/empty_state.dart';
 
 /// Phase 4, Task 4.3: Empty State Redesign Tests
 ///

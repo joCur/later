@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:later_mobile/design_system/tokens/tokens.dart';
 import '../../../core/responsive/breakpoints.dart';
-import '../../../core/theme/app_colors.dart';
-import '../../../core/theme/app_spacing.dart';
-import '../../../core/theme/app_typography.dart';
 import 'quick_capture_fab.dart';
 
 /// A responsive Floating Action Button that adapts between mobile and desktop layouts.

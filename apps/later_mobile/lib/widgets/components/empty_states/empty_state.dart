@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../core/theme/app_colors.dart';
-import '../../../core/theme/app_typography.dart';
-import '../../../core/theme/app_spacing.dart';
+import 'package:later_mobile/design_system/tokens/tokens.dart';
 
 /// Base empty state component following mobile-first redesign
 ///

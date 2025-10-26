@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:later_mobile/widgets/components/loading/skeleton_box.dart';
+import 'package:later_mobile/design_system/atoms/loading/skeleton_box.dart';
 
 void main() {
   group('SkeletonLoader - Generic Component', () {

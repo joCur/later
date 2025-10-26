@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:later_mobile/widgets/components/buttons/primary_button.dart';
-import 'package:later_mobile/widgets/components/buttons/secondary_button.dart';
-import 'package:later_mobile/widgets/components/buttons/ghost_button.dart';
+import 'package:later_mobile/design_system/atoms/buttons/primary_button.dart';
+import 'package:later_mobile/design_system/atoms/buttons/secondary_button.dart';
+import 'package:later_mobile/design_system/atoms/buttons/ghost_button.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();

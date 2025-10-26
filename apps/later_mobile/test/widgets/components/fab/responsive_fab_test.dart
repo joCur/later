@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:later_mobile/widgets/components/fab/quick_capture_fab.dart';
-import 'package:later_mobile/widgets/components/fab/responsive_fab.dart';
+import 'package:later_mobile/design_system/molecules/fab/quick_capture_fab.dart';
+import 'package:later_mobile/design_system/organisms/fab/responsive_fab.dart';
 
 void main() {
   group('ResponsiveFab', () {

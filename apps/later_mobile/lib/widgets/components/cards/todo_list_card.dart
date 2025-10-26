@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import '../../../core/theme/app_colors.dart';
-import '../../../core/theme/app_typography.dart';
-import '../../../core/theme/app_spacing.dart';
-import '../../../core/theme/app_animations.dart';
+import 'package:later_mobile/design_system/tokens/tokens.dart';
 import '../../../data/models/todo_list_model.dart';
 import '../text/gradient_text.dart';
 import '../borders/gradient_pill_border.dart';

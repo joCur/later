@@ -6,7 +6,7 @@ import 'package:later_mobile/data/models/space_model.dart';
 import 'package:later_mobile/data/repositories/space_repository.dart';
 import 'package:later_mobile/providers/spaces_provider.dart';
 import 'package:later_mobile/widgets/modals/space_switcher_modal.dart';
-import 'package:later_mobile/core/theme/app_colors.dart';
+import 'package:later_mobile/design_system/tokens/tokens.dart';
 import 'package:provider/provider.dart';
 
 void main() {

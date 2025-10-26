@@ -11,7 +11,8 @@
       "mcp__dart__get_runtime_errors",
       "mcp__dart__get_selected_widget",
       "mcp__dart__set_widget_selection_mode",
-      "mcp__dart__connect_dart_tooling_daemon"
+      "mcp__dart__connect_dart_tooling_daemon",
+      "Bash(xargs:*)"
     ],
     "deny": [],
     "ask": []

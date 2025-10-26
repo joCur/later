@@ -1,10 +1,9 @@
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:later_mobile/widgets/components/loading/skeleton_line.dart';
-import 'package:later_mobile/widgets/components/loading/skeleton_card.dart';
-import 'package:later_mobile/core/theme/app_colors.dart';
-import 'package:later_mobile/core/theme/app_spacing.dart';
+import 'package:later_mobile/design_system/atoms/loading/skeleton_line.dart';
+import 'package:later_mobile/design_system/molecules/loading/skeleton_card.dart';
+import 'package:later_mobile/design_system/tokens/tokens.dart';
 import 'package:shimmer/shimmer.dart';
 
 void main() {

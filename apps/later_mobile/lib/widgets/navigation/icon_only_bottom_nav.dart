@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../core/theme/app_colors.dart';
-import '../../core/theme/app_animations.dart';
-import '../../core/theme/app_spacing.dart';
+import 'package:later_mobile/design_system/tokens/tokens.dart';
 
 // Design Constants (Phase 2 - Mobile-First Bold Redesign)
 const double _kNavBarHeight = 60.0; // Reduced from 64px

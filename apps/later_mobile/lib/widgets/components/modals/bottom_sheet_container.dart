@@ -1,10 +1,8 @@
 import 'dart:ui' show ImageFilter;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:later_mobile/design_system/tokens/tokens.dart';
 import '../../../core/responsive/breakpoints.dart';
-import '../../../core/theme/app_colors.dart';
-import '../../../core/theme/app_spacing.dart';
-import '../../../core/theme/app_typography.dart';
 import '../buttons/gradient_button.dart';
 import '../buttons/secondary_button.dart';
 

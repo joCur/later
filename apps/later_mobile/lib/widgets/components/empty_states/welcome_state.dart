@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../core/theme/app_typography.dart';
+import 'package:later_mobile/design_system/tokens/tokens.dart';
 import '../text/gradient_text.dart';
 import 'empty_state.dart';
 

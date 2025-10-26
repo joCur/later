@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:later_mobile/widgets/screens/list_detail_screen.dart';
-import 'package:later_mobile/widgets/components/cards/list_item_card.dart';
-import 'package:later_mobile/widgets/components/text/gradient_text.dart';
-import 'package:later_mobile/widgets/components/fab/responsive_fab.dart';
-import 'package:later_mobile/widgets/components/modals/bottom_sheet_container.dart';
+import 'package:later_mobile/design_system/organisms/cards/list_item_card.dart';
+import 'package:later_mobile/design_system/atoms/text/gradient_text.dart';
+import 'package:later_mobile/design_system/organisms/fab/responsive_fab.dart';
+import 'package:later_mobile/design_system/organisms/modals/bottom_sheet_container.dart';
 import 'package:later_mobile/data/models/list_model.dart';
 import 'package:later_mobile/providers/content_provider.dart';
 import 'package:later_mobile/providers/spaces_provider.dart';

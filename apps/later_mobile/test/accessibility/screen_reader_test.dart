@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:later_mobile/widgets/components/buttons/primary_button.dart';
-import 'package:later_mobile/widgets/components/fab/quick_capture_fab.dart';
-import 'package:later_mobile/widgets/components/cards/item_card.dart';
+import 'package:later_mobile/design_system/atoms/buttons/primary_button.dart';
+import 'package:later_mobile/design_system/molecules/fab/quick_capture_fab.dart';
+import 'package:later_mobile/design_system/organisms/cards/item_card.dart';
 import 'package:later_mobile/data/models/item_model.dart';
 
 /// Accessibility Test Suite: Screen Reader Support

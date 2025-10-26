@@ -2,13 +2,13 @@ import 'dart:math' as dart_math;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:later_mobile/widgets/components/buttons/primary_button.dart';
-import 'package:later_mobile/widgets/components/buttons/secondary_button.dart';
-import 'package:later_mobile/widgets/components/buttons/ghost_button.dart';
-import 'package:later_mobile/widgets/components/inputs/text_input_field.dart';
-import 'package:later_mobile/widgets/components/cards/item_card.dart';
+import 'package:later_mobile/design_system/atoms/buttons/primary_button.dart';
+import 'package:later_mobile/design_system/atoms/buttons/secondary_button.dart';
+import 'package:later_mobile/design_system/atoms/buttons/ghost_button.dart';
+import 'package:later_mobile/design_system/atoms/inputs/text_input_field.dart';
+import 'package:later_mobile/design_system/organisms/cards/item_card.dart';
 import 'package:later_mobile/data/models/item_model.dart';
-import 'package:later_mobile/core/theme/app_colors.dart';
+import 'package:later_mobile/design_system/tokens/tokens.dart';
 
 /// Accessibility Test Suite: Focus Indicators & Keyboard Navigation
 ///
