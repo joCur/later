@@ -410,9 +410,9 @@ class _IconParser {
   static bool isEmoji(String text) {
     if (text.isEmpty) return false;
     final codeUnit = text.codeUnitAt(0);
-    return codeUnit >= 0x1F300 ||
-        (codeUnit >= 0x2600 && codeUnit <= 0x27BF) ||
-        text.length <= 2;
+    return (codeUnit >= 0x1F300 && codeUnit <= 0x1F9FF) ||
+        (codeUnit >= 0x2600 && codeUnit <= 0x26FF) ||
+        (codeUnit >= 0x2700 && codeUnit <= 0x27BF);
   }
 
   /// Parse icon name string to IconData

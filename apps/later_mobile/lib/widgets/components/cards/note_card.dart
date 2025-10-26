@@ -145,7 +145,14 @@ class _NoteCardState extends State<NoteCard> with TickerProviderStateMixin {
     if (content.length <= 100) {
       return content;
     }
-    return '${content.substring(0, 100)}...';
+    // Find the last space within the first 100 characters
+    final substring = content.substring(0, 100);
+    final lastSpace = substring.lastIndexOf(' ');
+    if (lastSpace == -1) {
+      // No space found, fall back to hard cut
+      return '$substring...';
+    }
+    return '${substring.substring(0, lastSpace)}...';
   }
 
   /// Build content preview (first 100 chars, 2 lines max)
