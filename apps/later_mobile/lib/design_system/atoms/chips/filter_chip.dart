@@ -84,13 +84,17 @@ class _TemporalFilterChipState extends State<TemporalFilterChip>
     // Create scale animation: 1.0 -> 1.05 -> 1.0
     _scaleAnimation = TweenSequence<double>([
       TweenSequenceItem(
-        tween: Tween<double>(begin: 1.0, end: 1.05)
-            .chain(CurveTween(curve: Curves.easeOut)),
+        tween: Tween<double>(
+          begin: 1.0,
+          end: 1.05,
+        ).chain(CurveTween(curve: Curves.easeOut)),
         weight: 50.0,
       ),
       TweenSequenceItem(
-        tween: Tween<double>(begin: 1.05, end: 1.0)
-            .chain(CurveTween(curve: Curves.easeIn)),
+        tween: Tween<double>(
+          begin: 1.05,
+          end: 1.0,
+        ).chain(CurveTween(curve: Curves.easeIn)),
         weight: 50.0,
       ),
     ]).animate(_animationController);
@@ -121,10 +125,7 @@ class _TemporalFilterChipState extends State<TemporalFilterChip>
     return AnimatedBuilder(
       animation: _scaleAnimation,
       builder: (context, child) {
-        return Transform.scale(
-          scale: _scaleAnimation.value,
-          child: child,
-        );
+        return Transform.scale(scale: _scaleAnimation.value, child: child);
       },
       child: _buildChipContent(),
     );
@@ -154,7 +155,7 @@ class _TemporalFilterChipState extends State<TemporalFilterChip>
               onTap: _handleTap,
               borderRadius: BorderRadius.circular(18),
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
+                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
                 child: Center(
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
@@ -171,9 +172,9 @@ class _TemporalFilterChipState extends State<TemporalFilterChip>
                       ],
                       Text(
                         widget.label,
-                        style: AppTypography.bodyMedium.copyWith(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500, // medium weight
+                        style: AppTypography.labelLarge.copyWith(
+                          fontWeight:
+                              AppTypography.medium, // medium weight override
                           color: isDark
                               ? AppColors.textPrimaryDark
                               : AppColors.textPrimaryLight,
@@ -206,7 +207,7 @@ class _TemporalFilterChipState extends State<TemporalFilterChip>
           onTap: _handleTap,
           borderRadius: BorderRadius.circular(20),
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
             child: Center(
               child: Row(
                 mainAxisSize: MainAxisSize.min,
@@ -223,9 +224,9 @@ class _TemporalFilterChipState extends State<TemporalFilterChip>
                   ],
                   Text(
                     widget.label,
-                    style: AppTypography.bodyMedium.copyWith(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500, // medium weight
+                    style: AppTypography.labelLarge.copyWith(
+                      fontWeight:
+                          AppTypography.medium, // medium weight override
                       color: isDark
                           ? AppColors.textSecondaryDark
                           : AppColors.textSecondaryLight,

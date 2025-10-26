@@ -261,6 +261,23 @@ class AppColors {
   static const Color infoBg = Color(0xFFDBEAFE);
 
   // ============================================================
+  // FORM VALIDATION COLORS
+  // ============================================================
+  // Semantic colors for form input character counters and validation states
+
+  /// Form success indicator - used for valid input states
+  static const Color formSuccess = success;
+
+  /// Form warning indicator - used for approaching limits (70-90%)
+  static const Color formWarning = warning;
+
+  /// Form error indicator - used for exceeded limits (90-95%)
+  static const Color formError = error;
+
+  /// Form critical indicator - used for critical violations (>95%)
+  static const Color formCritical = errorDark;
+
+  // ============================================================
   // NEUTRAL COLORS - Slate Palette
   // ============================================================
 

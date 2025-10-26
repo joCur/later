@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:shimmer/shimmer.dart';
-import 'package:later_mobile/design_system/tokens/tokens.dart';
 import 'package:later_mobile/core/responsive/breakpoints.dart';
 import 'package:later_mobile/design_system/atoms/loading/skeleton_line.dart';
+import 'package:later_mobile/design_system/tokens/tokens.dart';
+import 'package:shimmer/shimmer.dart';
 
 /// A skeleton card component that mimics the ItemCard layout
 ///
@@ -34,9 +34,7 @@ import 'package:later_mobile/design_system/atoms/loading/skeleton_line.dart';
 /// )
 /// ```
 class SkeletonCard extends StatelessWidget {
-  const SkeletonCard({
-    super.key,
-  });
+  const SkeletonCard({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -60,31 +58,31 @@ class SkeletonCard extends StatelessWidget {
         : AppColors.surfaceLight;
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 16), // Mobile-first: 16px spacing between skeletons
+      margin: const EdgeInsets.only(
+        bottom: AppSpacing.md,
+      ), // Mobile-first: 16px spacing between skeletons
       decoration: BoxDecoration(
         color: backgroundColor,
-        borderRadius: BorderRadius.circular(20), // Mobile-first: 20px border radius (pill shape)
+        borderRadius: BorderRadius.circular(
+          20,
+        ), // Mobile-first: 20px border radius (pill shape)
         boxShadow: [
           BoxShadow(
-            color: isDark
-                ? AppColors.shadowDark
-                : AppColors.shadowLight,
+            color: isDark ? AppColors.shadowDark : AppColors.shadowLight,
             blurRadius: 3,
             offset: const Offset(0, 1),
           ),
         ],
       ),
       child: Padding(
-        padding: const EdgeInsets.all(20), // Mobile-first: 20px padding matching cards
+        padding: const EdgeInsets.all(
+          AppSpacing.cardPaddingMobile,
+        ), // Mobile-first: 20px padding matching cards
         child: disableAnimations
             ? _buildCardContent(context, isMobile)
             : Shimmer(
                 gradient: LinearGradient(
-                  colors: [
-                    baseColor,
-                    highlightColor,
-                    baseColor,
-                  ],
+                  colors: [baseColor, highlightColor, baseColor],
                   stops: const [0.0, 0.5, 1.0],
                   begin: const Alignment(-1.0, -0.3),
                   end: const Alignment(1.0, 0.3),
@@ -112,9 +110,7 @@ class SkeletonCard extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               // Title line (mimics H4 typography)
-              const SkeletonLine(
-                height: 24,
-              ),
+              const SkeletonLine(height: 24),
               const SizedBox(height: AppSpacing.xxxs),
 
               // Content preview lines (2-3 lines)
@@ -123,23 +119,15 @@ class SkeletonCard extends StatelessWidget {
                 width: isMobile ? double.infinity : null,
               ),
               const SizedBox(height: AppSpacing.xxxs),
-              SkeletonLine(
-                height: 20,
-                width: isMobile ? 250 : 300,
-              ),
+              SkeletonLine(height: 20, width: isMobile ? 250 : 300),
               if (!isMobile) ...[
                 const SizedBox(height: AppSpacing.xxxs),
-                const SkeletonLine(
-                  height: 20,
-                  width: 200,
-                ),
+                const SkeletonLine(height: 20, width: 200),
               ],
 
               // Metadata row (mimics date/time info)
               const SizedBox(height: AppSpacing.xxs),
-              const SkeletonLine(
-                width: 120,
-              ),
+              const SkeletonLine(width: 120),
             ],
           ),
         ),

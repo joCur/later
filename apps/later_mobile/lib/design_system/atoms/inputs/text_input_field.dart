@@ -187,12 +187,12 @@ class _TextInputFieldState extends State<TextInputField> {
         end: Alignment.bottomRight,
         colors: isDark
             ? [
-                const Color(0xFFF87171), // red-400
-                const Color(0xFFFBBF24), // yellow-400
+                AppColors.formError, // red-400 equivalent
+                AppColors.formWarning, // yellow-400 equivalent
               ]
             : [
-                const Color(0xFFEF4444), // red-500
-                const Color(0xFFFB923C), // orange-400
+                AppColors.formError, // red-500 equivalent
+                AppColors.formCritical, // orange-400 equivalent
               ],
       );
     } else if (_isFocused) {
@@ -413,12 +413,12 @@ class _TextInputFieldState extends State<TextInputField> {
         end: Alignment.bottomRight,
         colors: isDark
             ? [
-                const Color(0xFFF87171), // red-400
-                const Color(0xFFFBBF24), // yellow-400
+                AppColors.formError, // red-400 equivalent
+                AppColors.formWarning, // yellow-400 equivalent
               ]
             : [
-                const Color(0xFFEF4444), // red-500
-                const Color(0xFFFB923C), // orange-400
+                AppColors.formError, // red-500 equivalent
+                AppColors.formCritical, // orange-400 equivalent
               ],
       );
 

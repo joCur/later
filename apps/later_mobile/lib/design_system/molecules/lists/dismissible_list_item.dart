@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:later_mobile/design_system/tokens/colors.dart';
 import 'package:later_mobile/design_system/organisms/dialogs/delete_confirmation_dialog.dart';
+import 'package:later_mobile/design_system/tokens/colors.dart';
+import 'package:later_mobile/design_system/tokens/spacing.dart';
 
 /// A reusable dismissible list item component that provides swipe-to-delete
 /// functionality with optional confirmation dialog.
@@ -118,13 +119,13 @@ class DismissibleListItem extends StatelessWidget {
     return Dismissible(
       key: itemKey,
       background: Padding(
-        padding: const EdgeInsets.only(bottom: 8.0),
+        padding: const EdgeInsets.only(bottom: AppSpacing.xs),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(8.0),
           child: Container(
             color: AppColors.error,
             alignment: Alignment.centerRight,
-            padding: const EdgeInsets.only(right: 16.0),
+            padding: const EdgeInsets.only(right: AppSpacing.md),
             child: const Icon(Icons.delete, color: Colors.white, size: 24),
           ),
         ),
