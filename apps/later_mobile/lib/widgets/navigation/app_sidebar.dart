@@ -5,7 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:later_mobile/design_system/tokens/tokens.dart';
 import '../../data/models/space_model.dart';
 import '../../providers/spaces_provider.dart';
-import '../components/buttons/theme_toggle_button.dart';
+import 'package:later_mobile/design_system/atoms/buttons/theme_toggle_button.dart';
 
 /// Desktop sidebar navigation component
 ///

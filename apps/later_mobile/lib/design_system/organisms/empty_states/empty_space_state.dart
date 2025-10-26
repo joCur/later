@@ -35,11 +35,10 @@ class EmptySpaceState extends StatelessWidget {
   Widget build(BuildContext context) {
     return EmptyState(
       icon: Icons.inbox,
-      iconSize: 64.0,
       title: 'Your $spaceName is empty',
-      description: 'Start capturing your thoughts, tasks, and ideas',
-      ctaText: 'Quick Capture',
-      onCtaPressed: onQuickCapture,
+      message: 'Start capturing your thoughts, tasks, and ideas',
+      actionLabel: 'Quick Capture',
+      onActionPressed: onQuickCapture,
     );
   }
 }

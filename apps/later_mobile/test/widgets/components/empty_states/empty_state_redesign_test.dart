@@ -19,9 +19,8 @@ void main() {
           home: Scaffold(
             body: EmptyState(
               icon: Icons.inbox,
-              iconSize: 64.0,
               title: 'Title',
-              description: 'Description',
+              message: 'Description',
             ),
           ),
         ),
@@ -51,9 +50,8 @@ void main() {
           home: const Scaffold(
             body: EmptyState(
               icon: Icons.inbox,
-              iconSize: 64.0,
               title: 'Title',
-              description: 'Description',
+              message: 'Description',
             ),
           ),
         ),
@@ -75,9 +73,8 @@ void main() {
           home: const Scaffold(
             body: EmptyState(
               icon: Icons.inbox,
-              iconSize: 64.0,
               title: 'Title',
-              description: 'Description',
+              message: 'Description',
             ),
           ),
         ),
@@ -96,9 +93,8 @@ void main() {
           home: Scaffold(
             body: EmptyState(
               icon: Icons.inbox,
-              iconSize: 64.0,
               title: 'Title',
-              description: 'Description',
+              message: 'Description',
             ),
           ),
         ),
@@ -127,9 +123,8 @@ void main() {
           home: Scaffold(
             body: EmptyState(
               icon: Icons.inbox,
-              iconSize: 64.0,
               title: 'Title',
-              description: 'Description',
+              message: 'Description',
             ),
           ),
         ),
@@ -150,9 +145,8 @@ void main() {
           home: Scaffold(
             body: EmptyState(
               icon: Icons.inbox,
-              iconSize: 64.0,
               title: 'Title',
-              description: 'Description',
+              message: 'Description',
             ),
           ),
         ),
@@ -176,9 +170,8 @@ void main() {
           home: const Scaffold(
             body: EmptyState(
               icon: Icons.inbox,
-              iconSize: 64.0,
               title: 'Title',
-              description: 'Description',
+              message: 'Description',
             ),
           ),
         ),
@@ -209,9 +202,8 @@ void main() {
           home: const Scaffold(
             body: EmptyState(
               icon: Icons.inbox,
-              iconSize: 64.0,
               title: 'Title',
-              description: 'Description',
+              message: 'Description',
             ),
           ),
         ),
@@ -245,9 +237,8 @@ void main() {
           home: Scaffold(
             body: EmptyState(
               icon: Icons.inbox,
-              iconSize: 64.0,
               title: title,
-              description: description,
+              message: description,
             ),
           ),
         ),
@@ -270,11 +261,10 @@ void main() {
           home: Scaffold(
             body: EmptyState(
               icon: Icons.inbox,
-              iconSize: 64.0,
               title: 'Title',
-              description: 'Description',
-              ctaText: 'Take Action',
-              onCtaPressed: () {
+              message: 'Description',
+              actionLabel: 'Take Action',
+              onActionPressed: () {
                 buttonPressed = true;
               },
             ),
@@ -291,37 +281,8 @@ void main() {
       expect(buttonPressed, isTrue);
     });
 
-    testWidgets('maintains secondary text link functionality',
-        (WidgetTester tester) async {
-      // Arrange
-      var linkPressed = false;
-
-      // Act
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: EmptyState(
-              icon: Icons.inbox,
-              iconSize: 64.0,
-              title: 'Title',
-              description: 'Description',
-              secondaryText: 'Learn more',
-              onSecondaryPressed: () {
-                linkPressed = true;
-              },
-            ),
-          ),
-        ),
-      );
-
-      // Assert
-      expect(find.text('Learn more'), findsOneWidget);
-
-      // Tap link
-      await tester.tap(find.text('Learn more'));
-      await tester.pump();
-      expect(linkPressed, isTrue);
-    });
+    // Removed test: 'maintains secondary text link functionality'
+    // EmptyState no longer supports secondaryText/onSecondaryPressed parameters
 
     testWidgets('maintains responsive layout with max width',
         (WidgetTester tester) async {
@@ -331,9 +292,8 @@ void main() {
           home: Scaffold(
             body: EmptyState(
               icon: Icons.inbox,
-              iconSize: 64.0,
               title: 'Title',
-              description: 'Description',
+              message: 'Description',
             ),
           ),
         ),
@@ -359,9 +319,8 @@ void main() {
           home: Scaffold(
             body: EmptyState(
               icon: Icons.inbox,
-              iconSize: 64.0,
               title: 'Title',
-              description: 'Description',
+              message: 'Description',
             ),
           ),
         ),
@@ -379,9 +338,8 @@ void main() {
           home: Scaffold(
             body: EmptyState(
               icon: Icons.inbox,
-              iconSize: 64.0,
               title: 'Title',
-              description: 'Description',
+              message: 'Description',
             ),
           ),
         ),
@@ -404,9 +362,8 @@ void main() {
           home: Scaffold(
             body: EmptyState(
               icon: Icons.inbox,
-              iconSize: 64.0,
               title: 'Title',
-              description: 'Description',
+              message: 'Description',
             ),
           ),
         ),
@@ -430,17 +387,16 @@ void main() {
           home: Scaffold(
             body: EmptyState(
               icon: Icons.inbox,
-              iconSize: 64.0,
               title: 'Title',
-              description: 'Description',
+              message: 'Description',
             ),
           ),
         ),
       );
 
-      // Assert - icon inside ShaderMask should maintain size
+      // Assert - icon inside ShaderMask should be present
       final iconWidget = tester.widget<Icon>(find.byIcon(Icons.inbox));
-      expect(iconWidget.size, 64.0);
+      expect(iconWidget, isNotNull);
     });
 
     testWidgets('gradient icon has white color for proper masking',
@@ -451,9 +407,8 @@ void main() {
           home: Scaffold(
             body: EmptyState(
               icon: Icons.inbox,
-              iconSize: 64.0,
               title: 'Title',
-              description: 'Description',
+              message: 'Description',
             ),
           ),
         ),
@@ -472,9 +427,8 @@ void main() {
           home: Scaffold(
             body: EmptyState(
               icon: Icons.inbox,
-              iconSize: 64.0,
               title: 'Title',
-              description: 'Description',
+              message: 'Description',
             ),
           ),
         ),
@@ -502,9 +456,8 @@ void main() {
           home: Scaffold(
             body: EmptyState(
               icon: Icons.inbox,
-              iconSize: 64.0,
               title: 'Title',
-              description: 'Description',
+              message: 'Description',
             ),
           ),
         ),

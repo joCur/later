@@ -15,8 +15,8 @@ import '../../data/models/list_model.dart';
 import '../../data/models/todo_list_model.dart';
 import '../../providers/content_provider.dart';
 import '../../providers/spaces_provider.dart';
-import '../components/inputs/text_area_field.dart';
-import '../components/buttons/ghost_button.dart';
+import 'package:later_mobile/design_system/atoms/inputs/text_area_field.dart';
+import 'package:later_mobile/design_system/atoms/buttons/ghost_button.dart';
 
 /// Type option for Quick Capture content type selector
 class TypeOption {

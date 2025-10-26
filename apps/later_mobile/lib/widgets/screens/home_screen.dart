@@ -9,12 +9,12 @@ import '../../data/models/todo_list_model.dart';
 import '../../data/models/list_model.dart';
 import '../../providers/content_provider.dart';
 import '../../providers/spaces_provider.dart';
-import '../components/cards/todo_list_card.dart';
-import '../components/cards/list_card.dart';
-import '../components/cards/note_card.dart';
-import '../components/fab/quick_capture_fab.dart';
-import '../components/empty_states/empty_space_state.dart';
-import '../components/empty_states/welcome_state.dart';
+import 'package:later_mobile/design_system/organisms/cards/todo_list_card.dart';
+import 'package:later_mobile/design_system/organisms/cards/list_card.dart';
+import 'package:later_mobile/design_system/organisms/cards/note_card.dart';
+import 'package:later_mobile/design_system/molecules/fab/quick_capture_fab.dart';
+import 'package:later_mobile/design_system/organisms/empty_states/empty_space_state.dart';
+import 'package:later_mobile/design_system/organisms/empty_states/welcome_state.dart';
 import '../navigation/icon_only_bottom_nav.dart';
 import '../navigation/app_sidebar.dart';
 import '../modals/space_switcher_modal.dart';
@@ -22,7 +22,7 @@ import '../modals/quick_capture_modal.dart';
 import 'todo_list_detail_screen.dart';
 import 'list_detail_screen.dart';
 import 'note_detail_screen.dart';
-import '../components/buttons/primary_button.dart';
+import 'package:later_mobile/design_system/atoms/buttons/primary_button.dart';
 
 /// Main home screen for the Later app
 ///

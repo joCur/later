@@ -7,8 +7,8 @@ import '../../core/responsive/breakpoints.dart';
 import '../../data/models/space_model.dart';
 import '../../providers/spaces_provider.dart';
 import 'create_space_modal.dart';
-import '../components/inputs/text_input_field.dart';
-import '../components/buttons/primary_button.dart';
+import 'package:later_mobile/design_system/atoms/inputs/text_input_field.dart';
+import 'package:later_mobile/design_system/atoms/buttons/primary_button.dart';
 
 /// Space switcher modal that allows users to switch between spaces and create new spaces.
 ///

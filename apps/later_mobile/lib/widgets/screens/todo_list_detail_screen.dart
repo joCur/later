@@ -8,13 +8,13 @@ import '../../core/utils/responsive_modal.dart';
 import '../../data/models/todo_list_model.dart';
 import '../../providers/content_provider.dart';
 import '../../providers/spaces_provider.dart';
-import '../components/cards/todo_item_card.dart';
-import '../components/fab/responsive_fab.dart';
-import '../components/modals/bottom_sheet_container.dart';
-import '../components/text/gradient_text.dart';
-import '../components/inputs/text_input_field.dart';
-import '../components/inputs/text_area_field.dart';
-import '../components/dialogs/delete_confirmation_dialog.dart';
+import 'package:later_mobile/design_system/organisms/cards/todo_item_card.dart';
+import 'package:later_mobile/design_system/organisms/fab/responsive_fab.dart';
+import 'package:later_mobile/design_system/organisms/modals/bottom_sheet_container.dart';
+import 'package:later_mobile/design_system/atoms/text/gradient_text.dart';
+import 'package:later_mobile/design_system/atoms/inputs/text_input_field.dart';
+import 'package:later_mobile/design_system/atoms/inputs/text_area_field.dart';
+import 'package:later_mobile/design_system/organisms/dialogs/delete_confirmation_dialog.dart';
 
 /// TodoList Detail Screen for viewing and editing TodoList with TodoItems
 ///

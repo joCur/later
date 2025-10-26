@@ -16,9 +16,8 @@ void main() {
           home: Scaffold(
             body: EmptyState(
               icon: Icons.inbox,
-              iconSize: 64.0,
               title: title,
-              description: description,
+              message: description,
             ),
           ),
         ),
@@ -37,17 +36,16 @@ void main() {
           home: Scaffold(
             body: EmptyState(
               icon: Icons.inbox,
-              iconSize: 64.0,
               title: 'Title',
-              description: 'Description',
+              message: 'Description',
             ),
           ),
         ),
       );
 
-      // Assert
+      // Assert - icon should be present
       final iconWidget = tester.widget<Icon>(find.byType(Icon));
-      expect(iconWidget.size, 64.0);
+      expect(iconWidget, isNotNull);
     });
 
     testWidgets('renders with CTA button', (WidgetTester tester) async {
@@ -60,11 +58,10 @@ void main() {
           home: Scaffold(
             body: EmptyState(
               icon: Icons.inbox,
-              iconSize: 64.0,
               title: 'Title',
-              description: 'Description',
-              ctaText: 'Take Action',
-              onCtaPressed: () {
+              message: 'Description',
+              actionLabel: 'Take Action',
+              onActionPressed: () {
                 buttonPressed = true;
               },
             ),
@@ -81,36 +78,8 @@ void main() {
       expect(buttonPressed, isTrue);
     });
 
-    testWidgets('renders with secondary text link', (WidgetTester tester) async {
-      // Arrange
-      var linkPressed = false;
-
-      // Act
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: EmptyState(
-              icon: Icons.inbox,
-              iconSize: 64.0,
-              title: 'Title',
-              description: 'Description',
-              secondaryText: 'Learn more',
-              onSecondaryPressed: () {
-                linkPressed = true;
-              },
-            ),
-          ),
-        ),
-      );
-
-      // Assert
-      expect(find.text('Learn more'), findsOneWidget);
-
-      // Tap link
-      await tester.tap(find.text('Learn more'));
-      await tester.pump();
-      expect(linkPressed, isTrue);
-    });
+    // Removed test: 'renders with secondary text link'
+    // EmptyState no longer supports secondaryText/onSecondaryPressed parameters
 
     testWidgets('does not render CTA when not provided',
         (WidgetTester tester) async {
@@ -120,9 +89,8 @@ void main() {
           home: Scaffold(
             body: EmptyState(
               icon: Icons.inbox,
-              iconSize: 64.0,
               title: 'Title',
-              description: 'Description',
+              message: 'Description',
             ),
           ),
         ),
@@ -132,25 +100,8 @@ void main() {
       expect(find.byType(ElevatedButton), findsNothing);
     });
 
-    testWidgets('does not render secondary link when not provided',
-        (WidgetTester tester) async {
-      // Act
-      await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: EmptyState(
-              icon: Icons.inbox,
-              iconSize: 64.0,
-              title: 'Title',
-              description: 'Description',
-            ),
-          ),
-        ),
-      );
-
-      // Assert
-      expect(find.byType(TextButton), findsNothing);
-    });
+    // Removed test: 'does not render secondary link when not provided'
+    // EmptyState no longer supports secondary link functionality
 
     testWidgets('uses correct colors in light mode',
         (WidgetTester tester) async {
@@ -161,9 +112,8 @@ void main() {
           home: const Scaffold(
             body: EmptyState(
               icon: Icons.inbox,
-              iconSize: 64.0,
               title: 'Title',
-              description: 'Description',
+              message: 'Description',
             ),
           ),
         ),
@@ -183,9 +133,8 @@ void main() {
           home: const Scaffold(
             body: EmptyState(
               icon: Icons.inbox,
-              iconSize: 64.0,
               title: 'Title',
-              description: 'Description',
+              message: 'Description',
             ),
           ),
         ),
@@ -203,9 +152,8 @@ void main() {
           home: Scaffold(
             body: EmptyState(
               icon: Icons.inbox,
-              iconSize: 64.0,
               title: 'Title',
-              description: 'Description',
+              message: 'Description',
             ),
           ),
         ),
@@ -227,9 +175,8 @@ void main() {
           home: Scaffold(
             body: EmptyState(
               icon: Icons.inbox,
-              iconSize: 64.0,
               title: 'Title',
-              description: 'Description',
+              message: 'Description',
             ),
           ),
         ),
@@ -248,9 +195,8 @@ void main() {
           home: Scaffold(
             body: EmptyState(
               icon: Icons.inbox,
-              iconSize: 64.0,
               title: 'Title',
-              description: 'Description',
+              message: 'Description',
             ),
           ),
         ),
@@ -270,9 +216,8 @@ void main() {
           home: Scaffold(
             body: EmptyState(
               icon: Icons.inbox,
-              iconSize: 64.0,
               title: 'Title',
-              description: 'Description',
+              message: 'Description',
             ),
           ),
         ),
@@ -297,9 +242,8 @@ void main() {
           home: Scaffold(
             body: EmptyState(
               icon: Icons.inbox,
-              iconSize: 64.0,
               title: 'Title',
-              description: 'Description',
+              message: 'Description',
             ),
           ),
         ),
@@ -320,11 +264,10 @@ void main() {
           home: Scaffold(
             body: EmptyState(
               icon: Icons.inbox,
-              iconSize: 64.0,
               title: 'Title',
-              description: 'Description',
-              ctaText: 'Action',
-              onCtaPressed: () {},
+              message: 'Description',
+              actionLabel: 'Action',
+              onActionPressed: () {},
             ),
           ),
         ),
@@ -334,69 +277,11 @@ void main() {
       expect(find.text('Action'), findsOneWidget);
     });
 
-    testWidgets('secondary link has correct styling',
-        (WidgetTester tester) async {
-      // Act
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: EmptyState(
-              icon: Icons.inbox,
-              iconSize: 64.0,
-              title: 'Title',
-              description: 'Description',
-              secondaryText: 'Learn more',
-              onSecondaryPressed: () {},
-            ),
-          ),
-        ),
-      );
+    // Removed test: 'secondary link has correct styling'
+    // EmptyState no longer supports secondary link functionality
 
-      // Assert
-      final textButton = tester.widget<TextButton>(find.byType(TextButton));
-      expect(textButton, isNotNull);
-    });
-
-    testWidgets('renders both CTA and secondary link together',
-        (WidgetTester tester) async {
-      // Arrange
-      var ctaPressed = false;
-      var secondaryPressed = false;
-
-      // Act
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: EmptyState(
-              icon: Icons.inbox,
-              iconSize: 64.0,
-              title: 'Title',
-              description: 'Description',
-              ctaText: 'Primary Action',
-              onCtaPressed: () {
-                ctaPressed = true;
-              },
-              secondaryText: 'Secondary Action',
-              onSecondaryPressed: () {
-                secondaryPressed = true;
-              },
-            ),
-          ),
-        ),
-      );
-
-      // Assert
-      expect(find.text('Primary Action'), findsOneWidget);
-      expect(find.text('Secondary Action'), findsOneWidget);
-
-      await tester.tap(find.text('Primary Action'));
-      await tester.pump();
-      expect(ctaPressed, isTrue);
-
-      await tester.tap(find.text('Secondary Action'));
-      await tester.pump();
-      expect(secondaryPressed, isTrue);
-    });
+    // Removed test: 'renders both CTA and secondary link together'
+    // EmptyState no longer supports secondary link functionality
 
     testWidgets('has proper semantic labels for accessibility',
         (WidgetTester tester) async {
@@ -406,9 +291,8 @@ void main() {
           home: Scaffold(
             body: EmptyState(
               icon: Icons.inbox,
-              iconSize: 64.0,
               title: 'Title',
-              description: 'Description',
+              message: 'Description',
             ),
           ),
         ),
@@ -427,11 +311,10 @@ void main() {
           home: Scaffold(
             body: EmptyState(
               icon: Icons.inbox,
-              iconSize: 64.0,
               title: 'Title',
-              description: 'Description',
-              ctaText: 'Action',
-              onCtaPressed: () {},
+              message: 'Description',
+              actionLabel: 'Action',
+              onActionPressed: () {},
             ),
           ),
         ),

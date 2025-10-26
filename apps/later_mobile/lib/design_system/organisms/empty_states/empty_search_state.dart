@@ -29,9 +29,8 @@ class EmptySearchState extends StatelessWidget {
   Widget build(BuildContext context) {
     return const EmptyState(
       icon: Icons.search,
-      iconSize: 64.0,
       title: 'No results found',
-      description: 'Try different keywords or check your spelling',
+      message: 'Try different keywords or check your spelling',
     );
   }
 }

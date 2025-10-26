@@ -6,9 +6,9 @@ import 'package:later_mobile/design_system/tokens/tokens.dart';
 import '../../core/responsive/breakpoints.dart';
 import '../../data/models/space_model.dart';
 import '../../providers/spaces_provider.dart';
-import '../components/inputs/text_input_field.dart';
-import '../components/buttons/primary_button.dart';
-import '../components/buttons/secondary_button.dart';
+import 'package:later_mobile/design_system/atoms/inputs/text_input_field.dart';
+import 'package:later_mobile/design_system/atoms/buttons/primary_button.dart';
+import 'package:later_mobile/design_system/atoms/buttons/secondary_button.dart';
 
 /// Mode for the CreateSpaceModal
 enum SpaceModalMode {
