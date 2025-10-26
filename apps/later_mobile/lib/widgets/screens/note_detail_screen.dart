@@ -10,6 +10,8 @@ import '../../providers/spaces_provider.dart';
 import '../components/text/gradient_text.dart';
 import '../components/modals/bottom_sheet_container.dart';
 import '../../core/utils/responsive_modal.dart';
+import '../components/inputs/text_input_field.dart';
+import '../components/dialogs/delete_confirmation_dialog.dart';
 
 /// Note Detail Screen for viewing and editing Note content
 ///
@@ -254,12 +256,10 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
           Navigator.of(context).pop();
           _addTag(_tagController.text);
         },
-        child: TextField(
+        child: TextInputField(
           controller: _tagController,
-          decoration: const InputDecoration(
-            labelText: 'Tag name',
-            hintText: 'Enter tag name',
-          ),
+          label: 'Tag Name',
+          hintText: 'Enter tag name',
           autofocus: true,
           textCapitalization: TextCapitalization.words,
           onSubmitted: (value) {
@@ -273,9 +273,6 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
 
   /// Delete the note
   Future<void> _deleteNote() async {
-    final confirmed = await _showDeleteConfirmation();
-    if (!confirmed || !mounted) return;
-
     try {
       final provider = Provider.of<ContentProvider>(context, listen: false);
       final spacesProvider = Provider.of<SpacesProvider>(
@@ -296,32 +293,18 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
   }
 
   /// Show delete confirmation dialog
-  Future<bool> _showDeleteConfirmation() async {
-    final result = await showDialog<bool>(
+  Future<void> _showDeleteConfirmation() async {
+    final confirmed = await showDeleteConfirmationDialog(
       context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text('Delete Note'),
-          content: Text(
-            'Are you sure you want to delete "${_currentNote.title}"?\n\n'
-            'This action cannot be undone.',
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(false),
-              child: const Text('Cancel'),
-            ),
-            ElevatedButton(
-              onPressed: () => Navigator.of(context).pop(true),
-              style: ElevatedButton.styleFrom(backgroundColor: AppColors.error),
-              child: const Text('Delete'),
-            ),
-          ],
-        );
-      },
+      title: 'Delete Note',
+      message: 'Are you sure you want to delete "${_currentNote.title}"?\n\n'
+          'This action cannot be undone.',
     );
 
-    return result ?? false;
+    if (confirmed == true && mounted) {
+      Navigator.of(context).pop(); // Return to previous screen
+      await _deleteNote();
+    }
   }
 
   /// Show SnackBar message
@@ -402,7 +385,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
             PopupMenuButton<String>(
               onSelected: (value) {
                 if (value == 'delete') {
-                  _deleteNote();
+                  _showDeleteConfirmation();
                 }
               },
               itemBuilder: (context) => [

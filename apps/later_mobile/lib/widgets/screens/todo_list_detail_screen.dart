@@ -14,6 +14,9 @@ import '../components/cards/todo_item_card.dart';
 import '../components/fab/responsive_fab.dart';
 import '../components/modals/bottom_sheet_container.dart';
 import '../components/text/gradient_text.dart';
+import '../components/inputs/text_input_field.dart';
+import '../components/inputs/text_area_field.dart';
+import '../components/dialogs/delete_confirmation_dialog.dart';
 
 /// TodoList Detail Screen for viewing and editing TodoList with TodoItems
 ///
@@ -237,9 +240,6 @@ class _TodoListDetailScreenState extends State<TodoListDetailScreen> {
 
   /// Delete the entire TodoList
   Future<void> _deleteTodoList() async {
-    final confirmed = await _showDeleteListConfirmation();
-    if (!confirmed || !mounted) return;
-
     try {
       final provider = Provider.of<ContentProvider>(context, listen: false);
       final spacesProvider = Provider.of<SpacesProvider>(
@@ -305,12 +305,10 @@ class _TodoListDetailScreenState extends State<TodoListDetailScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Title field
-                TextField(
+                TextInputField(
                   controller: titleController,
-                  decoration: const InputDecoration(
-                    labelText: 'Title *',
-                    hintText: 'Enter task title',
-                  ),
+                  label: 'Title *',
+                  hintText: 'Enter task title',
                   autofocus: true,
                   textCapitalization: TextCapitalization.sentences,
                   onChanged: (_) {
@@ -321,12 +319,10 @@ class _TodoListDetailScreenState extends State<TodoListDetailScreen> {
                 const SizedBox(height: AppSpacing.md),
 
                 // Description field
-                TextField(
+                TextAreaField(
                   controller: descriptionController,
-                  decoration: const InputDecoration(
-                    labelText: 'Description',
-                    hintText: 'Optional description',
-                  ),
+                  label: 'Description',
+                  hintText: 'Optional description',
                   maxLines: 3,
                   textCapitalization: TextCapitalization.sentences,
                 ),
@@ -394,59 +390,28 @@ class _TodoListDetailScreenState extends State<TodoListDetailScreen> {
   }
 
   /// Show delete item confirmation
-  Future<bool> _showDeleteItemConfirmation(String itemTitle) async {
-    final result = await showDialog<bool>(
+  Future<bool?> _showDeleteItemConfirmation(String itemTitle) async {
+    return showDeleteConfirmationDialog(
       context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text('Delete TodoItem'),
-          content: Text('Are you sure you want to delete "$itemTitle"?'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(false),
-              child: const Text('Cancel'),
-            ),
-            ElevatedButton(
-              onPressed: () => Navigator.of(context).pop(true),
-              style: ElevatedButton.styleFrom(backgroundColor: AppColors.error),
-              child: const Text('Delete'),
-            ),
-          ],
-        );
-      },
+      title: 'Delete TodoItem',
+      message: 'Are you sure you want to delete "$itemTitle"?',
     );
-
-    return result ?? false;
   }
 
   /// Show delete list confirmation
-  Future<bool> _showDeleteListConfirmation() async {
-    final result = await showDialog<bool>(
+  Future<void> _showDeleteListConfirmation() async {
+    final confirmed = await showDeleteConfirmationDialog(
       context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text('Delete TodoList'),
-          content: Text(
-            'Are you sure you want to delete "${_currentTodoList.name}"?\n\n'
-            'This will delete all ${_currentTodoList.items.length} items in this list. '
-            'This action cannot be undone.',
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(false),
-              child: const Text('Cancel'),
-            ),
-            ElevatedButton(
-              onPressed: () => Navigator.of(context).pop(true),
-              style: ElevatedButton.styleFrom(backgroundColor: AppColors.error),
-              child: const Text('Delete'),
-            ),
-          ],
-        );
-      },
+      title: 'Delete TodoList',
+      message: 'Are you sure you want to delete "${_currentTodoList.name}"?\n\n'
+          'This will delete all ${_currentTodoList.items.length} items in this list. '
+          'This action cannot be undone.',
     );
 
-    return result ?? false;
+    if (confirmed == true && mounted) {
+      Navigator.of(context).pop(); // Return to previous screen
+      await _deleteTodoList();
+    }
   }
 
   /// Show SnackBar message
@@ -539,7 +504,7 @@ class _TodoListDetailScreenState extends State<TodoListDetailScreen> {
             PopupMenuButton<String>(
               onSelected: (value) {
                 if (value == 'delete') {
-                  _deleteTodoList();
+                  _showDeleteListConfirmation();
                 }
               },
               itemBuilder: (context) => [

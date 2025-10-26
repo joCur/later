@@ -21,10 +21,14 @@ import '../../../core/theme/app_animations.dart';
 /// - Configurable min/max lines
 /// - Validation feedback support
 /// - Accessibility: screen reader compatible
+/// - Optional label (for cases like quick capture)
+/// - External focus control via focusNode parameter
+/// - Text capitalization support
+/// - Auto-expanding support (set maxLines to null)
 class TextAreaField extends StatefulWidget {
   const TextAreaField({
     super.key,
-    required this.label,
+    this.label,
     this.hintText,
     this.controller,
     this.initialValue,
@@ -37,10 +41,12 @@ class TextAreaField extends StatefulWidget {
     this.maxLength,
     this.minLines = 3,
     this.maxLines = 8,
+    this.focusNode,
+    this.textCapitalization = TextCapitalization.none,
   });
 
-  /// Field label
-  final String label;
+  /// Field label (optional - omit for cases like quick capture)
+  final String? label;
 
   /// Placeholder text
   final String? hintText;
@@ -75,8 +81,14 @@ class TextAreaField extends StatefulWidget {
   /// Minimum number of lines to display
   final int minLines;
 
-  /// Maximum number of lines (null for unlimited)
+  /// Maximum number of lines (null for unlimited auto-expanding)
   final int? maxLines;
+
+  /// External focus node (optional - if not provided, internal one will be created)
+  final FocusNode? focusNode;
+
+  /// Text capitalization behavior
+  final TextCapitalization textCapitalization;
 
   @override
   State<TextAreaField> createState() => _TextAreaFieldState();
@@ -87,11 +99,19 @@ class _TextAreaFieldState extends State<TextAreaField> {
   late TextEditingController _controller;
   bool _isFocused = false;
   bool _ownsController = false;
+  bool _ownsFocusNode = false;
 
   @override
   void initState() {
     super.initState();
-    _focusNode = FocusNode();
+
+    // Use provided focus node or create internal one
+    if (widget.focusNode == null) {
+      _focusNode = FocusNode();
+      _ownsFocusNode = true;
+    } else {
+      _focusNode = widget.focusNode!;
+    }
     _focusNode.addListener(_handleFocusChange);
 
     // Create internal controller if not provided
@@ -109,7 +129,10 @@ class _TextAreaFieldState extends State<TextAreaField> {
   @override
   void dispose() {
     _focusNode.removeListener(_handleFocusChange);
-    _focusNode.dispose();
+    // Only dispose focus node if we own it
+    if (_ownsFocusNode) {
+      _focusNode.dispose();
+    }
     _controller.removeListener(_handleTextChange);
     if (_ownsController) {
       _controller.dispose();
@@ -214,22 +237,23 @@ class _TextAreaFieldState extends State<TextAreaField> {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        // Label
-        Padding(
-          padding: const EdgeInsets.only(bottom: AppSpacing.xxxs),
-          child: Text(
-            widget.label,
-            style: AppTypography.labelMedium.copyWith(
-              color: widget.enabled
-                  ? (isDark
-                      ? AppColors.textPrimaryDark
-                      : AppColors.textPrimaryLight)
-                  : (isDark
-                      ? AppColors.textDisabledDark
-                      : AppColors.textDisabledLight),
+        // Label (optional)
+        if (widget.label != null)
+          Padding(
+            padding: const EdgeInsets.only(bottom: AppSpacing.xxxs),
+            child: Text(
+              widget.label!,
+              style: AppTypography.labelMedium.copyWith(
+                color: widget.enabled
+                    ? (isDark
+                        ? AppColors.textPrimaryDark
+                        : AppColors.textPrimaryLight)
+                    : (isDark
+                        ? AppColors.textDisabledDark
+                        : AppColors.textDisabledLight),
+              ),
             ),
           ),
-        ),
 
         // Input field with gradient border and smooth transitions
         AnimatedContainer(
@@ -278,6 +302,7 @@ class _TextAreaFieldState extends State<TextAreaField> {
                 maxLines: widget.maxLines,
                 keyboardType: TextInputType.multiline,
                 textInputAction: TextInputAction.newline,
+                textCapitalization: widget.textCapitalization,
                 style: AppTypography.input.copyWith(
                   color: widget.enabled
                       ? (isDark

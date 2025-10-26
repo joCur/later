@@ -22,10 +22,13 @@ import '../../../core/theme/app_animations.dart';
 /// - Auto-focus and keyboard actions support
 /// - Accessibility: screen reader compatible
 /// - Optional prefix/suffix icons
+/// - Optional label (for cases like search fields, quick capture)
+/// - External focus control via focusNode parameter
+/// - Text capitalization support
 class TextInputField extends StatefulWidget {
   const TextInputField({
     super.key,
-    required this.label,
+    this.label,
     this.hintText,
     this.controller,
     this.initialValue,
@@ -43,10 +46,12 @@ class TextInputField extends StatefulWidget {
     this.prefixIcon,
     this.suffixIcon,
     this.onSuffixIconPressed,
+    this.focusNode,
+    this.textCapitalization = TextCapitalization.none,
   });
 
-  /// Field label
-  final String label;
+  /// Field label (optional - omit for cases like search fields)
+  final String? label;
 
   /// Placeholder text
   final String? hintText;
@@ -99,6 +104,12 @@ class TextInputField extends StatefulWidget {
   /// Callback when suffix icon is pressed
   final VoidCallback? onSuffixIconPressed;
 
+  /// External focus node (optional - if not provided, internal one will be created)
+  final FocusNode? focusNode;
+
+  /// Text capitalization behavior
+  final TextCapitalization textCapitalization;
+
   @override
   State<TextInputField> createState() => _TextInputFieldState();
 }
@@ -108,11 +119,19 @@ class _TextInputFieldState extends State<TextInputField> {
   late TextEditingController _controller;
   bool _isFocused = false;
   bool _ownsController = false;
+  bool _ownsFocusNode = false;
 
   @override
   void initState() {
     super.initState();
-    _focusNode = FocusNode();
+
+    // Use provided focus node or create internal one
+    if (widget.focusNode == null) {
+      _focusNode = FocusNode();
+      _ownsFocusNode = true;
+    } else {
+      _focusNode = widget.focusNode!;
+    }
     _focusNode.addListener(_handleFocusChange);
 
     // Create internal controller if not provided
@@ -130,7 +149,10 @@ class _TextInputFieldState extends State<TextInputField> {
   @override
   void dispose() {
     _focusNode.removeListener(_handleFocusChange);
-    _focusNode.dispose();
+    // Only dispose focus node if we own it
+    if (_ownsFocusNode) {
+      _focusNode.dispose();
+    }
     _controller.removeListener(_handleTextChange);
     if (_ownsController) {
       _controller.dispose();
@@ -235,22 +257,23 @@ class _TextInputFieldState extends State<TextInputField> {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        // Label
-        Padding(
-          padding: const EdgeInsets.only(bottom: AppSpacing.xxxs),
-          child: Text(
-            widget.label,
-            style: AppTypography.labelMedium.copyWith(
-              color: widget.enabled
-                  ? (isDark
-                      ? AppColors.textPrimaryDark
-                      : AppColors.textPrimaryLight)
-                  : (isDark
-                      ? AppColors.textDisabledDark
-                      : AppColors.textDisabledLight),
+        // Label (optional)
+        if (widget.label != null)
+          Padding(
+            padding: const EdgeInsets.only(bottom: AppSpacing.xxxs),
+            child: Text(
+              widget.label!,
+              style: AppTypography.labelMedium.copyWith(
+                color: widget.enabled
+                    ? (isDark
+                        ? AppColors.textPrimaryDark
+                        : AppColors.textPrimaryLight)
+                    : (isDark
+                        ? AppColors.textDisabledDark
+                        : AppColors.textDisabledLight),
+              ),
             ),
           ),
-        ),
 
         // Input field with gradient border and smooth transitions
         AnimatedContainer(
@@ -298,6 +321,7 @@ class _TextInputFieldState extends State<TextInputField> {
                 autofocus: widget.autofocus,
                 keyboardType: widget.keyboardType,
                 textInputAction: widget.textInputAction,
+                textCapitalization: widget.textCapitalization,
                 maxLines: widget.maxLines,
                 style: AppTypography.input.copyWith(
                   color: widget.enabled

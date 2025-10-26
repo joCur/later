@@ -8,6 +8,9 @@ import '../../core/theme/app_spacing.dart';
 import '../../core/theme/app_typography.dart';
 import '../../data/models/space_model.dart';
 import '../../providers/spaces_provider.dart';
+import '../components/inputs/text_input_field.dart';
+import '../components/buttons/primary_button.dart';
+import '../components/buttons/secondary_button.dart';
 
 /// Mode for the CreateSpaceModal
 enum SpaceModalMode {
@@ -234,63 +237,17 @@ class _CreateSpaceModalState extends State<CreateSpaceModal> {
 
   /// Build name input field
   Widget _buildNameInput(bool isDark) {
-    final charCount = _nameController.text.length;
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Semantics(
-          label: 'Space Name',
-          child: TextField(
-            controller: _nameController,
-            focusNode: _nameFocusNode,
-            decoration: InputDecoration(
-              labelText: 'Space Name',
-              hintText: 'Enter space name',
-              errorText: _errorMessage,
-              suffixText: '$charCount/100',
-              filled: true,
-              fillColor: isDark
-                  ? AppColors.surfaceDarkVariant
-                  : AppColors.surfaceLightVariant,
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
-                borderSide: BorderSide.none,
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
-                borderSide: BorderSide(
-                  color: isDark
-                      ? AppColors.primaryAmberLight
-                      : AppColors.primaryAmber,
-                  width: AppSpacing.borderWidthMedium,
-                ),
-              ),
-              errorBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
-                borderSide: const BorderSide(
-                  color: AppColors.error,
-                  width: AppSpacing.borderWidthMedium,
-                ),
-              ),
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.inputPaddingHorizontal,
-                vertical: AppSpacing.inputPaddingVertical,
-              ),
-            ),
-            style: AppTypography.bodyLarge.copyWith(
-              color:
-                  isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
-            ),
-            textInputAction: TextInputAction.done,
-            maxLength: 100,
-            buildCounter: (context,
-                {required currentLength, required isFocused, maxLength}) {
-              return null; // Hide default counter, using suffixText instead
-            },
-          ),
-        ),
-      ],
+    return Semantics(
+      label: 'Space Name',
+      child: TextInputField(
+        label: 'Space Name',
+        hintText: 'Enter space name',
+        controller: _nameController,
+        focusNode: _nameFocusNode,
+        errorText: _errorMessage,
+        maxLength: 100,
+        textInputAction: TextInputAction.done,
+      ),
     );
   }
 
@@ -524,66 +481,27 @@ class _CreateSpaceModalState extends State<CreateSpaceModal> {
               children: [
                 // Cancel button
                 Expanded(
-                  child: Semantics(
-                    button: true,
-                    label: 'Cancel',
-                    child: OutlinedButton(
-                      onPressed: _isSubmitting
-                          ? null
-                          : () => Navigator.of(context).pop(false),
-                      style: OutlinedButton.styleFrom(
-                        minimumSize:
-                            const Size(double.infinity, AppSpacing.minTouchTarget),
-                        shape: RoundedRectangleBorder(
-                          borderRadius:
-                              BorderRadius.circular(AppSpacing.buttonRadius),
-                        ),
-                        side: BorderSide(
-                          color: isDark
-                              ? AppColors.borderDark
-                              : AppColors.borderLight,
-                        ),
-                      ),
-                      child: const Text('Cancel'),
-                    ),
+                  child: SecondaryButton(
+                    text: 'Cancel',
+                    onPressed: _isSubmitting
+                        ? null
+                        : () => Navigator.of(context).pop(false),
+                    isExpanded: true,
                   ),
                 ),
                 const SizedBox(width: AppSpacing.sm),
 
                 // Save/Create button
                 Expanded(
-                  child: ElevatedButton(
+                  child: PrimaryButton(
+                    text: widget.mode == SpaceModalMode.edit
+                        ? 'Save'
+                        : 'Create',
                     onPressed: _isFormValid && !_isSubmitting
                         ? _handleSave
                         : null,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primaryAmber,
-                      foregroundColor: AppColors.neutralBlack,
-                      disabledBackgroundColor: isDark
-                          ? AppColors.surfaceDarkVariant
-                          : AppColors.surfaceLightVariant,
-                      minimumSize:
-                          const Size(double.infinity, AppSpacing.minTouchTarget),
-                      shape: RoundedRectangleBorder(
-                        borderRadius:
-                            BorderRadius.circular(AppSpacing.buttonRadius),
-                      ),
-                    ),
-                    child: _isSubmitting
-                        ? const SizedBox(
-                            width: 20,
-                            height: 20,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              valueColor:
-                                  AlwaysStoppedAnimation<Color>(Colors.black),
-                            ),
-                          )
-                        : Text(
-                            widget.mode == SpaceModalMode.edit
-                                ? 'Save'
-                                : 'Create',
-                          ),
+                    isLoading: _isSubmitting,
+                    isExpanded: true,
                   ),
                 ),
               ],

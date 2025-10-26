@@ -10,6 +10,8 @@ import '../../core/theme/app_typography.dart';
 import '../../data/models/space_model.dart';
 import '../../providers/spaces_provider.dart';
 import 'create_space_modal.dart';
+import '../components/inputs/text_input_field.dart';
+import '../components/buttons/primary_button.dart';
 
 /// Space switcher modal that allows users to switch between spaces and create new spaces.
 ///
@@ -196,47 +198,17 @@ class _SpaceSwitcherModalState extends State<SpaceSwitcherModal> {
 
   /// Build search field
   Widget _buildSearchField(bool isDark) {
-    return TextField(
+    return TextInputField(
       controller: _searchController,
       focusNode: _searchFocusNode,
-      decoration: InputDecoration(
-        hintText: 'Search spaces...',
-        prefixIcon: Icon(
-          Icons.search,
-          color: isDark
-              ? AppColors.textSecondaryDark
-              : AppColors.textSecondaryLight,
-        ),
-        suffixIcon: _searchController.text.isNotEmpty
-            ? IconButton(
-                icon: Icon(
-                  Icons.clear,
-                  color: isDark
-                      ? AppColors.textSecondaryDark
-                      : AppColors.textSecondaryLight,
-                ),
-                onPressed: () {
-                  _searchController.clear();
-                },
-                tooltip: 'Clear search',
-              )
-            : null,
-        filled: true,
-        fillColor: isDark
-            ? AppColors.surfaceDarkVariant
-            : AppColors.surfaceLightVariant,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
-          borderSide: BorderSide.none,
-        ),
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.inputPaddingHorizontal,
-          vertical: AppSpacing.inputPaddingVertical,
-        ),
-      ),
-      style: AppTypography.bodyMedium.copyWith(
-        color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
-      ),
+      hintText: 'Search spaces...',
+      prefixIcon: Icons.search,
+      suffixIcon: _searchController.text.isNotEmpty ? Icons.clear : null,
+      onSuffixIconPressed: _searchController.text.isNotEmpty
+          ? () {
+              _searchController.clear();
+            }
+          : null,
       textInputAction: TextInputAction.search,
       onSubmitted: (_) {
         // Move focus to list for keyboard navigation
@@ -831,7 +803,9 @@ class _SpaceSwitcherModalState extends State<SpaceSwitcherModal> {
               ),
             ],
           ),
-          child: ElevatedButton.icon(
+          child: PrimaryButton(
+            text: 'Create New Space',
+            icon: Icons.add,
             onPressed: () async {
               // Show create space modal
               final result = await CreateSpaceModal.show(
@@ -845,17 +819,7 @@ class _SpaceSwitcherModalState extends State<SpaceSwitcherModal> {
                 Navigator.of(context).pop(true);
               }
             },
-            icon: const Icon(Icons.add),
-            label: const Text('Create New Space'),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.transparent,
-              foregroundColor: Colors.white,
-              shadowColor: Colors.transparent,
-              minimumSize: const Size(double.infinity, AppSpacing.minTouchTarget),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
-              ),
-            ),
+            isExpanded: true,
           ),
         ),
       ),

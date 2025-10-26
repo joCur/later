@@ -25,6 +25,7 @@ import '../modals/quick_capture_modal.dart';
 import 'todo_list_detail_screen.dart';
 import 'list_detail_screen.dart';
 import 'note_detail_screen.dart';
+import '../components/buttons/primary_button.dart';
 
 /// Main home screen for the Later app
 ///
@@ -416,18 +417,10 @@ class _HomeScreenState extends State<HomeScreen> {
             child: Center(
               child: _isLoadingMore
                   ? const CircularProgressIndicator()
-                  : ElevatedButton.icon(
+                  : PrimaryButton(
+                      text: 'Load More (${allContent.length - content.length} remaining)',
+                      icon: Icons.expand_more,
                       onPressed: () => _loadMoreItems(allContent.length),
-                      icon: const Icon(Icons.expand_more),
-                      label: Text(
-                        'Load More (${allContent.length - content.length} remaining)',
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: AppSpacing.lg,
-                          vertical: AppSpacing.sm,
-                        ),
-                      ),
                     ),
             ),
           );

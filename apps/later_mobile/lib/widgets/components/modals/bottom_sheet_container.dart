@@ -6,6 +6,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_typography.dart';
 import '../buttons/gradient_button.dart';
+import '../buttons/secondary_button.dart';
 
 /// A responsive container widget that adapts between mobile bottom sheet
 /// and desktop dialog presentations.
@@ -300,28 +301,13 @@ class BottomSheetContainer extends StatelessWidget {
               ? Row(
                   children: [
                     Expanded(
-                      child: OutlinedButton(
+                      child: SecondaryButton(
+                        text: secondaryButtonText,
                         onPressed: isPrimaryButtonLoading
                             ? null
                             : (onSecondaryPressed ??
                                   () => Navigator.of(context).pop()),
-                        style: OutlinedButton.styleFrom(
-                          minimumSize: const Size(
-                            double.infinity,
-                            AppSpacing.minTouchTarget,
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(
-                              AppSpacing.buttonRadius,
-                            ),
-                          ),
-                          side: BorderSide(
-                            color: isDark
-                                ? AppColors.borderDark
-                                : AppColors.borderLight,
-                          ),
-                        ),
-                        child: Text(secondaryButtonText),
+                        isExpanded: true,
                       ),
                     ),
                     const SizedBox(width: AppSpacing.sm),
