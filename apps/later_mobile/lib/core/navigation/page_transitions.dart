@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../theme/app_animations.dart';
-import '../theme/app_colors.dart';
+import '../../design_system/tokens/animations.dart';
+import '../../design_system/tokens/colors.dart';
 
 /// Temporal Flow page transitions with shared axis and gradient fade effects
 ///

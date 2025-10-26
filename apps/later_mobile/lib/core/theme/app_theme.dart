@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'app_colors.dart';
-import 'app_typography.dart';
-import 'app_spacing.dart';
+import '../../design_system/tokens/colors.dart';
+import '../../design_system/tokens/typography.dart';
+import '../../design_system/tokens/spacing.dart';
 
 /// Temporal Flow Design System - Theme Configuration
 /// Integrates colors, typography, spacing, and animations into Material ThemeData

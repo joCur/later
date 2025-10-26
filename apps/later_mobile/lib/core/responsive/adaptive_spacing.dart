@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../theme/app_spacing.dart';
+import '../../design_system/tokens/spacing.dart';
 import 'breakpoints.dart';
 
 /// Adaptive spacing utilities that adjust based on screen size
