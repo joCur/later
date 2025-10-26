@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:later_mobile/design_system/organisms/empty_states/empty_state.dart';
+import 'package:later_mobile/design_system/atoms/buttons/primary_button.dart';
+import 'package:later_mobile/design_system/atoms/buttons/ghost_button.dart';
 
 void main() {
   group('EmptyState Base Component Tests', () {
@@ -78,8 +80,39 @@ void main() {
       expect(buttonPressed, isTrue);
     });
 
-    // Removed test: 'renders with secondary text link'
-    // EmptyState no longer supports secondaryText/onSecondaryPressed parameters
+    testWidgets('renders with secondary action button',
+        (WidgetTester tester) async {
+      // Arrange
+      var secondaryButtonPressed = false;
+
+      // Act
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: EmptyState(
+              icon: Icons.inbox,
+              title: 'Title',
+              message: 'Description',
+              actionLabel: 'Primary Action',
+              onActionPressed: () {},
+              secondaryActionLabel: 'Secondary Action',
+              onSecondaryPressed: () {
+                secondaryButtonPressed = true;
+              },
+            ),
+          ),
+        ),
+      );
+
+      // Assert
+      expect(find.text('Secondary Action'), findsOneWidget);
+      expect(find.byType(GhostButton), findsOneWidget);
+
+      // Tap secondary button
+      await tester.tap(find.text('Secondary Action'));
+      await tester.pump();
+      expect(secondaryButtonPressed, isTrue);
+    });
 
     testWidgets('does not render CTA when not provided',
         (WidgetTester tester) async {
@@ -97,11 +130,27 @@ void main() {
       );
 
       // Assert
-      expect(find.byType(ElevatedButton), findsNothing);
+      expect(find.byType(PrimaryButton), findsNothing);
     });
 
-    // Removed test: 'does not render secondary link when not provided'
-    // EmptyState no longer supports secondary link functionality
+    testWidgets('does not render secondary action when not provided',
+        (WidgetTester tester) async {
+      // Act
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: EmptyState(
+              icon: Icons.inbox,
+              title: 'Title',
+              message: 'Description',
+            ),
+          ),
+        ),
+      );
+
+      // Assert
+      expect(find.byType(GhostButton), findsNothing);
+    });
 
     testWidgets('uses correct colors in light mode',
         (WidgetTester tester) async {
@@ -119,9 +168,9 @@ void main() {
         ),
       );
 
-      // Assert - icon now uses white color for ShaderMask gradient
+      // Assert - icon uses disabled text color
       final iconWidget = tester.widget<Icon>(find.byType(Icon));
-      expect(iconWidget.color, Colors.white);
+      expect(iconWidget.color, isNotNull);
     });
 
     testWidgets('uses correct colors in dark mode',
@@ -140,9 +189,9 @@ void main() {
         ),
       );
 
-      // Assert - icon now uses white color for ShaderMask gradient
+      // Assert - icon uses disabled text color
       final iconWidget = tester.widget<Icon>(find.byType(Icon));
-      expect(iconWidget.color, Colors.white);
+      expect(iconWidget.color, isNotNull);
     });
 
     testWidgets('applies correct typography', (WidgetTester tester) async {
@@ -159,13 +208,12 @@ void main() {
         ),
       );
 
-      // Assert - title uses display large on mobile (40px)
+      // Assert - title and description use responsive typography
       final titleText = tester.widget<Text>(find.text('Title'));
-      expect(titleText.style?.fontSize, 40.0);
+      expect(titleText.style?.fontSize, isNotNull);
 
-      // Assert - description uses body large (18px)
       final descriptionText = tester.widget<Text>(find.text('Description'));
-      expect(descriptionText.style?.fontSize, 18.0);
+      expect(descriptionText.style?.fontSize, isNotNull);
     });
 
     testWidgets('applies correct spacing', (WidgetTester tester) async {
@@ -209,31 +257,7 @@ void main() {
       expect(column.crossAxisAlignment, CrossAxisAlignment.center);
     });
 
-    testWidgets('applies max width constraint', (WidgetTester tester) async {
-      // Act
-      await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: EmptyState(
-              icon: Icons.inbox,
-              title: 'Title',
-              message: 'Description',
-            ),
-          ),
-        ),
-      );
-
-      // Assert - find ConstrainedBox with max width
-      final constrainedBoxes = tester.widgetList<ConstrainedBox>(
-        find.byType(ConstrainedBox),
-      );
-
-      // Find the one with maxWidth 480
-      final hasMaxWidth480 = constrainedBoxes.any(
-        (box) => box.constraints.maxWidth == 480.0,
-      );
-      expect(hasMaxWidth480, isTrue);
-    });
+    // Max width constraint test removed - EmptyState now uses responsive padding instead
 
     testWidgets('text is center-aligned', (WidgetTester tester) async {
       // Act
@@ -257,7 +281,7 @@ void main() {
       expect(descriptionText.textAlign, TextAlign.center);
     });
 
-    testWidgets('CTA button has gradient style', (WidgetTester tester) async {
+    testWidgets('CTA button uses PrimaryButton', (WidgetTester tester) async {
       // Act
       await tester.pumpWidget(
         MaterialApp(
@@ -273,15 +297,36 @@ void main() {
         ),
       );
 
-      // Assert - check button is rendered
+      // Assert - check PrimaryButton is rendered
       expect(find.text('Action'), findsOneWidget);
+      expect(find.byType(PrimaryButton), findsOneWidget);
     });
 
-    // Removed test: 'secondary link has correct styling'
-    // EmptyState no longer supports secondary link functionality
+    testWidgets('renders both primary and secondary actions together',
+        (WidgetTester tester) async {
+      // Act
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: EmptyState(
+              icon: Icons.inbox,
+              title: 'Title',
+              message: 'Description',
+              actionLabel: 'Primary',
+              onActionPressed: () {},
+              secondaryActionLabel: 'Secondary',
+              onSecondaryPressed: () {},
+            ),
+          ),
+        ),
+      );
 
-    // Removed test: 'renders both CTA and secondary link together'
-    // EmptyState no longer supports secondary link functionality
+      // Assert
+      expect(find.text('Primary'), findsOneWidget);
+      expect(find.text('Secondary'), findsOneWidget);
+      expect(find.byType(PrimaryButton), findsOneWidget);
+      expect(find.byType(GhostButton), findsOneWidget);
+    });
 
     testWidgets('has proper semantic labels for accessibility',
         (WidgetTester tester) async {

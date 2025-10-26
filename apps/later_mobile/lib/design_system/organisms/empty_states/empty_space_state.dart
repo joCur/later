@@ -14,7 +14,7 @@ import 'empty_state.dart';
 /// ```dart
 /// EmptySpaceState(
 ///   spaceName: 'Work',
-///   onQuickCapture: () => _showQuickCapture(),
+///   onActionPressed: () => _showQuickCapture(),
 /// )
 /// ```
 class EmptySpaceState extends StatelessWidget {
@@ -22,14 +22,14 @@ class EmptySpaceState extends StatelessWidget {
   const EmptySpaceState({
     super.key,
     required this.spaceName,
-    required this.onQuickCapture,
+    required this.onActionPressed,
   });
 
   /// Name of the current space
   final String spaceName;
 
   /// Callback when Quick Capture button is pressed
-  final VoidCallback onQuickCapture;
+  final VoidCallback onActionPressed;
 
   @override
   Widget build(BuildContext context) {
@@ -38,7 +38,7 @@ class EmptySpaceState extends StatelessWidget {
       title: 'Your $spaceName is empty',
       message: 'Start capturing your thoughts, tasks, and ideas',
       actionLabel: 'Quick Capture',
-      onActionPressed: onQuickCapture,
+      onActionPressed: onActionPressed,
     );
   }
 }

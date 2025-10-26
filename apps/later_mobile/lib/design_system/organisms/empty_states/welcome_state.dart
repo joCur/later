@@ -9,39 +9,39 @@ import 'empty_state.dart';
 /// - Sparkles icon (64px)
 /// - Welcoming message
 /// - Create first item CTA
-/// - Optional "Learn how it works" secondary link
+/// - Optional "Learn how it works" secondary action
 ///
 /// Example usage:
 /// ```dart
 /// WelcomeState(
-///   onCreateFirstItem: () => _showQuickCapture(),
-///   onLearnMore: () => _showOnboarding(), // optional
+///   onActionPressed: () => _showQuickCapture(),
+///   onSecondaryPressed: () => _showOnboarding(), // optional
 /// )
 /// ```
 class WelcomeState extends StatelessWidget {
   /// Creates a welcome state widget.
   const WelcomeState({
     super.key,
-    required this.onCreateFirstItem,
-    this.onLearnMore,
+    required this.onActionPressed,
+    this.onSecondaryPressed,
   });
 
   /// Callback when "Create your first item" button is pressed
-  final VoidCallback onCreateFirstItem;
+  final VoidCallback onActionPressed;
 
-  /// Optional callback when "Learn how it works" link is pressed
-  final VoidCallback? onLearnMore;
+  /// Optional callback when "Learn how it works" secondary action is pressed
+  final VoidCallback? onSecondaryPressed;
 
   @override
   Widget build(BuildContext context) {
-    // Note: Simplified to work with EmptyState API
-    // Custom gradient title and secondary action removed for API compatibility
     return EmptyState(
       icon: Icons.auto_awesome, // sparkles icon
       title: 'Welcome to later',
       message: 'Your peaceful place for thoughts, tasks, and everything in between',
       actionLabel: 'Create your first item',
-      onActionPressed: onCreateFirstItem,
+      onActionPressed: onActionPressed,
+      secondaryActionLabel: onSecondaryPressed != null ? 'Learn how it works' : null,
+      onSecondaryPressed: onSecondaryPressed,
     );
   }
 }

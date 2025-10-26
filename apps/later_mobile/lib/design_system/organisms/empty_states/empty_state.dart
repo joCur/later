@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:later_mobile/design_system/tokens/tokens.dart';
 import 'package:later_mobile/core/responsive/breakpoints.dart';
+import 'package:later_mobile/design_system/atoms/buttons/ghost_button.dart';
+import 'package:later_mobile/design_system/atoms/buttons/primary_button.dart';
 
 /// Reusable empty state component
 ///
@@ -22,13 +24,16 @@ import 'package:later_mobile/core/responsive/breakpoints.dart';
 ///   message: 'Create your first item to get started',
 ///   actionLabel: 'Create Item',
 ///   onActionPressed: () => _showCreateDialog(),
+///   secondaryActionLabel: 'Learn More',
+///   onSecondaryPressed: () => _showLearnMore(),
 /// )
 /// ```
 class EmptyState extends StatelessWidget {
   /// Creates an empty state widget.
   ///
   /// The [title] and [message] parameters are required.
-  /// The [icon], [actionLabel], and [onActionPressed] parameters are optional.
+  /// The [icon], [actionLabel], [onActionPressed], [secondaryActionLabel],
+  /// and [onSecondaryPressed] parameters are optional.
   const EmptyState({
     super.key,
     this.icon,
@@ -36,6 +41,8 @@ class EmptyState extends StatelessWidget {
     required this.message,
     this.actionLabel,
     this.onActionPressed,
+    this.secondaryActionLabel,
+    this.onSecondaryPressed,
   });
 
   /// Optional icon to display above the title
@@ -52,6 +59,12 @@ class EmptyState extends StatelessWidget {
 
   /// Optional callback when the CTA button is pressed
   final VoidCallback? onActionPressed;
+
+  /// Optional label for the secondary action button
+  final String? secondaryActionLabel;
+
+  /// Optional callback when the secondary action button is pressed
+  final VoidCallback? onSecondaryPressed;
 
   @override
   Widget build(BuildContext context) {
@@ -121,27 +134,20 @@ class EmptyState extends StatelessWidget {
             // Optional CTA button
             if (actionLabel != null && onActionPressed != null) ...[
               const SizedBox(height: AppSpacing.lg),
-              ElevatedButton(
+              PrimaryButton(
+                text: actionLabel!,
                 onPressed: onActionPressed,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primaryAmber,
-                  foregroundColor: AppColors.neutralBlack,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppSpacing.lg,
-                    vertical: AppSpacing.sm,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(AppSpacing.radiusMD),
-                  ),
-                  minimumSize: const Size(
-                    AppSpacing.minTouchTarget,
-                    AppSpacing.minTouchTarget,
-                  ),
-                ),
-                child: Text(
-                  actionLabel!,
-                  style: AppTypography.button,
-                ),
+                size: ButtonSize.large,
+              ),
+            ],
+
+            // Optional secondary action button
+            if (secondaryActionLabel != null && onSecondaryPressed != null) ...[
+              const SizedBox(height: AppSpacing.sm),
+              GhostButton(
+                text: secondaryActionLabel!,
+                onPressed: onSecondaryPressed,
+                size: ButtonSize.large,
               ),
             ],
           ],

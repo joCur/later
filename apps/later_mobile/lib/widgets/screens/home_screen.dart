@@ -374,13 +374,13 @@ class _HomeScreenState extends State<HomeScreen> {
       if (isNewUser) {
         // Show welcome state for first-time users
         return WelcomeState(
-          onCreateFirstItem: _showQuickCaptureModal,
+          onActionPressed: _showQuickCaptureModal,
         );
       } else {
         // Show empty space state for existing users with empty spaces
         return EmptySpaceState(
           spaceName: currentSpace?.name ?? 'space',
-          onQuickCapture: _showQuickCaptureModal,
+          onActionPressed: _showQuickCaptureModal,
         );
       }
     }
