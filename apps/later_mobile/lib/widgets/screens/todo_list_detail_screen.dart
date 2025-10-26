@@ -28,10 +28,7 @@ import '../components/text/gradient_text.dart';
 /// - Menu: Edit list properties, Delete list
 /// - Auto-save with debounce
 class TodoListDetailScreen extends StatefulWidget {
-  const TodoListDetailScreen({
-    super.key,
-    required this.todoList,
-  });
+  const TodoListDetailScreen({super.key, required this.todoList});
 
   /// TodoList to display and edit
   final TodoList todoList;
@@ -139,7 +136,9 @@ class _TodoListDetailScreenState extends State<TodoListDetailScreen> {
       await provider.addTodoItem(_currentTodoList.id, result);
 
       // Reload current todo list
-      final updated = provider.todoLists.firstWhere((tl) => tl.id == _currentTodoList.id);
+      final updated = provider.todoLists.firstWhere(
+        (tl) => tl.id == _currentTodoList.id,
+      );
       if (mounted) {
         setState(() {
           _currentTodoList = updated;
@@ -162,7 +161,9 @@ class _TodoListDetailScreenState extends State<TodoListDetailScreen> {
       await provider.updateTodoItem(_currentTodoList.id, item.id, result);
 
       // Reload current todo list
-      final updated = provider.todoLists.firstWhere((tl) => tl.id == _currentTodoList.id);
+      final updated = provider.todoLists.firstWhere(
+        (tl) => tl.id == _currentTodoList.id,
+      );
       if (mounted) {
         setState(() {
           _currentTodoList = updated;
@@ -175,7 +176,6 @@ class _TodoListDetailScreenState extends State<TodoListDetailScreen> {
     }
   }
 
-
   /// Perform the actual deletion without confirmation
   /// Used by Dismissible which handles confirmation separately
   Future<void> _performDeleteTodoItem(TodoItem item) async {
@@ -184,7 +184,9 @@ class _TodoListDetailScreenState extends State<TodoListDetailScreen> {
       await provider.deleteTodoItem(_currentTodoList.id, item.id);
 
       // Reload current todo list
-      final updated = provider.todoLists.firstWhere((tl) => tl.id == _currentTodoList.id);
+      final updated = provider.todoLists.firstWhere(
+        (tl) => tl.id == _currentTodoList.id,
+      );
       if (mounted) {
         setState(() {
           _currentTodoList = updated;
@@ -204,7 +206,9 @@ class _TodoListDetailScreenState extends State<TodoListDetailScreen> {
       await provider.toggleTodoItem(_currentTodoList.id, item.id);
 
       // Reload current todo list
-      final updated = provider.todoLists.firstWhere((tl) => tl.id == _currentTodoList.id);
+      final updated = provider.todoLists.firstWhere(
+        (tl) => tl.id == _currentTodoList.id,
+      );
       setState(() {
         _currentTodoList = updated;
       });
@@ -220,7 +224,9 @@ class _TodoListDetailScreenState extends State<TodoListDetailScreen> {
       await provider.reorderTodoItems(_currentTodoList.id, oldIndex, newIndex);
 
       // Reload current todo list
-      final updated = provider.todoLists.firstWhere((tl) => tl.id == _currentTodoList.id);
+      final updated = provider.todoLists.firstWhere(
+        (tl) => tl.id == _currentTodoList.id,
+      );
       setState(() {
         _currentTodoList = updated;
       });
@@ -236,7 +242,10 @@ class _TodoListDetailScreenState extends State<TodoListDetailScreen> {
 
     try {
       final provider = Provider.of<ContentProvider>(context, listen: false);
-      final spacesProvider = Provider.of<SpacesProvider>(context, listen: false);
+      final spacesProvider = Provider.of<SpacesProvider>(
+        context,
+        listen: false,
+      );
 
       await provider.deleteTodoList(_currentTodoList.id, spacesProvider);
 
@@ -252,16 +261,22 @@ class _TodoListDetailScreenState extends State<TodoListDetailScreen> {
 
   /// Show TodoItem edit/create dialog
   Future<TodoItem?> _showTodoItemDialog({TodoItem? existingItem}) async {
-    final titleController = TextEditingController(text: existingItem?.title ?? '');
-    final descriptionController = TextEditingController(text: existingItem?.description ?? '');
+    final titleController = TextEditingController(
+      text: existingItem?.title ?? '',
+    );
+    final descriptionController = TextEditingController(
+      text: existingItem?.description ?? '',
+    );
     DateTime? selectedDueDate = existingItem?.dueDate;
-    TodoPriority selectedPriority = existingItem?.priority ?? TodoPriority.medium;
+    TodoPriority selectedPriority =
+        existingItem?.priority ?? TodoPriority.medium;
 
     return ResponsiveModal.show<TodoItem>(
       context: context,
       child: BottomSheetContainer(
         title: existingItem == null ? 'Add TodoItem' : 'Edit TodoItem',
         primaryButtonText: existingItem == null ? 'Add' : 'Save',
+        showSecondaryButton: false,
         onPrimaryPressed: () {
           if (titleController.text.trim().isEmpty) {
             _showSnackBar('Title is required', isError: true);
@@ -284,97 +299,95 @@ class _TodoListDetailScreenState extends State<TodoListDetailScreen> {
           Navigator.of(context).pop(item);
         },
         child: StatefulBuilder(
-        builder: (context, setDialogState) {
-          return Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Title field
-              TextField(
-                controller: titleController,
-                decoration: const InputDecoration(
-                  labelText: 'Title *',
-                  hintText: 'Enter task title',
+          builder: (context, setDialogState) {
+            return Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Title field
+                TextField(
+                  controller: titleController,
+                  decoration: const InputDecoration(
+                    labelText: 'Title *',
+                    hintText: 'Enter task title',
+                  ),
+                  autofocus: true,
+                  textCapitalization: TextCapitalization.sentences,
+                  onChanged: (_) {
+                    // Force rebuild to enable/disable button
+                    setDialogState(() {});
+                  },
                 ),
-                autofocus: true,
-                textCapitalization: TextCapitalization.sentences,
-                onChanged: (_) {
-                  // Force rebuild to enable/disable button
-                  setDialogState(() {});
-                },
-              ),
-              const SizedBox(height: AppSpacing.md),
+                const SizedBox(height: AppSpacing.md),
 
-              // Description field
-              TextField(
-                controller: descriptionController,
-                decoration: const InputDecoration(
-                  labelText: 'Description',
-                  hintText: 'Optional description',
+                // Description field
+                TextField(
+                  controller: descriptionController,
+                  decoration: const InputDecoration(
+                    labelText: 'Description',
+                    hintText: 'Optional description',
+                  ),
+                  maxLines: 3,
+                  textCapitalization: TextCapitalization.sentences,
                 ),
-                maxLines: 3,
-                textCapitalization: TextCapitalization.sentences,
-              ),
-              const SizedBox(height: AppSpacing.md),
+                const SizedBox(height: AppSpacing.md),
 
-              // Due date picker
-              ListTile(
-                contentPadding: EdgeInsets.zero,
-                leading: const Icon(Icons.calendar_today),
-                title: Text(
-                  selectedDueDate == null
-                      ? 'No due date'
-                      : DateFormat.yMMMd().format(selectedDueDate!),
+                // Due date picker
+                ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  leading: const Icon(Icons.calendar_today),
+                  title: Text(
+                    selectedDueDate == null
+                        ? 'No due date'
+                        : DateFormat.yMMMd().format(selectedDueDate!),
+                  ),
+                  trailing: selectedDueDate != null
+                      ? IconButton(
+                          icon: const Icon(Icons.clear),
+                          onPressed: () {
+                            setDialogState(() {
+                              selectedDueDate = null;
+                            });
+                          },
+                        )
+                      : null,
+                  onTap: () async {
+                    final date = await showDatePicker(
+                      context: context,
+                      initialDate: selectedDueDate ?? DateTime.now(),
+                      firstDate: DateTime.now(),
+                      lastDate: DateTime.now().add(const Duration(days: 365)),
+                    );
+                    if (date != null) {
+                      setDialogState(() {
+                        selectedDueDate = date;
+                      });
+                    }
+                  },
                 ),
-                trailing: selectedDueDate != null
-                    ? IconButton(
-                        icon: const Icon(Icons.clear),
-                        onPressed: () {
-                          setDialogState(() {
-                            selectedDueDate = null;
-                          });
-                        },
-                      )
-                    : null,
-                onTap: () async {
-                  final date = await showDatePicker(
-                    context: context,
-                    initialDate: selectedDueDate ?? DateTime.now(),
-                    firstDate: DateTime.now(),
-                    lastDate: DateTime.now().add(const Duration(days: 365)),
-                  );
-                  if (date != null) {
-                    setDialogState(() {
-                      selectedDueDate = date;
-                    });
-                  }
-                },
-              ),
-              const SizedBox(height: AppSpacing.md),
+                const SizedBox(height: AppSpacing.md),
 
-              // Priority dropdown
-              DropdownButtonFormField<TodoPriority>(
-                initialValue: selectedPriority,
-                decoration: const InputDecoration(
-                  labelText: 'Priority',
+                // Priority dropdown
+                DropdownButtonFormField<TodoPriority>(
+                  initialValue: selectedPriority,
+                  decoration: const InputDecoration(labelText: 'Priority'),
+                  items: TodoPriority.values.map((priority) {
+                    return DropdownMenuItem(
+                      value: priority,
+                      child: Text(_getPriorityLabel(priority)),
+                    );
+                  }).toList(),
+                  onChanged: (value) {
+                    if (value != null) {
+                      setDialogState(() {
+                        selectedPriority = value;
+                      });
+                    }
+                  },
                 ),
-                items: TodoPriority.values.map((priority) {
-                  return DropdownMenuItem(
-                    value: priority,
-                    child: Text(_getPriorityLabel(priority)),
-                  );
-                }).toList(),
-                onChanged: (value) {
-                  if (value != null) {
-                    setDialogState(() {
-                      selectedPriority = value;
-                    });
-                  }
-                },
-              ),
-            ],
-          );
-        },
+              ],
+            );
+          },
         ),
       ),
     );
@@ -395,9 +408,7 @@ class _TodoListDetailScreenState extends State<TodoListDetailScreen> {
             ),
             ElevatedButton(
               onPressed: () => Navigator.of(context).pop(true),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.error,
-              ),
+              style: ElevatedButton.styleFrom(backgroundColor: AppColors.error),
               child: const Text('Delete'),
             ),
           ],
@@ -427,9 +438,7 @@ class _TodoListDetailScreenState extends State<TodoListDetailScreen> {
             ),
             ElevatedButton(
               onPressed: () => Navigator.of(context).pop(true),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.error,
-              ),
+              style: ElevatedButton.styleFrom(backgroundColor: AppColors.error),
               child: const Text('Delete'),
             ),
           ],
@@ -557,7 +566,9 @@ class _TodoListDetailScreenState extends State<TodoListDetailScreen> {
                 gradient: AppColors.taskGradient,
                 boxShadow: [
                   BoxShadow(
-                    color: AppColors.taskGradient.colors.first.withValues(alpha: 0.3),
+                    color: AppColors.taskGradient.colors.first.withValues(
+                      alpha: 0.3,
+                    ),
                     blurRadius: 8,
                     offset: const Offset(0, 2),
                   ),
@@ -577,7 +588,9 @@ class _TodoListDetailScreenState extends State<TodoListDetailScreen> {
                   LinearProgressIndicator(
                     value: _currentTodoList.progress,
                     backgroundColor: Colors.white.withValues(alpha: 0.3),
-                    valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
+                    valueColor: const AlwaysStoppedAnimation<Color>(
+                      Colors.white,
+                    ),
                     minHeight: 8,
                     borderRadius: BorderRadius.circular(4),
                   ),
@@ -619,7 +632,8 @@ class _TodoListDetailScreenState extends State<TodoListDetailScreen> {
                             ),
                           ),
                           direction: DismissDirection.endToStart,
-                          confirmDismiss: (_) => _showDeleteItemConfirmation(item.title),
+                          confirmDismiss: (_) =>
+                              _showDeleteItemConfirmation(item.title),
                           onDismissed: (_) => _performDeleteTodoItem(item),
                           child: TodoItemCard(
                             todoItem: item,

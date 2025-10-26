@@ -28,10 +28,7 @@ import '../components/text/gradient_text.dart';
 /// - Menu: Change style, Change icon, Delete list
 /// - Auto-save with debounce (500ms)
 class ListDetailScreen extends StatefulWidget {
-  const ListDetailScreen({
-    super.key,
-    required this.list,
-  });
+  const ListDetailScreen({super.key, required this.list});
 
   /// List to display and edit
   final ListModel list;
@@ -104,9 +101,7 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
 
     try {
       // Update list name
-      final updated = _currentList.copyWith(
-        name: _nameController.text.trim(),
-      );
+      final updated = _currentList.copyWith(name: _nameController.text.trim());
 
       // Save via provider
       final provider = Provider.of<ContentProvider>(context, listen: false);
@@ -275,7 +270,10 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
 
     try {
       final provider = Provider.of<ContentProvider>(context, listen: false);
-      final spacesProvider = Provider.of<SpacesProvider>(context, listen: false);
+      final spacesProvider = Provider.of<SpacesProvider>(
+        context,
+        listen: false,
+      );
 
       await provider.deleteList(_currentList.id, spacesProvider);
 
@@ -291,19 +289,24 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
 
   /// Show ListItem edit/create dialog
   Future<ListItem?> _showListItemDialog({ListItem? existingItem}) async {
-    final titleController = TextEditingController(text: existingItem?.title ?? '');
-    final notesController = TextEditingController(text: existingItem?.notes ?? '');
+    final titleController = TextEditingController(
+      text: existingItem?.title ?? '',
+    );
+    final notesController = TextEditingController(
+      text: existingItem?.notes ?? '',
+    );
 
     return ResponsiveModal.show<ListItem>(
       context: context,
       child: BottomSheetContainer(
         title: existingItem == null ? 'Add Item' : 'Edit Item',
         primaryButtonText: existingItem == null ? 'Add' : 'Save',
+        showSecondaryButton: false,
         onPrimaryPressed: () {
           if (titleController.text.trim().isEmpty) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Title is required')),
-            );
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(const SnackBar(content: Text('Title is required')));
             return;
           }
 
@@ -320,32 +323,32 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
           Navigator.of(context).pop(item);
         },
         child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Title field
-          TextField(
-            controller: titleController,
-            decoration: const InputDecoration(
-              labelText: 'Title *',
-              hintText: 'Enter item title',
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Title field
+            TextField(
+              controller: titleController,
+              decoration: const InputDecoration(
+                labelText: 'Title *',
+                hintText: 'Enter item title',
+              ),
+              autofocus: true,
+              textCapitalization: TextCapitalization.sentences,
             ),
-            autofocus: true,
-            textCapitalization: TextCapitalization.sentences,
-          ),
-          const SizedBox(height: AppSpacing.md),
+            const SizedBox(height: AppSpacing.md),
 
-          // Notes field
-          TextField(
-            controller: notesController,
-            decoration: const InputDecoration(
-              labelText: 'Notes',
-              hintText: 'Optional notes',
+            // Notes field
+            TextField(
+              controller: notesController,
+              decoration: const InputDecoration(
+                labelText: 'Notes',
+                hintText: 'Optional notes',
+              ),
+              maxLines: 3,
+              textCapitalization: TextCapitalization.sentences,
             ),
-            maxLines: 3,
-            textCapitalization: TextCapitalization.sentences,
-          ),
-        ],
+          ],
         ),
       ),
     );
@@ -358,27 +361,30 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
       child: BottomSheetContainer(
         title: 'Select Style',
         child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          ListTile(
-            leading: const Icon(Icons.circle, size: 8),
-            title: const Text('Bullets'),
-            subtitle: const Text('Simple bullet points'),
-            onTap: () => Navigator.of(context).pop(ListStyle.bullets),
-          ),
-          ListTile(
-            leading: const Text('1.', style: TextStyle(fontWeight: FontWeight.bold)),
-            title: const Text('Numbered'),
-            subtitle: const Text('Numbered list items'),
-            onTap: () => Navigator.of(context).pop(ListStyle.numbered),
-          ),
-          ListTile(
-            leading: const Icon(Icons.check_box_outline_blank),
-            title: const Text('Checkboxes'),
-            subtitle: const Text('Checkable task items'),
-            onTap: () => Navigator.of(context).pop(ListStyle.checkboxes),
-          ),
-        ],
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.circle, size: 8),
+              title: const Text('Bullets'),
+              subtitle: const Text('Simple bullet points'),
+              onTap: () => Navigator.of(context).pop(ListStyle.bullets),
+            ),
+            ListTile(
+              leading: const Text(
+                '1.',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              title: const Text('Numbered'),
+              subtitle: const Text('Numbered list items'),
+              onTap: () => Navigator.of(context).pop(ListStyle.numbered),
+            ),
+            ListTile(
+              leading: const Icon(Icons.check_box_outline_blank),
+              title: const Text('Checkboxes'),
+              subtitle: const Text('Checkable task items'),
+              onTap: () => Navigator.of(context).pop(ListStyle.checkboxes),
+            ),
+          ],
         ),
       ),
     );
@@ -387,8 +393,18 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
   /// Show icon selection dialog
   Future<String?> _showIconSelectionDialog() async {
     final commonIcons = [
-      '📝', '📋', '🛒', '✅', '📌', '⭐',
-      '❤️', '🏠', '💼', '🎯', '🔖', '📚',
+      '📝',
+      '📋',
+      '🛒',
+      '✅',
+      '📌',
+      '⭐',
+      '❤️',
+      '🏠',
+      '💼',
+      '🎯',
+      '🔖',
+      '📚',
     ];
 
     return ResponsiveModal.show<String>(
@@ -396,34 +412,31 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
       child: BottomSheetContainer(
         title: 'Select Icon',
         child: GridView.builder(
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 4,
-          crossAxisSpacing: AppSpacing.sm,
-          mainAxisSpacing: AppSpacing.sm,
-          mainAxisExtent: 56, // Minimum 48px touch target + padding
-        ),
-        itemCount: commonIcons.length,
-        itemBuilder: (context, index) {
-          final icon = commonIcons[index];
-          return InkWell(
-            onTap: () => Navigator.of(context).pop(icon),
-            borderRadius: BorderRadius.circular(AppSpacing.xs),
-            child: Container(
-              decoration: BoxDecoration(
-                border: Border.all(color: AppColors.border(context)),
-                borderRadius: BorderRadius.circular(AppSpacing.xs),
-              ),
-              child: Center(
-                child: Text(
-                  icon,
-                  style: const TextStyle(fontSize: 32),
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 4,
+            crossAxisSpacing: AppSpacing.sm,
+            mainAxisSpacing: AppSpacing.sm,
+            mainAxisExtent: 56, // Minimum 48px touch target + padding
+          ),
+          itemCount: commonIcons.length,
+          itemBuilder: (context, index) {
+            final icon = commonIcons[index];
+            return InkWell(
+              onTap: () => Navigator.of(context).pop(icon),
+              borderRadius: BorderRadius.circular(AppSpacing.xs),
+              child: Container(
+                decoration: BoxDecoration(
+                  border: Border.all(color: AppColors.border(context)),
+                  borderRadius: BorderRadius.circular(AppSpacing.xs),
+                ),
+                child: Center(
+                  child: Text(icon, style: const TextStyle(fontSize: 32)),
                 ),
               ),
-            ),
-          );
-        },
+            );
+          },
         ),
       ),
     );
@@ -444,9 +457,7 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
             ),
             ElevatedButton(
               onPressed: () => Navigator.of(context).pop(true),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.error,
-              ),
+              style: ElevatedButton.styleFrom(backgroundColor: AppColors.error),
               child: const Text('Delete'),
             ),
           ],
@@ -476,9 +487,7 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
             ),
             ElevatedButton(
               onPressed: () => Navigator.of(context).pop(true),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.error,
-              ),
+              style: ElevatedButton.styleFrom(backgroundColor: AppColors.error),
               child: const Text('Delete'),
             ),
           ],
@@ -501,7 +510,6 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
       ),
     );
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -638,7 +646,9 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
                   gradient: AppColors.listGradient,
                   boxShadow: [
                     BoxShadow(
-                      color: AppColors.listGradient.colors.first.withValues(alpha: 0.3),
+                      color: AppColors.listGradient.colors.first.withValues(
+                        alpha: 0.3,
+                      ),
                       blurRadius: 8,
                       offset: const Offset(0, 2),
                     ),
@@ -658,7 +668,9 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
                     LinearProgressIndicator(
                       value: _currentList.progress,
                       backgroundColor: Colors.white.withValues(alpha: 0.3),
-                      valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
+                      valueColor: const AlwaysStoppedAnimation<Color>(
+                        Colors.white,
+                      ),
                       minHeight: 8,
                       borderRadius: BorderRadius.circular(4),
                     ),
@@ -700,13 +712,15 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
                             ),
                           ),
                           direction: DismissDirection.endToStart,
-                          confirmDismiss: (_) => _showDeleteItemConfirmation(item.title),
+                          confirmDismiss: (_) =>
+                              _showDeleteItemConfirmation(item.title),
                           onDismissed: (_) => _performDeleteListItem(item),
                           child: ListItemCard(
                             listItem: item,
                             listStyle: _currentList.style,
                             itemIndex: index + 1, // 1-based for display
-                            onCheckboxChanged: _currentList.style == ListStyle.checkboxes
+                            onCheckboxChanged:
+                                _currentList.style == ListStyle.checkboxes
                                 ? (value) => _toggleListItem(item)
                                 : null,
                             onLongPress: () => _editListItem(item),

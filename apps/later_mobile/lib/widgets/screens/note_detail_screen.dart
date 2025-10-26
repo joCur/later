@@ -23,10 +23,7 @@ import '../../core/utils/responsive_modal.dart';
 /// - Empty state support
 /// - Error handling with SnackBar messages
 class NoteDetailScreen extends StatefulWidget {
-  const NoteDetailScreen({
-    super.key,
-    required this.note,
-  });
+  const NoteDetailScreen({super.key, required this.note});
 
   /// Note to display and edit
   final Item note;
@@ -170,8 +167,10 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
     }
 
     if (trimmedTag.length > _maxTagLength) {
-      _showSnackBar('Tag is too long (max $_maxTagLength characters)',
-          isError: true);
+      _showSnackBar(
+        'Tag is too long (max $_maxTagLength characters)',
+        isError: true,
+      );
       return;
     }
 
@@ -250,22 +249,23 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
       child: BottomSheetContainer(
         title: 'Add Tag',
         primaryButtonText: 'Add',
+        showSecondaryButton: false,
         onPrimaryPressed: () {
           Navigator.of(context).pop();
           _addTag(_tagController.text);
         },
         child: TextField(
-        controller: _tagController,
-        decoration: const InputDecoration(
-          labelText: 'Tag name',
-          hintText: 'Enter tag name',
-        ),
-        autofocus: true,
-        textCapitalization: TextCapitalization.words,
-        onSubmitted: (value) {
-          Navigator.of(context).pop();
-          _addTag(value);
-        },
+          controller: _tagController,
+          decoration: const InputDecoration(
+            labelText: 'Tag name',
+            hintText: 'Enter tag name',
+          ),
+          autofocus: true,
+          textCapitalization: TextCapitalization.words,
+          onSubmitted: (value) {
+            Navigator.of(context).pop();
+            _addTag(value);
+          },
         ),
       ),
     );
@@ -278,8 +278,10 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
 
     try {
       final provider = Provider.of<ContentProvider>(context, listen: false);
-      final spacesProvider =
-          Provider.of<SpacesProvider>(context, listen: false);
+      final spacesProvider = Provider.of<SpacesProvider>(
+        context,
+        listen: false,
+      );
 
       await provider.deleteNote(_currentNote.id, spacesProvider);
 
@@ -311,9 +313,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
             ),
             ElevatedButton(
               onPressed: () => Navigator.of(context).pop(true),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.error,
-              ),
+              style: ElevatedButton.styleFrom(backgroundColor: AppColors.error),
               child: const Text('Delete'),
             ),
           ],
@@ -479,8 +479,9 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
                             labelStyle: AppTypography.bodySmall,
                             deleteIcon: const Icon(Icons.close, size: 16),
                             onDeleted: () => _removeTag(tag),
-                            backgroundColor:
-                                AppColors.noteLight.withValues(alpha: 0.3),
+                            backgroundColor: AppColors.noteLight.withValues(
+                              alpha: 0.3,
+                            ),
                           );
                         }).toList(),
                       )

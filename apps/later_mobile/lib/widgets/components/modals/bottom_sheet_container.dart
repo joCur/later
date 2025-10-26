@@ -5,6 +5,7 @@ import '../../../core/responsive/breakpoints.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_typography.dart';
+import '../buttons/gradient_button.dart';
 
 /// A responsive container widget that adapts between mobile bottom sheet
 /// and desktop dialog presentations.
@@ -20,6 +21,7 @@ class BottomSheetContainer extends StatelessWidget {
     this.onPrimaryPressed,
     this.isPrimaryButtonEnabled = true,
     this.isPrimaryButtonLoading = false,
+    this.showSecondaryButton = true,
     this.secondaryButtonText = 'Cancel',
     this.onSecondaryPressed,
   });
@@ -31,6 +33,7 @@ class BottomSheetContainer extends StatelessWidget {
   final VoidCallback? onPrimaryPressed;
   final bool isPrimaryButtonEnabled;
   final bool isPrimaryButtonLoading;
+  final bool showSecondaryButton;
   final String secondaryButtonText;
   final VoidCallback? onSecondaryPressed;
 
@@ -73,47 +76,52 @@ class BottomSheetContainer extends StatelessWidget {
               child: GestureDetector(
                 onTap: () {}, // Prevent tap through to outer gesture detector
                 child: Padding(
-              padding: EdgeInsets.only(bottom: keyboardHeight),
-              child: Container(
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  // Solid surface background (mobile-first bold design, no glass)
-                  color: surfaceColor,
-                  borderRadius: const BorderRadius.vertical(
-                    top: Radius.circular(24.0), // 24px for mobile-first design
-                  ),
-                  // 4px gradient border on top edge
-                  border: Border(
-                    top: BorderSide(width: 4.0, color: primaryGradient.colors[0]),
-                  ),
-                ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    // Drag handle
-                    _buildDragHandle(),
-
-                    // Header
-                    _buildHeader(context, isDark, isMobile: true),
-
-                    // Content
-                    Flexible(
-                      child: SingleChildScrollView(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: AppSpacing.lg, // 24px on mobile
-                          vertical: AppSpacing.sm,
+                  padding: EdgeInsets.only(bottom: keyboardHeight),
+                  child: Container(
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      // Solid surface background (mobile-first bold design, no glass)
+                      color: surfaceColor,
+                      borderRadius: const BorderRadius.vertical(
+                        top: Radius.circular(
+                          24.0,
+                        ), // 24px for mobile-first design
+                      ),
+                      // 4px gradient border on top edge
+                      border: Border(
+                        top: BorderSide(
+                          width: 4.0,
+                          color: primaryGradient.colors[0],
                         ),
-                        child: child,
                       ),
                     ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        // Drag handle
+                        _buildDragHandle(),
 
-                    // Optional footer buttons
-                    if (primaryButtonText != null)
-                      _buildFooter(context, isDark),
-                  ],
-                ),
-              ),
+                        // Header
+                        _buildHeader(context, isDark, isMobile: true),
+
+                        // Content
+                        Flexible(
+                          child: SingleChildScrollView(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: AppSpacing.lg, // 24px on mobile
+                              vertical: AppSpacing.sm,
+                            ),
+                            child: child,
+                          ),
+                        ),
+
+                        // Optional footer buttons
+                        if (primaryButtonText != null)
+                          _buildFooter(context, isDark, isMobile: true),
+                      ],
+                    ),
+                  ),
                 ),
               ),
             ),
@@ -143,71 +151,69 @@ class BottomSheetContainer extends StatelessWidget {
               child: GestureDetector(
                 onTap: () {}, // Prevent tap through to outer gesture detector
                 child: Container(
-              constraints: const BoxConstraints(
-                maxWidth: AppSpacing.modalMaxWidth,
-              ), // 560px
-              margin: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(AppSpacing.modalRadius),
-                border: Border.all(
-                  color: primaryGradient.colors[0].withValues(alpha: 0.3),
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: isDark
-                        ? AppColors.shadowDark
-                        : AppColors.shadowLight,
-                    blurRadius: 24,
-                    offset: const Offset(0, 8),
-                  ),
-                  // Gradient shadow for glass effect
-                  BoxShadow(
-                    color: primaryGradient.colors[0].withValues(alpha: 0.2),
-                    blurRadius: 8,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(AppSpacing.modalRadius),
-                child: BackdropFilter(
-                  filter: ImageFilter.blur(
-                    sigmaX: AppSpacing.glassBlurRadius,
-                    sigmaY: AppSpacing.glassBlurRadius,
-                  ),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      // Glass morphism: semi-transparent background
-                      color: surfaceColor.withValues(alpha: 0.85),
+                  constraints: const BoxConstraints(
+                    maxWidth: AppSpacing.modalMaxWidth,
+                  ), // 560px
+                  margin: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(AppSpacing.modalRadius),
+                    border: Border.all(
+                      color: primaryGradient.colors[0].withValues(alpha: 0.3),
                     ),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        // Header
-                        _buildHeader(context, isDark, isMobile: false),
-
-                        // Content
-                        Flexible(
-                          child: SingleChildScrollView(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: AppSpacing.md,
-                              vertical: AppSpacing.sm,
-                            ),
-                            child: child,
-                          ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: isDark
+                            ? AppColors.shadowDark
+                            : AppColors.shadowLight,
+                        blurRadius: 24,
+                        offset: const Offset(0, 8),
+                      ),
+                      // Gradient shadow for glass effect
+                      BoxShadow(
+                        color: primaryGradient.colors[0].withValues(alpha: 0.2),
+                        blurRadius: 8,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(AppSpacing.modalRadius),
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(
+                        sigmaX: AppSpacing.glassBlurRadius,
+                        sigmaY: AppSpacing.glassBlurRadius,
+                      ),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          // Glass morphism: semi-transparent background
+                          color: surfaceColor.withValues(alpha: 0.85),
                         ),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            // Header
+                            _buildHeader(context, isDark, isMobile: false),
 
-                        // Optional footer buttons
-                        if (primaryButtonText != null)
-                          _buildFooter(context, isDark),
+                            // Content
+                            Flexible(
+                              child: SingleChildScrollView(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: AppSpacing.md,
+                                  vertical: AppSpacing.sm,
+                                ),
+                                child: child,
+                              ),
+                            ),
 
-                        const SizedBox(height: AppSpacing.sm),
-                      ],
+                            // Optional footer buttons
+                            if (primaryButtonText != null)
+                              _buildFooter(context, isDark, isMobile: false),
+                          ],
+                        ),
+                      ),
                     ),
                   ),
-                ),
-              ),
                 ),
               ),
             ),
@@ -235,7 +241,11 @@ class BottomSheetContainer extends StatelessWidget {
   }
 
   /// Copied from QuickCaptureModal._buildHeader()
-  Widget _buildHeader(BuildContext context, bool isDark, {required bool isMobile}) {
+  Widget _buildHeader(
+    BuildContext context,
+    bool isDark, {
+    required bool isMobile,
+  }) {
     return Padding(
       padding: EdgeInsets.fromLTRB(
         isMobile
@@ -276,59 +286,84 @@ class BottomSheetContainer extends StatelessWidget {
     );
   }
 
-  Widget _buildFooter(BuildContext context, bool isDark) {
-    return Padding(
-      padding: const EdgeInsets.all(AppSpacing.sm),
-      child: Row(
-        children: [
-          Expanded(
-            child: OutlinedButton(
-              onPressed: isPrimaryButtonLoading
-                  ? null
-                  : (onSecondaryPressed ?? () => Navigator.of(context).pop()),
-              style: OutlinedButton.styleFrom(
-                minimumSize: const Size(double.infinity, 44),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
-                ),
-                side: BorderSide(
-                  color: isDark ? AppColors.borderDark : AppColors.borderLight,
-                ),
-              ),
-              child: Text(secondaryButtonText),
-            ),
-          ),
-          const SizedBox(width: AppSpacing.sm),
-          Expanded(
-            child: ElevatedButton(
-              onPressed: isPrimaryButtonEnabled && !isPrimaryButtonLoading
-                  ? onPrimaryPressed
-                  : null,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primaryAmber,
-                foregroundColor: AppColors.neutralBlack,
-                disabledBackgroundColor: isDark
-                    ? AppColors.surfaceDarkVariant
-                    : AppColors.surfaceLightVariant,
-                minimumSize: const Size(double.infinity, 44),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
-                ),
-              ),
-              child: isPrimaryButtonLoading
-                  ? const SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        valueColor: AlwaysStoppedAnimation<Color>(Colors.black),
+  Widget _buildFooter(
+    BuildContext context,
+    bool isDark, {
+    required bool isMobile,
+  }) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(AppSpacing.sm),
+          child: showSecondaryButton
+              ? Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: isPrimaryButtonLoading
+                            ? null
+                            : (onSecondaryPressed ??
+                                  () => Navigator.of(context).pop()),
+                        style: OutlinedButton.styleFrom(
+                          minimumSize: const Size(
+                            double.infinity,
+                            AppSpacing.minTouchTarget,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(
+                              AppSpacing.buttonRadius,
+                            ),
+                          ),
+                          side: BorderSide(
+                            color: isDark
+                                ? AppColors.borderDark
+                                : AppColors.borderLight,
+                          ),
+                        ),
+                        child: Text(secondaryButtonText),
                       ),
-                    )
-                  : Text(primaryButtonText!),
+                    ),
+                    const SizedBox(width: AppSpacing.sm),
+                    Expanded(child: _buildPrimaryButton(isDark)),
+                  ],
+                )
+              : _buildPrimaryButton(isDark),
+        ),
+        // Bottom padding for mobile (safe area + keyboard)
+        if (isMobile) SizedBox(height: MediaQuery.of(context).padding.bottom),
+      ],
+    );
+  }
+
+  Widget _buildPrimaryButton(bool isDark) {
+    if (isPrimaryButtonLoading) {
+      // Show loading state with gradient background
+      return Container(
+        height: 44,
+        decoration: BoxDecoration(
+          gradient: isDark
+              ? AppColors.primaryGradientDark
+              : AppColors.primaryGradient,
+          borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
+        ),
+        child: const Center(
+          child: SizedBox(
+            width: 20,
+            height: 20,
+            child: CircularProgressIndicator(
+              strokeWidth: 2,
+              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
             ),
           ),
-        ],
-      ),
+        ),
+      );
+    }
+
+    return GradientButton(
+      onPressed: isPrimaryButtonEnabled ? onPrimaryPressed : null,
+      label: primaryButtonText!,
+      fullWidth: true,
     );
   }
 }
