@@ -10,6 +10,7 @@ import '../../core/utils/responsive_modal.dart';
 import 'package:later_mobile/design_system/atoms/inputs/text_input_field.dart';
 import 'package:later_mobile/design_system/organisms/dialogs/delete_confirmation_dialog.dart';
 import 'package:later_mobile/design_system/molecules/app_bars/editable_app_bar_title.dart';
+import 'package:later_mobile/core/mixins/auto_save_mixin.dart';
 
 /// Note Detail Screen for viewing and editing Note content
 ///
@@ -32,22 +33,18 @@ class NoteDetailScreen extends StatefulWidget {
   State<NoteDetailScreen> createState() => _NoteDetailScreenState();
 }
 
-class _NoteDetailScreenState extends State<NoteDetailScreen> {
+class _NoteDetailScreenState extends State<NoteDetailScreen> with AutoSaveMixin {
   // Text controllers
   late TextEditingController _titleController;
   late TextEditingController _contentController;
 
   // Local state
   late Item _currentNote;
-  Timer? _debounceTimer;
-  bool _isSaving = false;
-  bool _hasChanges = false;
 
   // Tag management
   final TextEditingController _tagController = TextEditingController();
 
   // Constants
-  static const int _autoSaveDelayMs = 2000;
   static const int _maxTagLength = 50;
 
   @override
@@ -62,54 +59,22 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
     _contentController = TextEditingController(text: widget.note.content ?? '');
 
     // Listen to text changes for auto-save
-    _titleController.addListener(_onTitleChanged);
-    _contentController.addListener(_onContentChanged);
+    _titleController.addListener(() => onFieldChanged());
+    _contentController.addListener(() => onFieldChanged());
   }
 
   @override
   void dispose() {
-    _debounceTimer?.cancel();
-    _titleController.removeListener(_onTitleChanged);
-    _contentController.removeListener(_onContentChanged);
     _titleController.dispose();
     _contentController.dispose();
     _tagController.dispose();
     super.dispose();
   }
 
-  /// Handle title changes and trigger debounced save
-  void _onTitleChanged() {
-    setState(() {
-      _hasChanges = true;
-    });
-
-    // Cancel previous timer
-    _debounceTimer?.cancel();
-
-    // Start new debounce timer
-    _debounceTimer = Timer(const Duration(milliseconds: _autoSaveDelayMs), () {
-      _saveChanges();
-    });
-  }
-
-  /// Handle content changes and trigger debounced save
-  void _onContentChanged() {
-    setState(() {
-      _hasChanges = true;
-    });
-
-    // Cancel previous timer
-    _debounceTimer?.cancel();
-
-    // Start new debounce timer
-    _debounceTimer = Timer(const Duration(milliseconds: _autoSaveDelayMs), () {
-      _saveChanges();
-    });
-  }
-
   /// Save changes to the note
-  Future<void> _saveChanges() async {
-    if (_isSaving) return;
+  @override
+  Future<void> saveChanges() async {
+    if (isSaving) return;
 
     // Validate title
     if (_titleController.text.trim().isEmpty) {
@@ -117,15 +82,15 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
       // Restore previous title
       _titleController.text = _currentNote.title;
       setState(() {
-        _hasChanges = false;
+        hasChanges = false;
       });
       return;
     }
 
-    if (!_hasChanges) return;
+    if (!hasChanges) return;
 
     setState(() {
-      _isSaving = true;
+      isSaving = true;
     });
 
     try {
@@ -144,13 +109,13 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
 
       setState(() {
         _currentNote = updated;
-        _hasChanges = false;
+        hasChanges = false;
       });
     } catch (e) {
       _showSnackBar('Failed to save changes: $e', isError: true);
     } finally {
       setState(() {
-        _isSaving = false;
+        isSaving = false;
       });
     }
   }
@@ -180,7 +145,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
 
     try {
       setState(() {
-        _isSaving = true;
+        isSaving = true;
       });
 
       // Add tag to note
@@ -203,7 +168,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
       _showSnackBar('Failed to add tag: $e', isError: true);
     } finally {
       setState(() {
-        _isSaving = false;
+        isSaving = false;
       });
     }
   }
@@ -212,7 +177,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
   Future<void> _removeTag(String tag) async {
     try {
       setState(() {
-        _isSaving = true;
+        isSaving = true;
       });
 
       // Remove tag from note
@@ -234,7 +199,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
       _showSnackBar('Failed to remove tag: $e', isError: true);
     } finally {
       setState(() {
-        _isSaving = false;
+        isSaving = false;
       });
     }
   }
@@ -324,7 +289,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
       onPopInvokedWithResult: (didPop, result) async {
         if (!didPop) {
           // Save before leaving
-          await _saveChanges();
+          await saveChanges();
           if (mounted && context.mounted) {
             Navigator.of(context).pop();
           }
@@ -336,13 +301,13 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
             text: _currentNote.title,
             onChanged: (newTitle) {
               _titleController.text = newTitle;
-              _saveChanges();
+              saveChanges();
             },
             gradient: AppColors.noteGradient,
             hintText: 'Note title',
           ),
           actions: [
-            if (_isSaving)
+            if (isSaving)
               const Padding(
                 padding: EdgeInsets.all(AppSpacing.md),
                 child: SizedBox(

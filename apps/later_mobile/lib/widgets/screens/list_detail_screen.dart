@@ -15,6 +15,7 @@ import 'package:later_mobile/design_system/atoms/inputs/text_area_field.dart';
 import 'package:later_mobile/design_system/organisms/dialogs/delete_confirmation_dialog.dart';
 import 'package:later_mobile/design_system/molecules/app_bars/editable_app_bar_title.dart';
 import 'package:later_mobile/design_system/molecules/lists/dismissible_list_item.dart';
+import 'package:later_mobile/core/mixins/auto_save_mixin.dart';
 
 /// List Detail Screen for viewing and editing List with ListItems
 ///
@@ -39,15 +40,12 @@ class ListDetailScreen extends StatefulWidget {
   State<ListDetailScreen> createState() => _ListDetailScreenState();
 }
 
-class _ListDetailScreenState extends State<ListDetailScreen> {
+class _ListDetailScreenState extends State<ListDetailScreen> with AutoSaveMixin {
   // Text controllers
   late TextEditingController _nameController;
 
   // Local state
   late ListModel _currentList;
-  Timer? _debounceTimer;
-  bool _isSaving = false;
-  bool _hasChanges = false;
 
   @override
   void initState() {
@@ -60,35 +58,22 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
     _nameController = TextEditingController(text: widget.list.name);
 
     // Listen to text changes for auto-save
-    _nameController.addListener(_onNameChanged);
+    _nameController.addListener(() => onFieldChanged());
   }
 
   @override
+  int get autoSaveDelayMs => 500;
+
+  @override
   void dispose() {
-    _debounceTimer?.cancel();
-    _nameController.removeListener(_onNameChanged);
     _nameController.dispose();
     super.dispose();
   }
 
-  /// Handle name changes and trigger debounced save
-  void _onNameChanged() {
-    setState(() {
-      _hasChanges = true;
-    });
-
-    // Cancel previous timer
-    _debounceTimer?.cancel();
-
-    // Start new debounce timer (500ms)
-    _debounceTimer = Timer(const Duration(milliseconds: 500), () {
-      _saveChanges();
-    });
-  }
-
   /// Save changes to the list
-  Future<void> _saveChanges() async {
-    if (!_hasChanges || _isSaving) return;
+  @override
+  Future<void> saveChanges() async {
+    if (!hasChanges || isSaving) return;
 
     // Validate name
     if (_nameController.text.trim().isEmpty) {
@@ -97,7 +82,7 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
     }
 
     setState(() {
-      _isSaving = true;
+      isSaving = true;
     });
 
     try {
@@ -110,13 +95,13 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
 
       setState(() {
         _currentList = updated;
-        _hasChanges = false;
+        hasChanges = false;
       });
     } catch (e) {
       _showSnackBar('Failed to save changes: $e', isError: true);
     } finally {
       setState(() {
-        _isSaving = false;
+        isSaving = false;
       });
     }
   }
@@ -472,7 +457,7 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
       onPopInvokedWithResult: (didPop, result) async {
         if (!didPop) {
           // Save before leaving
-          await _saveChanges();
+          await saveChanges();
           if (mounted && context.mounted) {
             Navigator.of(context).pop();
           }
@@ -495,7 +480,7 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
                   text: _currentList.name,
                   onChanged: (newName) {
                     _nameController.text = newName;
-                    _saveChanges();
+                    saveChanges();
                   },
                   gradient: AppColors.listGradient,
                   hintText: 'List name',
@@ -504,7 +489,7 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
             ],
           ),
           actions: [
-            if (_isSaving)
+            if (isSaving)
               const Padding(
                 padding: EdgeInsets.all(AppSpacing.md),
                 child: SizedBox(
