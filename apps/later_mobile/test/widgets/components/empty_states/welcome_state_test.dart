@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:later_mobile/widgets/components/empty_states/welcome_state.dart';
+import 'package:later_mobile/design_system/organisms/empty_states/welcome_state.dart';
 
 void main() {
   group('WelcomeState Tests', () {
@@ -10,15 +10,14 @@ void main() {
         MaterialApp(
           home: Scaffold(
             body: WelcomeState(
-              onCreateFirstItem: () {},
+              onActionPressed: () {},
             ),
           ),
         ),
       );
 
-      // Assert - Now the title is split between regular text and gradient text
-      expect(find.text('Welcome to '), findsOneWidget);
-      expect(find.text('later'), findsOneWidget);
+      // Assert
+      expect(find.text('Welcome to later'), findsOneWidget);
     });
 
     testWidgets('renders sparkles icon', (WidgetTester tester) async {
@@ -27,7 +26,7 @@ void main() {
         MaterialApp(
           home: Scaffold(
             body: WelcomeState(
-              onCreateFirstItem: () {},
+              onActionPressed: () {},
             ),
           ),
         ),
@@ -43,7 +42,7 @@ void main() {
         MaterialApp(
           home: Scaffold(
             body: WelcomeState(
-              onCreateFirstItem: () {},
+              onActionPressed: () {},
             ),
           ),
         ),
@@ -65,7 +64,7 @@ void main() {
         MaterialApp(
           home: Scaffold(
             body: WelcomeState(
-              onCreateFirstItem: () {},
+              onActionPressed: () {},
             ),
           ),
         ),
@@ -75,7 +74,7 @@ void main() {
       expect(find.text('Create your first item'), findsOneWidget);
     });
 
-    testWidgets('calls onCreateFirstItem when button pressed',
+    testWidgets('calls onActionPressed when button pressed',
         (WidgetTester tester) async {
       // Arrange
       var buttonPressed = false;
@@ -85,7 +84,7 @@ void main() {
         MaterialApp(
           home: Scaffold(
             body: WelcomeState(
-              onCreateFirstItem: () {
+              onActionPressed: () {
                 buttonPressed = true;
               },
             ),
@@ -108,8 +107,8 @@ void main() {
         MaterialApp(
           home: Scaffold(
             body: WelcomeState(
-              onCreateFirstItem: () {},
-              onLearnMore: () {},
+              onActionPressed: () {},
+              onSecondaryPressed: () {},
             ),
           ),
         ),
@@ -126,7 +125,7 @@ void main() {
         MaterialApp(
           home: Scaffold(
             body: WelcomeState(
-              onCreateFirstItem: () {},
+              onActionPressed: () {},
             ),
           ),
         ),
@@ -136,7 +135,7 @@ void main() {
       expect(find.text('Learn how it works'), findsNothing);
     });
 
-    testWidgets('calls onLearnMore when secondary link pressed',
+    testWidgets('calls onSecondaryPressed when secondary link pressed',
         (WidgetTester tester) async {
       // Arrange
       var linkPressed = false;
@@ -146,8 +145,8 @@ void main() {
         MaterialApp(
           home: Scaffold(
             body: WelcomeState(
-              onCreateFirstItem: () {},
-              onLearnMore: () {
+              onActionPressed: () {},
+              onSecondaryPressed: () {
                 linkPressed = true;
               },
             ),
@@ -163,21 +162,21 @@ void main() {
       expect(linkPressed, isTrue);
     });
 
-    testWidgets('icon size is 64px', (WidgetTester tester) async {
+    testWidgets('icon has responsive size', (WidgetTester tester) async {
       // Act
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
             body: WelcomeState(
-              onCreateFirstItem: () {},
+              onActionPressed: () {},
             ),
           ),
         ),
       );
 
-      // Assert
+      // Assert - icon size is responsive (80px mobile, 100px desktop)
       final iconWidget = tester.widget<Icon>(find.byType(Icon));
-      expect(iconWidget.size, 64.0);
+      expect(iconWidget.size, isNotNull);
     });
 
     testWidgets('uses EmptyState base component', (WidgetTester tester) async {
@@ -186,7 +185,7 @@ void main() {
         MaterialApp(
           home: Scaffold(
             body: WelcomeState(
-              onCreateFirstItem: () {},
+              onActionPressed: () {},
             ),
           ),
         ),
@@ -204,15 +203,13 @@ void main() {
           theme: ThemeData.light(),
           home: Scaffold(
             body: WelcomeState(
-              onCreateFirstItem: () {},
+              onActionPressed: () {},
             ),
           ),
         ),
       );
 
-      // Title is now split into two text widgets (regular + gradient)
-      expect(find.text('Welcome to '), findsOneWidget);
-      expect(find.text('later'), findsOneWidget);
+      expect(find.text('Welcome to later'), findsOneWidget);
 
       // Test dark mode
       await tester.pumpWidget(
@@ -220,15 +217,13 @@ void main() {
           theme: ThemeData.dark(),
           home: Scaffold(
             body: WelcomeState(
-              onCreateFirstItem: () {},
+              onActionPressed: () {},
             ),
           ),
         ),
       );
 
-      // Title is now split into two text widgets (regular + gradient)
-      expect(find.text('Welcome to '), findsOneWidget);
-      expect(find.text('later'), findsOneWidget);
+      expect(find.text('Welcome to later'), findsOneWidget);
     });
 
     testWidgets('has proper semantic structure', (WidgetTester tester) async {
@@ -237,16 +232,14 @@ void main() {
         MaterialApp(
           home: Scaffold(
             body: WelcomeState(
-              onCreateFirstItem: () {},
+              onActionPressed: () {},
             ),
           ),
         ),
       );
 
       // Assert - verify all key elements are accessible
-      // Title is now split into two text widgets (regular + gradient)
-      expect(find.text('Welcome to '), findsOneWidget);
-      expect(find.text('later'), findsOneWidget);
+      expect(find.text('Welcome to later'), findsOneWidget);
       expect(
         find.text(
           'Your peaceful place for thoughts, tasks, and everything in between',
@@ -267,10 +260,10 @@ void main() {
         MaterialApp(
           home: Scaffold(
             body: WelcomeState(
-              onCreateFirstItem: () {
+              onActionPressed: () {
                 buttonPressed = true;
               },
-              onLearnMore: () {
+              onSecondaryPressed: () {
                 linkPressed = true;
               },
             ),

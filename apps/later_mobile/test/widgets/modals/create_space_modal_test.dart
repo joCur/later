@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:later_mobile/core/utils/responsive_modal.dart';
 import 'package:later_mobile/data/models/space_model.dart';
 import 'package:later_mobile/data/repositories/space_repository.dart';
 import 'package:later_mobile/providers/spaces_provider.dart';
@@ -534,9 +535,11 @@ void main() {
           child: Builder(
             builder: (context) => ElevatedButton(
               onPressed: () async {
-                final result = await CreateSpaceModal.show(
-                  context,
-                  mode: SpaceModalMode.create,
+                final result = await ResponsiveModal.show<bool>(
+                  context: context,
+                  child: const CreateSpaceModal(
+                    mode: SpaceModalMode.create,
+                  ),
                 );
                 modalClosed = result == true;
               },
@@ -680,10 +683,12 @@ void main() {
           child: Builder(
             builder: (context) => ElevatedButton(
               onPressed: () async {
-                final result = await CreateSpaceModal.show(
-                  context,
-                  mode: SpaceModalMode.edit,
-                  initialSpace: existingSpace,
+                final result = await ResponsiveModal.show<bool>(
+                  context: context,
+                  child: CreateSpaceModal(
+                    mode: SpaceModalMode.edit,
+                    initialSpace: existingSpace,
+                  ),
                 );
                 modalClosed = result == true;
               },
@@ -755,9 +760,11 @@ void main() {
           child: Builder(
             builder: (context) => ElevatedButton(
               onPressed: () async {
-                await CreateSpaceModal.show(
-                  context,
-                  mode: SpaceModalMode.create,
+                await ResponsiveModal.show<bool>(
+                  context: context,
+                  child: const CreateSpaceModal(
+                    mode: SpaceModalMode.create,
+                  ),
                 );
               },
               child: const Text('Open Modal'),
@@ -786,9 +793,11 @@ void main() {
           child: Builder(
             builder: (context) => ElevatedButton(
               onPressed: () async {
-                await CreateSpaceModal.show(
-                  context,
-                  mode: SpaceModalMode.create,
+                await ResponsiveModal.show<bool>(
+                  context: context,
+                  child: const CreateSpaceModal(
+                    mode: SpaceModalMode.create,
+                  ),
                 );
               },
               child: const Text('Open Modal'),
@@ -884,9 +893,11 @@ void main() {
           child: Builder(
             builder: (context) => ElevatedButton(
               onPressed: () async {
-                await CreateSpaceModal.show(
-                  context,
-                  mode: SpaceModalMode.create,
+                await ResponsiveModal.show<bool>(
+                  context: context,
+                  child: const CreateSpaceModal(
+                    mode: SpaceModalMode.create,
+                  ),
                 );
               },
               child: const Text('Open Modal'),
@@ -916,9 +927,11 @@ void main() {
           child: Builder(
             builder: (context) => ElevatedButton(
               onPressed: () async {
-                await CreateSpaceModal.show(
-                  context,
-                  mode: SpaceModalMode.create,
+                await ResponsiveModal.show<bool>(
+                  context: context,
+                  child: const CreateSpaceModal(
+                    mode: SpaceModalMode.create,
+                  ),
                 );
               },
               child: const Text('Open Modal'),

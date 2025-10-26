@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:later_mobile/core/error/app_error.dart';
-import 'package:later_mobile/widgets/components/error/error_dialog.dart';
+import 'package:later_mobile/design_system/organisms/error/error_dialog.dart';
 
 void main() {
   group('ErrorDialog', () {

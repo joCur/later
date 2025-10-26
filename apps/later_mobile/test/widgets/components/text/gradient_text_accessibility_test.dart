@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:later_mobile/core/theme/app_colors.dart';
-import 'package:later_mobile/core/theme/app_typography.dart';
-import 'package:later_mobile/widgets/components/text/gradient_text.dart';
+import 'package:later_mobile/design_system/tokens/tokens.dart';
+import 'package:later_mobile/design_system/atoms/text/gradient_text.dart';
 
 void main() {
   group('GradientText Accessibility Tests', () {

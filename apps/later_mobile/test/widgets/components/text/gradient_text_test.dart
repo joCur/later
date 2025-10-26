@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:later_mobile/widgets/components/text/gradient_text.dart';
+import 'package:later_mobile/design_system/atoms/text/gradient_text.dart';
 
 void main() {
   group('GradientText Widget Tests', () {

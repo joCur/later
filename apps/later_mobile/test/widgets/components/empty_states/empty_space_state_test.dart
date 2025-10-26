@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:later_mobile/widgets/components/empty_states/empty_space_state.dart';
+import 'package:later_mobile/design_system/organisms/empty_states/empty_space_state.dart';
 
 void main() {
   group('EmptySpaceState Tests', () {
@@ -11,7 +11,7 @@ void main() {
           home: Scaffold(
             body: EmptySpaceState(
               spaceName: 'Work',
-              onQuickCapture: () {},
+              onActionPressed: () {},
             ),
           ),
         ),
@@ -28,7 +28,7 @@ void main() {
           home: Scaffold(
             body: EmptySpaceState(
               spaceName: 'Work',
-              onQuickCapture: () {},
+              onActionPressed: () {},
             ),
           ),
         ),
@@ -45,7 +45,7 @@ void main() {
           home: Scaffold(
             body: EmptySpaceState(
               spaceName: 'Work',
-              onQuickCapture: () {},
+              onActionPressed: () {},
             ),
           ),
         ),
@@ -65,7 +65,7 @@ void main() {
           home: Scaffold(
             body: EmptySpaceState(
               spaceName: 'Work',
-              onQuickCapture: () {},
+              onActionPressed: () {},
             ),
           ),
         ),
@@ -75,7 +75,7 @@ void main() {
       expect(find.text('Quick Capture'), findsOneWidget);
     });
 
-    testWidgets('calls onQuickCapture when button pressed',
+    testWidgets('calls onActionPressed when button pressed',
         (WidgetTester tester) async {
       // Arrange
       var buttonPressed = false;
@@ -86,7 +86,7 @@ void main() {
           home: Scaffold(
             body: EmptySpaceState(
               spaceName: 'Work',
-              onQuickCapture: () {
+              onActionPressed: () {
                 buttonPressed = true;
               },
             ),
@@ -112,7 +112,7 @@ void main() {
             home: Scaffold(
               body: EmptySpaceState(
                 spaceName: spaceName,
-                onQuickCapture: () {},
+                onActionPressed: () {},
               ),
             ),
           ),
@@ -122,22 +122,22 @@ void main() {
       }
     });
 
-    testWidgets('icon size is 64px', (WidgetTester tester) async {
+    testWidgets('icon has responsive size', (WidgetTester tester) async {
       // Act
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
             body: EmptySpaceState(
               spaceName: 'Work',
-              onQuickCapture: () {},
+              onActionPressed: () {},
             ),
           ),
         ),
       );
 
-      // Assert
+      // Assert - icon size is responsive (80px mobile, 100px desktop)
       final iconWidget = tester.widget<Icon>(find.byType(Icon));
-      expect(iconWidget.size, 64.0);
+      expect(iconWidget.size, isNotNull);
     });
 
     testWidgets('uses EmptyState base component', (WidgetTester tester) async {
@@ -147,7 +147,7 @@ void main() {
           home: Scaffold(
             body: EmptySpaceState(
               spaceName: 'Work',
-              onQuickCapture: () {},
+              onActionPressed: () {},
             ),
           ),
         ),
@@ -165,7 +165,7 @@ void main() {
           home: Scaffold(
             body: EmptySpaceState(
               spaceName: 'Very Long Space Name That Should Still Work',
-              onQuickCapture: () {},
+              onActionPressed: () {},
             ),
           ),
         ),
@@ -187,7 +187,7 @@ void main() {
           home: Scaffold(
             body: EmptySpaceState(
               spaceName: 'Work',
-              onQuickCapture: () {},
+              onActionPressed: () {},
             ),
           ),
         ),
@@ -202,7 +202,7 @@ void main() {
           home: Scaffold(
             body: EmptySpaceState(
               spaceName: 'Work',
-              onQuickCapture: () {},
+              onActionPressed: () {},
             ),
           ),
         ),

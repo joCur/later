@@ -2,17 +2,20 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
-import '../../core/theme/app_colors.dart';
-import '../../core/theme/app_typography.dart';
-import '../../core/theme/app_spacing.dart';
+import 'package:later_mobile/design_system/tokens/tokens.dart';
 import '../../data/models/list_model.dart';
 import '../../providers/content_provider.dart';
 import '../../providers/spaces_provider.dart';
-import '../components/cards/list_item_card.dart';
-import '../components/fab/responsive_fab.dart';
-import '../components/modals/bottom_sheet_container.dart';
+import 'package:later_mobile/design_system/organisms/cards/list_item_card.dart';
+import 'package:later_mobile/design_system/organisms/fab/responsive_fab.dart';
+import 'package:later_mobile/design_system/organisms/modals/bottom_sheet_container.dart';
 import '../../core/utils/responsive_modal.dart';
-import '../components/text/gradient_text.dart';
+import 'package:later_mobile/design_system/atoms/inputs/text_input_field.dart';
+import 'package:later_mobile/design_system/atoms/inputs/text_area_field.dart';
+import 'package:later_mobile/design_system/organisms/dialogs/delete_confirmation_dialog.dart';
+import 'package:later_mobile/design_system/molecules/app_bars/editable_app_bar_title.dart';
+import 'package:later_mobile/design_system/molecules/lists/dismissible_list_item.dart';
+import 'package:later_mobile/core/mixins/auto_save_mixin.dart';
 
 /// List Detail Screen for viewing and editing List with ListItems
 ///
@@ -37,16 +40,12 @@ class ListDetailScreen extends StatefulWidget {
   State<ListDetailScreen> createState() => _ListDetailScreenState();
 }
 
-class _ListDetailScreenState extends State<ListDetailScreen> {
+class _ListDetailScreenState extends State<ListDetailScreen> with AutoSaveMixin {
   // Text controllers
   late TextEditingController _nameController;
 
   // Local state
   late ListModel _currentList;
-  Timer? _debounceTimer;
-  bool _isSaving = false;
-  bool _hasChanges = false;
-  bool _isEditingName = false;
 
   @override
   void initState() {
@@ -59,35 +58,22 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
     _nameController = TextEditingController(text: widget.list.name);
 
     // Listen to text changes for auto-save
-    _nameController.addListener(_onNameChanged);
+    _nameController.addListener(() => onFieldChanged());
   }
 
   @override
+  int get autoSaveDelayMs => 500;
+
+  @override
   void dispose() {
-    _debounceTimer?.cancel();
-    _nameController.removeListener(_onNameChanged);
     _nameController.dispose();
     super.dispose();
   }
 
-  /// Handle name changes and trigger debounced save
-  void _onNameChanged() {
-    setState(() {
-      _hasChanges = true;
-    });
-
-    // Cancel previous timer
-    _debounceTimer?.cancel();
-
-    // Start new debounce timer (500ms)
-    _debounceTimer = Timer(const Duration(milliseconds: 500), () {
-      _saveChanges();
-    });
-  }
-
   /// Save changes to the list
-  Future<void> _saveChanges() async {
-    if (!_hasChanges || _isSaving) return;
+  @override
+  Future<void> saveChanges() async {
+    if (!hasChanges || isSaving) return;
 
     // Validate name
     if (_nameController.text.trim().isEmpty) {
@@ -96,7 +82,7 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
     }
 
     setState(() {
-      _isSaving = true;
+      isSaving = true;
     });
 
     try {
@@ -109,13 +95,13 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
 
       setState(() {
         _currentList = updated;
-        _hasChanges = false;
+        hasChanges = false;
       });
     } catch (e) {
       _showSnackBar('Failed to save changes: $e', isError: true);
     } finally {
       setState(() {
-        _isSaving = false;
+        isSaving = false;
       });
     }
   }
@@ -265,9 +251,6 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
 
   /// Delete the entire List
   Future<void> _deleteList() async {
-    final confirmed = await _showDeleteListConfirmation();
-    if (!confirmed || !mounted) return;
-
     try {
       final provider = Provider.of<ContentProvider>(context, listen: false);
       final spacesProvider = Provider.of<SpacesProvider>(
@@ -327,24 +310,20 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Title field
-            TextField(
+            TextInputField(
               controller: titleController,
-              decoration: const InputDecoration(
-                labelText: 'Title *',
-                hintText: 'Enter item title',
-              ),
+              label: 'Title *',
+              hintText: 'Enter item title',
               autofocus: true,
               textCapitalization: TextCapitalization.sentences,
             ),
             const SizedBox(height: AppSpacing.md),
 
             // Notes field
-            TextField(
+            TextAreaField(
               controller: notesController,
-              decoration: const InputDecoration(
-                labelText: 'Notes',
-                hintText: 'Optional notes',
-              ),
+              label: 'Notes',
+              hintText: 'Optional notes',
               maxLines: 3,
               textCapitalization: TextCapitalization.sentences,
             ),
@@ -442,60 +421,20 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
     );
   }
 
-  /// Show delete item confirmation
-  Future<bool> _showDeleteItemConfirmation(String itemTitle) async {
-    final result = await showDialog<bool>(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text('Delete Item'),
-          content: Text('Are you sure you want to delete "$itemTitle"?'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(false),
-              child: const Text('Cancel'),
-            ),
-            ElevatedButton(
-              onPressed: () => Navigator.of(context).pop(true),
-              style: ElevatedButton.styleFrom(backgroundColor: AppColors.error),
-              child: const Text('Delete'),
-            ),
-          ],
-        );
-      },
-    );
-
-    return result ?? false;
-  }
-
   /// Show delete list confirmation
-  Future<bool> _showDeleteListConfirmation() async {
-    final result = await showDialog<bool>(
+  Future<void> _showDeleteListConfirmation() async {
+    final confirmed = await showDeleteConfirmationDialog(
       context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text('Delete List'),
-          content: Text(
-            'Are you sure you want to delete "${_currentList.name}"?\n\n'
-            'This will delete all ${_currentList.items.length} items in this list. '
-            'This action cannot be undone.',
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(false),
-              child: const Text('Cancel'),
-            ),
-            ElevatedButton(
-              onPressed: () => Navigator.of(context).pop(true),
-              style: ElevatedButton.styleFrom(backgroundColor: AppColors.error),
-              child: const Text('Delete'),
-            ),
-          ],
-        );
-      },
+      title: 'Delete List',
+      message: 'Are you sure you want to delete "${_currentList.name}"?\n\n'
+          'This will delete all ${_currentList.items.length} items in this list. '
+          'This action cannot be undone.',
     );
 
-    return result ?? false;
+    if (confirmed == true && mounted) {
+      Navigator.of(context).pop(); // Return to previous screen
+      await _deleteList();
+    }
   }
 
   /// Show SnackBar message
@@ -518,7 +457,7 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
       onPopInvokedWithResult: (didPop, result) async {
         if (!didPop) {
           // Save before leaving
-          await _saveChanges();
+          await saveChanges();
           if (mounted && context.mounted) {
             Navigator.of(context).pop();
           }
@@ -537,48 +476,20 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
 
               // Editable name
               Flexible(
-                child: _isEditingName
-                    ? TextField(
-                        controller: _nameController,
-                        autofocus: true,
-                        style: AppTypography.h3,
-                        decoration: const InputDecoration(
-                          border: InputBorder.none,
-                          hintText: 'List name',
-                        ),
-                        onSubmitted: (_) {
-                          setState(() {
-                            _isEditingName = false;
-                          });
-                          _saveChanges();
-                        },
-                      )
-                    : GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            _isEditingName = true;
-                          });
-                        },
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Flexible(
-                              child: GradientText(
-                                _currentList.name,
-                                gradient: AppColors.listGradient,
-                                style: AppTypography.h3,
-                              ),
-                            ),
-                            const SizedBox(width: AppSpacing.xs),
-                            const Icon(Icons.edit, size: 16),
-                          ],
-                        ),
-                      ),
+                child: EditableAppBarTitle(
+                  text: _currentList.name,
+                  onChanged: (newName) {
+                    _nameController.text = newName;
+                    saveChanges();
+                  },
+                  gradient: AppColors.listGradient,
+                  hintText: 'List name',
+                ),
               ),
             ],
           ),
           actions: [
-            if (_isSaving)
+            if (isSaving)
               const Padding(
                 padding: EdgeInsets.all(AppSpacing.md),
                 child: SizedBox(
@@ -597,7 +508,7 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
                     _changeListIcon();
                     break;
                   case 'delete':
-                    _deleteList();
+                    _showDeleteListConfirmation();
                     break;
                 }
               },
@@ -693,28 +604,10 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
                       },
                       itemBuilder: (context, index) {
                         final item = _currentList.items[index];
-                        return Dismissible(
-                          key: ValueKey(item.id),
-                          background: Padding(
-                            padding: const EdgeInsets.only(bottom: 8.0),
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(8.0),
-                              child: Container(
-                                color: AppColors.error,
-                                alignment: Alignment.centerRight,
-                                padding: const EdgeInsets.only(right: 16.0),
-                                child: const Icon(
-                                  Icons.delete,
-                                  color: Colors.white,
-                                  size: 24,
-                                ),
-                              ),
-                            ),
-                          ),
-                          direction: DismissDirection.endToStart,
-                          confirmDismiss: (_) =>
-                              _showDeleteItemConfirmation(item.title),
-                          onDismissed: (_) => _performDeleteListItem(item),
+                        return DismissibleListItem(
+                          itemKey: ValueKey(item.id),
+                          itemName: item.title,
+                          onDelete: () => _performDeleteListItem(item),
                           child: ListItemCard(
                             listItem: item,
                             listStyle: _currentList.style,

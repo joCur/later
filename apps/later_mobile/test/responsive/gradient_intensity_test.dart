@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:later_mobile/core/theme/app_colors.dart';
-import 'package:later_mobile/widgets/components/fab/quick_capture_fab.dart';
+import 'package:later_mobile/design_system/tokens/tokens.dart';
+import 'package:later_mobile/design_system/molecules/fab/quick_capture_fab.dart';
 import 'package:hive/hive.dart';
 
 /// Responsive Behavior Test Suite: Gradient Intensity Tests

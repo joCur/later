@@ -1,6 +1,6 @@
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:later_mobile/core/theme/app_animations.dart';
+import 'package:later_mobile/design_system/tokens/tokens.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();

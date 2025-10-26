@@ -1,8 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import '../../core/theme/app_colors.dart';
-import '../../core/theme/app_animations.dart';
-import '../../core/theme/app_spacing.dart';
+import 'package:later_mobile/design_system/tokens/tokens.dart';
 
 // Design Constants
 const double _kNavBarHeight = 64.0;

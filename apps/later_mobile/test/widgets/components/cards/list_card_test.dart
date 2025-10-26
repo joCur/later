@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:later_mobile/data/models/list_model.dart';
-import 'package:later_mobile/widgets/components/cards/list_card.dart';
+import 'package:later_mobile/design_system/organisms/cards/list_card.dart';
 
 void main() {
   group('ListCard', () {

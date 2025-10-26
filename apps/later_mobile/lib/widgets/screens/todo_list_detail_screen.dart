@@ -3,17 +3,19 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import 'package:uuid/uuid.dart';
-import '../../core/theme/app_colors.dart';
-import '../../core/theme/app_typography.dart';
-import '../../core/theme/app_spacing.dart';
+import 'package:later_mobile/design_system/tokens/tokens.dart';
 import '../../core/utils/responsive_modal.dart';
 import '../../data/models/todo_list_model.dart';
 import '../../providers/content_provider.dart';
 import '../../providers/spaces_provider.dart';
-import '../components/cards/todo_item_card.dart';
-import '../components/fab/responsive_fab.dart';
-import '../components/modals/bottom_sheet_container.dart';
-import '../components/text/gradient_text.dart';
+import 'package:later_mobile/design_system/organisms/cards/todo_item_card.dart';
+import 'package:later_mobile/design_system/organisms/fab/responsive_fab.dart';
+import 'package:later_mobile/design_system/organisms/modals/bottom_sheet_container.dart';
+import 'package:later_mobile/design_system/atoms/inputs/text_input_field.dart';
+import 'package:later_mobile/design_system/atoms/inputs/text_area_field.dart';
+import 'package:later_mobile/design_system/organisms/dialogs/delete_confirmation_dialog.dart';
+import 'package:later_mobile/design_system/molecules/app_bars/editable_app_bar_title.dart';
+import 'package:later_mobile/design_system/molecules/lists/dismissible_list_item.dart';
 
 /// TodoList Detail Screen for viewing and editing TodoList with TodoItems
 ///
@@ -49,7 +51,6 @@ class _TodoListDetailScreenState extends State<TodoListDetailScreen> {
   Timer? _deletionTimer;
   bool _isSaving = false;
   bool _hasChanges = false;
-  bool _isEditingName = false;
 
   @override
   void initState() {
@@ -237,9 +238,6 @@ class _TodoListDetailScreenState extends State<TodoListDetailScreen> {
 
   /// Delete the entire TodoList
   Future<void> _deleteTodoList() async {
-    final confirmed = await _showDeleteListConfirmation();
-    if (!confirmed || !mounted) return;
-
     try {
       final provider = Provider.of<ContentProvider>(context, listen: false);
       final spacesProvider = Provider.of<SpacesProvider>(
@@ -305,12 +303,10 @@ class _TodoListDetailScreenState extends State<TodoListDetailScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Title field
-                TextField(
+                TextInputField(
                   controller: titleController,
-                  decoration: const InputDecoration(
-                    labelText: 'Title *',
-                    hintText: 'Enter task title',
-                  ),
+                  label: 'Title *',
+                  hintText: 'Enter task title',
                   autofocus: true,
                   textCapitalization: TextCapitalization.sentences,
                   onChanged: (_) {
@@ -321,12 +317,10 @@ class _TodoListDetailScreenState extends State<TodoListDetailScreen> {
                 const SizedBox(height: AppSpacing.md),
 
                 // Description field
-                TextField(
+                TextAreaField(
                   controller: descriptionController,
-                  decoration: const InputDecoration(
-                    labelText: 'Description',
-                    hintText: 'Optional description',
-                  ),
+                  label: 'Description',
+                  hintText: 'Optional description',
                   maxLines: 3,
                   textCapitalization: TextCapitalization.sentences,
                 ),
@@ -393,60 +387,20 @@ class _TodoListDetailScreenState extends State<TodoListDetailScreen> {
     );
   }
 
-  /// Show delete item confirmation
-  Future<bool> _showDeleteItemConfirmation(String itemTitle) async {
-    final result = await showDialog<bool>(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text('Delete TodoItem'),
-          content: Text('Are you sure you want to delete "$itemTitle"?'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(false),
-              child: const Text('Cancel'),
-            ),
-            ElevatedButton(
-              onPressed: () => Navigator.of(context).pop(true),
-              style: ElevatedButton.styleFrom(backgroundColor: AppColors.error),
-              child: const Text('Delete'),
-            ),
-          ],
-        );
-      },
-    );
-
-    return result ?? false;
-  }
-
   /// Show delete list confirmation
-  Future<bool> _showDeleteListConfirmation() async {
-    final result = await showDialog<bool>(
+  Future<void> _showDeleteListConfirmation() async {
+    final confirmed = await showDeleteConfirmationDialog(
       context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text('Delete TodoList'),
-          content: Text(
-            'Are you sure you want to delete "${_currentTodoList.name}"?\n\n'
-            'This will delete all ${_currentTodoList.items.length} items in this list. '
-            'This action cannot be undone.',
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(false),
-              child: const Text('Cancel'),
-            ),
-            ElevatedButton(
-              onPressed: () => Navigator.of(context).pop(true),
-              style: ElevatedButton.styleFrom(backgroundColor: AppColors.error),
-              child: const Text('Delete'),
-            ),
-          ],
-        );
-      },
+      title: 'Delete TodoList',
+      message: 'Are you sure you want to delete "${_currentTodoList.name}"?\n\n'
+          'This will delete all ${_currentTodoList.items.length} items in this list. '
+          'This action cannot be undone.',
     );
 
-    return result ?? false;
+    if (confirmed == true && mounted) {
+      Navigator.of(context).pop(); // Return to previous screen
+      await _deleteTodoList();
+    }
   }
 
   /// Show SnackBar message
@@ -489,43 +443,15 @@ class _TodoListDetailScreenState extends State<TodoListDetailScreen> {
       },
       child: Scaffold(
         appBar: AppBar(
-          title: _isEditingName
-              ? TextField(
-                  controller: _nameController,
-                  autofocus: true,
-                  style: AppTypography.h3,
-                  decoration: const InputDecoration(
-                    border: InputBorder.none,
-                    hintText: 'TodoList name',
-                  ),
-                  onSubmitted: (_) {
-                    setState(() {
-                      _isEditingName = false;
-                    });
-                    _saveChanges();
-                  },
-                )
-              : GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      _isEditingName = true;
-                    });
-                  },
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Flexible(
-                        child: GradientText(
-                          _currentTodoList.name,
-                          gradient: AppColors.taskGradient,
-                          style: AppTypography.h3,
-                        ),
-                      ),
-                      const SizedBox(width: AppSpacing.xs),
-                      const Icon(Icons.edit, size: 16),
-                    ],
-                  ),
-                ),
+          title: EditableAppBarTitle(
+            text: _currentTodoList.name,
+            onChanged: (newName) {
+              _nameController.text = newName;
+              _saveChanges();
+            },
+            gradient: AppColors.taskGradient,
+            hintText: 'TodoList name',
+          ),
           actions: [
             if (_isSaving)
               const Padding(
@@ -539,7 +465,7 @@ class _TodoListDetailScreenState extends State<TodoListDetailScreen> {
             PopupMenuButton<String>(
               onSelected: (value) {
                 if (value == 'delete') {
-                  _deleteTodoList();
+                  _showDeleteListConfirmation();
                 }
               },
               itemBuilder: (context) => [
@@ -613,28 +539,10 @@ class _TodoListDetailScreenState extends State<TodoListDetailScreen> {
                       },
                       itemBuilder: (context, index) {
                         final item = _currentTodoList.items[index];
-                        return Dismissible(
-                          key: ValueKey(item.id),
-                          background: Padding(
-                            padding: const EdgeInsets.only(bottom: 8.0),
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(8.0),
-                              child: Container(
-                                color: AppColors.error,
-                                alignment: Alignment.centerRight,
-                                padding: const EdgeInsets.only(right: 16.0),
-                                child: const Icon(
-                                  Icons.delete,
-                                  color: Colors.white,
-                                  size: 24,
-                                ),
-                              ),
-                            ),
-                          ),
-                          direction: DismissDirection.endToStart,
-                          confirmDismiss: (_) =>
-                              _showDeleteItemConfirmation(item.title),
-                          onDismissed: (_) => _performDeleteTodoItem(item),
+                        return DismissibleListItem(
+                          itemKey: ValueKey(item.id),
+                          itemName: item.title,
+                          onDelete: () => _performDeleteTodoItem(item),
                           child: TodoItemCard(
                             todoItem: item,
                             onCheckboxChanged: (value) => _toggleTodoItem(item),

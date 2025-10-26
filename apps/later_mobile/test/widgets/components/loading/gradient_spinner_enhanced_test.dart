@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:later_mobile/widgets/components/loading/gradient_spinner.dart';
+import 'package:later_mobile/design_system/atoms/loading/gradient_spinner.dart';
 
 void main() {
   group('GradientSpinner - Enhanced Features', () {

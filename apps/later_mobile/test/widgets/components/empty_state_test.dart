@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:later_mobile/widgets/components/empty_state.dart';
-import 'package:later_mobile/core/theme/app_colors.dart';
+import 'package:later_mobile/design_system/organisms/empty_states/empty_state.dart';
+import 'package:later_mobile/design_system/tokens/tokens.dart';
 
 void main() {
   group('EmptyState Widget Tests', () {

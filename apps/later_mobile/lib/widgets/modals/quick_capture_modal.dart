@@ -4,14 +4,13 @@ import 'dart:ui' show ImageFilter;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:later_mobile/design_system/atoms/buttons/ghost_button.dart';
+import 'package:later_mobile/design_system/atoms/inputs/text_area_field.dart';
+import 'package:later_mobile/design_system/tokens/tokens.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../core/responsive/breakpoints.dart';
-import '../../core/theme/app_animations.dart';
-import '../../core/theme/app_colors.dart';
-import '../../core/theme/app_spacing.dart';
-import '../../core/theme/app_typography.dart';
 import '../../core/utils/item_type_detector.dart';
 import '../../data/models/item_model.dart';
 import '../../data/models/list_model.dart';
@@ -291,11 +290,7 @@ class _QuickCaptureModalState extends State<QuickCaptureModal>
             break;
 
           case ContentType.note:
-            final note = Item(
-              id: id,
-              title: text,
-              spaceId: targetSpaceId,
-            );
+            final note = Item(id: id, title: text, spaceId: targetSpaceId);
             await contentProvider.createNote(note, spacesProvider);
             _currentItemId = id;
             break;
@@ -330,7 +325,6 @@ class _QuickCaptureModalState extends State<QuickCaptureModal>
       });
     }
   }
-
 
   Future<void> _handleKeyEvent(KeyEvent event) async {
     if (event is KeyDownEvent) {
@@ -449,24 +443,14 @@ class _QuickCaptureModalState extends State<QuickCaptureModal>
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    TextButton(
+                    GhostButton(
+                      text: 'Discard',
                       onPressed: () => Navigator.of(context).pop(false),
-                      child: Text(
-                        'Discard',
-                        style: TextStyle(
-                          color: isDark
-                              ? AppColors.textSecondaryDark
-                              : AppColors.textSecondaryLight,
-                        ),
-                      ),
                     ),
                     const SizedBox(width: AppSpacing.xs),
-                    TextButton(
+                    GhostButton(
+                      text: 'Save',
                       onPressed: () => Navigator.of(context).pop(true),
-                      child: const Text(
-                        'Save',
-                        style: TextStyle(color: AppColors.primaryAmber),
-                      ),
                     ),
                   ],
                 ),
@@ -710,100 +694,19 @@ class _QuickCaptureModalState extends State<QuickCaptureModal>
   }
 
   Widget _buildInputField() {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     final isMobile = context.isMobile;
-    final primaryGradient = isDark
-        ? AppColors.primaryGradientDark
-        : AppColors.primaryGradient;
 
     return Padding(
       padding: EdgeInsets.symmetric(
         horizontal: isMobile ? AppSpacing.lg : AppSpacing.md, // 24px on mobile
       ),
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(
-            12.0,
-          ), // 12px for mobile-first design
-          gradient: _focusNode.hasFocus
-              ? LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    primaryGradient.colors[0].withValues(alpha: 0.1),
-                    primaryGradient.colors[1].withValues(alpha: 0.1),
-                  ],
-                )
-              : null,
-          boxShadow: _focusNode.hasFocus
-              ? [
-                  BoxShadow(
-                    color: primaryGradient.colors[0].withValues(alpha: 0.2),
-                    blurRadius: 8,
-                    offset: const Offset(0, 2),
-                  ),
-                ]
-              : null,
-        ),
-        child: TextField(
-          key: const Key('capture_input'),
-          controller: _textController,
-          focusNode: _focusNode,
-          autofocus: true,
-          minLines: 3,
-          maxLines: 10,
-          keyboardType: TextInputType.multiline,
-          textInputAction: TextInputAction.newline,
-          style: AppTypography.input.copyWith(
-            color: isDark
-                ? AppColors.textPrimaryDark
-                : AppColors.textPrimaryLight,
-          ),
-          decoration: InputDecoration(
-            hintText: 'What\'s on your mind?',
-            hintStyle: AppTypography.input.copyWith(
-              color: isDark
-                  ? AppColors.textSecondaryDark
-                  : AppColors.textSecondaryLight,
-            ),
-            filled: true,
-            fillColor: _focusNode.hasFocus
-                ? (isDark
-                          ? AppColors.surfaceDarkVariant
-                          : AppColors.surfaceLightVariant)
-                      .withValues(alpha: 0.5)
-                : (isDark
-                      ? AppColors.surfaceDarkVariant
-                      : AppColors.surfaceLightVariant),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(
-                12.0,
-              ), // 12px for mobile-first design
-              borderSide: BorderSide(
-                width: 2.0, // 2px solid border (mobile-first design)
-                color: isDark ? AppColors.borderDark : AppColors.borderLight,
-              ),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12.0),
-              borderSide: BorderSide(
-                width: 2.0, // 2px solid border
-                color: isDark ? AppColors.borderDark : AppColors.borderLight,
-              ),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12.0),
-              borderSide: BorderSide(
-                width: 2.0, // 2px gradient border on focus
-                color: primaryGradient.colors[0],
-              ),
-            ),
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 16.0, // 16px horizontal padding (mobile-first design)
-              vertical: 12.0, // 12px vertical padding
-            ),
-          ),
-        ),
+      child: TextAreaField(
+        key: const Key('capture_input'),
+        controller: _textController,
+        focusNode: _focusNode,
+        autofocus: true,
+        maxLines: 10,
+        hintText: 'What\'s on your mind?',
       ),
     );
   }

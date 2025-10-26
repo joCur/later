@@ -2,12 +2,10 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import '../../core/theme/app_animations.dart';
-import '../../core/theme/app_colors.dart';
-import '../../core/theme/app_spacing.dart';
+import 'package:later_mobile/design_system/tokens/tokens.dart';
 import '../../data/models/space_model.dart';
 import '../../providers/spaces_provider.dart';
-import '../components/buttons/theme_toggle_button.dart';
+import 'package:later_mobile/design_system/atoms/buttons/theme_toggle_button.dart';
 
 /// Desktop sidebar navigation component
 ///

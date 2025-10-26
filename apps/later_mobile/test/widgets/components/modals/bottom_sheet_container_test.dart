@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:later_mobile/widgets/components/modals/bottom_sheet_container.dart';
+import 'package:later_mobile/design_system/organisms/modals/bottom_sheet_container.dart';
 
 void main() {
   group('BottomSheetContainer', () {

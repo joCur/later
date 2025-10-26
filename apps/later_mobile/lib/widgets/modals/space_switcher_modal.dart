@@ -1,15 +1,14 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import '../../core/responsive/breakpoints.dart';
-import '../../core/theme/app_animations.dart';
-import '../../core/theme/app_colors.dart';
-import '../../core/theme/app_spacing.dart';
-import '../../core/theme/app_typography.dart';
+import 'package:later_mobile/design_system/tokens/tokens.dart';
+import '../../core/utils/responsive_modal.dart';
 import '../../data/models/space_model.dart';
 import '../../providers/spaces_provider.dart';
 import 'create_space_modal.dart';
+import 'package:later_mobile/design_system/atoms/inputs/text_input_field.dart';
+import 'package:later_mobile/design_system/atoms/buttons/primary_button.dart';
+import 'package:later_mobile/design_system/organisms/modals/bottom_sheet_container.dart';
 
 /// Space switcher modal that allows users to switch between spaces and create new spaces.
 ///
@@ -27,26 +26,6 @@ import 'create_space_modal.dart';
 /// - Accessibility support (semantic labels, screen reader)
 class SpaceSwitcherModal extends StatefulWidget {
   const SpaceSwitcherModal({super.key});
-
-  /// Shows the space switcher modal with responsive layout
-  ///
-  /// Returns true if a space was switched, false if cancelled
-  static Future<bool?> show(BuildContext context) async {
-    final isDesktop = Breakpoints.isDesktopOrLarger(context);
-
-    if (isDesktop) {
-      return showDialog<bool>(
-        context: context,
-        builder: (_) => const SpaceSwitcherModal(),
-      );
-    } else {
-      return showModalBottomSheet<bool>(
-        context: context,
-        isScrollControlled: true,
-        builder: (_) => const SpaceSwitcherModal(),
-      );
-    }
-  }
 
   @override
   State<SpaceSwitcherModal> createState() => _SpaceSwitcherModalState();
@@ -196,47 +175,17 @@ class _SpaceSwitcherModalState extends State<SpaceSwitcherModal> {
 
   /// Build search field
   Widget _buildSearchField(bool isDark) {
-    return TextField(
+    return TextInputField(
       controller: _searchController,
       focusNode: _searchFocusNode,
-      decoration: InputDecoration(
-        hintText: 'Search spaces...',
-        prefixIcon: Icon(
-          Icons.search,
-          color: isDark
-              ? AppColors.textSecondaryDark
-              : AppColors.textSecondaryLight,
-        ),
-        suffixIcon: _searchController.text.isNotEmpty
-            ? IconButton(
-                icon: Icon(
-                  Icons.clear,
-                  color: isDark
-                      ? AppColors.textSecondaryDark
-                      : AppColors.textSecondaryLight,
-                ),
-                onPressed: () {
-                  _searchController.clear();
-                },
-                tooltip: 'Clear search',
-              )
-            : null,
-        filled: true,
-        fillColor: isDark
-            ? AppColors.surfaceDarkVariant
-            : AppColors.surfaceLightVariant,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
-          borderSide: BorderSide.none,
-        ),
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.inputPaddingHorizontal,
-          vertical: AppSpacing.inputPaddingVertical,
-        ),
-      ),
-      style: AppTypography.bodyMedium.copyWith(
-        color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
-      ),
+      hintText: 'Search spaces...',
+      prefixIcon: Icons.search,
+      suffixIcon: _searchController.text.isNotEmpty ? Icons.clear : null,
+      onSuffixIconPressed: _searchController.text.isNotEmpty
+          ? () {
+              _searchController.clear();
+            }
+          : null,
       textInputAction: TextInputAction.search,
       onSubmitted: (_) {
         // Move focus to list for keyboard navigation
@@ -648,10 +597,12 @@ class _SpaceSwitcherModalState extends State<SpaceSwitcherModal> {
   /// Handle edit space action
   Future<void> _handleEditSpace(BuildContext context, Space space) async {
     // Open CreateSpaceModal in edit mode
-    final result = await CreateSpaceModal.show(
-      context,
-      mode: SpaceModalMode.edit,
-      initialSpace: space,
+    final result = await ResponsiveModal.show<bool>(
+      context: context,
+      child: CreateSpaceModal(
+        mode: SpaceModalMode.edit,
+        initialSpace: space,
+      ),
     );
 
     // If space was updated, the provider will have been updated automatically
@@ -831,12 +782,16 @@ class _SpaceSwitcherModalState extends State<SpaceSwitcherModal> {
               ),
             ],
           ),
-          child: ElevatedButton.icon(
+          child: PrimaryButton(
+            text: 'Create New Space',
+            icon: Icons.add,
             onPressed: () async {
               // Show create space modal
-              final result = await CreateSpaceModal.show(
-                context,
-                mode: SpaceModalMode.create,
+              final result = await ResponsiveModal.show<bool>(
+                context: context,
+                child: const CreateSpaceModal(
+                  mode: SpaceModalMode.create,
+                ),
               );
 
               // If space was created, close this modal and return true
@@ -845,203 +800,116 @@ class _SpaceSwitcherModalState extends State<SpaceSwitcherModal> {
                 Navigator.of(context).pop(true);
               }
             },
-            icon: const Icon(Icons.add),
-            label: const Text('Create New Space'),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.transparent,
-              foregroundColor: Colors.white,
-              shadowColor: Colors.transparent,
-              minimumSize: const Size(double.infinity, AppSpacing.minTouchTarget),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
-              ),
-            ),
+            isExpanded: true,
           ),
         ),
       ),
     );
   }
 
-  /// Build modal content
-  Widget _buildContent(BuildContext context, SpacesProvider spacesProvider) {
+  /// Build space list view
+  Widget _buildSpaceList(BuildContext context, String currentSpaceId, bool isDark) {
+    return _filteredSpaces.isEmpty
+        ? Padding(
+            padding: const EdgeInsets.all(AppSpacing.md),
+            child: Center(
+              child: Text(
+                _searchController.text.isNotEmpty
+                    ? 'No spaces found'
+                    : 'No spaces available',
+                style: AppTypography.bodyMedium.copyWith(
+                  color: isDark
+                      ? AppColors.textSecondaryDark
+                      : AppColors.textSecondaryLight,
+                ),
+              ),
+            ),
+          )
+        : ListView.separated(
+            shrinkWrap: true,
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.sm,
+              vertical: AppSpacing.xs,
+            ),
+            itemCount: _filteredSpaces.length,
+            separatorBuilder: (context, index) =>
+                const SizedBox(height: AppSpacing.xxxs),
+            itemBuilder: (context, index) {
+              final space = _filteredSpaces[index];
+              final isSelected = space.id == currentSpaceId;
+              final isKeyboardSelected = index == _selectedIndex;
+
+              return _buildSpaceItem(
+                context: context,
+                space: space,
+                isSelected: isSelected,
+                isKeyboardSelected: isKeyboardSelected,
+                onTap: () => _selectSpace(space, currentSpaceId),
+                index: index,
+              );
+            },
+          );
+  }
+
+  /// Build modal content (for BottomSheetContainer child)
+  Widget _buildModalContent(BuildContext context, SpacesProvider spacesProvider) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final currentSpaceId = spacesProvider.currentSpace?.id ?? '';
     final allSpaces = spacesProvider.spaces;
     _filteredSpaces = _getFilteredSpaces(allSpaces);
-    final isDesktop = context.isDesktopOrLarger;
 
     return Focus(
       focusNode: _listFocusNode,
       onKeyEvent: (node, event) {
         return _handleKeyEvent(node, event, _filteredSpaces, currentSpaceId);
       },
-      child: ClipRRect(
-        borderRadius: isDesktop
-            ? BorderRadius.circular(AppSpacing.modalRadius)
-            : const BorderRadius.vertical(
-                top: Radius.circular(AppSpacing.modalRadius),
-              ),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-          child: Container(
-            constraints: BoxConstraints(
-              maxHeight: MediaQuery.of(context).size.height * 0.8,
-              maxWidth: isDesktop ? 500 : double.infinity,
-            ),
-            decoration: BoxDecoration(
-              color: isDark
-                  ? AppColors.glassDark
-                  : AppColors.glassLight,
-              borderRadius: isDesktop
-                  ? BorderRadius.circular(AppSpacing.modalRadius)
-                  : const BorderRadius.vertical(
-                      top: Radius.circular(AppSpacing.modalRadius),
-                    ),
-              border: Border.all(
-                color: isDark
-                    ? AppColors.glassBorderDark
-                    : AppColors.glassBorderLight,
-              ),
-            ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            // Header
-            Padding(
-              padding: const EdgeInsets.all(AppSpacing.sm),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      'Switch Space',
-                      style: AppTypography.h4.copyWith(
-                        color: isDark
-                            ? AppColors.textPrimaryDark
-                            : AppColors.textPrimaryLight,
-                      ),
-                    ),
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.close),
-                    onPressed: () => Navigator.of(context).pop(false),
-                    tooltip: 'Close',
-                    color: isDark
-                        ? AppColors.textSecondaryDark
-                        : AppColors.textSecondaryLight,
-                  ),
-                ],
-              ),
-            ),
-
-            // Search field
-            Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.sm,
-              ),
-              child: _buildSearchField(isDark),
-            ),
-
-            const SizedBox(height: AppSpacing.sm),
-
-            // Divider
-            Divider(
-              height: 1,
-              color: isDark ? AppColors.borderDark : AppColors.borderLight,
-            ),
-
-            // Space list
-            Flexible(
-              child: _filteredSpaces.isEmpty
-                  ? Padding(
-                      padding: const EdgeInsets.all(AppSpacing.md),
-                      child: Center(
-                        child: Text(
-                          _searchController.text.isNotEmpty
-                              ? 'No spaces found'
-                              : 'No spaces available',
-                          style: AppTypography.bodyMedium.copyWith(
-                            color: isDark
-                                ? AppColors.textSecondaryDark
-                                : AppColors.textSecondaryLight,
-                          ),
-                        ),
-                      ),
-                    )
-                  : ListView.separated(
-                      shrinkWrap: true,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: AppSpacing.sm,
-                        vertical: AppSpacing.xs,
-                      ),
-                      itemCount: _filteredSpaces.length,
-                      separatorBuilder: (context, index) =>
-                          const SizedBox(height: AppSpacing.xxxs),
-                      itemBuilder: (context, index) {
-                        final space = _filteredSpaces[index];
-                        final isSelected = space.id == currentSpaceId;
-                        final isKeyboardSelected = index == _selectedIndex;
-
-                        return _buildSpaceItem(
-                          context: context,
-                          space: space,
-                          isSelected: isSelected,
-                          isKeyboardSelected: isKeyboardSelected,
-                          onTap: () => _selectSpace(space, currentSpaceId),
-                          index: index,
-                        );
-                      },
-                    ),
-            ),
-
-            // Divider
-            Divider(
-              height: 1,
-              color: isDark ? AppColors.borderDark : AppColors.borderLight,
-            ),
-
-            // Show archived toggle
-            _buildShowArchivedToggle(isDark),
-
-            // Divider
-            Divider(
-              height: 1,
-              color: isDark ? AppColors.borderDark : AppColors.borderLight,
-            ),
-
-            // Create space button
-            _buildCreateSpaceButton(isDark),
-
-            // Bottom padding for mobile (safe area + keyboard)
-            if (!isDesktop)
-              SizedBox(
-                height: MediaQuery.of(context).padding.bottom +
-                    MediaQuery.of(context).viewInsets.bottom,
-              ),
-          ],
-        ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // Search field
+          Padding(
+            padding: const EdgeInsets.only(bottom: AppSpacing.md),
+            child: _buildSearchField(isDark),
           ),
-        ),
+
+          // Space list
+          Flexible(
+            child: _buildSpaceList(context, currentSpaceId, isDark),
+          ),
+
+          const SizedBox(height: AppSpacing.sm),
+
+          // Divider
+          Divider(
+            height: 1,
+            color: isDark ? AppColors.borderDark : AppColors.borderLight,
+          ),
+
+          // Show archived toggle
+          _buildShowArchivedToggle(isDark),
+
+          // Divider
+          Divider(
+            height: 1,
+            color: isDark ? AppColors.borderDark : AppColors.borderLight,
+          ),
+
+          // Create space button
+          _buildCreateSpaceButton(isDark),
+        ],
       ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    final isDesktop = context.isDesktopOrLarger;
-
     return Consumer<SpacesProvider>(
       builder: (context, spacesProvider, child) {
-        if (isDesktop) {
-          // Desktop: Dialog
-          return Dialog(
-            backgroundColor: Colors.transparent,
-            child: _buildContent(context, spacesProvider),
-          );
-        } else {
-          // Mobile: Bottom sheet
-          return _buildContent(context, spacesProvider);
-        }
+        return BottomSheetContainer(
+          title: 'Switch Space',
+          showSecondaryButton: false,
+          child: _buildModalContent(context, spacesProvider),
+        );
       },
     );
   }

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:later_mobile/widgets/components/buttons/ghost_button.dart';
-import 'package:later_mobile/core/theme/app_spacing.dart';
+import 'package:later_mobile/design_system/atoms/buttons/ghost_button.dart';
+import 'package:later_mobile/design_system/tokens/tokens.dart';
 
 void main() {
   group('GhostButton', () {

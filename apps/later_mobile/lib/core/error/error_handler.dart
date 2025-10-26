@@ -2,8 +2,8 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'app_error.dart';
 import 'error_logger.dart';
-import '../../widgets/components/error/error_dialog.dart';
-import '../../widgets/components/error/error_snackbar.dart';
+import 'package:later_mobile/design_system/organisms/error/error_dialog.dart';
+import 'package:later_mobile/design_system/organisms/error/error_snackbar.dart';
 
 /// Global error handler for the application.
 ///
