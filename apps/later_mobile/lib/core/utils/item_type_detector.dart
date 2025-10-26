@@ -1,7 +1,19 @@
-import '../../data/models/item_model.dart';
+/// Smart type detection utility for automatically classifying content
+/// based on content heuristics for the dual-model architecture.
+///
+/// Detects whether content should be:
+/// - TodoList: Actionable tasks with checkboxes
+/// - List: Reference collections (shopping lists, watch lists, etc.)
+/// - Note: Free-form documentation
+library;
 
-/// Smart type detection utility for automatically classifying items
-/// based on content heuristics.
+/// Content type enum for dual-model architecture
+enum ContentType {
+  todoList,
+  list,
+  note,
+}
+
 class ItemTypeDetector {
   // Scoring weights
   static const double _checkboxScore = 3.0;
@@ -112,14 +124,14 @@ class ItemTypeDetector {
   // Multiple newlines pattern
   static final _multipleNewlinesPattern = RegExp(r'\n\s*\n');
 
-  /// Detects the most likely item type based on content.
+  /// Detects the most likely content type based on content.
   ///
   /// Uses heuristics to analyze the content and determine if it's a
-  /// task, note, or list. Returns [ItemType.note] as the default for
+  /// TodoList, List, or Note. Returns [ContentType.note] as the default for
   /// ambiguous content.
-  static ItemType detectType(String content) {
+  static ContentType detectType(String content) {
     if (content.trim().isEmpty) {
-      return ItemType.note;
+      return ContentType.note;
     }
 
     final taskScore = _calculateTaskScore(content);
@@ -128,11 +140,11 @@ class ItemTypeDetector {
 
     // Return the type with the highest score
     if (listScore > taskScore && listScore > noteScore) {
-      return ItemType.list;
+      return ContentType.list;
     } else if (taskScore > noteScore) {
-      return ItemType.task;
+      return ContentType.todoList;
     } else {
-      return ItemType.note;
+      return ContentType.note;
     }
   }
 
@@ -141,9 +153,9 @@ class ItemTypeDetector {
   /// Higher scores indicate stronger confidence in the type classification.
   /// The confidence is based on how much stronger the detected type is
   /// compared to other types.
-  static double getConfidence(String content, ItemType type) {
+  static double getConfidence(String content, ContentType type) {
     if (content.trim().isEmpty) {
-      return type == ItemType.note ? 0.5 : 0.0;
+      return type == ContentType.note ? 0.5 : 0.0;
     }
 
     final taskScore = _calculateTaskScore(content);
@@ -152,18 +164,18 @@ class ItemTypeDetector {
 
     final totalScore = taskScore + listScore + noteScore;
     if (totalScore == 0) {
-      return type == ItemType.note ? 0.5 : 0.0;
+      return type == ContentType.note ? 0.5 : 0.0;
     }
 
     double typeScore;
     switch (type) {
-      case ItemType.task:
+      case ContentType.todoList:
         typeScore = taskScore;
         break;
-      case ItemType.list:
+      case ContentType.list:
         typeScore = listScore;
         break;
-      case ItemType.note:
+      case ContentType.note:
         typeScore = noteScore;
         break;
     }

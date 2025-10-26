@@ -1,99 +1,98 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:later_mobile/core/utils/item_type_detector.dart';
-import 'package:later_mobile/data/models/item_model.dart';
 
 void main() {
   group('ItemTypeDetector - detectType', () {
     group('Task Detection', () {
       test('should detect task with action verb at start', () {
         expect(ItemTypeDetector.detectType('Buy milk tomorrow'),
-            ItemType.task);
-        expect(ItemTypeDetector.detectType('Call mom at 5pm'), ItemType.task);
+            ContentType.todoList);
+        expect(ItemTypeDetector.detectType('Call mom at 5pm'), ContentType.todoList);
         expect(ItemTypeDetector.detectType('Send email to team ASAP'),
-            ItemType.task);
+            ContentType.todoList);
         expect(ItemTypeDetector.detectType('Schedule dentist appointment'),
-            ItemType.task);
+            ContentType.todoList);
       });
 
       test('should detect task with checkbox syntax', () {
         expect(
-            ItemTypeDetector.detectType('[ ] Complete the report'), ItemType.task);
+            ItemTypeDetector.detectType('[ ] Complete the report'), ContentType.todoList);
         expect(
-            ItemTypeDetector.detectType('[x] Finish homework'), ItemType.task);
-        expect(ItemTypeDetector.detectType('[] Buy groceries'), ItemType.task);
+            ItemTypeDetector.detectType('[x] Finish homework'), ContentType.todoList);
+        expect(ItemTypeDetector.detectType('[] Buy groceries'), ContentType.todoList);
       });
 
       test('should detect task with time/date indicators', () {
         expect(ItemTypeDetector.detectType('Meeting tomorrow at 3pm'),
-            ItemType.task);
+            ContentType.todoList);
         expect(
-            ItemTypeDetector.detectType('Call next week'), ItemType.task);
-        expect(ItemTypeDetector.detectType('Submit by Friday'), ItemType.task);
+            ItemTypeDetector.detectType('Call next week'), ContentType.todoList);
+        expect(ItemTypeDetector.detectType('Submit by Friday'), ContentType.todoList);
       });
 
       test('should detect task with priority indicators', () {
         expect(ItemTypeDetector.detectType('URGENT: Review document'),
-            ItemType.task);
+            ContentType.todoList);
         expect(ItemTypeDetector.detectType('Important meeting today'),
-            ItemType.task);
-        expect(ItemTypeDetector.detectType('Call client asap'), ItemType.task);
+            ContentType.todoList);
+        expect(ItemTypeDetector.detectType('Call client asap'), ContentType.todoList);
       });
 
       test('should detect task with multiple action verbs', () {
         expect(ItemTypeDetector.detectType('Write and send report'),
-            ItemType.task);
-        expect(ItemTypeDetector.detectType('Read book'), ItemType.task);
-        expect(ItemTypeDetector.detectType('Complete project'), ItemType.task);
-        expect(ItemTypeDetector.detectType('Start workout'), ItemType.task);
-        expect(ItemTypeDetector.detectType('Update database'), ItemType.task);
-        expect(ItemTypeDetector.detectType('Delete old files'), ItemType.task);
-        expect(ItemTypeDetector.detectType('Create presentation'), ItemType.task);
-        expect(ItemTypeDetector.detectType('Book flight tickets'), ItemType.task);
-        expect(ItemTypeDetector.detectType('Email team updates'), ItemType.task);
-        expect(ItemTypeDetector.detectType('Finish coding task'), ItemType.task);
+            ContentType.todoList);
+        expect(ItemTypeDetector.detectType('Read book'), ContentType.todoList);
+        expect(ItemTypeDetector.detectType('Complete project'), ContentType.todoList);
+        expect(ItemTypeDetector.detectType('Start workout'), ContentType.todoList);
+        expect(ItemTypeDetector.detectType('Update database'), ContentType.todoList);
+        expect(ItemTypeDetector.detectType('Delete old files'), ContentType.todoList);
+        expect(ItemTypeDetector.detectType('Create presentation'), ContentType.todoList);
+        expect(ItemTypeDetector.detectType('Book flight tickets'), ContentType.todoList);
+        expect(ItemTypeDetector.detectType('Email team updates'), ContentType.todoList);
+        expect(ItemTypeDetector.detectType('Finish coding task'), ContentType.todoList);
       });
 
       test('should detect short imperative sentences as tasks', () {
-        expect(ItemTypeDetector.detectType('Get groceries'), ItemType.task);
-        expect(ItemTypeDetector.detectType('Fix bug'), ItemType.task);
+        expect(ItemTypeDetector.detectType('Get groceries'), ContentType.todoList);
+        expect(ItemTypeDetector.detectType('Fix bug'), ContentType.todoList);
       });
     });
 
     group('List Detection', () {
       test('should detect list with bullet points', () {
         expect(ItemTypeDetector.detectType('- Milk\n- Eggs\n- Bread'),
-            ItemType.list);
+            ContentType.list);
         expect(ItemTypeDetector.detectType('* Apples\n* Oranges\n* Bananas'),
-            ItemType.list);
+            ContentType.list);
         expect(ItemTypeDetector.detectType('• Item 1\n• Item 2\n• Item 3'),
-            ItemType.list);
+            ContentType.list);
       });
 
       test('should detect list with numbered items', () {
         expect(ItemTypeDetector.detectType('1. Wake up\n2. Exercise\n3. Breakfast'),
-            ItemType.list);
+            ContentType.list);
         expect(ItemTypeDetector.detectType('1) First item\n2) Second item'),
-            ItemType.list);
+            ContentType.list);
       });
 
       test('should detect list with keywords', () {
         expect(ItemTypeDetector.detectType('Shopping list:\n- Milk\n- Eggs'),
-            ItemType.list);
+            ContentType.list);
         expect(ItemTypeDetector.detectType('TODO:\n- Task 1\n- Task 2'),
-            ItemType.list);
+            ContentType.list);
         expect(ItemTypeDetector.detectType('Things to buy:\napples\noranges'),
-            ItemType.list);
+            ContentType.list);
       });
 
       test('should detect list with multiple short items', () {
         expect(ItemTypeDetector.detectType('Milk\nEggs\nBread\nButter'),
-            ItemType.list);
+            ContentType.list);
       });
 
       test('should detect list with mixed patterns', () {
         expect(
             ItemTypeDetector.detectType('Items to pack:\n- Clothes\n- Shoes\n- Toiletries'),
-            ItemType.list);
+            ContentType.list);
       });
     });
 
@@ -103,7 +102,7 @@ void main() {
             ItemTypeDetector.detectType(
                 'This is a longer piece of text that contains multiple sentences. '
                 'It\'s more narrative in nature and doesn\'t have a clear action or list structure.'),
-            ItemType.note);
+            ContentType.note);
       });
 
       test('should detect note with multiple sentences', () {
@@ -111,7 +110,7 @@ void main() {
             ItemTypeDetector.detectType(
                 'Meeting notes: We discussed the project timeline and agreed on the deliverables. '
                 'Everyone was aligned on the next steps.'),
-            ItemType.note);
+            ContentType.note);
       });
 
       test('should detect note with paragraphs', () {
@@ -119,37 +118,37 @@ void main() {
             ItemTypeDetector.detectType(
                 'Random thought I had about improving the workflow.\n\n'
                 'This could really help with productivity.'),
-            ItemType.note);
+            ContentType.note);
       });
 
       test('should default to note for unclear patterns', () {
         expect(ItemTypeDetector.detectType('Just a random thought'),
-            ItemType.note);
+            ContentType.note);
       });
     });
 
     group('Edge Cases', () {
       test('should handle empty string', () {
-        expect(ItemTypeDetector.detectType(''), ItemType.note);
+        expect(ItemTypeDetector.detectType(''), ContentType.note);
       });
 
       test('should handle single word', () {
-        expect(ItemTypeDetector.detectType('Hello'), ItemType.note);
+        expect(ItemTypeDetector.detectType('Hello'), ContentType.note);
       });
 
       test('should handle whitespace only', () {
-        expect(ItemTypeDetector.detectType('   \n  \t  '), ItemType.note);
+        expect(ItemTypeDetector.detectType('   \n  \t  '), ContentType.note);
       });
 
       test('should handle mixed patterns preferring strongest signal', () {
         // List pattern is stronger than action verb in this case
         expect(
             ItemTypeDetector.detectType('Buy these items:\n- Milk\n- Eggs'),
-            ItemType.list);
+            ContentType.list);
       });
 
       test('should detect task over note for short action verb sentences', () {
-        expect(ItemTypeDetector.detectType('Buy milk'), ItemType.task);
+        expect(ItemTypeDetector.detectType('Buy milk'), ContentType.todoList);
       });
     });
   });
@@ -157,13 +156,13 @@ void main() {
   group('ItemTypeDetector - getConfidence', () {
     test('should return high confidence for clear task patterns', () {
       final confidence =
-          ItemTypeDetector.getConfidence('Buy milk tomorrow', ItemType.task);
+          ItemTypeDetector.getConfidence('Buy milk tomorrow', ContentType.todoList);
       expect(confidence, greaterThan(0.7));
     });
 
     test('should return high confidence for clear list patterns', () {
       final confidence = ItemTypeDetector.getConfidence(
-          '- Milk\n- Eggs\n- Bread', ItemType.list);
+          '- Milk\n- Eggs\n- Bread', ContentType.list);
       expect(confidence, greaterThan(0.7));
     });
 
@@ -171,26 +170,26 @@ void main() {
       final confidence = ItemTypeDetector.getConfidence(
           'This is a very long piece of narrative text that clearly looks like a note. '
           'It has multiple sentences and a descriptive tone.',
-          ItemType.note);
+          ContentType.note);
       expect(confidence, greaterThan(0.7));
     });
 
     test('should return lower confidence for ambiguous content', () {
       final confidence =
-          ItemTypeDetector.getConfidence('Hello world', ItemType.note);
+          ItemTypeDetector.getConfidence('Hello world', ContentType.note);
       expect(confidence, lessThan(0.7));
     });
 
     test('should return confidence between 0.0 and 1.0', () {
       final confidence =
-          ItemTypeDetector.getConfidence('Some text', ItemType.note);
+          ItemTypeDetector.getConfidence('Some text', ContentType.note);
       expect(confidence, greaterThanOrEqualTo(0.0));
       expect(confidence, lessThanOrEqualTo(1.0));
     });
 
     test('should return low confidence for wrong type', () {
       final confidence = ItemTypeDetector.getConfidence(
-          '- Milk\n- Eggs', ItemType.task);
+          '- Milk\n- Eggs', ContentType.todoList);
       expect(confidence, lessThan(0.5));
     });
   });

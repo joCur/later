@@ -1,6 +1,8 @@
 import 'package:hive_flutter/hive_flutter.dart';
 import '../models/item_model.dart';
 import '../models/space_model.dart';
+import '../models/todo_list_model.dart';
+import '../models/list_model.dart';
 
 /// Wrapper for Hive database operations
 /// Provides a clean interface for box management and initialization
@@ -12,33 +14,71 @@ class HiveDatabase {
   static final HiveDatabase _instance = HiveDatabase._internal();
 
   // Box names
-  static const String itemsBoxName = 'items';
+  static const String notesBoxName = 'notes';
+  static const String todoListsBoxName = 'todo_lists';
+  static const String listsBoxName = 'lists';
   static const String spacesBoxName = 'spaces';
 
   /// Initialize Hive and register adapters
   /// Must be called before using any Hive operations
   static Future<void> initialize() async {
-    // Initialize Hive with Flutter support
-    await Hive.initFlutter();
+    try {
+      // Initialize Hive with Flutter support
+      await Hive.initFlutter();
 
-    // Register type adapters
-    if (!Hive.isAdapterRegistered(0)) {
-      Hive.registerAdapter(ItemTypeAdapter());
-    }
-    if (!Hive.isAdapterRegistered(1)) {
-      Hive.registerAdapter(ItemAdapter());
-    }
-    if (!Hive.isAdapterRegistered(2)) {
-      Hive.registerAdapter(SpaceAdapter());
-    }
+      // Register type adapters for Item (Note) model
+      if (!Hive.isAdapterRegistered(1)) {
+        Hive.registerAdapter(ItemAdapter());
+      }
 
-    // Open boxes
-    await Hive.openBox<Item>(itemsBoxName);
-    await Hive.openBox<Space>(spacesBoxName);
+      // Register type adapters for Space model
+      if (!Hive.isAdapterRegistered(2)) {
+        Hive.registerAdapter(SpaceAdapter());
+      }
+
+      // Register type adapters for TodoList model
+      if (!Hive.isAdapterRegistered(20)) {
+        Hive.registerAdapter(TodoListAdapter());
+      }
+      if (!Hive.isAdapterRegistered(21)) {
+        Hive.registerAdapter(TodoItemAdapter());
+      }
+      if (!Hive.isAdapterRegistered(25)) {
+        Hive.registerAdapter(TodoPriorityAdapter());
+      }
+
+      // Register type adapters for ListModel
+      if (!Hive.isAdapterRegistered(22)) {
+        Hive.registerAdapter(ListModelAdapter());
+      }
+      if (!Hive.isAdapterRegistered(23)) {
+        Hive.registerAdapter(ListItemAdapter());
+      }
+      if (!Hive.isAdapterRegistered(24)) {
+        Hive.registerAdapter(ListStyleAdapter());
+      }
+
+      // Open boxes
+      await Hive.openBox<Item>(notesBoxName);
+      await Hive.openBox<TodoList>(todoListsBoxName);
+      await Hive.openBox<ListModel>(listsBoxName);
+      await Hive.openBox<Space>(spacesBoxName);
+    } catch (e) {
+      // Log error and rethrow for caller to handle
+      // ignore: avoid_print
+      print('Error initializing Hive database: $e');
+      rethrow;
+    }
   }
 
-  /// Get the items box
-  Box<Item> get itemsBox => Hive.box<Item>(itemsBoxName);
+  /// Get the notes box (formerly items box)
+  Box<Item> get notesBox => Hive.box<Item>(notesBoxName);
+
+  /// Get the todo lists box
+  Box<TodoList> get todoListsBox => Hive.box<TodoList>(todoListsBoxName);
+
+  /// Get the lists box
+  Box<ListModel> get listsBox => Hive.box<ListModel>(listsBoxName);
 
   /// Get the spaces box
   Box<Space> get spacesBox => Hive.box<Space>(spacesBoxName);
@@ -50,26 +90,34 @@ class HiveDatabase {
 
   /// Clear all data (useful for testing or reset)
   Future<void> clearAll() async {
-    await itemsBox.clear();
+    await notesBox.clear();
+    await todoListsBox.clear();
+    await listsBox.clear();
     await spacesBox.clear();
   }
 
   /// Close all boxes
   Future<void> close() async {
-    await itemsBox.close();
+    await notesBox.close();
+    await todoListsBox.close();
+    await listsBox.close();
     await spacesBox.close();
   }
 
   /// Delete all Hive data (including boxes)
   Future<void> deleteAll() async {
-    await Hive.deleteBoxFromDisk(itemsBoxName);
+    await Hive.deleteBoxFromDisk(notesBoxName);
+    await Hive.deleteBoxFromDisk(todoListsBoxName);
+    await Hive.deleteBoxFromDisk(listsBoxName);
     await Hive.deleteBoxFromDisk(spacesBoxName);
   }
 
   /// Get database statistics
   Map<String, dynamic> getStats() {
     return {
-      'itemCount': itemsBox.length,
+      'noteCount': notesBox.length,
+      'todoListCount': todoListsBox.length,
+      'listCount': listsBox.length,
       'spaceCount': spacesBox.length,
       'isInitialized': isInitialized,
     };

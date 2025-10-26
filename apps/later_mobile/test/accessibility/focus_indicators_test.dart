@@ -317,7 +317,6 @@ void main() {
       final testItem = Item(
         id: 'test-1',
         title: 'Test Task',
-        type: ItemType.task,
         spaceId: 'space-1',
       );
 
@@ -357,7 +356,6 @@ void main() {
       final testItem = Item(
         id: 'test-1',
         title: 'Test Task',
-        type: ItemType.task,
         spaceId: 'space-1',
       );
 
@@ -366,7 +364,6 @@ void main() {
           home: Scaffold(
             body: ItemCard(
               item: testItem,
-              onCheckboxChanged: (_) {},
             ),
           ),
         ),

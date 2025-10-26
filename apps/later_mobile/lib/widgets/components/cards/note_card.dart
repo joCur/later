@@ -9,11 +9,8 @@ import '../text/gradient_text.dart';
 import '../borders/gradient_pill_border.dart';
 import 'package:intl/intl.dart';
 
-/// Item card component for Notes (dual-model architecture)
+/// Note card component for displaying notes with content preview and tags
 /// Mobile-First Bold Redesign
-///
-/// IMPORTANT: This card is for the Item model (Notes) only in the dual-model architecture.
-/// TodoList and ListModel will have their own dedicated card components.
 ///
 /// Performance optimizations:
 /// - Uses RepaintBoundary to isolate repaints
@@ -22,30 +19,28 @@ import 'package:intl/intl.dart';
 /// - Optimized 6px gradient border for 60fps performance
 ///
 /// Mobile-First Bold Design Features:
-/// - 6px gradient pill border (3× more visible than 2px) wrapping entire card
-/// - 20px border radius (pill shape, not 12px rounded)
-/// - 18px bold title (12.5% larger + bold weight for scannability)
-/// - 15px content preview (improved readability)
+/// - 6px gradient pill border (blue-cyan note gradient)
+/// - 20px border radius (pill shape)
+/// - 18px bold title
 /// - 20px card padding (comfortable thumb zones)
-/// - Solid background (no gradient overlay for 60fps performance)
-/// - Note gradient colors: Blue→Cyan
-/// - Leading element: note icon
-/// - Content preview: 2 lines with ellipsis for consistent height
-/// - Metadata row: date with gradient text
-/// - States: default, pressed, selected
-/// - Gesture handlers: tap to open, long-press for multi-select
-class ItemCard extends StatefulWidget {
-  const ItemCard({
+/// - Content preview (first 100 chars, 2 lines max)
+/// - Tags display (first 3 tags, "+X more" if more)
+/// - Document icon with gradient
+/// - Created date metadata
+/// - Press animations with haptic feedback
+/// - Entrance animations with staggered delay
+/// - Semantic labels for accessibility
+class NoteCard extends StatefulWidget {
+  const NoteCard({
     super.key,
     required this.item,
     this.onTap,
     this.onLongPress,
-    this.isSelected = false,
     this.showMetadata = true,
     this.index,
   });
 
-  /// Item data to display
+  /// Item (Note) data to display
   final Item item;
 
   /// Callback when card is tapped
@@ -53,9 +48,6 @@ class ItemCard extends StatefulWidget {
 
   /// Callback when card is long-pressed
   final VoidCallback? onLongPress;
-
-  /// Whether card is in selected state
-  final bool isSelected;
 
   /// Whether to show metadata row
   final bool showMetadata;
@@ -65,10 +57,10 @@ class ItemCard extends StatefulWidget {
   final int? index;
 
   @override
-  State<ItemCard> createState() => _ItemCardState();
+  State<NoteCard> createState() => _NoteCardState();
 }
 
-class _ItemCardState extends State<ItemCard> with TickerProviderStateMixin {
+class _NoteCardState extends State<NoteCard> with TickerProviderStateMixin {
   bool _isPressed = false;
   late AnimationController _pressAnimationController;
   late Animation<double> _pressScaleAnimation;
@@ -100,28 +92,18 @@ class _ItemCardState extends State<ItemCard> with TickerProviderStateMixin {
     super.dispose();
   }
 
-  /// Get border gradient for notes
+  /// Get border gradient (blue-cyan note gradient)
   LinearGradient _getBorderGradient() {
-    // Item model represents Notes in dual-model architecture
     return AppColors.noteGradient;
   }
 
   /// Get background color with subtle gradient tint (5% opacity)
   Color _getBackgroundTint(bool isDark) {
-    return AppColors.typeLightBg(
-      'note',
-      isDark: isDark,
-    );
+    return AppColors.typeLightBg('note', isDark: isDark);
   }
 
-  /// Get leading icon for notes
-  IconData _getLeadingIcon() {
-    return Icons.description_outlined;
-  }
-
-  /// Build leading element (icon for notes)
-  Widget _buildLeadingElement() {
-    // Item model represents Notes - use note icon
+  /// Build leading icon (document icon with gradient)
+  Widget _buildLeadingIcon() {
     final gradient = _getBorderGradient();
 
     return SizedBox(
@@ -130,8 +112,8 @@ class _ItemCardState extends State<ItemCard> with TickerProviderStateMixin {
       child: Center(
         child: ShaderMask(
           shaderCallback: (bounds) => gradient.createShader(bounds),
-          child: Icon(
-            _getLeadingIcon(),
+          child: const Icon(
+            Icons.description_outlined,
             size: 20,
             color: Colors.white, // Base color for shader mask
           ),
@@ -154,25 +136,127 @@ class _ItemCardState extends State<ItemCard> with TickerProviderStateMixin {
     );
   }
 
-  /// Build content preview for notes
+  /// Truncate content to 100 characters with ellipsis
+  ///
+  /// Returns:
+  /// - Original content if 100 chars or less
+  /// - First 100 chars + "..." if longer
+  String _truncateContent(String content) {
+    if (content.length <= 100) {
+      return content;
+    }
+    // Find the last space within the first 100 characters
+    final substring = content.substring(0, 100);
+    final lastSpace = substring.lastIndexOf(' ');
+    if (lastSpace == -1) {
+      // No space found, fall back to hard cut
+      return '$substring...';
+    }
+    return '${substring.substring(0, lastSpace)}...';
+  }
+
+  /// Build content preview (first 100 chars, 2 lines max)
   Widget? _buildContentPreview(BuildContext context) {
     if (widget.item.content == null || widget.item.content!.isEmpty) {
       return null;
     }
 
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final truncatedContent = _truncateContent(widget.item.content!);
 
     return Text(
-      widget.item.content!,
+      truncatedContent,
       style: AppTypography.itemContent.copyWith(
         color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
       ),
-      maxLines: 2, // Fixed 2 lines for consistent card height (mobile-first design)
+      maxLines: 2, // Fixed 2 lines for consistent card height
       overflow: TextOverflow.ellipsis,
     );
   }
 
-  /// Build metadata row
+  /// Build tags row (show first 3, "+X more" if more)
+  Widget? _buildTags(BuildContext context) {
+    if (widget.item.tags.isEmpty) {
+      return null;
+    }
+
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final visibleTags = widget.item.tags.take(3).toList();
+    final remainingCount = widget.item.tags.length - visibleTags.length;
+
+    return Wrap(
+      spacing: AppSpacing.xxs, // 4px between chips
+      runSpacing: AppSpacing.xxs,
+      children: [
+        // Show first 3 tags as chips
+        ...visibleTags.map((tag) => _buildTagChip(tag, isDark)),
+
+        // Show "+X more" if there are more tags
+        if (remainingCount > 0)
+          _buildMoreTagsChip(remainingCount, isDark),
+      ],
+    );
+  }
+
+  /// Build individual tag chip with subtle border
+  Widget _buildTagChip(String tag, bool isDark) {
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.xs, // 8px
+        vertical: AppSpacing.xxxs, // 2px
+      ),
+      decoration: BoxDecoration(
+        color: isDark
+            ? AppColors.noteGradientStart.withValues(alpha: 0.15)
+            : AppColors.noteLight.withValues(alpha: 0.5),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusSM), // 8px
+        border: Border.all(
+          color: isDark
+              ? AppColors.noteGradientStart.withValues(alpha: 0.3)
+              : AppColors.noteGradientStart.withValues(alpha: 0.2),
+        ),
+      ),
+      child: Text(
+        tag,
+        style: AppTypography.metadata.copyWith(
+          color: isDark
+              ? AppColors.noteGradientStart.withValues(alpha: 0.9)
+              : AppColors.noteGradientStart,
+          fontSize: 11, // Slightly smaller for tags
+        ),
+      ),
+    );
+  }
+
+  /// Build "+X more" chip
+  Widget _buildMoreTagsChip(int count, bool isDark) {
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.xs, // 8px
+        vertical: AppSpacing.xxxs, // 2px
+      ),
+      decoration: BoxDecoration(
+        color: isDark
+            ? AppColors.neutral700.withValues(alpha: 0.5)
+            : AppColors.neutral200,
+        borderRadius: BorderRadius.circular(AppSpacing.radiusSM), // 8px
+        border: Border.all(
+          color: isDark
+              ? AppColors.neutral600
+              : AppColors.neutral300,
+        ),
+      ),
+      child: Text(
+        '+$count more',
+        style: AppTypography.metadata.copyWith(
+          color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
+          fontSize: 11,
+        ),
+      ),
+    );
+  }
+
+  /// Build metadata row (created date)
   Widget? _buildMetadata(BuildContext context) {
     if (!widget.showMetadata) return null;
 
@@ -230,6 +314,24 @@ class _ItemCardState extends State<ItemCard> with TickerProviderStateMixin {
     widget.onLongPress?.call();
   }
 
+  /// Build semantic label for accessibility
+  String _buildSemanticLabel() {
+    final buffer = StringBuffer('Note: ${widget.item.title}');
+
+    // Add tag count if tags exist
+    if (widget.item.tags.isNotEmpty) {
+      buffer.write(', ${widget.item.tags.length} ${widget.item.tags.length == 1 ? 'tag' : 'tags'}');
+    }
+
+    // Add content preview if exists
+    if (widget.item.content != null && widget.item.content!.isNotEmpty) {
+      final preview = _truncateContent(widget.item.content!);
+      buffer.write(', $preview');
+    }
+
+    return buffer.toString();
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -239,14 +341,9 @@ class _ItemCardState extends State<ItemCard> with TickerProviderStateMixin {
     final baseBgColor = isDark ? AppColors.surfaceDark : AppColors.surfaceLight;
     final tintColor = _getBackgroundTint(isDark);
 
-    // Background color based on state with glass morphism for hover/selected
+    // Background color based on state
     Color backgroundColor;
-    if (widget.isSelected) {
-      // Glass morphism overlay (3% opacity) for selected state
-      backgroundColor = isDark
-          ? AppColors.glass(context).withValues(alpha: 0.03)
-          : AppColors.glass(context).withValues(alpha: 0.03);
-    } else if (_isPressed) {
+    if (_isPressed) {
       backgroundColor = isDark
           ? AppColors.surfaceDarkVariant
           : AppColors.neutralGray100;
@@ -258,8 +355,8 @@ class _ItemCardState extends State<ItemCard> with TickerProviderStateMixin {
       );
     }
 
-    // Notes don't have completion status - always full opacity
-    const opacity = 1.0;
+    // Build the semantic label
+    final semanticLabel = _buildSemanticLabel();
 
     // Build the card widget with mobile-first bold design
     // Phase 5: Wrap with AnimatedBuilder for press scale animation
@@ -276,16 +373,14 @@ class _ItemCardState extends State<ItemCard> with TickerProviderStateMixin {
           container: true,
           button: true,
           enabled: widget.onTap != null,
-          label: 'Note: ${widget.item.title}',
+          label: semanticLabel,
           child: GestureDetector(
             onTapDown: _handleTapDown,
             onTapUp: _handleTapUp,
             onTapCancel: _handleTapCancel,
             onTap: _handleTap,
             onLongPress: _handleLongPress,
-            child: Opacity(
-              opacity: opacity,
-              child: Container(
+            child: Container(
               margin: const EdgeInsets.only(bottom: AppSpacing.cardSpacing), // 16px spacing
               // Wrap entire card with gradient pill border (6px width, 20px radius)
               child: GradientPillBorder(
@@ -293,7 +388,7 @@ class _ItemCardState extends State<ItemCard> with TickerProviderStateMixin {
                 child: Container(
                   decoration: BoxDecoration(
                     color: backgroundColor,
-                    borderRadius: BorderRadius.circular(AppSpacing.cardRadius - AppSpacing.cardBorderWidth), // Inner radius reduced by border width to maintain consistent corner appearance
+                    borderRadius: BorderRadius.circular(AppSpacing.cardRadius - AppSpacing.cardBorderWidth), // Inner radius reduced by border width
                     // Mobile-optimized shadow: 4px offset, 8px blur, 12% opacity
                     boxShadow: _isPressed
                         ? null
@@ -313,8 +408,8 @@ class _ItemCardState extends State<ItemCard> with TickerProviderStateMixin {
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Leading element (checkbox or icon)
-                      _buildLeadingElement(),
+                      // Leading icon (document icon)
+                      _buildLeadingIcon(),
                       const SizedBox(width: AppSpacing.xs), // 8px
 
                       // Content
@@ -326,13 +421,19 @@ class _ItemCardState extends State<ItemCard> with TickerProviderStateMixin {
                             // Title (18px bold, max 2 lines)
                             _buildTitle(context),
 
-                            // Content preview (15px, 2 lines)
+                            // Content preview (15px, 2 lines, first 100 chars)
                             if (_buildContentPreview(context) != null) ...[
                               const SizedBox(height: AppSpacing.xxs), // 4px
                               _buildContentPreview(context)!,
                             ],
 
-                            // Metadata (gradient text)
+                            // Tags (show first 3, "+X more")
+                            if (_buildTags(context) != null) ...[
+                              const SizedBox(height: AppSpacing.xs), // 8px
+                              _buildTags(context)!,
+                            ],
+
+                            // Metadata (created date)
                             if (_buildMetadata(context) != null) ...[
                               const SizedBox(height: AppSpacing.xs), // 8px
                               _buildMetadata(context)!,
@@ -347,7 +448,6 @@ class _ItemCardState extends State<ItemCard> with TickerProviderStateMixin {
             ),
           ),
         ),
-      ),
       ),
     );
 

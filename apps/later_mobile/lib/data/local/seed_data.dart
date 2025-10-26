@@ -1,19 +1,17 @@
 import 'package:uuid/uuid.dart';
 import '../models/item_model.dart';
 import '../models/space_model.dart';
-import '../repositories/item_repository.dart';
+import '../repositories/note_repository.dart';
 import '../repositories/space_repository.dart';
 
 /// Utility class for seeding the database with initial data on first run.
 ///
 /// This class provides methods to detect first run and initialize the app
-/// with a default "Personal" space and sample items to help users get started.
+/// with a default "Personal" space and sample notes to help users get started.
 ///
 /// The seed data includes:
 /// - 1 default "Personal" space
-/// - 2 tasks (one completed, one with due date)
-/// - 1 note with getting started information
-/// - 1 list with feature ideas
+/// - 1 welcome note with getting started information
 ///
 /// Example usage:
 /// ```dart
@@ -24,7 +22,7 @@ import '../repositories/space_repository.dart';
 class SeedData {
   static const Uuid _uuid = Uuid();
   static final SpaceRepository _spaceRepository = SpaceRepository();
-  static final ItemRepository _itemRepository = ItemRepository();
+  static final NoteRepository _noteRepository = NoteRepository();
 
   /// Check if this is the first run by checking if any spaces exist.
   ///
@@ -71,9 +69,9 @@ class SeedData {
     // Create sample items
     await _createSampleItems(space.id);
 
-    // Update the space's item count
+    // Update the space's item count (3 notes in dual-model architecture)
     await _spaceRepository.updateSpace(
-      space.copyWith(itemCount: 4),
+      space.copyWith(itemCount: 3),
     );
   }
 
@@ -99,11 +97,13 @@ class SeedData {
 
   /// Create sample items for user onboarding.
   ///
-  /// Creates 4 sample items to help users understand the app:
-  /// 1. A completed task demonstrating task completion
-  /// 2. An active task with a due date demonstrating task management
-  /// 3. A note with getting started information
-  /// 4. A list with feature ideas
+  /// UPDATED for dual-model architecture: Creates Notes (Item model) only
+  /// TodoList and ListModel creation will be added in future phases
+  ///
+  /// Creates 3 sample notes to help users understand the app:
+  /// 1. A welcome note
+  /// 2. A getting started guide note
+  /// 3. A feature ideas note
   ///
   /// All items are created in the specified space and tagged appropriately
   /// to help users learn about the app's features.
@@ -111,61 +111,45 @@ class SeedData {
   /// Parameters:
   ///   - [spaceId]: The ID of the space to create items in
   static Future<void> _createSampleItems(String spaceId) async {
-    final now = DateTime.now();
-    final tomorrow = now.add(const Duration(days: 1));
-
-    // Sample Item 1: Completed Task
-    final completedTask = Item(
+    // Sample Item 1: Welcome Note
+    final welcomeNote = Item(
       id: _uuid.v4(),
-      type: ItemType.task,
       title: 'Welcome to Later!',
-      content: 'Check off this task to see how completion works',
+      content: 'This is your personal space for capturing thoughts, ideas, and notes. '
+          'Get started by creating your first note using the + button below.',
       spaceId: spaceId,
-      isCompleted: true,
       tags: ['onboarding'],
     );
 
-    // Sample Item 2: Active Task with Due Date
-    final activeTask = Item(
+    // Sample Item 2: Getting Started Note
+    final gettingStartedNote = Item(
       id: _uuid.v4(),
-      type: ItemType.task,
-      title: 'Try creating your first item',
-      content: 'Tap the + button to create a new task, note, or list',
-      spaceId: spaceId,
-      dueDate: tomorrow,
-      tags: ['onboarding', 'tutorial'],
-    );
-
-    // Sample Item 3: Getting Started Note
-    final note = Item(
-      id: _uuid.v4(),
-      type: ItemType.note,
       title: 'Getting Started with Later',
-      content: 'Later helps you capture and organize your thoughts, tasks, '
-          'and lists in one place. Use spaces to organize different areas of '
-          'your life. \n\nTip: You can switch spaces by tapping the space name '
-          'at the top.',
+      content: 'Later helps you capture and organize your thoughts in one place. '
+          'Use spaces to organize different areas of your life. '
+          '\n\nTip: You can switch spaces by tapping the space name at the top. '
+          '\n\nTip: Long-press on a note to select multiple notes for batch operations.',
       spaceId: spaceId,
       tags: ['onboarding', 'help'],
     );
 
-    // Sample Item 4: Feature Ideas List
-    final list = Item(
+    // Sample Item 3: Feature Ideas Note
+    final featureIdeasNote = Item(
       id: _uuid.v4(),
-      type: ItemType.list,
       title: 'Feature Ideas',
-      content: '• Add tags to items\n'
-          '• Set due dates\n'
-          '• Create more spaces\n'
-          '• Archive completed tasks',
+      content: '• Add tags to organize notes\n'
+          '• Create more spaces for different projects\n'
+          '• Use rich text formatting\n'
+          '• Add images and attachments\n'
+          '• Share notes with others',
       spaceId: spaceId,
       tags: ['ideas'],
     );
 
-    // Create all items in the repository
-    await _itemRepository.createItem(completedTask);
-    await _itemRepository.createItem(activeTask);
-    await _itemRepository.createItem(note);
-    await _itemRepository.createItem(list);
+    // Create all notes in the repository
+    // Note: Item count is 3 (updated from 4)
+    await _noteRepository.create(welcomeNote);
+    await _noteRepository.create(gettingStartedNote);
+    await _noteRepository.create(featureIdeasNote);
   }
 }

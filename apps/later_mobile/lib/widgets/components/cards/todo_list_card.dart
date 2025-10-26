@@ -4,16 +4,13 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_animations.dart';
-import '../../../data/models/item_model.dart';
+import '../../../data/models/todo_list_model.dart';
 import '../text/gradient_text.dart';
 import '../borders/gradient_pill_border.dart';
 import 'package:intl/intl.dart';
 
-/// Item card component for Notes (dual-model architecture)
+/// TodoList card component for displaying todo lists with progress tracking
 /// Mobile-First Bold Redesign
-///
-/// IMPORTANT: This card is for the Item model (Notes) only in the dual-model architecture.
-/// TodoList and ListModel will have their own dedicated card components.
 ///
 /// Performance optimizations:
 /// - Uses RepaintBoundary to isolate repaints
@@ -22,40 +19,35 @@ import 'package:intl/intl.dart';
 /// - Optimized 6px gradient border for 60fps performance
 ///
 /// Mobile-First Bold Design Features:
-/// - 6px gradient pill border (3× more visible than 2px) wrapping entire card
-/// - 20px border radius (pill shape, not 12px rounded)
-/// - 18px bold title (12.5% larger + bold weight for scannability)
-/// - 15px content preview (improved readability)
+/// - 6px gradient pill border (red-orange task gradient)
+/// - 20px border radius (pill shape)
+/// - 18px bold title
 /// - 20px card padding (comfortable thumb zones)
-/// - Solid background (no gradient overlay for 60fps performance)
-/// - Note gradient colors: Blue→Cyan
-/// - Leading element: note icon
-/// - Content preview: 2 lines with ellipsis for consistent height
-/// - Metadata row: date with gradient text
-/// - States: default, pressed, selected
-/// - Gesture handlers: tap to open, long-press for multi-select
-class ItemCard extends StatefulWidget {
-  const ItemCard({
+/// - Progress indicator showing "X of Y completed"
+/// - Linear progress bar with success color
+/// - Checkbox outline icon with gradient
+/// - Due date metadata from earliest item
+/// - Press animations with haptic feedback
+/// - Entrance animations with staggered delay
+/// - Semantic labels for accessibility
+class TodoListCard extends StatefulWidget {
+  const TodoListCard({
     super.key,
-    required this.item,
+    required this.todoList,
     this.onTap,
     this.onLongPress,
-    this.isSelected = false,
     this.showMetadata = true,
     this.index,
   });
 
-  /// Item data to display
-  final Item item;
+  /// TodoList data to display
+  final TodoList todoList;
 
   /// Callback when card is tapped
   final VoidCallback? onTap;
 
   /// Callback when card is long-pressed
   final VoidCallback? onLongPress;
-
-  /// Whether card is in selected state
-  final bool isSelected;
 
   /// Whether to show metadata row
   final bool showMetadata;
@@ -65,10 +57,10 @@ class ItemCard extends StatefulWidget {
   final int? index;
 
   @override
-  State<ItemCard> createState() => _ItemCardState();
+  State<TodoListCard> createState() => _TodoListCardState();
 }
 
-class _ItemCardState extends State<ItemCard> with TickerProviderStateMixin {
+class _TodoListCardState extends State<TodoListCard> with TickerProviderStateMixin {
   bool _isPressed = false;
   late AnimationController _pressAnimationController;
   late Animation<double> _pressScaleAnimation;
@@ -100,28 +92,18 @@ class _ItemCardState extends State<ItemCard> with TickerProviderStateMixin {
     super.dispose();
   }
 
-  /// Get border gradient for notes
+  /// Get border gradient (red-orange task gradient for todo lists)
   LinearGradient _getBorderGradient() {
-    // Item model represents Notes in dual-model architecture
-    return AppColors.noteGradient;
+    return AppColors.taskGradient;
   }
 
   /// Get background color with subtle gradient tint (5% opacity)
   Color _getBackgroundTint(bool isDark) {
-    return AppColors.typeLightBg(
-      'note',
-      isDark: isDark,
-    );
+    return AppColors.typeLightBg('task', isDark: isDark);
   }
 
-  /// Get leading icon for notes
-  IconData _getLeadingIcon() {
-    return Icons.description_outlined;
-  }
-
-  /// Build leading element (icon for notes)
-  Widget _buildLeadingElement() {
-    // Item model represents Notes - use note icon
+  /// Build leading icon (checkbox outline with gradient)
+  Widget _buildLeadingIcon() {
     final gradient = _getBorderGradient();
 
     return SizedBox(
@@ -130,8 +112,8 @@ class _ItemCardState extends State<ItemCard> with TickerProviderStateMixin {
       child: Center(
         child: ShaderMask(
           shaderCallback: (bounds) => gradient.createShader(bounds),
-          child: Icon(
-            _getLeadingIcon(),
+          child: const Icon(
+            Icons.check_box_outline_blank,
             size: 20,
             color: Colors.white, // Base color for shader mask
           ),
@@ -145,7 +127,7 @@ class _ItemCardState extends State<ItemCard> with TickerProviderStateMixin {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Text(
-      widget.item.title,
+      widget.todoList.name,
       style: AppTypography.itemTitle.copyWith(
         color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
       ),
@@ -154,46 +136,71 @@ class _ItemCardState extends State<ItemCard> with TickerProviderStateMixin {
     );
   }
 
-  /// Build content preview for notes
-  Widget? _buildContentPreview(BuildContext context) {
-    if (widget.item.content == null || widget.item.content!.isEmpty) {
-      return null;
-    }
-
+  /// Build progress text (e.g., "4 of 7 completed")
+  Widget _buildProgressText(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final completed = widget.todoList.completedItems;
+    final total = widget.todoList.totalItems;
 
     return Text(
-      widget.item.content!,
-      style: AppTypography.itemContent.copyWith(
+      '$completed of $total completed',
+      style: AppTypography.metadata.copyWith(
         color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
       ),
-      maxLines: 2, // Fixed 2 lines for consistent card height (mobile-first design)
-      overflow: TextOverflow.ellipsis,
     );
+  }
+
+  /// Build progress bar
+  Widget _buildProgressBar() {
+    final progress = widget.todoList.progress;
+
+    return LinearProgressIndicator(
+      value: progress,
+      backgroundColor: AppColors.neutral200,
+      valueColor: const AlwaysStoppedAnimation<Color>(AppColors.success),
+      minHeight: 4,
+      borderRadius: BorderRadius.circular(2),
+    );
+  }
+
+  /// Get earliest due date from items
+  DateTime? _getEarliestDueDate() {
+    final itemsWithDueDates = widget.todoList.items
+        .where((item) => item.dueDate != null)
+        .toList();
+
+    if (itemsWithDueDates.isEmpty) return null;
+
+    itemsWithDueDates.sort((a, b) => a.dueDate!.compareTo(b.dueDate!));
+    return itemsWithDueDates.first.dueDate;
   }
 
   /// Build metadata row
   Widget? _buildMetadata(BuildContext context) {
     if (!widget.showMetadata) return null;
 
+    final earliestDueDate = _getEarliestDueDate();
+    if (earliestDueDate == null) return null;
+
     final dateFormat = DateFormat('MMM d, y');
 
     return Row(
       children: [
-        // Icon with gradient tint for created dates
+        // Icon with gradient tint for due dates
         ShaderMask(
-          shaderCallback: (bounds) => AppColors.primaryGradientAdaptive(context).createShader(bounds),
+          shaderCallback: (bounds) => AppColors.secondaryGradient.createShader(bounds),
           blendMode: BlendMode.srcIn,
           child: const Icon(
-            Icons.access_time,
+            Icons.calendar_today,
             size: 12,
             color: Colors.white,
           ),
         ),
         const SizedBox(width: AppSpacing.xxxs),
-        // Created date with subtle primary gradient
+        // Due date with subtle secondary gradient (amber→pink)
         GradientText.subtle(
-          dateFormat.format(widget.item.createdAt),
+          dateFormat.format(earliestDueDate),
+          gradient: AppColors.secondaryGradient,
           style: AppTypography.metadata,
         ),
       ],
@@ -239,14 +246,9 @@ class _ItemCardState extends State<ItemCard> with TickerProviderStateMixin {
     final baseBgColor = isDark ? AppColors.surfaceDark : AppColors.surfaceLight;
     final tintColor = _getBackgroundTint(isDark);
 
-    // Background color based on state with glass morphism for hover/selected
+    // Background color based on state
     Color backgroundColor;
-    if (widget.isSelected) {
-      // Glass morphism overlay (3% opacity) for selected state
-      backgroundColor = isDark
-          ? AppColors.glass(context).withValues(alpha: 0.03)
-          : AppColors.glass(context).withValues(alpha: 0.03);
-    } else if (_isPressed) {
+    if (_isPressed) {
       backgroundColor = isDark
           ? AppColors.surfaceDarkVariant
           : AppColors.neutralGray100;
@@ -258,8 +260,9 @@ class _ItemCardState extends State<ItemCard> with TickerProviderStateMixin {
       );
     }
 
-    // Notes don't have completion status - always full opacity
-    const opacity = 1.0;
+    // Build the semantic label
+    final semanticLabel = 'Todo list: ${widget.todoList.name}, '
+        '${widget.todoList.completedItems} of ${widget.todoList.totalItems} completed';
 
     // Build the card widget with mobile-first bold design
     // Phase 5: Wrap with AnimatedBuilder for press scale animation
@@ -276,16 +279,14 @@ class _ItemCardState extends State<ItemCard> with TickerProviderStateMixin {
           container: true,
           button: true,
           enabled: widget.onTap != null,
-          label: 'Note: ${widget.item.title}',
+          label: semanticLabel,
           child: GestureDetector(
             onTapDown: _handleTapDown,
             onTapUp: _handleTapUp,
             onTapCancel: _handleTapCancel,
             onTap: _handleTap,
             onLongPress: _handleLongPress,
-            child: Opacity(
-              opacity: opacity,
-              child: Container(
+            child: Container(
               margin: const EdgeInsets.only(bottom: AppSpacing.cardSpacing), // 16px spacing
               // Wrap entire card with gradient pill border (6px width, 20px radius)
               child: GradientPillBorder(
@@ -293,7 +294,7 @@ class _ItemCardState extends State<ItemCard> with TickerProviderStateMixin {
                 child: Container(
                   decoration: BoxDecoration(
                     color: backgroundColor,
-                    borderRadius: BorderRadius.circular(AppSpacing.cardRadius - AppSpacing.cardBorderWidth), // Inner radius reduced by border width to maintain consistent corner appearance
+                    borderRadius: BorderRadius.circular(AppSpacing.cardRadius - AppSpacing.cardBorderWidth), // Inner radius reduced by border width
                     // Mobile-optimized shadow: 4px offset, 8px blur, 12% opacity
                     boxShadow: _isPressed
                         ? null
@@ -313,8 +314,8 @@ class _ItemCardState extends State<ItemCard> with TickerProviderStateMixin {
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Leading element (checkbox or icon)
-                      _buildLeadingElement(),
+                      // Leading icon (checkbox outline)
+                      _buildLeadingIcon(),
                       const SizedBox(width: AppSpacing.xs), // 8px
 
                       // Content
@@ -326,13 +327,15 @@ class _ItemCardState extends State<ItemCard> with TickerProviderStateMixin {
                             // Title (18px bold, max 2 lines)
                             _buildTitle(context),
 
-                            // Content preview (15px, 2 lines)
-                            if (_buildContentPreview(context) != null) ...[
-                              const SizedBox(height: AppSpacing.xxs), // 4px
-                              _buildContentPreview(context)!,
-                            ],
+                            // Progress text
+                            const SizedBox(height: AppSpacing.xxs), // 4px
+                            _buildProgressText(context),
 
-                            // Metadata (gradient text)
+                            // Progress bar
+                            const SizedBox(height: AppSpacing.xs), // 8px
+                            _buildProgressBar(),
+
+                            // Metadata (due date if available)
                             if (_buildMetadata(context) != null) ...[
                               const SizedBox(height: AppSpacing.xs), // 8px
                               _buildMetadata(context)!,
@@ -347,7 +350,6 @@ class _ItemCardState extends State<ItemCard> with TickerProviderStateMixin {
             ),
           ),
         ),
-      ),
       ),
     );
 

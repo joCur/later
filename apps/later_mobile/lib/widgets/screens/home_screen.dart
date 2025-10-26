@@ -8,9 +8,13 @@ import '../../core/theme/app_animations.dart';
 import '../../core/responsive/breakpoints.dart';
 import '../../data/models/item_model.dart';
 import '../../data/models/space_model.dart';
-import '../../providers/items_provider.dart';
+import '../../data/models/todo_list_model.dart';
+import '../../data/models/list_model.dart';
+import '../../providers/content_provider.dart';
 import '../../providers/spaces_provider.dart';
-import '../components/cards/item_card.dart';
+import '../components/cards/todo_list_card.dart';
+import '../components/cards/list_card.dart';
+import '../components/cards/note_card.dart';
 import '../components/fab/quick_capture_fab.dart';
 import '../components/empty_states/empty_space_state.dart';
 import '../components/empty_states/welcome_state.dart';
@@ -18,7 +22,9 @@ import '../navigation/icon_only_bottom_nav.dart';
 import '../navigation/app_sidebar.dart';
 import '../modals/space_switcher_modal.dart';
 import '../modals/quick_capture_modal.dart';
-import 'item_detail_screen.dart';
+import 'todo_list_detail_screen.dart';
+import 'list_detail_screen.dart';
+import 'note_detail_screen.dart';
 
 /// Main home screen for the Later app
 ///
@@ -52,7 +58,7 @@ class _HomeScreenState extends State<HomeScreen> {
   bool _isSidebarExpanded = true;
 
   // Filter state
-  ItemFilter _selectedFilter = ItemFilter.all;
+  ContentFilter _selectedFilter = ContentFilter.all;
 
   // Pagination state
   int _currentItemCount = 100; // Initially load 100 items
@@ -67,47 +73,35 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  /// Load spaces and items
+  /// Load spaces and content
   Future<void> _loadData() async {
     final spacesProvider = context.read<SpacesProvider>();
-    final itemsProvider = context.read<ItemsProvider>();
+    final contentProvider = context.read<ContentProvider>();
 
     // Load spaces first
     await spacesProvider.loadSpaces();
 
-    // Load items for current space if available
+    // Load content for current space if available
     if (spacesProvider.currentSpace != null) {
-      await itemsProvider.loadItemsBySpace(spacesProvider.currentSpace!.id);
+      await contentProvider.loadSpaceContent(spacesProvider.currentSpace!.id);
     }
   }
 
-  /// Refresh items
+  /// Refresh content
   Future<void> _handleRefresh() async {
     final spacesProvider = context.read<SpacesProvider>();
-    final itemsProvider = context.read<ItemsProvider>();
+    final contentProvider = context.read<ContentProvider>();
 
     if (spacesProvider.currentSpace != null) {
-      await itemsProvider.loadItemsBySpace(spacesProvider.currentSpace!.id);
+      await contentProvider.loadSpaceContent(spacesProvider.currentSpace!.id);
     }
   }
 
-  /// Filter items based on selected filter
-  List<Item> _getFilteredItems(List<Item> items) {
-    List<Item> filtered;
-    switch (_selectedFilter) {
-      case ItemFilter.all:
-        filtered = items;
-        break;
-      case ItemFilter.tasks:
-        filtered = items.where((item) => item.type == ItemType.task).toList();
-        break;
-      case ItemFilter.notes:
-        filtered = items.where((item) => item.type == ItemType.note).toList();
-        break;
-      case ItemFilter.lists:
-        filtered = items.where((item) => item.type == ItemType.list).toList();
-        break;
-    }
+  /// Filter content based on selected filter
+  /// Returns a paginated list of mixed content (TodoList, ListModel, Item)
+  List<dynamic> _getFilteredContent(ContentProvider contentProvider) {
+    // Get filtered content from ContentProvider
+    final filtered = contentProvider.getFilteredContent(_selectedFilter);
 
     // Apply pagination: return only the current page of items
     return filtered.take(_currentItemCount).toList();
@@ -207,16 +201,16 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: InkWell(
                     onTap: () async {
                       final spacesProvider = context.read<SpacesProvider>();
-                      final itemsProvider = context.read<ItemsProvider>();
+                      final contentProvider = context.read<ContentProvider>();
 
                       final result = await SpaceSwitcherModal.show(context);
                       if (!mounted) return;
 
                       if (result == true) {
-                        // Space was switched, reload items and reset pagination
+                        // Space was switched, reload content and reset pagination
                         _resetPagination();
                         if (spacesProvider.currentSpace != null) {
-                          await itemsProvider.loadItemsBySpace(
+                          await contentProvider.loadSpaceContent(
                             spacesProvider.currentSpace!.id,
                           );
                         }
@@ -308,7 +302,7 @@ class _HomeScreenState extends State<HomeScreen> {
           );
   }
 
-  /// Build filter chips
+  /// Build filter chips for content types
   Widget _buildFilterChips(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
@@ -323,32 +317,23 @@ class _HomeScreenState extends State<HomeScreen> {
         children: [
           _FilterChip(
             label: 'All',
-            isSelected: _selectedFilter == ItemFilter.all,
+            icon: Icons.grid_view,
+            isSelected: _selectedFilter == ContentFilter.all,
             onSelected: () {
               setState(() {
-                _selectedFilter = ItemFilter.all;
+                _selectedFilter = ContentFilter.all;
                 _resetPagination();
               });
             },
             isDark: isDark,
           ),
           _FilterChip(
-            label: 'Tasks',
-            isSelected: _selectedFilter == ItemFilter.tasks,
+            label: 'Todo Lists',
+            icon: Icons.check_box_outlined,
+            isSelected: _selectedFilter == ContentFilter.todoLists,
             onSelected: () {
               setState(() {
-                _selectedFilter = ItemFilter.tasks;
-                _resetPagination();
-              });
-            },
-            isDark: isDark,
-          ),
-          _FilterChip(
-            label: 'Notes',
-            isSelected: _selectedFilter == ItemFilter.notes,
-            onSelected: () {
-              setState(() {
-                _selectedFilter = ItemFilter.notes;
+                _selectedFilter = ContentFilter.todoLists;
                 _resetPagination();
               });
             },
@@ -356,10 +341,23 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           _FilterChip(
             label: 'Lists',
-            isSelected: _selectedFilter == ItemFilter.lists,
+            icon: Icons.list_alt,
+            isSelected: _selectedFilter == ContentFilter.lists,
             onSelected: () {
               setState(() {
-                _selectedFilter = ItemFilter.lists;
+                _selectedFilter = ContentFilter.lists;
+                _resetPagination();
+              });
+            },
+            isDark: isDark,
+          ),
+          _FilterChip(
+            label: 'Notes',
+            icon: Icons.description_outlined,
+            isSelected: _selectedFilter == ContentFilter.notes,
+            onSelected: () {
+              setState(() {
+                _selectedFilter = ContentFilter.notes;
                 _resetPagination();
               });
             },
@@ -370,17 +368,18 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  /// Build item list with pagination
-  Widget _buildItemList(
+  /// Build content list with mixed types and pagination
+  Widget _buildContentList(
     BuildContext context,
-    List<Item> items,
+    List<dynamic> content,
     Space? currentSpace,
     SpacesProvider spacesProvider,
-    ItemsProvider itemsProvider,
+    ContentProvider contentProvider,
   ) {
-    if (items.isEmpty && itemsProvider.items.isEmpty) {
+    // Check if completely empty (no content at all)
+    if (content.isEmpty && contentProvider.getTotalCount() == 0) {
       // Check if this is a new user (welcome state)
-      // Welcome state: no items AND default space is the only space
+      // Welcome state: no content AND default space is the only space
       final isNewUser = spacesProvider.spaces.length == 1 &&
                         spacesProvider.spaces.first.name == 'Inbox';
 
@@ -399,23 +398,9 @@ class _HomeScreenState extends State<HomeScreen> {
     }
 
     // Calculate if there are more items to load
-    final filteredItems = _selectedFilter == ItemFilter.all
-        ? itemsProvider.items
-        : itemsProvider.items.where((item) {
-            switch (_selectedFilter) {
-              case ItemFilter.tasks:
-                return item.type == ItemType.task;
-              case ItemFilter.notes:
-                return item.type == ItemType.note;
-              case ItemFilter.lists:
-                return item.type == ItemType.list;
-              case ItemFilter.all:
-                return true;
-            }
-          }).toList();
-
-    final hasMoreItems = items.length < filteredItems.length;
-    final itemCount = hasMoreItems ? items.length + 1 : items.length;
+    final allContent = contentProvider.getFilteredContent(_selectedFilter);
+    final hasMoreItems = content.length < allContent.length;
+    final itemCount = hasMoreItems ? content.length + 1 : content.length;
 
     return ListView.builder(
       padding: const EdgeInsets.symmetric(
@@ -425,17 +410,17 @@ class _HomeScreenState extends State<HomeScreen> {
       itemCount: itemCount,
       itemBuilder: (context, index) {
         // Load more button at the end
-        if (hasMoreItems && index == items.length) {
+        if (hasMoreItems && index == content.length) {
           return Padding(
             padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
             child: Center(
               child: _isLoadingMore
                   ? const CircularProgressIndicator()
                   : ElevatedButton.icon(
-                      onPressed: () => _loadMoreItems(filteredItems.length),
+                      onPressed: () => _loadMoreItems(allContent.length),
                       icon: const Icon(Icons.expand_more),
                       label: Text(
-                        'Load More (${filteredItems.length - items.length} remaining)',
+                        'Load More (${allContent.length - content.length} remaining)',
                       ),
                       style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(
@@ -448,39 +433,78 @@ class _HomeScreenState extends State<HomeScreen> {
           );
         }
 
-        final item = items[index];
+        final item = content[index];
 
-        // Use ValueKey for efficient list updates
-        return ItemCard(
-          key: ValueKey<String>(item.id),
-          item: item,
-          onTap: () {
-            Navigator.of(context).push(
-              MaterialPageRoute<void>(
-                builder: (context) => ItemDetailScreen(item: item),
-              ),
-            );
-          },
-          onLongPress: () {
-            debugPrint('Item long-pressed: ${item.id}');
-          },
-          onCheckboxChanged: item.type == ItemType.task
-              ? (value) {
-                  context.read<ItemsProvider>().toggleCompletion(item.id);
-                }
-              : null,
-        );
+        // Render different card types based on content type
+        return _buildContentCard(item, index);
       },
     );
+  }
+
+  /// Build the appropriate card widget for each content type
+  Widget _buildContentCard(dynamic item, int index) {
+    // Use type checking to render correct card
+    if (item is TodoList) {
+      return TodoListCard(
+        key: ValueKey<String>('todo-${item.id}'),
+        todoList: item,
+        onTap: () {
+          Navigator.of(context).push(
+            MaterialPageRoute<void>(
+              builder: (context) => TodoListDetailScreen(todoList: item),
+            ),
+          );
+        },
+        onLongPress: () {
+          debugPrint('TodoList long-pressed: ${item.id}');
+        },
+        index: index,
+      );
+    } else if (item is ListModel) {
+      return ListCard(
+        key: ValueKey<String>('list-${item.id}'),
+        list: item,
+        onTap: () {
+          Navigator.of(context).push(
+            MaterialPageRoute<void>(
+              builder: (context) => ListDetailScreen(list: item),
+            ),
+          );
+        },
+        onLongPress: () {
+          debugPrint('List long-pressed: ${item.id}');
+        },
+        index: index,
+      );
+    } else if (item is Item) {
+      return NoteCard(
+        key: ValueKey<String>('note-${item.id}'),
+        item: item,
+        onTap: () {
+          Navigator.of(context).push(
+            MaterialPageRoute<void>(
+              builder: (context) => NoteDetailScreen(note: item),
+            ),
+          );
+        },
+        onLongPress: () {
+          debugPrint('Note long-pressed: ${item.id}');
+        },
+        index: index,
+      );
+    } else {
+      // Fallback for unknown types
+      return const SizedBox.shrink();
+    }
   }
 
   /// Build mobile layout
   Widget _buildMobileLayout(
     BuildContext context,
-    ItemsProvider itemsProvider,
+    ContentProvider contentProvider,
     SpacesProvider spacesProvider,
   ) {
-    final filteredItems = _getFilteredItems(itemsProvider.items);
+    final filteredContent = _getFilteredContent(contentProvider);
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
@@ -492,24 +516,22 @@ class _HomeScreenState extends State<HomeScreen> {
             children: [
               // Filter chips
               _buildFilterChips(context),
-
-              // Divider
               const Divider(height: 1),
 
-              // Item list
+              // Content list
               Expanded(
                 child: RefreshIndicator(
                   onRefresh: _handleRefresh,
                   color: isDark ? AppColors.primaryStartDark : AppColors.primaryStart,
                   backgroundColor: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
-                  child: itemsProvider.isLoading
+                  child: contentProvider.isLoading
                       ? const Center(child: CircularProgressIndicator())
-                      : _buildItemList(
+                      : _buildContentList(
                           context,
-                          filteredItems,
+                          filteredContent,
                           spacesProvider.currentSpace,
                           spacesProvider,
-                          itemsProvider,
+                          contentProvider,
                         ),
                 ),
               ),
@@ -556,10 +578,10 @@ class _HomeScreenState extends State<HomeScreen> {
   /// Build desktop layout
   Widget _buildDesktopLayout(
     BuildContext context,
-    ItemsProvider itemsProvider,
+    ContentProvider contentProvider,
     SpacesProvider spacesProvider,
   ) {
-    final filteredItems = _getFilteredItems(itemsProvider.items);
+    final filteredContent = _getFilteredContent(contentProvider);
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
@@ -585,24 +607,22 @@ class _HomeScreenState extends State<HomeScreen> {
 
                     // Filter chips
                     _buildFilterChips(context),
-
-                    // Divider
                     const Divider(height: 1),
 
-                    // Item list
+                    // Content list
                     Expanded(
                       child: RefreshIndicator(
                         onRefresh: _handleRefresh,
                         color: isDark ? AppColors.primaryStartDark : AppColors.primaryStart,
                         backgroundColor: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
-                        child: itemsProvider.isLoading
+                        child: contentProvider.isLoading
                             ? const Center(child: CircularProgressIndicator())
-                            : _buildItemList(
+                            : _buildContentList(
                                 context,
-                                filteredItems,
+                                filteredContent,
                                 spacesProvider.currentSpace,
                                 spacesProvider,
-                                itemsProvider,
+                                contentProvider,
                               ),
                       ),
                     ),
@@ -646,15 +666,15 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final isDesktop = context.isDesktopOrLarger;
-    final itemsProvider = context.watch<ItemsProvider>();
+    final contentProvider = context.watch<ContentProvider>();
     final spacesProvider = context.watch<SpacesProvider>();
 
     return Focus(
       autofocus: true,
       onKeyEvent: _handleKeyEvent,
       child: isDesktop
-          ? _buildDesktopLayout(context, itemsProvider, spacesProvider)
-          : _buildMobileLayout(context, itemsProvider, spacesProvider),
+          ? _buildDesktopLayout(context, contentProvider, spacesProvider)
+          : _buildMobileLayout(context, contentProvider, spacesProvider),
     );
   }
 }
@@ -666,12 +686,14 @@ class _FilterChip extends StatefulWidget {
     required this.isSelected,
     required this.onSelected,
     required this.isDark,
+    this.icon,
   });
 
   final String label;
   final bool isSelected;
   final VoidCallback onSelected;
   final bool isDark;
+  final IconData? icon;
 
   @override
   State<_FilterChip> createState() => _FilterChipState();
@@ -767,15 +789,30 @@ class _FilterChipState extends State<_FilterChip> with SingleTickerProviderState
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Center(
-                  child: Text(
-                    widget.label,
-                    style: AppTypography.bodyMedium.copyWith(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500, // medium weight
-                      color: isDark
-                          ? AppColors.textPrimaryDark
-                          : AppColors.textPrimaryLight,
-                    ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (widget.icon != null) ...[
+                        Icon(
+                          widget.icon,
+                          size: 16,
+                          color: isDark
+                              ? AppColors.textPrimaryDark
+                              : AppColors.textPrimaryLight,
+                        ),
+                        const SizedBox(width: 6),
+                      ],
+                      Text(
+                        widget.label,
+                        style: AppTypography.bodyMedium.copyWith(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500, // medium weight
+                          color: isDark
+                              ? AppColors.textPrimaryDark
+                              : AppColors.textPrimaryLight,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),
@@ -804,15 +841,30 @@ class _FilterChipState extends State<_FilterChip> with SingleTickerProviderState
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Center(
-              child: Text(
-                widget.label,
-                style: AppTypography.bodyMedium.copyWith(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500, // medium weight
-                  color: isDark
-                      ? AppColors.textSecondaryDark
-                      : AppColors.textSecondaryLight,
-                ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (widget.icon != null) ...[
+                    Icon(
+                      widget.icon,
+                      size: 16,
+                      color: isDark
+                          ? AppColors.textSecondaryDark
+                          : AppColors.textSecondaryLight,
+                    ),
+                    const SizedBox(width: 6),
+                  ],
+                  Text(
+                    widget.label,
+                    style: AppTypography.bodyMedium.copyWith(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500, // medium weight
+                      color: isDark
+                          ? AppColors.textSecondaryDark
+                          : AppColors.textSecondaryLight,
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
@@ -822,10 +874,3 @@ class _FilterChipState extends State<_FilterChip> with SingleTickerProviderState
   }
 }
 
-/// Item filter enum
-enum ItemFilter {
-  all,
-  tasks,
-  notes,
-  lists,
-}

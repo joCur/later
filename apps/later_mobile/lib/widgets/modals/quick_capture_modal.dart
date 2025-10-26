@@ -14,10 +14,12 @@ import '../../core/theme/app_spacing.dart';
 import '../../core/theme/app_typography.dart';
 import '../../core/utils/item_type_detector.dart';
 import '../../data/models/item_model.dart';
-import '../../providers/items_provider.dart';
+import '../../data/models/list_model.dart';
+import '../../data/models/todo_list_model.dart';
+import '../../providers/content_provider.dart';
 import '../../providers/spaces_provider.dart';
 
-/// Type option for the type selector
+/// Type option for Quick Capture content type selector
 class TypeOption {
   const TypeOption({
     required this.label,
@@ -28,7 +30,7 @@ class TypeOption {
 
   final String label;
   final IconData icon;
-  final ItemType? type; // null for "Auto"
+  final ContentType? type; // null for "Auto"
   final Color? color;
 }
 
@@ -64,31 +66,32 @@ class _QuickCaptureModalState extends State<QuickCaptureModal>
   bool _isSaved = false;
   String? _selectedSpaceId; // Local state for space selection (modal-only)
 
-  // Type options
+  // Type selection for content creation
   static const List<TypeOption> _typeOptions = [
     TypeOption(label: 'Auto', icon: Icons.auto_awesome, type: null),
     TypeOption(
-      label: 'Task',
+      label: 'Todo',
       icon: Icons.check_box_outlined,
-      type: ItemType.task,
+      type: ContentType.todoList,
       color: AppColors.accentBlue,
+    ),
+    TypeOption(
+      label: 'List',
+      icon: Icons.list_alt,
+      type: ContentType.list,
+      color: AppColors.accentViolet,
     ),
     TypeOption(
       label: 'Note',
       icon: Icons.description_outlined,
-      type: ItemType.note,
+      type: ContentType.note,
       color: AppColors.accentGreen,
-    ),
-    TypeOption(
-      label: 'List',
-      icon: Icons.list,
-      type: ItemType.list,
-      color: AppColors.accentViolet,
     ),
   ];
 
-  ItemType? _selectedType; // null = Auto
-  ItemType? _detectedType; // Tracks auto-detected type
+  ContentType? _selectedType; // null = Auto
+  ContentType? _detectedType; // Tracks auto-detected type
+
   late AnimationController _animationController;
   late Animation<double> _scaleAnimation;
   late Animation<double> _fadeAnimation;
@@ -144,22 +147,12 @@ class _QuickCaptureModalState extends State<QuickCaptureModal>
       vsync: this,
     );
 
-    _typeIconScaleAnimation = TweenSequence<double>([
-      TweenSequenceItem(
-        tween: Tween<double>(
-          begin: 1.0,
-          end: 1.1,
-        ).chain(CurveTween(curve: AppAnimations.springCurve)),
-        weight: 50,
+    _typeIconScaleAnimation = Tween<double>(begin: 1.0, end: 1.3).animate(
+      CurvedAnimation(
+        parent: _typeIconAnimationController,
+        curve: Curves.elasticOut,
       ),
-      TweenSequenceItem(
-        tween: Tween<double>(
-          begin: 1.1,
-          end: 1.0,
-        ).chain(CurveTween(curve: AppAnimations.springCurve)),
-        weight: 50,
-      ),
-    ]).animate(_typeIconAnimationController);
+    );
 
     // Start entrance animation
     _animationController.forward();
@@ -200,8 +193,20 @@ class _QuickCaptureModalState extends State<QuickCaptureModal>
       setState(() {
         _isSaving = false;
         _isSaved = false;
+        _detectedType = null;
       });
       return;
+    }
+
+    // Detect type if in Auto mode
+    if (_selectedType == null) {
+      final newDetectedType = ItemTypeDetector.detectType(text);
+      if (_detectedType != newDetectedType) {
+        setState(() {
+          _detectedType = newDetectedType;
+        });
+        _typeIconAnimationController.forward(from: 0.0);
+      }
     }
 
     // Show saving indicator
@@ -220,7 +225,7 @@ class _QuickCaptureModalState extends State<QuickCaptureModal>
     final text = _textController.text.trim();
     if (text.isEmpty) return;
 
-    final itemsProvider = context.read<ItemsProvider>();
+    final contentProvider = context.read<ContentProvider>();
     final spacesProvider = context.read<SpacesProvider>();
     final currentSpace = spacesProvider.currentSpace;
 
@@ -254,55 +259,78 @@ class _QuickCaptureModalState extends State<QuickCaptureModal>
       );
     }
 
-    // Detect or use selected type
-    final itemType = _selectedType ?? _detectType(text);
+    // Determine content type (either user-selected or auto-detected)
+    final contentType = _selectedType ?? _detectedType ?? ContentType.note;
 
-    if (_currentItemId == null) {
-      // Create new item in the selected space
-      final item = Item(
-        id: const Uuid().v4(),
-        type: itemType,
-        title: text,
-        spaceId: targetSpaceId,
-      );
+    try {
+      if (_currentItemId == null) {
+        // Create new content based on type
+        final id = const Uuid().v4();
 
-      await itemsProvider.addItem(item);
-      _currentItemId = item.id;
-    } else {
-      // Update existing item (preserve existing spaceId for updates)
-      final existingItem = itemsProvider.items.firstWhere(
-        (item) => item.id == _currentItemId,
-        orElse: () => Item(
-          id: _currentItemId!,
-          type: itemType,
-          title: text,
-          spaceId: targetSpaceId,
-        ),
-      );
+        switch (contentType) {
+          case ContentType.todoList:
+            final todoList = TodoList(
+              id: id,
+              spaceId: targetSpaceId,
+              name: text,
+              items: [],
+            );
+            await contentProvider.createTodoList(todoList, spacesProvider);
+            _currentItemId = id;
+            break;
 
-      await itemsProvider.updateItem(
-        existingItem.copyWith(title: text, type: itemType),
-      );
+          case ContentType.list:
+            final listModel = ListModel(
+              id: id,
+              spaceId: targetSpaceId,
+              name: text,
+              items: [],
+            );
+            await contentProvider.createList(listModel, spacesProvider);
+            _currentItemId = id;
+            break;
+
+          case ContentType.note:
+            final note = Item(
+              id: id,
+              title: text,
+              spaceId: targetSpaceId,
+            );
+            await contentProvider.createNote(note, spacesProvider);
+            _currentItemId = id;
+            break;
+        }
+      } else {
+        // Update existing item (only works for Notes in this simple version)
+        // For TodoLists and Lists, we don't support editing in quick capture
+        if (contentType == ContentType.note) {
+          final existingNotes = contentProvider.notes;
+          final existingNote = existingNotes.cast<Item?>().firstWhere(
+            (note) => note?.id == _currentItemId,
+            orElse: () => null,
+          );
+
+          if (existingNote != null) {
+            await contentProvider.updateNote(
+              existingNote.copyWith(title: text),
+            );
+          }
+        }
+      }
+
+      setState(() {
+        _isSaving = false;
+        _isSaved = true;
+      });
+    } catch (e) {
+      debugPrint('QuickCapture: Error saving item - $e');
+      setState(() {
+        _isSaving = false;
+        _isSaved = false;
+      });
     }
-
-    setState(() {
-      _isSaving = false;
-      _isSaved = true;
-    });
   }
 
-  ItemType _detectType(String text) {
-    // Use ItemTypeDetector for smart type detection
-    final detectedType = ItemTypeDetector.detectType(text);
-
-    // Trigger animation if type changed and we're in auto mode
-    if (_selectedType == null && _detectedType != detectedType) {
-      _detectedType = detectedType;
-      _typeIconAnimationController.forward(from: 0.0);
-    }
-
-    return detectedType;
-  }
 
   Future<void> _handleKeyEvent(KeyEvent event) async {
     if (event is KeyDownEvent) {
@@ -843,7 +871,6 @@ class _QuickCaptureModalState extends State<QuickCaptureModal>
 
           // Type selector
           _buildTypeSelector(),
-
           const SizedBox(width: AppSpacing.xs),
 
           // Space selector
@@ -855,9 +882,13 @@ class _QuickCaptureModalState extends State<QuickCaptureModal>
 
   Widget _buildTypeSelector() {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    // Determine which option to display
+    // If user selected a type, use that, otherwise show detected or Auto
+    final displayType = _selectedType ?? _detectedType;
     final selectedOption = _typeOptions.firstWhere(
-      (option) => option.type == _selectedType,
-      orElse: () => _typeOptions[0],
+      (option) => option.type == displayType,
+      orElse: () => _typeOptions[0], // Default to Auto
     );
 
     return PopupMenuButton<TypeOption>(
@@ -876,7 +907,6 @@ class _QuickCaptureModalState extends State<QuickCaptureModal>
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Animated icon for type detection feedback
             ScaleTransition(
               key: const Key('type_icon_animated'),
               scale: _typeIconScaleAnimation,
@@ -936,6 +966,15 @@ class _QuickCaptureModalState extends State<QuickCaptureModal>
       onSelected: (option) {
         setState(() {
           _selectedType = option.type;
+          // If user explicitly selects Auto, reset detected type
+          if (option.type == null) {
+            _detectedType = null;
+            // Re-run detection on current text
+            final text = _textController.text.trim();
+            if (text.isNotEmpty) {
+              _detectedType = ItemTypeDetector.detectType(text);
+            }
+          }
         });
       },
     );

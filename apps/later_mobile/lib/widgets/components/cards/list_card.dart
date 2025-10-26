@@ -4,16 +4,11 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_animations.dart';
-import '../../../data/models/item_model.dart';
-import '../text/gradient_text.dart';
+import '../../../data/models/list_model.dart';
 import '../borders/gradient_pill_border.dart';
-import 'package:intl/intl.dart';
 
-/// Item card component for Notes (dual-model architecture)
+/// List card component for displaying lists with item previews
 /// Mobile-First Bold Redesign
-///
-/// IMPORTANT: This card is for the Item model (Notes) only in the dual-model architecture.
-/// TodoList and ListModel will have their own dedicated card components.
 ///
 /// Performance optimizations:
 /// - Uses RepaintBoundary to isolate repaints
@@ -22,31 +17,27 @@ import 'package:intl/intl.dart';
 /// - Optimized 6px gradient border for 60fps performance
 ///
 /// Mobile-First Bold Design Features:
-/// - 6px gradient pill border (3× more visible than 2px) wrapping entire card
-/// - 20px border radius (pill shape, not 12px rounded)
-/// - 18px bold title (12.5% larger + bold weight for scannability)
-/// - 15px content preview (improved readability)
+/// - 6px gradient pill border (violet gradient)
+/// - 20px border radius (pill shape)
+/// - 18px bold title
 /// - 20px card padding (comfortable thumb zones)
-/// - Solid background (no gradient overlay for 60fps performance)
-/// - Note gradient colors: Blue→Cyan
-/// - Leading element: note icon
-/// - Content preview: 2 lines with ellipsis for consistent height
-/// - Metadata row: date with gradient text
-/// - States: default, pressed, selected
-/// - Gesture handlers: tap to open, long-press for multi-select
-class ItemCard extends StatefulWidget {
-  const ItemCard({
+/// - Item count display (e.g., "12 items")
+/// - Preview of first 3 items
+/// - Custom icon or default list icon
+/// - Press animations with haptic feedback
+/// - Entrance animations with staggered delay
+/// - Semantic labels for accessibility
+class ListCard extends StatefulWidget {
+  const ListCard({
     super.key,
-    required this.item,
+    required this.list,
     this.onTap,
     this.onLongPress,
-    this.isSelected = false,
-    this.showMetadata = true,
     this.index,
   });
 
-  /// Item data to display
-  final Item item;
+  /// List data to display
+  final ListModel list;
 
   /// Callback when card is tapped
   final VoidCallback? onTap;
@@ -54,21 +45,15 @@ class ItemCard extends StatefulWidget {
   /// Callback when card is long-pressed
   final VoidCallback? onLongPress;
 
-  /// Whether card is in selected state
-  final bool isSelected;
-
-  /// Whether to show metadata row
-  final bool showMetadata;
-
   /// Index in the list for staggered entrance animation
   /// If null, no entrance animation is applied
   final int? index;
 
   @override
-  State<ItemCard> createState() => _ItemCardState();
+  State<ListCard> createState() => _ListCardState();
 }
 
-class _ItemCardState extends State<ItemCard> with TickerProviderStateMixin {
+class _ListCardState extends State<ListCard> with TickerProviderStateMixin {
   bool _isPressed = false;
   late AnimationController _pressAnimationController;
   late Animation<double> _pressScaleAnimation;
@@ -100,29 +85,56 @@ class _ItemCardState extends State<ItemCard> with TickerProviderStateMixin {
     super.dispose();
   }
 
-  /// Get border gradient for notes
+  /// Get border gradient (violet list gradient)
   LinearGradient _getBorderGradient() {
-    // Item model represents Notes in dual-model architecture
-    return AppColors.noteGradient;
+    return AppColors.listGradient;
   }
 
   /// Get background color with subtle gradient tint (5% opacity)
   Color _getBackgroundTint(bool isDark) {
-    return AppColors.typeLightBg(
-      'note',
-      isDark: isDark,
-    );
+    return AppColors.typeLightBg('list', isDark: isDark);
   }
 
-  /// Get leading icon for notes
-  IconData _getLeadingIcon() {
-    return Icons.description_outlined;
-  }
-
-  /// Build leading element (icon for notes)
-  Widget _buildLeadingElement() {
-    // Item model represents Notes - use note icon
+  /// Build leading icon with gradient shader or emoji
+  ///
+  /// Supports three icon types:
+  /// 1. Emoji: Direct text rendering (e.g., "🛒")
+  /// 2. Icon name: Mapped to Material Icon (e.g., "shopping_cart")
+  /// 3. Default: list_alt icon when null or empty
+  Widget _buildLeadingIcon() {
     final gradient = _getBorderGradient();
+    final iconString = widget.list.icon;
+
+    Widget iconWidget;
+
+    if (iconString == null || iconString.isEmpty) {
+      // Default icon
+      iconWidget = const Icon(
+        Icons.list_alt,
+        size: 20,
+        color: Colors.white, // Base color for shader mask
+      );
+    } else if (_IconParser.isEmoji(iconString)) {
+      // Emoji icon - return text widget without shader mask
+      return SizedBox(
+        width: 48,
+        height: 48,
+        child: Center(
+          child: Text(
+            iconString,
+            style: const TextStyle(fontSize: 20),
+          ),
+        ),
+      );
+    } else {
+      // Icon name - try to parse to IconData
+      final iconData = _IconParser.parseIconName(iconString);
+      iconWidget = Icon(
+        iconData,
+        size: 20,
+        color: Colors.white, // Base color for shader mask
+      );
+    }
 
     return SizedBox(
       width: 48,
@@ -130,11 +142,7 @@ class _ItemCardState extends State<ItemCard> with TickerProviderStateMixin {
       child: Center(
         child: ShaderMask(
           shaderCallback: (bounds) => gradient.createShader(bounds),
-          child: Icon(
-            _getLeadingIcon(),
-            size: 20,
-            color: Colors.white, // Base color for shader mask
-          ),
+          child: iconWidget,
         ),
       ),
     );
@@ -145,7 +153,7 @@ class _ItemCardState extends State<ItemCard> with TickerProviderStateMixin {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Text(
-      widget.item.title,
+      widget.list.name,
       style: AppTypography.itemTitle.copyWith(
         color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
       ),
@@ -154,50 +162,63 @@ class _ItemCardState extends State<ItemCard> with TickerProviderStateMixin {
     );
   }
 
-  /// Build content preview for notes
-  Widget? _buildContentPreview(BuildContext context) {
-    if (widget.item.content == null || widget.item.content!.isEmpty) {
-      return null;
-    }
-
+  /// Build item count text with singular/plural handling
+  ///
+  /// Returns "1 item" for single item, "N items" for multiple items
+  /// Examples: "1 item", "5 items", "0 items"
+  Widget _buildItemCount(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final count = widget.list.totalItems;
+    final text = count == 1 ? '1 item' : '$count items';
 
     return Text(
-      widget.item.content!,
+      text,
+      style: AppTypography.metadata.copyWith(
+        color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
+      ),
+    );
+  }
+
+  /// Build preview of first 3 items with ellipsis handling
+  ///
+  /// Shows comma-separated list of first 3 item titles
+  /// Adds "..." if more than 3 items exist
+  /// Shows "No items" when list is empty
+  Widget _buildItemPreview(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final preview = _getItemPreview();
+
+    return Text(
+      preview,
       style: AppTypography.itemContent.copyWith(
         color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
       ),
-      maxLines: 2, // Fixed 2 lines for consistent card height (mobile-first design)
+      maxLines: 2,
       overflow: TextOverflow.ellipsis,
     );
   }
 
-  /// Build metadata row
-  Widget? _buildMetadata(BuildContext context) {
-    if (!widget.showMetadata) return null;
+  /// Generate item preview string from first 3 items
+  ///
+  /// Returns:
+  /// - "No items" when list is empty
+  /// - "Item1, Item2, Item3..." when more than 3 items (with ellipsis)
+  /// - "Item1, Item2" when 2 items (no ellipsis)
+  /// - "Item1" when 1 item (no ellipsis)
+  String _getItemPreview() {
+    if (widget.list.items.isEmpty) {
+      return 'No items';
+    }
 
-    final dateFormat = DateFormat('MMM d, y');
+    final firstThree = widget.list.items.take(3).map((item) => item.title).toList();
+    final preview = firstThree.join(', ');
 
-    return Row(
-      children: [
-        // Icon with gradient tint for created dates
-        ShaderMask(
-          shaderCallback: (bounds) => AppColors.primaryGradientAdaptive(context).createShader(bounds),
-          blendMode: BlendMode.srcIn,
-          child: const Icon(
-            Icons.access_time,
-            size: 12,
-            color: Colors.white,
-          ),
-        ),
-        const SizedBox(width: AppSpacing.xxxs),
-        // Created date with subtle primary gradient
-        GradientText.subtle(
-          dateFormat.format(widget.item.createdAt),
-          style: AppTypography.metadata,
-        ),
-      ],
-    );
+    // Add ellipsis if there are more than 3 items
+    if (widget.list.items.length > 3) {
+      return '$preview...';
+    }
+
+    return preview;
   }
 
   void _handleTapDown(TapDownDetails details) {
@@ -239,14 +260,9 @@ class _ItemCardState extends State<ItemCard> with TickerProviderStateMixin {
     final baseBgColor = isDark ? AppColors.surfaceDark : AppColors.surfaceLight;
     final tintColor = _getBackgroundTint(isDark);
 
-    // Background color based on state with glass morphism for hover/selected
+    // Background color based on state
     Color backgroundColor;
-    if (widget.isSelected) {
-      // Glass morphism overlay (3% opacity) for selected state
-      backgroundColor = isDark
-          ? AppColors.glass(context).withValues(alpha: 0.03)
-          : AppColors.glass(context).withValues(alpha: 0.03);
-    } else if (_isPressed) {
+    if (_isPressed) {
       backgroundColor = isDark
           ? AppColors.surfaceDarkVariant
           : AppColors.neutralGray100;
@@ -258,8 +274,9 @@ class _ItemCardState extends State<ItemCard> with TickerProviderStateMixin {
       );
     }
 
-    // Notes don't have completion status - always full opacity
-    const opacity = 1.0;
+    // Build the semantic label
+    final semanticLabel = 'List: ${widget.list.name}, '
+        '${widget.list.totalItems} ${widget.list.totalItems == 1 ? 'item' : 'items'}';
 
     // Build the card widget with mobile-first bold design
     // Phase 5: Wrap with AnimatedBuilder for press scale animation
@@ -276,16 +293,14 @@ class _ItemCardState extends State<ItemCard> with TickerProviderStateMixin {
           container: true,
           button: true,
           enabled: widget.onTap != null,
-          label: 'Note: ${widget.item.title}',
+          label: semanticLabel,
           child: GestureDetector(
             onTapDown: _handleTapDown,
             onTapUp: _handleTapUp,
             onTapCancel: _handleTapCancel,
             onTap: _handleTap,
             onLongPress: _handleLongPress,
-            child: Opacity(
-              opacity: opacity,
-              child: Container(
+            child: Container(
               margin: const EdgeInsets.only(bottom: AppSpacing.cardSpacing), // 16px spacing
               // Wrap entire card with gradient pill border (6px width, 20px radius)
               child: GradientPillBorder(
@@ -293,7 +308,7 @@ class _ItemCardState extends State<ItemCard> with TickerProviderStateMixin {
                 child: Container(
                   decoration: BoxDecoration(
                     color: backgroundColor,
-                    borderRadius: BorderRadius.circular(AppSpacing.cardRadius - AppSpacing.cardBorderWidth), // Inner radius reduced by border width to maintain consistent corner appearance
+                    borderRadius: BorderRadius.circular(AppSpacing.cardRadius - AppSpacing.cardBorderWidth), // Inner radius reduced by border width
                     // Mobile-optimized shadow: 4px offset, 8px blur, 12% opacity
                     boxShadow: _isPressed
                         ? null
@@ -313,8 +328,8 @@ class _ItemCardState extends State<ItemCard> with TickerProviderStateMixin {
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Leading element (checkbox or icon)
-                      _buildLeadingElement(),
+                      // Leading icon
+                      _buildLeadingIcon(),
                       const SizedBox(width: AppSpacing.xs), // 8px
 
                       // Content
@@ -326,17 +341,13 @@ class _ItemCardState extends State<ItemCard> with TickerProviderStateMixin {
                             // Title (18px bold, max 2 lines)
                             _buildTitle(context),
 
-                            // Content preview (15px, 2 lines)
-                            if (_buildContentPreview(context) != null) ...[
-                              const SizedBox(height: AppSpacing.xxs), // 4px
-                              _buildContentPreview(context)!,
-                            ],
+                            // Item count
+                            const SizedBox(height: AppSpacing.xxs), // 4px
+                            _buildItemCount(context),
 
-                            // Metadata (gradient text)
-                            if (_buildMetadata(context) != null) ...[
-                              const SizedBox(height: AppSpacing.xs), // 8px
-                              _buildMetadata(context)!,
-                            ],
+                            // Item preview
+                            const SizedBox(height: AppSpacing.xs), // 8px
+                            _buildItemPreview(context),
                           ],
                         ),
                       ),
@@ -347,7 +358,6 @@ class _ItemCardState extends State<ItemCard> with TickerProviderStateMixin {
             ),
           ),
         ),
-      ),
       ),
     );
 
@@ -381,5 +391,58 @@ class _ItemCardState extends State<ItemCard> with TickerProviderStateMixin {
 
     // Return without entrance animation
     return cardWidget;
+  }
+}
+
+/// Helper class for parsing icon strings
+///
+/// Handles three types of icon representations:
+/// 1. Emoji strings (Unicode characters)
+/// 2. Icon names (mapped to Material Icons)
+/// 3. Default fallback (list_alt icon)
+class _IconParser {
+  _IconParser._(); // Private constructor to prevent instantiation
+
+  /// Check if string is an emoji
+  ///
+  /// Uses Unicode range heuristics to detect emoji characters
+  /// Common emoji ranges: 0x1F300-0x1F9FF, 0x2600-0x26FF, 0x2700-0x27BF
+  static bool isEmoji(String text) {
+    if (text.isEmpty) return false;
+    final codeUnit = text.codeUnitAt(0);
+    return (codeUnit >= 0x1F300 && codeUnit <= 0x1F9FF) ||
+        (codeUnit >= 0x2600 && codeUnit <= 0x26FF) ||
+        (codeUnit >= 0x2700 && codeUnit <= 0x27BF);
+  }
+
+  /// Parse icon name string to IconData
+  ///
+  /// Maps common icon name strings to Material IconData objects
+  /// Returns Icons.list_alt as default fallback for unmapped names
+  static IconData parseIconName(String iconName) {
+    // Map common icon names to IconData
+    const iconMap = <String, IconData>{
+      'shopping_cart': Icons.shopping_cart,
+      'favorite': Icons.favorite,
+      'star': Icons.star,
+      'home': Icons.home,
+      'work': Icons.work,
+      'school': Icons.school,
+      'restaurant': Icons.restaurant,
+      'local_grocery_store': Icons.local_grocery_store,
+      'shopping_bag': Icons.shopping_bag,
+      'list': Icons.list,
+      'list_alt': Icons.list_alt,
+      'checklist': Icons.checklist,
+      'check_circle': Icons.check_circle,
+      'folder': Icons.folder,
+      'description': Icons.description,
+      'note': Icons.note,
+      'book': Icons.book,
+      'library_books': Icons.library_books,
+      'assignment': Icons.assignment,
+    };
+
+    return iconMap[iconName] ?? Icons.list_alt; // Default fallback
   }
 }

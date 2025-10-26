@@ -2,7 +2,6 @@
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:later_mobile/core/utils/item_type_detector.dart';
-import 'package:later_mobile/data/models/item_model.dart';
 
 void main() {
   group('ItemTypeDetector - Performance', () {
@@ -96,7 +95,7 @@ Shopping list:
       final stopwatch = Stopwatch()..start();
 
       for (var i = 0; i < 100; i++) {
-        ItemTypeDetector.getConfidence(content, ItemType.task);
+        ItemTypeDetector.getConfidence(content, ContentType.todoList);
       }
 
       stopwatch.stop();

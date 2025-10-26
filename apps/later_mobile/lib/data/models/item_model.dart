@@ -2,29 +2,23 @@ import 'package:hive/hive.dart';
 
 part 'item_model.g.dart';
 
-/// Enum representing the type of item
-@HiveType(typeId: 0)
-enum ItemType {
-  @HiveField(0)
-  task,
-  @HiveField(1)
-  note,
-  @HiveField(2)
-  list,
-}
-
-/// Item model for tasks, notes, and lists
+/// Note model for free-form content and documentation
 /// Designed for both local storage (Hive) and future backend sync (Supabase)
+///
+/// A Note represents a simple piece of content with:
+/// - A title (required)
+/// - Optional body content
+/// - Association with a Space
+/// - Tags for organization
+/// - Timestamps for creation and updates
+/// - Sync status for future backend integration
 @HiveType(typeId: 1)
 class Item {
   Item({
     required this.id,
-    required this.type,
     required this.title,
     this.content,
     required this.spaceId,
-    this.isCompleted = false,
-    this.dueDate,
     List<String>? tags,
     DateTime? createdAt,
     DateTime? updatedAt,
@@ -37,16 +31,9 @@ class Item {
   factory Item.fromJson(Map<String, dynamic> json) {
     return Item(
       id: json['id'] as String,
-      type: ItemType.values.firstWhere(
-        (e) => e.toString().split('.').last == json['type'],
-      ),
       title: json['title'] as String,
       content: json['content'] as String?,
       spaceId: json['spaceId'] as String,
-      isCompleted: json['isCompleted'] as bool? ?? false,
-      dueDate: json['dueDate'] != null
-          ? DateTime.parse(json['dueDate'] as String)
-          : null,
       tags: (json['tags'] as List<dynamic>?)?.cast<String>() ?? [],
       createdAt: DateTime.parse(json['createdAt'] as String),
       updatedAt: DateTime.parse(json['updatedAt'] as String),
@@ -58,39 +45,27 @@ class Item {
   @HiveField(0)
   final String id;
 
-  /// Type of item (task, note, or list)
-  @HiveField(1)
-  final ItemType type;
-
-  /// Title/heading of the item
+  /// Title/heading of the note
   @HiveField(2)
   final String title;
 
-  /// Optional content/body of the item
+  /// Optional content/body of the note
   @HiveField(3)
   final String? content;
 
-  /// ID of the space this item belongs to
+  /// ID of the space this note belongs to
   @HiveField(4)
   final String spaceId;
 
-  /// Whether the task is completed (only relevant for tasks)
-  @HiveField(5)
-  final bool isCompleted;
-
-  /// Optional due date (primarily for tasks)
-  @HiveField(6)
-  final DateTime? dueDate;
-
-  /// Tags associated with the item
+  /// Tags associated with the note for organization
   @HiveField(7)
   final List<String> tags;
 
-  /// When the item was created
+  /// When the note was created
   @HiveField(8)
   final DateTime createdAt;
 
-  /// When the item was last updated
+  /// When the note was last updated
   @HiveField(9)
   final DateTime updatedAt;
 
@@ -99,18 +74,15 @@ class Item {
   @HiveField(10)
   final String? syncStatus;
 
-  /// Create a copy of this item with updated fields
+  /// Create a copy of this note with updated fields
   ///
-  /// Note: To explicitly clear nullable fields like dueDate, use the clearDueDate parameter
+  /// Note: To explicitly clear nullable fields like content or syncStatus,
+  /// pass null directly (the pattern with clear* parameters is not needed here)
   Item copyWith({
     String? id,
-    ItemType? type,
     String? title,
     String? content,
     String? spaceId,
-    bool? isCompleted,
-    DateTime? dueDate,
-    bool clearDueDate = false,
     List<String>? tags,
     DateTime? createdAt,
     DateTime? updatedAt,
@@ -118,12 +90,9 @@ class Item {
   }) {
     return Item(
       id: id ?? this.id,
-      type: type ?? this.type,
       title: title ?? this.title,
       content: content ?? this.content,
       spaceId: spaceId ?? this.spaceId,
-      isCompleted: isCompleted ?? this.isCompleted,
-      dueDate: clearDueDate ? null : (dueDate ?? this.dueDate),
       tags: tags ?? this.tags,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
@@ -135,12 +104,9 @@ class Item {
   Map<String, dynamic> toJson() {
     return {
       'id': id,
-      'type': type.toString().split('.').last,
       'title': title,
       'content': content,
       'spaceId': spaceId,
-      'isCompleted': isCompleted,
-      'dueDate': dueDate?.toIso8601String(),
       'tags': tags,
       'createdAt': createdAt.toIso8601String(),
       'updatedAt': updatedAt.toIso8601String(),
@@ -150,7 +116,7 @@ class Item {
 
   @override
   String toString() {
-    return 'Item(id: $id, type: $type, title: $title, spaceId: $spaceId, isCompleted: $isCompleted)';
+    return 'Item(id: $id, title: $title, spaceId: $spaceId, tags: $tags)';
   }
 
   @override
