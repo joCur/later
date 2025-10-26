@@ -4,10 +4,12 @@ import 'dart:ui' show ImageFilter;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:later_mobile/design_system/atoms/buttons/ghost_button.dart';
+import 'package:later_mobile/design_system/atoms/inputs/text_area_field.dart';
+import 'package:later_mobile/design_system/tokens/tokens.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 
-import 'package:later_mobile/design_system/tokens/tokens.dart';
 import '../../core/responsive/breakpoints.dart';
 import '../../core/utils/item_type_detector.dart';
 import '../../data/models/item_model.dart';
@@ -15,8 +17,6 @@ import '../../data/models/list_model.dart';
 import '../../data/models/todo_list_model.dart';
 import '../../providers/content_provider.dart';
 import '../../providers/spaces_provider.dart';
-import 'package:later_mobile/design_system/atoms/inputs/text_area_field.dart';
-import 'package:later_mobile/design_system/atoms/buttons/ghost_button.dart';
 
 /// Type option for Quick Capture content type selector
 class TypeOption {
@@ -290,11 +290,7 @@ class _QuickCaptureModalState extends State<QuickCaptureModal>
             break;
 
           case ContentType.note:
-            final note = Item(
-              id: id,
-              title: text,
-              spaceId: targetSpaceId,
-            );
+            final note = Item(id: id, title: text, spaceId: targetSpaceId);
             await contentProvider.createNote(note, spacesProvider);
             _currentItemId = id;
             break;
@@ -329,7 +325,6 @@ class _QuickCaptureModalState extends State<QuickCaptureModal>
       });
     }
   }
-
 
   Future<void> _handleKeyEvent(KeyEvent event) async {
     if (event is KeyDownEvent) {

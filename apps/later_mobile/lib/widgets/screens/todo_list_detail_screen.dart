@@ -11,10 +11,11 @@ import '../../providers/spaces_provider.dart';
 import 'package:later_mobile/design_system/organisms/cards/todo_item_card.dart';
 import 'package:later_mobile/design_system/organisms/fab/responsive_fab.dart';
 import 'package:later_mobile/design_system/organisms/modals/bottom_sheet_container.dart';
-import 'package:later_mobile/design_system/atoms/text/gradient_text.dart';
 import 'package:later_mobile/design_system/atoms/inputs/text_input_field.dart';
 import 'package:later_mobile/design_system/atoms/inputs/text_area_field.dart';
 import 'package:later_mobile/design_system/organisms/dialogs/delete_confirmation_dialog.dart';
+import 'package:later_mobile/design_system/molecules/app_bars/editable_app_bar_title.dart';
+import 'package:later_mobile/design_system/molecules/lists/dismissible_list_item.dart';
 
 /// TodoList Detail Screen for viewing and editing TodoList with TodoItems
 ///
@@ -50,7 +51,6 @@ class _TodoListDetailScreenState extends State<TodoListDetailScreen> {
   Timer? _deletionTimer;
   bool _isSaving = false;
   bool _hasChanges = false;
-  bool _isEditingName = false;
 
   @override
   void initState() {
@@ -387,15 +387,6 @@ class _TodoListDetailScreenState extends State<TodoListDetailScreen> {
     );
   }
 
-  /// Show delete item confirmation
-  Future<bool?> _showDeleteItemConfirmation(String itemTitle) async {
-    return showDeleteConfirmationDialog(
-      context: context,
-      title: 'Delete TodoItem',
-      message: 'Are you sure you want to delete "$itemTitle"?',
-    );
-  }
-
   /// Show delete list confirmation
   Future<void> _showDeleteListConfirmation() async {
     final confirmed = await showDeleteConfirmationDialog(
@@ -452,43 +443,15 @@ class _TodoListDetailScreenState extends State<TodoListDetailScreen> {
       },
       child: Scaffold(
         appBar: AppBar(
-          title: _isEditingName
-              ? TextField(
-                  controller: _nameController,
-                  autofocus: true,
-                  style: AppTypography.h3,
-                  decoration: const InputDecoration(
-                    border: InputBorder.none,
-                    hintText: 'TodoList name',
-                  ),
-                  onSubmitted: (_) {
-                    setState(() {
-                      _isEditingName = false;
-                    });
-                    _saveChanges();
-                  },
-                )
-              : GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      _isEditingName = true;
-                    });
-                  },
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Flexible(
-                        child: GradientText(
-                          _currentTodoList.name,
-                          gradient: AppColors.taskGradient,
-                          style: AppTypography.h3,
-                        ),
-                      ),
-                      const SizedBox(width: AppSpacing.xs),
-                      const Icon(Icons.edit, size: 16),
-                    ],
-                  ),
-                ),
+          title: EditableAppBarTitle(
+            text: _currentTodoList.name,
+            onChanged: (newName) {
+              _nameController.text = newName;
+              _saveChanges();
+            },
+            gradient: AppColors.taskGradient,
+            hintText: 'TodoList name',
+          ),
           actions: [
             if (_isSaving)
               const Padding(
@@ -576,28 +539,10 @@ class _TodoListDetailScreenState extends State<TodoListDetailScreen> {
                       },
                       itemBuilder: (context, index) {
                         final item = _currentTodoList.items[index];
-                        return Dismissible(
-                          key: ValueKey(item.id),
-                          background: Padding(
-                            padding: const EdgeInsets.only(bottom: 8.0),
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(8.0),
-                              child: Container(
-                                color: AppColors.error,
-                                alignment: Alignment.centerRight,
-                                padding: const EdgeInsets.only(right: 16.0),
-                                child: const Icon(
-                                  Icons.delete,
-                                  color: Colors.white,
-                                  size: 24,
-                                ),
-                              ),
-                            ),
-                          ),
-                          direction: DismissDirection.endToStart,
-                          confirmDismiss: (_) =>
-                              _showDeleteItemConfirmation(item.title),
-                          onDismissed: (_) => _performDeleteTodoItem(item),
+                        return DismissibleListItem(
+                          itemKey: ValueKey(item.id),
+                          itemName: item.title,
+                          onDelete: () => _performDeleteTodoItem(item),
                           child: TodoItemCard(
                             todoItem: item,
                             onCheckboxChanged: (value) => _toggleTodoItem(item),

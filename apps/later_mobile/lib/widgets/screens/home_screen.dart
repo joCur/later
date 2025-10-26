@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:later_mobile/design_system/tokens/tokens.dart';
 import '../../core/responsive/breakpoints.dart';
+import '../../core/utils/responsive_modal.dart';
 import '../../data/models/item_model.dart';
 import '../../data/models/space_model.dart';
 import '../../data/models/todo_list_model.dart';
@@ -23,6 +24,7 @@ import 'todo_list_detail_screen.dart';
 import 'list_detail_screen.dart';
 import 'note_detail_screen.dart';
 import 'package:later_mobile/design_system/atoms/buttons/primary_button.dart';
+import 'package:later_mobile/design_system/atoms/chips/filter_chip.dart';
 
 /// Main home screen for the Later app
 ///
@@ -134,27 +136,12 @@ class _HomeScreenState extends State<HomeScreen> {
 
   /// Show quick capture modal
   void _showQuickCaptureModal() {
-    final isMobile = Breakpoints.isMobile(context);
-
-    if (isMobile) {
-      // Show as bottom sheet on mobile
-      showModalBottomSheet<void>(
-        context: context,
-        isScrollControlled: true,
-        backgroundColor: Colors.transparent,
-        builder: (context) => QuickCaptureModal(
-          onClose: () => Navigator.of(context).pop(),
-        ),
-      );
-    } else {
-      // Show as dialog on desktop/tablet
-      showDialog<void>(
-        context: context,
-        builder: (context) => QuickCaptureModal(
-          onClose: () => Navigator.of(context).pop(),
-        ),
-      );
-    }
+    ResponsiveModal.show<void>(
+      context: context,
+      child: QuickCaptureModal(
+        onClose: () => Navigator.of(context).pop(),
+      ),
+    );
   }
 
   /// Handle keyboard shortcuts
@@ -201,7 +188,10 @@ class _HomeScreenState extends State<HomeScreen> {
                       final spacesProvider = context.read<SpacesProvider>();
                       final contentProvider = context.read<ContentProvider>();
 
-                      final result = await SpaceSwitcherModal.show(context);
+                      final result = await ResponsiveModal.show<bool>(
+                        context: context,
+                        child: const SpaceSwitcherModal(),
+                      );
                       if (!mounted) return;
 
                       if (result == true) {
@@ -313,7 +303,7 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Wrap(
         spacing: AppSpacing.xs,
         children: [
-          _FilterChip(
+          TemporalFilterChip(
             label: 'All',
             icon: Icons.grid_view,
             isSelected: _selectedFilter == ContentFilter.all,
@@ -325,7 +315,7 @@ class _HomeScreenState extends State<HomeScreen> {
             },
             isDark: isDark,
           ),
-          _FilterChip(
+          TemporalFilterChip(
             label: 'Todo Lists',
             icon: Icons.check_box_outlined,
             isSelected: _selectedFilter == ContentFilter.todoLists,
@@ -337,7 +327,7 @@ class _HomeScreenState extends State<HomeScreen> {
             },
             isDark: isDark,
           ),
-          _FilterChip(
+          TemporalFilterChip(
             label: 'Lists',
             icon: Icons.list_alt,
             isSelected: _selectedFilter == ContentFilter.lists,
@@ -349,7 +339,7 @@ class _HomeScreenState extends State<HomeScreen> {
             },
             isDark: isDark,
           ),
-          _FilterChip(
+          TemporalFilterChip(
             label: 'Notes',
             icon: Icons.description_outlined,
             isSelected: _selectedFilter == ContentFilter.notes,
@@ -668,199 +658,3 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 }
-
-/// Filter chip widget with gradient active state
-class _FilterChip extends StatefulWidget {
-  const _FilterChip({
-    required this.label,
-    required this.isSelected,
-    required this.onSelected,
-    required this.isDark,
-    this.icon,
-  });
-
-  final String label;
-  final bool isSelected;
-  final VoidCallback onSelected;
-  final bool isDark;
-  final IconData? icon;
-
-  @override
-  State<_FilterChip> createState() => _FilterChipState();
-}
-
-class _FilterChipState extends State<_FilterChip> with SingleTickerProviderStateMixin {
-  late AnimationController _animationController;
-  late Animation<double> _scaleAnimation;
-
-  @override
-  void initState() {
-    super.initState();
-
-    // Phase 5: Initialize animation controller for selection animation
-    _animationController = AnimationController(
-      duration: const Duration(milliseconds: 200),
-      vsync: this,
-    );
-
-    // Create scale animation: 1.0 -> 1.05 -> 1.0
-    _scaleAnimation = TweenSequence<double>([
-      TweenSequenceItem(
-        tween: Tween<double>(begin: 1.0, end: 1.05)
-            .chain(CurveTween(curve: Curves.easeOut)),
-        weight: 50.0,
-      ),
-      TweenSequenceItem(
-        tween: Tween<double>(begin: 1.05, end: 1.0)
-            .chain(CurveTween(curve: Curves.easeIn)),
-        weight: 50.0,
-      ),
-    ]).animate(_animationController);
-  }
-
-  @override
-  void dispose() {
-    _animationController.dispose();
-    super.dispose();
-  }
-
-  void _handleTap() {
-    // Phase 5: Trigger scale animation and haptic feedback on selection
-    _animationController.forward(from: 0.0);
-    AppAnimations.lightHaptic();
-    widget.onSelected();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    // Mobile-first Phase 4: Pill-shaped chips with gradient border when selected
-    // Phase 5: Added scale animation and haptic feedback
-    // Selected: 2px gradient border (not full background)
-    // Unselected: 1px solid border (neutral)
-    // Height: 36px, padding: 16px horizontal
-    // Font: 14px medium weight
-
-    // Wrap with AnimatedBuilder for scale animation
-    return AnimatedBuilder(
-      animation: _scaleAnimation,
-      builder: (context, child) {
-        return Transform.scale(
-          scale: _scaleAnimation.value,
-          child: child,
-        );
-      },
-      child: _buildChipContent(),
-    );
-  }
-
-  Widget _buildChipContent() {
-    final isDark = widget.isDark;
-
-    if (widget.isSelected) {
-      return Container(
-        height: 36,
-        decoration: BoxDecoration(
-          gradient: isDark
-              ? AppColors.primaryGradientDark
-              : AppColors.primaryGradient,
-          borderRadius: BorderRadius.circular(20), // Pill shape
-        ),
-        child: Container(
-          margin: const EdgeInsets.all(2), // 2px border width
-          decoration: BoxDecoration(
-            color: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
-            borderRadius: BorderRadius.circular(18), // 20 - 2 = 18
-          ),
-          child: Material(
-            color: Colors.transparent,
-            child: InkWell(
-              onTap: _handleTap, // Phase 5: Use new handler with animation
-              borderRadius: BorderRadius.circular(18),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Center(
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      if (widget.icon != null) ...[
-                        Icon(
-                          widget.icon,
-                          size: 16,
-                          color: isDark
-                              ? AppColors.textPrimaryDark
-                              : AppColors.textPrimaryLight,
-                        ),
-                        const SizedBox(width: 6),
-                      ],
-                      Text(
-                        widget.label,
-                        style: AppTypography.bodyMedium.copyWith(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500, // medium weight
-                          color: isDark
-                              ? AppColors.textPrimaryDark
-                              : AppColors.textPrimaryLight,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ),
-      );
-    }
-
-    // Unselected state - 1px solid border
-    return Container(
-      height: 36,
-      decoration: BoxDecoration(
-        border: Border.all(
-          color: isDark
-              ? AppColors.neutral600.withValues(alpha: 0.3)
-              : AppColors.neutral400.withValues(alpha: 0.3),
-        ),
-        borderRadius: BorderRadius.circular(20), // Pill shape
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: _handleTap, // Phase 5: Use new handler with animation
-          borderRadius: BorderRadius.circular(20),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Center(
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  if (widget.icon != null) ...[
-                    Icon(
-                      widget.icon,
-                      size: 16,
-                      color: isDark
-                          ? AppColors.textSecondaryDark
-                          : AppColors.textSecondaryLight,
-                    ),
-                    const SizedBox(width: 6),
-                  ],
-                  Text(
-                    widget.label,
-                    style: AppTypography.bodyMedium.copyWith(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500, // medium weight
-                      color: isDark
-                          ? AppColors.textSecondaryDark
-                          : AppColors.textSecondaryLight,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-

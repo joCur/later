@@ -1161,6 +1161,129 @@ showDeleteConfirmationDialog(
 
 ---
 
+## New Components (Phase 3)
+
+### Editable AppBar Titles
+
+**When to use:**
+- Detail screens with editable titles
+- Any screen where the title needs inline editing
+
+**Component:** `EditableAppBarTitle`
+
+**Example:**
+```dart
+appBar: AppBar(
+  title: EditableAppBarTitle(
+    text: _currentItem.title,
+    onChanged: (newTitle) {
+      _titleController.text = newTitle;
+      _saveChanges();
+    },
+    gradient: AppColors.noteGradient,
+    hintText: 'Note title',
+  ),
+  actions: [...],
+)
+```
+
+### Swipe-to-Delete List Items
+
+**When to use:**
+- Lists where items can be deleted by swiping
+- ReorderableListView with deletion
+
+**Component:** `DismissibleListItem`
+
+**Example:**
+```dart
+DismissibleListItem(
+  itemKey: ValueKey(item.id),
+  itemName: item.title,
+  onDelete: () => _performDeleteItem(item),
+  child: TodoItemCard(
+    todoItem: item,
+    onCheckboxChanged: (value) => _toggleItem(item),
+    onLongPress: () => _editItem(item),
+  ),
+)
+```
+
+### Filter Chips
+
+**When to use:**
+- Filtering content (all/active/completed, etc.)
+- Selection among multiple options
+- Tab-like navigation at the top of screens
+
+**Component:** `TemporalFilterChip`
+
+**Example:**
+```dart
+Wrap(
+  spacing: 8,
+  children: [
+    TemporalFilterChip(
+      label: 'All',
+      isSelected: _selectedFilter == FilterType.all,
+      onSelected: () => setState(() => _selectedFilter = FilterType.all),
+      isDark: isDark,
+      icon: Icons.grid_view_rounded,
+    ),
+    TemporalFilterChip(
+      label: 'Active',
+      isSelected: _selectedFilter == FilterType.active,
+      onSelected: () => setState(() => _selectedFilter = FilterType.active),
+      isDark: isDark,
+      icon: Icons.check_circle_outline,
+    ),
+  ],
+)
+```
+
+### Auto-Save Mixin
+
+**When to use:**
+- Detail screens with auto-save on text change
+- Forms with debounced save
+
+**Mixin:** `AutoSaveMixin`
+
+**Example:**
+```dart
+class _NoteDetailScreenState extends State<NoteDetailScreen> with AutoSaveMixin {
+  late TextEditingController _titleController;
+
+  @override
+  void initState() {
+    super.initState();
+    _titleController = TextEditingController(text: widget.note.title);
+    _titleController.addListener(() => onFieldChanged());
+  }
+
+  @override
+  Future<void> saveChanges() async {
+    if (isSaving || !hasChanges) return;
+
+    setState(() => isSaving = true);
+    try {
+      await provider.updateNote(...);
+      setState(() => hasChanges = false);
+    } finally {
+      setState(() => isSaving = false);
+    }
+  }
+
+  @override
+  void dispose() {
+    _titleController.dispose();
+    super.dispose(); // Calls mixin's dispose
+  }
+}
+```
+
+---
+
 ## Summary
 
 The component library provides a complete set of reusable UI elements that enforce design system consistency while reducing code duplication. By using these components, you benefit from:

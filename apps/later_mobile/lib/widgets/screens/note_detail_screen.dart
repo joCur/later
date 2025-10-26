@@ -5,11 +5,11 @@ import 'package:later_mobile/design_system/tokens/tokens.dart';
 import '../../data/models/item_model.dart';
 import '../../providers/content_provider.dart';
 import '../../providers/spaces_provider.dart';
-import 'package:later_mobile/design_system/atoms/text/gradient_text.dart';
 import 'package:later_mobile/design_system/organisms/modals/bottom_sheet_container.dart';
 import '../../core/utils/responsive_modal.dart';
 import 'package:later_mobile/design_system/atoms/inputs/text_input_field.dart';
 import 'package:later_mobile/design_system/organisms/dialogs/delete_confirmation_dialog.dart';
+import 'package:later_mobile/design_system/molecules/app_bars/editable_app_bar_title.dart';
 
 /// Note Detail Screen for viewing and editing Note content
 ///
@@ -42,7 +42,6 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
   Timer? _debounceTimer;
   bool _isSaving = false;
   bool _hasChanges = false;
-  bool _isEditingTitle = false;
 
   // Tag management
   final TextEditingController _tagController = TextEditingController();
@@ -333,43 +332,15 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
       },
       child: Scaffold(
         appBar: AppBar(
-          title: _isEditingTitle
-              ? TextField(
-                  controller: _titleController,
-                  autofocus: true,
-                  style: AppTypography.h3,
-                  decoration: const InputDecoration(
-                    border: InputBorder.none,
-                    hintText: 'Note title',
-                  ),
-                  onSubmitted: (_) {
-                    setState(() {
-                      _isEditingTitle = false;
-                    });
-                    _saveChanges();
-                  },
-                )
-              : GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      _isEditingTitle = true;
-                    });
-                  },
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Flexible(
-                        child: GradientText(
-                          _currentNote.title,
-                          gradient: AppColors.noteGradient,
-                          style: AppTypography.h3,
-                        ),
-                      ),
-                      const SizedBox(width: AppSpacing.xs),
-                      const Icon(Icons.edit, size: 16),
-                    ],
-                  ),
-                ),
+          title: EditableAppBarTitle(
+            text: _currentNote.title,
+            onChanged: (newTitle) {
+              _titleController.text = newTitle;
+              _saveChanges();
+            },
+            gradient: AppColors.noteGradient,
+            hintText: 'Note title',
+          ),
           actions: [
             if (_isSaving)
               const Padding(

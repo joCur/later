@@ -10,10 +10,11 @@ import 'package:later_mobile/design_system/organisms/cards/list_item_card.dart';
 import 'package:later_mobile/design_system/organisms/fab/responsive_fab.dart';
 import 'package:later_mobile/design_system/organisms/modals/bottom_sheet_container.dart';
 import '../../core/utils/responsive_modal.dart';
-import 'package:later_mobile/design_system/atoms/text/gradient_text.dart';
 import 'package:later_mobile/design_system/atoms/inputs/text_input_field.dart';
 import 'package:later_mobile/design_system/atoms/inputs/text_area_field.dart';
 import 'package:later_mobile/design_system/organisms/dialogs/delete_confirmation_dialog.dart';
+import 'package:later_mobile/design_system/molecules/app_bars/editable_app_bar_title.dart';
+import 'package:later_mobile/design_system/molecules/lists/dismissible_list_item.dart';
 
 /// List Detail Screen for viewing and editing List with ListItems
 ///
@@ -47,7 +48,6 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
   Timer? _debounceTimer;
   bool _isSaving = false;
   bool _hasChanges = false;
-  bool _isEditingName = false;
 
   @override
   void initState() {
@@ -436,15 +436,6 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
     );
   }
 
-  /// Show delete item confirmation
-  Future<bool?> _showDeleteItemConfirmation(String itemTitle) async {
-    return showDeleteConfirmationDialog(
-      context: context,
-      title: 'Delete Item',
-      message: 'Are you sure you want to delete "$itemTitle"?',
-    );
-  }
-
   /// Show delete list confirmation
   Future<void> _showDeleteListConfirmation() async {
     final confirmed = await showDeleteConfirmationDialog(
@@ -500,43 +491,15 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
 
               // Editable name
               Flexible(
-                child: _isEditingName
-                    ? TextField(
-                        controller: _nameController,
-                        autofocus: true,
-                        style: AppTypography.h3,
-                        decoration: const InputDecoration(
-                          border: InputBorder.none,
-                          hintText: 'List name',
-                        ),
-                        onSubmitted: (_) {
-                          setState(() {
-                            _isEditingName = false;
-                          });
-                          _saveChanges();
-                        },
-                      )
-                    : GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            _isEditingName = true;
-                          });
-                        },
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Flexible(
-                              child: GradientText(
-                                _currentList.name,
-                                gradient: AppColors.listGradient,
-                                style: AppTypography.h3,
-                              ),
-                            ),
-                            const SizedBox(width: AppSpacing.xs),
-                            const Icon(Icons.edit, size: 16),
-                          ],
-                        ),
-                      ),
+                child: EditableAppBarTitle(
+                  text: _currentList.name,
+                  onChanged: (newName) {
+                    _nameController.text = newName;
+                    _saveChanges();
+                  },
+                  gradient: AppColors.listGradient,
+                  hintText: 'List name',
+                ),
               ),
             ],
           ),
@@ -656,28 +619,10 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
                       },
                       itemBuilder: (context, index) {
                         final item = _currentList.items[index];
-                        return Dismissible(
-                          key: ValueKey(item.id),
-                          background: Padding(
-                            padding: const EdgeInsets.only(bottom: 8.0),
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(8.0),
-                              child: Container(
-                                color: AppColors.error,
-                                alignment: Alignment.centerRight,
-                                padding: const EdgeInsets.only(right: 16.0),
-                                child: const Icon(
-                                  Icons.delete,
-                                  color: Colors.white,
-                                  size: 24,
-                                ),
-                              ),
-                            ),
-                          ),
-                          direction: DismissDirection.endToStart,
-                          confirmDismiss: (_) =>
-                              _showDeleteItemConfirmation(item.title),
-                          onDismissed: (_) => _performDeleteListItem(item),
+                        return DismissibleListItem(
+                          itemKey: ValueKey(item.id),
+                          itemName: item.title,
+                          onDelete: () => _performDeleteListItem(item),
                           child: ListItemCard(
                             listItem: item,
                             listStyle: _currentList.style,

@@ -234,6 +234,35 @@ import 'package:later_mobile/design_system/atoms/loading/gradient_spinner.dart';
 if (_isLoading) GradientSpinner()
 ```
 
+#### Filter Chips (`atoms/chips/filter_chip.dart`)
+
+Pill-shaped filter chips with gradient border when selected, scale animation, and haptic feedback.
+
+**API:**
+- `label` (String): Chip label text
+- `isSelected` (bool): Selection state
+- `onSelected` (VoidCallback): Tap callback
+- `isDark` (bool): Theme mode
+- `icon` (IconData?): Optional leading icon
+
+**Usage:**
+```dart
+TemporalFilterChip(
+  label: 'All',
+  isSelected: selectedFilter == FilterType.all,
+  onSelected: () => setState(() => selectedFilter = FilterType.all),
+  isDark: isDark,
+  icon: Icons.grid_view_rounded,
+)
+```
+
+**Features:**
+- Scale animation (1.0 → 1.05 → 1.0) on tap
+- Light haptic feedback
+- 2px gradient border when selected
+- 1px solid border when unselected
+- 36px fixed height, pill-shaped (20px border radius)
+
 ---
 
 ### Molecules
@@ -271,6 +300,67 @@ QuickCaptureFab(
   onPressed: () => _showQuickCapture(),
 )
 ```
+
+#### Editable AppBar Title (`molecules/app_bars/editable_app_bar_title.dart`)
+
+Tap-to-edit title widget for AppBar with gradient styling.
+
+**API:**
+- `text` (String): Current title text
+- `onChanged` (ValueChanged<String>): Callback when text changes
+- `gradient` (Gradient?): Gradient for display mode (default: primary)
+- `style` (TextStyle?): Text style (default: h3)
+- `hintText` (String): TextField hint (default: 'Title')
+
+**Usage:**
+```dart
+appBar: AppBar(
+  title: EditableAppBarTitle(
+    text: _currentNote.title,
+    onChanged: (newTitle) {
+      _titleController.text = newTitle;
+      _saveChanges();
+    },
+    gradient: AppColors.noteGradient,
+    hintText: 'Note title',
+  ),
+)
+```
+
+**Features:**
+- Display mode: GradientText with edit icon
+- Edit mode: TextField with auto-focus
+- Validates: Prevents empty titles
+- Auto-trims whitespace
+- Only calls onChange if text actually changed
+
+#### Dismissible List Item (`molecules/lists/dismissible_list_item.dart`)
+
+Wrapper for list items with swipe-to-delete functionality and confirmation.
+
+**API:**
+- `itemKey` (Key): Unique key for animations
+- `itemName` (String): Item name for confirmation dialog
+- `onDelete` (VoidCallback): Deletion callback
+- `confirmDelete` (bool): Show confirmation (default: true)
+- `child` (Widget): Widget to wrap
+
+**Usage:**
+```dart
+DismissibleListItem(
+  itemKey: ValueKey(item.id),
+  itemName: item.title,
+  onDelete: () => _deleteItem(item),
+  child: ListItemCard(listItem: item),
+)
+```
+
+**Features:**
+- Swipe right-to-left to reveal delete
+- Red error background with delete icon
+- Optional confirmation dialog (using DeleteConfirmationDialog)
+- Proper list animations via required itemKey
+- 8px bottom padding, 8px border radius
 
 ---
 
@@ -375,6 +465,63 @@ if (items.isEmpty)
     onAction: () => _showCreateDialog(),
   )
 ```
+
+---
+
+### Mixins
+
+#### Auto-Save Mixin (`core/mixins/auto_save_mixin.dart`)
+
+Mixin providing auto-save functionality with debouncing for detail screens.
+
+**Features:**
+- **Debounced Auto-save**: Changes trigger a debounced save operation
+- **State Management**: Tracks `isSaving` and `hasChanges` flags
+- **Timer Management**: Handles debounce timer lifecycle automatically
+- **Configurable Delay**: Override `autoSaveDelayMs` to customize debounce duration (default: 2000ms)
+
+**Usage:**
+```dart
+class _NoteDetailScreenState extends State<NoteDetailScreen> with AutoSaveMixin {
+  late TextEditingController _titleController;
+
+  @override
+  void initState() {
+    super.initState();
+    _titleController = TextEditingController(text: widget.note.title);
+    _titleController.addListener(() => onFieldChanged());
+  }
+
+  @override
+  Future<void> saveChanges() async {
+    if (isSaving || !hasChanges) return;
+
+    setState(() => isSaving = true);
+    try {
+      await provider.updateNote(...);
+      setState(() => hasChanges = false);
+    } finally {
+      setState(() => isSaving = false);
+    }
+  }
+
+  @override
+  void dispose() {
+    _titleController.dispose();
+    super.dispose(); // Calls mixin's dispose
+  }
+}
+```
+
+**State Properties:**
+- `isSaving` (bool): True when save operation is in progress
+- `hasChanges` (bool): True when user has made changes since last save
+- `debounceTimer` (Timer?): Active debounce timer
+
+**Methods:**
+- `onFieldChanged()`: Call from input listeners to trigger auto-save
+- `saveChanges()`: Must be implemented by the screen (screen-specific save logic)
+- `cancelDebounceTimer()`: Cancel pending save operation
 
 ---
 
@@ -778,9 +925,10 @@ import 'package:later_mobile/design_system/atoms/buttons/primary_button.dart';
 - Created comprehensive design system documentation
 
 **Component Distribution**:
-- **Atoms**: 13 components (buttons, inputs, text, borders, loading)
-- **Molecules**: 3 components (loading, fab)
+- **Atoms**: 14 components (buttons, inputs, text, borders, loading, chips)
+- **Molecules**: 5 components (loading, fab, app bars, lists)
 - **Organisms**: 15 components (cards, modals, dialogs, empty states, error)
+- **Mixins**: 1 mixin (auto-save)
 
 ### Old Component Location
 
@@ -896,6 +1044,14 @@ enum ComponentSize {
 ---
 
 ## Version History
+
+**v3.0.0** (October 26, 2025) - Phase 3 Pattern Components
+- Added TemporalFilterChip atom for content filtering
+- Added EditableAppBarTitle molecule for inline title editing
+- Added DismissibleListItem molecule for swipe-to-delete functionality
+- Added AutoSaveMixin for debounced auto-save in detail screens
+- Enhanced component library with advanced interaction patterns
+- Updated comprehensive documentation
 
 **v2.0.0** (October 26, 2025) - Atomic Design Restructure
 - Reorganized components into atomic design structure

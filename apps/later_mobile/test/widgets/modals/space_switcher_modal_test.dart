@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:later_mobile/core/utils/responsive_modal.dart';
 import 'package:later_mobile/data/models/space_model.dart';
 import 'package:later_mobile/data/repositories/space_repository.dart';
 import 'package:later_mobile/providers/spaces_provider.dart';
@@ -262,7 +263,10 @@ void main() {
                 builder: (context) => Scaffold(
                   body: ElevatedButton(
                     onPressed: () async {
-                      final result = await SpaceSwitcherModal.show(context);
+                      final result = await ResponsiveModal.show<bool>(
+                        context: context,
+                        child: const SpaceSwitcherModal(),
+                      );
                       modalClosed = result == null || !result;
                     },
                     child: const Text('Show Modal'),
@@ -314,7 +318,10 @@ void main() {
                 builder: (context) => Scaffold(
                   body: ElevatedButton(
                     onPressed: () async {
-                      final result = await SpaceSwitcherModal.show(context);
+                      final result = await ResponsiveModal.show<bool>(
+                        context: context,
+                        child: const SpaceSwitcherModal(),
+                      );
                       modalClosed = result == null || !result;
                     },
                     child: const Text('Show Modal'),
@@ -423,7 +430,10 @@ void main() {
               child: Builder(
                 builder: (context) => Scaffold(
                   body: ElevatedButton(
-                    onPressed: () => SpaceSwitcherModal.show(context),
+                    onPressed: () => ResponsiveModal.show<bool>(
+                      context: context,
+                      child: const SpaceSwitcherModal(),
+                    ),
                     child: const Text('Show Modal'),
                   ),
                 ),
@@ -453,7 +463,10 @@ void main() {
               child: Builder(
                 builder: (context) => Scaffold(
                   body: ElevatedButton(
-                    onPressed: () => SpaceSwitcherModal.show(context),
+                    onPressed: () => ResponsiveModal.show<bool>(
+                      context: context,
+                      child: const SpaceSwitcherModal(),
+                    ),
                     child: const Text('Show Modal'),
                   ),
                 ),
@@ -568,7 +581,10 @@ void main() {
                 builder: (context) => Scaffold(
                   body: ElevatedButton(
                     onPressed: () async {
-                      final result = await SpaceSwitcherModal.show(context);
+                      final result = await ResponsiveModal.show<bool>(
+                        context: context,
+                        child: const SpaceSwitcherModal(),
+                      );
                       modalClosed = result == true;
                     },
                     child: const Text('Show Modal'),

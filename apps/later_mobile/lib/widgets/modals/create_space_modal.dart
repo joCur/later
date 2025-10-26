@@ -1,14 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 import 'package:later_mobile/design_system/tokens/tokens.dart';
-import '../../core/responsive/breakpoints.dart';
 import '../../data/models/space_model.dart';
 import '../../providers/spaces_provider.dart';
 import 'package:later_mobile/design_system/atoms/inputs/text_input_field.dart';
-import 'package:later_mobile/design_system/atoms/buttons/primary_button.dart';
-import 'package:later_mobile/design_system/atoms/buttons/secondary_button.dart';
+import 'package:later_mobile/design_system/organisms/modals/bottom_sheet_container.dart';
 
 /// Mode for the CreateSpaceModal
 enum SpaceModalMode {
@@ -45,36 +42,6 @@ class CreateSpaceModal extends StatefulWidget {
 
   /// Initial space data for edit mode
   final Space? initialSpace;
-
-  /// Shows the create/edit space modal with responsive layout
-  ///
-  /// Returns true if a space was created/updated, false if cancelled
-  static Future<bool?> show(
-    BuildContext context, {
-    required SpaceModalMode mode,
-    Space? initialSpace,
-  }) async {
-    final isDesktop = Breakpoints.isDesktopOrLarger(context);
-
-    if (isDesktop) {
-      return showDialog<bool>(
-        context: context,
-        builder: (_) => CreateSpaceModal(
-          mode: mode,
-          initialSpace: initialSpace,
-        ),
-      );
-    } else {
-      return showModalBottomSheet<bool>(
-        context: context,
-        isScrollControlled: true,
-        builder: (_) => CreateSpaceModal(
-          mode: mode,
-          initialSpace: initialSpace,
-        ),
-      );
-    }
-  }
 
   @override
   State<CreateSpaceModal> createState() => _CreateSpaceModalState();
@@ -179,7 +146,7 @@ class _CreateSpaceModalState extends State<CreateSpaceModal> {
   }
 
   /// Handle form submission
-  Future<void> _handleSave() async {
+  Future<void> _handleSubmit() async {
     if (!_isFormValid || _isSubmitting) return;
 
     setState(() {
@@ -386,157 +353,38 @@ class _CreateSpaceModalState extends State<CreateSpaceModal> {
     );
   }
 
-  /// Build modal content
-  Widget _buildContent(BuildContext context) {
+  /// Build form content
+  Widget _buildFormContent(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final isDesktop = context.isDesktopOrLarger;
 
-    return Container(
-      constraints: BoxConstraints(
-        maxHeight: MediaQuery.of(context).size.height * 0.9,
-        maxWidth: isDesktop ? 600 : double.infinity,
-      ),
-      decoration: BoxDecoration(
-        color: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
-        borderRadius: isDesktop
-            ? BorderRadius.circular(AppSpacing.modalRadius)
-            : const BorderRadius.vertical(
-                top: Radius.circular(AppSpacing.modalRadius),
-              ),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          // Header
-          Padding(
-            padding: const EdgeInsets.all(AppSpacing.sm),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    widget.mode == SpaceModalMode.edit
-                        ? 'Edit Space'
-                        : 'Create Space',
-                    style: AppTypography.h4.copyWith(
-                      color: isDark
-                          ? AppColors.textPrimaryDark
-                          : AppColors.textPrimaryLight,
-                    ),
-                  ),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.close),
-                  onPressed: () => Navigator.of(context).pop(false),
-                  tooltip: 'Close',
-                  color: isDark
-                      ? AppColors.textSecondaryDark
-                      : AppColors.textSecondaryLight,
-                ),
-              ],
-            ),
-          ),
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Name input
+        _buildNameInput(isDark),
+        const SizedBox(height: AppSpacing.lg),
 
-          // Divider
-          Divider(
-            height: 1,
-            color: isDark ? AppColors.borderDark : AppColors.borderLight,
-          ),
+        // Icon picker
+        _buildIconPicker(isDark),
+        const SizedBox(height: AppSpacing.lg),
 
-          // Form content
-          Flexible(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(AppSpacing.sm),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Name input
-                  _buildNameInput(isDark),
-                  const SizedBox(height: AppSpacing.md),
-
-                  // Icon picker
-                  _buildIconPicker(isDark),
-                  const SizedBox(height: AppSpacing.md),
-
-                  // Color picker
-                  _buildColorPicker(isDark),
-                  const SizedBox(height: AppSpacing.md),
-                ],
-              ),
-            ),
-          ),
-
-          // Divider
-          Divider(
-            height: 1,
-            color: isDark ? AppColors.borderDark : AppColors.borderLight,
-          ),
-
-          // Action buttons
-          Padding(
-            padding: const EdgeInsets.all(AppSpacing.sm),
-            child: Row(
-              children: [
-                // Cancel button
-                Expanded(
-                  child: SecondaryButton(
-                    text: 'Cancel',
-                    onPressed: _isSubmitting
-                        ? null
-                        : () => Navigator.of(context).pop(false),
-                    isExpanded: true,
-                  ),
-                ),
-                const SizedBox(width: AppSpacing.sm),
-
-                // Save/Create button
-                Expanded(
-                  child: PrimaryButton(
-                    text: widget.mode == SpaceModalMode.edit
-                        ? 'Save'
-                        : 'Create',
-                    onPressed: _isFormValid && !_isSubmitting
-                        ? _handleSave
-                        : null,
-                    isLoading: _isSubmitting,
-                    isExpanded: true,
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          // Bottom padding for mobile (safe area + keyboard)
-          if (!isDesktop)
-            SizedBox(
-              height: MediaQuery.of(context).padding.bottom +
-                  MediaQuery.of(context).viewInsets.bottom,
-            ),
-        ],
-      ),
+        // Color picker
+        _buildColorPicker(isDark),
+      ],
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    final isDesktop = context.isDesktopOrLarger;
-
-    return Focus(
-      onKeyEvent: (node, event) {
-        // Handle Escape key
-        if (event is KeyDownEvent &&
-            event.logicalKey == LogicalKeyboardKey.escape) {
-          Navigator.of(context).pop(false);
-          return KeyEventResult.handled;
-        }
-        return KeyEventResult.ignored;
-      },
-      child: isDesktop
-          ? Dialog(
-              backgroundColor: Colors.transparent,
-              child: _buildContent(context),
-            )
-          : _buildContent(context),
+    return BottomSheetContainer(
+      title: widget.mode == SpaceModalMode.create ? 'Create Space' : 'Edit Space',
+      primaryButtonText: widget.mode == SpaceModalMode.create ? 'Create' : 'Save',
+      onPrimaryPressed: _isSubmitting ? null : _handleSubmit,
+      isPrimaryButtonEnabled: !_isSubmitting && _isFormValid,
+      isPrimaryButtonLoading: _isSubmitting,
+      onSecondaryPressed: () => Navigator.of(context).pop(false),
+      child: _buildFormContent(context),
     );
   }
 }

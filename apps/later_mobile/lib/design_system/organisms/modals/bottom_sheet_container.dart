@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:later_mobile/design_system/tokens/tokens.dart';
 import '../../../core/responsive/breakpoints.dart';
-import 'package:later_mobile/design_system/atoms/buttons/gradient_button.dart';
+import 'package:later_mobile/design_system/atoms/buttons/primary_button.dart';
 import 'package:later_mobile/design_system/atoms/buttons/secondary_button.dart';
 
 /// A responsive container widget that adapts between mobile bottom sheet
@@ -321,33 +321,11 @@ class BottomSheetContainer extends StatelessWidget {
   }
 
   Widget _buildPrimaryButton(bool isDark) {
-    if (isPrimaryButtonLoading) {
-      // Show loading state with gradient background
-      return Container(
-        height: 44,
-        decoration: BoxDecoration(
-          gradient: isDark
-              ? AppColors.primaryGradientDark
-              : AppColors.primaryGradient,
-          borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
-        ),
-        child: const Center(
-          child: SizedBox(
-            width: 20,
-            height: 20,
-            child: CircularProgressIndicator(
-              strokeWidth: 2,
-              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-            ),
-          ),
-        ),
-      );
-    }
-
-    return GradientButton(
+    return PrimaryButton(
+      text: primaryButtonText!,
       onPressed: isPrimaryButtonEnabled ? onPrimaryPressed : null,
-      label: primaryButtonText!,
-      fullWidth: true,
+      isExpanded: true,
+      isLoading: isPrimaryButtonLoading,
     );
   }
 }
