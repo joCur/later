@@ -453,6 +453,13 @@ class AppColors {
   }
 
   /// Get adaptive glass background based on theme
+  ///
+  /// **DEPRECATED**: Use `Theme.of(context).extension<TemporalFlowTheme>()!.glassBackground` instead.
+  /// This method is kept for backward compatibility but will be removed in a future version.
+  @Deprecated(
+    'Use Theme.of(context).extension<TemporalFlowTheme>()!.glassBackground instead. '
+    'This helper method is redundant now that theme extensions are in place.',
+  )
   static Color glass(BuildContext context) {
     return Theme.of(context).brightness == Brightness.light
         ? glassLight
@@ -460,6 +467,13 @@ class AppColors {
   }
 
   /// Get adaptive glass border based on theme
+  ///
+  /// **DEPRECATED**: Use `Theme.of(context).extension<TemporalFlowTheme>()!.glassBorder` instead.
+  /// This method is kept for backward compatibility but will be removed in a future version.
+  @Deprecated(
+    'Use Theme.of(context).extension<TemporalFlowTheme>()!.glassBorder instead. '
+    'This helper method is redundant now that theme extensions are in place.',
+  )
   static Color glassBorder(BuildContext context) {
     return Theme.of(context).brightness == Brightness.light
         ? glassBorderLight
@@ -467,6 +481,13 @@ class AppColors {
   }
 
   /// Get adaptive shadow color based on theme
+  ///
+  /// **DEPRECATED**: Use `Theme.of(context).extension<TemporalFlowTheme>()!.shadowColor` instead.
+  /// This method is kept for backward compatibility but will be removed in a future version.
+  @Deprecated(
+    'Use Theme.of(context).extension<TemporalFlowTheme>()!.shadowColor instead. '
+    'This helper method is redundant now that theme extensions are in place.',
+  )
   static Color shadow(BuildContext context) {
     return Theme.of(context).brightness == Brightness.light
         ? shadowLight
@@ -502,6 +523,13 @@ class AppColors {
   }
 
   /// Get adaptive primary gradient based on theme
+  ///
+  /// **DEPRECATED**: Use `Theme.of(context).extension<TemporalFlowTheme>()!.primaryGradient` instead.
+  /// This method is kept for backward compatibility but will be removed in a future version.
+  @Deprecated(
+    'Use Theme.of(context).extension<TemporalFlowTheme>()!.primaryGradient instead. '
+    'This helper method is redundant now that theme extensions are in place.',
+  )
   static LinearGradient primaryGradientAdaptive(BuildContext context) {
     return Theme.of(context).brightness == Brightness.light
         ? primaryGradient
@@ -509,6 +537,13 @@ class AppColors {
   }
 
   /// Get adaptive secondary gradient based on theme
+  ///
+  /// **DEPRECATED**: Use `Theme.of(context).extension<TemporalFlowTheme>()!.secondaryGradient` instead.
+  /// This method is kept for backward compatibility but will be removed in a future version.
+  @Deprecated(
+    'Use Theme.of(context).extension<TemporalFlowTheme>()!.secondaryGradient instead. '
+    'This helper method is redundant now that theme extensions are in place.',
+  )
   static LinearGradient secondaryGradientAdaptive(BuildContext context) {
     return Theme.of(context).brightness == Brightness.light
         ? secondaryGradient

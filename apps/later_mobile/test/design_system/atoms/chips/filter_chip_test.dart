@@ -36,7 +36,7 @@ void main() {
               label: 'Test Filter',
               isSelected: false,
               onSelected: () {},
-                          ),
+            ),
           ),
         ),
       );
@@ -54,7 +54,7 @@ void main() {
               label: 'Selected',
               isSelected: true,
               onSelected: () {},
-                          ),
+            ),
           ),
         ),
       );
@@ -85,7 +85,7 @@ void main() {
               label: 'Selected',
               isSelected: true,
               onSelected: () {},
-                          ),
+            ),
           ),
         ),
       );
@@ -108,7 +108,7 @@ void main() {
               label: 'Unselected',
               isSelected: false,
               onSelected: () {},
-                          ),
+            ),
           ),
         ),
       );
@@ -134,7 +134,7 @@ void main() {
               label: 'Unselected',
               isSelected: false,
               onSelected: () {},
-                          ),
+            ),
           ),
         ),
       );
@@ -161,7 +161,7 @@ void main() {
                 onSelected: () {
                   callbackInvoked = true;
                 },
-                              ),
+              ),
             ),
           ),
         ),
@@ -182,7 +182,7 @@ void main() {
               label: 'Animate',
               isSelected: false,
               onSelected: () {},
-                          ),
+            ),
           ),
         ),
       );
@@ -222,7 +222,7 @@ void main() {
               label: 'With Icon',
               isSelected: false,
               onSelected: () {},
-                            icon: Icons.filter_list,
+              icon: Icons.filter_list,
             ),
           ),
         ),
@@ -244,7 +244,7 @@ void main() {
               label: 'No Icon',
               isSelected: false,
               onSelected: () {},
-                          ),
+            ),
           ),
         ),
       );
@@ -264,7 +264,7 @@ void main() {
               label: 'Selected',
               isSelected: true,
               onSelected: () {},
-                          ),
+            ),
           ),
         ),
       );
@@ -280,7 +280,7 @@ void main() {
               label: 'Unselected',
               isSelected: false,
               onSelected: () {},
-                          ),
+            ),
           ),
         ),
       );
@@ -300,7 +300,7 @@ void main() {
               label: 'Selected',
               isSelected: true,
               onSelected: () {},
-                          ),
+            ),
           ),
         ),
       );
@@ -316,7 +316,7 @@ void main() {
               label: 'Unselected',
               isSelected: false,
               onSelected: () {},
-                          ),
+            ),
           ),
         ),
       );
@@ -336,7 +336,7 @@ void main() {
               label: 'Selected',
               isSelected: true,
               onSelected: () {},
-                            icon: Icons.star,
+              icon: Icons.star,
             ),
           ),
         ),
@@ -353,7 +353,7 @@ void main() {
               label: 'Unselected',
               isSelected: false,
               onSelected: () {},
-                            icon: Icons.star,
+              icon: Icons.star,
             ),
           ),
         ),
@@ -374,7 +374,7 @@ void main() {
               label: 'Selected',
               isSelected: true,
               onSelected: () {},
-                            icon: Icons.star,
+              icon: Icons.star,
             ),
           ),
         ),
@@ -391,7 +391,7 @@ void main() {
               label: 'Unselected',
               isSelected: false,
               onSelected: () {},
-                            icon: Icons.star,
+              icon: Icons.star,
             ),
           ),
         ),
@@ -409,7 +409,7 @@ void main() {
               label: 'Height Test',
               isSelected: false,
               onSelected: () {},
-                          ),
+            ),
           ),
         ),
       );
@@ -441,7 +441,7 @@ void main() {
               label: 'Typography Test',
               isSelected: false,
               onSelected: () {},
-                          ),
+            ),
           ),
         ),
       );
@@ -461,17 +461,17 @@ void main() {
                   label: 'First',
                   isSelected: true,
                   onSelected: () {},
-                                  ),
+                ),
                 TemporalFilterChip(
                   label: 'Second',
                   isSelected: false,
                   onSelected: () {},
-                                  ),
+                ),
                 TemporalFilterChip(
                   label: 'Third',
                   isSelected: false,
                   onSelected: () {},
-                                    icon: Icons.filter,
+                  icon: Icons.filter,
                 ),
               ],
             ),
@@ -504,7 +504,7 @@ void main() {
                         isSelected = !isSelected;
                       });
                     },
-                                      ),
+                  ),
                 ),
               ),
             );
