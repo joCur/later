@@ -148,9 +148,9 @@ class TodoList {
     List<TodoItem>? items,
     DateTime? createdAt,
     DateTime? updatedAt,
-  })  : items = items ?? [],
-        createdAt = createdAt ?? DateTime.now(),
-        updatedAt = updatedAt ?? DateTime.now();
+  }) : items = items ?? [],
+       createdAt = createdAt ?? DateTime.now(),
+       updatedAt = updatedAt ?? DateTime.now();
 
   /// Create from JSON for serialization
   factory TodoList.fromJson(Map<String, dynamic> json) {
@@ -159,7 +159,8 @@ class TodoList {
       spaceId: json['spaceId'] as String,
       name: json['name'] as String,
       description: json['description'] as String?,
-      items: (json['items'] as List<dynamic>?)
+      items:
+          (json['items'] as List<dynamic>?)
               ?.map((item) => TodoItem.fromJson(item as Map<String, dynamic>))
               .toList() ??
           [],

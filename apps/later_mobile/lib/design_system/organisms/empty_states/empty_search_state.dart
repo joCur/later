@@ -17,10 +17,7 @@ import 'empty_state.dart';
 /// ```
 class EmptySearchState extends StatelessWidget {
   /// Creates an empty search state widget.
-  const EmptySearchState({
-    super.key,
-    this.query,
-  });
+  const EmptySearchState({super.key, this.query});
 
   /// Optional search query that returned no results
   final String? query;

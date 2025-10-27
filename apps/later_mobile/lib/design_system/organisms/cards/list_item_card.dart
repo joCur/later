@@ -165,9 +165,7 @@ class _ListItemCardState extends State<ListItemCard> {
     return Text(
       widget.listItem.notes!,
       style: AppTypography.bodySmall.copyWith(
-        color: isDark
-            ? AppColors.neutral500
-            : AppColors.neutral500,
+        color: isDark ? AppColors.neutral500 : AppColors.neutral500,
       ),
       maxLines: _notesMaxLines,
       overflow: TextOverflow.ellipsis,
@@ -277,9 +275,7 @@ class _ListItemCardState extends State<ListItemCard> {
                 Text(
                   widget.listItem.title,
                   style: AppTypography.titleSmall.copyWith(
-                    color: isDark
-                        ? AppColors.neutral400
-                        : AppColors.neutral600,
+                    color: isDark ? AppColors.neutral400 : AppColors.neutral600,
                     decoration: isChecked ? TextDecoration.lineThrough : null,
                   ),
                   maxLines: 1,

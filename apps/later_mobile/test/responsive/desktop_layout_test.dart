@@ -42,8 +42,9 @@ void main() {
     const testWidth = 1280.0;
     const testHeight = 720.0;
 
-    testWidgets('Breakpoint detection identifies desktop at 1280px',
-        (WidgetTester tester) async {
+    testWidgets('Breakpoint detection identifies desktop at 1280px', (
+      WidgetTester tester,
+    ) async {
       bool? isMobile;
       bool? isTablet;
       bool? isDesktop;
@@ -51,9 +52,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: MediaQuery(
-            data: const MediaQueryData(
-              size: Size(testWidth, testHeight),
-            ),
+            data: const MediaQueryData(size: Size(testWidth, testHeight)),
             child: Builder(
               builder: (context) {
                 isMobile = Breakpoints.isMobile(context);
@@ -68,8 +67,11 @@ void main() {
 
       expect(isMobile, isFalse);
       expect(isTablet, isFalse);
-      expect(isDesktop, isTrue,
-          reason: '1280px should be identified as desktop');
+      expect(
+        isDesktop,
+        isTrue,
+        reason: '1280px should be identified as desktop',
+      );
     });
 
     testWidgets('Grid columns are 3 at 1280px', (WidgetTester tester) async {
@@ -78,9 +80,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: MediaQuery(
-            data: const MediaQueryData(
-              size: Size(testWidth, testHeight),
-            ),
+            data: const MediaQueryData(size: Size(testWidth, testHeight)),
             child: Builder(
               builder: (context) {
                 columns = Breakpoints.getGridColumns(context);
@@ -91,20 +91,22 @@ void main() {
         ),
       );
 
-      expect(columns, equals(3),
-          reason: 'Desktop at 1280px should use 3-column layout');
+      expect(
+        columns,
+        equals(3),
+        reason: 'Desktop at 1280px should use 3-column layout',
+      );
     });
 
-    testWidgets('Max content width is 1200px at 1280px',
-        (WidgetTester tester) async {
+    testWidgets('Max content width is 1200px at 1280px', (
+      WidgetTester tester,
+    ) async {
       double? maxWidth;
 
       await tester.pumpWidget(
         MaterialApp(
           home: MediaQuery(
-            data: const MediaQueryData(
-              size: Size(testWidth, testHeight),
-            ),
+            data: const MediaQueryData(size: Size(testWidth, testHeight)),
             child: Builder(
               builder: (context) {
                 maxWidth = Breakpoints.getMaxContentWidth(context);
@@ -115,26 +117,23 @@ void main() {
         ),
       );
 
-      expect(maxWidth, equals(1200.0),
-          reason: 'Desktop large should constrain content to 1200px');
+      expect(
+        maxWidth,
+        equals(1200.0),
+        reason: 'Desktop large should constrain content to 1200px',
+      );
     });
 
     testWidgets('Sidebar is visible at 1280px', (WidgetTester tester) async {
       await tester.pumpWidget(
         MediaQuery(
-          data: const MediaQueryData(
-            size: Size(testWidth, testHeight),
-          ),
+          data: const MediaQueryData(size: Size(testWidth, testHeight)),
           child: MaterialApp(
             home: Scaffold(
               body: Row(
                 children: [
-                  AppSidebar(
-                    onToggleExpanded: () {},
-                  ),
-                  const Expanded(
-                    child: Center(child: Text('Content')),
-                  ),
+                  AppSidebar(onToggleExpanded: () {}),
+                  const Expanded(child: Center(child: Text('Content'))),
                 ],
               ),
             ),
@@ -142,27 +141,25 @@ void main() {
         ),
       );
 
-      expect(find.byType(AppSidebar), findsOneWidget,
-          reason: 'Sidebar should be visible on desktop');
+      expect(
+        find.byType(AppSidebar),
+        findsOneWidget,
+        reason: 'Sidebar should be visible on desktop',
+      );
     });
 
-    testWidgets('Sidebar can be expanded at 1280px',
-        (WidgetTester tester) async {
+    testWidgets('Sidebar can be expanded at 1280px', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         MediaQuery(
-          data: const MediaQueryData(
-            size: Size(testWidth, testHeight),
-          ),
+          data: const MediaQueryData(size: Size(testWidth, testHeight)),
           child: MaterialApp(
             home: Scaffold(
               body: Row(
                 children: [
-                  AppSidebar(
-                    onToggleExpanded: () {},
-                  ),
-                  const Expanded(
-                    child: Center(child: Text('Content')),
-                  ),
+                  AppSidebar(onToggleExpanded: () {}),
+                  const Expanded(child: Center(child: Text('Content'))),
                 ],
               ),
             ),
@@ -172,28 +169,25 @@ void main() {
 
       // Expanded sidebar should be 240px
       final sidebarSize = tester.getSize(find.byType(AppSidebar));
-      expect(sidebarSize.width, equals(240.0),
-          reason: 'Expanded sidebar should be 240px wide');
+      expect(
+        sidebarSize.width,
+        equals(240.0),
+        reason: 'Expanded sidebar should be 240px wide',
+      );
     });
 
-    testWidgets('Sidebar can be collapsed at 1280px',
-        (WidgetTester tester) async {
+    testWidgets('Sidebar can be collapsed at 1280px', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         MediaQuery(
-          data: const MediaQueryData(
-            size: Size(testWidth, testHeight),
-          ),
+          data: const MediaQueryData(size: Size(testWidth, testHeight)),
           child: MaterialApp(
             home: Scaffold(
               body: Row(
                 children: [
-                  AppSidebar(
-                    isExpanded: false,
-                    onToggleExpanded: () {},
-                  ),
-                  const Expanded(
-                    child: Center(child: Text('Content')),
-                  ),
+                  AppSidebar(isExpanded: false, onToggleExpanded: () {}),
+                  const Expanded(child: Center(child: Text('Content'))),
                 ],
               ),
             ),
@@ -205,17 +199,19 @@ void main() {
 
       // Collapsed sidebar should be 72px
       final sidebarSize = tester.getSize(find.byType(AppSidebar));
-      expect(sidebarSize.width, equals(72.0),
-          reason: 'Collapsed sidebar should be 72px wide');
+      expect(
+        sidebarSize.width,
+        equals(72.0),
+        reason: 'Collapsed sidebar should be 72px wide',
+      );
     });
 
-    testWidgets('Bottom navigation is hidden at 1280px',
-        (WidgetTester tester) async {
+    testWidgets('Bottom navigation is hidden at 1280px', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         MediaQuery(
-          data: const MediaQueryData(
-            size: Size(testWidth, testHeight),
-          ),
+          data: const MediaQueryData(size: Size(testWidth, testHeight)),
           child: MaterialApp(
             home: Builder(
               builder: (context) {
@@ -234,26 +230,26 @@ void main() {
         ),
       );
 
-      expect(find.byType(IconOnlyBottomNav), findsNothing,
-          reason: 'Bottom navigation should be hidden on desktop');
+      expect(
+        find.byType(IconOnlyBottomNav),
+        findsNothing,
+        reason: 'Bottom navigation should be hidden on desktop',
+      );
     });
 
-    testWidgets('Content area with expanded sidebar at 1280px',
-        (WidgetTester tester) async {
+    testWidgets('Content area with expanded sidebar at 1280px', (
+      WidgetTester tester,
+    ) async {
       const sidebarWidth = 240.0;
 
       await tester.pumpWidget(
         MediaQuery(
-          data: const MediaQueryData(
-            size: Size(testWidth, testHeight),
-          ),
+          data: const MediaQueryData(size: Size(testWidth, testHeight)),
           child: MaterialApp(
             home: Scaffold(
               body: Row(
                 children: [
-                  AppSidebar(
-                    onToggleExpanded: () {},
-                  ),
+                  AppSidebar(onToggleExpanded: () {}),
                   Expanded(
                     child: LayoutBuilder(
                       builder: (context, constraints) {
@@ -272,26 +268,25 @@ void main() {
 
       // Content width should be screen width minus sidebar
       const expectedContentWidth = testWidth - sidebarWidth;
-      expect(find.textContaining('Width: $expectedContentWidth'), findsOneWidget);
+      expect(
+        find.textContaining('Width: $expectedContentWidth'),
+        findsOneWidget,
+      );
     });
 
-    testWidgets('Content area with collapsed sidebar at 1280px',
-        (WidgetTester tester) async {
+    testWidgets('Content area with collapsed sidebar at 1280px', (
+      WidgetTester tester,
+    ) async {
       const collapsedSidebarWidth = 72.0;
 
       await tester.pumpWidget(
         MediaQuery(
-          data: const MediaQueryData(
-            size: Size(testWidth, testHeight),
-          ),
+          data: const MediaQueryData(size: Size(testWidth, testHeight)),
           child: MaterialApp(
             home: Scaffold(
               body: Row(
                 children: [
-                  AppSidebar(
-                    isExpanded: false,
-                    onToggleExpanded: () {},
-                  ),
+                  AppSidebar(isExpanded: false, onToggleExpanded: () {}),
                   Expanded(
                     child: LayoutBuilder(
                       builder: (context, constraints) {
@@ -312,16 +307,18 @@ void main() {
 
       // Content width should be screen width minus collapsed sidebar
       const expectedContentWidth = testWidth - collapsedSidebarWidth;
-      expect(find.textContaining('Width: $expectedContentWidth'), findsOneWidget);
+      expect(
+        find.textContaining('Width: $expectedContentWidth'),
+        findsOneWidget,
+      );
     });
 
-    testWidgets('Modal has centered positioning at 1280px',
-        (WidgetTester tester) async {
+    testWidgets('Modal has centered positioning at 1280px', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         MediaQuery(
-          data: const MediaQueryData(
-            size: Size(testWidth, testHeight),
-          ),
+          data: const MediaQueryData(size: Size(testWidth, testHeight)),
           child: MaterialApp(
             home: Scaffold(
               body: Builder(
@@ -358,8 +355,11 @@ void main() {
 
       // Modal should be centered and have max width of 560px
       final dialog = find.byType(SizedBox).evaluate().first.widget as SizedBox;
-      expect(dialog.width, equals(560.0),
-          reason: 'Modal should have max-width of 560px');
+      expect(
+        dialog.width,
+        equals(560.0),
+        reason: 'Modal should have max-width of 560px',
+      );
     });
   });
 
@@ -367,16 +367,15 @@ void main() {
     const testWidth = 1440.0;
     const testHeight = 900.0;
 
-    testWidgets('Breakpoint identifies desktopLarge at 1440px',
-        (WidgetTester tester) async {
+    testWidgets('Breakpoint identifies desktopLarge at 1440px', (
+      WidgetTester tester,
+    ) async {
       bool? isDesktopLarge;
 
       await tester.pumpWidget(
         MaterialApp(
           home: MediaQuery(
-            data: const MediaQueryData(
-              size: Size(testWidth, testHeight),
-            ),
+            data: const MediaQueryData(size: Size(testWidth, testHeight)),
             child: Builder(
               builder: (context) {
                 isDesktopLarge = Breakpoints.isDesktopLarge(context);
@@ -387,8 +386,11 @@ void main() {
         ),
       );
 
-      expect(isDesktopLarge, isTrue,
-          reason: '1440px should be identified as desktopLarge');
+      expect(
+        isDesktopLarge,
+        isTrue,
+        reason: '1440px should be identified as desktopLarge',
+      );
     });
 
     testWidgets('Grid columns are 4 at 1440px', (WidgetTester tester) async {
@@ -397,9 +399,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: MediaQuery(
-            data: const MediaQueryData(
-              size: Size(testWidth, testHeight),
-            ),
+            data: const MediaQueryData(size: Size(testWidth, testHeight)),
             child: Builder(
               builder: (context) {
                 columns = Breakpoints.getGridColumns(context);
@@ -410,20 +410,22 @@ void main() {
         ),
       );
 
-      expect(columns, equals(4),
-          reason: 'Desktop large should use 4-column layout');
+      expect(
+        columns,
+        equals(4),
+        reason: 'Desktop large should use 4-column layout',
+      );
     });
 
-    testWidgets('Max content width remains 1200px at 1440px',
-        (WidgetTester tester) async {
+    testWidgets('Max content width remains 1200px at 1440px', (
+      WidgetTester tester,
+    ) async {
       double? maxWidth;
 
       await tester.pumpWidget(
         MaterialApp(
           home: MediaQuery(
-            data: const MediaQueryData(
-              size: Size(testWidth, testHeight),
-            ),
+            data: const MediaQueryData(size: Size(testWidth, testHeight)),
             child: Builder(
               builder: (context) {
                 maxWidth = Breakpoints.getMaxContentWidth(context);
@@ -434,20 +436,22 @@ void main() {
         ),
       );
 
-      expect(maxWidth, equals(1200.0),
-          reason: 'Max content width should be capped at 1200px');
+      expect(
+        maxWidth,
+        equals(1200.0),
+        reason: 'Max content width should be capped at 1200px',
+      );
     });
 
-    testWidgets('ScreenSize enum returns desktopLarge at 1440px',
-        (WidgetTester tester) async {
+    testWidgets('ScreenSize enum returns desktopLarge at 1440px', (
+      WidgetTester tester,
+    ) async {
       ScreenSize? screenSize;
 
       await tester.pumpWidget(
         MaterialApp(
           home: MediaQuery(
-            data: const MediaQueryData(
-              size: Size(testWidth, testHeight),
-            ),
+            data: const MediaQueryData(size: Size(testWidth, testHeight)),
             child: Builder(
               builder: (context) {
                 screenSize = Breakpoints.getScreenSize(context);
@@ -461,13 +465,12 @@ void main() {
       expect(screenSize, equals(ScreenSize.desktopLarge));
     });
 
-    testWidgets('ResponsiveLayout shows desktopLarge widget at 1440px',
-        (WidgetTester tester) async {
+    testWidgets('ResponsiveLayout shows desktopLarge widget at 1440px', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         const MediaQuery(
-          data: MediaQueryData(
-            size: Size(testWidth, testHeight),
-          ),
+          data: MediaQueryData(size: Size(testWidth, testHeight)),
           child: MaterialApp(
             home: Scaffold(
               body: ResponsiveLayout(
@@ -487,23 +490,18 @@ void main() {
       expect(find.text('Mobile'), findsNothing);
     });
 
-    testWidgets('Sidebar remains functional at 1440px',
-        (WidgetTester tester) async {
+    testWidgets('Sidebar remains functional at 1440px', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         MediaQuery(
-          data: const MediaQueryData(
-            size: Size(testWidth, testHeight),
-          ),
+          data: const MediaQueryData(size: Size(testWidth, testHeight)),
           child: MaterialApp(
             home: Scaffold(
               body: Row(
                 children: [
-                  AppSidebar(
-                    onToggleExpanded: () {},
-                  ),
-                  const Expanded(
-                    child: Center(child: Text('Content')),
-                  ),
+                  AppSidebar(onToggleExpanded: () {}),
+                  const Expanded(child: Center(child: Text('Content'))),
                 ],
               ),
             ),
@@ -522,16 +520,15 @@ void main() {
     const testWidth = 1920.0;
     const testHeight = 1080.0;
 
-    testWidgets('Breakpoint identifies desktopLarge at 1920px',
-        (WidgetTester tester) async {
+    testWidgets('Breakpoint identifies desktopLarge at 1920px', (
+      WidgetTester tester,
+    ) async {
       bool? isDesktopLarge;
 
       await tester.pumpWidget(
         MaterialApp(
           home: MediaQuery(
-            data: const MediaQueryData(
-              size: Size(testWidth, testHeight),
-            ),
+            data: const MediaQueryData(size: Size(testWidth, testHeight)),
             child: Builder(
               builder: (context) {
                 isDesktopLarge = Breakpoints.isDesktopLarge(context);
@@ -551,9 +548,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: MediaQuery(
-            data: const MediaQueryData(
-              size: Size(testWidth, testHeight),
-            ),
+            data: const MediaQueryData(size: Size(testWidth, testHeight)),
             child: Builder(
               builder: (context) {
                 columns = Breakpoints.getGridColumns(context);
@@ -567,13 +562,12 @@ void main() {
       expect(columns, equals(4));
     });
 
-    testWidgets('Content is centered with max-width at 1920px',
-        (WidgetTester tester) async {
+    testWidgets('Content is centered with max-width at 1920px', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         MediaQuery(
-          data: const MediaQueryData(
-            size: Size(testWidth, testHeight),
-          ),
+          data: const MediaQueryData(size: Size(testWidth, testHeight)),
           child: MaterialApp(
             home: Scaffold(
               body: Center(
@@ -594,32 +588,32 @@ void main() {
 
       // Verify the constraint is applied
       final constrainedBox = find.byType(ConstrainedBox);
-      final constraints =
-          tester.widget<ConstrainedBox>(constrainedBox).constraints;
-      expect(constraints.maxWidth, equals(1200.0),
-          reason: 'Content should be constrained to 1200px max width');
+      final constraints = tester
+          .widget<ConstrainedBox>(constrainedBox)
+          .constraints;
+      expect(
+        constraints.maxWidth,
+        equals(1200.0),
+        reason: 'Content should be constrained to 1200px max width',
+      );
     });
 
-    testWidgets('Layout is usable at very wide screens',
-        (WidgetTester tester) async {
+    testWidgets('Layout is usable at very wide screens', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         MediaQuery(
-          data: const MediaQueryData(
-            size: Size(testWidth, testHeight),
-          ),
+          data: const MediaQueryData(size: Size(testWidth, testHeight)),
           child: MaterialApp(
             home: Scaffold(
               body: Row(
                 children: [
-                  AppSidebar(
-                    onToggleExpanded: () {},
-                  ),
+                  AppSidebar(onToggleExpanded: () {}),
                   Expanded(
                     child: ListView.builder(
                       itemCount: 20,
-                      itemBuilder: (context, index) => ListTile(
-                        title: Text('Item $index'),
-                      ),
+                      itemBuilder: (context, index) =>
+                          ListTile(title: Text('Item $index')),
                     ),
                   ),
                 ],
@@ -638,15 +632,14 @@ void main() {
   });
 
   group('Desktop Keyboard Navigation Tests', () {
-    testWidgets('Keyboard shortcuts are enabled on desktop',
-        (WidgetTester tester) async {
+    testWidgets('Keyboard shortcuts are enabled on desktop', (
+      WidgetTester tester,
+    ) async {
       bool shortcutCalled = false;
 
       await tester.pumpWidget(
         MediaQuery(
-          data: const MediaQueryData(
-            size: Size(1280.0, 720.0),
-          ),
+          data: const MediaQueryData(size: Size(1280.0, 720.0)),
           child: MaterialApp(
             home: Scaffold(
               body: Focus(
@@ -670,17 +663,19 @@ void main() {
       await tester.sendKeyEvent(LogicalKeyboardKey.keyN);
       await tester.pump();
 
-      expect(shortcutCalled, isTrue,
-          reason: 'Keyboard shortcuts should work on desktop');
+      expect(
+        shortcutCalled,
+        isTrue,
+        reason: 'Keyboard shortcuts should work on desktop',
+      );
     });
 
-    testWidgets('Focus indicators are visible on desktop',
-        (WidgetTester tester) async {
+    testWidgets('Focus indicators are visible on desktop', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         MediaQuery(
-          data: const MediaQueryData(
-            size: Size(1280.0, 720.0),
-          ),
+          data: const MediaQueryData(size: Size(1280.0, 720.0)),
           child: MaterialApp(
             home: Scaffold(
               body: Center(

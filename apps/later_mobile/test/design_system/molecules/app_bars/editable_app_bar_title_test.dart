@@ -11,10 +11,7 @@ void main() {
         MaterialApp(
           home: Scaffold(
             appBar: AppBar(
-              title: EditableAppBarTitle(
-                text: 'Test Title',
-                onChanged: (_) {},
-              ),
+              title: EditableAppBarTitle(text: 'Test Title', onChanged: (_) {}),
             ),
           ),
         ),
@@ -31,10 +28,7 @@ void main() {
         MaterialApp(
           home: Scaffold(
             appBar: AppBar(
-              title: EditableAppBarTitle(
-                text: 'Test Title',
-                onChanged: (_) {},
-              ),
+              title: EditableAppBarTitle(text: 'Test Title', onChanged: (_) {}),
             ),
           ),
         ),
@@ -49,10 +43,7 @@ void main() {
         MaterialApp(
           home: Scaffold(
             appBar: AppBar(
-              title: EditableAppBarTitle(
-                text: 'Test Title',
-                onChanged: (_) {},
-              ),
+              title: EditableAppBarTitle(text: 'Test Title', onChanged: (_) {}),
             ),
           ),
         ),
@@ -94,7 +85,9 @@ void main() {
       expect(textField.controller?.text, equals('Initial Text'));
     });
 
-    testWidgets('calls onChanged when submitted with valid text', (tester) async {
+    testWidgets('calls onChanged when submitted with valid text', (
+      tester,
+    ) async {
       String? changedText;
 
       await tester.pumpWidget(
@@ -133,10 +126,7 @@ void main() {
         MaterialApp(
           home: Scaffold(
             appBar: AppBar(
-              title: EditableAppBarTitle(
-                text: 'Test',
-                onChanged: (_) {},
-              ),
+              title: EditableAppBarTitle(text: 'Test', onChanged: (_) {}),
             ),
           ),
         ),
@@ -192,15 +182,14 @@ void main() {
       expect(changedText, isNull);
     });
 
-    testWidgets('restores original text when submitted with empty text', (tester) async {
+    testWidgets('restores original text when submitted with empty text', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
             appBar: AppBar(
-              title: EditableAppBarTitle(
-                text: 'Original',
-                onChanged: (_) {},
-              ),
+              title: EditableAppBarTitle(text: 'Original', onChanged: (_) {}),
             ),
           ),
         ),
@@ -239,7 +228,9 @@ void main() {
       );
 
       // Find the GradientText and verify it has the custom gradient
-      final gradientText = tester.widget<GradientText>(find.byType(GradientText));
+      final gradientText = tester.widget<GradientText>(
+        find.byType(GradientText),
+      );
       expect(gradientText.gradient, equals(AppColors.noteGradient));
     });
 
@@ -261,7 +252,9 @@ void main() {
       );
 
       // Verify custom style is applied to GradientText
-      final gradientText = tester.widget<GradientText>(find.byType(GradientText));
+      final gradientText = tester.widget<GradientText>(
+        find.byType(GradientText),
+      );
       expect(gradientText.style, equals(customStyle));
     });
 
@@ -294,10 +287,7 @@ void main() {
         MaterialApp(
           home: Scaffold(
             appBar: AppBar(
-              title: EditableAppBarTitle(
-                text: 'Test',
-                onChanged: (_) {},
-              ),
+              title: EditableAppBarTitle(text: 'Test', onChanged: (_) {}),
             ),
           ),
         ),
@@ -312,7 +302,9 @@ void main() {
       expect(textField.decoration?.border, equals(InputBorder.none));
     });
 
-    testWidgets('only calls onChanged if text actually changed', (tester) async {
+    testWidgets('only calls onChanged if text actually changed', (
+      tester,
+    ) async {
       int callCount = 0;
 
       await tester.pumpWidget(
@@ -381,17 +373,16 @@ void main() {
         MaterialApp(
           home: Scaffold(
             appBar: AppBar(
-              title: EditableAppBarTitle(
-                text: 'Test',
-                onChanged: (_) {},
-              ),
+              title: EditableAppBarTitle(text: 'Test', onChanged: (_) {}),
             ),
           ),
         ),
       );
 
       // Verify default style
-      final gradientText = tester.widget<GradientText>(find.byType(GradientText));
+      final gradientText = tester.widget<GradientText>(
+        find.byType(GradientText),
+      );
       expect(gradientText.style, equals(AppTypography.h3));
     });
 
@@ -410,7 +401,9 @@ void main() {
       );
 
       // Verify overflow handling
-      final gradientText = tester.widget<GradientText>(find.byType(GradientText));
+      final gradientText = tester.widget<GradientText>(
+        find.byType(GradientText),
+      );
       expect(gradientText.overflow, equals(TextOverflow.ellipsis));
     });
 
@@ -449,11 +442,15 @@ void main() {
       );
 
       expect(find.text('List Title'), findsOneWidget);
-      final gradientText = tester.widget<GradientText>(find.byType(GradientText));
+      final gradientText = tester.widget<GradientText>(
+        find.byType(GradientText),
+      );
       expect(gradientText.gradient, equals(AppColors.listGradient));
     });
 
-    testWidgets('updates displayed text when widget text changes', (tester) async {
+    testWidgets('updates displayed text when widget text changes', (
+      tester,
+    ) async {
       String displayText = 'Original';
 
       await tester.pumpWidget(

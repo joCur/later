@@ -5,6 +5,7 @@ import 'package:later_mobile/design_system/tokens/tokens.dart';
 import '../../../core/responsive/breakpoints.dart';
 import 'package:later_mobile/design_system/atoms/buttons/primary_button.dart';
 import 'package:later_mobile/design_system/atoms/buttons/secondary_button.dart';
+import 'package:later_mobile/core/theme/temporal_flow_theme.dart';
 
 /// A responsive container widget that adapts between mobile bottom sheet
 /// and desktop dialog presentations.
@@ -57,13 +58,10 @@ class BottomSheetContainer extends StatelessWidget {
   Widget _buildMobileLayout() {
     return Builder(
       builder: (context) {
+        final temporalTheme = Theme.of(context).extension<TemporalFlowTheme>()!;
         final isDark = Theme.of(context).brightness == Brightness.dark;
-        final surfaceColor = isDark
-            ? AppColors.neutral900
-            : Colors.white;
-        final primaryGradient = isDark
-            ? AppColors.primaryGradientDark
-            : AppColors.primaryGradient;
+        final surfaceColor = isDark ? AppColors.neutral900 : Colors.white;
+        final primaryGradient = temporalTheme.primaryGradient;
         final keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
 
         return GestureDetector(
@@ -134,13 +132,10 @@ class BottomSheetContainer extends StatelessWidget {
   Widget _buildDesktopLayout() {
     return Builder(
       builder: (context) {
+        final temporalTheme = Theme.of(context).extension<TemporalFlowTheme>()!;
         final isDark = Theme.of(context).brightness == Brightness.dark;
-        final surfaceColor = isDark
-            ? AppColors.neutral900
-            : Colors.white;
-        final primaryGradient = isDark
-            ? AppColors.primaryGradientDark
-            : AppColors.primaryGradient;
+        final surfaceColor = isDark ? AppColors.neutral900 : Colors.white;
+        final primaryGradient = temporalTheme.primaryGradient;
 
         return GestureDetector(
           onTap: () => Navigator.of(context).pop(), // Tap outside to dismiss
@@ -161,9 +156,7 @@ class BottomSheetContainer extends StatelessWidget {
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: isDark
-                            ? AppColors.shadowDark
-                            : AppColors.shadowLight,
+                        color: temporalTheme.shadowColor,
                         blurRadius: 24,
                         offset: const Offset(0, 8),
                       ),
@@ -260,18 +253,14 @@ class BottomSheetContainer extends StatelessWidget {
             child: Text(
               title ?? '',
               style: AppTypography.h3.copyWith(
-                color: isDark
-                    ? AppColors.neutral400
-                    : AppColors.neutral600,
+                color: isDark ? AppColors.neutral400 : AppColors.neutral600,
               ),
             ),
           ),
           IconButton(
             icon: Icon(
               Icons.close,
-              color: isDark
-                  ? AppColors.neutral500
-                  : AppColors.neutral500,
+              color: isDark ? AppColors.neutral500 : AppColors.neutral500,
             ),
             onPressed: () => Navigator.of(context).pop(),
             iconSize: 24,

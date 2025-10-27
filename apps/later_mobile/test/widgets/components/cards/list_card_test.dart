@@ -46,9 +46,7 @@ void main() {
 
         await tester.pumpWidget(
           MaterialApp(
-            home: Scaffold(
-              body: ListCard(list: listModel),
-            ),
+            home: Scaffold(body: ListCard(list: listModel)),
           ),
         );
 
@@ -61,16 +59,16 @@ void main() {
 
         await tester.pumpWidget(
           MaterialApp(
-            home: Scaffold(
-              body: ListCard(list: listModel),
-            ),
+            home: Scaffold(body: ListCard(list: listModel)),
           ),
         );
 
         expect(find.text('Grocery List'), findsOneWidget);
       });
 
-      testWidgets('shows item count with correct format - multiple items', (tester) async {
+      testWidgets('shows item count with correct format - multiple items', (
+        tester,
+      ) async {
         final listModel = createListModel(
           items: [
             createListItem(id: '1', title: 'Milk'),
@@ -83,27 +81,23 @@ void main() {
 
         await tester.pumpWidget(
           MaterialApp(
-            home: Scaffold(
-              body: ListCard(list: listModel),
-            ),
+            home: Scaffold(body: ListCard(list: listModel)),
           ),
         );
 
         expect(find.text('5 items'), findsOneWidget);
       });
 
-      testWidgets('shows item count with singular format - one item', (tester) async {
+      testWidgets('shows item count with singular format - one item', (
+        tester,
+      ) async {
         final listModel = createListModel(
-          items: [
-            createListItem(id: '1', title: 'Milk'),
-          ],
+          items: [createListItem(id: '1', title: 'Milk')],
         );
 
         await tester.pumpWidget(
           MaterialApp(
-            home: Scaffold(
-              body: ListCard(list: listModel),
-            ),
+            home: Scaffold(body: ListCard(list: listModel)),
           ),
         );
 
@@ -115,9 +109,7 @@ void main() {
 
         await tester.pumpWidget(
           MaterialApp(
-            home: Scaffold(
-              body: ListCard(list: listModel),
-            ),
+            home: Scaffold(body: ListCard(list: listModel)),
           ),
         );
 
@@ -137,16 +129,16 @@ void main() {
 
         await tester.pumpWidget(
           MaterialApp(
-            home: Scaffold(
-              body: ListCard(list: listModel),
-            ),
+            home: Scaffold(body: ListCard(list: listModel)),
           ),
         );
 
         expect(find.text('Milk, Eggs, Bread...'), findsOneWidget);
       });
 
-      testWidgets('shows preview with ellipsis when more than 3 items', (tester) async {
+      testWidgets('shows preview with ellipsis when more than 3 items', (
+        tester,
+      ) async {
         final listModel = createListModel(
           items: [
             createListItem(id: '1', title: 'Item 1'),
@@ -158,17 +150,20 @@ void main() {
 
         await tester.pumpWidget(
           MaterialApp(
-            home: Scaffold(
-              body: ListCard(list: listModel),
-            ),
+            home: Scaffold(body: ListCard(list: listModel)),
           ),
         );
 
         // Should show first 3 items with ellipsis
-        expect(find.textContaining('Item 1, Item 2, Item 3...'), findsOneWidget);
+        expect(
+          find.textContaining('Item 1, Item 2, Item 3...'),
+          findsOneWidget,
+        );
       });
 
-      testWidgets('shows preview without ellipsis when 3 or fewer items', (tester) async {
+      testWidgets('shows preview without ellipsis when 3 or fewer items', (
+        tester,
+      ) async {
         final listModel = createListModel(
           items: [
             createListItem(id: '1', title: 'Milk'),
@@ -178,9 +173,7 @@ void main() {
 
         await tester.pumpWidget(
           MaterialApp(
-            home: Scaffold(
-              body: ListCard(list: listModel),
-            ),
+            home: Scaffold(body: ListCard(list: listModel)),
           ),
         );
 
@@ -192,9 +185,7 @@ void main() {
 
         await tester.pumpWidget(
           MaterialApp(
-            home: Scaffold(
-              body: ListCard(list: listModel),
-            ),
+            home: Scaffold(body: ListCard(list: listModel)),
           ),
         );
 
@@ -206,9 +197,7 @@ void main() {
 
         await tester.pumpWidget(
           MaterialApp(
-            home: Scaffold(
-              body: ListCard(list: listModel),
-            ),
+            home: Scaffold(body: ListCard(list: listModel)),
           ),
         );
 
@@ -221,9 +210,7 @@ void main() {
 
         await tester.pumpWidget(
           MaterialApp(
-            home: Scaffold(
-              body: ListCard(list: listModel),
-            ),
+            home: Scaffold(body: ListCard(list: listModel)),
           ),
         );
 
@@ -236,9 +223,7 @@ void main() {
 
         await tester.pumpWidget(
           MaterialApp(
-            home: Scaffold(
-              body: ListCard(list: listModel),
-            ),
+            home: Scaffold(body: ListCard(list: listModel)),
           ),
         );
 
@@ -251,9 +236,7 @@ void main() {
 
         await tester.pumpWidget(
           MaterialApp(
-            home: Scaffold(
-              body: ListCard(list: listModel),
-            ),
+            home: Scaffold(body: ListCard(list: listModel)),
           ),
         );
 
@@ -265,16 +248,12 @@ void main() {
     group('List Styles', () {
       testWidgets('handles bullets style', (tester) async {
         final listModel = createListModel(
-          items: [
-            createListItem(id: '1', title: 'Item 1'),
-          ],
+          items: [createListItem(id: '1', title: 'Item 1')],
         );
 
         await tester.pumpWidget(
           MaterialApp(
-            home: Scaffold(
-              body: ListCard(list: listModel),
-            ),
+            home: Scaffold(body: ListCard(list: listModel)),
           ),
         );
 
@@ -284,16 +263,12 @@ void main() {
       testWidgets('handles numbered style', (tester) async {
         final listModel = createListModel(
           style: ListStyle.numbered,
-          items: [
-            createListItem(id: '1', title: 'Item 1'),
-          ],
+          items: [createListItem(id: '1', title: 'Item 1')],
         );
 
         await tester.pumpWidget(
           MaterialApp(
-            home: Scaffold(
-              body: ListCard(list: listModel),
-            ),
+            home: Scaffold(body: ListCard(list: listModel)),
           ),
         );
 
@@ -303,16 +278,12 @@ void main() {
       testWidgets('handles checkboxes style', (tester) async {
         final listModel = createListModel(
           style: ListStyle.checkboxes,
-          items: [
-            createListItem(id: '1', title: 'Item 1', isChecked: true),
-          ],
+          items: [createListItem(id: '1', title: 'Item 1', isChecked: true)],
         );
 
         await tester.pumpWidget(
           MaterialApp(
-            home: Scaffold(
-              body: ListCard(list: listModel),
-            ),
+            home: Scaffold(body: ListCard(list: listModel)),
           ),
         );
 
@@ -344,7 +315,9 @@ void main() {
         expect(tapped, isTrue);
       });
 
-      testWidgets('onLongPress callback fires when long pressed', (tester) async {
+      testWidgets('onLongPress callback fires when long pressed', (
+        tester,
+      ) async {
         final listModel = createListModel();
         var longPressed = false;
 
@@ -372,9 +345,7 @@ void main() {
 
         await tester.pumpWidget(
           MaterialApp(
-            home: Scaffold(
-              body: ListCard(list: listModel),
-            ),
+            home: Scaffold(body: ListCard(list: listModel)),
           ),
         );
 
@@ -397,9 +368,7 @@ void main() {
 
         await tester.pumpWidget(
           MaterialApp(
-            home: Scaffold(
-              body: ListCard(list: listModel),
-            ),
+            home: Scaffold(body: ListCard(list: listModel)),
           ),
         );
 
@@ -423,9 +392,7 @@ void main() {
 
         await tester.pumpWidget(
           MaterialApp(
-            home: Scaffold(
-              body: ListCard(list: listModel),
-            ),
+            home: Scaffold(body: ListCard(list: listModel)),
           ),
         );
 
@@ -450,9 +417,7 @@ void main() {
 
         await tester.pumpWidget(
           MaterialApp(
-            home: Scaffold(
-              body: ListCard(list: listModel),
-            ),
+            home: Scaffold(body: ListCard(list: listModel)),
           ),
         );
 
@@ -470,9 +435,7 @@ void main() {
 
         await tester.pumpWidget(
           MaterialApp(
-            home: Scaffold(
-              body: ListCard(list: listModel),
-            ),
+            home: Scaffold(body: ListCard(list: listModel)),
           ),
         );
 
@@ -490,10 +453,7 @@ void main() {
         await tester.pumpWidget(
           MaterialApp(
             home: Scaffold(
-              body: ListCard(
-                list: listModel,
-                onTap: () {},
-              ),
+              body: ListCard(list: listModel, onTap: () {}),
             ),
           ),
         );
@@ -515,17 +475,14 @@ void main() {
     });
 
     group('Entrance Animation', () {
-      testWidgets('applies entrance animation with index parameter', (tester) async {
+      testWidgets('applies entrance animation with index parameter', (
+        tester,
+      ) async {
         final listModel = createListModel();
 
         await tester.pumpWidget(
           MaterialApp(
-            home: Scaffold(
-              body: ListCard(
-                list: listModel,
-                index: 0,
-              ),
-            ),
+            home: Scaffold(body: ListCard(list: listModel, index: 0)),
           ),
         );
 
@@ -544,9 +501,7 @@ void main() {
 
         await tester.pumpWidget(
           MaterialApp(
-            home: Scaffold(
-              body: ListCard(list: listModel),
-            ),
+            home: Scaffold(body: ListCard(list: listModel)),
           ),
         );
 
@@ -558,10 +513,7 @@ void main() {
       testWidgets('applies staggered delay based on index', (tester) async {
         final lists = List.generate(
           3,
-          (index) => createListModel(
-            id: 'list_$index',
-            name: 'List $index',
-          ),
+          (index) => createListModel(id: 'list_$index', name: 'List $index'),
         );
 
         await tester.pumpWidget(
@@ -570,10 +522,7 @@ void main() {
               body: ListView.builder(
                 itemCount: lists.length,
                 itemBuilder: (context, index) {
-                  return ListCard(
-                    list: lists[index],
-                    index: index,
-                  );
+                  return ListCard(list: lists[index], index: index);
                 },
               ),
             ),
@@ -599,9 +548,7 @@ void main() {
 
         await tester.pumpWidget(
           MaterialApp(
-            home: Scaffold(
-              body: ListCard(list: listModel),
-            ),
+            home: Scaffold(body: ListCard(list: listModel)),
           ),
         );
 
@@ -613,9 +560,7 @@ void main() {
 
         await tester.pumpWidget(
           MaterialApp(
-            home: Scaffold(
-              body: ListCard(list: listModel),
-            ),
+            home: Scaffold(body: ListCard(list: listModel)),
           ),
         );
 
@@ -627,9 +572,7 @@ void main() {
 
         await tester.pumpWidget(
           MaterialApp(
-            home: Scaffold(
-              body: ListCard(list: listModel),
-            ),
+            home: Scaffold(body: ListCard(list: listModel)),
           ),
         );
 
@@ -642,9 +585,7 @@ void main() {
 
         await tester.pumpWidget(
           MaterialApp(
-            home: Scaffold(
-              body: ListCard(list: listModel),
-            ),
+            home: Scaffold(body: ListCard(list: listModel)),
           ),
         );
 
@@ -656,16 +597,14 @@ void main() {
     group('Edge Cases', () {
       testWidgets('handles very long list names', (tester) async {
         final listModel = createListModel(
-          name: 'This is a very long list name that should be truncated with ellipsis when it exceeds the maximum number of lines allowed',
+          name:
+              'This is a very long list name that should be truncated with ellipsis when it exceeds the maximum number of lines allowed',
         );
 
         await tester.pumpWidget(
           MaterialApp(
             home: Scaffold(
-              body: SizedBox(
-                width: 300,
-                child: ListCard(list: listModel),
-              ),
+              body: SizedBox(width: 300, child: ListCard(list: listModel)),
             ),
           ),
         );
@@ -676,19 +615,14 @@ void main() {
       testWidgets('handles many items', (tester) async {
         final items = List.generate(
           100,
-          (index) => createListItem(
-            id: 'item_$index',
-            title: 'Item $index',
-          ),
+          (index) => createListItem(id: 'item_$index', title: 'Item $index'),
         );
 
         final listModel = createListModel(items: items);
 
         await tester.pumpWidget(
           MaterialApp(
-            home: Scaffold(
-              body: ListCard(list: listModel),
-            ),
+            home: Scaffold(body: ListCard(list: listModel)),
           ),
         );
 
@@ -701,7 +635,10 @@ void main() {
       testWidgets('handles items with very long titles', (tester) async {
         final listModel = createListModel(
           items: [
-            createListItem(id: '1', title: 'This is a very long item title that might cause overflow'),
+            createListItem(
+              id: '1',
+              title: 'This is a very long item title that might cause overflow',
+            ),
             createListItem(id: '2', title: 'Another long title'),
             createListItem(id: '3', title: 'Yet another long title'),
           ],
@@ -710,10 +647,7 @@ void main() {
         await tester.pumpWidget(
           MaterialApp(
             home: Scaffold(
-              body: SizedBox(
-                width: 300,
-                child: ListCard(list: listModel),
-              ),
+              body: SizedBox(width: 300, child: ListCard(list: listModel)),
             ),
           ),
         );

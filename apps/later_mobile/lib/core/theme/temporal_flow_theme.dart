@@ -4,7 +4,6 @@ import '../../design_system/tokens/colors.dart';
 /// Theme extension for custom Temporal Flow design tokens
 /// Provides gradient-based color system with automatic light/dark mode handling
 class TemporalFlowTheme extends ThemeExtension<TemporalFlowTheme> {
-
   /// Creates a TemporalFlowTheme with all required properties
   const TemporalFlowTheme({
     required this.primaryGradient,
@@ -53,6 +52,7 @@ class TemporalFlowTheme extends ThemeExtension<TemporalFlowTheme> {
       shadowColor: AppColors.shadowDark,
     );
   }
+
   /// Main brand gradient (indigo → purple)
   final LinearGradient primaryGradient;
 

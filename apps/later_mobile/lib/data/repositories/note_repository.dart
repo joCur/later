@@ -117,9 +117,7 @@ class NoteRepository {
       }
 
       // Update the updatedAt timestamp
-      final updatedNote = note.copyWith(
-        updatedAt: DateTime.now(),
-      );
+      final updatedNote = note.copyWith(updatedAt: DateTime.now());
 
       await _box.put(updatedNote.id, updatedNote);
       return updatedNote;
@@ -233,7 +231,8 @@ class NoteRepository {
       final lowerQuery = query.toLowerCase();
       return _box.values.where((note) {
         final titleMatch = note.title.toLowerCase().contains(lowerQuery);
-        final contentMatch = note.content?.toLowerCase().contains(lowerQuery) ?? false;
+        final contentMatch =
+            note.content?.toLowerCase().contains(lowerQuery) ?? false;
         return titleMatch || contentMatch;
       }).toList();
     } catch (e) {

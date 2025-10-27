@@ -169,7 +169,9 @@ class _TodoItemCardState extends State<TodoItemCard> {
     final buffer = StringBuffer(widget.todoItem.title);
 
     // Add completion status
-    buffer.write(widget.todoItem.isCompleted ? ', completed' : ', not completed');
+    buffer.write(
+      widget.todoItem.isCompleted ? ', completed' : ', not completed',
+    );
 
     // Add due date if present
     if (widget.todoItem.dueDate != null) {
@@ -319,7 +321,9 @@ class _TodoItemCardState extends State<TodoItemCard> {
             onTap: _handleTap,
             onLongPress: _handleLongPress,
             child: Opacity(
-              opacity: widget.todoItem.isCompleted ? AppColors.completedOpacity : 1.0,
+              opacity: widget.todoItem.isCompleted
+                  ? AppColors.completedOpacity
+                  : 1.0,
               child: cardContent,
             ),
           ),

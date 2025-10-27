@@ -29,8 +29,9 @@ import 'package:later_mobile/data/models/item_model.dart';
 /// - All content is reachable via screen reader
 void main() {
   group('Screen Reader - Semantic Tree Structure', () {
-    testWidgets('App has proper semantic tree hierarchy',
-        (WidgetTester tester) async {
+    testWidgets('App has proper semantic tree hierarchy', (
+      WidgetTester tester,
+    ) async {
       // Arrange: Build a simple screen with multiple elements
       await tester.pumpWidget(
         MaterialApp(
@@ -39,15 +40,10 @@ void main() {
             body: Column(
               children: [
                 const Text('Welcome'),
-                PrimaryButton(
-                  text: 'Get Started',
-                  onPressed: () {},
-                ),
+                PrimaryButton(text: 'Get Started', onPressed: () {}),
               ],
             ),
-            floatingActionButton: QuickCaptureFab(
-              onPressed: () {},
-            ),
+            floatingActionButton: QuickCaptureFab(onPressed: () {}),
           ),
         ),
       );
@@ -70,26 +66,18 @@ void main() {
       handle.dispose();
     });
 
-    testWidgets('Screen reader can traverse all interactive elements',
-        (WidgetTester tester) async {
+    testWidgets('Screen reader can traverse all interactive elements', (
+      WidgetTester tester,
+    ) async {
       // Arrange: Create screen with multiple interactive elements
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
             body: Column(
               children: [
-                PrimaryButton(
-                  text: 'Button 1',
-                  onPressed: () {},
-                ),
-                PrimaryButton(
-                  text: 'Button 2',
-                  onPressed: () {},
-                ),
-                PrimaryButton(
-                  text: 'Button 3',
-                  onPressed: () {},
-                ),
+                PrimaryButton(text: 'Button 1', onPressed: () {}),
+                PrimaryButton(text: 'Button 2', onPressed: () {}),
+                PrimaryButton(text: 'Button 3', onPressed: () {}),
               ],
             ),
           ),
@@ -118,8 +106,9 @@ void main() {
       handle.dispose();
     });
 
-    testWidgets('Semantic tree respects visual hierarchy',
-        (WidgetTester tester) async {
+    testWidgets('Semantic tree respects visual hierarchy', (
+      WidgetTester tester,
+    ) async {
       // Arrange: Create nested semantic structure
       await tester.pumpWidget(
         MaterialApp(
@@ -180,26 +169,18 @@ void main() {
   });
 
   group('Screen Reader - Focus Order', () {
-    testWidgets('Focus order follows logical reading order',
-        (WidgetTester tester) async {
+    testWidgets('Focus order follows logical reading order', (
+      WidgetTester tester,
+    ) async {
       // Arrange: Create screen with multiple focusable elements
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
             body: Column(
               children: [
-                PrimaryButton(
-                  text: 'First',
-                  onPressed: () {},
-                ),
-                PrimaryButton(
-                  text: 'Second',
-                  onPressed: () {},
-                ),
-                PrimaryButton(
-                  text: 'Third',
-                  onPressed: () {},
-                ),
+                PrimaryButton(text: 'First', onPressed: () {}),
+                PrimaryButton(text: 'Second', onPressed: () {}),
+                PrimaryButton(text: 'Third', onPressed: () {}),
               ],
             ),
           ),
@@ -227,8 +208,9 @@ void main() {
       handle.dispose();
     });
 
-    testWidgets('Bottom navigation is accessible in correct order',
-        (WidgetTester tester) async {
+    testWidgets('Bottom navigation is accessible in correct order', (
+      WidgetTester tester,
+    ) async {
       // Arrange: Create screen with bottom navigation
       await tester.pumpWidget(
         MaterialApp(
@@ -237,10 +219,7 @@ void main() {
             bottomNavigationBar: BottomNavigationBar(
               onTap: (_) {},
               items: const [
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.home),
-                  label: 'Home',
-                ),
+                BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
                 BottomNavigationBarItem(
                   icon: Icon(Icons.search),
                   label: 'Search',
@@ -269,18 +248,16 @@ void main() {
   });
 
   group('Screen Reader - State Announcements', () {
-    testWidgets('Button state changes are announced',
-        (WidgetTester tester) async {
+    testWidgets('Button state changes are announced', (
+      WidgetTester tester,
+    ) async {
       // Arrange: Create enabled button
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
             body: StatefulBuilder(
               builder: (context, setState) {
-                return PrimaryButton(
-                  text: 'Toggle Me',
-                  onPressed: () {},
-                );
+                return PrimaryButton(text: 'Toggle Me', onPressed: () {});
               },
             ),
           ),
@@ -306,8 +283,9 @@ void main() {
       handle.dispose();
     });
 
-    testWidgets('Checkbox state changes are announced',
-        (WidgetTester tester) async {
+    testWidgets('Checkbox state changes are announced', (
+      WidgetTester tester,
+    ) async {
       // Arrange: Create task card with checkbox
 
       await tester.pumpWidget(
@@ -370,18 +348,16 @@ void main() {
       handle.dispose();
     });
 
-    testWidgets('Loading state is communicated to screen reader',
-        (WidgetTester tester) async {
+    testWidgets('Loading state is communicated to screen reader', (
+      WidgetTester tester,
+    ) async {
       // Arrange: Create button with loading state
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
             body: StatefulBuilder(
               builder: (context, setState) {
-                return PrimaryButton(
-                  text: 'Submit',
-                  onPressed: () {},
-                );
+                return PrimaryButton(text: 'Submit', onPressed: () {});
               },
             ),
           ),
@@ -409,8 +385,9 @@ void main() {
   });
 
   group('Screen Reader - Content Discovery', () {
-    testWidgets('All text content is exposed to screen reader',
-        (WidgetTester tester) async {
+    testWidgets('All text content is exposed to screen reader', (
+      WidgetTester tester,
+    ) async {
       // Arrange: Create card with title and content
       final testItem = Item(
         id: 'test-1',
@@ -422,10 +399,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: ItemCard(
-              item: testItem,
-              onTap: () {},
-            ),
+            body: ItemCard(item: testItem, onTap: () {}),
           ),
         ),
       );
@@ -442,8 +416,9 @@ void main() {
       handle.dispose();
     });
 
-    testWidgets('Icon-only buttons have accessible labels',
-        (WidgetTester tester) async {
+    testWidgets('Icon-only buttons have accessible labels', (
+      WidgetTester tester,
+    ) async {
       // Arrange: Create FAB (icon-only button)
       await tester.pumpWidget(
         MaterialApp(
@@ -477,8 +452,9 @@ void main() {
       handle.dispose();
     });
 
-    testWidgets('Images and icons have alternative text',
-        (WidgetTester tester) async {
+    testWidgets('Images and icons have alternative text', (
+      WidgetTester tester,
+    ) async {
       // Arrange: Create button with icon
       await tester.pumpWidget(
         MaterialApp(
@@ -515,18 +491,14 @@ void main() {
   });
 
   group('Screen Reader - Navigation Announcements', () {
-    testWidgets('Screen navigation is announced',
-        (WidgetTester tester) async {
+    testWidgets('Screen navigation is announced', (WidgetTester tester) async {
       // Arrange: Create two screens that can be navigated
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
             appBar: AppBar(title: const Text('Home')),
             body: Center(
-              child: PrimaryButton(
-                text: 'Go to Details',
-                onPressed: () {},
-              ),
+              child: PrimaryButton(text: 'Go to Details', onPressed: () {}),
             ),
           ),
         ),
@@ -544,8 +516,9 @@ void main() {
       handle.dispose();
     });
 
-    testWidgets('Modal dialogs are announced when opened',
-        (WidgetTester tester) async {
+    testWidgets('Modal dialogs are announced when opened', (
+      WidgetTester tester,
+    ) async {
       // Arrange: Create button that opens dialog
       await tester.pumpWidget(
         MaterialApp(
@@ -597,8 +570,9 @@ void main() {
   });
 
   group('Screen Reader - Error Announcements', () {
-    testWidgets('Form validation errors are announced',
-        (WidgetTester tester) async {
+    testWidgets('Form validation errors are announced', (
+      WidgetTester tester,
+    ) async {
       // Arrange: Create form with error
       const errorMessage = 'This field is required';
 
@@ -628,8 +602,9 @@ void main() {
   });
 
   group('Screen Reader - Interactive Element Grouping', () {
-    testWidgets('Related elements are grouped semantically',
-        (WidgetTester tester) async {
+    testWidgets('Related elements are grouped semantically', (
+      WidgetTester tester,
+    ) async {
       // Arrange: Create card with multiple elements
       final testItem = Item(
         id: 'test-1',
@@ -639,11 +614,7 @@ void main() {
 
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(
-            body: ItemCard(
-              item: testItem,
-            ),
-          ),
+          home: Scaffold(body: ItemCard(item: testItem)),
         ),
       );
 

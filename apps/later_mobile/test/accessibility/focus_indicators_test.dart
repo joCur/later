@@ -35,8 +35,9 @@ import 'package:later_mobile/design_system/tokens/tokens.dart';
 /// - Can reach all interactive elements via keyboard
 void main() {
   group('Focus Indicators - Button Components', () {
-    testWidgets('PrimaryButton has visible focus indicator',
-        (WidgetTester tester) async {
+    testWidgets('PrimaryButton has visible focus indicator', (
+      WidgetTester tester,
+    ) async {
       // Arrange: Create button
       final focusNode = FocusNode();
       await tester.pumpWidget(
@@ -45,10 +46,7 @@ void main() {
             body: Center(
               child: Focus(
                 focusNode: focusNode,
-                child: PrimaryButton(
-                  text: 'Test Button',
-                  onPressed: () {},
-                ),
+                child: PrimaryButton(text: 'Test Button', onPressed: () {}),
               ),
             ),
           ),
@@ -64,7 +62,8 @@ void main() {
       expect(
         focusWidget,
         findsWidgets,
-        reason: 'Button should be wrapped in Focus widget for keyboard navigation',
+        reason:
+            'Button should be wrapped in Focus widget for keyboard navigation',
       );
 
       // Verify focus node is focused
@@ -78,8 +77,9 @@ void main() {
       focusNode.dispose();
     });
 
-    testWidgets('SecondaryButton has visible focus indicator',
-        (WidgetTester tester) async {
+    testWidgets('SecondaryButton has visible focus indicator', (
+      WidgetTester tester,
+    ) async {
       // Arrange: Create button
       final focusNode = FocusNode();
       await tester.pumpWidget(
@@ -88,10 +88,7 @@ void main() {
             body: Center(
               child: Focus(
                 focusNode: focusNode,
-                child: SecondaryButton(
-                  text: 'Test Button',
-                  onPressed: () {},
-                ),
+                child: SecondaryButton(text: 'Test Button', onPressed: () {}),
               ),
             ),
           ),
@@ -113,8 +110,9 @@ void main() {
       focusNode.dispose();
     });
 
-    testWidgets('GhostButton has visible focus indicator',
-        (WidgetTester tester) async {
+    testWidgets('GhostButton has visible focus indicator', (
+      WidgetTester tester,
+    ) async {
       // Arrange: Create button
       final focusNode = FocusNode();
       await tester.pumpWidget(
@@ -123,10 +121,7 @@ void main() {
             body: Center(
               child: Focus(
                 focusNode: focusNode,
-                child: GhostButton(
-                  text: 'Test Button',
-                  onPressed: () {},
-                ),
+                child: GhostButton(text: 'Test Button', onPressed: () {}),
               ),
             ),
           ),
@@ -148,8 +143,9 @@ void main() {
       focusNode.dispose();
     });
 
-    testWidgets('Disabled button cannot receive focus',
-        (WidgetTester tester) async {
+    testWidgets('Disabled button cannot receive focus', (
+      WidgetTester tester,
+    ) async {
       // Arrange: Create disabled button
       final focusNode = FocusNode();
       await tester.pumpWidget(
@@ -189,16 +185,14 @@ void main() {
   });
 
   group('Focus Indicators - Input Fields', () {
-    testWidgets('TextInputField has visible focus indicator',
-        (WidgetTester tester) async {
+    testWidgets('TextInputField has visible focus indicator', (
+      WidgetTester tester,
+    ) async {
       // Arrange: Create text input
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(
-            body: TextInputField(
-              label: 'Test Input',
-              autofocus: true,
-            ),
+            body: TextInputField(label: 'Test Input', autofocus: true),
           ),
         ),
       );
@@ -216,8 +210,9 @@ void main() {
       );
     });
 
-    testWidgets('TextInputField shows focus state with gradient border',
-        (WidgetTester tester) async {
+    testWidgets('TextInputField shows focus state with gradient border', (
+      WidgetTester tester,
+    ) async {
       // Arrange: Create text input
       final controller = TextEditingController();
       await tester.pumpWidget(
@@ -249,15 +244,17 @@ void main() {
       expect(
         animatedContainers,
         findsWidgets,
-        reason: 'Input field should use AnimatedContainer for focus transitions',
+        reason:
+            'Input field should use AnimatedContainer for focus transitions',
       );
 
       // Clean up
       controller.dispose();
     });
 
-    testWidgets('Multiple inputs have logical tab order',
-        (WidgetTester tester) async {
+    testWidgets('Multiple inputs have logical tab order', (
+      WidgetTester tester,
+    ) async {
       // Arrange: Create form with multiple inputs
       final controller1 = TextEditingController();
       final controller2 = TextEditingController();
@@ -268,18 +265,9 @@ void main() {
           home: Scaffold(
             body: Column(
               children: [
-                TextInputField(
-                  label: 'First Name',
-                  controller: controller1,
-                ),
-                TextInputField(
-                  label: 'Last Name',
-                  controller: controller2,
-                ),
-                TextInputField(
-                  label: 'Email',
-                  controller: controller3,
-                ),
+                TextInputField(label: 'First Name', controller: controller1),
+                TextInputField(label: 'Last Name', controller: controller2),
+                TextInputField(label: 'Email', controller: controller3),
               ],
             ),
           ),
@@ -311,8 +299,7 @@ void main() {
   });
 
   group('Focus Indicators - Item Cards', () {
-    testWidgets('ItemCard can receive focus',
-        (WidgetTester tester) async {
+    testWidgets('ItemCard can receive focus', (WidgetTester tester) async {
       // Arrange: Create item card
       final testItem = Item(
         id: 'test-1',
@@ -326,10 +313,7 @@ void main() {
           home: Scaffold(
             body: Focus(
               focusNode: focusNode,
-              child: ItemCard(
-                item: testItem,
-                onTap: () {},
-              ),
+              child: ItemCard(item: testItem, onTap: () {}),
             ),
           ),
         ),
@@ -350,8 +334,9 @@ void main() {
       focusNode.dispose();
     });
 
-    testWidgets('ItemCard checkbox can be focused separately from card',
-        (WidgetTester tester) async {
+    testWidgets('ItemCard checkbox can be focused separately from card', (
+      WidgetTester tester,
+    ) async {
       // Arrange: Create task card with checkbox
       final testItem = Item(
         id: 'test-1',
@@ -361,11 +346,7 @@ void main() {
 
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(
-            body: ItemCard(
-              item: testItem,
-            ),
-          ),
+          home: Scaffold(body: ItemCard(item: testItem)),
         ),
       );
 
@@ -387,26 +368,18 @@ void main() {
   });
 
   group('Focus Indicators - Tab Order', () {
-    testWidgets('Tab order follows visual layout top to bottom',
-        (WidgetTester tester) async {
+    testWidgets('Tab order follows visual layout top to bottom', (
+      WidgetTester tester,
+    ) async {
       // Arrange: Create screen with multiple focusable elements
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
             body: Column(
               children: [
-                PrimaryButton(
-                  text: 'First',
-                  onPressed: () {},
-                ),
-                PrimaryButton(
-                  text: 'Second',
-                  onPressed: () {},
-                ),
-                PrimaryButton(
-                  text: 'Third',
-                  onPressed: () {},
-                ),
+                PrimaryButton(text: 'First', onPressed: () {}),
+                PrimaryButton(text: 'Second', onPressed: () {}),
+                PrimaryButton(text: 'Third', onPressed: () {}),
               ],
             ),
           ),
@@ -429,38 +402,27 @@ void main() {
       expect(thirdButton.text, equals('Third'));
     });
 
-    testWidgets('Tab order handles complex layouts correctly',
-        (WidgetTester tester) async {
+    testWidgets('Tab order handles complex layouts correctly', (
+      WidgetTester tester,
+    ) async {
       // Arrange: Create complex layout with row and column
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
             body: Column(
               children: [
-                PrimaryButton(
-                  text: 'Top',
-                  onPressed: () {},
-                ),
+                PrimaryButton(text: 'Top', onPressed: () {}),
                 Row(
                   children: [
                     Expanded(
-                      child: PrimaryButton(
-                        text: 'Left',
-                        onPressed: () {},
-                      ),
+                      child: PrimaryButton(text: 'Left', onPressed: () {}),
                     ),
                     Expanded(
-                      child: PrimaryButton(
-                        text: 'Right',
-                        onPressed: () {},
-                      ),
+                      child: PrimaryButton(text: 'Right', onPressed: () {}),
                     ),
                   ],
                 ),
-                PrimaryButton(
-                  text: 'Bottom',
-                  onPressed: () {},
-                ),
+                PrimaryButton(text: 'Bottom', onPressed: () {}),
               ],
             ),
           ),
@@ -487,8 +449,9 @@ void main() {
   });
 
   group('Focus Indicators - No Keyboard Traps', () {
-    testWidgets('Can tab through all elements and back to start',
-        (WidgetTester tester) async {
+    testWidgets('Can tab through all elements and back to start', (
+      WidgetTester tester,
+    ) async {
       // Arrange: Create screen with multiple buttons
       await tester.pumpWidget(
         MaterialApp(
@@ -526,8 +489,9 @@ void main() {
       }
     });
 
-    testWidgets('Modal dialogs can be exited with keyboard',
-        (WidgetTester tester) async {
+    testWidgets('Modal dialogs can be exited with keyboard', (
+      WidgetTester tester,
+    ) async {
       // Arrange: Create button that opens dialog
       await tester.pumpWidget(
         MaterialApp(
@@ -576,8 +540,9 @@ void main() {
       expect(find.text('Test Dialog'), findsNothing);
     });
 
-    testWidgets('Focus returns to trigger after modal closes',
-        (WidgetTester tester) async {
+    testWidgets('Focus returns to trigger after modal closes', (
+      WidgetTester tester,
+    ) async {
       // Arrange: Create button that opens and closes dialog
       final buttonFocusNode = FocusNode();
 
@@ -672,8 +637,9 @@ void main() {
   });
 
   group('Focus Indicators - Skip Links', () {
-    testWidgets('App provides way to skip repeated content',
-        (WidgetTester tester) async {
+    testWidgets('App provides way to skip repeated content', (
+      WidgetTester tester,
+    ) async {
       // Arrange: Create app with navigation and content
       await tester.pumpWidget(
         MaterialApp(
@@ -682,10 +648,7 @@ void main() {
             body: Column(
               children: [
                 const Text('Main Content'),
-                PrimaryButton(
-                  text: 'Action',
-                  onPressed: () {},
-                ),
+                PrimaryButton(text: 'Action', onPressed: () {}),
               ],
             ),
           ),

@@ -32,12 +32,15 @@ void main() {
     );
 
     // Setup default mock behavior
-    when(mockContentProvider.updateNote(any))
-        .thenAnswer((_) async => Future.value());
-    when(mockContentProvider.deleteNote(any, any))
-        .thenAnswer((_) async => Future.value());
-    when(mockSpacesProvider.decrementSpaceItemCount(any))
-        .thenAnswer((_) async => Future.value());
+    when(
+      mockContentProvider.updateNote(any),
+    ).thenAnswer((_) async => Future.value());
+    when(
+      mockContentProvider.deleteNote(any, any),
+    ).thenAnswer((_) async => Future.value());
+    when(
+      mockSpacesProvider.decrementSpaceItemCount(any),
+    ).thenAnswer((_) async => Future.value());
   });
 
   Widget createTestWidget(Item note, {Size? screenSize}) {
@@ -46,13 +49,9 @@ void main() {
         ChangeNotifierProvider<ContentProvider>.value(
           value: mockContentProvider,
         ),
-        ChangeNotifierProvider<SpacesProvider>.value(
-          value: mockSpacesProvider,
-        ),
+        ChangeNotifierProvider<SpacesProvider>.value(value: mockSpacesProvider),
       ],
-      child: MaterialApp(
-        home: NoteDetailScreen(note: note),
-      ),
+      child: MaterialApp(home: NoteDetailScreen(note: note)),
     );
 
     // Wrap with MediaQuery if custom screen size is provided
@@ -68,7 +67,10 @@ void main() {
 
   /// Helper to set mobile viewport size (< 768px)
   Widget createMobileTestWidget(Item note) {
-    return createTestWidget(note, screenSize: const Size(375, 812)); // iPhone size
+    return createTestWidget(
+      note,
+      screenSize: const Size(375, 812),
+    ); // iPhone size
   }
 
   /// Helper to set desktop viewport size (>= 1024px)
@@ -99,8 +101,7 @@ void main() {
       expect(find.text('tag2'), findsOneWidget);
     });
 
-    testWidgets('should have multiline TextField for content',
-        (tester) async {
+    testWidgets('should have multiline TextField for content', (tester) async {
       await tester.pumpWidget(createTestWidget(testNote));
       await tester.pumpAndSettle();
 
@@ -138,8 +139,9 @@ void main() {
       await tester.pumpAndSettle();
 
       // Should show TextField for editing
-      final editableFields =
-          tester.widgetList<TextField>(find.byType(TextField));
+      final editableFields = tester.widgetList<TextField>(
+        find.byType(TextField),
+      );
       expect(editableFields.length, greaterThanOrEqualTo(1));
     });
 
@@ -337,10 +339,7 @@ void main() {
 
       // Should show confirmation
       expect(find.byType(AlertDialog), findsOneWidget);
-      expect(
-        find.textContaining('Are you sure'),
-        findsOneWidget,
-      );
+      expect(find.textContaining('Are you sure'), findsOneWidget);
     });
 
     testWidgets('should delete note on confirmation', (tester) async {
@@ -358,8 +357,9 @@ void main() {
       await tester.pumpAndSettle();
 
       // Should call deleteNote
-      verify(mockContentProvider.deleteNote('note-1', mockSpacesProvider))
-          .called(1);
+      verify(
+        mockContentProvider.deleteNote('note-1', mockSpacesProvider),
+      ).called(1);
     });
 
     testWidgets('should cancel deletion', (tester) async {
@@ -382,8 +382,9 @@ void main() {
   });
 
   group('NoteDetailScreen - Empty State', () {
-    testWidgets('should show empty state for note without content',
-        (tester) async {
+    testWidgets('should show empty state for note without content', (
+      tester,
+    ) async {
       final emptyNote = Item(
         id: 'note-2',
         title: 'Empty Note',
@@ -402,8 +403,7 @@ void main() {
       expect(textField.controller?.text, isEmpty);
     });
 
-    testWidgets('should show hint text in empty content field',
-        (tester) async {
+    testWidgets('should show hint text in empty content field', (tester) async {
       final emptyNote = Item(
         id: 'note-2',
         title: 'Empty Note',
@@ -418,10 +418,7 @@ void main() {
         find.byKey(const Key('note_content_field')),
       );
 
-      expect(
-        contentField.decoration?.hintText,
-        isNotNull,
-      );
+      expect(contentField.decoration?.hintText, isNotNull);
     });
   });
 
@@ -449,8 +446,9 @@ void main() {
   group('NoteDetailScreen - Error Handling', () {
     testWidgets('should show error message when save fails', (tester) async {
       // Setup provider to throw error
-      when(mockContentProvider.updateNote(any))
-          .thenThrow(Exception('Save failed'));
+      when(
+        mockContentProvider.updateNote(any),
+      ).thenThrow(Exception('Save failed'));
 
       await tester.pumpWidget(createTestWidget(testNote));
       await tester.pumpAndSettle();
@@ -472,8 +470,9 @@ void main() {
     });
 
     testWidgets('should show error when delete fails', (tester) async {
-      when(mockContentProvider.deleteNote(any, any))
-          .thenThrow(Exception('Delete failed'));
+      when(
+        mockContentProvider.deleteNote(any, any),
+      ).thenThrow(Exception('Delete failed'));
 
       await tester.pumpWidget(createTestWidget(testNote));
       await tester.pumpAndSettle();
@@ -493,8 +492,7 @@ void main() {
   });
 
   group('NoteDetailScreen - Styling and Design', () {
-    testWidgets('should use AppColors.noteGradient for title',
-        (tester) async {
+    testWidgets('should use AppColors.noteGradient for title', (tester) async {
       await tester.pumpWidget(createTestWidget(testNote));
       await tester.pumpAndSettle();
 
@@ -542,8 +540,9 @@ void main() {
   });
 
   group('NoteDetailScreen - Responsive Modal', () {
-    testWidgets('should show bottom sheet on mobile when adding tag',
-        (tester) async {
+    testWidgets('should show bottom sheet on mobile when adding tag', (
+      tester,
+    ) async {
       await tester.pumpWidget(createMobileTestWidget(testNote));
       await tester.pumpAndSettle();
 
@@ -558,8 +557,9 @@ void main() {
       expect(find.text('Add Tag'), findsOneWidget);
     });
 
-    testWidgets('should show dialog on desktop when adding tag',
-        (tester) async {
+    testWidgets('should show dialog on desktop when adding tag', (
+      tester,
+    ) async {
       await tester.pumpWidget(createDesktopTestWidget(testNote));
       await tester.pumpAndSettle();
 
@@ -573,8 +573,9 @@ void main() {
       expect(find.text('Add Tag'), findsOneWidget);
     });
 
-    testWidgets('should add tag successfully from mobile bottom sheet',
-        (tester) async {
+    testWidgets('should add tag successfully from mobile bottom sheet', (
+      tester,
+    ) async {
       await tester.pumpWidget(createMobileTestWidget(testNote));
       await tester.pumpAndSettle();
 
@@ -592,8 +593,9 @@ void main() {
       verify(mockContentProvider.updateNote(any)).called(greaterThan(0));
     });
 
-    testWidgets('should add tag successfully from desktop dialog',
-        (tester) async {
+    testWidgets('should add tag successfully from desktop dialog', (
+      tester,
+    ) async {
       await tester.pumpWidget(createDesktopTestWidget(testNote));
       await tester.pumpAndSettle();
 

@@ -17,13 +17,12 @@ void main() {
 
       // Mock HapticFeedback channel
       TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
-          .setMockMethodCallHandler(
-        SystemChannels.platform,
-        (MethodCall methodCall) async {
-          methodCalls.add(methodCall);
-          return null;
-        },
-      );
+          .setMockMethodCallHandler(SystemChannels.platform, (
+            MethodCall methodCall,
+          ) async {
+            methodCalls.add(methodCall);
+            return null;
+          });
     });
 
     tearDown(() {
@@ -32,7 +31,9 @@ void main() {
     });
 
     group('PrimaryButton', () {
-      testWidgets('triggers light haptic on press', (WidgetTester tester) async {
+      testWidgets('triggers light haptic on press', (
+        WidgetTester tester,
+      ) async {
         bool wasPressed = false;
 
         await tester.pumpWidget(
@@ -63,14 +64,13 @@ void main() {
         // This test verifies the button works without throwing errors
       });
 
-      testWidgets('does not trigger haptic when disabled', (WidgetTester tester) async {
+      testWidgets('does not trigger haptic when disabled', (
+        WidgetTester tester,
+      ) async {
         await tester.pumpWidget(
           const MaterialApp(
             home: Scaffold(
-              body: PrimaryButton(
-                text: 'Disabled Button',
-                onPressed: null,
-              ),
+              body: PrimaryButton(text: 'Disabled Button', onPressed: null),
             ),
           ),
         );
@@ -87,7 +87,9 @@ void main() {
     });
 
     group('SecondaryButton', () {
-      testWidgets('triggers light haptic on press', (WidgetTester tester) async {
+      testWidgets('triggers light haptic on press', (
+        WidgetTester tester,
+      ) async {
         bool wasPressed = false;
 
         await tester.pumpWidget(
@@ -111,7 +113,9 @@ void main() {
     });
 
     group('GhostButton', () {
-      testWidgets('triggers light haptic on press', (WidgetTester tester) async {
+      testWidgets('triggers light haptic on press', (
+        WidgetTester tester,
+      ) async {
         bool wasPressed = false;
 
         await tester.pumpWidget(

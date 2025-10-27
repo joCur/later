@@ -35,35 +35,11 @@ void main() {
 
       // Create test spaces with different counts (1, 5, 20+)
       testSpaces = [
-        Space(
-          id: 'space-1',
-          name: 'Personal',
-          icon: '🏠',
-          itemCount: 5,
-        ),
-        Space(
-          id: 'space-2',
-          name: 'Work',
-          icon: '💼',
-          itemCount: 12,
-        ),
-        Space(
-          id: 'space-3',
-          name: 'Projects',
-          icon: '🚀',
-          itemCount: 3,
-        ),
-        Space(
-          id: 'space-4',
-          name: 'Shopping',
-          icon: '🛒',
-        ),
-        Space(
-          id: 'space-5',
-          name: 'Ideas',
-          icon: '💡',
-          itemCount: 8,
-        ),
+        Space(id: 'space-1', name: 'Personal', icon: '🏠', itemCount: 5),
+        Space(id: 'space-2', name: 'Work', icon: '💼', itemCount: 12),
+        Space(id: 'space-3', name: 'Projects', icon: '🚀', itemCount: 3),
+        Space(id: 'space-4', name: 'Shopping', icon: '🛒'),
+        Space(id: 'space-5', name: 'Ideas', icon: '💡', itemCount: 8),
       ];
 
       // Add test spaces to repository
@@ -96,17 +72,16 @@ void main() {
           theme: theme ?? ThemeData.light(),
           home: ChangeNotifierProvider<SpacesProvider>.value(
             value: spacesProvider,
-            child: const Scaffold(
-              body: SpaceSwitcherModal(),
-            ),
+            child: const Scaffold(body: SpaceSwitcherModal()),
           ),
         ),
       );
     }
 
     group('Glassmorphic Modal Background', () {
-      testWidgets('modal container uses BackdropFilter with blur',
-          (WidgetTester tester) async {
+      testWidgets('modal container uses BackdropFilter with blur', (
+        WidgetTester tester,
+      ) async {
         // Act
         await tester.pumpWidget(buildModalWithProvider());
         await tester.pumpAndSettle();
@@ -116,15 +91,17 @@ void main() {
         expect(backdropFilters, findsAtLeastNWidgets(1));
 
         // Verify blur properties
-        final backdropFilter =
-            tester.widget<BackdropFilter>(backdropFilters.first);
+        final backdropFilter = tester.widget<BackdropFilter>(
+          backdropFilters.first,
+        );
         final imageFilter = backdropFilter.filter;
         // Note: We can't directly inspect sigmaX/sigmaY in tests, but we verify it exists
         expect(imageFilter, isNotNull);
       });
 
-      testWidgets('modal has glass background color in light mode',
-          (WidgetTester tester) async {
+      testWidgets('modal has glass background color in light mode', (
+        WidgetTester tester,
+      ) async {
         // Act
         await tester.pumpWidget(
           buildModalWithProvider(theme: ThemeData.light()),
@@ -154,12 +131,16 @@ void main() {
             }
           }
         }
-        expect(foundGlassContainer, isTrue,
-            reason: 'Should have at least one glass container with transparency');
+        expect(
+          foundGlassContainer,
+          isTrue,
+          reason: 'Should have at least one glass container with transparency',
+        );
       });
 
-      testWidgets('modal has glass background color in dark mode',
-          (WidgetTester tester) async {
+      testWidgets('modal has glass background color in dark mode', (
+        WidgetTester tester,
+      ) async {
         // Act
         await tester.pumpWidget(
           buildModalWithProvider(theme: ThemeData.dark()),
@@ -188,14 +169,18 @@ void main() {
             }
           }
         }
-        expect(foundGlassContainer, isTrue,
-            reason: 'Should have glass container in dark mode');
+        expect(
+          foundGlassContainer,
+          isTrue,
+          reason: 'Should have glass container in dark mode',
+        );
       });
     });
 
     group('Gradient Accents on Space Items', () {
-      testWidgets('space items have gradient border decorations',
-          (WidgetTester tester) async {
+      testWidgets('space items have gradient border decorations', (
+        WidgetTester tester,
+      ) async {
         // Act
         await tester.pumpWidget(buildModalWithProvider());
         await tester.pumpAndSettle();
@@ -219,12 +204,16 @@ void main() {
             }
           }
         }
-        expect(foundGradientBorder, isTrue,
-            reason: 'Space items should have gradient styling');
+        expect(
+          foundGradientBorder,
+          isTrue,
+          reason: 'Space items should have gradient styling',
+        );
       });
 
-      testWidgets('selected space has primary gradient accent',
-          (WidgetTester tester) async {
+      testWidgets('selected space has primary gradient accent', (
+        WidgetTester tester,
+      ) async {
         // Act
         await tester.pumpWidget(buildModalWithProvider());
         await tester.pumpAndSettle();
@@ -244,8 +233,9 @@ void main() {
     });
 
     group('Gradient Hover States', () {
-      testWidgets('space items show gradient overlay on hover',
-          (WidgetTester tester) async {
+      testWidgets('space items show gradient overlay on hover', (
+        WidgetTester tester,
+      ) async {
         // Act
         await tester.pumpWidget(buildModalWithProvider());
         await tester.pumpAndSettle();
@@ -259,12 +249,16 @@ void main() {
 
         // InkWell should have proper hover configuration
         final inkWell = tester.widget<InkWell>(inkWells.first);
-        expect(inkWell.onTap, isNotNull,
-            reason: 'Space items should be interactive');
+        expect(
+          inkWell.onTap,
+          isNotNull,
+          reason: 'Space items should be interactive',
+        );
       });
 
-      testWidgets('hover state uses 8% opacity gradient overlay',
-          (WidgetTester tester) async {
+      testWidgets('hover state uses 8% opacity gradient overlay', (
+        WidgetTester tester,
+      ) async {
         // Act
         await tester.pumpWidget(buildModalWithProvider());
         await tester.pumpAndSettle();
@@ -280,8 +274,9 @@ void main() {
     });
 
     group('Spring Physics Animations', () {
-      testWidgets('selection animation uses 250ms duration',
-          (WidgetTester tester) async {
+      testWidgets('selection animation uses 250ms duration', (
+        WidgetTester tester,
+      ) async {
         // Act
         await tester.pumpWidget(buildModalWithProvider());
         await tester.pumpAndSettle();
@@ -297,8 +292,9 @@ void main() {
         expect(spacesProvider.currentSpace?.name, equals('Work'));
       });
 
-      testWidgets('animation completes with spring physics',
-          (WidgetTester tester) async {
+      testWidgets('animation completes with spring physics', (
+        WidgetTester tester,
+      ) async {
         // Act
         await tester.pumpWidget(buildModalWithProvider());
         await tester.pumpAndSettle();
@@ -316,8 +312,9 @@ void main() {
         expect(duration.inMilliseconds, lessThan(1000));
       });
 
-      testWidgets('keyboard navigation uses spring animation',
-          (WidgetTester tester) async {
+      testWidgets('keyboard navigation uses spring animation', (
+        WidgetTester tester,
+      ) async {
         // Act
         await tester.pumpWidget(buildModalWithProvider());
         await tester.pumpAndSettle();
@@ -335,8 +332,9 @@ void main() {
     });
 
     group('Gradient Styling on Create New Space Button', () {
-      testWidgets('create button has gradient background',
-          (WidgetTester tester) async {
+      testWidgets('create button has gradient background', (
+        WidgetTester tester,
+      ) async {
         // Act
         await tester.pumpWidget(buildModalWithProvider());
         await tester.pumpAndSettle();
@@ -364,12 +362,16 @@ void main() {
             }
           }
         }
-        expect(foundGradient, isTrue,
-            reason: 'Button container should have gradient');
+        expect(
+          foundGradient,
+          isTrue,
+          reason: 'Button container should have gradient',
+        );
       });
 
-      testWidgets('create button uses primary gradient colors',
-          (WidgetTester tester) async {
+      testWidgets('create button uses primary gradient colors', (
+        WidgetTester tester,
+      ) async {
         // Act
         await tester.pumpWidget(buildModalWithProvider());
         await tester.pumpAndSettle();
@@ -401,12 +403,16 @@ void main() {
             }
           }
         }
-        expect(foundPrimaryGradient, isTrue,
-            reason: 'Button should use primary gradient colors');
+        expect(
+          foundPrimaryGradient,
+          isTrue,
+          reason: 'Button should use primary gradient colors',
+        );
       });
 
-      testWidgets('create button has proper styling in dark mode',
-          (WidgetTester tester) async {
+      testWidgets('create button has proper styling in dark mode', (
+        WidgetTester tester,
+      ) async {
         // Act
         await tester.pumpWidget(
           buildModalWithProvider(theme: ThemeData.dark()),
@@ -435,14 +441,18 @@ void main() {
             }
           }
         }
-        expect(foundGradient, isTrue,
-            reason: 'Button should have gradient in dark mode');
+        expect(
+          foundGradient,
+          isTrue,
+          reason: 'Button should have gradient in dark mode',
+        );
       });
     });
 
     group('Visual Feedback and Selection', () {
-      testWidgets('selected space shows gradient visual feedback',
-          (WidgetTester tester) async {
+      testWidgets('selected space shows gradient visual feedback', (
+        WidgetTester tester,
+      ) async {
         // Act
         await tester.pumpWidget(buildModalWithProvider());
         await tester.pumpAndSettle();
@@ -459,8 +469,9 @@ void main() {
         expect(selectedContainer, findsWidgets);
       });
 
-      testWidgets('gradient feedback changes when selecting different space',
-          (WidgetTester tester) async {
+      testWidgets('gradient feedback changes when selecting different space', (
+        WidgetTester tester,
+      ) async {
         // Act
         await tester.pumpWidget(buildModalWithProvider());
         await tester.pumpAndSettle();
@@ -485,11 +496,7 @@ void main() {
       testWidgets('modal works with 1 space', (WidgetTester tester) async {
         // Arrange - Clear and add only 1 space
         await Hive.box<Space>('spaces').clear();
-        final singleSpace = Space(
-          id: 'space-1',
-          name: 'Only Space',
-          icon: '⭐',
-        );
+        final singleSpace = Space(id: 'space-1', name: 'Only Space', icon: '⭐');
         await repository.createSpace(singleSpace);
         await spacesProvider.loadSpaces();
 
@@ -506,8 +513,9 @@ void main() {
         expect(backdropFilters, findsAtLeastNWidgets(1));
       });
 
-      testWidgets('modal works with 5 spaces (default)',
-          (WidgetTester tester) async {
+      testWidgets('modal works with 5 spaces (default)', (
+        WidgetTester tester,
+      ) async {
         // Act - Using default 5 spaces from setUp
         await tester.pumpWidget(buildModalWithProvider());
         await tester.pumpAndSettle();
@@ -570,12 +578,11 @@ void main() {
     });
 
     group('Modal Responsiveness', () {
-      testWidgets('mobile layout applies glass morphism',
-          (WidgetTester tester) async {
+      testWidgets('mobile layout applies glass morphism', (
+        WidgetTester tester,
+      ) async {
         // Act
-        await tester.pumpWidget(
-          buildModalWithProvider(),
-        );
+        await tester.pumpWidget(buildModalWithProvider());
         await tester.pumpAndSettle();
 
         // Assert
@@ -583,8 +590,9 @@ void main() {
         expect(backdropFilters, findsAtLeastNWidgets(1));
       });
 
-      testWidgets('desktop layout applies glass morphism',
-          (WidgetTester tester) async {
+      testWidgets('desktop layout applies glass morphism', (
+        WidgetTester tester,
+      ) async {
         // Act
         await tester.pumpWidget(
           buildModalWithProvider(size: const Size(1200, 800)),
@@ -601,8 +609,9 @@ void main() {
     });
 
     group('Animation Performance', () {
-      testWidgets('animations use spring physics curve',
-          (WidgetTester tester) async {
+      testWidgets('animations use spring physics curve', (
+        WidgetTester tester,
+      ) async {
         // Act
         await tester.pumpWidget(buildModalWithProvider());
         await tester.pumpAndSettle();
@@ -621,8 +630,9 @@ void main() {
         expect(spacesProvider.currentSpace?.name, equals('Work'));
       });
 
-      testWidgets('multiple rapid selections handle gracefully',
-          (WidgetTester tester) async {
+      testWidgets('multiple rapid selections handle gracefully', (
+        WidgetTester tester,
+      ) async {
         // Act
         await tester.pumpWidget(buildModalWithProvider());
         await tester.pumpAndSettle();

@@ -5,6 +5,7 @@ import '../../../data/models/todo_list_model.dart';
 import 'package:later_mobile/design_system/atoms/text/gradient_text.dart';
 import 'package:later_mobile/design_system/atoms/borders/gradient_pill_border.dart';
 import 'package:intl/intl.dart';
+import 'package:later_mobile/core/theme/temporal_flow_theme.dart';
 
 /// TodoList card component for displaying todo lists with progress tracking
 /// Mobile-First Bold Redesign
@@ -57,7 +58,8 @@ class TodoListCard extends StatefulWidget {
   State<TodoListCard> createState() => _TodoListCardState();
 }
 
-class _TodoListCardState extends State<TodoListCard> with TickerProviderStateMixin {
+class _TodoListCardState extends State<TodoListCard>
+    with TickerProviderStateMixin {
   bool _isPressed = false;
   late AnimationController _pressAnimationController;
   late Animation<double> _pressScaleAnimation;
@@ -73,14 +75,14 @@ class _TodoListCardState extends State<TodoListCard> with TickerProviderStateMix
     );
 
     // Create press scale animation: 1.0 -> 0.98 (scale down on press)
-    _pressScaleAnimation = Tween<double>(
-      begin: 1.0,
-      end: AppAnimations.itemPressScale,
-    ).animate(CurvedAnimation(
-      parent: _pressAnimationController,
-      curve: Curves.easeOut,
-      reverseCurve: Curves.easeOutBack,
-    ));
+    _pressScaleAnimation =
+        Tween<double>(begin: 1.0, end: AppAnimations.itemPressScale).animate(
+          CurvedAnimation(
+            parent: _pressAnimationController,
+            curve: Curves.easeOut,
+            reverseCurve: Curves.easeOutBack,
+          ),
+        );
   }
 
   @override
@@ -185,7 +187,8 @@ class _TodoListCardState extends State<TodoListCard> with TickerProviderStateMix
       children: [
         // Icon with gradient tint for due dates
         ShaderMask(
-          shaderCallback: (bounds) => AppColors.secondaryGradient.createShader(bounds),
+          shaderCallback: (bounds) =>
+              AppColors.secondaryGradient.createShader(bounds),
           blendMode: BlendMode.srcIn,
           child: const Icon(
             Icons.calendar_today,
@@ -246,9 +249,7 @@ class _TodoListCardState extends State<TodoListCard> with TickerProviderStateMix
     // Background color based on state
     Color backgroundColor;
     if (_isPressed) {
-      backgroundColor = isDark
-          ? AppColors.neutral800
-          : AppColors.neutral100;
+      backgroundColor = isDark ? AppColors.neutral800 : AppColors.neutral100;
     } else {
       // Blend base color with subtle type-specific tint
       backgroundColor = Color.alphaBlend(
@@ -258,7 +259,8 @@ class _TodoListCardState extends State<TodoListCard> with TickerProviderStateMix
     }
 
     // Build the semantic label
-    final semanticLabel = 'Todo list: ${widget.todoList.name}, '
+    final semanticLabel =
+        'Todo list: ${widget.todoList.name}, '
         '${widget.todoList.completedItems} of ${widget.todoList.totalItems} completed';
 
     // Build the card widget with mobile-first bold design
@@ -284,20 +286,26 @@ class _TodoListCardState extends State<TodoListCard> with TickerProviderStateMix
             onTap: _handleTap,
             onLongPress: _handleLongPress,
             child: Container(
-              margin: const EdgeInsets.only(bottom: AppSpacing.cardSpacing), // 16px spacing
+              margin: const EdgeInsets.only(
+                bottom: AppSpacing.cardSpacing,
+              ), // 16px spacing
               // Wrap entire card with gradient pill border (6px width, 20px radius)
               child: GradientPillBorder(
                 gradient: _getBorderGradient(),
                 child: Container(
                   decoration: BoxDecoration(
                     color: backgroundColor,
-                    borderRadius: BorderRadius.circular(AppSpacing.cardRadius - AppSpacing.cardBorderWidth), // Inner radius reduced by border width
+                    borderRadius: BorderRadius.circular(
+                      AppSpacing.cardRadius - AppSpacing.cardBorderWidth,
+                    ), // Inner radius reduced by border width
                     // Mobile-optimized shadow: 4px offset, 8px blur, 12% opacity
                     boxShadow: _isPressed
                         ? null
                         : [
                             BoxShadow(
-                              color: (isDark ? AppColors.shadowDark : AppColors.shadowLight)
+                              color: Theme.of(context)
+                                  .extension<TemporalFlowTheme>()!
+                                  .shadowColor
                                   .withValues(alpha: 0.12),
                               blurRadius: 8,
                               offset: const Offset(0, 4),
@@ -307,14 +315,15 @@ class _TodoListCardState extends State<TodoListCard> with TickerProviderStateMix
                   // Clip the content to follow the border radius
                   clipBehavior: Clip.antiAlias,
                   // Main content with 20px padding (mobile-first comfortable touch zones)
-                  padding: const EdgeInsets.all(AppSpacing.cardPaddingMobile), // 20px
+                  padding: const EdgeInsets.all(
+                    AppSpacing.cardPaddingMobile,
+                  ), // 20px
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       // Leading icon (checkbox outline)
                       _buildLeadingIcon(),
                       const SizedBox(width: AppSpacing.xs), // 8px
-
                       // Content
                       Expanded(
                         child: Column(
@@ -353,24 +362,32 @@ class _TodoListCardState extends State<TodoListCard> with TickerProviderStateMix
     // Apply entrance animation if index is provided (Phase 5 optimized)
     if (widget.index != null) {
       final delay = AppAnimations.itemEntranceStagger * widget.index!;
-      final duration = AppAnimations.getDuration(context, AppAnimations.itemEntrance);
+      final duration = AppAnimations.getDuration(
+        context,
+        AppAnimations.itemEntrance,
+      );
 
       return cardWidget
           .animate()
           .fadeIn(
             duration: duration,
             delay: delay,
-            curve: Curves.easeOut, // Phase 5: Use easeOut instead of springCurve for entrance
+            curve: Curves
+                .easeOut, // Phase 5: Use easeOut instead of springCurve for entrance
           )
           .slideY(
-            begin: AppAnimations.itemEntranceSlideDistance, // Phase 5: Use 8px distance instead of percentage
+            begin: AppAnimations
+                .itemEntranceSlideDistance, // Phase 5: Use 8px distance instead of percentage
             end: 0,
             duration: duration,
             delay: delay,
             curve: Curves.easeOut,
           )
           .scale(
-            begin: const Offset(AppAnimations.itemEntranceScale, AppAnimations.itemEntranceScale),
+            begin: const Offset(
+              AppAnimations.itemEntranceScale,
+              AppAnimations.itemEntranceScale,
+            ),
             end: const Offset(1.0, 1.0),
             duration: duration,
             delay: delay,

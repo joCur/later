@@ -219,10 +219,7 @@ void main() {
 
     group('copyWith', () {
       test('copies with updated message', () {
-        const original = AppError(
-          type: ErrorType.storage,
-          message: 'Original',
-        );
+        const original = AppError(type: ErrorType.storage, message: 'Original');
 
         final copy = original.copyWith(message: 'Updated');
 

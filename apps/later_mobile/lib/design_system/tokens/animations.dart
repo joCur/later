@@ -352,7 +352,9 @@ class AppAnimations {
   }
 
   /// Conditionally trigger haptic feedback only on supported platforms
-  static Future<void> conditionalHaptic(Future<void> Function() hapticFn) async {
+  static Future<void> conditionalHaptic(
+    Future<void> Function() hapticFn,
+  ) async {
     if (supportsHaptics()) {
       try {
         await hapticFn();
@@ -455,10 +457,7 @@ class AppAnimations {
 
   /// Scale pulse animation (for emphasis)
   // ignore: strict_raw_type
-  static List<Effect> scalePulse({
-    Duration? duration,
-    double peak = 1.05,
-  }) {
+  static List<Effect> scalePulse({Duration? duration, double peak = 1.05}) {
     final halfDuration = (duration ?? quick).inMilliseconds ~/ 2;
     return [
       ScaleEffect(
@@ -479,10 +478,7 @@ class AppAnimations {
 
   /// Shake animation (for errors)
   // ignore: strict_raw_type
-  static List<Effect> shake({
-    Duration? duration,
-    double intensity = 10.0,
-  }) {
+  static List<Effect> shake({Duration? duration, double intensity = 10.0}) {
     return [
       ShakeEffect(
         duration: duration ?? inputError,
@@ -495,9 +491,7 @@ class AppAnimations {
 
   /// Shimmer effect (for loading states)
   // ignore: strict_raw_type
-  static List<Effect> shimmer({
-    Duration? duration,
-  }) {
+  static List<Effect> shimmer({Duration? duration}) {
     return [
       ShimmerEffect(
         duration: duration ?? shimmerDuration,
@@ -537,7 +531,6 @@ class AppAnimations {
     }
     return spring;
   }
-
 }
 
 // ============================================================

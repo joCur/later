@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:later_mobile/design_system/tokens/tokens.dart';
+import '../../core/theme/temporal_flow_theme.dart';
 import '../../data/models/space_model.dart';
 import '../../providers/spaces_provider.dart';
 import 'package:later_mobile/design_system/atoms/buttons/theme_toggle_button.dart';
@@ -39,11 +40,7 @@ class AppSidebar extends StatefulWidget {
   ///
   /// The [isExpanded] parameter controls the sidebar width.
   /// The [onToggleExpanded] callback is called when the user toggles expansion.
-  const AppSidebar({
-    super.key,
-    this.isExpanded = true,
-    this.onToggleExpanded,
-  });
+  const AppSidebar({super.key, this.isExpanded = true, this.onToggleExpanded});
 
   /// Whether the sidebar is expanded (240px) or collapsed (72px).
   final bool isExpanded;
@@ -113,6 +110,7 @@ class _AppSidebarState extends State<AppSidebar> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDarkMode = theme.brightness == Brightness.dark;
+    final temporalTheme = Theme.of(context).extension<TemporalFlowTheme>()!;
     final spacesProvider = context.watch<SpacesProvider>();
 
     return Focus(
@@ -136,9 +134,7 @@ class _AppSidebarState extends State<AppSidebar> {
                 ),
                 child: Container(
                   decoration: BoxDecoration(
-                    color: (isDarkMode
-                            ? AppColors.neutral900
-                            : Colors.white)
+                    color: (isDarkMode ? AppColors.neutral900 : Colors.white)
                         .withValues(alpha: 0.9),
                     border: Border(
                       right: BorderSide(
@@ -164,10 +160,9 @@ class _AppSidebarState extends State<AppSidebar> {
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
                     colors: [
-                      (isDarkMode
-                              ? AppColors.primaryStartDark
-                              : AppColors.primaryStart)
-                          .withValues(alpha: 0.1),
+                      temporalTheme.primaryGradient.colors.first.withValues(
+                        alpha: 0.1,
+                      ),
                       Colors.transparent,
                     ],
                   ),
@@ -183,18 +178,13 @@ class _AppSidebarState extends State<AppSidebar> {
                 _buildHeader(isDarkMode),
 
                 // Divider
-                const Divider(
-                  height: 1,
-                  thickness: AppSpacing.borderWidthThin,
-                ),
+                const Divider(height: 1, thickness: AppSpacing.borderWidthThin),
 
                 // Spaces list
-                Expanded(
-                  child: _buildSpacesList(spacesProvider, isDarkMode),
-                ),
+                Expanded(child: _buildSpacesList(spacesProvider, isDarkMode)),
 
                 // Footer with settings
-                _buildFooter(isDarkMode),
+                _buildFooter(isDarkMode, temporalTheme),
               ],
             ),
           ],
@@ -207,9 +197,7 @@ class _AppSidebarState extends State<AppSidebar> {
     return Container(
       height: 64.0,
       padding: EdgeInsets.symmetric(
-        horizontal: widget.isExpanded
-            ? AppSpacing.sm
-            : AppSpacing.xs,
+        horizontal: widget.isExpanded ? AppSpacing.sm : AppSpacing.xs,
       ),
       child: Row(
         mainAxisAlignment: widget.isExpanded
@@ -222,24 +210,18 @@ class _AppSidebarState extends State<AppSidebar> {
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
-                color: isDarkMode
-                    ? AppColors.neutral400
-                    : AppColors.neutral600,
+                color: isDarkMode ? AppColors.neutral400 : AppColors.neutral600,
               ),
             ),
           if (widget.onToggleExpanded != null)
             Tooltip(
-              message: widget.isExpanded ? 'Collapse sidebar' : 'Expand sidebar',
+              message: widget.isExpanded
+                  ? 'Collapse sidebar'
+                  : 'Expand sidebar',
               child: IconButton(
-                icon: Icon(
-                  widget.isExpanded
-                      ? Icons.menu_open
-                      : Icons.menu,
-                ),
+                icon: Icon(widget.isExpanded ? Icons.menu_open : Icons.menu),
                 onPressed: widget.onToggleExpanded,
-                color: isDarkMode
-                    ? AppColors.neutral500
-                    : AppColors.neutral500,
+                color: isDarkMode ? AppColors.neutral500 : AppColors.neutral500,
               ),
             ),
         ],
@@ -255,14 +237,9 @@ class _AppSidebarState extends State<AppSidebar> {
         child: widget.isExpanded
             ? const Padding(
                 padding: EdgeInsets.all(AppSpacing.sm),
-                child: Text(
-                  'No spaces yet',
-                  textAlign: TextAlign.center,
-                ),
+                child: Text('No spaces yet', textAlign: TextAlign.center),
               )
-            : const Icon(
-                Icons.inbox_outlined,
-              ),
+            : const Icon(Icons.inbox_outlined),
       );
     }
 
@@ -292,7 +269,7 @@ class _AppSidebarState extends State<AppSidebar> {
     );
   }
 
-  Widget _buildFooter(bool isDarkMode) {
+  Widget _buildFooter(bool isDarkMode, TemporalFlowTheme temporalTheme) {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -303,10 +280,9 @@ class _AppSidebarState extends State<AppSidebar> {
             gradient: LinearGradient(
               colors: [
                 Colors.transparent,
-                (isDarkMode
-                        ? AppColors.primaryStartDark
-                        : AppColors.primaryStart)
-                    .withValues(alpha: 0.2),
+                temporalTheme.primaryGradient.colors.first.withValues(
+                  alpha: 0.2,
+                ),
                 Colors.transparent,
               ],
             ),
@@ -411,37 +387,34 @@ class _SpaceListItem extends StatefulWidget {
 class _SpaceListItemState extends State<_SpaceListItem> {
   bool _isHovered = false;
 
-  LinearGradient _getTypeGradient() {
+  LinearGradient _getTypeGradient(BuildContext context) {
+    final temporalTheme = Theme.of(context).extension<TemporalFlowTheme>()!;
+
     // For now, use color field if available to determine gradient
     // In the future, this could be based on a space type field
     final spaceColor = widget.space.color;
     if (spaceColor != null) {
       // Map colors to gradients
       if (spaceColor.contains('red') || spaceColor.contains('orange')) {
-        return AppColors.taskGradient;
+        return temporalTheme.taskGradient;
       } else if (spaceColor.contains('blue') || spaceColor.contains('cyan')) {
-        return AppColors.noteGradient;
-      } else if (spaceColor.contains('violet') || spaceColor.contains('purple')) {
-        return AppColors.listGradient;
+        return temporalTheme.noteGradient;
+      } else if (spaceColor.contains('violet') ||
+          spaceColor.contains('purple')) {
+        return temporalTheme.listGradient;
       }
     }
 
-    return widget.isDarkMode
-        ? AppColors.primaryGradientDark
-        : AppColors.primaryGradient;
+    return temporalTheme.primaryGradient;
   }
 
   @override
   Widget build(BuildContext context) {
-    final gradient = _getTypeGradient();
+    final gradient = _getTypeGradient(context);
 
     final textColor = widget.isSelected
-        ? (widget.isDarkMode
-            ? AppColors.neutral400
-            : AppColors.neutral600)
-        : (widget.isDarkMode
-            ? AppColors.neutral500
-            : AppColors.neutral500);
+        ? (widget.isDarkMode ? AppColors.neutral400 : AppColors.neutral600)
+        : (widget.isDarkMode ? AppColors.neutral500 : AppColors.neutral500);
 
     return Padding(
       padding: const EdgeInsets.symmetric(
@@ -460,8 +433,8 @@ class _SpaceListItemState extends State<_SpaceListItem> {
           child: Tooltip(
             message: widget.isExpanded
                 ? (widget.keyboardShortcut != null
-                    ? 'Press ${widget.keyboardShortcut} to switch'
-                    : widget.space.name)
+                      ? 'Press ${widget.keyboardShortcut} to switch'
+                      : widget.space.name)
                 : '${widget.space.name} (${widget.space.itemCount} items)',
             child: InkWell(
               onTap: widget.onTap,
@@ -481,13 +454,13 @@ class _SpaceListItemState extends State<_SpaceListItem> {
                     decoration: BoxDecoration(
                       color: widget.isSelected
                           ? (widget.isDarkMode
-                              ? AppColors.selectedDark
-                              : AppColors.selectedLight)
+                                ? AppColors.selectedDark
+                                : AppColors.selectedLight)
                           : (_isHovered
-                              ? (widget.isDarkMode
-                                  ? AppColors.neutral800
-                                  : AppColors.neutral100)
-                              : Colors.transparent),
+                                ? (widget.isDarkMode
+                                      ? AppColors.neutral800
+                                      : AppColors.neutral100)
+                                : Colors.transparent),
                       borderRadius: const BorderRadius.all(
                         Radius.circular(AppSpacing.radiusSM),
                       ),
@@ -547,7 +520,8 @@ class _SpaceListItemState extends State<_SpaceListItem> {
                               ),
                             ),
                             child: Text(
-                              widget.space.icon ?? widget.space.name[0].toUpperCase(),
+                              widget.space.icon ??
+                                  widget.space.name[0].toUpperCase(),
                               style: TextStyle(
                                 fontSize: widget.space.icon != null ? 20 : 16,
                                 color: textColor,

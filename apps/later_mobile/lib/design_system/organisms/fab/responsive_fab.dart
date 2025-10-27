@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:later_mobile/design_system/tokens/tokens.dart';
 import '../../../core/responsive/breakpoints.dart';
 import 'package:later_mobile/design_system/molecules/fab/quick_capture_fab.dart';
+import 'package:later_mobile/core/theme/temporal_flow_theme.dart';
 
 /// A responsive Floating Action Button that adapts between mobile and desktop layouts.
 ///
@@ -81,12 +82,10 @@ class ResponsiveFab extends StatelessWidget {
 
   /// Build desktop extended FAB
   Widget _buildDesktopFab(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
+    final temporalTheme = Theme.of(context).extension<TemporalFlowTheme>()!;
 
     // Get the appropriate gradient
-    final effectiveGradient = gradient ??
-        (isDark ? AppColors.primaryGradientDark : AppColors.primaryGradient);
+    final effectiveGradient = gradient ?? temporalTheme.primaryGradient;
 
     // Get shadow color from gradient
     final shadowColor = effectiveGradient is LinearGradient
@@ -125,18 +124,12 @@ class ResponsiveFab extends StatelessWidget {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              icon,
-              color: Colors.white,
-              size: 24,
-            ),
+            Icon(icon, color: Colors.white, size: 24),
             if (label != null) ...[
               const SizedBox(width: AppSpacing.xs),
               Text(
                 label!,
-                style: AppTypography.button.copyWith(
-                  color: Colors.white,
-                ),
+                style: AppTypography.button.copyWith(color: Colors.white),
               ),
             ],
           ],

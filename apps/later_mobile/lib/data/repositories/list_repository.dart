@@ -114,9 +114,7 @@ class ListRepository {
       }
 
       // Update the updatedAt timestamp
-      final updatedList = list.copyWith(
-        updatedAt: DateTime.now(),
-      );
+      final updatedList = list.copyWith(updatedAt: DateTime.now());
 
       await _box.put(updatedList.id, updatedList);
       return updatedList;
@@ -206,7 +204,11 @@ class ListRepository {
   ///   item.copyWith(title: 'Updated title'),
   /// );
   /// ```
-  Future<ListModel> updateItem(String listId, String itemId, ListItem updatedItem) async {
+  Future<ListModel> updateItem(
+    String listId,
+    String itemId,
+    ListItem updatedItem,
+  ) async {
     try {
       final list = await getById(listId);
       if (list == null) {
@@ -215,7 +217,9 @@ class ListRepository {
 
       final itemIndex = list.items.indexWhere((item) => item.id == itemId);
       if (itemIndex == -1) {
-        throw Exception('ListItem with id $itemId does not exist in list $listId');
+        throw Exception(
+          'ListItem with id $itemId does not exist in list $listId',
+        );
       }
 
       final updatedItems = [...list.items];
@@ -256,7 +260,9 @@ class ListRepository {
         throw Exception('ListModel with id $listId does not exist');
       }
 
-      final updatedItems = list.items.where((item) => item.id != itemId).toList();
+      final updatedItems = list.items
+          .where((item) => item.id != itemId)
+          .toList();
 
       final updatedList = list.copyWith(
         items: updatedItems,
@@ -297,7 +303,9 @@ class ListRepository {
 
       final itemIndex = list.items.indexWhere((item) => item.id == itemId);
       if (itemIndex == -1) {
-        throw Exception('ListItem with id $itemId does not exist in list $listId');
+        throw Exception(
+          'ListItem with id $itemId does not exist in list $listId',
+        );
       }
 
       final updatedItems = [...list.items];
@@ -334,16 +342,24 @@ class ListRepository {
   /// ```dart
   /// final updated = await repository.reorderItems('list-1', 0, 2);
   /// ```
-  Future<ListModel> reorderItems(String listId, int oldIndex, int newIndex) async {
+  Future<ListModel> reorderItems(
+    String listId,
+    int oldIndex,
+    int newIndex,
+  ) async {
     try {
       final list = await getById(listId);
       if (list == null) {
         throw Exception('ListModel with id $listId does not exist');
       }
 
-      if (oldIndex < 0 || oldIndex >= list.items.length ||
-          newIndex < 0 || newIndex >= list.items.length) {
-        throw Exception('Invalid reorder indices: oldIndex=$oldIndex, newIndex=$newIndex');
+      if (oldIndex < 0 ||
+          oldIndex >= list.items.length ||
+          newIndex < 0 ||
+          newIndex >= list.items.length) {
+        throw Exception(
+          'Invalid reorder indices: oldIndex=$oldIndex, newIndex=$newIndex',
+        );
       }
 
       final updatedItems = [...list.items];

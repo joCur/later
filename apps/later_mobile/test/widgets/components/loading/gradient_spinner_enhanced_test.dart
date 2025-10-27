@@ -6,11 +6,7 @@ void main() {
   group('GradientSpinner - Enhanced Features', () {
     testWidgets('renders with default size (48px)', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: GradientSpinner(),
-          ),
-        ),
+        const MaterialApp(home: Scaffold(body: GradientSpinner())),
       );
 
       final sizedBox = tester.widget<SizedBox>(find.byType(SizedBox).first);
@@ -18,13 +14,11 @@ void main() {
       expect(sizedBox.height, equals(48.0));
     });
 
-    testWidgets('factory constructor .small() creates 16px spinner', (tester) async {
+    testWidgets('factory constructor .small() creates 16px spinner', (
+      tester,
+    ) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: GradientSpinner.small(),
-          ),
-        ),
+        const MaterialApp(home: Scaffold(body: GradientSpinner.small())),
       );
 
       final sizedBox = tester.widget<SizedBox>(find.byType(SizedBox).first);
@@ -32,13 +26,11 @@ void main() {
       expect(sizedBox.height, equals(16.0));
     });
 
-    testWidgets('factory constructor .medium() creates 24px spinner', (tester) async {
+    testWidgets('factory constructor .medium() creates 24px spinner', (
+      tester,
+    ) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: GradientSpinner.medium(),
-          ),
-        ),
+        const MaterialApp(home: Scaffold(body: GradientSpinner.medium())),
       );
 
       final sizedBox = tester.widget<SizedBox>(find.byType(SizedBox).first);
@@ -46,13 +38,11 @@ void main() {
       expect(sizedBox.height, equals(24.0));
     });
 
-    testWidgets('factory constructor .large() creates 48px spinner', (tester) async {
+    testWidgets('factory constructor .large() creates 48px spinner', (
+      tester,
+    ) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: GradientSpinner.large(),
-          ),
-        ),
+        const MaterialApp(home: Scaffold(body: GradientSpinner.large())),
       );
 
       final sizedBox = tester.widget<SizedBox>(find.byType(SizedBox).first);
@@ -60,28 +50,25 @@ void main() {
       expect(sizedBox.height, equals(48.0));
     });
 
-    testWidgets('factory constructor .pulsing() creates spinner with pulsing enabled', (tester) async {
-      await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: GradientSpinner.pulsing(),
-          ),
-        ),
-      );
+    testWidgets(
+      'factory constructor .pulsing() creates spinner with pulsing enabled',
+      (tester) async {
+        await tester.pumpWidget(
+          const MaterialApp(home: Scaffold(body: GradientSpinner.pulsing())),
+        );
 
-      expect(find.byType(GradientSpinner), findsOneWidget);
-      // Spinner should exist with pulsing animation
-      final spinner = tester.widget<GradientSpinner>(find.byType(GradientSpinner));
-      expect(spinner.pulsing, isTrue);
-    });
+        expect(find.byType(GradientSpinner), findsOneWidget);
+        // Spinner should exist with pulsing animation
+        final spinner = tester.widget<GradientSpinner>(
+          find.byType(GradientSpinner),
+        );
+        expect(spinner.pulsing, isTrue);
+      },
+    );
 
     testWidgets('uses custom size when provided', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: GradientSpinner(size: 60),
-          ),
-        ),
+        const MaterialApp(home: Scaffold(body: GradientSpinner(size: 60))),
       );
 
       final sizedBox = tester.widget<SizedBox>(find.byType(SizedBox).first);
@@ -90,17 +77,11 @@ void main() {
     });
 
     testWidgets('uses custom gradient when provided', (tester) async {
-      const customGradient = LinearGradient(
-        colors: [Colors.red, Colors.blue],
-      );
+      const customGradient = LinearGradient(colors: [Colors.red, Colors.blue]);
 
       await tester.pumpWidget(
         const MaterialApp(
-          home: Scaffold(
-            body: GradientSpinner(
-              gradient: customGradient,
-            ),
-          ),
+          home: Scaffold(body: GradientSpinner(gradient: customGradient)),
         ),
       );
 
@@ -109,11 +90,7 @@ void main() {
 
     testWidgets('rotates continuously', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: GradientSpinner(),
-          ),
-        ),
+        const MaterialApp(home: Scaffold(body: GradientSpinner())),
       );
 
       // Find Transform.rotate widget specifically
@@ -130,11 +107,7 @@ void main() {
 
     testWidgets('pulsing animation scales spinner', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: GradientSpinner.pulsing(),
-          ),
-        ),
+        const MaterialApp(home: Scaffold(body: GradientSpinner.pulsing())),
       );
 
       // Should find AnimatedScale or Transform.scale widget
@@ -149,11 +122,7 @@ void main() {
 
     testWidgets('uses RepaintBoundary for performance', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: GradientSpinner(),
-          ),
-        ),
+        const MaterialApp(home: Scaffold(body: GradientSpinner())),
       );
 
       expect(find.byType(RepaintBoundary), findsAtLeastNWidgets(1));
@@ -163,9 +132,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           theme: ThemeData.light(),
-          home: const Scaffold(
-            body: GradientSpinner(),
-          ),
+          home: const Scaffold(body: GradientSpinner()),
         ),
       );
 
@@ -177,9 +144,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           theme: ThemeData.dark(),
-          home: const Scaffold(
-            body: GradientSpinner(),
-          ),
+          home: const Scaffold(body: GradientSpinner()),
         ),
       );
 
@@ -202,7 +167,9 @@ void main() {
         ),
       );
 
-      final spinners = tester.widgetList<GradientSpinner>(find.byType(GradientSpinner));
+      final spinners = tester.widgetList<GradientSpinner>(
+        find.byType(GradientSpinner),
+      );
       expect(spinners.elementAt(0).strokeWidth, equals(2.0));
       expect(spinners.elementAt(1).strokeWidth, equals(3.0));
       expect(spinners.elementAt(2).strokeWidth, equals(4.0));
@@ -228,22 +195,14 @@ void main() {
 
     testWidgets('disposes animation controller properly', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: GradientSpinner(),
-          ),
-        ),
+        const MaterialApp(home: Scaffold(body: GradientSpinner())),
       );
 
       expect(find.byType(GradientSpinner), findsOneWidget);
 
       // Remove widget
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: SizedBox(),
-          ),
-        ),
+        const MaterialApp(home: Scaffold(body: SizedBox())),
       );
 
       // Should not throw errors

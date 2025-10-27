@@ -25,7 +25,6 @@ import 'package:later_mobile/design_system/tokens/tokens.dart';
 /// - Adapts to light/dark mode automatically
 /// - Supports text scaling up to 2.0x
 class GradientText extends StatelessWidget {
-
   /// Creates a gradient text with the primary gradient (indigo → purple).
   ///
   /// This is the default brand gradient, ideal for:
@@ -215,6 +214,7 @@ class GradientText extends StatelessWidget {
       overflow: overflow,
     );
   }
+
   /// Creates a gradient text widget.
   ///
   /// The [text] parameter is required and specifies the text content.

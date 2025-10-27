@@ -53,7 +53,10 @@ void main() {
 
         expect(item.id, 'todo-2');
         expect(item.title, 'Complete project');
-        expect(item.description, 'Finish the quarterly report and submit to management');
+        expect(
+          item.description,
+          'Finish the quarterly report and submit to management',
+        );
         expect(item.isCompleted, true);
         expect(item.dueDate, dueDate);
         expect(item.priority, TodoPriority.high);
@@ -62,22 +65,14 @@ void main() {
       });
 
       test('defaults tags to empty list when null', () {
-        final item = TodoItem(
-          id: 'todo-3',
-          title: 'Test task',
-          sortOrder: 0,
-        );
+        final item = TodoItem(id: 'todo-3', title: 'Test task', sortOrder: 0);
 
         expect(item.tags, isEmpty);
         expect(item.tags, isA<List<String>>());
       });
 
       test('defaults isCompleted to false', () {
-        final item = TodoItem(
-          id: 'todo-4',
-          title: 'Task',
-          sortOrder: 0,
-        );
+        final item = TodoItem(id: 'todo-4', title: 'Task', sortOrder: 0);
 
         expect(item.isCompleted, false);
       });
@@ -109,11 +104,7 @@ void main() {
       });
 
       test('toJson handles null optional fields', () {
-        final item = TodoItem(
-          id: 'todo-6',
-          title: 'Simple task',
-          sortOrder: 0,
-        );
+        final item = TodoItem(id: 'todo-6', title: 'Simple task', sortOrder: 0);
 
         final json = item.toJson();
 
@@ -148,11 +139,7 @@ void main() {
       });
 
       test('fromJson handles null optional fields', () {
-        final json = {
-          'id': 'todo-8',
-          'title': 'Minimal task',
-          'sortOrder': 0,
-        };
+        final json = {'id': 'todo-8', 'title': 'Minimal task', 'sortOrder': 0};
 
         final item = TodoItem.fromJson(json);
 
@@ -354,11 +341,7 @@ void main() {
       });
 
       test('can update all fields', () {
-        final original = TodoItem(
-          id: 'todo-20',
-          title: 'Old',
-          sortOrder: 0,
-        );
+        final original = TodoItem(id: 'todo-20', title: 'Old', sortOrder: 0);
 
         final newDueDate = DateTime(2025, 12, 31);
         final updated = original.copyWith(
@@ -407,27 +390,15 @@ void main() {
       });
 
       test('different ids are not equal', () {
-        final item1 = TodoItem(
-          id: 'id-1',
-          title: 'Same title',
-          sortOrder: 0,
-        );
+        final item1 = TodoItem(id: 'id-1', title: 'Same title', sortOrder: 0);
 
-        final item2 = TodoItem(
-          id: 'id-2',
-          title: 'Same title',
-          sortOrder: 0,
-        );
+        final item2 = TodoItem(id: 'id-2', title: 'Same title', sortOrder: 0);
 
         expect(item1, isNot(equals(item2)));
       });
 
       test('identical items are equal', () {
-        final item = TodoItem(
-          id: 'todo-22',
-          title: 'Task',
-          sortOrder: 0,
-        );
+        final item = TodoItem(id: 'todo-22', title: 'Task', sortOrder: 0);
 
         expect(item, equals(item));
       });
@@ -451,11 +422,7 @@ void main() {
       });
 
       test('has readable format', () {
-        final item = TodoItem(
-          id: 'todo-24',
-          title: 'Task',
-          sortOrder: 0,
-        );
+        final item = TodoItem(id: 'todo-24', title: 'Task', sortOrder: 0);
 
         final string = item.toString();
 
@@ -467,22 +434,14 @@ void main() {
 
     group('edge cases', () {
       test('handles empty string title', () {
-        final item = TodoItem(
-          id: 'todo-25',
-          title: '',
-          sortOrder: 0,
-        );
+        final item = TodoItem(id: 'todo-25', title: '', sortOrder: 0);
 
         expect(item.title, '');
       });
 
       test('handles very long title', () {
         final longTitle = 'A' * 1000;
-        final item = TodoItem(
-          id: 'todo-26',
-          title: longTitle,
-          sortOrder: 0,
-        );
+        final item = TodoItem(id: 'todo-26', title: longTitle, sortOrder: 0);
 
         expect(item.title, longTitle);
       });
@@ -536,21 +495,13 @@ void main() {
       });
 
       test('handles negative sort order', () {
-        final item = TodoItem(
-          id: 'todo-31',
-          title: 'Task',
-          sortOrder: -1,
-        );
+        final item = TodoItem(id: 'todo-31', title: 'Task', sortOrder: -1);
 
         expect(item.sortOrder, -1);
       });
 
       test('handles large sort order', () {
-        final item = TodoItem(
-          id: 'todo-32',
-          title: 'Task',
-          sortOrder: 999999,
-        );
+        final item = TodoItem(id: 'todo-32', title: 'Task', sortOrder: 999999);
 
         expect(item.sortOrder, 999999);
       });
@@ -615,17 +566,25 @@ void main() {
 
       test('defaults createdAt and updatedAt to now when null', () {
         final before = DateTime.now();
-        final list = TodoList(
-          id: 'list-4',
-          spaceId: 'space-4',
-          name: 'List',
-        );
+        final list = TodoList(id: 'list-4', spaceId: 'space-4', name: 'List');
         final after = DateTime.now();
 
-        expect(list.createdAt.isAfter(before.subtract(const Duration(seconds: 1))), true);
-        expect(list.createdAt.isBefore(after.add(const Duration(seconds: 1))), true);
-        expect(list.updatedAt.isAfter(before.subtract(const Duration(seconds: 1))), true);
-        expect(list.updatedAt.isBefore(after.add(const Duration(seconds: 1))), true);
+        expect(
+          list.createdAt.isAfter(before.subtract(const Duration(seconds: 1))),
+          true,
+        );
+        expect(
+          list.createdAt.isBefore(after.add(const Duration(seconds: 1))),
+          true,
+        );
+        expect(
+          list.updatedAt.isAfter(before.subtract(const Duration(seconds: 1))),
+          true,
+        );
+        expect(
+          list.updatedAt.isBefore(after.add(const Duration(seconds: 1))),
+          true,
+        );
       });
     });
 
@@ -685,11 +644,7 @@ void main() {
       });
 
       test('toJson serializes empty items list', () {
-        final list = TodoList(
-          id: 'list-7',
-          spaceId: 'space-7',
-          name: 'Empty',
-        );
+        final list = TodoList(id: 'list-7', spaceId: 'space-7', name: 'Empty');
 
         final json = list.toJson();
 
@@ -806,9 +761,7 @@ void main() {
           description: 'Original description',
         );
 
-        final updated = original.copyWith(
-          name: 'Updated Name',
-        );
+        final updated = original.copyWith(name: 'Updated Name');
 
         expect(updated.id, original.id);
         expect(updated.spaceId, original.spaceId);
@@ -822,9 +775,7 @@ void main() {
       test('preserves unchanged fields', () {
         final createdAt = DateTime(2025);
         final updatedAt = DateTime(2025, 10, 25);
-        final items = [
-          TodoItem(id: 'item-1', title: 'Task', sortOrder: 0),
-        ];
+        final items = [TodoItem(id: 'item-1', title: 'Task', sortOrder: 0)];
 
         final original = TodoList(
           id: 'list-12',
@@ -925,28 +876,51 @@ void main() {
         expect(list.completedItems, 0);
       });
 
-      test('completedItems returns correct count when some items completed', () {
-        final items = [
-          TodoItem(id: 'item-1', title: 'Task 1', isCompleted: true, sortOrder: 0),
-          TodoItem(id: 'item-2', title: 'Task 2', sortOrder: 1),
-          TodoItem(id: 'item-3', title: 'Task 3', isCompleted: true, sortOrder: 2),
-          TodoItem(id: 'item-4', title: 'Task 4', sortOrder: 3),
-        ];
+      test(
+        'completedItems returns correct count when some items completed',
+        () {
+          final items = [
+            TodoItem(
+              id: 'item-1',
+              title: 'Task 1',
+              isCompleted: true,
+              sortOrder: 0,
+            ),
+            TodoItem(id: 'item-2', title: 'Task 2', sortOrder: 1),
+            TodoItem(
+              id: 'item-3',
+              title: 'Task 3',
+              isCompleted: true,
+              sortOrder: 2,
+            ),
+            TodoItem(id: 'item-4', title: 'Task 4', sortOrder: 3),
+          ];
 
-        final list = TodoList(
-          id: 'list-18',
-          spaceId: 'space-18',
-          name: 'List',
-          items: items,
-        );
+          final list = TodoList(
+            id: 'list-18',
+            spaceId: 'space-18',
+            name: 'List',
+            items: items,
+          );
 
-        expect(list.completedItems, 2);
-      });
+          expect(list.completedItems, 2);
+        },
+      );
 
       test('completedItems returns correct count when all items completed', () {
         final items = [
-          TodoItem(id: 'item-1', title: 'Task 1', isCompleted: true, sortOrder: 0),
-          TodoItem(id: 'item-2', title: 'Task 2', isCompleted: true, sortOrder: 1),
+          TodoItem(
+            id: 'item-1',
+            title: 'Task 1',
+            isCompleted: true,
+            sortOrder: 0,
+          ),
+          TodoItem(
+            id: 'item-2',
+            title: 'Task 2',
+            isCompleted: true,
+            sortOrder: 1,
+          ),
         ];
 
         final list = TodoList(
@@ -987,8 +961,18 @@ void main() {
 
       test('progress returns 1.0 when all items completed', () {
         final items = [
-          TodoItem(id: 'item-1', title: 'Task 1', isCompleted: true, sortOrder: 0),
-          TodoItem(id: 'item-2', title: 'Task 2', isCompleted: true, sortOrder: 1),
+          TodoItem(
+            id: 'item-1',
+            title: 'Task 1',
+            isCompleted: true,
+            sortOrder: 0,
+          ),
+          TodoItem(
+            id: 'item-2',
+            title: 'Task 2',
+            isCompleted: true,
+            sortOrder: 1,
+          ),
         ];
 
         final list = TodoList(
@@ -1003,7 +987,12 @@ void main() {
 
       test('progress calculates correctly for partial completion', () {
         final items = [
-          TodoItem(id: 'item-1', title: 'Task 1', isCompleted: true, sortOrder: 0),
+          TodoItem(
+            id: 'item-1',
+            title: 'Task 1',
+            isCompleted: true,
+            sortOrder: 0,
+          ),
           TodoItem(id: 'item-2', title: 'Task 2', sortOrder: 1),
           TodoItem(id: 'item-3', title: 'Task 3', sortOrder: 2),
           TodoItem(id: 'item-4', title: 'Task 4', sortOrder: 3),
@@ -1021,8 +1010,18 @@ void main() {
 
       test('progress calculates correctly for 50% completion', () {
         final items = [
-          TodoItem(id: 'item-1', title: 'Task 1', isCompleted: true, sortOrder: 0),
-          TodoItem(id: 'item-2', title: 'Task 2', isCompleted: true, sortOrder: 1),
+          TodoItem(
+            id: 'item-1',
+            title: 'Task 1',
+            isCompleted: true,
+            sortOrder: 0,
+          ),
+          TodoItem(
+            id: 'item-2',
+            title: 'Task 2',
+            isCompleted: true,
+            sortOrder: 1,
+          ),
           TodoItem(id: 'item-3', title: 'Task 3', sortOrder: 2),
           TodoItem(id: 'item-4', title: 'Task 4', sortOrder: 3),
         ];
@@ -1087,11 +1086,7 @@ void main() {
       });
 
       test('identical lists are equal', () {
-        final list = TodoList(
-          id: 'list-26',
-          spaceId: 'space-26',
-          name: 'List',
-        );
+        final list = TodoList(id: 'list-26', spaceId: 'space-26', name: 'List');
 
         expect(list, equals(list));
       });
@@ -1100,7 +1095,12 @@ void main() {
     group('toString', () {
       test('includes key identifying fields', () {
         final items = [
-          TodoItem(id: 'item-1', title: 'Task 1', isCompleted: true, sortOrder: 0),
+          TodoItem(
+            id: 'item-1',
+            title: 'Task 1',
+            isCompleted: true,
+            sortOrder: 0,
+          ),
           TodoItem(id: 'item-2', title: 'Task 2', sortOrder: 1),
         ];
 
@@ -1121,11 +1121,7 @@ void main() {
       });
 
       test('has readable format', () {
-        final list = TodoList(
-          id: 'list-28',
-          spaceId: 'space-28',
-          name: 'List',
-        );
+        final list = TodoList(id: 'list-28', spaceId: 'space-28', name: 'List');
 
         final string = list.toString();
 
@@ -1138,11 +1134,7 @@ void main() {
 
     group('edge cases', () {
       test('handles empty string name', () {
-        final list = TodoList(
-          id: 'list-29',
-          spaceId: 'space-29',
-          name: '',
-        );
+        final list = TodoList(id: 'list-29', spaceId: 'space-29', name: '');
 
         expect(list.name, '');
       });

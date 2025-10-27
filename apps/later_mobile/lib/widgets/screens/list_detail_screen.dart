@@ -40,7 +40,8 @@ class ListDetailScreen extends StatefulWidget {
   State<ListDetailScreen> createState() => _ListDetailScreenState();
 }
 
-class _ListDetailScreenState extends State<ListDetailScreen> with AutoSaveMixin {
+class _ListDetailScreenState extends State<ListDetailScreen>
+    with AutoSaveMixin {
   // Text controllers
   late TextEditingController _nameController;
 
@@ -426,7 +427,8 @@ class _ListDetailScreenState extends State<ListDetailScreen> with AutoSaveMixin 
     final confirmed = await showDeleteConfirmationDialog(
       context: context,
       title: 'Delete List',
-      message: 'Are you sure you want to delete "${_currentList.name}"?\n\n'
+      message:
+          'Are you sure you want to delete "${_currentList.name}"?\n\n'
           'This will delete all ${_currentList.items.length} items in this list. '
           'This action cannot be undone.',
     );

@@ -35,22 +35,19 @@ void main() {
   });
 
   group('Gradient Rendering Tests - Mobile', () {
-    testWidgets('Primary gradient renders at 320px',
-        (WidgetTester tester) async {
+    testWidgets('Primary gradient renders at 320px', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         MediaQuery(
-          data: const MediaQueryData(
-            size: Size(320.0, 568.0),
-          ),
+          data: const MediaQueryData(size: Size(320.0, 568.0)),
           child: MaterialApp(
             home: Scaffold(
               body: Container(
                 decoration: const BoxDecoration(
                   gradient: AppColors.primaryGradient,
                 ),
-                child: const Center(
-                  child: Text('Gradient Test'),
-                ),
+                child: const Center(child: Text('Gradient Test')),
               ),
             ),
           ),
@@ -59,26 +56,26 @@ void main() {
 
       // Verify container renders without errors
       expect(find.byType(Container), findsWidgets);
-      expect(tester.takeException(), isNull,
-          reason: 'Gradient should render without errors at 320px');
+      expect(
+        tester.takeException(),
+        isNull,
+        reason: 'Gradient should render without errors at 320px',
+      );
     });
 
-    testWidgets('Primary gradient renders at 375px',
-        (WidgetTester tester) async {
+    testWidgets('Primary gradient renders at 375px', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         MediaQuery(
-          data: const MediaQueryData(
-            size: Size(375.0, 812.0),
-          ),
+          data: const MediaQueryData(size: Size(375.0, 812.0)),
           child: MaterialApp(
             home: Scaffold(
               body: Container(
                 decoration: const BoxDecoration(
                   gradient: AppColors.primaryGradient,
                 ),
-                child: const Center(
-                  child: Text('Gradient Test'),
-                ),
+                child: const Center(child: Text('Gradient Test')),
               ),
             ),
           ),
@@ -88,22 +85,19 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
-    testWidgets('Primary gradient renders at 414px',
-        (WidgetTester tester) async {
+    testWidgets('Primary gradient renders at 414px', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         MediaQuery(
-          data: const MediaQueryData(
-            size: Size(414.0, 896.0),
-          ),
+          data: const MediaQueryData(size: Size(414.0, 896.0)),
           child: MaterialApp(
             home: Scaffold(
               body: Container(
                 decoration: const BoxDecoration(
                   gradient: AppColors.primaryGradient,
                 ),
-                child: const Center(
-                  child: Text('Gradient Test'),
-                ),
+                child: const Center(child: Text('Gradient Test')),
               ),
             ),
           ),
@@ -113,63 +107,62 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
-    testWidgets('Gradient FAB renders at mobile sizes',
-        (WidgetTester tester) async {
+    testWidgets('Gradient FAB renders at mobile sizes', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         MediaQuery(
-          data: const MediaQueryData(
-            size: Size(375.0, 812.0),
-          ),
+          data: const MediaQueryData(size: Size(375.0, 812.0)),
           child: MaterialApp(
             home: Scaffold(
-              floatingActionButton: QuickCaptureFab(
-                onPressed: () {},
-              ),
+              floatingActionButton: QuickCaptureFab(onPressed: () {}),
             ),
           ),
         ),
       );
 
       expect(find.byType(QuickCaptureFab), findsOneWidget);
-      expect(tester.takeException(), isNull,
-          reason: 'FAB with gradient should render on mobile');
+      expect(
+        tester.takeException(),
+        isNull,
+        reason: 'FAB with gradient should render on mobile',
+      );
     });
   });
 
   group('Gradient Rendering Tests - Tablet', () {
-    testWidgets('Primary gradient renders at 768px',
-        (WidgetTester tester) async {
+    testWidgets('Primary gradient renders at 768px', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         MediaQuery(
-          data: const MediaQueryData(
-            size: Size(768.0, 1024.0),
-          ),
+          data: const MediaQueryData(size: Size(768.0, 1024.0)),
           child: MaterialApp(
             home: Scaffold(
               body: Container(
                 decoration: const BoxDecoration(
                   gradient: AppColors.primaryGradient,
                 ),
-                child: const Center(
-                  child: Text('Gradient Test'),
-                ),
+                child: const Center(child: Text('Gradient Test')),
               ),
             ),
           ),
         ),
       );
 
-      expect(tester.takeException(), isNull,
-          reason: 'Gradient should render at tablet size');
+      expect(
+        tester.takeException(),
+        isNull,
+        reason: 'Gradient should render at tablet size',
+      );
     });
 
-    testWidgets('Primary gradient renders at 834px',
-        (WidgetTester tester) async {
+    testWidgets('Primary gradient renders at 834px', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         MediaQuery(
-          data: const MediaQueryData(
-            size: Size(834.0, 1194.0),
-          ),
+          data: const MediaQueryData(size: Size(834.0, 1194.0)),
           child: MaterialApp(
             home: Scaffold(
               body: Container(
@@ -185,13 +178,12 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
-    testWidgets('Primary gradient renders at 1024px',
-        (WidgetTester tester) async {
+    testWidgets('Primary gradient renders at 1024px', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         MediaQuery(
-          data: const MediaQueryData(
-            size: Size(1024.0, 1366.0),
-          ),
+          data: const MediaQueryData(size: Size(1024.0, 1366.0)),
           child: MaterialApp(
             home: Scaffold(
               body: Container(
@@ -209,13 +201,12 @@ void main() {
   });
 
   group('Gradient Rendering Tests - Desktop', () {
-    testWidgets('Primary gradient renders at 1280px',
-        (WidgetTester tester) async {
+    testWidgets('Primary gradient renders at 1280px', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         MediaQuery(
-          data: const MediaQueryData(
-            size: Size(1280.0, 720.0),
-          ),
+          data: const MediaQueryData(size: Size(1280.0, 720.0)),
           child: MaterialApp(
             home: Scaffold(
               body: Container(
@@ -228,17 +219,19 @@ void main() {
         ),
       );
 
-      expect(tester.takeException(), isNull,
-          reason: 'Gradient should render at desktop size');
+      expect(
+        tester.takeException(),
+        isNull,
+        reason: 'Gradient should render at desktop size',
+      );
     });
 
-    testWidgets('Primary gradient renders at 1440px',
-        (WidgetTester tester) async {
+    testWidgets('Primary gradient renders at 1440px', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         MediaQuery(
-          data: const MediaQueryData(
-            size: Size(1440.0, 900.0),
-          ),
+          data: const MediaQueryData(size: Size(1440.0, 900.0)),
           child: MaterialApp(
             home: Scaffold(
               body: Container(
@@ -254,13 +247,12 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
-    testWidgets('Primary gradient renders at 1920px',
-        (WidgetTester tester) async {
+    testWidgets('Primary gradient renders at 1920px', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         MediaQuery(
-          data: const MediaQueryData(
-            size: Size(1920.0, 1080.0),
-          ),
+          data: const MediaQueryData(size: Size(1920.0, 1080.0)),
           child: MaterialApp(
             home: Scaffold(
               body: Container(
@@ -278,8 +270,9 @@ void main() {
   });
 
   group('Gradient Opacity Tests', () {
-    testWidgets('2% opacity gradient renders correctly',
-        (WidgetTester tester) async {
+    testWidgets('2% opacity gradient renders correctly', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -299,12 +292,16 @@ void main() {
         ),
       );
 
-      expect(tester.takeException(), isNull,
-          reason: '2% opacity gradient should render without errors');
+      expect(
+        tester.takeException(),
+        isNull,
+        reason: '2% opacity gradient should render without errors',
+      );
     });
 
-    testWidgets('5% opacity gradient renders correctly',
-        (WidgetTester tester) async {
+    testWidgets('5% opacity gradient renders correctly', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -327,8 +324,9 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
-    testWidgets('10% opacity gradient renders correctly',
-        (WidgetTester tester) async {
+    testWidgets('10% opacity gradient renders correctly', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -351,8 +349,9 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
-    testWidgets('15% opacity gradient renders correctly',
-        (WidgetTester tester) async {
+    testWidgets('15% opacity gradient renders correctly', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -375,8 +374,9 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
-    testWidgets('Multiple opacity levels on same screen',
-        (WidgetTester tester) async {
+    testWidgets('Multiple opacity levels on same screen', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -431,14 +431,18 @@ void main() {
         ),
       );
 
-      expect(tester.takeException(), isNull,
-          reason: 'Multiple gradient opacity levels should coexist');
+      expect(
+        tester.takeException(),
+        isNull,
+        reason: 'Multiple gradient opacity levels should coexist',
+      );
     });
   });
 
   group('Gradient Theme Mode Tests', () {
-    testWidgets('Light mode gradient renders correctly',
-        (WidgetTester tester) async {
+    testWidgets('Light mode gradient renders correctly', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
           theme: ThemeData.light(),
@@ -455,8 +459,9 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
-    testWidgets('Dark mode gradient renders correctly',
-        (WidgetTester tester) async {
+    testWidgets('Dark mode gradient renders correctly', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
           theme: ThemeData.dark(),
@@ -473,8 +478,9 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
-    testWidgets('Secondary gradient renders correctly',
-        (WidgetTester tester) async {
+    testWidgets('Secondary gradient renders correctly', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -490,15 +496,12 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
-    testWidgets('Task gradient renders correctly',
-        (WidgetTester tester) async {
+    testWidgets('Task gradient renders correctly', (WidgetTester tester) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
             body: Container(
-              decoration: const BoxDecoration(
-                gradient: AppColors.taskGradient,
-              ),
+              decoration: const BoxDecoration(gradient: AppColors.taskGradient),
             ),
           ),
         ),
@@ -507,15 +510,12 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
-    testWidgets('Note gradient renders correctly',
-        (WidgetTester tester) async {
+    testWidgets('Note gradient renders correctly', (WidgetTester tester) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
             body: Container(
-              decoration: const BoxDecoration(
-                gradient: AppColors.noteGradient,
-              ),
+              decoration: const BoxDecoration(gradient: AppColors.noteGradient),
             ),
           ),
         ),
@@ -524,15 +524,12 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
-    testWidgets('List gradient renders correctly',
-        (WidgetTester tester) async {
+    testWidgets('List gradient renders correctly', (WidgetTester tester) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
             body: Container(
-              decoration: const BoxDecoration(
-                gradient: AppColors.listGradient,
-              ),
+              decoration: const BoxDecoration(gradient: AppColors.listGradient),
             ),
           ),
         ),
@@ -543,8 +540,9 @@ void main() {
   });
 
   group('Gradient Performance Tests', () {
-    testWidgets('Multiple gradients render without lag',
-        (WidgetTester tester) async {
+    testWidgets('Multiple gradients render without lag', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -558,9 +556,7 @@ void main() {
                     gradient: AppColors.primaryGradient,
                     borderRadius: BorderRadius.all(Radius.circular(12)),
                   ),
-                  child: Center(
-                    child: Text('Item $index'),
-                  ),
+                  child: Center(child: Text('Item $index')),
                 );
               },
             ),
@@ -571,12 +567,16 @@ void main() {
       // Pump and settle to ensure all animations complete
       await tester.pumpAndSettle();
 
-      expect(tester.takeException(), isNull,
-          reason: 'Multiple gradients should not cause performance issues');
+      expect(
+        tester.takeException(),
+        isNull,
+        reason: 'Multiple gradients should not cause performance issues',
+      );
     });
 
-    testWidgets('Gradient overlays do not conflict',
-        (WidgetTester tester) async {
+    testWidgets('Gradient overlays do not conflict', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -609,8 +609,11 @@ void main() {
         ),
       );
 
-      expect(tester.takeException(), isNull,
-          reason: 'Gradient overlays should not conflict');
+      expect(
+        tester.takeException(),
+        isNull,
+        reason: 'Gradient overlays should not conflict',
+      );
     });
   });
 }

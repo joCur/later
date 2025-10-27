@@ -9,12 +9,7 @@ import '../data/repositories/todo_list_repository.dart';
 import 'spaces_provider.dart';
 
 /// Enum to filter content by type
-enum ContentFilter {
-  all,
-  todoLists,
-  lists,
-  notes,
-}
+enum ContentFilter { all, todoLists, lists, notes }
 
 /// Provider for managing unified content state (TodoLists, Lists, Notes) in the application.
 ///
@@ -41,9 +36,9 @@ class ContentProvider extends ChangeNotifier {
     required TodoListRepository todoListRepository,
     required ListRepository listRepository,
     required NoteRepository noteRepository,
-  })  : _todoListRepository = todoListRepository,
-        _listRepository = listRepository,
-        _noteRepository = noteRepository;
+  }) : _todoListRepository = todoListRepository,
+       _listRepository = listRepository,
+       _noteRepository = noteRepository;
 
   final TodoListRepository _todoListRepository;
   final ListRepository _listRepository;
@@ -163,7 +158,10 @@ class ContentProvider extends ChangeNotifier {
   /// );
   /// await provider.createTodoList(todoList, spacesProvider);
   /// ```
-  Future<void> createTodoList(TodoList todoList, SpacesProvider spacesProvider) async {
+  Future<void> createTodoList(
+    TodoList todoList,
+    SpacesProvider spacesProvider,
+  ) async {
     _error = null;
 
     try {
@@ -321,7 +319,11 @@ class ContentProvider extends ChangeNotifier {
   /// final updated = item.copyWith(title: 'Updated title');
   /// await provider.updateTodoItem('todo-1', 'item-1', updated);
   /// ```
-  Future<void> updateTodoItem(String listId, String itemId, TodoItem item) async {
+  Future<void> updateTodoItem(
+    String listId,
+    String itemId,
+    TodoItem item,
+  ) async {
     _error = null;
 
     try {
@@ -439,7 +441,11 @@ class ContentProvider extends ChangeNotifier {
   /// ```dart
   /// await provider.reorderTodoItems('todo-1', 0, 2);
   /// ```
-  Future<void> reorderTodoItems(String listId, int oldIndex, int newIndex) async {
+  Future<void> reorderTodoItems(
+    String listId,
+    int oldIndex,
+    int newIndex,
+  ) async {
     _error = null;
 
     try {
@@ -566,10 +572,7 @@ class ContentProvider extends ChangeNotifier {
       // Get the list to find its spaceId before deleting
       final list = _lists.firstWhere((l) => l.id == id);
 
-      await _executeWithRetry(
-        () => _listRepository.delete(id),
-        'deleteList',
-      );
+      await _executeWithRetry(() => _listRepository.delete(id), 'deleteList');
       _lists = _lists.where((l) => l.id != id).toList();
 
       // Decrement space item count
@@ -643,7 +646,11 @@ class ContentProvider extends ChangeNotifier {
   /// final updated = item.copyWith(title: 'Updated title');
   /// await provider.updateListItem('list-1', 'item-1', updated);
   /// ```
-  Future<void> updateListItem(String listId, String itemId, ListItem item) async {
+  Future<void> updateListItem(
+    String listId,
+    String itemId,
+    ListItem item,
+  ) async {
     _error = null;
 
     try {
@@ -761,7 +768,11 @@ class ContentProvider extends ChangeNotifier {
   /// ```dart
   /// await provider.reorderListItems('list-1', 0, 2);
   /// ```
-  Future<void> reorderListItems(String listId, int oldIndex, int newIndex) async {
+  Future<void> reorderListItems(
+    String listId,
+    int oldIndex,
+    int newIndex,
+  ) async {
     _error = null;
 
     try {
@@ -890,10 +901,7 @@ class ContentProvider extends ChangeNotifier {
       // Get the note to find its spaceId before deleting
       final note = _notes.firstWhere((n) => n.id == id);
 
-      await _executeWithRetry(
-        () => _noteRepository.delete(id),
-        'deleteNote',
-      );
+      await _executeWithRetry(() => _noteRepository.delete(id), 'deleteNote');
       _notes = _notes.where((n) => n.id != id).toList();
 
       // Decrement space item count
@@ -983,7 +991,8 @@ class ContentProvider extends ChangeNotifier {
     results.addAll(
       _todoLists.where((todoList) {
         final nameMatch = todoList.name.toLowerCase().contains(lowerQuery);
-        final descMatch = todoList.description?.toLowerCase().contains(lowerQuery) ?? false;
+        final descMatch =
+            todoList.description?.toLowerCase().contains(lowerQuery) ?? false;
         return nameMatch || descMatch;
       }),
     );
@@ -999,7 +1008,8 @@ class ContentProvider extends ChangeNotifier {
     results.addAll(
       _notes.where((note) {
         final titleMatch = note.title.toLowerCase().contains(lowerQuery);
-        final contentMatch = note.content?.toLowerCase().contains(lowerQuery) ?? false;
+        final contentMatch =
+            note.content?.toLowerCase().contains(lowerQuery) ?? false;
         return titleMatch || contentMatch;
       }),
     );
@@ -1086,6 +1096,7 @@ class ContentProvider extends ChangeNotifier {
     }
 
     // This should never be reached, but throw the last error just in case
-    throw lastError ?? AppError.unknown(message: 'Unknown error in $operationName');
+    throw lastError ??
+        AppError.unknown(message: 'Unknown error in $operationName');
   }
 }

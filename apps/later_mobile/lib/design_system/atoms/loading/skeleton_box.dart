@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:later_mobile/core/theme/temporal_flow_theme.dart';
 import 'package:later_mobile/design_system/tokens/tokens.dart';
 
 /// Shape options for skeleton loaders
@@ -38,13 +39,8 @@ enum SkeletonShape {
 /// )
 /// ```
 class SkeletonLoader extends StatefulWidget {
-
   /// Creates a text line skeleton (16px height, full width).
-  factory SkeletonLoader.text({
-    Key? key,
-    double? width,
-    double height = 16.0,
-  }) {
+  factory SkeletonLoader.text({Key? key, double? width, double height = 16.0}) {
     return SkeletonLoader(
       key: key,
       width: width,
@@ -54,10 +50,7 @@ class SkeletonLoader extends StatefulWidget {
   }
 
   /// Creates a circular avatar skeleton (40px diameter by default).
-  factory SkeletonLoader.avatar({
-    Key? key,
-    double size = 40.0,
-  }) {
+  factory SkeletonLoader.avatar({Key? key, double size = 40.0}) {
     return SkeletonLoader(
       key: key,
       width: size,
@@ -169,7 +162,9 @@ class _SkeletonLoaderState extends State<SkeletonLoader>
                 painter: _ShimmerPainter(
                   animation: _shimmerController,
                   baseColor: baseColor,
-                  shimmerColor: Colors.white.withValues(alpha: isDark ? 0.05 : 0.3),
+                  shimmerColor: Colors.white.withValues(
+                    alpha: isDark ? 0.05 : 0.3,
+                  ),
                 ),
               ),
             ),
@@ -198,11 +193,7 @@ class _ShimmerPainter extends CustomPainter {
       ..shader = LinearGradient(
         begin: Alignment(-1.0 + animation.value * 3, 0),
         end: Alignment(0.0 + animation.value * 3, 0),
-        colors: [
-          baseColor,
-          shimmerColor,
-          baseColor,
-        ],
+        colors: [baseColor, shimmerColor, baseColor],
         stops: const [0.0, 0.5, 1.0],
       ).createShader(Rect.fromLTWH(0, 0, size.width, size.height));
 
@@ -229,11 +220,11 @@ class ItemCardSkeleton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final temporalTheme = Theme.of(context).extension<TemporalFlowTheme>()!;
 
     return Container(
       decoration: BoxDecoration(
-        color: isDark ? AppColors.glassDark : AppColors.glassLight,
+        color: temporalTheme.glassBackground,
         borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
       ),
       child: BackdropFilter(
@@ -247,21 +238,13 @@ class ItemCardSkeleton extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Title skeleton (20px height, full width)
-              SkeletonLoader(
-                height: 20,
-                width: double.infinity,
-              ),
+              SkeletonLoader(height: 20, width: double.infinity),
               SizedBox(height: AppSpacing.xs),
               // Content preview skeleton (16px height, 200px width)
-              SkeletonLoader(
-                width: 200,
-              ),
+              SkeletonLoader(width: 200),
               SizedBox(height: AppSpacing.xs),
               // Metadata skeleton (14px height, 120px width)
-              SkeletonLoader(
-                height: 14,
-                width: 120,
-              ),
+              SkeletonLoader(height: 14, width: 120),
             ],
           ),
         ),

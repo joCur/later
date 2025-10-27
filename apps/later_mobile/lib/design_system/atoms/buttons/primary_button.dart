@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:later_mobile/core/theme/temporal_flow_theme.dart';
 import 'package:later_mobile/design_system/tokens/tokens.dart';
 
 /// Button size enum
@@ -142,13 +143,10 @@ class _PrimaryButtonState extends State<PrimaryButton> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
+    final temporalTheme = Theme.of(context).extension<TemporalFlowTheme>()!;
 
-    // Get gradient based on theme
-    final gradient = isDark
-        ? AppColors.primaryGradientDark
-        : AppColors.primaryGradient;
+    // Get gradient from theme
+    final gradient = temporalTheme.primaryGradient;
 
     // Foreground color (white for both light and dark)
     const foregroundColor = Colors.white;
@@ -167,11 +165,7 @@ class _PrimaryButtonState extends State<PrimaryButton> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               if (widget.icon != null) ...[
-                Icon(
-                  widget.icon,
-                  size: _iconSize,
-                  color: foregroundColor,
-                ),
+                Icon(widget.icon, size: _iconSize, color: foregroundColor),
                 const SizedBox(width: AppSpacing.xs),
               ],
               Text(
@@ -197,9 +191,7 @@ class _PrimaryButtonState extends State<PrimaryButton> {
           boxShadow: _isEnabled && !_isPressed
               ? [
                   BoxShadow(
-                    color: isDark
-                        ? AppColors.shadowDark
-                        : AppColors.shadowLight,
+                    color: temporalTheme.shadowColor,
                     blurRadius: 4.0,
                     offset: const Offset(0, 2),
                   ),

@@ -111,13 +111,16 @@ void main() {
       expect(transitioningStateChanges.contains(true), true);
     });
 
-    test('should set isTransitioning to false after theme change completes', () async {
-      final provider = ThemeProvider();
+    test(
+      'should set isTransitioning to false after theme change completes',
+      () async {
+        final provider = ThemeProvider();
 
-      await provider.setThemeMode(ThemeMode.dark);
+        await provider.setThemeMode(ThemeMode.dark);
 
-      expect(provider.isTransitioning, false);
-    });
+        expect(provider.isTransitioning, false);
+      },
+    );
 
     test('should not change theme if new mode is same as current', () async {
       SharedPreferences.setMockInitialValues({'themeMode': 'dark'});

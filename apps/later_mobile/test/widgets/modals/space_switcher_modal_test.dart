@@ -36,35 +36,11 @@ void main() {
 
       // Create test spaces
       testSpaces = [
-        Space(
-          id: 'space-1',
-          name: 'Personal',
-          icon: '🏠',
-          itemCount: 5,
-        ),
-        Space(
-          id: 'space-2',
-          name: 'Work',
-          icon: '💼',
-          itemCount: 12,
-        ),
-        Space(
-          id: 'space-3',
-          name: 'Projects',
-          icon: '🚀',
-          itemCount: 3,
-        ),
-        Space(
-          id: 'space-4',
-          name: 'Shopping',
-          icon: '🛒',
-        ),
-        Space(
-          id: 'space-5',
-          name: 'Ideas',
-          icon: '💡',
-          itemCount: 8,
-        ),
+        Space(id: 'space-1', name: 'Personal', icon: '🏠', itemCount: 5),
+        Space(id: 'space-2', name: 'Work', icon: '💼', itemCount: 12),
+        Space(id: 'space-3', name: 'Projects', icon: '🚀', itemCount: 3),
+        Space(id: 'space-4', name: 'Shopping', icon: '🛒'),
+        Space(id: 'space-5', name: 'Ideas', icon: '💡', itemCount: 8),
       ];
 
       // Add test spaces to repository
@@ -97,15 +73,15 @@ void main() {
           theme: theme ?? ThemeData.light(),
           home: ChangeNotifierProvider<SpacesProvider>.value(
             value: spacesProvider,
-            child: const Scaffold(
-              body: SpaceSwitcherModal(),
-            ),
+            child: const Scaffold(body: SpaceSwitcherModal()),
           ),
         ),
       );
     }
 
-    testWidgets('renders list of spaces correctly', (WidgetTester tester) async {
+    testWidgets('renders list of spaces correctly', (
+      WidgetTester tester,
+    ) async {
       // Act
       await tester.pumpWidget(buildModalWithProvider());
       await tester.pumpAndSettle();
@@ -143,8 +119,9 @@ void main() {
       expect(find.text('8'), findsWidgets); // Ideas - unique
     });
 
-    testWidgets('highlights currently selected space',
-        (WidgetTester tester) async {
+    testWidgets('highlights currently selected space', (
+      WidgetTester tester,
+    ) async {
       // Act
       await tester.pumpWidget(buildModalWithProvider());
       await tester.pumpAndSettle();
@@ -154,7 +131,9 @@ void main() {
       expect(selectedIcon, findsOneWidget);
     });
 
-    testWidgets('displays search field at the top', (WidgetTester tester) async {
+    testWidgets('displays search field at the top', (
+      WidgetTester tester,
+    ) async {
       // Act
       await tester.pumpWidget(buildModalWithProvider());
       await tester.pumpAndSettle();
@@ -192,8 +171,9 @@ void main() {
       expect(find.text('Work'), findsOneWidget);
     });
 
-    testWidgets('shows "No spaces found" when filter has no results',
-        (WidgetTester tester) async {
+    testWidgets('shows "No spaces found" when filter has no results', (
+      WidgetTester tester,
+    ) async {
       // Act
       await tester.pumpWidget(buildModalWithProvider());
       await tester.pumpAndSettle();
@@ -223,7 +203,9 @@ void main() {
       expect(find.text('Projects'), findsOneWidget);
     });
 
-    testWidgets('displays create new space button', (WidgetTester tester) async {
+    testWidgets('displays create new space button', (
+      WidgetTester tester,
+    ) async {
       // Act
       await tester.pumpWidget(buildModalWithProvider());
       await tester.pumpAndSettle();
@@ -233,8 +215,9 @@ void main() {
       expect(find.widgetWithIcon(ElevatedButton, Icons.add), findsOneWidget);
     });
 
-    testWidgets('create button opens create space modal',
-        (WidgetTester tester) async {
+    testWidgets('create button opens create space modal', (
+      WidgetTester tester,
+    ) async {
       // Act
       await tester.pumpWidget(buildModalWithProvider());
       await tester.pumpAndSettle();
@@ -248,8 +231,9 @@ void main() {
       expect(find.text('Create New Space'), findsNothing);
     });
 
-    testWidgets('closes modal when close button is tapped',
-        (WidgetTester tester) async {
+    testWidgets('closes modal when close button is tapped', (
+      WidgetTester tester,
+    ) async {
       // Arrange
       var modalClosed = false;
 
@@ -289,8 +273,9 @@ void main() {
       expect(modalClosed, isTrue);
     });
 
-    testWidgets('switches space when space is tapped',
-        (WidgetTester tester) async {
+    testWidgets('switches space when space is tapped', (
+      WidgetTester tester,
+    ) async {
       // Act
       await tester.pumpWidget(buildModalWithProvider());
       await tester.pumpAndSettle();
@@ -344,8 +329,9 @@ void main() {
       expect(modalClosed, isTrue);
     });
 
-    testWidgets('arrow down key navigates down the list',
-        (WidgetTester tester) async {
+    testWidgets('arrow down key navigates down the list', (
+      WidgetTester tester,
+    ) async {
       // Act
       await tester.pumpWidget(buildModalWithProvider());
       await tester.pumpAndSettle();
@@ -365,8 +351,9 @@ void main() {
       expect(spacesProvider.currentSpace?.id, equals('space-2'));
     });
 
-    testWidgets('arrow up key navigates up the list',
-        (WidgetTester tester) async {
+    testWidgets('arrow up key navigates up the list', (
+      WidgetTester tester,
+    ) async {
       // Act
       await tester.pumpWidget(buildModalWithProvider());
       await tester.pumpAndSettle();
@@ -382,7 +369,9 @@ void main() {
       expect(spacesProvider.currentSpace?.id, equals('space-5'));
     });
 
-    testWidgets('number key 1 selects first space', (WidgetTester tester) async {
+    testWidgets('number key 1 selects first space', (
+      WidgetTester tester,
+    ) async {
       // Act
       await tester.pumpWidget(buildModalWithProvider());
       await tester.pumpAndSettle();
@@ -394,7 +383,9 @@ void main() {
       expect(spacesProvider.currentSpace?.id, equals('space-1'));
     });
 
-    testWidgets('number key 2 selects second space', (WidgetTester tester) async {
+    testWidgets('number key 2 selects second space', (
+      WidgetTester tester,
+    ) async {
       // Act
       await tester.pumpWidget(buildModalWithProvider());
       await tester.pumpAndSettle();
@@ -406,8 +397,9 @@ void main() {
       expect(spacesProvider.currentSpace?.id, equals('space-2'));
     });
 
-    testWidgets('shows number indicators for first 9 spaces',
-        (WidgetTester tester) async {
+    testWidgets('shows number indicators for first 9 spaces', (
+      WidgetTester tester,
+    ) async {
       // Act
       await tester.pumpWidget(buildModalWithProvider());
       await tester.pumpAndSettle();
@@ -419,7 +411,9 @@ void main() {
       expect(find.text('4'), findsWidgets);
     });
 
-    testWidgets('displays as bottom sheet on mobile', (WidgetTester tester) async {
+    testWidgets('displays as bottom sheet on mobile', (
+      WidgetTester tester,
+    ) async {
       // Arrange
       await tester.pumpWidget(
         MediaQuery(
@@ -485,8 +479,9 @@ void main() {
       expect(find.text('Switch Space'), findsOneWidget);
     });
 
-    testWidgets('has minimum touch target size for all interactive elements',
-        (WidgetTester tester) async {
+    testWidgets('has minimum touch target size for all interactive elements', (
+      WidgetTester tester,
+    ) async {
       // Act
       await tester.pumpWidget(buildModalWithProvider());
       await tester.pumpAndSettle();
@@ -495,63 +490,70 @@ void main() {
       final createButton = tester.widget<ElevatedButton>(
         find.widgetWithText(ElevatedButton, 'Create New Space'),
       );
-      final minimumSize =
-          createButton.style!.minimumSize?.resolve(<WidgetState>{});
+      final minimumSize = createButton.style!.minimumSize?.resolve(
+        <WidgetState>{},
+      );
       expect(minimumSize, isNotNull);
       expect(minimumSize!.height, greaterThanOrEqualTo(44.0));
     });
 
-    testWidgets('uses correct colors in light mode', (WidgetTester tester) async {
+    testWidgets('uses correct colors in light mode', (
+      WidgetTester tester,
+    ) async {
       // Act
-      await tester.pumpWidget(
-        buildModalWithProvider(theme: ThemeData.light()),
-      );
+      await tester.pumpWidget(buildModalWithProvider(theme: ThemeData.light()));
       await tester.pumpAndSettle();
 
       // Assert - Create button should use primary amber
       final createButton = tester.widget<ElevatedButton>(
         find.widgetWithText(ElevatedButton, 'Create New Space'),
       );
-      final backgroundColor =
-          createButton.style!.backgroundColor?.resolve(<WidgetState>{});
+      final backgroundColor = createButton.style!.backgroundColor?.resolve(
+        <WidgetState>{},
+      );
       expect(backgroundColor, AppColors.primarySolid);
     });
 
-    testWidgets('uses correct colors in dark mode', (WidgetTester tester) async {
+    testWidgets('uses correct colors in dark mode', (
+      WidgetTester tester,
+    ) async {
       // Act
-      await tester.pumpWidget(
-        buildModalWithProvider(theme: ThemeData.dark()),
-      );
+      await tester.pumpWidget(buildModalWithProvider(theme: ThemeData.dark()));
       await tester.pumpAndSettle();
 
       // Assert - Create button should still use primary amber
       final createButton = tester.widget<ElevatedButton>(
         find.widgetWithText(ElevatedButton, 'Create New Space'),
       );
-      final backgroundColor =
-          createButton.style!.backgroundColor?.resolve(<WidgetState>{});
+      final backgroundColor = createButton.style!.backgroundColor?.resolve(
+        <WidgetState>{},
+      );
       expect(backgroundColor, AppColors.primarySolid);
     });
 
-    testWidgets('has proper semantic labels for accessibility',
-        (WidgetTester tester) async {
+    testWidgets('has proper semantic labels for accessibility', (
+      WidgetTester tester,
+    ) async {
       // Act
       await tester.pumpWidget(buildModalWithProvider());
       await tester.pumpAndSettle();
 
       // Assert - Space items should have semantic labels
       final personalSemantics = tester.getSemantics(
-        find.ancestor(
-          of: find.text('Personal'),
-          matching: find.byType(Semantics),
-        ).first,
+        find
+            .ancestor(
+              of: find.text('Personal'),
+              matching: find.byType(Semantics),
+            )
+            .first,
       );
       expect(personalSemantics.label, contains('Personal'));
       expect(personalSemantics.label, contains('5 items'));
     });
 
-    testWidgets('performance: space switching completes quickly',
-        (WidgetTester tester) async {
+    testWidgets('performance: space switching completes quickly', (
+      WidgetTester tester,
+    ) async {
       // Act
       await tester.pumpWidget(buildModalWithProvider());
       await tester.pumpAndSettle();
@@ -566,8 +568,9 @@ void main() {
       expect(spacesProvider.currentSpace?.name, equals('Work'));
     });
 
-    testWidgets('closes modal automatically when space is selected',
-        (WidgetTester tester) async {
+    testWidgets('closes modal automatically when space is selected', (
+      WidgetTester tester,
+    ) async {
       // Arrange
       var modalClosed = false;
 
@@ -615,8 +618,9 @@ void main() {
       expect(modalClosed, isTrue);
     });
 
-    testWidgets('does not close when selecting current space',
-        (WidgetTester tester) async {
+    testWidgets('does not close when selecting current space', (
+      WidgetTester tester,
+    ) async {
       // Act
       await tester.pumpWidget(buildModalWithProvider());
       await tester.pumpAndSettle();

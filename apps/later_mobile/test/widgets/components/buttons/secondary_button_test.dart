@@ -9,10 +9,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: SecondaryButton(
-              text: 'Test Button',
-              onPressed: () {},
-            ),
+            body: SecondaryButton(text: 'Test Button', onPressed: () {}),
           ),
         ),
       );
@@ -43,26 +40,26 @@ void main() {
       expect(pressed, isTrue);
     });
 
-    testWidgets('renders in disabled state when onPressed is null',
-        (tester) async {
+    testWidgets('renders in disabled state when onPressed is null', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(
-            body: SecondaryButton(
-              text: 'Disabled Button',
-              onPressed: null,
-            ),
+            body: SecondaryButton(text: 'Disabled Button', onPressed: null),
           ),
         ),
       );
 
-      final button =
-          tester.widget<SecondaryButton>(find.byType(SecondaryButton));
+      final button = tester.widget<SecondaryButton>(
+        find.byType(SecondaryButton),
+      );
       expect(button.onPressed, isNull);
     });
 
-    testWidgets('shows loading indicator when isLoading is true',
-        (tester) async {
+    testWidgets('shows loading indicator when isLoading is true', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -100,10 +97,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: SecondaryButton(
-              text: 'Accessible Button',
-              onPressed: () {},
-            ),
+            body: SecondaryButton(text: 'Accessible Button', onPressed: () {}),
           ),
         ),
       );
@@ -118,19 +112,18 @@ void main() {
         await tester.pumpWidget(
           MaterialApp(
             home: Scaffold(
-              body: SecondaryButton(
-                text: 'Test',
-                onPressed: () {},
-              ),
+              body: SecondaryButton(text: 'Test', onPressed: () {}),
             ),
           ),
         );
 
         final container = tester.widget<Container>(
-          find.descendant(
-            of: find.byType(SecondaryButton),
-            matching: find.byType(Container),
-          ).first,
+          find
+              .descendant(
+                of: find.byType(SecondaryButton),
+                matching: find.byType(Container),
+              )
+              .first,
         );
         final decoration = container.decoration as BoxDecoration;
         final borderRadius = decoration.borderRadius as BorderRadius;
@@ -141,10 +134,7 @@ void main() {
         await tester.pumpWidget(
           MaterialApp(
             home: Scaffold(
-              body: SecondaryButton(
-                text: 'Test',
-                onPressed: () {},
-              ),
+              body: SecondaryButton(text: 'Test', onPressed: () {}),
             ),
           ),
         );
@@ -168,10 +158,7 @@ void main() {
         await tester.pumpWidget(
           MaterialApp(
             home: Scaffold(
-              body: SecondaryButton(
-                text: 'Test',
-                onPressed: () {},
-              ),
+              body: SecondaryButton(text: 'Test', onPressed: () {}),
             ),
           ),
         );
@@ -203,10 +190,7 @@ void main() {
         await tester.pumpWidget(
           const MaterialApp(
             home: Scaffold(
-              body: SecondaryButton(
-                text: 'Disabled',
-                onPressed: null,
-              ),
+              body: SecondaryButton(text: 'Disabled', onPressed: null),
             ),
           ),
         );

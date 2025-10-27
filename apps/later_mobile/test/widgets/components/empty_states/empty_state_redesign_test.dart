@@ -11,8 +11,9 @@ import 'package:later_mobile/design_system/organisms/empty_states/empty_state.da
 /// 4. All contexts work correctly (EmptySpaceState, WelcomeState, EmptySearchState)
 void main() {
   group('EmptyState Redesign - Temporal Flow (Phase 4.3)', () {
-    testWidgets('has gradient tinted icon using ShaderMask',
-        (WidgetTester tester) async {
+    testWidgets('has gradient tinted icon using ShaderMask', (
+      WidgetTester tester,
+    ) async {
       // Arrange & Act
       await tester.pumpWidget(
         const MaterialApp(
@@ -41,8 +42,9 @@ void main() {
       expect(iconInShaderMask, findsOneWidget);
     });
 
-    testWidgets('icon gradient uses primaryGradient in light mode',
-        (WidgetTester tester) async {
+    testWidgets('icon gradient uses primaryGradient in light mode', (
+      WidgetTester tester,
+    ) async {
       // Arrange & Act
       await tester.pumpWidget(
         MaterialApp(
@@ -58,14 +60,13 @@ void main() {
       );
 
       // Assert - ShaderMask should use primaryGradient colors
-      final shaderMask = tester.widget<ShaderMask>(
-        find.byType(ShaderMask),
-      );
+      final shaderMask = tester.widget<ShaderMask>(find.byType(ShaderMask));
       expect(shaderMask.blendMode, BlendMode.srcIn);
     });
 
-    testWidgets('icon gradient uses primaryGradientDark in dark mode',
-        (WidgetTester tester) async {
+    testWidgets('icon gradient uses primaryGradientDark in dark mode', (
+      WidgetTester tester,
+    ) async {
       // Arrange & Act
       await tester.pumpWidget(
         MaterialApp(
@@ -85,8 +86,9 @@ void main() {
       expect(shaderMaskFinder, findsOneWidget);
     });
 
-    testWidgets('has animated gradient background container',
-        (WidgetTester tester) async {
+    testWidgets('has animated gradient background container', (
+      WidgetTester tester,
+    ) async {
       // Arrange & Act
       await tester.pumpWidget(
         const MaterialApp(
@@ -115,8 +117,9 @@ void main() {
       expect(containerInAnimation, findsOneWidget);
     });
 
-    testWidgets('animated background fades in over 2 seconds',
-        (WidgetTester tester) async {
+    testWidgets('animated background fades in over 2 seconds', (
+      WidgetTester tester,
+    ) async {
       // Arrange & Act
       await tester.pumpWidget(
         const MaterialApp(
@@ -137,8 +140,9 @@ void main() {
       expect(animatedOpacity.duration, const Duration(seconds: 2));
     });
 
-    testWidgets('animated background starts at opacity 0',
-        (WidgetTester tester) async {
+    testWidgets('animated background starts at opacity 0', (
+      WidgetTester tester,
+    ) async {
       // Arrange & Act
       await tester.pumpWidget(
         const MaterialApp(
@@ -161,8 +165,9 @@ void main() {
       expect(animatedOpacity.opacity, 0.03); // Target opacity
     });
 
-    testWidgets('background gradient uses primaryGradient in light mode',
-        (WidgetTester tester) async {
+    testWidgets('background gradient uses primaryGradient in light mode', (
+      WidgetTester tester,
+    ) async {
       // Arrange & Act
       await tester.pumpWidget(
         MaterialApp(
@@ -193,8 +198,9 @@ void main() {
       expect(boxDecoration.gradient, isA<LinearGradient>());
     });
 
-    testWidgets('background gradient uses primaryGradientDark in dark mode',
-        (WidgetTester tester) async {
+    testWidgets('background gradient uses primaryGradientDark in dark mode', (
+      WidgetTester tester,
+    ) async {
       // Arrange & Act
       await tester.pumpWidget(
         MaterialApp(
@@ -225,33 +231,36 @@ void main() {
       expect(boxDecoration.gradient, isA<LinearGradient>());
     });
 
-    testWidgets('maintains all existing functionality - icon, title, description',
-        (WidgetTester tester) async {
-      // Arrange
-      const title = 'Empty State Title';
-      const description = 'Empty state description';
+    testWidgets(
+      'maintains all existing functionality - icon, title, description',
+      (WidgetTester tester) async {
+        // Arrange
+        const title = 'Empty State Title';
+        const description = 'Empty state description';
 
-      // Act
-      await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: EmptyState(
-              icon: Icons.inbox,
-              title: title,
-              message: description,
+        // Act
+        await tester.pumpWidget(
+          const MaterialApp(
+            home: Scaffold(
+              body: EmptyState(
+                icon: Icons.inbox,
+                title: title,
+                message: description,
+              ),
             ),
           ),
-        ),
-      );
+        );
 
-      // Assert - all original elements still present
-      expect(find.text(title), findsOneWidget);
-      expect(find.text(description), findsOneWidget);
-      expect(find.byIcon(Icons.inbox), findsOneWidget);
-    });
+        // Assert - all original elements still present
+        expect(find.text(title), findsOneWidget);
+        expect(find.text(description), findsOneWidget);
+        expect(find.byIcon(Icons.inbox), findsOneWidget);
+      },
+    );
 
-    testWidgets('maintains CTA button functionality',
-        (WidgetTester tester) async {
+    testWidgets('maintains CTA button functionality', (
+      WidgetTester tester,
+    ) async {
       // Arrange
       var buttonPressed = false;
 
@@ -284,8 +293,9 @@ void main() {
     // Removed test: 'maintains secondary text link functionality'
     // EmptyState no longer supports secondaryText/onSecondaryPressed parameters
 
-    testWidgets('maintains responsive layout with max width',
-        (WidgetTester tester) async {
+    testWidgets('maintains responsive layout with max width', (
+      WidgetTester tester,
+    ) async {
       // Act
       await tester.pumpWidget(
         const MaterialApp(
@@ -311,8 +321,7 @@ void main() {
       expect(hasMaxWidth480, isTrue);
     });
 
-    testWidgets('maintains scrollable behavior',
-        (WidgetTester tester) async {
+    testWidgets('maintains scrollable behavior', (WidgetTester tester) async {
       // Act
       await tester.pumpWidget(
         const MaterialApp(
@@ -330,8 +339,7 @@ void main() {
       expect(find.byType(SingleChildScrollView), findsOneWidget);
     });
 
-    testWidgets('typography remains unchanged',
-        (WidgetTester tester) async {
+    testWidgets('typography remains unchanged', (WidgetTester tester) async {
       // Act
       await tester.pumpWidget(
         const MaterialApp(
@@ -354,8 +362,7 @@ void main() {
       expect(descriptionText.style?.fontSize, greaterThanOrEqualTo(16.0));
     });
 
-    testWidgets('maintains center alignment',
-        (WidgetTester tester) async {
+    testWidgets('maintains center alignment', (WidgetTester tester) async {
       // Act
       await tester.pumpWidget(
         const MaterialApp(
@@ -379,8 +386,9 @@ void main() {
       expect(descriptionText.textAlign, TextAlign.center);
     });
 
-    testWidgets('gradient icon maintains proper size',
-        (WidgetTester tester) async {
+    testWidgets('gradient icon maintains proper size', (
+      WidgetTester tester,
+    ) async {
       // Act
       await tester.pumpWidget(
         const MaterialApp(
@@ -399,8 +407,9 @@ void main() {
       expect(iconWidget, isNotNull);
     });
 
-    testWidgets('gradient icon has white color for proper masking',
-        (WidgetTester tester) async {
+    testWidgets('gradient icon has white color for proper masking', (
+      WidgetTester tester,
+    ) async {
       // Act
       await tester.pumpWidget(
         const MaterialApp(
@@ -419,8 +428,9 @@ void main() {
       expect(iconWidget.color, Colors.white);
     });
 
-    testWidgets('background gradient covers full widget area',
-        (WidgetTester tester) async {
+    testWidgets('background gradient covers full widget area', (
+      WidgetTester tester,
+    ) async {
       // Act
       await tester.pumpWidget(
         const MaterialApp(
@@ -438,18 +448,18 @@ void main() {
       final positionedFill = find.descendant(
         of: find.byType(EmptyState),
         matching: find.byWidgetPredicate(
-          (widget) => widget is Positioned &&
-                      widget.left == 0 &&
-                      widget.right == 0 &&
-                      widget.top == 0 &&
-                      widget.bottom == 0,
+          (widget) =>
+              widget is Positioned &&
+              widget.left == 0 &&
+              widget.right == 0 &&
+              widget.top == 0 &&
+              widget.bottom == 0,
         ),
       );
       expect(positionedFill, findsOneWidget);
     });
 
-    testWidgets('uses spring curve for animation',
-        (WidgetTester tester) async {
+    testWidgets('uses spring curve for animation', (WidgetTester tester) async {
       // Act
       await tester.pumpWidget(
         const MaterialApp(

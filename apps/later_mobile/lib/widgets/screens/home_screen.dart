@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:later_mobile/design_system/tokens/tokens.dart';
 import '../../core/responsive/breakpoints.dart';
+import '../../core/theme/temporal_flow_theme.dart';
 import '../../core/utils/responsive_modal.dart';
 import '../../data/models/item_model.dart';
 import '../../data/models/space_model.dart';
@@ -119,8 +120,9 @@ class _HomeScreenState extends State<HomeScreen> {
     Future.delayed(const Duration(milliseconds: 100), () {
       if (mounted) {
         setState(() {
-          _currentItemCount = (_currentItemCount + 50) // Load 50 more items
-              .clamp(0, totalItemCount);
+          _currentItemCount =
+              (_currentItemCount + 50) // Load 50 more items
+                  .clamp(0, totalItemCount);
           _isLoadingMore = false;
         });
       }
@@ -138,9 +140,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void _showQuickCaptureModal() {
     ResponsiveModal.show<void>(
       context: context,
-      child: QuickCaptureModal(
-        onClose: () => Navigator.of(context).pop(),
-      ),
+      child: QuickCaptureModal(onClose: () => Navigator.of(context).pop()),
     );
   }
 
@@ -150,8 +150,9 @@ class _HomeScreenState extends State<HomeScreen> {
       final isNKey = event.logicalKey == LogicalKeyboardKey.keyN;
 
       // Check for Cmd/Ctrl+N
-      if (isNKey && (HardwareKeyboard.instance.isControlPressed ||
-                     HardwareKeyboard.instance.isMetaPressed)) {
+      if (isNKey &&
+          (HardwareKeyboard.instance.isControlPressed ||
+              HardwareKeyboard.instance.isMetaPressed)) {
         _showQuickCaptureModal();
         return KeyEventResult.handled;
       }
@@ -162,6 +163,7 @@ class _HomeScreenState extends State<HomeScreen> {
   /// Build app bar
   PreferredSizeWidget _buildAppBar(BuildContext context, Space? currentSpace) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final temporalTheme = Theme.of(context).extension<TemporalFlowTheme>()!;
 
     // Mobile-first Phase 4: Flat app bar with 1px bottom border
     // - No glass effect (solid background)
@@ -169,131 +171,124 @@ class _HomeScreenState extends State<HomeScreen> {
     // - Elevation: 0 (flat, modern look)
     // - Height: 56px (Android standard - default AppBar)
     return AppBar(
-            backgroundColor: isDark ? AppColors.neutral900 : Colors.white,
-            elevation: 0, // Flat design
-            automaticallyImplyLeading: false,
-            shape: Border(
-              bottom: BorderSide(
-                color: isDark
-                    ? AppColors.neutral600.withValues(alpha: 0.1)
-                    : AppColors.neutral400.withValues(alpha: 0.1),
-              ),
-            ),
-            title: Row(
-              children: [
-                // Space switcher button
-                Expanded(
-                  child: InkWell(
-                    onTap: () async {
-                      final spacesProvider = context.read<SpacesProvider>();
-                      final contentProvider = context.read<ContentProvider>();
+      backgroundColor: isDark ? AppColors.neutral900 : Colors.white,
+      elevation: 0, // Flat design
+      automaticallyImplyLeading: false,
+      shape: Border(
+        bottom: BorderSide(
+          color: isDark
+              ? AppColors.neutral600.withValues(alpha: 0.1)
+              : AppColors.neutral400.withValues(alpha: 0.1),
+        ),
+      ),
+      title: Row(
+        children: [
+          // Space switcher button
+          Expanded(
+            child: InkWell(
+              onTap: () async {
+                final spacesProvider = context.read<SpacesProvider>();
+                final contentProvider = context.read<ContentProvider>();
 
-                      final result = await ResponsiveModal.show<bool>(
-                        context: context,
-                        child: const SpaceSwitcherModal(),
-                      );
-                      if (!mounted) return;
+                final result = await ResponsiveModal.show<bool>(
+                  context: context,
+                  child: const SpaceSwitcherModal(),
+                );
+                if (!mounted) return;
 
-                      if (result == true) {
-                        // Space was switched, reload content and reset pagination
-                        _resetPagination();
-                        if (spacesProvider.currentSpace != null) {
-                          await contentProvider.loadSpaceContent(
-                            spacesProvider.currentSpace!.id,
-                          );
-                        }
-                      }
-                    },
-                    borderRadius: BorderRadius.circular(AppSpacing.radiusMD),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: AppSpacing.xs,
-                        vertical: AppSpacing.xxs,
+                if (result == true) {
+                  // Space was switched, reload content and reset pagination
+                  _resetPagination();
+                  if (spacesProvider.currentSpace != null) {
+                    await contentProvider.loadSpaceContent(
+                      spacesProvider.currentSpace!.id,
+                    );
+                  }
+                }
+              },
+              borderRadius: BorderRadius.circular(AppSpacing.radiusMD),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.xs,
+                  vertical: AppSpacing.xxs,
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // Space icon with gradient (if no emoji)
+                    if (currentSpace?.icon != null)
+                      Text(
+                        currentSpace!.icon!,
+                        style: const TextStyle(fontSize: 24),
+                      )
+                    else
+                      ShaderMask(
+                        shaderCallback: (bounds) =>
+                            temporalTheme.primaryGradient.createShader(bounds),
+                        child: Icon(
+                          Icons.folder_outlined,
+                          size: 24,
+                          color: isDark
+                              ? AppColors.neutral400
+                              : AppColors.neutral600,
+                        ),
                       ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          // Space icon with gradient (if no emoji)
-                          if (currentSpace?.icon != null)
-                            Text(
-                              currentSpace!.icon!,
-                              style: const TextStyle(fontSize: 24),
-                            )
-                          else
-                            ShaderMask(
-                              shaderCallback: (bounds) => AppColors
-                                  .primaryGradientAdaptive(context)
-                                  .createShader(bounds),
-                              child: Icon(
-                                Icons.folder_outlined,
-                                size: 24,
-                                color: isDark
-                                    ? AppColors.neutral400
-                                    : AppColors.neutral600,
-                              ),
-                            ),
-                          const SizedBox(width: AppSpacing.xs),
+                    const SizedBox(width: AppSpacing.xs),
 
-                          // Space name
-                          Flexible(
-                            child: Text(
-                              currentSpace?.name ?? 'No Space',
-                              style: AppTypography.h4.copyWith(
-                                color: isDark
-                                    ? AppColors.neutral400
-                                    : AppColors.neutral600,
-                              ),
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-
-                          // Dropdown icon
-                          const SizedBox(width: AppSpacing.xxs),
-                          Icon(
-                            Icons.arrow_drop_down,
-                            color: isDark
-                                ? AppColors.neutral500
-                                : AppColors.neutral500,
-                          ),
-                        ],
+                    // Space name
+                    Flexible(
+                      child: Text(
+                        currentSpace?.name ?? 'No Space',
+                        style: AppTypography.h4.copyWith(
+                          color: isDark
+                              ? AppColors.neutral400
+                              : AppColors.neutral600,
+                        ),
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
-                  ),
-                ),
-              ],
-            ),
-            actions: [
-              // Search button
-              IconButton(
-                icon: const Icon(Icons.search),
-                onPressed: () {
-                  debugPrint('Search tapped');
-                },
-                tooltip: 'Search',
-                color: isDark
-                    ? AppColors.neutral500
-                    : AppColors.neutral500,
-              ),
 
-              // Menu button
-              IconButton(
-                icon: const Icon(Icons.more_vert),
-                onPressed: () {
-                  debugPrint('Menu tapped');
-                },
-                tooltip: 'Menu',
-                color: isDark
-                    ? AppColors.neutral500
-                    : AppColors.neutral500,
+                    // Dropdown icon
+                    const SizedBox(width: AppSpacing.xxs),
+                    Icon(
+                      Icons.arrow_drop_down,
+                      color: isDark
+                          ? AppColors.neutral500
+                          : AppColors.neutral500,
+                    ),
+                  ],
+                ),
               ),
-            ],
-          );
+            ),
+          ),
+        ],
+      ),
+      actions: [
+        // Search button
+        IconButton(
+          icon: const Icon(Icons.search),
+          onPressed: () {
+            debugPrint('Search tapped');
+          },
+          tooltip: 'Search',
+          color: isDark ? AppColors.neutral500 : AppColors.neutral500,
+        ),
+
+        // Menu button
+        IconButton(
+          icon: const Icon(Icons.more_vert),
+          onPressed: () {
+            debugPrint('Menu tapped');
+          },
+          tooltip: 'Menu',
+          color: isDark ? AppColors.neutral500 : AppColors.neutral500,
+        ),
+      ],
+    );
   }
 
   /// Build filter chips for content types
   Widget _buildFilterChips(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       padding: const EdgeInsets.symmetric(
@@ -313,7 +308,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 _resetPagination();
               });
             },
-            isDark: isDark,
           ),
           TemporalFilterChip(
             label: 'Todo Lists',
@@ -325,7 +319,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 _resetPagination();
               });
             },
-            isDark: isDark,
           ),
           TemporalFilterChip(
             label: 'Lists',
@@ -337,7 +330,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 _resetPagination();
               });
             },
-            isDark: isDark,
           ),
           TemporalFilterChip(
             label: 'Notes',
@@ -349,7 +341,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 _resetPagination();
               });
             },
-            isDark: isDark,
           ),
         ],
       ),
@@ -368,14 +359,13 @@ class _HomeScreenState extends State<HomeScreen> {
     if (content.isEmpty && contentProvider.getTotalCount() == 0) {
       // Check if this is a new user (welcome state)
       // Welcome state: no content AND default space is the only space
-      final isNewUser = spacesProvider.spaces.length == 1 &&
-                        spacesProvider.spaces.first.name == 'Inbox';
+      final isNewUser =
+          spacesProvider.spaces.length == 1 &&
+          spacesProvider.spaces.first.name == 'Inbox';
 
       if (isNewUser) {
         // Show welcome state for first-time users
-        return WelcomeState(
-          onActionPressed: _showQuickCaptureModal,
-        );
+        return WelcomeState(onActionPressed: _showQuickCaptureModal);
       } else {
         // Show empty space state for existing users with empty spaces
         return EmptySpaceState(
@@ -405,7 +395,8 @@ class _HomeScreenState extends State<HomeScreen> {
               child: _isLoadingMore
                   ? const CircularProgressIndicator()
                   : PrimaryButton(
-                      text: 'Load More (${allContent.length - content.length} remaining)',
+                      text:
+                          'Load More (${allContent.length - content.length} remaining)',
                       icon: Icons.expand_more,
                       onPressed: () => _loadMoreItems(allContent.length),
                     ),
@@ -486,6 +477,7 @@ class _HomeScreenState extends State<HomeScreen> {
   ) {
     final filteredContent = _getFilteredContent(contentProvider);
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final temporalTheme = Theme.of(context).extension<TemporalFlowTheme>()!;
 
     return Scaffold(
       appBar: _buildAppBar(context, spacesProvider.currentSpace),
@@ -502,7 +494,7 @@ class _HomeScreenState extends State<HomeScreen> {
               Expanded(
                 child: RefreshIndicator(
                   onRefresh: _handleRefresh,
-                  color: isDark ? AppColors.primaryStartDark : AppColors.primaryStart,
+                  color: temporalTheme.primaryGradient.colors.first,
                   backgroundColor: isDark ? AppColors.neutral900 : Colors.white,
                   child: contentProvider.isLoading
                       ? const Center(child: CircularProgressIndicator())
@@ -531,8 +523,9 @@ class _HomeScreenState extends State<HomeScreen> {
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
                     colors: [
-                      (isDark ? AppColors.primaryStartDark : AppColors.primaryStart)
-                          .withValues(alpha: 0.02),
+                      temporalTheme.primaryGradient.colors.first.withValues(
+                        alpha: 0.02,
+                      ),
                       Colors.transparent,
                     ],
                   ),
@@ -563,6 +556,7 @@ class _HomeScreenState extends State<HomeScreen> {
   ) {
     final filteredContent = _getFilteredContent(contentProvider);
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final temporalTheme = Theme.of(context).extension<TemporalFlowTheme>()!;
 
     return Scaffold(
       body: Row(
@@ -593,8 +587,10 @@ class _HomeScreenState extends State<HomeScreen> {
                     Expanded(
                       child: RefreshIndicator(
                         onRefresh: _handleRefresh,
-                        color: isDark ? AppColors.primaryStartDark : AppColors.primaryStart,
-                        backgroundColor: isDark ? AppColors.neutral900 : Colors.white,
+                        color: temporalTheme.primaryGradient.colors.first,
+                        backgroundColor: isDark
+                            ? AppColors.neutral900
+                            : Colors.white,
                         child: contentProvider.isLoading
                             ? const Center(child: CircularProgressIndicator())
                             : _buildContentList(
@@ -622,7 +618,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           begin: Alignment.topCenter,
                           end: Alignment.bottomCenter,
                           colors: [
-                            (isDark ? AppColors.primaryStartDark : AppColors.primaryStart)
+                            temporalTheme.primaryGradient.colors.first
                                 .withValues(alpha: 0.02),
                             Colors.transparent,
                           ],

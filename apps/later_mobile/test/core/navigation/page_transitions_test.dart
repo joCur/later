@@ -5,9 +5,7 @@ import 'package:later_mobile/core/navigation/page_transitions.dart';
 void main() {
   group('SharedAxisPageRoute', () {
     testWidgets('creates route with correct page', (tester) async {
-      const testPage = Scaffold(
-        body: Center(child: Text('Test Page')),
-      );
+      const testPage = Scaffold(body: Center(child: Text('Test Page')));
 
       final route = SharedAxisPageRoute<void>(page: testPage);
 
@@ -41,9 +39,7 @@ void main() {
     });
 
     testWidgets('respects reduced motion', (tester) async {
-      const testPage = Scaffold(
-        body: Center(child: Text('Test Page')),
-      );
+      const testPage = Scaffold(body: Center(child: Text('Test Page')));
 
       final route = SharedAxisPageRoute<void>(page: testPage);
 
@@ -76,9 +72,7 @@ void main() {
     });
 
     testWidgets('applies transition animations', (tester) async {
-      const testPage = Scaffold(
-        body: Center(child: Text('Test Page')),
-      );
+      const testPage = Scaffold(body: Center(child: Text('Test Page')));
 
       final route = SharedAxisPageRoute<void>(page: testPage);
 
@@ -112,9 +106,7 @@ void main() {
 
   group('FadePageRoute', () {
     testWidgets('creates route with fade transition', (tester) async {
-      const testPage = Scaffold(
-        body: Center(child: Text('Fade Page')),
-      );
+      const testPage = Scaffold(body: Center(child: Text('Fade Page')));
 
       final route = FadePageRoute<void>(page: testPage);
 
@@ -140,9 +132,7 @@ void main() {
     });
 
     testWidgets('respects reduced motion', (tester) async {
-      const testPage = Scaffold(
-        body: Center(child: Text('Fade Page')),
-      );
+      const testPage = Scaffold(body: Center(child: Text('Fade Page')));
 
       final route = FadePageRoute<void>(page: testPage);
 
@@ -176,9 +166,7 @@ void main() {
 
   group('ScalePageRoute', () {
     testWidgets('creates route with scale transition', (tester) async {
-      const testPage = Scaffold(
-        body: Center(child: Text('Scale Page')),
-      );
+      const testPage = Scaffold(body: Center(child: Text('Scale Page')));
 
       final route = ScalePageRoute<void>(page: testPage);
 
@@ -216,10 +204,10 @@ void main() {
   });
 
   group('PageTransitionExtensions', () {
-    testWidgets('toSharedAxisRoute creates SharedAxisPageRoute', (tester) async {
-      const testPage = Scaffold(
-        body: Center(child: Text('Extension Page')),
-      );
+    testWidgets('toSharedAxisRoute creates SharedAxisPageRoute', (
+      tester,
+    ) async {
+      const testPage = Scaffold(body: Center(child: Text('Extension Page')));
 
       final route = testPage.toSharedAxisRoute<void>();
 
@@ -247,9 +235,7 @@ void main() {
     });
 
     testWidgets('toFadeRoute creates FadePageRoute', (tester) async {
-      const testPage = Scaffold(
-        body: Center(child: Text('Fade Extension')),
-      );
+      const testPage = Scaffold(body: Center(child: Text('Fade Extension')));
 
       final route = testPage.toFadeRoute<void>();
 
@@ -277,9 +263,7 @@ void main() {
     });
 
     testWidgets('toScaleRoute creates ScalePageRoute', (tester) async {
-      const testPage = Scaffold(
-        body: Center(child: Text('Scale Extension')),
-      );
+      const testPage = Scaffold(body: Center(child: Text('Scale Extension')));
 
       final route = testPage.toScaleRoute<void>();
 

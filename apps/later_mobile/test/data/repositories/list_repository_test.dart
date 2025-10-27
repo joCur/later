@@ -79,10 +79,7 @@ void main() {
     group('CRUD operations', () {
       test('create() successfully stores a ListModel', () async {
         // Arrange
-        final list = createTestList(
-          id: 'list-1',
-          style: ListStyle.checkboxes,
-        );
+        final list = createTestList(id: 'list-1', style: ListStyle.checkboxes);
 
         // Act
         final result = await repository.create(list);
@@ -124,14 +121,8 @@ void main() {
 
       test('getBySpace() returns all ListModels for a space', () async {
         // Arrange
-        final list1 = createTestList(
-          id: 'list-1',
-          name: 'List 1',
-        );
-        final list2 = createTestList(
-          id: 'list-2',
-          name: 'List 2',
-        );
+        final list1 = createTestList(id: 'list-1', name: 'List 1');
+        final list2 = createTestList(id: 'list-2', name: 'List 2');
         final list3 = createTestList(
           id: 'list-3',
           spaceId: 'space-2',
@@ -148,31 +139,32 @@ void main() {
         // Assert
         expect(result.length, equals(2));
         expect(result.every((list) => list.spaceId == 'space-1'), isTrue);
-        expect(result.map((list) => list.id), containsAll(['list-1', 'list-2']));
+        expect(
+          result.map((list) => list.id),
+          containsAll(['list-1', 'list-2']),
+        );
       });
 
-      test('getBySpace() returns empty list when no ListModels exist', () async {
-        // Act
-        final result = await repository.getBySpace('space-1');
+      test(
+        'getBySpace() returns empty list when no ListModels exist',
+        () async {
+          // Act
+          final result = await repository.getBySpace('space-1');
 
-        // Assert
-        expect(result, isEmpty);
-      });
+          // Assert
+          expect(result, isEmpty);
+        },
+      );
 
       test('update() updates existing ListModel and timestamp', () async {
         // Arrange
-        final list = createTestList(
-          id: 'list-1',
-          name: 'Original Name',
-        );
+        final list = createTestList(id: 'list-1', name: 'Original Name');
         await repository.create(list);
 
         // Wait to ensure timestamp difference
         await Future<void>.delayed(const Duration(milliseconds: 10));
 
-        final updatedList = list.copyWith(
-          name: 'Updated Name',
-        );
+        final updatedList = list.copyWith(name: 'Updated Name');
 
         // Act
         final result = await repository.update(updatedList);
@@ -188,10 +180,7 @@ void main() {
         final nonExistentList = createTestList(id: 'non-existent');
 
         // Act & Assert
-        expect(
-          () => repository.update(nonExistentList),
-          throwsException,
-        );
+        expect(() => repository.update(nonExistentList), throwsException);
       });
 
       test('delete() removes ListModel', () async {
@@ -221,10 +210,7 @@ void main() {
         final list = createTestList(id: 'list-1', items: []);
         await repository.create(list);
 
-        final item = createTestListItem(
-          id: 'item-1',
-          title: 'Bread',
-        );
+        final item = createTestListItem(id: 'item-1', title: 'Bread');
 
         // Act
         final result = await repository.addItem('list-1', item);
@@ -236,72 +222,79 @@ void main() {
         expect(listBox.get('list-1')!.items.length, equals(1));
       });
 
-      test('addItem() throws exception when ListModel does not exist', () async {
-        // Arrange
-        final item = createTestListItem(id: 'item-1');
+      test(
+        'addItem() throws exception when ListModel does not exist',
+        () async {
+          // Arrange
+          final item = createTestListItem(id: 'item-1');
 
-        // Act & Assert
-        expect(
-          () => repository.addItem('non-existent', item),
-          throwsException,
-        );
-      });
+          // Act & Assert
+          expect(
+            () => repository.addItem('non-existent', item),
+            throwsException,
+          );
+        },
+      );
 
       test('updateItem() updates specific ListItem', () async {
         // Arrange
-        final item1 = createTestListItem(
-          id: 'item-1',
-          title: 'Original Title',
-        );
-        final list = createTestList(
-          id: 'list-1',
-          items: [item1],
-        );
+        final item1 = createTestListItem(id: 'item-1', title: 'Original Title');
+        final list = createTestList(id: 'list-1', items: [item1]);
         await repository.create(list);
 
         final updatedItem = item1.copyWith(title: 'Updated Title');
 
         // Act
-        final result = await repository.updateItem('list-1', 'item-1', updatedItem);
+        final result = await repository.updateItem(
+          'list-1',
+          'item-1',
+          updatedItem,
+        );
 
         // Assert
         expect(result.items.first.title, equals('Updated Title'));
-        expect(listBox.get('list-1')!.items.first.title, equals('Updated Title'));
-      });
-
-      test('updateItem() throws exception when ListModel does not exist', () async {
-        // Arrange
-        final item = createTestListItem(id: 'item-1');
-
-        // Act & Assert
         expect(
-          () => repository.updateItem('non-existent', 'item-1', item),
-          throwsException,
+          listBox.get('list-1')!.items.first.title,
+          equals('Updated Title'),
         );
       });
 
-      test('updateItem() throws exception when ListItem does not exist', () async {
-        // Arrange
-        final list = createTestList(id: 'list-1', items: []);
-        await repository.create(list);
+      test(
+        'updateItem() throws exception when ListModel does not exist',
+        () async {
+          // Arrange
+          final item = createTestListItem(id: 'item-1');
 
-        final item = createTestListItem(id: 'item-1');
+          // Act & Assert
+          expect(
+            () => repository.updateItem('non-existent', 'item-1', item),
+            throwsException,
+          );
+        },
+      );
 
-        // Act & Assert
-        expect(
-          () => repository.updateItem('list-1', 'item-1', item),
-          throwsException,
-        );
-      });
+      test(
+        'updateItem() throws exception when ListItem does not exist',
+        () async {
+          // Arrange
+          final list = createTestList(id: 'list-1', items: []);
+          await repository.create(list);
+
+          final item = createTestListItem(id: 'item-1');
+
+          // Act & Assert
+          expect(
+            () => repository.updateItem('list-1', 'item-1', item),
+            throwsException,
+          );
+        },
+      );
 
       test('deleteItem() removes ListItem from ListModel', () async {
         // Arrange
         final item1 = createTestListItem(id: 'item-1');
         final item2 = createTestListItem(id: 'item-2', sortOrder: 1);
-        final list = createTestList(
-          id: 'list-1',
-          items: [item1, item2],
-        );
+        final list = createTestList(id: 'list-1', items: [item1, item2]);
         await repository.create(list);
 
         // Act
@@ -313,19 +306,20 @@ void main() {
         expect(listBox.get('list-1')!.items.length, equals(1));
       });
 
-      test('deleteItem() throws exception when ListModel does not exist', () async {
-        // Act & Assert
-        expect(
-          () => repository.deleteItem('non-existent', 'item-1'),
-          throwsException,
-        );
-      });
+      test(
+        'deleteItem() throws exception when ListModel does not exist',
+        () async {
+          // Act & Assert
+          expect(
+            () => repository.deleteItem('non-existent', 'item-1'),
+            throwsException,
+          );
+        },
+      );
 
       test('toggleItem() toggles isChecked status', () async {
         // Arrange
-        final item = createTestListItem(
-          id: 'item-1',
-        );
+        final item = createTestListItem(id: 'item-1');
         final list = createTestList(
           id: 'list-1',
           items: [item],
@@ -346,35 +340,46 @@ void main() {
         expect(result2.items.first.isChecked, isFalse);
       });
 
-      test('toggleItem() throws exception when ListModel does not exist', () async {
-        // Act & Assert
-        expect(
-          () => repository.toggleItem('non-existent', 'item-1'),
-          throwsException,
-        );
-      });
+      test(
+        'toggleItem() throws exception when ListModel does not exist',
+        () async {
+          // Act & Assert
+          expect(
+            () => repository.toggleItem('non-existent', 'item-1'),
+            throwsException,
+          );
+        },
+      );
 
-      test('toggleItem() throws exception when ListItem does not exist', () async {
-        // Arrange
-        final list = createTestList(id: 'list-1', items: []);
-        await repository.create(list);
+      test(
+        'toggleItem() throws exception when ListItem does not exist',
+        () async {
+          // Arrange
+          final list = createTestList(id: 'list-1', items: []);
+          await repository.create(list);
 
-        // Act & Assert
-        expect(
-          () => repository.toggleItem('list-1', 'non-existent'),
-          throwsException,
-        );
-      });
+          // Act & Assert
+          expect(
+            () => repository.toggleItem('list-1', 'non-existent'),
+            throwsException,
+          );
+        },
+      );
 
       test('reorderItems() reorders items and updates sortOrder', () async {
         // Arrange
         final item1 = createTestListItem(id: 'item-1', title: 'First');
-        final item2 = createTestListItem(id: 'item-2', title: 'Second', sortOrder: 1);
-        final item3 = createTestListItem(id: 'item-3', title: 'Third', sortOrder: 2);
-        final list = createTestList(
-          id: 'list-1',
-          items: [item1, item2, item3],
+        final item2 = createTestListItem(
+          id: 'item-2',
+          title: 'Second',
+          sortOrder: 1,
         );
+        final item3 = createTestListItem(
+          id: 'item-3',
+          title: 'Third',
+          sortOrder: 2,
+        );
+        final list = createTestList(id: 'list-1', items: [item1, item2, item3]);
         await repository.create(list);
 
         // Act - move first item to last position
@@ -392,50 +397,29 @@ void main() {
       test('reorderItems() throws exception for invalid oldIndex', () async {
         // Arrange
         final item = createTestListItem(id: 'item-1');
-        final list = createTestList(
-          id: 'list-1',
-          items: [item],
-        );
+        final list = createTestList(id: 'list-1', items: [item]);
         await repository.create(list);
 
         // Act & Assert
-        expect(
-          () => repository.reorderItems('list-1', -1, 0),
-          throwsException,
-        );
-        expect(
-          () => repository.reorderItems('list-1', 5, 0),
-          throwsException,
-        );
+        expect(() => repository.reorderItems('list-1', -1, 0), throwsException);
+        expect(() => repository.reorderItems('list-1', 5, 0), throwsException);
       });
 
       test('reorderItems() throws exception for invalid newIndex', () async {
         // Arrange
         final item = createTestListItem(id: 'item-1');
-        final list = createTestList(
-          id: 'list-1',
-          items: [item],
-        );
+        final list = createTestList(id: 'list-1', items: [item]);
         await repository.create(list);
 
         // Act & Assert
-        expect(
-          () => repository.reorderItems('list-1', 0, -1),
-          throwsException,
-        );
-        expect(
-          () => repository.reorderItems('list-1', 0, 5),
-          throwsException,
-        );
+        expect(() => repository.reorderItems('list-1', 0, -1), throwsException);
+        expect(() => repository.reorderItems('list-1', 0, 5), throwsException);
       });
 
       test('reorderItems() handles single item list', () async {
         // Arrange
         final item = createTestListItem(id: 'item-1');
-        final list = createTestList(
-          id: 'list-1',
-          items: [item],
-        );
+        final list = createTestList(id: 'list-1', items: [item]);
         await repository.create(list);
 
         // Act
@@ -450,16 +434,9 @@ void main() {
     group('Bulk operations', () {
       test('deleteAllInSpace() deletes all ListModels in space', () async {
         // Arrange
-        final list1 = createTestList(
-          id: 'list-1',
-        );
-        final list2 = createTestList(
-          id: 'list-2',
-        );
-        final list3 = createTestList(
-          id: 'list-3',
-          spaceId: 'space-2',
-        );
+        final list1 = createTestList(id: 'list-1');
+        final list2 = createTestList(id: 'list-2');
+        final list3 = createTestList(id: 'list-3', spaceId: 'space-2');
 
         await repository.create(list1);
         await repository.create(list2);
@@ -475,12 +452,8 @@ void main() {
 
       test('deleteAllInSpace() returns correct count', () async {
         // Arrange
-        final list1 = createTestList(
-          id: 'list-1',
-        );
-        final list2 = createTestList(
-          id: 'list-2',
-        );
+        final list1 = createTestList(id: 'list-1');
+        final list2 = createTestList(id: 'list-2');
 
         await repository.create(list1);
         await repository.create(list2);
@@ -503,16 +476,9 @@ void main() {
 
       test('countBySpace() returns correct count', () async {
         // Arrange
-        final list1 = createTestList(
-          id: 'list-1',
-        );
-        final list2 = createTestList(
-          id: 'list-2',
-        );
-        final list3 = createTestList(
-          id: 'list-3',
-          spaceId: 'space-2',
-        );
+        final list1 = createTestList(id: 'list-1');
+        final list2 = createTestList(id: 'list-2');
+        final list3 = createTestList(id: 'list-3', spaceId: 'space-2');
 
         await repository.create(list1);
         await repository.create(list2);
@@ -539,10 +505,7 @@ void main() {
     group('ListStyle variants', () {
       test('create ListModel with bullets style', () async {
         // Arrange
-        final list = createTestList(
-          id: 'list-1',
-          name: 'Notes',
-        );
+        final list = createTestList(id: 'list-1', name: 'Notes');
 
         // Act
         final result = await repository.create(list);
@@ -583,9 +546,7 @@ void main() {
 
       test('update ListModel style', () async {
         // Arrange
-        final list = createTestList(
-          id: 'list-1',
-        );
+        final list = createTestList(id: 'list-1');
         await repository.create(list);
 
         // Act
@@ -605,10 +566,7 @@ void main() {
           createTestListItem(id: 'item-2', title: 'Item 2', sortOrder: 1),
           createTestListItem(id: 'item-3', title: 'Item 3', sortOrder: 2),
         ];
-        final list = createTestList(
-          id: 'list-1',
-          items: items,
-        );
+        final list = createTestList(id: 'list-1', items: items);
 
         // Act
         final result = await repository.create(list);
@@ -625,17 +583,17 @@ void main() {
           title: 'Important item',
           notes: 'This is a detailed note about the item',
         );
-        final list = createTestList(
-          id: 'list-1',
-          items: [item],
-        );
+        final list = createTestList(id: 'list-1', items: [item]);
 
         // Act
         await repository.create(list);
         final result = await repository.getById('list-1');
 
         // Assert
-        expect(result!.items.first.notes, equals('This is a detailed note about the item'));
+        expect(
+          result!.items.first.notes,
+          equals('This is a detailed note about the item'),
+        );
       });
 
       test('progress calculation with checked items', () async {
@@ -702,8 +660,14 @@ void main() {
 
         // Act
         await repository.addItem('list-1', createTestListItem(id: 'item-1'));
-        await repository.addItem('list-1', createTestListItem(id: 'item-2', sortOrder: 1));
-        await repository.addItem('list-1', createTestListItem(id: 'item-3', sortOrder: 2));
+        await repository.addItem(
+          'list-1',
+          createTestListItem(id: 'item-2', sortOrder: 1),
+        );
+        await repository.addItem(
+          'list-1',
+          createTestListItem(id: 'item-3', sortOrder: 2),
+        );
 
         // Assert
         final result = await repository.getById('list-1');
@@ -713,10 +677,7 @@ void main() {
       test('deleteItem on non-existent item does not throw', () async {
         // Arrange
         final item = createTestListItem(id: 'item-1');
-        final list = createTestList(
-          id: 'list-1',
-          items: [item],
-        );
+        final list = createTestList(id: 'list-1', items: [item]);
         await repository.create(list);
 
         // Act
@@ -728,11 +689,7 @@ void main() {
 
       test('ListModel with custom icon', () async {
         // Arrange
-        final list = createTestList(
-          id: 'list-1',
-          name: 'Shopping',
-          icon: '🛒',
-        );
+        final list = createTestList(id: 'list-1', name: 'Shopping', icon: '🛒');
 
         // Act
         final result = await repository.create(list);
@@ -743,9 +700,7 @@ void main() {
 
       test('ListModel with null icon', () async {
         // Arrange
-        final list = createTestList(
-          id: 'list-1',
-        );
+        final list = createTestList(id: 'list-1');
 
         // Act
         final result = await repository.create(list);
@@ -763,25 +718,14 @@ void main() {
         final result = await repository.create(list);
 
         // Assert
-        expect(
-          result.createdAt.difference(now).inSeconds.abs(),
-          lessThan(2),
-        );
-        expect(
-          result.updatedAt.difference(now).inSeconds.abs(),
-          lessThan(2),
-        );
+        expect(result.createdAt.difference(now).inSeconds.abs(), lessThan(2));
+        expect(result.updatedAt.difference(now).inSeconds.abs(), lessThan(2));
       });
 
       test('checkbox toggle is relevant only for checkbox style', () async {
         // Arrange
-        final item = createTestListItem(
-          id: 'item-1',
-        );
-        final list = createTestList(
-          id: 'list-1',
-          items: [item],
-        );
+        final item = createTestListItem(id: 'item-1');
+        final list = createTestList(id: 'list-1', items: [item]);
         await repository.create(list);
 
         // Act - toggle should still work but is semantically for checkboxes
@@ -794,13 +738,8 @@ void main() {
 
       test('ListItem with null notes', () async {
         // Arrange
-        final item = createTestListItem(
-          id: 'item-1',
-        );
-        final list = createTestList(
-          id: 'list-1',
-          items: [item],
-        );
+        final item = createTestListItem(id: 'item-1');
+        final list = createTestList(id: 'list-1', items: [item]);
 
         // Act
         final result = await repository.create(list);
@@ -811,10 +750,7 @@ void main() {
 
       test('clear icon with clearIcon flag', () async {
         // Arrange
-        final list = createTestList(
-          id: 'list-1',
-          icon: '📝',
-        );
+        final list = createTestList(id: 'list-1', icon: '📝');
         await repository.create(list);
 
         // Act

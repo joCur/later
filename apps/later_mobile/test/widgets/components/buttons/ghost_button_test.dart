@@ -9,10 +9,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: GhostButton(
-              text: 'Test Button',
-              onPressed: () {},
-            ),
+            body: GhostButton(text: 'Test Button', onPressed: () {}),
           ),
         ),
       );
@@ -43,15 +40,13 @@ void main() {
       expect(pressed, isTrue);
     });
 
-    testWidgets('renders in disabled state when onPressed is null',
-        (tester) async {
+    testWidgets('renders in disabled state when onPressed is null', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(
-            body: GhostButton(
-              text: 'Disabled Button',
-              onPressed: null,
-            ),
+            body: GhostButton(text: 'Disabled Button', onPressed: null),
           ),
         ),
       );
@@ -60,8 +55,9 @@ void main() {
       expect(button.onPressed, isNull);
     });
 
-    testWidgets('shows loading indicator when isLoading is true',
-        (tester) async {
+    testWidgets('shows loading indicator when isLoading is true', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -99,10 +95,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: GhostButton(
-              text: 'Accessible Button',
-              onPressed: () {},
-            ),
+            body: GhostButton(text: 'Accessible Button', onPressed: () {}),
           ),
         ),
       );
@@ -140,19 +133,18 @@ void main() {
         await tester.pumpWidget(
           MaterialApp(
             home: Scaffold(
-              body: GhostButton(
-                text: 'Test',
-                onPressed: () {},
-              ),
+              body: GhostButton(text: 'Test', onPressed: () {}),
             ),
           ),
         );
 
         final container = tester.widget<Container>(
-          find.descendant(
-            of: find.byType(GhostButton),
-            matching: find.byType(Container),
-          ).first,
+          find
+              .descendant(
+                of: find.byType(GhostButton),
+                matching: find.byType(Container),
+              )
+              .first,
         );
         final decoration = container.decoration as BoxDecoration;
         final borderRadius = decoration.borderRadius as BorderRadius;
@@ -163,10 +155,7 @@ void main() {
         await tester.pumpWidget(
           MaterialApp(
             home: Scaffold(
-              body: GhostButton(
-                text: 'Test',
-                onPressed: () {},
-              ),
+              body: GhostButton(text: 'Test', onPressed: () {}),
             ),
           ),
         );
@@ -198,10 +187,7 @@ void main() {
         await tester.pumpWidget(
           const MaterialApp(
             home: Scaffold(
-              body: GhostButton(
-                text: 'Disabled',
-                onPressed: null,
-              ),
+              body: GhostButton(text: 'Disabled', onPressed: null),
             ),
           ),
         );

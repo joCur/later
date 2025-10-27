@@ -53,7 +53,8 @@ class AppError implements Exception {
       type: ErrorType.storage,
       message: message,
       technicalDetails: details,
-      userMessage: userMessage ??
+      userMessage:
+          userMessage ??
           'Unable to save or load data. Please try again or free up storage space.',
     );
   }
@@ -69,7 +70,8 @@ class AppError implements Exception {
       message: message,
       technicalDetails: details,
       userMessage:
-          userMessage ?? 'Connection failed. Please check your internet connection and try again.',
+          userMessage ??
+          'Connection failed. Please check your internet connection and try again.',
     );
   }
 
@@ -83,7 +85,8 @@ class AppError implements Exception {
       type: ErrorType.validation,
       message: message,
       technicalDetails: details,
-      userMessage: userMessage ?? 'Invalid input. Please check your data and try again.',
+      userMessage:
+          userMessage ?? 'Invalid input. Please check your data and try again.',
     );
   }
 
@@ -98,7 +101,8 @@ class AppError implements Exception {
       message: message,
       technicalDetails: details,
       userMessage:
-          userMessage ?? 'Data is corrupted. You may need to reset and restore from backup.',
+          userMessage ??
+          'Data is corrupted. You may need to reset and restore from backup.',
     );
   }
 
@@ -112,7 +116,8 @@ class AppError implements Exception {
       type: ErrorType.unknown,
       message: message,
       technicalDetails: details,
-      userMessage: userMessage ?? 'An unexpected error occurred. Please try again.',
+      userMessage:
+          userMessage ?? 'An unexpected error occurred. Please try again.',
     );
   }
 
@@ -127,28 +132,19 @@ class AppError implements Exception {
         message.contains('storage') ||
         message.contains('Box') ||
         message.contains('file')) {
-      return AppError.storage(
-        message: message,
-        details: exception.toString(),
-      );
+      return AppError.storage(message: message, details: exception.toString());
     } else if (message.contains('network') ||
         message.contains('connection') ||
         message.contains('timeout') ||
         message.contains('socket')) {
-      return AppError.network(
-        message: message,
-        details: exception.toString(),
-      );
+      return AppError.network(message: message, details: exception.toString());
     } else if (exception is ArgumentError || message.contains('validation')) {
       return AppError.validation(
         message: message,
         details: exception.toString(),
       );
     } else {
-      return AppError.unknown(
-        message: message,
-        details: exception.toString(),
-      );
+      return AppError.unknown(message: message, details: exception.toString());
     }
   }
 

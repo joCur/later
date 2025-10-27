@@ -7,11 +7,7 @@ void main() {
     testWidgets('renders FAB with icon', (tester) async {
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(
-            body: QuickCaptureFab(
-              onPressed: () {},
-            ),
-          ),
+          home: Scaffold(body: QuickCaptureFab(onPressed: () {})),
         ),
       );
 
@@ -43,11 +39,7 @@ void main() {
     testWidgets('has correct size', (tester) async {
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(
-            body: QuickCaptureFab(
-              onPressed: () {},
-            ),
-          ),
+          home: Scaffold(body: QuickCaptureFab(onPressed: () {})),
         ),
       );
 
@@ -67,10 +59,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: QuickCaptureFab(
-              icon: Icons.edit,
-              onPressed: () {},
-            ),
+            body: QuickCaptureFab(icon: Icons.edit, onPressed: () {}),
           ),
         ),
       );
@@ -82,10 +71,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: QuickCaptureFab(
-              label: 'Create',
-              onPressed: () {},
-            ),
+            body: QuickCaptureFab(label: 'Create', onPressed: () {}),
           ),
         ),
       );
@@ -97,10 +83,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: QuickCaptureFab(
-              label: 'Create Item',
-              onPressed: () {},
-            ),
+            body: QuickCaptureFab(label: 'Create Item', onPressed: () {}),
           ),
         ),
       );
@@ -113,10 +96,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: QuickCaptureFab(
-              tooltip: 'Quick Capture',
-              onPressed: () {},
-            ),
+            body: QuickCaptureFab(tooltip: 'Quick Capture', onPressed: () {}),
           ),
         ),
       );
@@ -127,11 +107,7 @@ void main() {
     testWidgets('is disabled when onPressed is null', (tester) async {
       await tester.pumpWidget(
         const MaterialApp(
-          home: Scaffold(
-            body: QuickCaptureFab(
-              onPressed: null,
-            ),
-          ),
+          home: Scaffold(body: QuickCaptureFab(onPressed: null)),
         ),
       );
 
@@ -142,11 +118,7 @@ void main() {
     testWidgets('has hero tag when provided', (tester) async {
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(
-            body: QuickCaptureFab(
-              onPressed: () {},
-            ),
-          ),
+          home: Scaffold(body: QuickCaptureFab(onPressed: () {})),
         ),
       );
 
@@ -156,11 +128,7 @@ void main() {
     testWidgets('has elevation shadow', (tester) async {
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(
-            body: QuickCaptureFab(
-              onPressed: () {},
-            ),
-          ),
+          home: Scaffold(body: QuickCaptureFab(onPressed: () {})),
         ),
       );
 

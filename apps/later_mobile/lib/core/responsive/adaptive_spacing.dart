@@ -100,9 +100,7 @@ class AdaptiveSpacing {
   /// Accounts for safe area on mobile devices
   static EdgeInsets getBottomNavPadding(BuildContext context) {
     final mediaQuery = MediaQuery.of(context);
-    return EdgeInsets.only(
-      bottom: mediaQuery.padding.bottom,
-    );
+    return EdgeInsets.only(bottom: mediaQuery.padding.bottom);
   }
 
   /// Get responsive app bar height
@@ -144,13 +142,15 @@ class AdaptiveSpacing {
 /// Extension on BuildContext for convenient adaptive spacing access
 extension AdaptiveSpacingExtension on BuildContext {
   double get screenPadding => AdaptiveSpacing.getScreenPadding(this);
-  EdgeInsets get screenPaddingInsets => AdaptiveSpacing.getScreenPaddingInsets(this);
+  EdgeInsets get screenPaddingInsets =>
+      AdaptiveSpacing.getScreenPaddingInsets(this);
   EdgeInsets get screenPaddingAll => AdaptiveSpacing.getScreenPaddingAll(this);
   double get gap => AdaptiveSpacing.getGap(this);
   double get sectionSpacing => AdaptiveSpacing.getSectionSpacing(this);
   EdgeInsets get modalPadding => AdaptiveSpacing.getModalPadding(this);
   double get listItemSpacing => AdaptiveSpacing.getListItemSpacing(this);
-  BoxConstraints get contentConstraints => AdaptiveSpacing.getContentConstraints(this);
+  BoxConstraints get contentConstraints =>
+      AdaptiveSpacing.getContentConstraints(this);
   EdgeInsets get bottomNavPadding => AdaptiveSpacing.getBottomNavPadding(this);
   double get appBarHeight => AdaptiveSpacing.getAppBarHeight(this);
   double? get sidebarWidth => AdaptiveSpacing.getSidebarWidth(this);

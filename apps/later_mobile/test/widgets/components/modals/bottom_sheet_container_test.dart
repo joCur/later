@@ -4,16 +4,15 @@ import 'package:later_mobile/design_system/organisms/modals/bottom_sheet_contain
 
 void main() {
   group('BottomSheetContainer', () {
-    testWidgets('renders mobile bottom sheet with drag handle on mobile',
-        (tester) async {
+    testWidgets('renders mobile bottom sheet with drag handle on mobile', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         const MaterialApp(
           home: MediaQuery(
             data: MediaQueryData(size: Size(375, 812)), // Mobile size
             child: Scaffold(
-              body: BottomSheetContainer(
-                child: Text('Test Content'),
-              ),
+              body: BottomSheetContainer(child: Text('Test Content')),
             ),
           ),
         ),
@@ -27,8 +26,9 @@ void main() {
       expect(find.byType(Container), findsWidgets);
     });
 
-    testWidgets('renders mobile bottom sheet with title when provided',
-        (tester) async {
+    testWidgets('renders mobile bottom sheet with title when provided', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         const MaterialApp(
           home: MediaQuery(
@@ -56,9 +56,7 @@ void main() {
           home: MediaQuery(
             data: MediaQueryData(size: Size(1440, 900)), // Desktop size
             child: Scaffold(
-              body: BottomSheetContainer(
-                child: Text('Test Content'),
-              ),
+              body: BottomSheetContainer(child: Text('Test Content')),
             ),
           ),
         ),
@@ -71,8 +69,9 @@ void main() {
       expect(find.byType(Dialog), findsOneWidget);
     });
 
-    testWidgets('renders desktop dialog with title when provided',
-        (tester) async {
+    testWidgets('renders desktop dialog with title when provided', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         const MaterialApp(
           home: MediaQuery(
@@ -97,16 +96,15 @@ void main() {
       expect(find.byType(Dialog), findsOneWidget);
     });
 
-    testWidgets('renders without title when not provided on mobile',
-        (tester) async {
+    testWidgets('renders without title when not provided on mobile', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         const MaterialApp(
           home: MediaQuery(
             data: MediaQueryData(size: Size(375, 812)), // Mobile size
             child: Scaffold(
-              body: BottomSheetContainer(
-                child: Text('Test Content'),
-              ),
+              body: BottomSheetContainer(child: Text('Test Content')),
             ),
           ),
         ),
@@ -119,16 +117,15 @@ void main() {
       expect(find.byType(Text), findsOneWidget); // Only the content text
     });
 
-    testWidgets('renders without title when not provided on desktop',
-        (tester) async {
+    testWidgets('renders without title when not provided on desktop', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         const MaterialApp(
           home: MediaQuery(
             data: MediaQueryData(size: Size(1440, 900)), // Desktop size
             child: Scaffold(
-              body: BottomSheetContainer(
-                child: Text('Test Content'),
-              ),
+              body: BottomSheetContainer(child: Text('Test Content')),
             ),
           ),
         ),
@@ -172,9 +169,7 @@ void main() {
               viewInsets: EdgeInsets.only(bottom: 300), // Keyboard height
             ),
             child: Scaffold(
-              body: BottomSheetContainer(
-                child: Text('Test Content'),
-              ),
+              body: BottomSheetContainer(child: Text('Test Content')),
             ),
           ),
         ),
@@ -194,9 +189,7 @@ void main() {
           home: const MediaQuery(
             data: MediaQueryData(size: Size(375, 812)), // Mobile size
             child: Scaffold(
-              body: BottomSheetContainer(
-                child: Text('Test Content'),
-              ),
+              body: BottomSheetContainer(child: Text('Test Content')),
             ),
           ),
         ),
@@ -213,9 +206,7 @@ void main() {
           home: const MediaQuery(
             data: MediaQueryData(size: Size(375, 812)), // Mobile size
             child: Scaffold(
-              body: BottomSheetContainer(
-                child: Text('Test Content'),
-              ),
+              body: BottomSheetContainer(child: Text('Test Content')),
             ),
           ),
         ),

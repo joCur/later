@@ -79,10 +79,7 @@ void main() {
         final error = AppError.storage(message: 'Test error');
 
         expect(() {
-          ErrorHandler.handleError(
-            error,
-            context: 'ItemsProvider.loadItems',
-          );
+          ErrorHandler.handleError(error, context: 'ItemsProvider.loadItems');
         }, returnsNormally);
       });
     });
@@ -327,8 +324,9 @@ void main() {
         expect(find.text('User message'), findsOneWidget);
       });
 
-      testWidgets('snackbar has action button for retryable errors',
-          (tester) async {
+      testWidgets('snackbar has action button for retryable errors', (
+        tester,
+      ) async {
         final error = AppError.storage(message: 'Test error');
 
         await tester.pumpWidget(

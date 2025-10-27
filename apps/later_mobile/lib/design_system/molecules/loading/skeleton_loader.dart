@@ -2,6 +2,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:later_mobile/design_system/tokens/tokens.dart';
+import 'package:later_mobile/core/theme/temporal_flow_theme.dart';
 
 /// A skeleton loading card that mimics the structure of an ItemCard.
 ///
@@ -17,48 +18,36 @@ class SkeletonItemCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final temporalTheme = Theme.of(context).extension<TemporalFlowTheme>()!;
 
     return Container(
-      decoration: BoxDecoration(
-        color: isDark ? AppColors.glassDark : AppColors.glassLight,
-        borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
-      ),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(
-          sigmaX: AppSpacing.glassBlurRadius,
-          sigmaY: AppSpacing.glassBlurRadius,
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(AppSpacing.md),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Title skeleton
-              _buildShimmerBox(
-                context,
-                height: 20,
-                width: double.infinity,
-              ),
-              const SizedBox(height: AppSpacing.xs),
-              // Content preview skeleton
-              _buildShimmerBox(
-                context,
-                height: 16,
-                width: 200,
-              ),
-              const SizedBox(height: AppSpacing.xs),
-              // Metadata skeleton
-              _buildShimmerBox(
-                context,
-                height: 14,
-                width: 120,
-              ),
-            ],
+          decoration: BoxDecoration(
+            color: temporalTheme.glassBackground,
+            borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
           ),
-        ),
-      ),
-    )
+          child: BackdropFilter(
+            filter: ImageFilter.blur(
+              sigmaX: AppSpacing.glassBlurRadius,
+              sigmaY: AppSpacing.glassBlurRadius,
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(AppSpacing.md),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Title skeleton
+                  _buildShimmerBox(context, height: 20, width: double.infinity),
+                  const SizedBox(height: AppSpacing.xs),
+                  // Content preview skeleton
+                  _buildShimmerBox(context, height: 16, width: 200),
+                  const SizedBox(height: AppSpacing.xs),
+                  // Metadata skeleton
+                  _buildShimmerBox(context, height: 14, width: 120),
+                ],
+              ),
+            ),
+          ),
+        )
         .animate()
         .fadeIn(duration: AppAnimations.quick)
         .shimmer(
@@ -101,11 +90,7 @@ class SkeletonItemCard extends StatelessWidget {
 ///
 /// Used for list loading states with multiple items.
 class SkeletonListView extends StatelessWidget {
-  const SkeletonListView({
-    super.key,
-    this.itemCount = 3,
-    this.padding,
-  });
+  const SkeletonListView({super.key, this.itemCount = 3, this.padding});
 
   /// Number of skeleton cards to display.
   final int itemCount;
@@ -118,9 +103,8 @@ class SkeletonListView extends StatelessWidget {
     return ListView.separated(
       padding: padding ?? const EdgeInsets.all(AppSpacing.md),
       itemCount: itemCount,
-      separatorBuilder: (context, index) => const SizedBox(
-        height: AppSpacing.sm,
-      ),
+      separatorBuilder: (context, index) =>
+          const SizedBox(height: AppSpacing.sm),
       itemBuilder: (context, index) {
         return const SkeletonItemCard();
       },
@@ -142,7 +126,7 @@ class SkeletonDetailView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final temporalTheme = Theme.of(context).extension<TemporalFlowTheme>()!;
 
     return SingleChildScrollView(
       child: Column(
@@ -156,8 +140,12 @@ class SkeletonDetailView extends StatelessWidget {
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
                 colors: [
-                  AppColors.primaryStart.withValues(alpha: 0.3),
-                  AppColors.primaryEnd.withValues(alpha: 0.3),
+                  temporalTheme.primaryGradient.colors[0].withValues(
+                    alpha: 0.3,
+                  ),
+                  temporalTheme.primaryGradient.colors[1].withValues(
+                    alpha: 0.3,
+                  ),
                 ],
               ),
             ),
@@ -167,17 +155,9 @@ class SkeletonDetailView extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  _buildShimmerBox(
-                    context,
-                    height: 28,
-                    width: 250,
-                  ),
+                  _buildShimmerBox(context, height: 28, width: 250),
                   const SizedBox(height: AppSpacing.sm),
-                  _buildShimmerBox(
-                    context,
-                    height: 16,
-                    width: 150,
-                  ),
+                  _buildShimmerBox(context, height: 16, width: 150),
                 ],
               ),
             ),
@@ -191,7 +171,7 @@ class SkeletonDetailView extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(AppSpacing.md),
                   decoration: BoxDecoration(
-                    color: isDark ? AppColors.glassDark : AppColors.glassLight,
+                    color: temporalTheme.glassBackground,
                     borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
                   ),
                   child: BackdropFilter(
@@ -202,9 +182,17 @@ class SkeletonDetailView extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _buildShimmerBox(context, height: 20, width: double.infinity),
+                        _buildShimmerBox(
+                          context,
+                          height: 20,
+                          width: double.infinity,
+                        ),
                         const SizedBox(height: AppSpacing.sm),
-                        _buildShimmerBox(context, height: 16, width: double.infinity),
+                        _buildShimmerBox(
+                          context,
+                          height: 16,
+                          width: double.infinity,
+                        ),
                         const SizedBox(height: AppSpacing.xs),
                         _buildShimmerBox(context, height: 16, width: 300),
                         const SizedBox(height: AppSpacing.xs),
@@ -264,12 +252,10 @@ class SkeletonSidebar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final temporalTheme = Theme.of(context).extension<TemporalFlowTheme>()!;
 
     return Container(
-      decoration: BoxDecoration(
-        color: isDark ? AppColors.glassDark : AppColors.glassLight,
-      ),
+      decoration: BoxDecoration(color: temporalTheme.glassBackground),
       child: BackdropFilter(
         filter: ImageFilter.blur(
           sigmaX: AppSpacing.glassBlurRadius,
@@ -286,19 +272,19 @@ class SkeletonSidebar extends StatelessWidget {
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [
-                    AppColors.primaryStart.withValues(alpha: 0.1),
-                    AppColors.primaryEnd.withValues(alpha: 0.05),
+                    temporalTheme.primaryGradient.colors[0].withValues(
+                      alpha: 0.1,
+                    ),
+                    temporalTheme.primaryGradient.colors[1].withValues(
+                      alpha: 0.05,
+                    ),
                   ],
                 ),
               ),
               padding: const EdgeInsets.all(AppSpacing.lg),
               child: Align(
                 alignment: Alignment.bottomLeft,
-                child: _buildShimmerBox(
-                  context,
-                  height: 24,
-                  width: 150,
-                ),
+                child: _buildShimmerBox(context, height: 24, width: 150),
               ),
             ),
             // Space items

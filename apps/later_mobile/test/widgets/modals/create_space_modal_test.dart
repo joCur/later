@@ -22,10 +22,7 @@ void main() {
     spacesProvider = SpacesProvider(mockRepository);
   });
 
-  Widget createTestWidget({
-    required Widget child,
-    bool isDark = false,
-  }) {
+  Widget createTestWidget({required Widget child, bool isDark = false}) {
     return MaterialApp(
       theme: ThemeData.light(),
       darkTheme: ThemeData.dark(),
@@ -40,8 +37,9 @@ void main() {
   }
 
   group('CreateSpaceModal - Rendering', () {
-    testWidgets('should render in create mode with correct title',
-        (WidgetTester tester) async {
+    testWidgets('should render in create mode with correct title', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         createTestWidget(
           child: const CreateSpaceModal(mode: SpaceModalMode.create),
@@ -53,8 +51,9 @@ void main() {
       expect(find.text('Create'), findsOneWidget);
     });
 
-    testWidgets('should render in edit mode with correct title',
-        (WidgetTester tester) async {
+    testWidgets('should render in edit mode with correct title', (
+      WidgetTester tester,
+    ) async {
       final existingSpace = Space(
         id: 'space-1',
         name: 'Work',
@@ -99,8 +98,9 @@ void main() {
       expect(find.text('Create'), findsOneWidget);
     });
 
-    testWidgets('should render icon picker with emoji grid',
-        (WidgetTester tester) async {
+    testWidgets('should render icon picker with emoji grid', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         createTestWidget(
           child: const CreateSpaceModal(mode: SpaceModalMode.create),
@@ -115,8 +115,9 @@ void main() {
       expect(find.text('💡'), findsOneWidget);
     });
 
-    testWidgets('should render color picker with color swatches',
-        (WidgetTester tester) async {
+    testWidgets('should render color picker with color swatches', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         createTestWidget(
           child: const CreateSpaceModal(mode: SpaceModalMode.create),
@@ -134,8 +135,9 @@ void main() {
       expect(colorSwatches, findsWidgets);
     });
 
-    testWidgets('should pre-fill form in edit mode',
-        (WidgetTester tester) async {
+    testWidgets('should pre-fill form in edit mode', (
+      WidgetTester tester,
+    ) async {
       final existingSpace = Space(
         id: 'space-1',
         name: 'Work',
@@ -163,8 +165,9 @@ void main() {
   });
 
   group('CreateSpaceModal - Form Validation', () {
-    testWidgets('should show error when name is empty',
-        (WidgetTester tester) async {
+    testWidgets('should show error when name is empty', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         createTestWidget(
           child: const CreateSpaceModal(mode: SpaceModalMode.create),
@@ -178,16 +181,14 @@ void main() {
 
       // Button should be disabled initially
       final button = tester.widget<ElevatedButton>(
-        find.ancestor(
-          of: createButton,
-          matching: find.byType(ElevatedButton),
-        ),
+        find.ancestor(of: createButton, matching: find.byType(ElevatedButton)),
       );
       expect(button.onPressed, isNull);
     });
 
-    testWidgets('should enable button when name is valid',
-        (WidgetTester tester) async {
+    testWidgets('should enable button when name is valid', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         createTestWidget(
           child: const CreateSpaceModal(mode: SpaceModalMode.create),
@@ -202,16 +203,14 @@ void main() {
       // Button should be enabled
       final createButton = find.text('Create');
       final button = tester.widget<ElevatedButton>(
-        find.ancestor(
-          of: createButton,
-          matching: find.byType(ElevatedButton),
-        ),
+        find.ancestor(of: createButton, matching: find.byType(ElevatedButton)),
       );
       expect(button.onPressed, isNotNull);
     });
 
-    testWidgets('should show error when name is too long',
-        (WidgetTester tester) async {
+    testWidgets('should show error when name is too long', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         createTestWidget(
           child: const CreateSpaceModal(mode: SpaceModalMode.create),
@@ -225,16 +224,15 @@ void main() {
       await tester.pumpAndSettle();
 
       // Should show error message
-      expect(find.text('Name must be between 1 and 100 characters'),
-          findsOneWidget);
+      expect(
+        find.text('Name must be between 1 and 100 characters'),
+        findsOneWidget,
+      );
 
       // Button should be disabled
       final createButton = find.text('Create');
       final button = tester.widget<ElevatedButton>(
-        find.ancestor(
-          of: createButton,
-          matching: find.byType(ElevatedButton),
-        ),
+        find.ancestor(of: createButton, matching: find.byType(ElevatedButton)),
       );
       expect(button.onPressed, isNull);
     });
@@ -255,16 +253,16 @@ void main() {
       expect(find.textContaining('/100'), findsOneWidget);
     });
 
-    testWidgets('should trim whitespace from name',
-        (WidgetTester tester) async {
+    testWidgets('should trim whitespace from name', (
+      WidgetTester tester,
+    ) async {
       final newSpace = Space(
         id: 'space-1',
         name: 'Work',
         icon: '💼',
         color: '#6366F1',
       );
-      when(mockRepository.createSpace(any))
-          .thenAnswer((_) async => newSpace);
+      when(mockRepository.createSpace(any)).thenAnswer((_) async => newSpace);
 
       await tester.pumpWidget(
         createTestWidget(
@@ -286,9 +284,11 @@ void main() {
       await tester.pumpAndSettle();
 
       // Verify trimmed name was used
-      verify(mockRepository.createSpace(
-        argThat(predicate<Space>((space) => space.name == 'Work')),
-      )).called(1);
+      verify(
+        mockRepository.createSpace(
+          argThat(predicate<Space>((space) => space.name == 'Work')),
+        ),
+      ).called(1);
     });
   });
 
@@ -309,8 +309,9 @@ void main() {
       expect(find.byIcon(Icons.check), findsOneWidget);
     });
 
-    testWidgets('should allow changing icon selection',
-        (WidgetTester tester) async {
+    testWidgets('should allow changing icon selection', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         createTestWidget(
           child: const CreateSpaceModal(mode: SpaceModalMode.create),
@@ -330,15 +331,11 @@ void main() {
       expect(find.byIcon(Icons.check), findsOneWidget);
     });
 
-    testWidgets('should use default folder icon if none selected',
-        (WidgetTester tester) async {
-      final newSpace = Space(
-        id: 'space-1',
-        name: 'Work',
-        color: '#6366F1',
-      );
-      when(mockRepository.createSpace(any))
-          .thenAnswer((_) async => newSpace);
+    testWidgets('should use default folder icon if none selected', (
+      WidgetTester tester,
+    ) async {
+      final newSpace = Space(id: 'space-1', name: 'Work', color: '#6366F1');
+      when(mockRepository.createSpace(any)).thenAnswer((_) async => newSpace);
 
       await tester.pumpWidget(
         createTestWidget(
@@ -356,15 +353,16 @@ void main() {
       await tester.pumpAndSettle();
 
       // Verify null icon was used
-      verify(mockRepository.createSpace(
-        argThat(predicate<Space>((space) => space.icon == null)),
-      )).called(1);
+      verify(
+        mockRepository.createSpace(
+          argThat(predicate<Space>((space) => space.icon == null)),
+        ),
+      ).called(1);
     });
   });
 
   group('CreateSpaceModal - Color Selection', () {
-    testWidgets('should select color when tapped',
-        (WidgetTester tester) async {
+    testWidgets('should select color when tapped', (WidgetTester tester) async {
       await tester.pumpWidget(
         createTestWidget(
           child: const CreateSpaceModal(mode: SpaceModalMode.create),
@@ -388,16 +386,16 @@ void main() {
       expect(find.byIcon(Icons.check), findsOneWidget);
     });
 
-    testWidgets('should use default primary color if none selected',
-        (WidgetTester tester) async {
+    testWidgets('should use default primary color if none selected', (
+      WidgetTester tester,
+    ) async {
       final newSpace = Space(
         id: 'space-1',
         name: 'Work',
         icon: '💼',
         color: '#6366F1',
       );
-      when(mockRepository.createSpace(any))
-          .thenAnswer((_) async => newSpace);
+      when(mockRepository.createSpace(any)).thenAnswer((_) async => newSpace);
 
       await tester.pumpWidget(
         createTestWidget(
@@ -415,23 +413,25 @@ void main() {
       await tester.pumpAndSettle();
 
       // Verify default color was used
-      verify(mockRepository.createSpace(
-        argThat(predicate<Space>((space) => space.color == '#6366F1')),
-      )).called(1);
+      verify(
+        mockRepository.createSpace(
+          argThat(predicate<Space>((space) => space.color == '#6366F1')),
+        ),
+      ).called(1);
     });
   });
 
   group('CreateSpaceModal - Create Mode', () {
-    testWidgets('should create new space successfully',
-        (WidgetTester tester) async {
+    testWidgets('should create new space successfully', (
+      WidgetTester tester,
+    ) async {
       final newSpace = Space(
         id: 'space-1',
         name: 'Work',
         icon: '💼',
         color: '#6366F1',
       );
-      when(mockRepository.createSpace(any))
-          .thenAnswer((_) async => newSpace);
+      when(mockRepository.createSpace(any)).thenAnswer((_) async => newSpace);
 
       await tester.pumpWidget(
         createTestWidget(
@@ -456,16 +456,16 @@ void main() {
       verify(mockRepository.createSpace(any)).called(1);
     });
 
-    testWidgets('should generate unique UUID for new space',
-        (WidgetTester tester) async {
+    testWidgets('should generate unique UUID for new space', (
+      WidgetTester tester,
+    ) async {
       final newSpace = Space(
         id: 'unique-uuid',
         name: 'Work',
         icon: '💼',
         color: '#6366F1',
       );
-      when(mockRepository.createSpace(any))
-          .thenAnswer((_) async => newSpace);
+      when(mockRepository.createSpace(any)).thenAnswer((_) async => newSpace);
 
       await tester.pumpWidget(
         createTestWidget(
@@ -483,21 +483,23 @@ void main() {
       await tester.pumpAndSettle();
 
       // Verify UUID was generated (not empty)
-      verify(mockRepository.createSpace(
-        argThat(predicate<Space>((space) => space.id.isNotEmpty)),
-      )).called(1);
+      verify(
+        mockRepository.createSpace(
+          argThat(predicate<Space>((space) => space.id.isNotEmpty)),
+        ),
+      ).called(1);
     });
 
-    testWidgets('should auto-switch to newly created space',
-        (WidgetTester tester) async {
+    testWidgets('should auto-switch to newly created space', (
+      WidgetTester tester,
+    ) async {
       final newSpace = Space(
         id: 'space-1',
         name: 'Work',
         icon: '💼',
         color: '#6366F1',
       );
-      when(mockRepository.createSpace(any))
-          .thenAnswer((_) async => newSpace);
+      when(mockRepository.createSpace(any)).thenAnswer((_) async => newSpace);
 
       await tester.pumpWidget(
         createTestWidget(
@@ -518,16 +520,16 @@ void main() {
       expect(spacesProvider.currentSpace?.id, 'space-1');
     });
 
-    testWidgets('should close modal after successful creation',
-        (WidgetTester tester) async {
+    testWidgets('should close modal after successful creation', (
+      WidgetTester tester,
+    ) async {
       final newSpace = Space(
         id: 'space-1',
         name: 'Work',
         icon: '💼',
         color: '#6366F1',
       );
-      when(mockRepository.createSpace(any))
-          .thenAnswer((_) async => newSpace);
+      when(mockRepository.createSpace(any)).thenAnswer((_) async => newSpace);
 
       bool modalClosed = false;
       await tester.pumpWidget(
@@ -537,9 +539,7 @@ void main() {
               onPressed: () async {
                 final result = await ResponsiveModal.show<bool>(
                   context: context,
-                  child: const CreateSpaceModal(
-                    mode: SpaceModalMode.create,
-                  ),
+                  child: const CreateSpaceModal(mode: SpaceModalMode.create),
                 );
                 modalClosed = result == true;
               },
@@ -567,10 +567,12 @@ void main() {
       expect(modalClosed, isTrue);
     });
 
-    testWidgets('should show error snackbar on creation failure',
-        (WidgetTester tester) async {
-      when(mockRepository.createSpace(any))
-          .thenThrow(Exception('Failed to create space'));
+    testWidgets('should show error snackbar on creation failure', (
+      WidgetTester tester,
+    ) async {
+      when(
+        mockRepository.createSpace(any),
+      ).thenThrow(Exception('Failed to create space'));
 
       await tester.pumpWidget(
         createTestWidget(
@@ -595,8 +597,9 @@ void main() {
   });
 
   group('CreateSpaceModal - Edit Mode', () {
-    testWidgets('should update existing space successfully',
-        (WidgetTester tester) async {
+    testWidgets('should update existing space successfully', (
+      WidgetTester tester,
+    ) async {
       final existingSpace = Space(
         id: 'space-1',
         name: 'Work',
@@ -604,8 +607,9 @@ void main() {
         color: '#6366F1',
       );
       final updatedSpace = existingSpace.copyWith(name: 'Updated Work');
-      when(mockRepository.updateSpace(any))
-          .thenAnswer((_) async => updatedSpace);
+      when(
+        mockRepository.updateSpace(any),
+      ).thenAnswer((_) async => updatedSpace);
 
       await tester.pumpWidget(
         createTestWidget(
@@ -629,8 +633,9 @@ void main() {
       verify(mockRepository.updateSpace(any)).called(1);
     });
 
-    testWidgets('should preserve space ID in edit mode',
-        (WidgetTester tester) async {
+    testWidgets('should preserve space ID in edit mode', (
+      WidgetTester tester,
+    ) async {
       final existingSpace = Space(
         id: 'space-1',
         name: 'Work',
@@ -638,8 +643,9 @@ void main() {
         color: '#6366F1',
       );
       final updatedSpace = existingSpace.copyWith(name: 'Updated Work');
-      when(mockRepository.updateSpace(any))
-          .thenAnswer((_) async => updatedSpace);
+      when(
+        mockRepository.updateSpace(any),
+      ).thenAnswer((_) async => updatedSpace);
 
       await tester.pumpWidget(
         createTestWidget(
@@ -660,13 +666,16 @@ void main() {
       await tester.pumpAndSettle();
 
       // Verify ID was preserved
-      verify(mockRepository.updateSpace(
-        argThat(predicate<Space>((space) => space.id == 'space-1')),
-      )).called(1);
+      verify(
+        mockRepository.updateSpace(
+          argThat(predicate<Space>((space) => space.id == 'space-1')),
+        ),
+      ).called(1);
     });
 
-    testWidgets('should close modal after successful update',
-        (WidgetTester tester) async {
+    testWidgets('should close modal after successful update', (
+      WidgetTester tester,
+    ) async {
       final existingSpace = Space(
         id: 'space-1',
         name: 'Work',
@@ -674,8 +683,9 @@ void main() {
         color: '#6366F1',
       );
       final updatedSpace = existingSpace.copyWith(name: 'Updated Work');
-      when(mockRepository.updateSpace(any))
-          .thenAnswer((_) async => updatedSpace);
+      when(
+        mockRepository.updateSpace(any),
+      ).thenAnswer((_) async => updatedSpace);
 
       bool modalClosed = false;
       await tester.pumpWidget(
@@ -716,16 +726,18 @@ void main() {
       expect(modalClosed, isTrue);
     });
 
-    testWidgets('should show error snackbar on update failure',
-        (WidgetTester tester) async {
+    testWidgets('should show error snackbar on update failure', (
+      WidgetTester tester,
+    ) async {
       final existingSpace = Space(
         id: 'space-1',
         name: 'Work',
         icon: '💼',
         color: '#6366F1',
       );
-      when(mockRepository.updateSpace(any))
-          .thenThrow(Exception('Failed to update space'));
+      when(
+        mockRepository.updateSpace(any),
+      ).thenThrow(Exception('Failed to update space'));
 
       await tester.pumpWidget(
         createTestWidget(
@@ -753,8 +765,9 @@ void main() {
   });
 
   group('CreateSpaceModal - User Interaction', () {
-    testWidgets('should close modal when Cancel button is tapped',
-        (WidgetTester tester) async {
+    testWidgets('should close modal when Cancel button is tapped', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         createTestWidget(
           child: Builder(
@@ -762,9 +775,7 @@ void main() {
               onPressed: () async {
                 await ResponsiveModal.show<bool>(
                   context: context,
-                  child: const CreateSpaceModal(
-                    mode: SpaceModalMode.create,
-                  ),
+                  child: const CreateSpaceModal(mode: SpaceModalMode.create),
                 );
               },
               child: const Text('Open Modal'),
@@ -786,8 +797,9 @@ void main() {
       expect(find.text('Create Space'), findsNothing);
     });
 
-    testWidgets('should close modal when close button is tapped',
-        (WidgetTester tester) async {
+    testWidgets('should close modal when close button is tapped', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         createTestWidget(
           child: Builder(
@@ -795,9 +807,7 @@ void main() {
               onPressed: () async {
                 await ResponsiveModal.show<bool>(
                   context: context,
-                  child: const CreateSpaceModal(
-                    mode: SpaceModalMode.create,
-                  ),
+                  child: const CreateSpaceModal(mode: SpaceModalMode.create),
                 );
               },
               child: const Text('Open Modal'),
@@ -819,8 +829,9 @@ void main() {
       expect(find.text('Create Space'), findsNothing);
     });
 
-    testWidgets('should close modal on Escape key press',
-        (WidgetTester tester) async {
+    testWidgets('should close modal on Escape key press', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         createTestWidget(
           child: const CreateSpaceModal(mode: SpaceModalMode.create),
@@ -838,8 +849,9 @@ void main() {
   });
 
   group('CreateSpaceModal - Accessibility', () {
-    testWidgets('should have semantic labels for all interactive elements',
-        (WidgetTester tester) async {
+    testWidgets('should have semantic labels for all interactive elements', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         createTestWidget(
           child: const CreateSpaceModal(mode: SpaceModalMode.create),
@@ -849,21 +861,24 @@ void main() {
 
       // Check for semantic labels (Semantics widget wraps TextField)
       expect(
-        find.byWidgetPredicate((widget) =>
-            widget is Semantics &&
-            widget.properties.label == 'Space Name'),
+        find.byWidgetPredicate(
+          (widget) =>
+              widget is Semantics && widget.properties.label == 'Space Name',
+        ),
         findsOneWidget,
       );
       expect(
-        find.byWidgetPredicate((widget) =>
-            widget is Semantics &&
-            widget.properties.label == 'Cancel'),
+        find.byWidgetPredicate(
+          (widget) =>
+              widget is Semantics && widget.properties.label == 'Cancel',
+        ),
         findsOneWidget,
       );
     });
 
-    testWidgets('should have minimum touch target size',
-        (WidgetTester tester) async {
+    testWidgets('should have minimum touch target size', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         createTestWidget(
           child: const CreateSpaceModal(mode: SpaceModalMode.create),
@@ -881,8 +896,9 @@ void main() {
   });
 
   group('CreateSpaceModal - Responsive Layout', () {
-    testWidgets('should render as bottom sheet on mobile',
-        (WidgetTester tester) async {
+    testWidgets('should render as bottom sheet on mobile', (
+      WidgetTester tester,
+    ) async {
       // Set mobile size
       tester.view.physicalSize = const Size(375, 667);
       tester.view.devicePixelRatio = 1.0;
@@ -895,9 +911,7 @@ void main() {
               onPressed: () async {
                 await ResponsiveModal.show<bool>(
                   context: context,
-                  child: const CreateSpaceModal(
-                    mode: SpaceModalMode.create,
-                  ),
+                  child: const CreateSpaceModal(mode: SpaceModalMode.create),
                 );
               },
               child: const Text('Open Modal'),
@@ -915,8 +929,9 @@ void main() {
       expect(find.text('Create Space'), findsOneWidget);
     });
 
-    testWidgets('should render as dialog on desktop',
-        (WidgetTester tester) async {
+    testWidgets('should render as dialog on desktop', (
+      WidgetTester tester,
+    ) async {
       // Set desktop size
       tester.view.physicalSize = const Size(1920, 1080);
       tester.view.devicePixelRatio = 1.0;
@@ -929,9 +944,7 @@ void main() {
               onPressed: () async {
                 await ResponsiveModal.show<bool>(
                   context: context,
-                  child: const CreateSpaceModal(
-                    mode: SpaceModalMode.create,
-                  ),
+                  child: const CreateSpaceModal(mode: SpaceModalMode.create),
                 );
               },
               child: const Text('Open Modal'),

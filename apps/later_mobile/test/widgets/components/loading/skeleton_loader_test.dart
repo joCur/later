@@ -7,11 +7,7 @@ void main() {
   group('SkeletonItemCard', () {
     testWidgets('renders successfully', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: SkeletonItemCard(),
-          ),
-        ),
+        const MaterialApp(home: Scaffold(body: SkeletonItemCard())),
       );
 
       await tester.pumpAndSettle();
@@ -22,18 +18,12 @@ void main() {
 
     testWidgets('applies correct border radius', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: SkeletonItemCard(),
-          ),
-        ),
+        const MaterialApp(home: Scaffold(body: SkeletonItemCard())),
       );
 
       await tester.pumpAndSettle();
 
-      final container = tester.widget<Container>(
-        find.byType(Container).first,
-      );
+      final container = tester.widget<Container>(find.byType(Container).first);
 
       final decoration = container.decoration as BoxDecoration;
       final borderRadius = decoration.borderRadius as BorderRadius;
@@ -43,11 +33,7 @@ void main() {
 
     testWidgets('contains multiple shimmer boxes for content', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: SkeletonItemCard(),
-          ),
-        ),
+        const MaterialApp(home: Scaffold(body: SkeletonItemCard())),
       );
 
       await tester.pumpAndSettle();
@@ -60,9 +46,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           theme: ThemeData.light(),
-          home: const Scaffold(
-            body: SkeletonItemCard(),
-          ),
+          home: const Scaffold(body: SkeletonItemCard()),
         ),
       );
 
@@ -75,9 +59,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           theme: ThemeData.dark(),
-          home: const Scaffold(
-            body: SkeletonItemCard(),
-          ),
+          home: const Scaffold(body: SkeletonItemCard()),
         ),
       );
 
@@ -88,18 +70,12 @@ void main() {
 
     testWidgets('has proper padding', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: SkeletonItemCard(),
-          ),
-        ),
+        const MaterialApp(home: Scaffold(body: SkeletonItemCard())),
       );
 
       await tester.pumpAndSettle();
 
-      final padding = tester.widget<Padding>(
-        find.byType(Padding).first,
-      );
+      final padding = tester.widget<Padding>(find.byType(Padding).first);
 
       expect(padding.padding, const EdgeInsets.all(AppSpacing.md));
     });
@@ -111,9 +87,7 @@ void main() {
 
       await tester.pumpWidget(
         const MaterialApp(
-          home: Scaffold(
-            body: SkeletonListView(itemCount: itemCount),
-          ),
+          home: Scaffold(body: SkeletonListView(itemCount: itemCount)),
         ),
       );
 
@@ -124,11 +98,7 @@ void main() {
 
     testWidgets('uses default item count of 3', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: SkeletonListView(),
-          ),
-        ),
+        const MaterialApp(home: Scaffold(body: SkeletonListView())),
       );
 
       await tester.pumpAndSettle();
@@ -138,11 +108,7 @@ void main() {
 
     testWidgets('has proper spacing between items', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: SkeletonListView(),
-          ),
-        ),
+        const MaterialApp(home: Scaffold(body: SkeletonListView())),
       );
 
       await tester.pumpAndSettle();
@@ -156,9 +122,7 @@ void main() {
     testWidgets('is scrollable', (tester) async {
       await tester.pumpWidget(
         const MaterialApp(
-          home: Scaffold(
-            body: SkeletonListView(itemCount: 10),
-          ),
+          home: Scaffold(body: SkeletonListView(itemCount: 10)),
         ),
       );
 
@@ -171,11 +135,7 @@ void main() {
     testWidgets('renders with custom padding', (tester) async {
       await tester.pumpWidget(
         const MaterialApp(
-          home: Scaffold(
-            body: SkeletonListView(
-              padding: EdgeInsets.all(24.0),
-            ),
-          ),
+          home: Scaffold(body: SkeletonListView(padding: EdgeInsets.all(24.0))),
         ),
       );
 
@@ -188,11 +148,7 @@ void main() {
   group('SkeletonDetailView', () {
     testWidgets('renders skeleton detail view', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: SkeletonDetailView(),
-          ),
-        ),
+        const MaterialApp(home: Scaffold(body: SkeletonDetailView())),
       );
 
       await tester.pumpAndSettle();
@@ -202,11 +158,7 @@ void main() {
 
     testWidgets('has header section skeleton', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: SkeletonDetailView(),
-          ),
-        ),
+        const MaterialApp(home: Scaffold(body: SkeletonDetailView())),
       );
 
       await tester.pumpAndSettle();
@@ -217,11 +169,7 @@ void main() {
 
     testWidgets('has content section skeleton', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: SkeletonDetailView(),
-          ),
-        ),
+        const MaterialApp(home: Scaffold(body: SkeletonDetailView())),
       );
 
       await tester.pumpAndSettle();
@@ -233,11 +181,7 @@ void main() {
   group('SkeletonSidebar', () {
     testWidgets('renders skeleton sidebar', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: SkeletonSidebar(),
-          ),
-        ),
+        const MaterialApp(home: Scaffold(body: SkeletonSidebar())),
       );
 
       await tester.pumpAndSettle();
@@ -247,11 +191,7 @@ void main() {
 
     testWidgets('has multiple space item skeletons', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: SkeletonSidebar(),
-          ),
-        ),
+        const MaterialApp(home: Scaffold(body: SkeletonSidebar())),
       );
 
       await tester.pumpAndSettle();
@@ -262,11 +202,7 @@ void main() {
 
     testWidgets('renders with glass morphism', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: SkeletonSidebar(),
-          ),
-        ),
+        const MaterialApp(home: Scaffold(body: SkeletonSidebar())),
       );
 
       await tester.pumpAndSettle();

@@ -15,13 +15,12 @@ void main() {
 
       // Mock HapticFeedback channel
       TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
-          .setMockMethodCallHandler(
-        SystemChannels.platform,
-        (MethodCall methodCall) async {
-          methodCalls.add(methodCall);
-          return null;
-        },
-      );
+          .setMockMethodCallHandler(SystemChannels.platform, (
+            MethodCall methodCall,
+          ) async {
+            methodCalls.add(methodCall);
+            return null;
+          });
     });
 
     tearDown(() {
@@ -31,35 +30,50 @@ void main() {
     });
 
     group('Basic Haptic Methods', () {
-      test('lightHaptic should call HapticFeedback.lightImpact when supported', () async {
-        // Note: On non-mobile platforms, haptics won't trigger
-        // This test verifies the method executes without error
-        await AppAnimations.lightHaptic();
+      test(
+        'lightHaptic should call HapticFeedback.lightImpact when supported',
+        () async {
+          // Note: On non-mobile platforms, haptics won't trigger
+          // This test verifies the method executes without error
+          await AppAnimations.lightHaptic();
 
-        // On mobile platforms, this would be called
-        // On desktop, it gracefully does nothing
-        expect(() => AppAnimations.lightHaptic(), returnsNormally);
-      });
+          // On mobile platforms, this would be called
+          // On desktop, it gracefully does nothing
+          expect(() => AppAnimations.lightHaptic(), returnsNormally);
+        },
+      );
 
-      test('mediumHaptic should call HapticFeedback.mediumImpact when supported', () async {
-        await AppAnimations.mediumHaptic();
-        expect(() => AppAnimations.mediumHaptic(), returnsNormally);
-      });
+      test(
+        'mediumHaptic should call HapticFeedback.mediumImpact when supported',
+        () async {
+          await AppAnimations.mediumHaptic();
+          expect(() => AppAnimations.mediumHaptic(), returnsNormally);
+        },
+      );
 
-      test('heavyHaptic should call HapticFeedback.heavyImpact when supported', () async {
-        await AppAnimations.heavyHaptic();
-        expect(() => AppAnimations.heavyHaptic(), returnsNormally);
-      });
+      test(
+        'heavyHaptic should call HapticFeedback.heavyImpact when supported',
+        () async {
+          await AppAnimations.heavyHaptic();
+          expect(() => AppAnimations.heavyHaptic(), returnsNormally);
+        },
+      );
 
-      test('selectionHaptic should call HapticFeedback.selectionClick when supported', () async {
-        await AppAnimations.selectionHaptic();
-        expect(() => AppAnimations.selectionHaptic(), returnsNormally);
-      });
+      test(
+        'selectionHaptic should call HapticFeedback.selectionClick when supported',
+        () async {
+          await AppAnimations.selectionHaptic();
+          expect(() => AppAnimations.selectionHaptic(), returnsNormally);
+        },
+      );
 
-      test('warningHaptic should call HapticFeedback.vibrate when supported', () async {
-        await AppAnimations.warningHaptic();
-        expect(() => AppAnimations.warningHaptic(), returnsNormally);
-      });
+      test(
+        'warningHaptic should call HapticFeedback.vibrate when supported',
+        () async {
+          await AppAnimations.warningHaptic();
+          expect(() => AppAnimations.warningHaptic(), returnsNormally);
+        },
+      );
     });
 
     group('Platform Support Detection', () {
@@ -74,31 +88,37 @@ void main() {
     });
 
     group('Conditional Haptic Execution', () {
-      test('conditionalHaptic should execute callback on supported platforms', () async {
-        int callCount = 0;
+      test(
+        'conditionalHaptic should execute callback on supported platforms',
+        () async {
+          int callCount = 0;
 
-        await AppAnimations.conditionalHaptic(() async {
-          callCount++;
-        });
+          await AppAnimations.conditionalHaptic(() async {
+            callCount++;
+          });
 
-        // Should execute if platform supports haptics
-        if (AppAnimations.supportsHaptics()) {
-          expect(callCount, equals(1));
-        } else {
-          // On unsupported platforms, callback is not executed
-          expect(callCount, equals(0));
-        }
-      });
+          // Should execute if platform supports haptics
+          if (AppAnimations.supportsHaptics()) {
+            expect(callCount, equals(1));
+          } else {
+            // On unsupported platforms, callback is not executed
+            expect(callCount, equals(0));
+          }
+        },
+      );
 
-      test('conditionalHaptic should not fail on unsupported platforms', () async {
-        // This should not throw even if haptics are unsupported
-        expect(
-          () async => await AppAnimations.conditionalHaptic(() async {
-            await AppAnimations.lightHaptic();
-          }),
-          returnsNormally,
-        );
-      });
+      test(
+        'conditionalHaptic should not fail on unsupported platforms',
+        () async {
+          // This should not throw even if haptics are unsupported
+          expect(
+            () async => await AppAnimations.conditionalHaptic(() async {
+              await AppAnimations.lightHaptic();
+            }),
+            returnsNormally,
+          );
+        },
+      );
     });
 
     group('Haptic Method Call Order', () {
@@ -122,19 +142,24 @@ void main() {
       test('haptic methods should not throw on platform errors', () async {
         // Override mock to simulate error
         TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
-            .setMockMethodCallHandler(
-          SystemChannels.platform,
-          (MethodCall methodCall) async {
-            throw PlatformException(code: 'UNAVAILABLE');
-          },
-        );
+            .setMockMethodCallHandler(SystemChannels.platform, (
+              MethodCall methodCall,
+            ) async {
+              throw PlatformException(code: 'UNAVAILABLE');
+            });
 
         // Should not throw
         expect(() async => await AppAnimations.lightHaptic(), returnsNormally);
         expect(() async => await AppAnimations.mediumHaptic(), returnsNormally);
         expect(() async => await AppAnimations.heavyHaptic(), returnsNormally);
-        expect(() async => await AppAnimations.selectionHaptic(), returnsNormally);
-        expect(() async => await AppAnimations.warningHaptic(), returnsNormally);
+        expect(
+          () async => await AppAnimations.selectionHaptic(),
+          returnsNormally,
+        );
+        expect(
+          () async => await AppAnimations.warningHaptic(),
+          returnsNormally,
+        );
       });
     });
   });

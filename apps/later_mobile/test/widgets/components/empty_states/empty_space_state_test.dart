@@ -9,10 +9,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: EmptySpaceState(
-              spaceName: 'Work',
-              onActionPressed: () {},
-            ),
+            body: EmptySpaceState(spaceName: 'Work', onActionPressed: () {}),
           ),
         ),
       );
@@ -26,10 +23,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: EmptySpaceState(
-              spaceName: 'Work',
-              onActionPressed: () {},
-            ),
+            body: EmptySpaceState(spaceName: 'Work', onActionPressed: () {}),
           ),
         ),
       );
@@ -43,10 +37,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: EmptySpaceState(
-              spaceName: 'Work',
-              onActionPressed: () {},
-            ),
+            body: EmptySpaceState(spaceName: 'Work', onActionPressed: () {}),
           ),
         ),
       );
@@ -63,10 +54,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: EmptySpaceState(
-              spaceName: 'Work',
-              onActionPressed: () {},
-            ),
+            body: EmptySpaceState(spaceName: 'Work', onActionPressed: () {}),
           ),
         ),
       );
@@ -75,8 +63,9 @@ void main() {
       expect(find.text('Quick Capture'), findsOneWidget);
     });
 
-    testWidgets('calls onActionPressed when button pressed',
-        (WidgetTester tester) async {
+    testWidgets('calls onActionPressed when button pressed', (
+      WidgetTester tester,
+    ) async {
       // Arrange
       var buttonPressed = false;
 
@@ -127,10 +116,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: EmptySpaceState(
-              spaceName: 'Work',
-              onActionPressed: () {},
-            ),
+            body: EmptySpaceState(spaceName: 'Work', onActionPressed: () {}),
           ),
         ),
       );
@@ -145,10 +131,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: EmptySpaceState(
-              spaceName: 'Work',
-              onActionPressed: () {},
-            ),
+            body: EmptySpaceState(spaceName: 'Work', onActionPressed: () {}),
           ),
         ),
       );
@@ -157,8 +140,9 @@ void main() {
       expect(find.byType(Center), findsWidgets);
     });
 
-    testWidgets('handles long space names gracefully',
-        (WidgetTester tester) async {
+    testWidgets('handles long space names gracefully', (
+      WidgetTester tester,
+    ) async {
       // Act
       await tester.pumpWidget(
         MaterialApp(
@@ -172,23 +156,18 @@ void main() {
       );
 
       // Assert
-      expect(
-        find.textContaining('Your Very Long Space Name'),
-        findsOneWidget,
-      );
+      expect(find.textContaining('Your Very Long Space Name'), findsOneWidget);
     });
 
-    testWidgets('renders in both light and dark mode',
-        (WidgetTester tester) async {
+    testWidgets('renders in both light and dark mode', (
+      WidgetTester tester,
+    ) async {
       // Test light mode
       await tester.pumpWidget(
         MaterialApp(
           theme: ThemeData.light(),
           home: Scaffold(
-            body: EmptySpaceState(
-              spaceName: 'Work',
-              onActionPressed: () {},
-            ),
+            body: EmptySpaceState(spaceName: 'Work', onActionPressed: () {}),
           ),
         ),
       );
@@ -200,10 +179,7 @@ void main() {
         MaterialApp(
           theme: ThemeData.dark(),
           home: Scaffold(
-            body: EmptySpaceState(
-              spaceName: 'Work',
-              onActionPressed: () {},
-            ),
+            body: EmptySpaceState(spaceName: 'Work', onActionPressed: () {}),
           ),
         ),
       );

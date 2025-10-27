@@ -7,11 +7,7 @@ void main() {
     testWidgets('renders no results found title', (WidgetTester tester) async {
       // Act
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: EmptySearchState(),
-          ),
-        ),
+        const MaterialApp(home: Scaffold(body: EmptySearchState())),
       );
 
       // Assert
@@ -21,11 +17,7 @@ void main() {
     testWidgets('renders search icon', (WidgetTester tester) async {
       // Act
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: EmptySearchState(),
-          ),
-        ),
+        const MaterialApp(home: Scaffold(body: EmptySearchState())),
       );
 
       // Assert
@@ -35,11 +27,7 @@ void main() {
     testWidgets('displays helpful description', (WidgetTester tester) async {
       // Act
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: EmptySearchState(),
-          ),
-        ),
+        const MaterialApp(home: Scaffold(body: EmptySearchState())),
       );
 
       // Assert
@@ -52,11 +40,7 @@ void main() {
     testWidgets('does not display CTA button', (WidgetTester tester) async {
       // Act
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: EmptySearchState(),
-          ),
-        ),
+        const MaterialApp(home: Scaffold(body: EmptySearchState())),
       );
 
       // Assert
@@ -66,11 +50,7 @@ void main() {
     testWidgets('does not display secondary link', (WidgetTester tester) async {
       // Act
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: EmptySearchState(),
-          ),
-        ),
+        const MaterialApp(home: Scaffold(body: EmptySearchState())),
       );
 
       // Assert
@@ -80,11 +60,7 @@ void main() {
     testWidgets('icon size is 64px', (WidgetTester tester) async {
       // Act
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: EmptySearchState(),
-          ),
-        ),
+        const MaterialApp(home: Scaffold(body: EmptySearchState())),
       );
 
       // Assert
@@ -95,26 +71,21 @@ void main() {
     testWidgets('uses EmptyState base component', (WidgetTester tester) async {
       // Act
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: EmptySearchState(),
-          ),
-        ),
+        const MaterialApp(home: Scaffold(body: EmptySearchState())),
       );
 
       // Assert - verify it's using the base component
       expect(find.byType(Center), findsWidgets);
     });
 
-    testWidgets('renders in both light and dark mode',
-        (WidgetTester tester) async {
+    testWidgets('renders in both light and dark mode', (
+      WidgetTester tester,
+    ) async {
       // Test light mode
       await tester.pumpWidget(
         MaterialApp(
           theme: ThemeData.light(),
-          home: const Scaffold(
-            body: EmptySearchState(),
-          ),
+          home: const Scaffold(body: EmptySearchState()),
         ),
       );
 
@@ -124,9 +95,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           theme: ThemeData.dark(),
-          home: const Scaffold(
-            body: EmptySearchState(),
-          ),
+          home: const Scaffold(body: EmptySearchState()),
         ),
       );
 
@@ -136,11 +105,7 @@ void main() {
     testWidgets('has proper semantic structure', (WidgetTester tester) async {
       // Act
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: EmptySearchState(),
-          ),
-        ),
+        const MaterialApp(home: Scaffold(body: EmptySearchState())),
       );
 
       // Assert - verify all key elements are accessible
@@ -154,11 +119,7 @@ void main() {
     testWidgets('content is centered', (WidgetTester tester) async {
       // Act
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: EmptySearchState(),
-          ),
-        ),
+        const MaterialApp(home: Scaffold(body: EmptySearchState())),
       );
 
       // Assert
@@ -168,13 +129,13 @@ void main() {
       expect(column.crossAxisAlignment, CrossAxisAlignment.center);
     });
 
-    testWidgets('accepts optional query parameter', (WidgetTester tester) async {
+    testWidgets('accepts optional query parameter', (
+      WidgetTester tester,
+    ) async {
       // Act
       await tester.pumpWidget(
         const MaterialApp(
-          home: Scaffold(
-            body: EmptySearchState(query: 'test query'),
-          ),
+          home: Scaffold(body: EmptySearchState(query: 'test query')),
         ),
       );
 
@@ -182,14 +143,13 @@ void main() {
       expect(find.text('No results found'), findsOneWidget);
     });
 
-    testWidgets('displays alternative message with query',
-        (WidgetTester tester) async {
+    testWidgets('displays alternative message with query', (
+      WidgetTester tester,
+    ) async {
       // Act
       await tester.pumpWidget(
         const MaterialApp(
-          home: Scaffold(
-            body: EmptySearchState(query: 'flutter'),
-          ),
+          home: Scaffold(body: EmptySearchState(query: 'flutter')),
         ),
       );
 

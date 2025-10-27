@@ -14,10 +14,7 @@ void main() {
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(
-            body: EmptyState(
-              title: title,
-              message: message,
-            ),
+            body: EmptyState(title: title, message: message),
           ),
         ),
       );
@@ -35,11 +32,7 @@ void main() {
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(
-            body: EmptyState(
-              icon: icon,
-              title: 'Title',
-              message: 'Message',
-            ),
+            body: EmptyState(icon: icon, title: 'Title', message: 'Message'),
           ),
         ),
       );
@@ -48,16 +41,14 @@ void main() {
       expect(find.byIcon(icon), findsOneWidget);
     });
 
-    testWidgets('does not render icon when not provided',
-        (WidgetTester tester) async {
+    testWidgets('does not render icon when not provided', (
+      WidgetTester tester,
+    ) async {
       // Act
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(
-            body: EmptyState(
-              title: 'Title',
-              message: 'Message',
-            ),
+            body: EmptyState(title: 'Title', message: 'Message'),
           ),
         ),
       );
@@ -66,8 +57,9 @@ void main() {
       expect(find.byType(Icon), findsNothing);
     });
 
-    testWidgets('renders CTA button when provided',
-        (WidgetTester tester) async {
+    testWidgets('renders CTA button when provided', (
+      WidgetTester tester,
+    ) async {
       // Arrange
       const actionLabel = 'Create Item';
       var buttonPressed = false;
@@ -99,16 +91,14 @@ void main() {
       expect(buttonPressed, isTrue);
     });
 
-    testWidgets('does not render CTA button when not provided',
-        (WidgetTester tester) async {
+    testWidgets('does not render CTA button when not provided', (
+      WidgetTester tester,
+    ) async {
       // Act
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(
-            body: EmptyState(
-              title: 'Title',
-              message: 'Message',
-            ),
+            body: EmptyState(title: 'Title', message: 'Message'),
           ),
         ),
       );
@@ -117,8 +107,9 @@ void main() {
       expect(find.byType(ElevatedButton), findsNothing);
     });
 
-    testWidgets('does not render CTA button when only label provided',
-        (WidgetTester tester) async {
+    testWidgets('does not render CTA button when only label provided', (
+      WidgetTester tester,
+    ) async {
       // Act
       await tester.pumpWidget(
         const MaterialApp(
@@ -136,8 +127,9 @@ void main() {
       expect(find.byType(ElevatedButton), findsNothing);
     });
 
-    testWidgets('does not render CTA button when only callback provided',
-        (WidgetTester tester) async {
+    testWidgets('does not render CTA button when only callback provided', (
+      WidgetTester tester,
+    ) async {
       // Act
       await tester.pumpWidget(
         MaterialApp(
@@ -155,8 +147,9 @@ void main() {
       expect(find.byType(ElevatedButton), findsNothing);
     });
 
-    testWidgets('uses correct colors in light mode',
-        (WidgetTester tester) async {
+    testWidgets('uses correct colors in light mode', (
+      WidgetTester tester,
+    ) async {
       // Act
       await tester.pumpWidget(
         MaterialApp(
@@ -176,8 +169,9 @@ void main() {
       expect(iconWidget.color, AppColors.neutral400);
     });
 
-    testWidgets('uses correct colors in dark mode',
-        (WidgetTester tester) async {
+    testWidgets('uses correct colors in dark mode', (
+      WidgetTester tester,
+    ) async {
       // Act
       await tester.pumpWidget(
         MaterialApp(
@@ -197,16 +191,14 @@ void main() {
       expect(iconWidget.color, AppColors.neutral600);
     });
 
-    testWidgets('centers content vertically and horizontally',
-        (WidgetTester tester) async {
+    testWidgets('centers content vertically and horizontally', (
+      WidgetTester tester,
+    ) async {
       // Act
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(
-            body: EmptyState(
-              title: 'Title',
-              message: 'Message',
-            ),
+            body: EmptyState(title: 'Title', message: 'Message'),
           ),
         ),
       );
@@ -229,10 +221,7 @@ void main() {
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(
-            body: EmptyState(
-              title: title,
-              message: message,
-            ),
+            body: EmptyState(title: title, message: message),
           ),
         ),
       );
@@ -245,20 +234,19 @@ void main() {
       expect(messageText.textAlign, TextAlign.center);
     });
 
-    testWidgets('message has max 3 lines with ellipsis',
-        (WidgetTester tester) async {
+    testWidgets('message has max 3 lines with ellipsis', (
+      WidgetTester tester,
+    ) async {
       // Arrange
-      const longMessage = 'This is a very long message that should be truncated '
+      const longMessage =
+          'This is a very long message that should be truncated '
           'after three lines with ellipsis overflow behavior';
 
       // Act
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(
-            body: EmptyState(
-              title: 'Title',
-              message: longMessage,
-            ),
+            body: EmptyState(title: 'Title', message: longMessage),
           ),
         ),
       );
@@ -289,18 +277,21 @@ void main() {
       final buttonStyle = button.style!;
 
       // Check background color
-      final backgroundColor =
-          buttonStyle.backgroundColor?.resolve(<WidgetState>{});
+      final backgroundColor = buttonStyle.backgroundColor?.resolve(
+        <WidgetState>{},
+      );
       expect(backgroundColor, AppColors.primarySolid);
 
       // Check foreground color
-      final foregroundColor =
-          buttonStyle.foregroundColor?.resolve(<WidgetState>{});
+      final foregroundColor = buttonStyle.foregroundColor?.resolve(
+        <WidgetState>{},
+      );
       expect(foregroundColor, AppColors.neutral900);
     });
 
-    testWidgets('responds to different screen sizes',
-        (WidgetTester tester) async {
+    testWidgets('responds to different screen sizes', (
+      WidgetTester tester,
+    ) async {
       // Test mobile size
       await tester.pumpWidget(
         const MediaQuery(
@@ -340,8 +331,9 @@ void main() {
       expect(iconWidgetDesktop.size, 100.0);
     });
 
-    testWidgets('CTA button has minimum touch target size',
-        (WidgetTester tester) async {
+    testWidgets('CTA button has minimum touch target size', (
+      WidgetTester tester,
+    ) async {
       // Act
       await tester.pumpWidget(
         MaterialApp(
@@ -365,8 +357,9 @@ void main() {
       expect(minimumSize.height, greaterThanOrEqualTo(44.0));
     });
 
-    testWidgets('full integration with all features',
-        (WidgetTester tester) async {
+    testWidgets('full integration with all features', (
+      WidgetTester tester,
+    ) async {
       // Arrange
       var actionCalled = false;
 
@@ -390,7 +383,10 @@ void main() {
       // Assert - all elements present
       expect(find.byIcon(Icons.inbox_outlined), findsOneWidget);
       expect(find.text('No items yet'), findsOneWidget);
-      expect(find.text('Create your first item to get started'), findsOneWidget);
+      expect(
+        find.text('Create your first item to get started'),
+        findsOneWidget,
+      );
       expect(find.text('Create Item'), findsOneWidget);
 
       // Tap action button

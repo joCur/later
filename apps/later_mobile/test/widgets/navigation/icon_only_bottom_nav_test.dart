@@ -22,14 +22,13 @@ void main() {
       expect(containerFinder, findsWidgets);
 
       // Verify height is 60px as per Phase 2 spec
-      final container = tester.widget<Container>(
-        containerFinder.first,
-      );
+      final container = tester.widget<Container>(containerFinder.first);
       expect(container.constraints?.minHeight, 60.0);
     });
 
-    testWidgets('renders three icon buttons (Home, Search, Settings)',
-        (WidgetTester tester) async {
+    testWidgets('renders three icon buttons (Home, Search, Settings)', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -47,8 +46,9 @@ void main() {
       expect(find.byIcon(Icons.settings_outlined), findsOneWidget);
     });
 
-    testWidgets('shows gradient underline for active tab',
-        (WidgetTester tester) async {
+    testWidgets('shows gradient underline for active tab', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -67,18 +67,19 @@ void main() {
       await tester.pumpAndSettle();
 
       // Verify one underline is visible (for active tab)
-      final activeUnderlines = tester.widgetList<AnimatedContainer>(
-        underlineFinder,
-      ).where((container) {
-        return container.decoration is BoxDecoration &&
-            (container.decoration as BoxDecoration).gradient != null;
-      });
+      final activeUnderlines = tester
+          .widgetList<AnimatedContainer>(underlineFinder)
+          .where((container) {
+            return container.decoration is BoxDecoration &&
+                (container.decoration as BoxDecoration).gradient != null;
+          });
 
       expect(activeUnderlines.length, greaterThan(0));
     });
 
-    testWidgets('changes selection when tapping different tab',
-        (WidgetTester tester) async {
+    testWidgets('changes selection when tapping different tab', (
+      WidgetTester tester,
+    ) async {
       int selectedIndex = 0;
 
       await tester.pumpWidget(
@@ -195,16 +196,15 @@ void main() {
       await tester.pumpAndSettle();
 
       // Find an inactive icon (home)
-      final homeIcon = tester.widget<Icon>(
-        find.byIcon(Icons.home_outlined),
-      );
+      final homeIcon = tester.widget<Icon>(find.byIcon(Icons.home_outlined));
 
       // Verify it uses dark mode color (neutral400)
       expect(homeIcon.color, AppColors.neutral400);
     });
 
-    testWidgets('has proper touch targets (48x48px)',
-        (WidgetTester tester) async {
+    testWidgets('has proper touch targets (48x48px)', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -227,8 +227,9 @@ void main() {
       expect(touchTargets, findsNWidgets(3));
     });
 
-    testWidgets('underline animates when selection changes',
-        (WidgetTester tester) async {
+    testWidgets('underline animates when selection changes', (
+      WidgetTester tester,
+    ) async {
       int selectedIndex = 0;
 
       await tester.pumpWidget(
@@ -267,8 +268,9 @@ void main() {
       expect(tester.hasRunningAnimations, false);
     });
 
-    testWidgets('provides semantic labels for accessibility',
-        (WidgetTester tester) async {
+    testWidgets('provides semantic labels for accessibility', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -316,8 +318,9 @@ void main() {
       expect(find.text('Search items'), findsOneWidget);
     });
 
-    testWidgets('gradient underline has correct dimensions',
-        (WidgetTester tester) async {
+    testWidgets('gradient underline has correct dimensions', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -332,14 +335,14 @@ void main() {
       await tester.pumpAndSettle();
 
       // Find the underline container
-      final underlineContainers = tester.widgetList<AnimatedContainer>(
-        find.byType(AnimatedContainer),
-      ).where((container) {
-        final decoration = container.decoration;
-        return decoration is BoxDecoration &&
-               decoration.gradient != null &&
-               container.constraints?.maxHeight == 3.0; // 3px height
-      });
+      final underlineContainers = tester
+          .widgetList<AnimatedContainer>(find.byType(AnimatedContainer))
+          .where((container) {
+            final decoration = container.decoration;
+            return decoration is BoxDecoration &&
+                decoration.gradient != null &&
+                container.constraints?.maxHeight == 3.0; // 3px height
+          });
 
       expect(underlineContainers.length, greaterThan(0));
 

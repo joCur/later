@@ -5,20 +5,17 @@ import 'package:later_mobile/design_system/atoms/text/gradient_text.dart';
 
 void main() {
   group('GradientText Accessibility Tests', () {
-    testWidgets('preserves semantic meaning for screen readers', (tester) async {
+    testWidgets('preserves semantic meaning for screen readers', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         const MaterialApp(
-          home: Scaffold(
-            body: GradientText('Accessible Text'),
-          ),
+          home: Scaffold(body: GradientText('Accessible Text')),
         ),
       );
 
       // Text should be found by semantics
-      expect(
-        find.bySemanticsLabel('Accessible Text'),
-        findsOneWidget,
-      );
+      expect(find.bySemanticsLabel('Accessible Text'), findsOneWidget);
     });
 
     testWidgets('supports Semantics widget wrapping', (tester) async {
@@ -43,10 +40,7 @@ void main() {
           home: MediaQuery(
             data: MediaQueryData(textScaler: TextScaler.linear(1.5)),
             child: Scaffold(
-              body: GradientText(
-                'Scaled Text',
-                style: TextStyle(fontSize: 16),
-              ),
+              body: GradientText('Scaled Text', style: TextStyle(fontSize: 16)),
             ),
           ),
         ),
@@ -83,9 +77,7 @@ void main() {
             builder: (context) {
               return Scaffold(
                 backgroundColor: AppColors.background(context),
-                body: const Center(
-                  child: GradientText('Light Mode Text'),
-                ),
+                body: const Center(child: GradientText('Light Mode Text')),
               );
             },
           ),
@@ -104,9 +96,7 @@ void main() {
             builder: (context) {
               return Scaffold(
                 backgroundColor: AppColors.background(context),
-                body: const Center(
-                  child: GradientText('Dark Mode Text'),
-                ),
+                body: const Center(child: GradientText('Dark Mode Text')),
               );
             },
           ),
@@ -117,7 +107,9 @@ void main() {
       expect(find.text('Dark Mode Text'), findsOneWidget);
     });
 
-    testWidgets('gradient text is visually distinct on light background', (tester) async {
+    testWidgets('gradient text is visually distinct on light background', (
+      tester,
+    ) async {
       // This is a visual test - we verify the widget renders without errors
       await tester.pumpWidget(
         MaterialApp(
@@ -141,7 +133,9 @@ void main() {
       expect(find.byType(GradientText), findsNWidgets(3));
     });
 
-    testWidgets('gradient text is visually distinct on dark background', (tester) async {
+    testWidgets('gradient text is visually distinct on dark background', (
+      tester,
+    ) async {
       // This is a visual test - we verify the widget renders without errors
       await tester.pumpWidget(
         MaterialApp(
@@ -205,7 +199,9 @@ void main() {
       expect(text.style?.fontSize, greaterThanOrEqualTo(18));
     });
 
-    testWidgets('small metadata text with gradient is readable', (tester) async {
+    testWidgets('small metadata text with gradient is readable', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -227,10 +223,7 @@ void main() {
           home: Scaffold(
             body: GradientText(
               'Bold Text',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
           ),
         ),
@@ -262,7 +255,9 @@ void main() {
       expect(find.byType(GradientText), findsNWidgets(20));
     });
 
-    testWidgets('gradient text respects platform text direction (LTR)', (tester) async {
+    testWidgets('gradient text respects platform text direction (LTR)', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(
@@ -278,7 +273,9 @@ void main() {
       expect(find.text('Left to Right'), findsOneWidget);
     });
 
-    testWidgets('gradient text respects platform text direction (RTL)', (tester) async {
+    testWidgets('gradient text respects platform text direction (RTL)', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(
@@ -294,7 +291,9 @@ void main() {
       expect(find.text('Right to Left'), findsOneWidget);
     });
 
-    testWidgets('gradient text maintains tap/selection behavior', (tester) async {
+    testWidgets('gradient text maintains tap/selection behavior', (
+      tester,
+    ) async {
       bool tapped = false;
 
       await tester.pumpWidget(
@@ -331,46 +330,70 @@ void main() {
       return (lighter + 0.05) / (darker + 0.05);
     }
 
-    test('primary gradient start has sufficient contrast on white (light mode)', () {
-      final contrast = calculateContrastRatio(
-        AppColors.primaryStart,
-        Colors.white,
-      );
+    test(
+      'primary gradient start has sufficient contrast on white (light mode)',
+      () {
+        final contrast = calculateContrastRatio(
+          AppColors.primaryStart,
+          Colors.white,
+        );
 
-      // WCAG AA requires 4.5:1 for normal text, 3:1 for large text
-      expect(contrast, greaterThanOrEqualTo(3.0),
-          reason: 'Primary gradient should meet WCAG AA for large text (3:1)');
-    });
+        // WCAG AA requires 4.5:1 for normal text, 3:1 for large text
+        expect(
+          contrast,
+          greaterThanOrEqualTo(3.0),
+          reason: 'Primary gradient should meet WCAG AA for large text (3:1)',
+        );
+      },
+    );
 
-    test('primary gradient start has sufficient contrast on neutral50 (light mode)', () {
-      final contrast = calculateContrastRatio(
-        AppColors.primaryStart,
-        AppColors.neutral50,
-      );
+    test(
+      'primary gradient start has sufficient contrast on neutral50 (light mode)',
+      () {
+        final contrast = calculateContrastRatio(
+          AppColors.primaryStart,
+          AppColors.neutral50,
+        );
 
-      expect(contrast, greaterThanOrEqualTo(3.0),
-          reason: 'Primary gradient should be readable on app background');
-    });
+        expect(
+          contrast,
+          greaterThanOrEqualTo(3.0),
+          reason: 'Primary gradient should be readable on app background',
+        );
+      },
+    );
 
-    test('primary gradient end has sufficient contrast on white (light mode)', () {
-      final contrast = calculateContrastRatio(
-        AppColors.primaryEnd,
-        Colors.white,
-      );
+    test(
+      'primary gradient end has sufficient contrast on white (light mode)',
+      () {
+        final contrast = calculateContrastRatio(
+          AppColors.primaryEnd,
+          Colors.white,
+        );
 
-      expect(contrast, greaterThanOrEqualTo(3.0),
-          reason: 'Primary gradient end should meet WCAG AA for large text');
-    });
+        expect(
+          contrast,
+          greaterThanOrEqualTo(3.0),
+          reason: 'Primary gradient end should meet WCAG AA for large text',
+        );
+      },
+    );
 
-    test('dark mode primary gradient start has sufficient contrast on neutral950', () {
-      final contrast = calculateContrastRatio(
-        AppColors.primaryStartDark,
-        AppColors.neutral950,
-      );
+    test(
+      'dark mode primary gradient start has sufficient contrast on neutral950',
+      () {
+        final contrast = calculateContrastRatio(
+          AppColors.primaryStartDark,
+          AppColors.neutral950,
+        );
 
-      expect(contrast, greaterThanOrEqualTo(3.0),
-          reason: 'Dark mode gradient should be readable on dark background');
-    });
+        expect(
+          contrast,
+          greaterThanOrEqualTo(3.0),
+          reason: 'Dark mode gradient should be readable on dark background',
+        );
+      },
+    );
 
     test('task gradient has sufficient contrast on light background', () {
       final contrastStart = calculateContrastRatio(
@@ -384,8 +407,12 @@ void main() {
 
       // Task gradient is designed for use with large text (18px+) or on tinted backgrounds
       // Minimum 2.5:1 for large text is acceptable, prefer 3:1+
-      expect(contrastStart, greaterThanOrEqualTo(2.5),
-          reason: 'Task gradient should be used with large text or on appropriate backgrounds');
+      expect(
+        contrastStart,
+        greaterThanOrEqualTo(2.5),
+        reason:
+            'Task gradient should be used with large text or on appropriate backgrounds',
+      );
       expect(contrastEnd, greaterThanOrEqualTo(2.5));
     });
 
@@ -400,8 +427,12 @@ void main() {
       );
 
       // Note gradient is designed for use with large text (18px+) or on tinted backgrounds
-      expect(contrastStart, greaterThanOrEqualTo(2.4),
-          reason: 'Note gradient should be used with large text or on appropriate backgrounds');
+      expect(
+        contrastStart,
+        greaterThanOrEqualTo(2.4),
+        reason:
+            'Note gradient should be used with large text or on appropriate backgrounds',
+      );
       expect(contrastEnd, greaterThanOrEqualTo(2.4));
     });
 
@@ -416,8 +447,12 @@ void main() {
       );
 
       // List gradient is designed for use with large text (18px+) or on tinted backgrounds
-      expect(contrastStart, greaterThanOrEqualTo(2.5),
-          reason: 'List gradient should be used with large text or on appropriate backgrounds');
+      expect(
+        contrastStart,
+        greaterThanOrEqualTo(2.5),
+        reason:
+            'List gradient should be used with large text or on appropriate backgrounds',
+      );
       expect(contrastEnd, greaterThanOrEqualTo(2.5));
     });
 
@@ -432,8 +467,12 @@ void main() {
       );
 
       // Secondary gradient (amber→pink) is designed for use with large text (18px+) or on tinted backgrounds
-      expect(contrastStart, greaterThanOrEqualTo(2.1),
-          reason: 'Secondary gradient should be used with large text or on appropriate backgrounds');
+      expect(
+        contrastStart,
+        greaterThanOrEqualTo(2.1),
+        reason:
+            'Secondary gradient should be used with large text or on appropriate backgrounds',
+      );
       expect(contrastEnd, greaterThanOrEqualTo(2.1));
     });
   });

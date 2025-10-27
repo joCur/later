@@ -33,7 +33,8 @@ class NoteDetailScreen extends StatefulWidget {
   State<NoteDetailScreen> createState() => _NoteDetailScreenState();
 }
 
-class _NoteDetailScreenState extends State<NoteDetailScreen> with AutoSaveMixin {
+class _NoteDetailScreenState extends State<NoteDetailScreen>
+    with AutoSaveMixin {
   // Text controllers
   late TextEditingController _titleController;
   late TextEditingController _contentController;
@@ -259,7 +260,8 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> with AutoSaveMixin 
     final confirmed = await showDeleteConfirmationDialog(
       context: context,
       title: 'Delete Note',
-      message: 'Are you sure you want to delete "${_currentNote.title}"?\n\n'
+      message:
+          'Are you sure you want to delete "${_currentNote.title}"?\n\n'
           'This action cannot be undone.',
     );
 

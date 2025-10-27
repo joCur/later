@@ -8,11 +8,7 @@
 library;
 
 /// Content type enum for dual-model architecture
-enum ContentType {
-  todoList,
-  list,
-  note,
-}
+enum ContentType { todoList, list, note }
 
 class ItemTypeDetector {
   // Scoring weights
@@ -185,7 +181,11 @@ class ItemTypeDetector {
 
     // Adjust confidence based on absolute score strength
     // Low absolute scores indicate weak signals
-    final maxScore = [taskScore, listScore, noteScore].reduce((a, b) => a > b ? a : b);
+    final maxScore = [
+      taskScore,
+      listScore,
+      noteScore,
+    ].reduce((a, b) => a > b ? a : b);
     if (maxScore < _weakSignalThreshold) {
       // Weak signal - reduce confidence
       return (rawConfidence * _weakSignalConfidenceMultiplier).clamp(0.0, 1.0);
@@ -269,7 +269,9 @@ class ItemTypeDetector {
 
       // Skip headers/keywords if we haven't found list items yet
       final lowerLine = trimmedLine.toLowerCase();
-      final isKeyword = _listKeywords.any((keyword) => lowerLine.contains(keyword));
+      final isKeyword = _listKeywords.any(
+        (keyword) => lowerLine.contains(keyword),
+      );
       if (isKeyword && items.isEmpty) {
         continue;
       }
@@ -371,10 +373,13 @@ class ItemTypeDetector {
     }
 
     // Check for multiple short lines (potential simple list)
-    final nonEmptyLines = lines.where((line) => line.trim().isNotEmpty).toList();
+    final nonEmptyLines = lines
+        .where((line) => line.trim().isNotEmpty)
+        .toList();
     if (nonEmptyLines.length >= 3) {
-      final shortLinesCount =
-          nonEmptyLines.where((line) => line.trim().length < _shortLineThreshold).length;
+      final shortLinesCount = nonEmptyLines
+          .where((line) => line.trim().length < _shortLineThreshold)
+          .length;
       if (shortLinesCount >= 3 && shortLinesCount == nonEmptyLines.length) {
         score += _simpleListScore;
       }

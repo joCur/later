@@ -136,8 +136,7 @@ class _GhostButtonState extends State<GhostButton> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     // Foreground color - use gradient colors
     final foregroundColor = isDark
@@ -158,11 +157,7 @@ class _GhostButtonState extends State<GhostButton> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               if (widget.icon != null) ...[
-                Icon(
-                  widget.icon,
-                  size: _iconSize,
-                  color: foregroundColor,
-                ),
+                Icon(widget.icon, size: _iconSize, color: foregroundColor),
                 const SizedBox(width: AppSpacing.xs),
               ],
               Text(

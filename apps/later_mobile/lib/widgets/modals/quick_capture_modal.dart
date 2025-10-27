@@ -11,6 +11,7 @@ import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../core/responsive/breakpoints.dart';
+import '../../core/theme/temporal_flow_theme.dart';
 import '../../core/utils/item_type_detector.dart';
 import '../../data/models/item_model.dart';
 import '../../data/models/list_model.dart';
@@ -383,9 +384,8 @@ class _QuickCaptureModalState extends State<QuickCaptureModal>
 
   Future<bool?> _showCloseConfirmation() async {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final surfaceColor = isDark
-        ? AppColors.neutral900
-        : Colors.white;
+    final temporalTheme = Theme.of(context).extension<TemporalFlowTheme>()!;
+    final surfaceColor = isDark ? AppColors.neutral900 : Colors.white;
 
     return showDialog<bool>(
       context: context,
@@ -403,15 +403,13 @@ class _QuickCaptureModalState extends State<QuickCaptureModal>
               color: surfaceColor.withValues(alpha: 0.92),
               borderRadius: BorderRadius.circular(AppSpacing.modalRadius),
               border: Border.all(
-                color:
-                    (isDark
-                            ? AppColors.primaryStartDark
-                            : AppColors.primaryStart)
-                        .withValues(alpha: 0.3),
+                color: temporalTheme.primaryGradient.colors.first.withValues(
+                  alpha: 0.3,
+                ),
               ),
               boxShadow: [
                 BoxShadow(
-                  color: isDark ? AppColors.shadowDark : AppColors.shadowLight,
+                  color: temporalTheme.shadowColor,
                   blurRadius: 24,
                   offset: const Offset(0, 8),
                 ),
@@ -425,18 +423,14 @@ class _QuickCaptureModalState extends State<QuickCaptureModal>
                 Text(
                   'Save changes?',
                   style: AppTypography.h4.copyWith(
-                    color: isDark
-                        ? AppColors.neutral400
-                        : AppColors.neutral600,
+                    color: isDark ? AppColors.neutral400 : AppColors.neutral600,
                   ),
                 ),
                 const SizedBox(height: AppSpacing.md),
                 Text(
                   'You have unsaved changes. Would you like to save them before closing?',
                   style: AppTypography.bodyMedium.copyWith(
-                    color: isDark
-                        ? AppColors.neutral500
-                        : AppColors.neutral500,
+                    color: isDark ? AppColors.neutral500 : AppColors.neutral500,
                   ),
                 ),
                 const SizedBox(height: AppSpacing.lg),
@@ -491,12 +485,9 @@ class _QuickCaptureModalState extends State<QuickCaptureModal>
 
   Widget _buildMobileLayout() {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final surfaceColor = isDark
-        ? AppColors.neutral900
-        : Colors.white;
-    final primaryGradient = isDark
-        ? AppColors.primaryGradientDark
-        : AppColors.primaryGradient;
+    final temporalTheme = Theme.of(context).extension<TemporalFlowTheme>()!;
+    final surfaceColor = isDark ? AppColors.neutral900 : Colors.white;
+    final primaryGradient = temporalTheme.primaryGradient;
     final keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
 
     return SlideTransition(
@@ -535,12 +526,9 @@ class _QuickCaptureModalState extends State<QuickCaptureModal>
 
   Widget _buildDesktopLayout() {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final surfaceColor = isDark
-        ? AppColors.neutral900
-        : Colors.white;
-    final primaryGradient = isDark
-        ? AppColors.primaryGradientDark
-        : AppColors.primaryGradient;
+    final temporalTheme = Theme.of(context).extension<TemporalFlowTheme>()!;
+    final surfaceColor = isDark ? AppColors.neutral900 : Colors.white;
+    final primaryGradient = temporalTheme.primaryGradient;
 
     return ScaleTransition(
       scale: _scaleAnimation,
@@ -562,9 +550,7 @@ class _QuickCaptureModalState extends State<QuickCaptureModal>
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: isDark
-                        ? AppColors.shadowDark
-                        : AppColors.shadowLight,
+                    color: temporalTheme.shadowColor,
                     blurRadius: 24,
                     offset: const Offset(0, 8),
                   ),
@@ -662,9 +648,7 @@ class _QuickCaptureModalState extends State<QuickCaptureModal>
               child: Text(
                 'Quick Capture',
                 style: AppTypography.h3.copyWith(
-                  color: isDark
-                      ? AppColors.neutral400
-                      : AppColors.neutral600,
+                  color: isDark ? AppColors.neutral400 : AppColors.neutral600,
                 ),
               ),
             ),
@@ -676,9 +660,7 @@ class _QuickCaptureModalState extends State<QuickCaptureModal>
               key: const Key('close_button'),
               icon: Icon(
                 Icons.close,
-                color: isDark
-                    ? AppColors.neutral500
-                    : AppColors.neutral500,
+                color: isDark ? AppColors.neutral500 : AppColors.neutral500,
               ),
               onPressed: _handleClose,
               iconSize: 24,
@@ -732,9 +714,7 @@ class _QuickCaptureModalState extends State<QuickCaptureModal>
               key: const Key('voice_button'),
               icon: Icon(
                 Icons.mic_outlined,
-                color: isDark
-                    ? AppColors.neutral500
-                    : AppColors.neutral500,
+                color: isDark ? AppColors.neutral500 : AppColors.neutral500,
               ),
               onPressed: () {
                 // TODO: Implement voice input
@@ -755,9 +735,7 @@ class _QuickCaptureModalState extends State<QuickCaptureModal>
               key: const Key('image_button'),
               icon: Icon(
                 Icons.image_outlined,
-                color: isDark
-                    ? AppColors.neutral500
-                    : AppColors.neutral500,
+                color: isDark ? AppColors.neutral500 : AppColors.neutral500,
               ),
               onPressed: () {
                 // TODO: Implement image attachment
@@ -818,27 +796,21 @@ class _QuickCaptureModalState extends State<QuickCaptureModal>
                 size: 16,
                 color:
                     selectedOption.color ??
-                    (isDark
-                        ? AppColors.neutral400
-                        : AppColors.neutral600),
+                    (isDark ? AppColors.neutral400 : AppColors.neutral600),
               ),
             ),
             const SizedBox(width: AppSpacing.xxs),
             Text(
               selectedOption.label,
               style: AppTypography.labelMedium.copyWith(
-                color: isDark
-                    ? AppColors.neutral400
-                    : AppColors.neutral600,
+                color: isDark ? AppColors.neutral400 : AppColors.neutral600,
               ),
             ),
             const SizedBox(width: AppSpacing.xxs),
             Icon(
               Icons.arrow_drop_down,
               size: 16,
-              color: isDark
-                  ? AppColors.neutral500
-                  : AppColors.neutral500,
+              color: isDark ? AppColors.neutral500 : AppColors.neutral500,
             ),
           ],
         ),
@@ -855,9 +827,7 @@ class _QuickCaptureModalState extends State<QuickCaptureModal>
                   size: 20,
                   color:
                       option.color ??
-                      (isDark
-                          ? AppColors.neutral400
-                          : AppColors.neutral600),
+                      (isDark ? AppColors.neutral400 : AppColors.neutral600),
                 ),
                 const SizedBox(width: AppSpacing.xs),
                 Text(option.label),
@@ -922,18 +892,14 @@ class _QuickCaptureModalState extends State<QuickCaptureModal>
                 Text(
                   selectedSpace.name,
                   style: AppTypography.labelMedium.copyWith(
-                    color: isDark
-                        ? AppColors.neutral400
-                        : AppColors.neutral600,
+                    color: isDark ? AppColors.neutral400 : AppColors.neutral600,
                   ),
                 ),
                 const SizedBox(width: AppSpacing.xxs),
                 Icon(
                   Icons.arrow_drop_down,
                   size: 16,
-                  color: isDark
-                      ? AppColors.neutral500
-                      : AppColors.neutral500,
+                  color: isDark ? AppColors.neutral500 : AppColors.neutral500,
                 ),
               ],
             ),
@@ -1052,9 +1018,7 @@ class _QuickCaptureModalState extends State<QuickCaptureModal>
                 key: const Key('keyboard_hints'),
                 textAlign: TextAlign.right,
                 style: AppTypography.labelSmall.copyWith(
-                  color: isDark
-                      ? AppColors.neutral500
-                      : AppColors.neutral500,
+                  color: isDark ? AppColors.neutral500 : AppColors.neutral500,
                 ),
               ),
             ),

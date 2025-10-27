@@ -13,9 +13,7 @@ void main() {
       test('logs error in debug mode', () {
         // This test runs in debug mode by default
         expect(() {
-          ErrorLogger.logError(
-            AppError.storage(message: 'Test error'),
-          );
+          ErrorLogger.logError(AppError.storage(message: 'Test error'));
         }, returnsNormally);
       });
 
@@ -35,10 +33,7 @@ void main() {
         final error = AppError.storage(message: 'Test error');
 
         expect(() {
-          ErrorLogger.logError(
-            error,
-            context: 'ItemsProvider.loadItems',
-          );
+          ErrorLogger.logError(error, context: 'ItemsProvider.loadItems');
         }, returnsNormally);
       });
 

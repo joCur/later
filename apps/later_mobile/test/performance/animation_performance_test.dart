@@ -37,24 +37,35 @@ void main() {
       }
 
       if (frames.isNotEmpty) {
-        final averageFrameTime = frames.fold<Duration>(
-          Duration.zero,
-          (prev, duration) => prev + duration,
-        ) ~/ frames.length;
+        final averageFrameTime =
+            frames.fold<Duration>(
+              Duration.zero,
+              (prev, duration) => prev + duration,
+            ) ~/
+            frames.length;
 
         final maxFrameTime = frames.reduce((a, b) => a > b ? a : b);
 
-        debugPrint('Spring animation avg frame time: ${averageFrameTime.inMicroseconds / 1000}ms');
-        debugPrint('Spring animation max frame time: ${maxFrameTime.inMicroseconds / 1000}ms');
+        debugPrint(
+          'Spring animation avg frame time: ${averageFrameTime.inMicroseconds / 1000}ms',
+        );
+        debugPrint(
+          'Spring animation max frame time: ${maxFrameTime.inMicroseconds / 1000}ms',
+        );
 
         // Should maintain 60fps
         expect(averageFrameTime.inMilliseconds, lessThanOrEqualTo(16));
-        expect(maxFrameTime.inMilliseconds, lessThanOrEqualTo(20),
-          reason: 'Max frame time should stay within budget');
+        expect(
+          maxFrameTime.inMilliseconds,
+          lessThanOrEqualTo(20),
+          reason: 'Max frame time should stay within budget',
+        );
       }
     });
 
-    testWidgets('Multiple simultaneous animations (5 elements)', (tester) async {
+    testWidgets('Multiple simultaneous animations (5 elements)', (
+      tester,
+    ) async {
       await tester.pumpWidget(_buildMultipleAnimationsWidget(5));
       await tester.pumpAndSettle();
 
@@ -77,14 +88,21 @@ void main() {
         final jankyFrames = frames.where((d) => d.inMilliseconds > 16).length;
         final jankyPercentage = (jankyFrames / frames.length) * 100;
 
-        debugPrint('5 simultaneous animations janky frames: ${jankyPercentage.toStringAsFixed(1)}%');
+        debugPrint(
+          '5 simultaneous animations janky frames: ${jankyPercentage.toStringAsFixed(1)}%',
+        );
 
-        expect(jankyPercentage, lessThan(5),
-          reason: '5 animations should run smoothly');
+        expect(
+          jankyPercentage,
+          lessThan(5),
+          reason: '5 animations should run smoothly',
+        );
       }
     });
 
-    testWidgets('Multiple simultaneous animations (10 elements)', (tester) async {
+    testWidgets('Multiple simultaneous animations (10 elements)', (
+      tester,
+    ) async {
       await tester.pumpWidget(_buildMultipleAnimationsWidget(10));
       await tester.pumpAndSettle();
 
@@ -106,10 +124,15 @@ void main() {
         final jankyFrames = frames.where((d) => d.inMilliseconds > 16).length;
         final jankyPercentage = (jankyFrames / frames.length) * 100;
 
-        debugPrint('10 simultaneous animations janky frames: ${jankyPercentage.toStringAsFixed(1)}%');
+        debugPrint(
+          '10 simultaneous animations janky frames: ${jankyPercentage.toStringAsFixed(1)}%',
+        );
 
-        expect(jankyPercentage, lessThan(10),
-          reason: '10 animations should maintain acceptable performance');
+        expect(
+          jankyPercentage,
+          lessThan(10),
+          reason: '10 animations should maintain acceptable performance',
+        );
       }
     });
 
@@ -134,10 +157,15 @@ void main() {
         final jankyFrames = frames.where((d) => d.inMilliseconds > 16).length;
         final jankyPercentage = (jankyFrames / frames.length) * 100;
 
-        debugPrint('Staggered animations janky frames: ${jankyPercentage.toStringAsFixed(1)}%');
+        debugPrint(
+          'Staggered animations janky frames: ${jankyPercentage.toStringAsFixed(1)}%',
+        );
 
-        expect(jankyPercentage, lessThan(10),
-          reason: 'Staggered entrance should be smooth');
+        expect(
+          jankyPercentage,
+          lessThan(10),
+          reason: 'Staggered entrance should be smooth',
+        );
       }
     });
 
@@ -160,12 +188,16 @@ void main() {
       }
 
       if (frames.isNotEmpty) {
-        final averageFrameTime = frames.fold<Duration>(
-          Duration.zero,
-          (prev, duration) => prev + duration,
-        ) ~/ frames.length;
+        final averageFrameTime =
+            frames.fold<Duration>(
+              Duration.zero,
+              (prev, duration) => prev + duration,
+            ) ~/
+            frames.length;
 
-        debugPrint('Scale animation avg frame time: ${averageFrameTime.inMicroseconds / 1000}ms');
+        debugPrint(
+          'Scale animation avg frame time: ${averageFrameTime.inMicroseconds / 1000}ms',
+        );
 
         expect(averageFrameTime.inMilliseconds, lessThanOrEqualTo(16));
       }
@@ -190,12 +222,16 @@ void main() {
       }
 
       if (frames.isNotEmpty) {
-        final averageFrameTime = frames.fold<Duration>(
-          Duration.zero,
-          (prev, duration) => prev + duration,
-        ) ~/ frames.length;
+        final averageFrameTime =
+            frames.fold<Duration>(
+              Duration.zero,
+              (prev, duration) => prev + duration,
+            ) ~/
+            frames.length;
 
-        debugPrint('Fade animation avg frame time: ${averageFrameTime.inMicroseconds / 1000}ms');
+        debugPrint(
+          'Fade animation avg frame time: ${averageFrameTime.inMicroseconds / 1000}ms',
+        );
 
         expect(averageFrameTime.inMilliseconds, lessThanOrEqualTo(16));
       }
@@ -220,12 +256,16 @@ void main() {
       }
 
       if (frames.isNotEmpty) {
-        final averageFrameTime = frames.fold<Duration>(
-          Duration.zero,
-          (prev, duration) => prev + duration,
-        ) ~/ frames.length;
+        final averageFrameTime =
+            frames.fold<Duration>(
+              Duration.zero,
+              (prev, duration) => prev + duration,
+            ) ~/
+            frames.length;
 
-        debugPrint('Slide animation avg frame time: ${averageFrameTime.inMicroseconds / 1000}ms');
+        debugPrint(
+          'Slide animation avg frame time: ${averageFrameTime.inMicroseconds / 1000}ms',
+        );
 
         expect(averageFrameTime.inMilliseconds, lessThanOrEqualTo(16));
       }
@@ -250,12 +290,16 @@ void main() {
       }
 
       if (frames.isNotEmpty) {
-        final averageFrameTime = frames.fold<Duration>(
-          Duration.zero,
-          (prev, duration) => prev + duration,
-        ) ~/ frames.length;
+        final averageFrameTime =
+            frames.fold<Duration>(
+              Duration.zero,
+              (prev, duration) => prev + duration,
+            ) ~/
+            frames.length;
 
-        debugPrint('Combined animation avg frame time: ${averageFrameTime.inMicroseconds / 1000}ms');
+        debugPrint(
+          'Combined animation avg frame time: ${averageFrameTime.inMicroseconds / 1000}ms',
+        );
 
         expect(averageFrameTime.inMilliseconds, lessThanOrEqualTo(16));
       }
@@ -264,7 +308,7 @@ void main() {
     testWidgets('Reduced motion compliance test', (tester) async {
       // Enable reduced motion
       tester.platformDispatcher.accessibilityFeaturesTestValue =
-        const FakeAccessibilityFeatures(disableAnimations: true);
+          const FakeAccessibilityFeatures(disableAnimations: true);
 
       addTearDown(() {
         tester.platformDispatcher.clearAccessibilityFeaturesTestValue();
@@ -313,10 +357,15 @@ void main() {
         final jankyFrames = frames.where((d) => d.inMilliseconds > 16).length;
         final jankyPercentage = (jankyFrames / frames.length) * 100;
 
-        debugPrint('Optimized animation janky frames: ${jankyPercentage.toStringAsFixed(1)}%');
+        debugPrint(
+          'Optimized animation janky frames: ${jankyPercentage.toStringAsFixed(1)}%',
+        );
 
-        expect(jankyPercentage, lessThan(5),
-          reason: 'RepaintBoundary should optimize animation');
+        expect(
+          jankyPercentage,
+          lessThan(5),
+          reason: 'RepaintBoundary should optimize animation',
+        );
       }
     });
 
@@ -343,10 +392,15 @@ void main() {
         final jankyFrames = frames.where((d) => d.inMilliseconds > 16).length;
         final jankyPercentage = (jankyFrames / frames.length) * 100;
 
-        debugPrint('Complex animation janky frames: ${jankyPercentage.toStringAsFixed(1)}%');
+        debugPrint(
+          'Complex animation janky frames: ${jankyPercentage.toStringAsFixed(1)}%',
+        );
 
-        expect(jankyPercentage, lessThan(15),
-          reason: 'Complex animations should maintain acceptable performance');
+        expect(
+          jankyPercentage,
+          lessThan(15),
+          reason: 'Complex animations should maintain acceptable performance',
+        );
       }
     });
   });
@@ -355,18 +409,12 @@ void main() {
 // Helper widgets
 
 Widget _buildSimpleAnimationWidget() {
-  return MaterialApp(
-    home: Scaffold(
-      body: _SimpleAnimatedBox(),
-    ),
-  );
+  return MaterialApp(home: Scaffold(body: _SimpleAnimatedBox()));
 }
 
 Widget _buildMultipleAnimationsWidget(int count) {
   return MaterialApp(
-    home: Scaffold(
-      body: _MultipleAnimationsWidget(count: count),
-    ),
+    home: Scaffold(body: _MultipleAnimationsWidget(count: count)),
   );
 }
 
@@ -376,10 +424,7 @@ Widget _buildStaggeredListWidget(int itemCount) {
       body: ListView.builder(
         itemCount: itemCount,
         itemBuilder: (context, index) {
-          return _StaggeredListItem(
-            index: index,
-            key: ValueKey('item_$index'),
-          );
+          return _StaggeredListItem(index: index, key: ValueKey('item_$index'));
         },
       ),
     ),
@@ -387,59 +432,31 @@ Widget _buildStaggeredListWidget(int itemCount) {
 }
 
 Widget _buildScaleAnimationWidget() {
-  return MaterialApp(
-    home: Scaffold(
-      body: _ScaleAnimatedBox(),
-    ),
-  );
+  return MaterialApp(home: Scaffold(body: _ScaleAnimatedBox()));
 }
 
 Widget _buildFadeAnimationWidget() {
-  return MaterialApp(
-    home: Scaffold(
-      body: _FadeAnimatedBox(),
-    ),
-  );
+  return MaterialApp(home: Scaffold(body: _FadeAnimatedBox()));
 }
 
 Widget _buildSlideAnimationWidget() {
-  return MaterialApp(
-    home: Scaffold(
-      body: _SlideAnimatedBox(),
-    ),
-  );
+  return MaterialApp(home: Scaffold(body: _SlideAnimatedBox()));
 }
 
 Widget _buildCombinedAnimationWidget() {
-  return MaterialApp(
-    home: Scaffold(
-      body: _CombinedAnimatedBox(),
-    ),
-  );
+  return MaterialApp(home: Scaffold(body: _CombinedAnimatedBox()));
 }
 
 Widget _buildReducedMotionWidget() {
-  return MaterialApp(
-    home: Scaffold(
-      body: _ReducedMotionBox(),
-    ),
-  );
+  return MaterialApp(home: Scaffold(body: _ReducedMotionBox()));
 }
 
 Widget _buildOptimizedAnimationWidget() {
-  return MaterialApp(
-    home: Scaffold(
-      body: _OptimizedAnimatedBox(),
-    ),
-  );
+  return MaterialApp(home: Scaffold(body: _OptimizedAnimatedBox()));
 }
 
 Widget _buildComplexAnimationWidget() {
-  return MaterialApp(
-    home: Scaffold(
-      body: _ComplexAnimatedBox(),
-    ),
-  );
+  return MaterialApp(home: Scaffold(body: _ComplexAnimatedBox()));
 }
 
 // Animation widgets
@@ -503,12 +520,12 @@ class _SimpleAnimatedBoxState extends State<_SimpleAnimatedBox>
 }
 
 class _MultipleAnimationsWidget extends StatefulWidget {
-
   const _MultipleAnimationsWidget({required this.count});
   final int count;
 
   @override
-  State<_MultipleAnimationsWidget> createState() => _MultipleAnimationsWidgetState();
+  State<_MultipleAnimationsWidget> createState() =>
+      _MultipleAnimationsWidgetState();
 }
 
 class _MultipleAnimationsWidgetState extends State<_MultipleAnimationsWidget>
@@ -565,7 +582,6 @@ class _MultipleAnimationsWidgetState extends State<_MultipleAnimationsWidget>
 }
 
 class _StaggeredListItem extends StatefulWidget {
-
   const _StaggeredListItem({required this.index, super.key});
   final int index;
 
@@ -588,7 +604,10 @@ class _StaggeredListItemState extends State<_StaggeredListItem>
     );
     _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(_controller);
     _slideAnimation = Tween<Offset>(
-      begin: const Offset(0, 0.05), // Use Offset directly instead of removed constant
+      begin: const Offset(
+        0,
+        0.05,
+      ), // Use Offset directly instead of removed constant
       end: Offset.zero,
     ).animate(_controller);
 
@@ -615,12 +634,8 @@ class _StaggeredListItemState extends State<_StaggeredListItem>
         child: Container(
           height: 80,
           margin: const EdgeInsets.all(8),
-          decoration: const BoxDecoration(
-            gradient: AppColors.primaryGradient,
-          ),
-          child: Center(
-            child: Text('Item ${widget.index}'),
-          ),
+          decoration: const BoxDecoration(gradient: AppColors.primaryGradient),
+          child: Center(child: Text('Item ${widget.index}')),
         ),
       ),
     );
@@ -958,7 +973,10 @@ class _ComplexAnimatedBoxState extends State<_ComplexAnimatedBox>
     ]).animate(_controller);
 
     _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(_controller);
-    _rotationAnimation = Tween<double>(begin: 0.0, end: 0.5).animate(_controller);
+    _rotationAnimation = Tween<double>(
+      begin: 0.0,
+      end: 0.5,
+    ).animate(_controller);
   }
 
   @override

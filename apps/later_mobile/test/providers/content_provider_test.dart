@@ -93,7 +93,11 @@ class MockTodoListRepository extends TodoListRepository {
   }
 
   @override
-  Future<TodoList> updateItem(String listId, String itemId, TodoItem updatedItem) async {
+  Future<TodoList> updateItem(
+    String listId,
+    String itemId,
+    TodoItem updatedItem,
+  ) async {
     if (shouldThrowError) {
       throw Exception(errorMessage ?? 'Failed to update item');
     }
@@ -101,7 +105,9 @@ class MockTodoListRepository extends TodoListRepository {
     if (listIndex == -1) {
       throw Exception('TodoList with id $listId does not exist');
     }
-    final itemIndex = mockTodoLists[listIndex].items.indexWhere((i) => i.id == itemId);
+    final itemIndex = mockTodoLists[listIndex].items.indexWhere(
+      (i) => i.id == itemId,
+    );
     if (itemIndex == -1) {
       throw Exception('TodoItem with id $itemId does not exist');
     }
@@ -121,7 +127,9 @@ class MockTodoListRepository extends TodoListRepository {
     if (index == -1) {
       throw Exception('TodoList with id $listId does not exist');
     }
-    final items = mockTodoLists[index].items.where((i) => i.id != itemId).toList();
+    final items = mockTodoLists[index].items
+        .where((i) => i.id != itemId)
+        .toList();
     final updated = mockTodoLists[index].copyWith(items: items);
     mockTodoLists[index] = updated;
     return updated;
@@ -136,7 +144,9 @@ class MockTodoListRepository extends TodoListRepository {
     if (listIndex == -1) {
       throw Exception('TodoList with id $listId does not exist');
     }
-    final itemIndex = mockTodoLists[listIndex].items.indexWhere((i) => i.id == itemId);
+    final itemIndex = mockTodoLists[listIndex].items.indexWhere(
+      (i) => i.id == itemId,
+    );
     if (itemIndex == -1) {
       throw Exception('TodoItem with id $itemId does not exist');
     }
@@ -150,7 +160,11 @@ class MockTodoListRepository extends TodoListRepository {
   }
 
   @override
-  Future<TodoList> reorderItems(String listId, int oldIndex, int newIndex) async {
+  Future<TodoList> reorderItems(
+    String listId,
+    int oldIndex,
+    int newIndex,
+  ) async {
     if (shouldThrowError) {
       throw Exception(errorMessage ?? 'Failed to reorder items');
     }
@@ -248,7 +262,11 @@ class MockListRepository extends ListRepository {
   }
 
   @override
-  Future<ListModel> updateItem(String listId, String itemId, ListItem updatedItem) async {
+  Future<ListModel> updateItem(
+    String listId,
+    String itemId,
+    ListItem updatedItem,
+  ) async {
     if (shouldThrowError) {
       throw Exception(errorMessage ?? 'Failed to update item');
     }
@@ -256,7 +274,9 @@ class MockListRepository extends ListRepository {
     if (listIndex == -1) {
       throw Exception('ListModel with id $listId does not exist');
     }
-    final itemIndex = mockLists[listIndex].items.indexWhere((i) => i.id == itemId);
+    final itemIndex = mockLists[listIndex].items.indexWhere(
+      (i) => i.id == itemId,
+    );
     if (itemIndex == -1) {
       throw Exception('ListItem with id $itemId does not exist');
     }
@@ -291,7 +311,9 @@ class MockListRepository extends ListRepository {
     if (listIndex == -1) {
       throw Exception('ListModel with id $listId does not exist');
     }
-    final itemIndex = mockLists[listIndex].items.indexWhere((i) => i.id == itemId);
+    final itemIndex = mockLists[listIndex].items.indexWhere(
+      (i) => i.id == itemId,
+    );
     if (itemIndex == -1) {
       throw Exception('ListItem with id $itemId does not exist');
     }
@@ -305,7 +327,11 @@ class MockListRepository extends ListRepository {
   }
 
   @override
-  Future<ListModel> reorderItems(String listId, int oldIndex, int newIndex) async {
+  Future<ListModel> reorderItems(
+    String listId,
+    int oldIndex,
+    int newIndex,
+  ) async {
     if (shouldThrowError) {
       throw Exception(errorMessage ?? 'Failed to reorder items');
     }
@@ -419,13 +445,15 @@ class MockSpaceRepository extends SpaceRepository {
     if (shouldThrowError) {
       throw Exception(errorMessage ?? 'Failed to decrement space item count');
     }
-    spaceItemCounts[spaceId] = ((spaceItemCounts[spaceId] ?? 1) - 1).clamp(0, 999);
+    spaceItemCounts[spaceId] = ((spaceItemCounts[spaceId] ?? 1) - 1).clamp(
+      0,
+      999,
+    );
   }
 }
 
 /// Mock implementation of SpacesProvider for testing
 class MockSpacesProvider extends SpacesProvider {
-
   MockSpacesProvider(this.mockRepo) : super(mockRepo);
   final MockSpaceRepository mockRepo;
 
@@ -464,7 +492,10 @@ class MockSpacesProvider extends SpacesProvider {
     if (shouldThrowError) {
       throw Exception(errorMessage ?? 'Failed to decrement space item count');
     }
-    spaceItemCounts[spaceId] = ((spaceItemCounts[spaceId] ?? 1) - 1).clamp(0, 999);
+    spaceItemCounts[spaceId] = ((spaceItemCounts[spaceId] ?? 1) - 1).clamp(
+      0,
+      999,
+    );
     mockRepo.spaceItemCounts[spaceId] = spaceItemCounts[spaceId]!;
   }
 }
@@ -519,12 +550,24 @@ void main() {
 
     test('should return unmodifiable lists from getters', () {
       // Verify that returned lists are unmodifiable
-      expect(() => provider.todoLists.add(TodoList(id: 'test', spaceId: 'test', name: 'test')),
-          throwsUnsupportedError);
-      expect(() => provider.lists.add(ListModel(id: 'test', spaceId: 'test', name: 'test')),
-          throwsUnsupportedError);
-      expect(() => provider.notes.add(Item(id: 'test', title: 'test', spaceId: 'test')),
-          throwsUnsupportedError);
+      expect(
+        () => provider.todoLists.add(
+          TodoList(id: 'test', spaceId: 'test', name: 'test'),
+        ),
+        throwsUnsupportedError,
+      );
+      expect(
+        () => provider.lists.add(
+          ListModel(id: 'test', spaceId: 'test', name: 'test'),
+        ),
+        throwsUnsupportedError,
+      );
+      expect(
+        () => provider.notes.add(
+          Item(id: 'test', title: 'test', spaceId: 'test'),
+        ),
+        throwsUnsupportedError,
+      );
     });
 
     test('should set isLoading to true during loadSpaceContent', () async {
@@ -541,13 +584,16 @@ void main() {
       expect(loadingStates, contains(true));
     });
 
-    test('should set isLoading to false after loadSpaceContent completes', () async {
-      // Act
-      await provider.loadSpaceContent('space-1');
+    test(
+      'should set isLoading to false after loadSpaceContent completes',
+      () async {
+        // Act
+        await provider.loadSpaceContent('space-1');
 
-      // Assert
-      expect(provider.isLoading, isFalse);
-    });
+        // Assert
+        expect(provider.isLoading, isFalse);
+      },
+    );
 
     test('should set error when loadSpaceContent fails', () async {
       // Arrange
@@ -562,19 +608,22 @@ void main() {
       expect(provider.error, isA<AppError>());
     });
 
-    test('should clear error on successful operation after previous error', () async {
-      // Arrange - cause an error first
-      mockTodoListRepo.shouldThrowError = true;
-      await provider.loadSpaceContent('space-1');
-      expect(provider.error, isNotNull);
+    test(
+      'should clear error on successful operation after previous error',
+      () async {
+        // Arrange - cause an error first
+        mockTodoListRepo.shouldThrowError = true;
+        await provider.loadSpaceContent('space-1');
+        expect(provider.error, isNotNull);
 
-      // Act - successful operation
-      mockTodoListRepo.shouldThrowError = false;
-      await provider.loadSpaceContent('space-1');
+        // Act - successful operation
+        mockTodoListRepo.shouldThrowError = false;
+        await provider.loadSpaceContent('space-1');
 
-      // Assert
-      expect(provider.error, isNull);
-    });
+        // Assert
+        expect(provider.error, isNull);
+      },
+    );
 
     test('should set currentSpaceId during loadSpaceContent', () async {
       // Act
@@ -760,7 +809,11 @@ void main() {
 
     test('should update existing todo list', () async {
       // Arrange
-      final original = TodoList(id: 'todo-1', spaceId: 'space-1', name: 'Original');
+      final original = TodoList(
+        id: 'todo-1',
+        spaceId: 'space-1',
+        name: 'Original',
+      );
       await provider.createTodoList(original, mockSpacesProvider);
 
       final updated = original.copyWith(name: 'Updated');
@@ -776,7 +829,11 @@ void main() {
 
     test('should handle update non-existent todo list', () async {
       // Arrange
-      final todoList = TodoList(id: 'non-existent', spaceId: 'space-1', name: 'Test');
+      final todoList = TodoList(
+        id: 'non-existent',
+        spaceId: 'space-1',
+        name: 'Test',
+      );
 
       // Act
       await provider.updateTodoList(todoList);
@@ -967,16 +1024,28 @@ void main() {
     test('should notify listeners on todo item operations', () async {
       // Arrange
       final item = TodoItem(id: 'item-1', title: 'Task 1', sortOrder: 0);
-      final todoList = TodoList(id: 'todo-1', spaceId: 'space-1', name: 'Test', items: [item]);
+      final todoList = TodoList(
+        id: 'todo-1',
+        spaceId: 'space-1',
+        name: 'Test',
+        items: [item],
+      );
       await provider.createTodoList(todoList, mockSpacesProvider);
 
       // Test each operation
       notifyListenersCallCount = 0;
-      await provider.addTodoItem('todo-1', TodoItem(id: 'item-2', title: 'Task 2', sortOrder: 1));
+      await provider.addTodoItem(
+        'todo-1',
+        TodoItem(id: 'item-2', title: 'Task 2', sortOrder: 1),
+      );
       expect(notifyListenersCallCount, greaterThan(0));
 
       notifyListenersCallCount = 0;
-      await provider.updateTodoItem('todo-1', 'item-1', item.copyWith(title: 'Updated'));
+      await provider.updateTodoItem(
+        'todo-1',
+        'item-1',
+        item.copyWith(title: 'Updated'),
+      );
       expect(notifyListenersCallCount, greaterThan(0));
 
       notifyListenersCallCount = 0;
@@ -1020,7 +1089,11 @@ void main() {
 
     test('should update existing list', () async {
       // Arrange
-      final original = ListModel(id: 'list-1', spaceId: 'space-1', name: 'Original');
+      final original = ListModel(
+        id: 'list-1',
+        spaceId: 'space-1',
+        name: 'Original',
+      );
       await provider.createList(original, mockSpacesProvider);
 
       final updated = original.copyWith(name: 'Updated');
@@ -1036,7 +1109,11 @@ void main() {
 
     test('should handle update non-existent list', () async {
       // Arrange
-      final list = ListModel(id: 'non-existent', spaceId: 'space-1', name: 'Test');
+      final list = ListModel(
+        id: 'non-existent',
+        spaceId: 'space-1',
+        name: 'Test',
+      );
 
       // Act
       await provider.updateList(list);
@@ -1223,16 +1300,28 @@ void main() {
     test('should notify listeners on list item operations', () async {
       // Arrange
       final item = ListItem(id: 'item-1', title: 'Item 1', sortOrder: 0);
-      final list = ListModel(id: 'list-1', spaceId: 'space-1', name: 'Test', items: [item]);
+      final list = ListModel(
+        id: 'list-1',
+        spaceId: 'space-1',
+        name: 'Test',
+        items: [item],
+      );
       await provider.createList(list, mockSpacesProvider);
 
       // Test each operation
       notifyListenersCallCount = 0;
-      await provider.addListItem('list-1', ListItem(id: 'item-2', title: 'Item 2', sortOrder: 1));
+      await provider.addListItem(
+        'list-1',
+        ListItem(id: 'item-2', title: 'Item 2', sortOrder: 1),
+      );
       expect(notifyListenersCallCount, greaterThan(0));
 
       notifyListenersCallCount = 0;
-      await provider.updateListItem('list-1', 'item-1', item.copyWith(title: 'Updated'));
+      await provider.updateListItem(
+        'list-1',
+        'item-1',
+        item.copyWith(title: 'Updated'),
+      );
       expect(notifyListenersCallCount, greaterThan(0));
 
       notifyListenersCallCount = 0;
@@ -1276,7 +1365,11 @@ void main() {
 
     test('should update existing note', () async {
       // Arrange
-      final original = Item(id: 'note-1', title: 'Original', spaceId: 'space-1');
+      final original = Item(
+        id: 'note-1',
+        title: 'Original',
+        spaceId: 'space-1',
+      );
       await provider.createNote(original, mockSpacesProvider);
 
       final updated = original.copyWith(title: 'Updated');
@@ -1356,8 +1449,18 @@ void main() {
         ListModel(id: 'list-2', spaceId: 'space-1', name: 'Packing List'),
       ];
       mockNoteRepo.mockNotes = [
-        Item(id: 'note-1', title: 'Meeting Notes', content: 'Important points', spaceId: 'space-1'),
-        Item(id: 'note-2', title: 'Ideas', content: 'Creative thoughts', spaceId: 'space-1'),
+        Item(
+          id: 'note-1',
+          title: 'Meeting Notes',
+          content: 'Important points',
+          spaceId: 'space-1',
+        ),
+        Item(
+          id: 'note-2',
+          title: 'Ideas',
+          content: 'Creative thoughts',
+          spaceId: 'space-1',
+        ),
       ];
       await provider.loadSpaceContent('space-1');
     });
@@ -1473,8 +1576,18 @@ void main() {
       );
 
       mockTodoListRepo.mockTodoLists = [
-        TodoList(id: 'todo-1', spaceId: 'space-1', name: 'Today Tasks', items: [item1]),
-        TodoList(id: 'todo-2', spaceId: 'space-1', name: 'Tomorrow Tasks', items: [item2]),
+        TodoList(
+          id: 'todo-1',
+          spaceId: 'space-1',
+          name: 'Today Tasks',
+          items: [item1],
+        ),
+        TodoList(
+          id: 'todo-2',
+          spaceId: 'space-1',
+          name: 'Tomorrow Tasks',
+          items: [item2],
+        ),
       ];
       await provider.loadSpaceContent('space-1');
 
@@ -1505,8 +1618,18 @@ void main() {
       );
 
       mockTodoListRepo.mockTodoLists = [
-        TodoList(id: 'todo-1', spaceId: 'space-1', name: 'Morning', items: [item1]),
-        TodoList(id: 'todo-2', spaceId: 'space-1', name: 'Evening', items: [item2]),
+        TodoList(
+          id: 'todo-1',
+          spaceId: 'space-1',
+          name: 'Morning',
+          items: [item1],
+        ),
+        TodoList(
+          id: 'todo-2',
+          spaceId: 'space-1',
+          name: 'Evening',
+          items: [item2],
+        ),
       ];
       await provider.loadSpaceContent('space-1');
 
@@ -1544,10 +1667,20 @@ void main() {
       // Arrange
       final today = DateTime(2025, 1, 15);
       final item1 = TodoItem(id: 'item-1', title: 'No due date', sortOrder: 0);
-      final item2 = TodoItem(id: 'item-2', title: 'Has due date', sortOrder: 1, dueDate: today);
+      final item2 = TodoItem(
+        id: 'item-2',
+        title: 'Has due date',
+        sortOrder: 1,
+        dueDate: today,
+      );
 
       mockTodoListRepo.mockTodoLists = [
-        TodoList(id: 'todo-1', spaceId: 'space-1', name: 'Mixed', items: [item1, item2]),
+        TodoList(
+          id: 'todo-1',
+          spaceId: 'space-1',
+          name: 'Mixed',
+          items: [item1, item2],
+        ),
       ];
       await provider.loadSpaceContent('space-1');
 
@@ -1591,21 +1724,24 @@ void main() {
       expect(notifyListenersCallCount, 1);
     });
 
-    test('should preserve error state across operations until cleared', () async {
-      // Arrange - cause an error
-      mockTodoListRepo.shouldThrowError = true;
-      await provider.loadSpaceContent('space-1');
-      final firstError = provider.error;
-      expect(firstError, isNotNull);
+    test(
+      'should preserve error state across operations until cleared',
+      () async {
+        // Arrange - cause an error
+        mockTodoListRepo.shouldThrowError = true;
+        await provider.loadSpaceContent('space-1');
+        final firstError = provider.error;
+        expect(firstError, isNotNull);
 
-      // Act - try another operation that succeeds
-      mockTodoListRepo.shouldThrowError = false;
-      final note = Item(id: 'note-1', title: 'Test', spaceId: 'space-1');
-      await provider.createNote(note, mockSpacesProvider);
+        // Act - try another operation that succeeds
+        mockTodoListRepo.shouldThrowError = false;
+        final note = Item(id: 'note-1', title: 'Test', spaceId: 'space-1');
+        await provider.createNote(note, mockSpacesProvider);
 
-      // Assert - error should be cleared by successful operation
-      expect(provider.error, isNull);
-    });
+        // Assert - error should be cleared by successful operation
+        expect(provider.error, isNull);
+      },
+    );
 
     test('should create AppError from exceptions', () async {
       // Arrange
@@ -1620,34 +1756,48 @@ void main() {
       expect(provider.error!.message, contains('Storage error'));
     });
 
-    test('should handle error during content creation and not increment count', () async {
-      // Arrange
-      mockTodoListRepo.shouldThrowError = true;
-      final todoList = TodoList(id: 'todo-1', spaceId: 'space-1', name: 'Test');
+    test(
+      'should handle error during content creation and not increment count',
+      () async {
+        // Arrange
+        mockTodoListRepo.shouldThrowError = true;
+        final todoList = TodoList(
+          id: 'todo-1',
+          spaceId: 'space-1',
+          name: 'Test',
+        );
 
-      // Act
-      await provider.createTodoList(todoList, mockSpacesProvider);
+        // Act
+        await provider.createTodoList(todoList, mockSpacesProvider);
 
-      // Assert
-      expect(provider.error, isNotNull);
-      expect(mockSpacesProvider.incrementSpaceItemCountCallCount, 0);
-      expect(provider.todoLists, isEmpty);
-    });
+        // Assert
+        expect(provider.error, isNotNull);
+        expect(mockSpacesProvider.incrementSpaceItemCountCallCount, 0);
+        expect(provider.todoLists, isEmpty);
+      },
+    );
 
-    test('should handle error during content deletion and not decrement count', () async {
-      // Arrange
-      final todoList = TodoList(id: 'todo-1', spaceId: 'space-1', name: 'Test');
-      await provider.createTodoList(todoList, mockSpacesProvider);
+    test(
+      'should handle error during content deletion and not decrement count',
+      () async {
+        // Arrange
+        final todoList = TodoList(
+          id: 'todo-1',
+          spaceId: 'space-1',
+          name: 'Test',
+        );
+        await provider.createTodoList(todoList, mockSpacesProvider);
 
-      // Act - cause error on delete
-      mockTodoListRepo.shouldThrowError = true;
-      await provider.deleteTodoList('todo-1', mockSpacesProvider);
+        // Act - cause error on delete
+        mockTodoListRepo.shouldThrowError = true;
+        await provider.deleteTodoList('todo-1', mockSpacesProvider);
 
-      // Assert
-      expect(provider.error, isNotNull);
-      // Count should have been incremented on create but not decremented on failed delete
-      expect(mockSpacesProvider.decrementSpaceItemCountCallCount, 0);
-    });
+        // Assert
+        expect(provider.error, isNotNull);
+        // Count should have been incremented on create but not decremented on failed delete
+        expect(mockSpacesProvider.decrementSpaceItemCountCallCount, 0);
+      },
+    );
 
     test('should continue normal operation after error recovery', () async {
       // Arrange - cause an error

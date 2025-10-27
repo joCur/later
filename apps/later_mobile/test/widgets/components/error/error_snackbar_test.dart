@@ -61,8 +61,9 @@ void main() {
       expect(find.text('Retry'), findsOneWidget);
     });
 
-    testWidgets('does not show action for non-retryable errors',
-        (tester) async {
+    testWidgets('does not show action for non-retryable errors', (
+      tester,
+    ) async {
       final error = AppError.validation(message: 'Test'); // Not retryable
 
       await tester.pumpWidget(
@@ -306,8 +307,9 @@ void main() {
       }
     });
 
-    testWidgets('dismisses previous snackbar when showing new one',
-        (tester) async {
+    testWidgets('dismisses previous snackbar when showing new one', (
+      tester,
+    ) async {
       final error1 = AppError.storage(message: 'Error 1');
       final error2 = AppError.network(message: 'Error 2');
 

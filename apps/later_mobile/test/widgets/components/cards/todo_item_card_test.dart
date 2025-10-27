@@ -32,19 +32,13 @@ void main() {
 
     // Helper to wrap widget in MaterialApp for testing
     Widget makeTestableWidget(Widget child) {
-      return MaterialApp(
-        home: Scaffold(
-          body: child,
-        ),
-      );
+      return MaterialApp(home: Scaffold(body: child));
     }
 
     group('Rendering', () {
       testWidgets('renders with TodoItem data', (tester) async {
         await tester.pumpWidget(
-          makeTestableWidget(
-            TodoItemCard(todoItem: testTodoItem),
-          ),
+          makeTestableWidget(TodoItemCard(todoItem: testTodoItem)),
         );
 
         expect(find.byType(TodoItemCard), findsOneWidget);
@@ -52,30 +46,28 @@ void main() {
 
       testWidgets('displays title correctly', (tester) async {
         await tester.pumpWidget(
-          makeTestableWidget(
-            TodoItemCard(todoItem: testTodoItem),
-          ),
+          makeTestableWidget(TodoItemCard(todoItem: testTodoItem)),
         );
 
         expect(find.text('Complete project documentation'), findsOneWidget);
       });
 
-      testWidgets('shows checkbox with correct state when not completed', (tester) async {
+      testWidgets('shows checkbox with correct state when not completed', (
+        tester,
+      ) async {
         await tester.pumpWidget(
-          makeTestableWidget(
-            TodoItemCard(todoItem: testTodoItem),
-          ),
+          makeTestableWidget(TodoItemCard(todoItem: testTodoItem)),
         );
 
         final checkbox = tester.widget<Checkbox>(find.byType(Checkbox));
         expect(checkbox.value, false);
       });
 
-      testWidgets('shows checkbox with correct state when completed', (tester) async {
+      testWidgets('shows checkbox with correct state when completed', (
+        tester,
+      ) async {
         await tester.pumpWidget(
-          makeTestableWidget(
-            TodoItemCard(todoItem: completedTodoItem),
-          ),
+          makeTestableWidget(TodoItemCard(todoItem: completedTodoItem)),
         );
 
         final checkbox = tester.widget<Checkbox>(find.byType(Checkbox));
@@ -84,9 +76,7 @@ void main() {
 
       testWidgets('shows strikethrough when completed', (tester) async {
         await tester.pumpWidget(
-          makeTestableWidget(
-            TodoItemCard(todoItem: completedTodoItem),
-          ),
+          makeTestableWidget(TodoItemCard(todoItem: completedTodoItem)),
         );
 
         final textWidget = tester.widget<Text>(
@@ -95,11 +85,11 @@ void main() {
         expect(textWidget.style?.decoration, TextDecoration.lineThrough);
       });
 
-      testWidgets('does not show strikethrough when not completed', (tester) async {
+      testWidgets('does not show strikethrough when not completed', (
+        tester,
+      ) async {
         await tester.pumpWidget(
-          makeTestableWidget(
-            TodoItemCard(todoItem: testTodoItem),
-          ),
+          makeTestableWidget(TodoItemCard(todoItem: testTodoItem)),
         );
 
         final textWidget = tester.widget<Text>(
@@ -110,9 +100,7 @@ void main() {
 
       testWidgets('shows due date if present', (tester) async {
         await tester.pumpWidget(
-          makeTestableWidget(
-            TodoItemCard(todoItem: testTodoItem),
-          ),
+          makeTestableWidget(TodoItemCard(todoItem: testTodoItem)),
         );
 
         // Should show "Mar 15" format
@@ -121,9 +109,7 @@ void main() {
 
       testWidgets('does not show due date if not present', (tester) async {
         await tester.pumpWidget(
-          makeTestableWidget(
-            TodoItemCard(todoItem: minimalTodoItem),
-          ),
+          makeTestableWidget(TodoItemCard(todoItem: minimalTodoItem)),
         );
 
         // Should not show date text
@@ -132,41 +118,39 @@ void main() {
 
       testWidgets('shows priority badge for high priority', (tester) async {
         await tester.pumpWidget(
-          makeTestableWidget(
-            TodoItemCard(todoItem: testTodoItem),
-          ),
+          makeTestableWidget(TodoItemCard(todoItem: testTodoItem)),
         );
 
         expect(find.text('HIGH'), findsOneWidget);
       });
 
       testWidgets('shows priority badge for medium priority', (tester) async {
-        final mediumPriorityItem = testTodoItem.copyWith(priority: TodoPriority.medium);
+        final mediumPriorityItem = testTodoItem.copyWith(
+          priority: TodoPriority.medium,
+        );
         await tester.pumpWidget(
-          makeTestableWidget(
-            TodoItemCard(todoItem: mediumPriorityItem),
-          ),
+          makeTestableWidget(TodoItemCard(todoItem: mediumPriorityItem)),
         );
 
         expect(find.text('MED'), findsOneWidget);
       });
 
       testWidgets('shows priority badge for low priority', (tester) async {
-        final lowPriorityItem = testTodoItem.copyWith(priority: TodoPriority.low);
+        final lowPriorityItem = testTodoItem.copyWith(
+          priority: TodoPriority.low,
+        );
         await tester.pumpWidget(
-          makeTestableWidget(
-            TodoItemCard(todoItem: lowPriorityItem),
-          ),
+          makeTestableWidget(TodoItemCard(todoItem: lowPriorityItem)),
         );
 
         expect(find.text('LOW'), findsOneWidget);
       });
 
-      testWidgets('does not show priority badge if priority is null', (tester) async {
+      testWidgets('does not show priority badge if priority is null', (
+        tester,
+      ) async {
         await tester.pumpWidget(
-          makeTestableWidget(
-            TodoItemCard(todoItem: minimalTodoItem),
-          ),
+          makeTestableWidget(TodoItemCard(todoItem: minimalTodoItem)),
         );
 
         expect(find.text('HIGH'), findsNothing);
@@ -176,9 +160,7 @@ void main() {
 
       testWidgets('shows reorder handle icon', (tester) async {
         await tester.pumpWidget(
-          makeTestableWidget(
-            TodoItemCard(todoItem: testTodoItem),
-          ),
+          makeTestableWidget(TodoItemCard(todoItem: testTodoItem)),
         );
 
         expect(find.byIcon(Icons.drag_indicator), findsOneWidget);
@@ -186,9 +168,7 @@ void main() {
 
       testWidgets('renders with compact height', (tester) async {
         await tester.pumpWidget(
-          makeTestableWidget(
-            TodoItemCard(todoItem: testTodoItem),
-          ),
+          makeTestableWidget(TodoItemCard(todoItem: testTodoItem)),
         );
 
         // Find the container (card should be 56-64px height)
@@ -200,9 +180,7 @@ void main() {
     group('Priority Badge Colors', () {
       testWidgets('high priority badge has red background', (tester) async {
         await tester.pumpWidget(
-          makeTestableWidget(
-            TodoItemCard(todoItem: testTodoItem),
-          ),
+          makeTestableWidget(TodoItemCard(todoItem: testTodoItem)),
         );
 
         // Find the priority badge container
@@ -218,11 +196,11 @@ void main() {
       });
 
       testWidgets('medium priority badge has amber background', (tester) async {
-        final mediumPriorityItem = testTodoItem.copyWith(priority: TodoPriority.medium);
+        final mediumPriorityItem = testTodoItem.copyWith(
+          priority: TodoPriority.medium,
+        );
         await tester.pumpWidget(
-          makeTestableWidget(
-            TodoItemCard(todoItem: mediumPriorityItem),
-          ),
+          makeTestableWidget(TodoItemCard(todoItem: mediumPriorityItem)),
         );
 
         final badgeFinder = find.ancestor(
@@ -237,11 +215,11 @@ void main() {
       });
 
       testWidgets('low priority badge has neutral background', (tester) async {
-        final lowPriorityItem = testTodoItem.copyWith(priority: TodoPriority.low);
+        final lowPriorityItem = testTodoItem.copyWith(
+          priority: TodoPriority.low,
+        );
         await tester.pumpWidget(
-          makeTestableWidget(
-            TodoItemCard(todoItem: lowPriorityItem),
-          ),
+          makeTestableWidget(TodoItemCard(todoItem: lowPriorityItem)),
         );
 
         final badgeFinder = find.ancestor(
@@ -261,10 +239,7 @@ void main() {
         bool tapped = false;
         await tester.pumpWidget(
           makeTestableWidget(
-            TodoItemCard(
-              todoItem: testTodoItem,
-              onTap: () => tapped = true,
-            ),
+            TodoItemCard(todoItem: testTodoItem, onTap: () => tapped = true),
           ),
         );
 
@@ -274,7 +249,9 @@ void main() {
         expect(tapped, true);
       });
 
-      testWidgets('onCheckboxChanged callback fires when checkbox is tapped', (tester) async {
+      testWidgets('onCheckboxChanged callback fires when checkbox is tapped', (
+        tester,
+      ) async {
         bool? newValue;
         await tester.pumpWidget(
           makeTestableWidget(
@@ -291,22 +268,25 @@ void main() {
         expect(newValue, true);
       });
 
-      testWidgets('onCheckboxChanged callback receives correct value when toggling from completed', (tester) async {
-        bool? newValue;
-        await tester.pumpWidget(
-          makeTestableWidget(
-            TodoItemCard(
-              todoItem: completedTodoItem,
-              onCheckboxChanged: (value) => newValue = value,
+      testWidgets(
+        'onCheckboxChanged callback receives correct value when toggling from completed',
+        (tester) async {
+          bool? newValue;
+          await tester.pumpWidget(
+            makeTestableWidget(
+              TodoItemCard(
+                todoItem: completedTodoItem,
+                onCheckboxChanged: (value) => newValue = value,
+              ),
             ),
-          ),
-        );
+          );
 
-        await tester.tap(find.byType(Checkbox));
-        await tester.pump();
+          await tester.tap(find.byType(Checkbox));
+          await tester.pump();
 
-        expect(newValue, false);
-      });
+          expect(newValue, false);
+        },
+      );
 
       testWidgets('long press callback fires', (tester) async {
         bool longPressed = false;
@@ -325,7 +305,9 @@ void main() {
         expect(longPressed, true);
       });
 
-      testWidgets('onTap toggles completion when no callback provided', (tester) async {
+      testWidgets('onTap toggles completion when no callback provided', (
+        tester,
+      ) async {
         bool? checkboxValue;
         await tester.pumpWidget(
           makeTestableWidget(
@@ -346,24 +328,26 @@ void main() {
     });
 
     group('Accessibility', () {
-      testWidgets('has correct semantic label for incomplete item', (tester) async {
+      testWidgets('has correct semantic label for incomplete item', (
+        tester,
+      ) async {
         await tester.pumpWidget(
-          makeTestableWidget(
-            TodoItemCard(todoItem: testTodoItem),
-          ),
+          makeTestableWidget(TodoItemCard(todoItem: testTodoItem)),
         );
 
         expect(
-          find.bySemanticsLabel(RegExp('Complete project documentation.*not completed')),
+          find.bySemanticsLabel(
+            RegExp('Complete project documentation.*not completed'),
+          ),
           findsOneWidget,
         );
       });
 
-      testWidgets('has correct semantic label for completed item', (tester) async {
+      testWidgets('has correct semantic label for completed item', (
+        tester,
+      ) async {
         await tester.pumpWidget(
-          makeTestableWidget(
-            TodoItemCard(todoItem: completedTodoItem),
-          ),
+          makeTestableWidget(TodoItemCard(todoItem: completedTodoItem)),
         );
 
         expect(
@@ -372,11 +356,11 @@ void main() {
         );
       });
 
-      testWidgets('includes due date in semantic label if present', (tester) async {
+      testWidgets('includes due date in semantic label if present', (
+        tester,
+      ) async {
         await tester.pumpWidget(
-          makeTestableWidget(
-            TodoItemCard(todoItem: testTodoItem),
-          ),
+          makeTestableWidget(TodoItemCard(todoItem: testTodoItem)),
         );
 
         expect(
@@ -385,11 +369,11 @@ void main() {
         );
       });
 
-      testWidgets('includes priority in semantic label if present', (tester) async {
+      testWidgets('includes priority in semantic label if present', (
+        tester,
+      ) async {
         await tester.pumpWidget(
-          makeTestableWidget(
-            TodoItemCard(todoItem: testTodoItem),
-          ),
+          makeTestableWidget(TodoItemCard(todoItem: testTodoItem)),
         );
 
         expect(
@@ -398,11 +382,11 @@ void main() {
         );
       });
 
-      testWidgets('checkbox is marked as checkbox for screen readers', (tester) async {
+      testWidgets('checkbox is marked as checkbox for screen readers', (
+        tester,
+      ) async {
         await tester.pumpWidget(
-          makeTestableWidget(
-            TodoItemCard(todoItem: testTodoItem),
-          ),
+          makeTestableWidget(TodoItemCard(todoItem: testTodoItem)),
         );
 
         // Verify checkbox is present and accessible
@@ -413,9 +397,7 @@ void main() {
     group('Visual States', () {
       testWidgets('shows hover state on desktop', (tester) async {
         await tester.pumpWidget(
-          makeTestableWidget(
-            TodoItemCard(todoItem: testTodoItem),
-          ),
+          makeTestableWidget(TodoItemCard(todoItem: testTodoItem)),
         );
 
         // Find the gesture detector and hover
@@ -429,9 +411,7 @@ void main() {
 
       testWidgets('applies reduced opacity when completed', (tester) async {
         await tester.pumpWidget(
-          makeTestableWidget(
-            TodoItemCard(todoItem: completedTodoItem),
-          ),
+          makeTestableWidget(TodoItemCard(todoItem: completedTodoItem)),
         );
 
         // The entire card should have reduced opacity
@@ -453,9 +433,7 @@ void main() {
         );
 
         await tester.pumpWidget(
-          makeTestableWidget(
-            TodoItemCard(todoItem: item),
-          ),
+          makeTestableWidget(TodoItemCard(todoItem: item)),
         );
 
         expect(find.text('Jun 20'), findsOneWidget);
@@ -467,9 +445,7 @@ void main() {
         );
 
         await tester.pumpWidget(
-          makeTestableWidget(
-            TodoItemCard(todoItem: item),
-          ),
+          makeTestableWidget(TodoItemCard(todoItem: item)),
         );
 
         expect(find.text('Dec 5'), findsOneWidget);
@@ -478,16 +454,10 @@ void main() {
 
     group('Edge Cases', () {
       testWidgets('handles empty title gracefully', (tester) async {
-        final emptyTitleItem = TodoItem(
-          id: 'empty',
-          title: '',
-          sortOrder: 0,
-        );
+        final emptyTitleItem = TodoItem(id: 'empty', title: '', sortOrder: 0);
 
         await tester.pumpWidget(
-          makeTestableWidget(
-            TodoItemCard(todoItem: emptyTitleItem),
-          ),
+          makeTestableWidget(TodoItemCard(todoItem: emptyTitleItem)),
         );
 
         expect(find.byType(TodoItemCard), findsOneWidget);
@@ -496,27 +466,22 @@ void main() {
       testWidgets('handles very long title with ellipsis', (tester) async {
         final longTitleItem = TodoItem(
           id: 'long',
-          title: 'This is a very long title that should be truncated with an ellipsis because it exceeds the maximum width available in the card',
+          title:
+              'This is a very long title that should be truncated with an ellipsis because it exceeds the maximum width available in the card',
           sortOrder: 0,
         );
 
         await tester.pumpWidget(
-          makeTestableWidget(
-            TodoItemCard(todoItem: longTitleItem),
-          ),
+          makeTestableWidget(TodoItemCard(todoItem: longTitleItem)),
         );
 
-        final textWidget = tester.widget<Text>(
-          find.text(longTitleItem.title),
-        );
+        final textWidget = tester.widget<Text>(find.text(longTitleItem.title));
         expect(textWidget.overflow, TextOverflow.ellipsis);
       });
 
       testWidgets('handles null callbacks gracefully', (tester) async {
         await tester.pumpWidget(
-          makeTestableWidget(
-            TodoItemCard(todoItem: testTodoItem),
-          ),
+          makeTestableWidget(TodoItemCard(todoItem: testTodoItem)),
         );
 
         // Should not crash when tapping without callbacks
@@ -530,9 +495,7 @@ void main() {
     group('Layout', () {
       testWidgets('checkbox is on the left', (tester) async {
         await tester.pumpWidget(
-          makeTestableWidget(
-            TodoItemCard(todoItem: testTodoItem),
-          ),
+          makeTestableWidget(TodoItemCard(todoItem: testTodoItem)),
         );
 
         final checkboxOffset = tester.getTopLeft(find.byType(Checkbox));
@@ -543,22 +506,22 @@ void main() {
 
       testWidgets('reorder handle is on the right', (tester) async {
         await tester.pumpWidget(
-          makeTestableWidget(
-            TodoItemCard(todoItem: testTodoItem),
-          ),
+          makeTestableWidget(TodoItemCard(todoItem: testTodoItem)),
         );
 
-        final handleOffset = tester.getTopRight(find.byIcon(Icons.drag_indicator));
+        final handleOffset = tester.getTopRight(
+          find.byIcon(Icons.drag_indicator),
+        );
         final titleOffset = tester.getTopRight(find.text(testTodoItem.title));
 
         expect(handleOffset.dx, greaterThan(titleOffset.dx));
       });
 
-      testWidgets('priority badge is below title in metadata row', (tester) async {
+      testWidgets('priority badge is below title in metadata row', (
+        tester,
+      ) async {
         await tester.pumpWidget(
-          makeTestableWidget(
-            TodoItemCard(todoItem: testTodoItem),
-          ),
+          makeTestableWidget(TodoItemCard(todoItem: testTodoItem)),
         );
 
         final titleOffset = tester.getCenter(find.text(testTodoItem.title));
@@ -572,9 +535,7 @@ void main() {
     group('Performance', () {
       testWidgets('uses RepaintBoundary for optimization', (tester) async {
         await tester.pumpWidget(
-          makeTestableWidget(
-            TodoItemCard(todoItem: testTodoItem),
-          ),
+          makeTestableWidget(TodoItemCard(todoItem: testTodoItem)),
         );
 
         expect(find.byType(RepaintBoundary), findsWidgets);

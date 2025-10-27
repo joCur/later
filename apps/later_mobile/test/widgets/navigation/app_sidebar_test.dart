@@ -150,18 +150,8 @@ void main() {
 
     testWidgets('displays space list with item counts', (tester) async {
       final spaces = [
-        Space(
-          id: 'space-1',
-          name: 'Work',
-          icon: '💼',
-          itemCount: 5,
-        ),
-        Space(
-          id: 'space-2',
-          name: 'Personal',
-          icon: '🏠',
-          itemCount: 3,
-        ),
+        Space(id: 'space-1', name: 'Work', icon: '💼', itemCount: 5),
+        Space(id: 'space-2', name: 'Personal', icon: '🏠', itemCount: 3),
       ];
 
       mockRepository.mockSpaces = spaces;
@@ -222,8 +212,9 @@ void main() {
       expect(spacesProvider.currentSpace?.id, equals('space-2'));
     });
 
-    testWidgets('calls onToggleExpanded when toggle button tapped',
-        (tester) async {
+    testWidgets('calls onToggleExpanded when toggle button tapped', (
+      tester,
+    ) async {
       bool toggleCalled = false;
 
       await tester.pumpWidget(
@@ -246,10 +237,7 @@ void main() {
 
     testWidgets('shows correct icon in collapsed state', (tester) async {
       await tester.pumpWidget(
-        createTestWidget(
-          isExpanded: false,
-          onToggleExpanded: () {},
-        ),
+        createTestWidget(isExpanded: false, onToggleExpanded: () {}),
       );
 
       // In collapsed state, should show menu icon instead of menu_open
@@ -347,11 +335,8 @@ void main() {
     testWidgets('keyboard shortcuts work for spaces 1-9', (tester) async {
       final spaces = List.generate(
         9,
-        (i) => Space(
-          id: 'space-${i + 1}',
-          name: 'Space ${i + 1}',
-          itemCount: i,
-        ),
+        (i) =>
+            Space(id: 'space-${i + 1}', name: 'Space ${i + 1}', itemCount: i),
       );
 
       mockRepository.mockSpaces = spaces;
@@ -407,16 +392,11 @@ void main() {
 
       // Verify semantic label includes item count and keyboard shortcut
       final semantics = tester.getSemantics(spaceItem);
-      expect(
-        semantics.label,
-        contains('Work, 5 items, keyboard shortcut 1'),
-      );
+      expect(semantics.label, contains('Work, 5 items, keyboard shortcut 1'));
     });
 
     testWidgets('displays tooltips on hover', (tester) async {
-      final spaces = [
-        Space(id: 'space-1', name: 'Work', itemCount: 5),
-      ];
+      final spaces = [Space(id: 'space-1', name: 'Work', itemCount: 5)];
 
       mockRepository.mockSpaces = spaces;
 
@@ -429,8 +409,9 @@ void main() {
       expect(find.byType(Tooltip), findsWidgets);
     });
 
-    testWidgets('collapsed view shows space icon or first letter',
-        (tester) async {
+    testWidgets('collapsed view shows space icon or first letter', (
+      tester,
+    ) async {
       final spaces = [
         Space(id: 'space-1', name: 'Work', icon: '💼', itemCount: 5),
         Space(id: 'space-2', name: 'Personal', itemCount: 3),
@@ -450,9 +431,7 @@ void main() {
     });
 
     testWidgets('maintains minimum touch target size', (tester) async {
-      final spaces = [
-        Space(id: 'space-1', name: 'Work', itemCount: 5),
-      ];
+      final spaces = [Space(id: 'space-1', name: 'Work', itemCount: 5)];
 
       mockRepository.mockSpaces = spaces;
 
@@ -463,10 +442,7 @@ void main() {
 
       // Each space item should be at least 44px tall (minimum touch target)
       final spaceItemContainer = find
-          .ancestor(
-            of: find.text('Work'),
-            matching: find.byType(Container),
-          )
+          .ancestor(of: find.text('Work'), matching: find.byType(Container))
           .first;
 
       final container = tester.widget<Container>(spaceItemContainer);
@@ -479,9 +455,7 @@ void main() {
           theme: ThemeData.dark(),
           home: ChangeNotifierProvider<SpacesProvider>.value(
             value: spacesProvider,
-            child: const Scaffold(
-              body: AppSidebar(),
-            ),
+            child: const Scaffold(body: AppSidebar()),
           ),
         ),
       );
@@ -495,9 +469,7 @@ void main() {
           theme: ThemeData.light(),
           home: ChangeNotifierProvider<SpacesProvider>.value(
             value: spacesProvider,
-            child: const Scaffold(
-              body: AppSidebar(),
-            ),
+            child: const Scaffold(body: AppSidebar()),
           ),
         ),
       );
@@ -560,21 +532,18 @@ void main() {
 
       // Should find gradient overlay on hover
       final hoveredContainer = find.descendant(
-        of: find.ancestor(
-          of: spaceItem,
-          matching: find.byType(Container),
-        ),
+        of: find.ancestor(of: spaceItem, matching: find.byType(Container)),
         matching: find.byWidgetPredicate(
-          (widget) =>
-              widget is Container &&
-              widget.decoration is BoxDecoration,
+          (widget) => widget is Container && widget.decoration is BoxDecoration,
         ),
       );
 
       expect(hoveredContainer, findsWidgets);
     });
 
-    testWidgets('selected space has gradient active indicator pill', (tester) async {
+    testWidgets('selected space has gradient active indicator pill', (
+      tester,
+    ) async {
       final spaces = [
         Space(id: 'space-1', name: 'Work', icon: '💼', itemCount: 5),
         Space(id: 'space-2', name: 'Personal', icon: '🏠', itemCount: 3),
@@ -629,7 +598,9 @@ void main() {
       expect(iconContainer, findsAtLeastNWidgets(1));
     });
 
-    testWidgets('uses spring physics for expand/collapse animation', (tester) async {
+    testWidgets('uses spring physics for expand/collapse animation', (
+      tester,
+    ) async {
       bool isExpanded = true;
 
       await tester.pumpWidget(
@@ -665,10 +636,15 @@ void main() {
       final animatedContainer = tester.widget<AnimatedContainer>(
         find.byType(AnimatedContainer).first,
       );
-      expect(animatedContainer.duration, equals(const Duration(milliseconds: 250)));
+      expect(
+        animatedContainer.duration,
+        equals(const Duration(milliseconds: 250)),
+      );
     });
 
-    testWidgets('collapsed state shows gradient hints on left edge', (tester) async {
+    testWidgets('collapsed state shows gradient hints on left edge', (
+      tester,
+    ) async {
       final spaces = [
         Space(id: 'space-1', name: 'Work', icon: '💼', itemCount: 5),
       ];
@@ -722,14 +698,13 @@ void main() {
       expect(gradientSeparator, findsWidgets);
     });
 
-    testWidgets('keyboard shortcuts still work with gradient redesign', (tester) async {
+    testWidgets('keyboard shortcuts still work with gradient redesign', (
+      tester,
+    ) async {
       final spaces = List.generate(
         5,
-        (i) => Space(
-          id: 'space-${i + 1}',
-          name: 'Space ${i + 1}',
-          itemCount: i,
-        ),
+        (i) =>
+            Space(id: 'space-${i + 1}', name: 'Space ${i + 1}', itemCount: i),
       );
 
       mockRepository.mockSpaces = spaces;

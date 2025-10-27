@@ -83,9 +83,7 @@ void main() {
     group('CRUD operations', () {
       test('create() successfully stores a TodoList', () async {
         // Arrange
-        final todoList = createTestTodoList(
-          id: 'todo-1',
-        );
+        final todoList = createTestTodoList(id: 'todo-1');
 
         // Act
         final result = await repository.create(todoList);
@@ -124,14 +122,8 @@ void main() {
 
       test('getBySpace() returns all TodoLists for a space', () async {
         // Arrange
-        final todoList1 = createTestTodoList(
-          id: 'todo-1',
-          name: 'List 1',
-        );
-        final todoList2 = createTestTodoList(
-          id: 'todo-2',
-          name: 'List 2',
-        );
+        final todoList1 = createTestTodoList(id: 'todo-1', name: 'List 1');
+        final todoList2 = createTestTodoList(id: 'todo-2', name: 'List 2');
         final todoList3 = createTestTodoList(
           id: 'todo-3',
           spaceId: 'space-2',
@@ -148,7 +140,10 @@ void main() {
         // Assert
         expect(result.length, equals(2));
         expect(result.every((list) => list.spaceId == 'space-1'), isTrue);
-        expect(result.map((list) => list.id), containsAll(['todo-1', 'todo-2']));
+        expect(
+          result.map((list) => list.id),
+          containsAll(['todo-1', 'todo-2']),
+        );
       });
 
       test('getBySpace() returns empty list when no TodoLists exist', () async {
@@ -170,9 +165,7 @@ void main() {
         // Wait to ensure timestamp difference
         await Future<void>.delayed(const Duration(milliseconds: 10));
 
-        final updatedTodoList = todoList.copyWith(
-          name: 'Updated Name',
-        );
+        final updatedTodoList = todoList.copyWith(name: 'Updated Name');
 
         // Act
         final result = await repository.update(updatedTodoList);
@@ -188,10 +181,7 @@ void main() {
         final nonExistentTodoList = createTestTodoList(id: 'non-existent');
 
         // Act & Assert
-        expect(
-          () => repository.update(nonExistentTodoList),
-          throwsException,
-        );
+        expect(() => repository.update(nonExistentTodoList), throwsException);
       });
 
       test('delete() removes TodoList', () async {
@@ -221,10 +211,7 @@ void main() {
         final todoList = createTestTodoList(id: 'todo-1', items: []);
         await repository.create(todoList);
 
-        final item = createTestTodoItem(
-          id: 'item-1',
-          title: 'Fix bug #123',
-        );
+        final item = createTestTodoItem(id: 'item-1', title: 'Fix bug #123');
 
         // Act
         final result = await repository.addItem('todo-1', item);
@@ -241,58 +228,62 @@ void main() {
         final item = createTestTodoItem(id: 'item-1');
 
         // Act & Assert
-        expect(
-          () => repository.addItem('non-existent', item),
-          throwsException,
-        );
+        expect(() => repository.addItem('non-existent', item), throwsException);
       });
 
       test('updateItem() updates specific TodoItem', () async {
         // Arrange
-        final item1 = createTestTodoItem(
-          id: 'item-1',
-          title: 'Original Title',
-        );
-        final todoList = createTestTodoList(
-          id: 'todo-1',
-          items: [item1],
-        );
+        final item1 = createTestTodoItem(id: 'item-1', title: 'Original Title');
+        final todoList = createTestTodoList(id: 'todo-1', items: [item1]);
         await repository.create(todoList);
 
         final updatedItem = item1.copyWith(title: 'Updated Title');
 
         // Act
-        final result = await repository.updateItem('todo-1', 'item-1', updatedItem);
+        final result = await repository.updateItem(
+          'todo-1',
+          'item-1',
+          updatedItem,
+        );
 
         // Assert
         expect(result.items.first.title, equals('Updated Title'));
-        expect(todoListBox.get('todo-1')!.items.first.title, equals('Updated Title'));
-      });
-
-      test('updateItem() throws exception when TodoList does not exist', () async {
-        // Arrange
-        final item = createTestTodoItem(id: 'item-1');
-
-        // Act & Assert
         expect(
-          () => repository.updateItem('non-existent', 'item-1', item),
-          throwsException,
+          todoListBox.get('todo-1')!.items.first.title,
+          equals('Updated Title'),
         );
       });
 
-      test('updateItem() throws exception when TodoItem does not exist', () async {
-        // Arrange
-        final todoList = createTestTodoList(id: 'todo-1', items: []);
-        await repository.create(todoList);
+      test(
+        'updateItem() throws exception when TodoList does not exist',
+        () async {
+          // Arrange
+          final item = createTestTodoItem(id: 'item-1');
 
-        final item = createTestTodoItem(id: 'item-1');
+          // Act & Assert
+          expect(
+            () => repository.updateItem('non-existent', 'item-1', item),
+            throwsException,
+          );
+        },
+      );
 
-        // Act & Assert
-        expect(
-          () => repository.updateItem('todo-1', 'item-1', item),
-          throwsException,
-        );
-      });
+      test(
+        'updateItem() throws exception when TodoItem does not exist',
+        () async {
+          // Arrange
+          final todoList = createTestTodoList(id: 'todo-1', items: []);
+          await repository.create(todoList);
+
+          final item = createTestTodoItem(id: 'item-1');
+
+          // Act & Assert
+          expect(
+            () => repository.updateItem('todo-1', 'item-1', item),
+            throwsException,
+          );
+        },
+      );
 
       test('deleteItem() removes TodoItem from TodoList', () async {
         // Arrange
@@ -313,23 +304,21 @@ void main() {
         expect(todoListBox.get('todo-1')!.items.length, equals(1));
       });
 
-      test('deleteItem() throws exception when TodoList does not exist', () async {
-        // Act & Assert
-        expect(
-          () => repository.deleteItem('non-existent', 'item-1'),
-          throwsException,
-        );
-      });
+      test(
+        'deleteItem() throws exception when TodoList does not exist',
+        () async {
+          // Act & Assert
+          expect(
+            () => repository.deleteItem('non-existent', 'item-1'),
+            throwsException,
+          );
+        },
+      );
 
       test('toggleItem() toggles isCompleted status', () async {
         // Arrange
-        final item = createTestTodoItem(
-          id: 'item-1',
-        );
-        final todoList = createTestTodoList(
-          id: 'todo-1',
-          items: [item],
-        );
+        final item = createTestTodoItem(id: 'item-1');
+        final todoList = createTestTodoList(id: 'todo-1', items: [item]);
         await repository.create(todoList);
 
         // Act - toggle to true
@@ -345,31 +334,45 @@ void main() {
         expect(result2.items.first.isCompleted, isFalse);
       });
 
-      test('toggleItem() throws exception when TodoList does not exist', () async {
-        // Act & Assert
-        expect(
-          () => repository.toggleItem('non-existent', 'item-1'),
-          throwsException,
-        );
-      });
+      test(
+        'toggleItem() throws exception when TodoList does not exist',
+        () async {
+          // Act & Assert
+          expect(
+            () => repository.toggleItem('non-existent', 'item-1'),
+            throwsException,
+          );
+        },
+      );
 
-      test('toggleItem() throws exception when TodoItem does not exist', () async {
-        // Arrange
-        final todoList = createTestTodoList(id: 'todo-1', items: []);
-        await repository.create(todoList);
+      test(
+        'toggleItem() throws exception when TodoItem does not exist',
+        () async {
+          // Arrange
+          final todoList = createTestTodoList(id: 'todo-1', items: []);
+          await repository.create(todoList);
 
-        // Act & Assert
-        expect(
-          () => repository.toggleItem('todo-1', 'non-existent'),
-          throwsException,
-        );
-      });
+          // Act & Assert
+          expect(
+            () => repository.toggleItem('todo-1', 'non-existent'),
+            throwsException,
+          );
+        },
+      );
 
       test('reorderItems() reorders items and updates sortOrder', () async {
         // Arrange
         final item1 = createTestTodoItem(id: 'item-1', title: 'First');
-        final item2 = createTestTodoItem(id: 'item-2', title: 'Second', sortOrder: 1);
-        final item3 = createTestTodoItem(id: 'item-3', title: 'Third', sortOrder: 2);
+        final item2 = createTestTodoItem(
+          id: 'item-2',
+          title: 'Second',
+          sortOrder: 1,
+        );
+        final item3 = createTestTodoItem(
+          id: 'item-3',
+          title: 'Third',
+          sortOrder: 2,
+        );
         final todoList = createTestTodoList(
           id: 'todo-1',
           items: [item1, item2, item3],
@@ -391,50 +394,29 @@ void main() {
       test('reorderItems() throws exception for invalid oldIndex', () async {
         // Arrange
         final item = createTestTodoItem(id: 'item-1');
-        final todoList = createTestTodoList(
-          id: 'todo-1',
-          items: [item],
-        );
+        final todoList = createTestTodoList(id: 'todo-1', items: [item]);
         await repository.create(todoList);
 
         // Act & Assert
-        expect(
-          () => repository.reorderItems('todo-1', -1, 0),
-          throwsException,
-        );
-        expect(
-          () => repository.reorderItems('todo-1', 5, 0),
-          throwsException,
-        );
+        expect(() => repository.reorderItems('todo-1', -1, 0), throwsException);
+        expect(() => repository.reorderItems('todo-1', 5, 0), throwsException);
       });
 
       test('reorderItems() throws exception for invalid newIndex', () async {
         // Arrange
         final item = createTestTodoItem(id: 'item-1');
-        final todoList = createTestTodoList(
-          id: 'todo-1',
-          items: [item],
-        );
+        final todoList = createTestTodoList(id: 'todo-1', items: [item]);
         await repository.create(todoList);
 
         // Act & Assert
-        expect(
-          () => repository.reorderItems('todo-1', 0, -1),
-          throwsException,
-        );
-        expect(
-          () => repository.reorderItems('todo-1', 0, 5),
-          throwsException,
-        );
+        expect(() => repository.reorderItems('todo-1', 0, -1), throwsException);
+        expect(() => repository.reorderItems('todo-1', 0, 5), throwsException);
       });
 
       test('reorderItems() handles single item list', () async {
         // Arrange
         final item = createTestTodoItem(id: 'item-1');
-        final todoList = createTestTodoList(
-          id: 'todo-1',
-          items: [item],
-        );
+        final todoList = createTestTodoList(id: 'todo-1', items: [item]);
         await repository.create(todoList);
 
         // Act
@@ -449,16 +431,9 @@ void main() {
     group('Bulk operations', () {
       test('deleteAllInSpace() deletes all TodoLists in space', () async {
         // Arrange
-        final todoList1 = createTestTodoList(
-          id: 'todo-1',
-        );
-        final todoList2 = createTestTodoList(
-          id: 'todo-2',
-        );
-        final todoList3 = createTestTodoList(
-          id: 'todo-3',
-          spaceId: 'space-2',
-        );
+        final todoList1 = createTestTodoList(id: 'todo-1');
+        final todoList2 = createTestTodoList(id: 'todo-2');
+        final todoList3 = createTestTodoList(id: 'todo-3', spaceId: 'space-2');
 
         await repository.create(todoList1);
         await repository.create(todoList2);
@@ -474,12 +449,8 @@ void main() {
 
       test('deleteAllInSpace() returns correct count', () async {
         // Arrange
-        final todoList1 = createTestTodoList(
-          id: 'todo-1',
-        );
-        final todoList2 = createTestTodoList(
-          id: 'todo-2',
-        );
+        final todoList1 = createTestTodoList(id: 'todo-1');
+        final todoList2 = createTestTodoList(id: 'todo-2');
 
         await repository.create(todoList1);
         await repository.create(todoList2);
@@ -502,16 +473,9 @@ void main() {
 
       test('countBySpace() returns correct count', () async {
         // Arrange
-        final todoList1 = createTestTodoList(
-          id: 'todo-1',
-        );
-        final todoList2 = createTestTodoList(
-          id: 'todo-2',
-        );
-        final todoList3 = createTestTodoList(
-          id: 'todo-3',
-          spaceId: 'space-2',
-        );
+        final todoList1 = createTestTodoList(id: 'todo-1');
+        final todoList2 = createTestTodoList(id: 'todo-2');
+        final todoList3 = createTestTodoList(id: 'todo-3', spaceId: 'space-2');
 
         await repository.create(todoList1);
         await repository.create(todoList2);
@@ -543,10 +507,7 @@ void main() {
           createTestTodoItem(id: 'item-2', title: 'Task 2', sortOrder: 1),
           createTestTodoItem(id: 'item-3', title: 'Task 3', sortOrder: 2),
         ];
-        final todoList = createTestTodoList(
-          id: 'todo-1',
-          items: items,
-        );
+        final todoList = createTestTodoList(id: 'todo-1', items: items);
 
         // Act
         final result = await repository.create(todoList);
@@ -564,10 +525,7 @@ void main() {
           priority: TodoPriority.high,
           tags: ['urgent', 'work'],
         );
-        final todoList = createTestTodoList(
-          id: 'todo-1',
-          items: [item],
-        );
+        final todoList = createTestTodoList(id: 'todo-1', items: [item]);
 
         // Act
         await repository.create(todoList);
@@ -581,14 +539,8 @@ void main() {
       test('TodoItem with due date', () async {
         // Arrange
         final dueDate = DateTime(2025, 12, 31);
-        final item = createTestTodoItem(
-          id: 'item-1',
-          dueDate: dueDate,
-        );
-        final todoList = createTestTodoList(
-          id: 'todo-1',
-          items: [item],
-        );
+        final item = createTestTodoItem(id: 'item-1', dueDate: dueDate);
+        final todoList = createTestTodoList(id: 'todo-1', items: [item]);
 
         // Act
         await repository.create(todoList);
@@ -605,10 +557,7 @@ void main() {
           createTestTodoItem(id: 'item-2', isCompleted: true, sortOrder: 1),
           createTestTodoItem(id: 'item-3', sortOrder: 2),
         ];
-        final todoList = createTestTodoList(
-          id: 'todo-1',
-          items: items,
-        );
+        final todoList = createTestTodoList(id: 'todo-1', items: items);
 
         // Act
         await repository.create(todoList);
@@ -660,8 +609,14 @@ void main() {
 
         // Act
         await repository.addItem('todo-1', createTestTodoItem(id: 'item-1'));
-        await repository.addItem('todo-1', createTestTodoItem(id: 'item-2', sortOrder: 1));
-        await repository.addItem('todo-1', createTestTodoItem(id: 'item-3', sortOrder: 2));
+        await repository.addItem(
+          'todo-1',
+          createTestTodoItem(id: 'item-2', sortOrder: 1),
+        );
+        await repository.addItem(
+          'todo-1',
+          createTestTodoItem(id: 'item-3', sortOrder: 2),
+        );
 
         // Assert
         final result = await repository.getById('todo-1');
@@ -671,10 +626,7 @@ void main() {
       test('deleteItem on non-existent item does not throw', () async {
         // Arrange
         final item = createTestTodoItem(id: 'item-1');
-        final todoList = createTestTodoList(
-          id: 'todo-1',
-          items: [item],
-        );
+        final todoList = createTestTodoList(id: 'todo-1', items: [item]);
         await repository.create(todoList);
 
         // Act
@@ -686,9 +638,7 @@ void main() {
 
       test('TodoList with null description', () async {
         // Arrange
-        final todoList = createTestTodoList(
-          id: 'todo-1',
-        );
+        final todoList = createTestTodoList(id: 'todo-1');
 
         // Act
         final result = await repository.create(todoList);
@@ -706,14 +656,8 @@ void main() {
         final result = await repository.create(todoList);
 
         // Assert
-        expect(
-          result.createdAt.difference(now).inSeconds.abs(),
-          lessThan(2),
-        );
-        expect(
-          result.updatedAt.difference(now).inSeconds.abs(),
-          lessThan(2),
-        );
+        expect(result.createdAt.difference(now).inSeconds.abs(), lessThan(2));
+        expect(result.updatedAt.difference(now).inSeconds.abs(), lessThan(2));
       });
     });
   });

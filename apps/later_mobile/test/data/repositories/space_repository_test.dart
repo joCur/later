@@ -123,7 +123,11 @@ void main() {
         // Arrange
         final space1 = createTestSpace(id: 'space-1', name: 'Work');
         final space2 = createTestSpace(id: 'space-2', name: 'Personal');
-        final space3 = createTestSpace(id: 'space-3', name: 'Archived', isArchived: true);
+        final space3 = createTestSpace(
+          id: 'space-3',
+          name: 'Archived',
+          isArchived: true,
+        );
 
         await repository.createSpace(space1);
         await repository.createSpace(space2);
@@ -135,14 +139,21 @@ void main() {
         // Assert
         expect(result.length, equals(2));
         expect(result.every((space) => !space.isArchived), isTrue);
-        expect(result.map((space) => space.id), containsAll(['space-1', 'space-2']));
+        expect(
+          result.map((space) => space.id),
+          containsAll(['space-1', 'space-2']),
+        );
       });
 
       test('should return all spaces when includeArchived is true', () async {
         // Arrange
         final space1 = createTestSpace(id: 'space-1', name: 'Work');
         final space2 = createTestSpace(id: 'space-2', name: 'Personal');
-        final space3 = createTestSpace(id: 'space-3', name: 'Archived', isArchived: true);
+        final space3 = createTestSpace(
+          id: 'space-3',
+          name: 'Archived',
+          isArchived: true,
+        );
 
         await repository.createSpace(space1);
         await repository.createSpace(space2);
@@ -153,29 +164,45 @@ void main() {
 
         // Assert
         expect(result.length, equals(3));
-        expect(result.map((space) => space.id), containsAll(['space-1', 'space-2', 'space-3']));
+        expect(
+          result.map((space) => space.id),
+          containsAll(['space-1', 'space-2', 'space-3']),
+        );
       });
 
-      test('should return only archived spaces when all are archived', () async {
-        // Arrange
-        final space1 = createTestSpace(id: 'space-1', name: 'Archived 1', isArchived: true);
-        final space2 = createTestSpace(id: 'space-2', name: 'Archived 2', isArchived: true);
+      test(
+        'should return only archived spaces when all are archived',
+        () async {
+          // Arrange
+          final space1 = createTestSpace(
+            id: 'space-1',
+            name: 'Archived 1',
+            isArchived: true,
+          );
+          final space2 = createTestSpace(
+            id: 'space-2',
+            name: 'Archived 2',
+            isArchived: true,
+          );
 
-        await repository.createSpace(space1);
-        await repository.createSpace(space2);
+          await repository.createSpace(space1);
+          await repository.createSpace(space2);
 
-        // Act
-        final result = await repository.getSpaces();
+          // Act
+          final result = await repository.getSpaces();
 
-        // Assert
-        expect(result, isEmpty);
+          // Assert
+          expect(result, isEmpty);
 
-        // Act with includeArchived
-        final resultWithArchived = await repository.getSpaces(includeArchived: true);
+          // Act with includeArchived
+          final resultWithArchived = await repository.getSpaces(
+            includeArchived: true,
+          );
 
-        // Assert
-        expect(resultWithArchived.length, equals(2));
-      });
+          // Assert
+          expect(resultWithArchived.length, equals(2));
+        },
+      );
     });
 
     group('getSpaceById', () {
@@ -274,10 +301,7 @@ void main() {
         final nonExistentSpace = createTestSpace(id: 'non-existent');
 
         // Act & Assert
-        expect(
-          () => repository.updateSpace(nonExistentSpace),
-          throwsException,
-        );
+        expect(() => repository.updateSpace(nonExistentSpace), throwsException);
       });
 
       test('should update space archive status', () async {
@@ -304,10 +328,7 @@ void main() {
         );
         await repository.createSpace(space);
 
-        final updatedSpace = space.copyWith(
-          icon: '💼',
-          color: '#FF5733',
-        );
+        final updatedSpace = space.copyWith(icon: '💼', color: '#FF5733');
 
         // Act
         final result = await repository.updateSpace(updatedSpace);
