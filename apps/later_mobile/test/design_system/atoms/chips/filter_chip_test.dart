@@ -288,7 +288,7 @@ void main() {
       final selectedText = tester.widget<Text>(find.text('Selected'));
       expect(
         selectedText.style?.color,
-        equals(AppColors.textPrimaryLight),
+        equals(AppColors.neutral600),
       );
 
       // Test unselected state
@@ -308,7 +308,7 @@ void main() {
       final unselectedText = tester.widget<Text>(find.text('Unselected'));
       expect(
         unselectedText.style?.color,
-        equals(AppColors.textSecondaryLight),
+        equals(AppColors.neutral500),
       );
     });
 
@@ -331,7 +331,7 @@ void main() {
       final selectedText = tester.widget<Text>(find.text('Selected'));
       expect(
         selectedText.style?.color,
-        equals(AppColors.textPrimaryDark),
+        equals(AppColors.neutral400),
       );
 
       // Test unselected state
@@ -351,7 +351,7 @@ void main() {
       final unselectedText = tester.widget<Text>(find.text('Unselected'));
       expect(
         unselectedText.style?.color,
-        equals(AppColors.textSecondaryDark),
+        equals(AppColors.neutral500),
       );
     });
 
@@ -373,7 +373,7 @@ void main() {
       );
 
       final selectedIcon = tester.widget<Icon>(find.byIcon(Icons.star));
-      expect(selectedIcon.color, equals(AppColors.textPrimaryLight));
+      expect(selectedIcon.color, equals(AppColors.neutral600));
 
       // Test unselected state
       await tester.pumpWidget(
@@ -391,7 +391,7 @@ void main() {
       );
 
       final unselectedIcon = tester.widget<Icon>(find.byIcon(Icons.star));
-      expect(unselectedIcon.color, equals(AppColors.textSecondaryLight));
+      expect(unselectedIcon.color, equals(AppColors.neutral500));
     });
 
     testWidgets('Icon uses correct colors in dark theme',
@@ -412,7 +412,7 @@ void main() {
       );
 
       final selectedIcon = tester.widget<Icon>(find.byIcon(Icons.star));
-      expect(selectedIcon.color, equals(AppColors.textPrimaryDark));
+      expect(selectedIcon.color, equals(AppColors.neutral400));
 
       // Test unselected state
       await tester.pumpWidget(
@@ -430,7 +430,7 @@ void main() {
       );
 
       final unselectedIcon = tester.widget<Icon>(find.byIcon(Icons.star));
-      expect(unselectedIcon.color, equals(AppColors.textSecondaryDark));
+      expect(unselectedIcon.color, equals(AppColors.neutral500));
     });
 
     testWidgets('Chip has correct height', (WidgetTester tester) async {

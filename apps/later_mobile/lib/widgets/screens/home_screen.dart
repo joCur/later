@@ -169,7 +169,7 @@ class _HomeScreenState extends State<HomeScreen> {
     // - Elevation: 0 (flat, modern look)
     // - Height: 56px (Android standard - default AppBar)
     return AppBar(
-            backgroundColor: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
+            backgroundColor: isDark ? AppColors.neutral900 : Colors.white,
             elevation: 0, // Flat design
             automaticallyImplyLeading: false,
             shape: Border(
@@ -228,8 +228,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                 Icons.folder_outlined,
                                 size: 24,
                                 color: isDark
-                                    ? AppColors.textPrimaryDark
-                                    : AppColors.textPrimaryLight,
+                                    ? AppColors.neutral400
+                                    : AppColors.neutral600,
                               ),
                             ),
                           const SizedBox(width: AppSpacing.xs),
@@ -240,20 +240,20 @@ class _HomeScreenState extends State<HomeScreen> {
                               currentSpace?.name ?? 'No Space',
                               style: AppTypography.h4.copyWith(
                                 color: isDark
-                                    ? AppColors.textPrimaryDark
-                                    : AppColors.textPrimaryLight,
+                                    ? AppColors.neutral400
+                                    : AppColors.neutral600,
                               ),
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
 
                           // Dropdown icon
-                          const SizedBox(width: AppSpacing.xxxs),
+                          const SizedBox(width: AppSpacing.xxs),
                           Icon(
                             Icons.arrow_drop_down,
                             color: isDark
-                                ? AppColors.textSecondaryDark
-                                : AppColors.textSecondaryLight,
+                                ? AppColors.neutral500
+                                : AppColors.neutral500,
                           ),
                         ],
                       ),
@@ -271,8 +271,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 },
                 tooltip: 'Search',
                 color: isDark
-                    ? AppColors.textSecondaryDark
-                    : AppColors.textSecondaryLight,
+                    ? AppColors.neutral500
+                    : AppColors.neutral500,
               ),
 
               // Menu button
@@ -283,8 +283,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 },
                 tooltip: 'Menu',
                 color: isDark
-                    ? AppColors.textSecondaryDark
-                    : AppColors.textSecondaryLight,
+                    ? AppColors.neutral500
+                    : AppColors.neutral500,
               ),
             ],
           );
@@ -503,7 +503,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: RefreshIndicator(
                   onRefresh: _handleRefresh,
                   color: isDark ? AppColors.primaryStartDark : AppColors.primaryStart,
-                  backgroundColor: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
+                  backgroundColor: isDark ? AppColors.neutral900 : Colors.white,
                   child: contentProvider.isLoading
                       ? const Center(child: CircularProgressIndicator())
                       : _buildContentList(
@@ -594,7 +594,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       child: RefreshIndicator(
                         onRefresh: _handleRefresh,
                         color: isDark ? AppColors.primaryStartDark : AppColors.primaryStart,
-                        backgroundColor: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
+                        backgroundColor: isDark ? AppColors.neutral900 : Colors.white,
                         child: contentProvider.isLoading
                             ? const Center(child: CircularProgressIndicator())
                             : _buildContentList(

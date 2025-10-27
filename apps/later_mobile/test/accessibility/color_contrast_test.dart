@@ -26,8 +26,8 @@ void main() {
   group('Color Contrast - Text on Solid Backgrounds', () {
     test('Primary text on light background meets WCAG AA', () {
       // Arrange: Primary text color on light background
-      const textColor = AppColors.textPrimaryLight; // neutral600
-      const bgColor = AppColors.backgroundLight; // neutral50
+      const textColor = AppColors.neutral600; // neutral600
+      const bgColor = AppColors.neutral50; // neutral50
 
       // Act: Calculate contrast ratio
       final ratio = _calculateContrastRatio(textColor, bgColor);
@@ -43,8 +43,8 @@ void main() {
 
     test('Primary text on dark background meets WCAG AA', () {
       // Arrange: Primary text color on dark background
-      const textColor = AppColors.textPrimaryDark; // neutral400
-      const bgColor = AppColors.backgroundDark; // neutral950
+      const textColor = AppColors.neutral400; // neutral400
+      const bgColor = AppColors.neutral950; // neutral950
 
       // Act: Calculate contrast ratio
       final ratio = _calculateContrastRatio(textColor, bgColor);
@@ -60,8 +60,8 @@ void main() {
 
     test('Secondary text on light background meets WCAG AA', () {
       // Arrange: Secondary text color on light background
-      const textColor = AppColors.textSecondaryLight; // neutral500
-      const bgColor = AppColors.backgroundLight; // neutral50
+      const textColor = AppColors.neutral500; // neutral500
+      const bgColor = AppColors.neutral50; // neutral50
 
       // Act: Calculate contrast ratio
       final ratio = _calculateContrastRatio(textColor, bgColor);
@@ -77,8 +77,8 @@ void main() {
 
     test('Secondary text on dark background meets WCAG AA', () {
       // Arrange: Secondary text color on dark background
-      const textColor = AppColors.textSecondaryDark; // neutral500
-      const bgColor = AppColors.backgroundDark; // neutral950
+      const textColor = AppColors.neutral500; // neutral500
+      const bgColor = AppColors.neutral950; // neutral950
 
       // Act: Calculate contrast ratio
       final ratio = _calculateContrastRatio(textColor, bgColor);
@@ -94,10 +94,10 @@ void main() {
 
     test('Disabled text provides adequate visual distinction', () {
       // Arrange: Disabled text colors
-      const disabledLight = AppColors.textDisabledLight; // neutral400
-      const disabledDark = AppColors.textDisabledDark; // neutral600
-      const bgLight = AppColors.backgroundLight;
-      const bgDark = AppColors.backgroundDark;
+      const disabledLight = AppColors.neutral400; // neutral400
+      const disabledDark = AppColors.neutral600; // neutral600
+      const bgLight = AppColors.neutral50;
+      const bgDark = AppColors.neutral950;
 
       // Act: Calculate contrast ratios
       final ratioLight = _calculateContrastRatio(disabledLight, bgLight);
@@ -177,8 +177,8 @@ void main() {
 
     test('Secondary button text contrast (light mode)', () {
       // Arrange: Button text on surface
-      const textColor = AppColors.textPrimaryLight;
-      const bgColor = AppColors.surfaceLight;
+      const textColor = AppColors.neutral600;
+      const bgColor = Colors.white;
 
       // Act: Calculate contrast ratio
       final ratio = _calculateContrastRatio(textColor, bgColor);
@@ -195,7 +195,7 @@ void main() {
     test('Secondary button border contrast (light mode)', () {
       // Arrange: Primary color border on surface
       const borderColor = AppColors.primarySolid;
-      const bgColor = AppColors.surfaceLight;
+      const bgColor = Colors.white;
 
       // Act: Calculate contrast ratio
       final ratio = _calculateContrastRatio(borderColor, bgColor);
@@ -213,9 +213,9 @@ void main() {
   group('Color Contrast - Input Fields', () {
     test('Input field text on glass background (light mode)', () {
       // Arrange: Text on glass background
-      const textColor = AppColors.textPrimaryLight;
+      const textColor = AppColors.neutral600;
       // Glass background is 3% opacity white on neutral50
-      const bgColor = AppColors.backgroundLight;
+      const bgColor = AppColors.neutral50;
 
       // Act: Calculate contrast ratio
       final ratio = _calculateContrastRatio(textColor, bgColor);
@@ -232,8 +232,8 @@ void main() {
     test('Input field placeholder text provides adequate contrast', () {
       // Arrange: Placeholder at 60% opacity
       // neutral500 at 60% opacity on neutral50 background
-      final placeholderColor = AppColors.textSecondaryLight.withValues(alpha: 0.6);
-      const bgColor = AppColors.backgroundLight;
+      final placeholderColor = AppColors.neutral500.withValues(alpha: 0.6);
+      const bgColor = AppColors.neutral50;
 
       // Act: Calculate contrast ratio with alpha blending
       final blendedColor = _blendColors(placeholderColor, bgColor);
@@ -251,7 +251,7 @@ void main() {
     test('Input field border (focus state) meets UI component contrast', () {
       // Arrange: Gradient border at 30% opacity
       final borderStart = AppColors.primaryStart.withValues(alpha: 0.3);
-      const bgColor = AppColors.surfaceLight;
+      const bgColor = Colors.white;
 
       // Act: Calculate contrast ratio
       final blendedColor = _blendColors(borderStart, bgColor);
@@ -271,7 +271,7 @@ void main() {
     test('Task card gradient border provides adequate contrast', () {
       // Arrange: Task gradient on card background
       const gradientStart = AppColors.taskGradientStart;
-      const cardBg = AppColors.surfaceLight;
+      const cardBg = Colors.white;
 
       // Act: Calculate contrast ratio
       final ratio = _calculateContrastRatio(gradientStart, cardBg);
@@ -288,7 +288,7 @@ void main() {
     test('Note card gradient border provides adequate contrast', () {
       // Arrange: Note gradient on card background
       const gradientStart = AppColors.noteGradientStart;
-      const cardBg = AppColors.surfaceLight;
+      const cardBg = Colors.white;
 
       // Act: Calculate contrast ratio
       final ratio = _calculateContrastRatio(gradientStart, cardBg);
@@ -305,7 +305,7 @@ void main() {
     test('List card gradient border provides adequate contrast', () {
       // Arrange: List gradient on card background
       const gradientStart = AppColors.listGradientStart;
-      const cardBg = AppColors.surfaceLight;
+      const cardBg = Colors.white;
 
       // Act: Calculate contrast ratio
       final ratio = _calculateContrastRatio(gradientStart, cardBg);
@@ -321,8 +321,8 @@ void main() {
 
     test('Completed task opacity maintains readable text', () {
       // Arrange: Text at 70% opacity
-      const textColor = AppColors.textPrimaryLight;
-      const bgColor = AppColors.surfaceLight;
+      const textColor = AppColors.neutral600;
+      const bgColor = Colors.white;
       const opacity = 0.7;
 
       // Act: Calculate contrast with opacity
@@ -344,7 +344,7 @@ void main() {
     test('Success color meets contrast requirements', () {
       // Arrange: Success color on light background
       const successColor = AppColors.success;
-      const bgColor = AppColors.backgroundLight;
+      const bgColor = AppColors.neutral50;
 
       // Act: Calculate contrast ratio
       final ratio = _calculateContrastRatio(successColor, bgColor);
@@ -361,7 +361,7 @@ void main() {
     test('Warning color meets contrast requirements', () {
       // Arrange: Warning color on light background
       const warningColor = AppColors.warning;
-      const bgColor = AppColors.backgroundLight;
+      const bgColor = AppColors.neutral50;
 
       // Act: Calculate contrast ratio
       final ratio = _calculateContrastRatio(warningColor, bgColor);
@@ -378,7 +378,7 @@ void main() {
     test('Error color meets contrast requirements', () {
       // Arrange: Error color on light background
       const errorColor = AppColors.error;
-      const bgColor = AppColors.backgroundLight;
+      const bgColor = AppColors.neutral50;
 
       // Act: Calculate contrast ratio
       final ratio = _calculateContrastRatio(errorColor, bgColor);
@@ -395,7 +395,7 @@ void main() {
     test('Info color meets contrast requirements', () {
       // Arrange: Info color on light background
       const infoColor = AppColors.info;
-      const bgColor = AppColors.backgroundLight;
+      const bgColor = AppColors.neutral50;
 
       // Act: Calculate contrast ratio
       final ratio = _calculateContrastRatio(infoColor, bgColor);
@@ -415,7 +415,7 @@ void main() {
       // Arrange: Dark mode gradient colors on dark background
       const gradientStart = AppColors.primaryStartDark;
       const gradientEnd = AppColors.primaryEndDark;
-      const bgColor = AppColors.backgroundDark;
+      const bgColor = AppColors.neutral950;
 
       // Act: Calculate contrast ratios
       final ratioStart = _calculateContrastRatio(gradientStart, bgColor);
@@ -439,8 +439,8 @@ void main() {
 
     test('Dark mode borders provide adequate contrast', () {
       // Arrange: Dark mode border on dark surface
-      const borderColor = AppColors.borderDark; // neutral700
-      const bgColor = AppColors.surfaceDark; // neutral900
+      const borderColor = AppColors.neutral700; // neutral700
+      const bgColor = AppColors.neutral900; // neutral900
 
       // Act: Calculate contrast ratio
       final ratio = _calculateContrastRatio(borderColor, bgColor);

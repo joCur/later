@@ -225,7 +225,7 @@ class _CreateSpaceModalState extends State<CreateSpaceModal> {
           'Icon',
           style: AppTypography.labelLarge.copyWith(
             color:
-                isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
+                isDark ? AppColors.neutral400 : AppColors.neutral600,
           ),
         ),
         const SizedBox(height: AppSpacing.xs),
@@ -249,14 +249,14 @@ class _CreateSpaceModalState extends State<CreateSpaceModal> {
                           ? AppColors.selectedDark
                           : AppColors.selectedLight)
                       : (isDark
-                          ? AppColors.surfaceDarkVariant
-                          : AppColors.surfaceLightVariant),
+                          ? AppColors.neutral800
+                          : AppColors.neutral100),
                   borderRadius: BorderRadius.circular(AppSpacing.radiusSM),
                   border: isSelected
                       ? Border.all(
                           color: isDark
-                              ? AppColors.primaryAmberLight
-                              : AppColors.primaryAmber,
+                              ? AppColors.primaryLight
+                              : AppColors.primarySolid,
                           width: AppSpacing.borderWidthMedium,
                         )
                       : null,
@@ -276,7 +276,7 @@ class _CreateSpaceModalState extends State<CreateSpaceModal> {
                         child: Icon(
                           Icons.check,
                           size: 16,
-                          color: AppColors.primaryAmber,
+                          color: AppColors.primarySolid,
                         ),
                       ),
                   ],
@@ -298,7 +298,7 @@ class _CreateSpaceModalState extends State<CreateSpaceModal> {
           'Color',
           style: AppTypography.labelLarge.copyWith(
             color:
-                isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
+                isDark ? AppColors.neutral400 : AppColors.neutral600,
           ),
         ),
         const SizedBox(height: AppSpacing.xs),
@@ -326,14 +326,14 @@ class _CreateSpaceModalState extends State<CreateSpaceModal> {
                   border: isSelected
                       ? Border.all(
                           color: isDark
-                              ? AppColors.primaryAmberLight
-                              : AppColors.primaryAmber,
+                              ? AppColors.primaryLight
+                              : AppColors.primarySolid,
                           width: 3,
                         )
                       : Border.all(
                           color: isDark
-                              ? AppColors.borderDark
-                              : AppColors.borderLight,
+                              ? AppColors.neutral700
+                              : AppColors.neutral200,
                         ),
                 ),
                 child: isSelected

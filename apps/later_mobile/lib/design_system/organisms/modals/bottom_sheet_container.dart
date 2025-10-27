@@ -59,8 +59,8 @@ class BottomSheetContainer extends StatelessWidget {
       builder: (context) {
         final isDark = Theme.of(context).brightness == Brightness.dark;
         final surfaceColor = isDark
-            ? AppColors.surfaceDark
-            : AppColors.surfaceLight;
+            ? AppColors.neutral900
+            : Colors.white;
         final primaryGradient = isDark
             ? AppColors.primaryGradientDark
             : AppColors.primaryGradient;
@@ -136,8 +136,8 @@ class BottomSheetContainer extends StatelessWidget {
       builder: (context) {
         final isDark = Theme.of(context).brightness == Brightness.dark;
         final surfaceColor = isDark
-            ? AppColors.surfaceDark
-            : AppColors.surfaceLight;
+            ? AppColors.neutral900
+            : Colors.white;
         final primaryGradient = isDark
             ? AppColors.primaryGradientDark
             : AppColors.primaryGradient;
@@ -231,7 +231,7 @@ class BottomSheetContainer extends StatelessWidget {
           width: 40,
           height: 4,
           decoration: BoxDecoration(
-            color: AppColors.neutralGray300,
+            color: AppColors.neutral300,
             borderRadius: BorderRadius.circular(2),
           ),
         ),
@@ -261,8 +261,8 @@ class BottomSheetContainer extends StatelessWidget {
               title ?? '',
               style: AppTypography.h3.copyWith(
                 color: isDark
-                    ? AppColors.textPrimaryDark
-                    : AppColors.textPrimaryLight,
+                    ? AppColors.neutral400
+                    : AppColors.neutral600,
               ),
             ),
           ),
@@ -270,8 +270,8 @@ class BottomSheetContainer extends StatelessWidget {
             icon: Icon(
               Icons.close,
               color: isDark
-                  ? AppColors.textSecondaryDark
-                  : AppColors.textSecondaryLight,
+                  ? AppColors.neutral500
+                  : AppColors.neutral500,
             ),
             onPressed: () => Navigator.of(context).pop(),
             iconSize: 24,

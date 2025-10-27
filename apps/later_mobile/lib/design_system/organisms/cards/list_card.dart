@@ -152,7 +152,7 @@ class _ListCardState extends State<ListCard> with TickerProviderStateMixin {
     return Text(
       widget.list.name,
       style: AppTypography.itemTitle.copyWith(
-        color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
+        color: isDark ? AppColors.neutral400 : AppColors.neutral600,
       ),
       maxLines: AppTypography.itemTitleMaxLines,
       overflow: TextOverflow.ellipsis,
@@ -171,7 +171,7 @@ class _ListCardState extends State<ListCard> with TickerProviderStateMixin {
     return Text(
       text,
       style: AppTypography.metadata.copyWith(
-        color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
+        color: isDark ? AppColors.neutral500 : AppColors.neutral500,
       ),
     );
   }
@@ -188,7 +188,7 @@ class _ListCardState extends State<ListCard> with TickerProviderStateMixin {
     return Text(
       preview,
       style: AppTypography.itemContent.copyWith(
-        color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
+        color: isDark ? AppColors.neutral500 : AppColors.neutral500,
       ),
       maxLines: 2,
       overflow: TextOverflow.ellipsis,
@@ -254,15 +254,15 @@ class _ListCardState extends State<ListCard> with TickerProviderStateMixin {
     final isDark = theme.brightness == Brightness.dark;
 
     // Base background color with subtle gradient tint (5% opacity)
-    final baseBgColor = isDark ? AppColors.surfaceDark : AppColors.surfaceLight;
+    final baseBgColor = isDark ? AppColors.neutral900 : Colors.white;
     final tintColor = _getBackgroundTint(isDark);
 
     // Background color based on state
     Color backgroundColor;
     if (_isPressed) {
       backgroundColor = isDark
-          ? AppColors.surfaceDarkVariant
-          : AppColors.neutralGray100;
+          ? AppColors.neutral800
+          : AppColors.neutral100;
     } else {
       // Blend base color with subtle type-specific tint
       backgroundColor = Color.alphaBlend(

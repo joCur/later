@@ -639,7 +639,7 @@ void main() {
     test('Focus indicator color meets 3:1 contrast ratio (light mode)', () {
       // Arrange: Get focus indicator color for light mode
       const focusColor = AppColors.focusLight; // info color
-      const bgColor = AppColors.surfaceLight; // white
+      const bgColor = Colors.white; // white
 
       // Act: Calculate contrast ratio
       final ratio = _calculateContrastRatio(focusColor, bgColor);
@@ -656,7 +656,7 @@ void main() {
     test('Focus indicator color meets 3:1 contrast ratio (dark mode)', () {
       // Arrange: Get focus indicator color for dark mode
       const focusColor = AppColors.focusDark; // primaryLight
-      const bgColor = AppColors.surfaceDark; // neutral900
+      const bgColor = AppColors.neutral900; // neutral900
 
       // Act: Calculate contrast ratio
       final ratio = _calculateContrastRatio(focusColor, bgColor);

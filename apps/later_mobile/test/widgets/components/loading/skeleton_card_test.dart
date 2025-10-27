@@ -92,7 +92,7 @@ void main() {
       final Container container = tester.widget(containerFinder.first);
       final BoxDecoration? decoration = container.decoration as BoxDecoration?;
       expect(decoration, isNotNull);
-      expect(decoration!.color, equals(AppColors.neutralGray200));
+      expect(decoration!.color, equals(AppColors.neutral200));
     });
 
     testWidgets('uses correct colors in dark mode', (WidgetTester tester) async {
@@ -114,7 +114,7 @@ void main() {
       final Container container = tester.widget(containerFinder.first);
       final BoxDecoration? decoration = container.decoration as BoxDecoration?;
       expect(decoration, isNotNull);
-      expect(decoration!.color, equals(AppColors.surfaceDarkVariant));
+      expect(decoration!.color, equals(AppColors.neutral800));
     });
 
     testWidgets('can be configured with different widths', (WidgetTester tester) async {

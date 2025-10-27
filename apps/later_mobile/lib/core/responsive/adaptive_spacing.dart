@@ -35,9 +35,9 @@ class AdaptiveSpacing {
   static double getGap(BuildContext context) {
     return Breakpoints.valueWhen<double>(
       context: context,
-      mobile: AppSpacing.gapSM,
-      tablet: AppSpacing.gapMD,
-      desktop: AppSpacing.gapLG,
+      mobile: AppSpacing.xs,
+      tablet: AppSpacing.sm,
+      desktop: AppSpacing.md,
     );
   }
 
@@ -55,7 +55,7 @@ class AdaptiveSpacing {
   /// Get responsive card margin
   /// Consistent across all breakpoints for grid layouts
   static double getCardMargin(BuildContext context) {
-    return AppSpacing.cardMargin; // 8px on all screen sizes
+    return AppSpacing.sm; // 8px on all screen sizes
   }
 
   /// Get responsive modal/dialog padding

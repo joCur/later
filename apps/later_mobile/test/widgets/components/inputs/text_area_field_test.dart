@@ -166,8 +166,8 @@ void main() {
 
         // Check for glass background (3% opacity)
         final expectedColor = isDark
-            ? AppColors.surfaceDark.withValues(alpha: 0.03)
-            : AppColors.surfaceLight.withValues(alpha: 0.03);
+            ? AppColors.neutral900.withValues(alpha: 0.03)
+            : Colors.white.withValues(alpha: 0.03);
 
         expect(decoration.color, expectedColor);
       });
@@ -350,8 +350,8 @@ void main() {
         final isDark = theme.brightness == Brightness.dark;
 
         final expectedColor = isDark
-            ? AppColors.textSecondaryDark.withValues(alpha: 0.6)
-            : AppColors.textSecondaryLight.withValues(alpha: 0.6);
+            ? AppColors.neutral500.withValues(alpha: 0.6)
+            : AppColors.neutral500.withValues(alpha: 0.6);
 
         expect(hintStyle.color?.toARGB32(), expectedColor.toARGB32());
       });

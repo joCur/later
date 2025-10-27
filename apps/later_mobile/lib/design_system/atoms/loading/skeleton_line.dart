@@ -37,8 +37,8 @@ class SkeletonLine extends StatelessWidget {
 
     // Base color based on theme
     final baseColor = isDark
-        ? AppColors.surfaceDarkVariant
-        : AppColors.neutralGray200;
+        ? AppColors.neutral800
+        : AppColors.neutral200;
 
     return SizedBox(
       width: width,

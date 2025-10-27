@@ -94,8 +94,8 @@ class EmptyState extends StatelessWidget {
                 icon,
                 size: iconSize,
                 color: isDark
-                    ? AppColors.textDisabledDark
-                    : AppColors.textDisabledLight,
+                    ? AppColors.neutral600
+                    : AppColors.neutral400,
               ),
               const SizedBox(height: AppSpacing.md),
             ],
@@ -106,13 +106,13 @@ class EmptyState extends StatelessWidget {
               style: isMobile
                   ? AppTypography.h3.copyWith(
                       color: isDark
-                          ? AppColors.textPrimaryDark
-                          : AppColors.textPrimaryLight,
+                          ? AppColors.neutral400
+                          : AppColors.neutral600,
                     )
                   : AppTypography.h2.copyWith(
                       color: isDark
-                          ? AppColors.textPrimaryDark
-                          : AppColors.textPrimaryLight,
+                          ? AppColors.neutral400
+                          : AppColors.neutral600,
                     ),
               textAlign: TextAlign.center,
             ),
@@ -123,8 +123,8 @@ class EmptyState extends StatelessWidget {
               message,
               style: AppTypography.bodyLarge.copyWith(
                 color: isDark
-                    ? AppColors.textSecondaryDark
-                    : AppColors.textSecondaryLight,
+                    ? AppColors.neutral500
+                    : AppColors.neutral500,
               ),
               textAlign: TextAlign.center,
               maxLines: 3,

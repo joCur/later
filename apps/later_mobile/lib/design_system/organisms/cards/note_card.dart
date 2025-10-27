@@ -126,7 +126,7 @@ class _NoteCardState extends State<NoteCard> with TickerProviderStateMixin {
     return Text(
       widget.item.title,
       style: AppTypography.itemTitle.copyWith(
-        color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
+        color: isDark ? AppColors.neutral400 : AppColors.neutral600,
       ),
       maxLines: AppTypography.itemTitleMaxLines,
       overflow: TextOverflow.ellipsis,
@@ -164,7 +164,7 @@ class _NoteCardState extends State<NoteCard> with TickerProviderStateMixin {
     return Text(
       truncatedContent,
       style: AppTypography.itemContent.copyWith(
-        color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
+        color: isDark ? AppColors.neutral500 : AppColors.neutral500,
       ),
       maxLines: 2, // Fixed 2 lines for consistent card height
       overflow: TextOverflow.ellipsis,
@@ -200,7 +200,7 @@ class _NoteCardState extends State<NoteCard> with TickerProviderStateMixin {
     return Container(
       padding: const EdgeInsets.symmetric(
         horizontal: AppSpacing.xs, // 8px
-        vertical: AppSpacing.xxxs, // 2px
+        vertical: AppSpacing.xxs, // 2px
       ),
       decoration: BoxDecoration(
         color: isDark
@@ -230,7 +230,7 @@ class _NoteCardState extends State<NoteCard> with TickerProviderStateMixin {
     return Container(
       padding: const EdgeInsets.symmetric(
         horizontal: AppSpacing.xs, // 8px
-        vertical: AppSpacing.xxxs, // 2px
+        vertical: AppSpacing.xxs, // 2px
       ),
       decoration: BoxDecoration(
         color: isDark
@@ -246,7 +246,7 @@ class _NoteCardState extends State<NoteCard> with TickerProviderStateMixin {
       child: Text(
         '+$count more',
         style: AppTypography.metadata.copyWith(
-          color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
+          color: isDark ? AppColors.neutral500 : AppColors.neutral500,
           fontSize: 11,
         ),
       ),
@@ -271,7 +271,7 @@ class _NoteCardState extends State<NoteCard> with TickerProviderStateMixin {
             color: Colors.white,
           ),
         ),
-        const SizedBox(width: AppSpacing.xxxs),
+        const SizedBox(width: AppSpacing.xxs),
         // Created date with subtle primary gradient
         GradientText.subtle(
           dateFormat.format(widget.item.createdAt),
@@ -335,15 +335,15 @@ class _NoteCardState extends State<NoteCard> with TickerProviderStateMixin {
     final isDark = theme.brightness == Brightness.dark;
 
     // Base background color with subtle gradient tint (5% opacity)
-    final baseBgColor = isDark ? AppColors.surfaceDark : AppColors.surfaceLight;
+    final baseBgColor = isDark ? AppColors.neutral900 : Colors.white;
     final tintColor = _getBackgroundTint(isDark);
 
     // Background color based on state
     Color backgroundColor;
     if (_isPressed) {
       backgroundColor = isDark
-          ? AppColors.surfaceDarkVariant
-          : AppColors.neutralGray100;
+          ? AppColors.neutral800
+          : AppColors.neutral100;
     } else {
       // Blend base color with subtle type-specific tint
       backgroundColor = Color.alphaBlend(

@@ -538,29 +538,6 @@ class AppAnimations {
     return spring;
   }
 
-  // ============================================================
-  // BACKWARD COMPATIBILITY ALIASES
-  // These aliases map old curve names to new Temporal Flow curves
-  // TODO: Remove these after updating all component references
-  // ============================================================
-
-  /// Button easing curve (use springCurve)
-  static const Curve buttonEasing = snappySpringCurve;
-
-  /// FAB press easing (use snappySpringCurve)
-  static const Curve fabPressEasing = snappySpringCurve;
-
-  /// FAB release easing (use bouncySpringCurve)
-  static const Curve fabReleaseEasing = bouncySpringCurve;
-
-  /// Fade easing (use springCurve)
-  static const Curve fadeEasing = springCurve;
-
-  /// Modal enter easing (use smoothSpringCurve)
-  static const Curve modalEnterEasing = smoothSpringCurve;
-
-  /// Slide in easing (use springCurve)
-  static const Curve slideInEasing = springCurve;
 }
 
 // ============================================================

@@ -110,12 +110,12 @@ class _IconOnlyBottomNavState extends State<IconOnlyBottomNav>
         height: _kNavBarHeight,
         constraints: const BoxConstraints(minHeight: _kNavBarHeight),
         decoration: BoxDecoration(
-          color: isDarkMode ? AppColors.surfaceDark : AppColors.surfaceLight,
+          color: isDarkMode ? AppColors.neutral900 : Colors.white,
           border: Border(
             top: BorderSide(
               color: isDarkMode
-                  ? AppColors.borderDark.withValues(alpha: 0.1)
-                  : AppColors.borderLight.withValues(alpha: 0.1),
+                  ? AppColors.neutral700.withValues(alpha: 0.1)
+                  : AppColors.neutral200.withValues(alpha: 0.1),
             ),
           ),
         ),
