@@ -151,13 +151,13 @@ class _TodoItemCardState extends State<TodoItemCard> {
         Icon(
           Icons.calendar_today,
           size: _dueDateIconSize,
-          color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
+          color: isDark ? AppColors.neutral500 : AppColors.neutral500,
         ),
         const SizedBox(width: _dueDateIconSpacing),
         Text(
           _formatDueDate(dueDate),
           style: AppTypography.metadata.copyWith(
-            color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
+            color: isDark ? AppColors.neutral500 : AppColors.neutral500,
           ),
         ),
       ],
@@ -213,8 +213,8 @@ class _TodoItemCardState extends State<TodoItemCard> {
 
     // Background color based on hover state
     final backgroundColor = _isHovered
-        ? (isDark ? AppColors.surfaceDarkVariant : AppColors.neutralGray100)
-        : (isDark ? AppColors.surfaceDark : AppColors.surfaceLight);
+        ? (isDark ? AppColors.neutral800 : AppColors.neutral100)
+        : (isDark ? AppColors.neutral900 : Colors.white);
 
     // Build semantic label
     final semanticLabel = _buildSemanticLabel();
@@ -233,7 +233,7 @@ class _TodoItemCardState extends State<TodoItemCard> {
         color: backgroundColor,
         borderRadius: BorderRadius.circular(_cardBorderRadius),
         border: Border.all(
-          color: isDark ? AppColors.borderDark : AppColors.borderLight,
+          color: isDark ? AppColors.neutral700 : AppColors.neutral200,
         ),
       ),
       child: Row(
@@ -262,7 +262,7 @@ class _TodoItemCardState extends State<TodoItemCard> {
                 Text(
                   widget.todoItem.title,
                   style: AppTypography.titleSmall.copyWith(
-                    color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
+                    color: isDark ? AppColors.neutral400 : AppColors.neutral600,
                     decoration: widget.todoItem.isCompleted
                         ? TextDecoration.lineThrough
                         : null,

@@ -146,7 +146,7 @@ class _TemporalFilterChipState extends State<TemporalFilterChip>
         child: Container(
           margin: const EdgeInsets.all(2), // 2px border width
           decoration: BoxDecoration(
-            color: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
+            color: isDark ? AppColors.neutral900 : Colors.white,
             borderRadius: BorderRadius.circular(18), // 20 - 2 = 18
           ),
           child: Material(
@@ -165,8 +165,8 @@ class _TemporalFilterChipState extends State<TemporalFilterChip>
                           widget.icon,
                           size: 16,
                           color: isDark
-                              ? AppColors.textPrimaryDark
-                              : AppColors.textPrimaryLight,
+                              ? AppColors.neutral400
+                              : AppColors.neutral600,
                         ),
                         const SizedBox(width: 6),
                       ],
@@ -176,8 +176,8 @@ class _TemporalFilterChipState extends State<TemporalFilterChip>
                           fontWeight:
                               AppTypography.medium, // medium weight override
                           color: isDark
-                              ? AppColors.textPrimaryDark
-                              : AppColors.textPrimaryLight,
+                              ? AppColors.neutral400
+                              : AppColors.neutral600,
                         ),
                       ),
                     ],
@@ -217,8 +217,8 @@ class _TemporalFilterChipState extends State<TemporalFilterChip>
                       widget.icon,
                       size: 16,
                       color: isDark
-                          ? AppColors.textSecondaryDark
-                          : AppColors.textSecondaryLight,
+                          ? AppColors.neutral500
+                          : AppColors.neutral500,
                     ),
                     const SizedBox(width: 6),
                   ],
@@ -228,8 +228,8 @@ class _TemporalFilterChipState extends State<TemporalFilterChip>
                       fontWeight:
                           AppTypography.medium, // medium weight override
                       color: isDark
-                          ? AppColors.textSecondaryDark
-                          : AppColors.textSecondaryLight,
+                          ? AppColors.neutral500
+                          : AppColors.neutral500,
                     ),
                   ),
                 ],

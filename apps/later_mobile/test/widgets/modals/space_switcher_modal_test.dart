@@ -514,7 +514,7 @@ void main() {
       );
       final backgroundColor =
           createButton.style!.backgroundColor?.resolve(<WidgetState>{});
-      expect(backgroundColor, AppColors.primaryAmber);
+      expect(backgroundColor, AppColors.primarySolid);
     });
 
     testWidgets('uses correct colors in dark mode', (WidgetTester tester) async {
@@ -530,7 +530,7 @@ void main() {
       );
       final backgroundColor =
           createButton.style!.backgroundColor?.resolve(<WidgetState>{});
-      expect(backgroundColor, AppColors.primaryAmber);
+      expect(backgroundColor, AppColors.primarySolid);
     });
 
     testWidgets('has proper semantic labels for accessibility',

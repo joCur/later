@@ -18,8 +18,8 @@ import 'package:shimmer/shimmer.dart';
 /// - Border radius: 20px (pill shape, matching cards)
 /// - Height: ~120px (typical card height)
 /// - Spacing: 16px between skeletons
-/// - Base color: AppColors.neutralGray200 (light) / surfaceDarkVariant (dark)
-/// - Highlight color: AppColors.neutralGray100 (light) / surfaceDark (dark)
+/// - Base color: AppColors.neutral200 (light) / surfaceDarkVariant (dark)
+/// - Highlight color: AppColors.neutral100 (light) / surfaceDark (dark)
 ///
 /// Usage:
 /// ```dart
@@ -43,19 +43,19 @@ class SkeletonCard extends StatelessWidget {
 
     // Shimmer colors based on theme
     final baseColor = isDark
-        ? AppColors.surfaceDarkVariant
-        : AppColors.neutralGray200;
+        ? AppColors.neutral800
+        : AppColors.neutral200;
     final highlightColor = isDark
-        ? AppColors.surfaceDark
-        : AppColors.neutralGray100;
+        ? AppColors.neutral900
+        : AppColors.neutral100;
 
     // Check for reduce motion preference
     final disableAnimations = MediaQuery.of(context).disableAnimations;
 
     // Card background color
     final backgroundColor = isDark
-        ? AppColors.surfaceDark
-        : AppColors.surfaceLight;
+        ? AppColors.neutral900
+        : Colors.white;
 
     return Container(
       margin: const EdgeInsets.only(
@@ -101,7 +101,7 @@ class SkeletonCard extends StatelessWidget {
       children: [
         // Leading element space (mimics checkbox/icon)
         _buildLeadingElement(),
-        const SizedBox(width: AppSpacing.xxxs),
+        const SizedBox(width: AppSpacing.xxs),
 
         // Content
         Expanded(
@@ -111,17 +111,17 @@ class SkeletonCard extends StatelessWidget {
             children: [
               // Title line (mimics H4 typography)
               const SkeletonLine(height: 24),
-              const SizedBox(height: AppSpacing.xxxs),
+              const SizedBox(height: AppSpacing.xxs),
 
               // Content preview lines (2-3 lines)
               SkeletonLine(
                 height: 20,
                 width: isMobile ? double.infinity : null,
               ),
-              const SizedBox(height: AppSpacing.xxxs),
+              const SizedBox(height: AppSpacing.xxs),
               SkeletonLine(height: 20, width: isMobile ? 250 : 300),
               if (!isMobile) ...[
-                const SizedBox(height: AppSpacing.xxxs),
+                const SizedBox(height: AppSpacing.xxs),
                 const SkeletonLine(height: 20, width: 200),
               ],
 

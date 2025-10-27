@@ -173,7 +173,7 @@ void main() {
 
       // Assert
       final iconWidget = tester.widget<Icon>(find.byType(Icon));
-      expect(iconWidget.color, AppColors.textDisabledLight);
+      expect(iconWidget.color, AppColors.neutral400);
     });
 
     testWidgets('uses correct colors in dark mode',
@@ -194,7 +194,7 @@ void main() {
 
       // Assert
       final iconWidget = tester.widget<Icon>(find.byType(Icon));
-      expect(iconWidget.color, AppColors.textDisabledDark);
+      expect(iconWidget.color, AppColors.neutral600);
     });
 
     testWidgets('centers content vertically and horizontally',
@@ -291,12 +291,12 @@ void main() {
       // Check background color
       final backgroundColor =
           buttonStyle.backgroundColor?.resolve(<WidgetState>{});
-      expect(backgroundColor, AppColors.primaryAmber);
+      expect(backgroundColor, AppColors.primarySolid);
 
       // Check foreground color
       final foregroundColor =
           buttonStyle.foregroundColor?.resolve(<WidgetState>{});
-      expect(foregroundColor, AppColors.neutralBlack);
+      expect(foregroundColor, AppColors.neutral900);
     });
 
     testWidgets('responds to different screen sizes',

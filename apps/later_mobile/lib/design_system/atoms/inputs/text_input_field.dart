@@ -223,12 +223,12 @@ class _TextInputFieldState extends State<TextInputField> {
 
     // Glass background color (3% opacity)
     final backgroundColor = isDark
-        ? AppColors.surfaceDark.withValues(alpha: 0.03)
-        : AppColors.surfaceLight.withValues(alpha: 0.03);
+        ? AppColors.neutral900.withValues(alpha: 0.03)
+        : Colors.white.withValues(alpha: 0.03);
 
     // Standard border color (when not focused)
     final standardBorderColor =
-        isDark ? AppColors.borderDark : AppColors.borderLight;
+        isDark ? AppColors.neutral700 : AppColors.neutral200;
 
     // Focus shadow
     List<BoxShadow>? boxShadow;
@@ -247,8 +247,8 @@ class _TextInputFieldState extends State<TextInputField> {
 
     // Placeholder color (60% opacity)
     final hintColor = isDark
-        ? AppColors.textSecondaryDark.withValues(alpha: 0.6)
-        : AppColors.textSecondaryLight.withValues(alpha: 0.6);
+        ? AppColors.neutral500.withValues(alpha: 0.6)
+        : AppColors.neutral500.withValues(alpha: 0.6);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -257,17 +257,17 @@ class _TextInputFieldState extends State<TextInputField> {
         // Label (optional)
         if (widget.label != null)
           Padding(
-            padding: const EdgeInsets.only(bottom: AppSpacing.xxxs),
+            padding: const EdgeInsets.only(bottom: AppSpacing.xxs),
             child: Text(
               widget.label!,
               style: AppTypography.labelMedium.copyWith(
                 color: widget.enabled
                     ? (isDark
-                        ? AppColors.textPrimaryDark
-                        : AppColors.textPrimaryLight)
+                        ? AppColors.neutral400
+                        : AppColors.neutral600)
                     : (isDark
-                        ? AppColors.textDisabledDark
-                        : AppColors.textDisabledLight),
+                        ? AppColors.neutral600
+                        : AppColors.neutral400),
               ),
             ),
           ),
@@ -323,11 +323,11 @@ class _TextInputFieldState extends State<TextInputField> {
                 style: AppTypography.input.copyWith(
                   color: widget.enabled
                       ? (isDark
-                          ? AppColors.textPrimaryDark
-                          : AppColors.textPrimaryLight)
+                          ? AppColors.neutral400
+                          : AppColors.neutral600)
                       : (isDark
-                          ? AppColors.textDisabledDark
-                          : AppColors.textDisabledLight),
+                          ? AppColors.neutral600
+                          : AppColors.neutral400),
                 ),
                 decoration: InputDecoration(
                   hintText: widget.hintText,
@@ -344,8 +344,8 @@ class _TextInputFieldState extends State<TextInputField> {
                       ? Icon(
                           widget.prefixIcon,
                           color: isDark
-                              ? AppColors.textSecondaryDark
-                              : AppColors.textSecondaryLight,
+                              ? AppColors.neutral500
+                              : AppColors.neutral500,
                           size: 20,
                         )
                       : null,
@@ -354,8 +354,8 @@ class _TextInputFieldState extends State<TextInputField> {
                           icon: Icon(
                             widget.suffixIcon,
                             color: isDark
-                                ? AppColors.textSecondaryDark
-                                : AppColors.textSecondaryLight,
+                                ? AppColors.neutral500
+                                : AppColors.neutral500,
                             size: 20,
                           ),
                           onPressed: widget.onSuffixIconPressed,
@@ -373,7 +373,7 @@ class _TextInputFieldState extends State<TextInputField> {
         if (widget.errorText != null || widget.maxLength != null)
           Padding(
             padding: const EdgeInsets.only(
-              top: AppSpacing.xxxs,
+              top: AppSpacing.xxs,
               left: AppSpacing.xxs,
             ),
             child: Row(
@@ -439,8 +439,8 @@ class _TextInputFieldState extends State<TextInputField> {
       counterText,
       style: AppTypography.labelSmall.copyWith(
         color: isDark
-            ? AppColors.textSecondaryDark
-            : AppColors.textSecondaryLight,
+            ? AppColors.neutral500
+            : AppColors.neutral500,
       ),
     );
   }

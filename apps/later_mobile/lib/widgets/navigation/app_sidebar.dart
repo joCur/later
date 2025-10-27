@@ -137,14 +137,14 @@ class _AppSidebarState extends State<AppSidebar> {
                 child: Container(
                   decoration: BoxDecoration(
                     color: (isDarkMode
-                            ? AppColors.surfaceDark
-                            : AppColors.surfaceLight)
+                            ? AppColors.neutral900
+                            : Colors.white)
                         .withValues(alpha: 0.9),
                     border: Border(
                       right: BorderSide(
                         color: isDarkMode
-                            ? AppColors.borderDark
-                            : AppColors.borderLight,
+                            ? AppColors.neutral700
+                            : AppColors.neutral200,
                       ),
                     ),
                   ),
@@ -223,8 +223,8 @@ class _AppSidebarState extends State<AppSidebar> {
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
                 color: isDarkMode
-                    ? AppColors.textPrimaryDark
-                    : AppColors.textPrimaryLight,
+                    ? AppColors.neutral400
+                    : AppColors.neutral600,
               ),
             ),
           if (widget.onToggleExpanded != null)
@@ -238,8 +238,8 @@ class _AppSidebarState extends State<AppSidebar> {
                 ),
                 onPressed: widget.onToggleExpanded,
                 color: isDarkMode
-                    ? AppColors.textSecondaryDark
-                    : AppColors.textSecondaryLight,
+                    ? AppColors.neutral500
+                    : AppColors.neutral500,
               ),
             ),
         ],
@@ -323,7 +323,7 @@ class _AppSidebarState extends State<AppSidebar> {
               const ThemeToggleButton(),
 
               if (widget.isExpanded) ...[
-                const SizedBox(width: AppSpacing.gapSM),
+                const SizedBox(width: AppSpacing.xs),
                 // Settings button
                 Expanded(
                   child: Tooltip(
@@ -343,7 +343,7 @@ class _AppSidebarState extends State<AppSidebar> {
                         child: const Row(
                           children: [
                             Icon(Icons.settings_outlined),
-                            SizedBox(width: AppSpacing.gapSM),
+                            SizedBox(width: AppSpacing.xs),
                             Text('Settings'),
                           ],
                         ),
@@ -437,16 +437,16 @@ class _SpaceListItemState extends State<_SpaceListItem> {
 
     final textColor = widget.isSelected
         ? (widget.isDarkMode
-            ? AppColors.textPrimaryDark
-            : AppColors.textPrimaryLight)
+            ? AppColors.neutral400
+            : AppColors.neutral600)
         : (widget.isDarkMode
-            ? AppColors.textSecondaryDark
-            : AppColors.textSecondaryLight);
+            ? AppColors.neutral500
+            : AppColors.neutral500);
 
     return Padding(
       padding: const EdgeInsets.symmetric(
         horizontal: AppSpacing.xs,
-        vertical: AppSpacing.xxxs,
+        vertical: AppSpacing.xxs,
       ),
       child: Semantics(
         label: widget.isExpanded
@@ -485,8 +485,8 @@ class _SpaceListItemState extends State<_SpaceListItem> {
                               : AppColors.selectedLight)
                           : (_isHovered
                               ? (widget.isDarkMode
-                                  ? AppColors.surfaceDarkVariant
-                                  : AppColors.surfaceLightVariant)
+                                  ? AppColors.neutral800
+                                  : AppColors.neutral100)
                               : Colors.transparent),
                       borderRadius: const BorderRadius.all(
                         Radius.circular(AppSpacing.radiusSM),
@@ -516,7 +516,7 @@ class _SpaceListItemState extends State<_SpaceListItem> {
                                       style: const TextStyle(fontSize: 20),
                                     ),
                                   ),
-                                  const SizedBox(width: AppSpacing.gapSM),
+                                  const SizedBox(width: AppSpacing.xs),
                                 ],
                                 // Space name
                                 Expanded(
@@ -563,12 +563,12 @@ class _SpaceListItemState extends State<_SpaceListItem> {
                           Container(
                             padding: const EdgeInsets.symmetric(
                               horizontal: AppSpacing.xs,
-                              vertical: AppSpacing.xxxs,
+                              vertical: AppSpacing.xxs,
                             ),
                             decoration: BoxDecoration(
                               color: widget.isDarkMode
-                                  ? AppColors.surfaceDarkVariant
-                                  : AppColors.surfaceLightVariant,
+                                  ? AppColors.neutral800
+                                  : AppColors.neutral100,
                               borderRadius: BorderRadius.circular(
                                 AppSpacing.radiusFull,
                               ),

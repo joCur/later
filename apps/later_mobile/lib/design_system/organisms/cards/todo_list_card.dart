@@ -126,7 +126,7 @@ class _TodoListCardState extends State<TodoListCard> with TickerProviderStateMix
     return Text(
       widget.todoList.name,
       style: AppTypography.itemTitle.copyWith(
-        color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
+        color: isDark ? AppColors.neutral400 : AppColors.neutral600,
       ),
       maxLines: AppTypography.itemTitleMaxLines,
       overflow: TextOverflow.ellipsis,
@@ -142,7 +142,7 @@ class _TodoListCardState extends State<TodoListCard> with TickerProviderStateMix
     return Text(
       '$completed of $total completed',
       style: AppTypography.metadata.copyWith(
-        color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
+        color: isDark ? AppColors.neutral500 : AppColors.neutral500,
       ),
     );
   }
@@ -193,7 +193,7 @@ class _TodoListCardState extends State<TodoListCard> with TickerProviderStateMix
             color: Colors.white,
           ),
         ),
-        const SizedBox(width: AppSpacing.xxxs),
+        const SizedBox(width: AppSpacing.xxs),
         // Due date with subtle secondary gradient (amber→pink)
         GradientText.subtle(
           dateFormat.format(earliestDueDate),
@@ -240,15 +240,15 @@ class _TodoListCardState extends State<TodoListCard> with TickerProviderStateMix
     final isDark = theme.brightness == Brightness.dark;
 
     // Base background color with subtle gradient tint (5% opacity)
-    final baseBgColor = isDark ? AppColors.surfaceDark : AppColors.surfaceLight;
+    final baseBgColor = isDark ? AppColors.neutral900 : Colors.white;
     final tintColor = _getBackgroundTint(isDark);
 
     // Background color based on state
     Color backgroundColor;
     if (_isPressed) {
       backgroundColor = isDark
-          ? AppColors.surfaceDarkVariant
-          : AppColors.neutralGray100;
+          ? AppColors.neutral800
+          : AppColors.neutral100;
     } else {
       // Blend base color with subtle type-specific tint
       backgroundColor = Color.alphaBlend(

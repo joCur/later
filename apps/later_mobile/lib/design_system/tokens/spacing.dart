@@ -409,36 +409,6 @@ class AppSpacing {
     if (width < 1024) return verticalXL;
     return verticalXXL;
   }
-
-  // ============================================================
-  // BACKWARD COMPATIBILITY ALIASES
-  // These aliases map old spacing names to new Temporal Flow values
-  // TODO: Remove these after updating all component references
-  // ============================================================
-
-  /// xxxs: 2px - Not in base scale, use xxs (4px) instead
-  static const double xxxs = 2.0;
-
-  /// Card margin (12px)
-  static const double cardMargin = 12.0; // sm
-
-  /// Chip border radius (8px)
-  static const double chipRadius = 8.0; // xs
-
-  /// Gap SM (8px)
-  static const double gapSM = 8.0; // xs
-
-  /// Gap MD (12px)
-  static const double gapMD = 12.0; // sm
-
-  /// Gap LG (16px)
-  static const double gapLG = 16.0; // md
-
-  /// Item border width (2px)
-  static const double itemBorderWidth = 2.0; // borderWidthAccent
-
-  /// FAB touch target (64px)
-  static const double touchTargetFAB = 64.0; // fabSize
 }
 
 // ============================================================
