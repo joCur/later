@@ -33,18 +33,8 @@ void main() {
 
       // Create test spaces (mix of active and archived)
       testSpaces = [
-        Space(
-          id: 'space-1',
-          name: 'Personal',
-          icon: '🏠',
-          itemCount: 5,
-        ),
-        Space(
-          id: 'space-2',
-          name: 'Work',
-          icon: '💼',
-          itemCount: 12,
-        ),
+        Space(id: 'space-1', name: 'Personal', icon: '🏠', itemCount: 5),
+        Space(id: 'space-2', name: 'Work', icon: '💼', itemCount: 12),
         Space(
           id: 'space-3',
           name: 'Archived Project',
@@ -52,18 +42,8 @@ void main() {
           itemCount: 3,
           isArchived: true,
         ),
-        Space(
-          id: 'space-4',
-          name: 'Old Ideas',
-          icon: '💡',
-          isArchived: true,
-        ),
-        Space(
-          id: 'space-5',
-          name: 'Shopping',
-          icon: '🛒',
-          itemCount: 2,
-        ),
+        Space(id: 'space-4', name: 'Old Ideas', icon: '💡', isArchived: true),
+        Space(id: 'space-5', name: 'Shopping', icon: '🛒', itemCount: 2),
       ];
 
       // Add test spaces to repository
@@ -96,17 +76,16 @@ void main() {
           theme: theme ?? ThemeData.light(),
           home: ChangeNotifierProvider<SpacesProvider>.value(
             value: spacesProvider,
-            child: const Scaffold(
-              body: SpaceSwitcherModal(),
-            ),
+            child: const Scaffold(body: SpaceSwitcherModal()),
           ),
         ),
       );
     }
 
     group('Show Archived Toggle', () {
-      testWidgets('displays "Show Archived Spaces" toggle',
-          (WidgetTester tester) async {
+      testWidgets('displays "Show Archived Spaces" toggle', (
+        WidgetTester tester,
+      ) async {
         // Act
         await tester.pumpWidget(buildModalWithProvider());
         await tester.pumpAndSettle();
@@ -128,8 +107,9 @@ void main() {
         expect(switchListTile.value, isFalse);
       });
 
-      testWidgets('archived spaces are NOT shown by default',
-          (WidgetTester tester) async {
+      testWidgets('archived spaces are NOT shown by default', (
+        WidgetTester tester,
+      ) async {
         // Act
         await tester.pumpWidget(buildModalWithProvider());
         await tester.pumpAndSettle();
@@ -142,8 +122,9 @@ void main() {
         expect(find.text('Old Ideas'), findsNothing);
       });
 
-      testWidgets('toggling ON loads archived spaces',
-          (WidgetTester tester) async {
+      testWidgets('toggling ON loads archived spaces', (
+        WidgetTester tester,
+      ) async {
         // Act
         await tester.pumpWidget(buildModalWithProvider());
         await tester.pumpAndSettle();
@@ -160,8 +141,9 @@ void main() {
         expect(find.text('Old Ideas'), findsOneWidget);
       });
 
-      testWidgets('toggling OFF hides archived spaces again',
-          (WidgetTester tester) async {
+      testWidgets('toggling OFF hides archived spaces again', (
+        WidgetTester tester,
+      ) async {
         // Arrange
         await tester.pumpWidget(buildModalWithProvider());
         await tester.pumpAndSettle();
@@ -181,25 +163,28 @@ void main() {
         expect(find.text('Old Ideas'), findsNothing);
       });
 
-      testWidgets('toggle calls loadSpaces with correct includeArchived parameter',
-          (WidgetTester tester) async {
-        // Act
-        await tester.pumpWidget(buildModalWithProvider());
-        await tester.pumpAndSettle();
+      testWidgets(
+        'toggle calls loadSpaces with correct includeArchived parameter',
+        (WidgetTester tester) async {
+          // Act
+          await tester.pumpWidget(buildModalWithProvider());
+          await tester.pumpAndSettle();
 
-        // Verify initial load with includeArchived: false
-        expect(spacesProvider.spaces.length, equals(3));
+          // Verify initial load with includeArchived: false
+          expect(spacesProvider.spaces.length, equals(3));
 
-        // Toggle ON
-        await tester.tap(find.byType(SwitchListTile));
-        await tester.pumpAndSettle();
+          // Toggle ON
+          await tester.tap(find.byType(SwitchListTile));
+          await tester.pumpAndSettle();
 
-        // Assert - Should now have all 5 spaces
-        expect(spacesProvider.spaces.length, equals(5));
-      });
+          // Assert - Should now have all 5 spaces
+          expect(spacesProvider.spaces.length, equals(5));
+        },
+      );
 
-      testWidgets('toggle is positioned above Create New Space button',
-          (WidgetTester tester) async {
+      testWidgets('toggle is positioned above Create New Space button', (
+        WidgetTester tester,
+      ) async {
         // Act
         await tester.pumpWidget(buildModalWithProvider());
         await tester.pumpAndSettle();
@@ -221,8 +206,9 @@ void main() {
     });
 
     group('Archived Spaces Visual Indicators', () {
-      testWidgets('archived spaces show archive icon instead of folder icon',
-          (WidgetTester tester) async {
+      testWidgets('archived spaces show archive icon instead of folder icon', (
+        WidgetTester tester,
+      ) async {
         // Arrange
         await tester.pumpWidget(buildModalWithProvider());
         await tester.pumpAndSettle();
@@ -232,11 +218,15 @@ void main() {
         await tester.pumpAndSettle();
 
         // Assert - Should have archive icons for archived spaces
-        expect(find.byIcon(Icons.archive), findsNWidgets(2)); // 2 archived spaces
+        expect(
+          find.byIcon(Icons.archive),
+          findsNWidgets(2),
+        ); // 2 archived spaces
       });
 
-      testWidgets('archived spaces have reduced opacity',
-          (WidgetTester tester) async {
+      testWidgets('archived spaces have reduced opacity', (
+        WidgetTester tester,
+      ) async {
         // Arrange
         await tester.pumpWidget(buildModalWithProvider());
         await tester.pumpAndSettle();
@@ -256,8 +246,9 @@ void main() {
         expect(opacityWidget.opacity, equals(0.5));
       });
 
-      testWidgets('archived spaces show "Archived" badge',
-          (WidgetTester tester) async {
+      testWidgets('archived spaces show "Archived" badge', (
+        WidgetTester tester,
+      ) async {
         // Arrange
         await tester.pumpWidget(buildModalWithProvider());
         await tester.pumpAndSettle();
@@ -270,8 +261,9 @@ void main() {
         expect(find.text('Archived'), findsNWidgets(2)); // 2 archived spaces
       });
 
-      testWidgets('archived spaces use secondary text color',
-          (WidgetTester tester) async {
+      testWidgets('archived spaces use secondary text color', (
+        WidgetTester tester,
+      ) async {
         // Arrange
         await tester.pumpWidget(
           buildModalWithProvider(theme: ThemeData.light()),
@@ -287,8 +279,9 @@ void main() {
         expect(find.text('Archived Project'), findsOneWidget);
       });
 
-      testWidgets('non-archived spaces show normal folder icon',
-          (WidgetTester tester) async {
+      testWidgets('non-archived spaces show normal folder icon', (
+        WidgetTester tester,
+      ) async {
         // Arrange
         await tester.pumpWidget(buildModalWithProvider());
         await tester.pumpAndSettle();
@@ -299,13 +292,17 @@ void main() {
 
         // Assert - Non-archived spaces without custom icons should show folder icon
         // (Personal, Work, Shopping have emojis, so we check for presence of folder icon if needed)
-        expect(find.byIcon(Icons.folder_outlined), findsNothing); // All have custom icons
+        expect(
+          find.byIcon(Icons.folder_outlined),
+          findsNothing,
+        ); // All have custom icons
       });
     });
 
     group('Archive Confirmation Dialog', () {
-      testWidgets('shows confirmation dialog for space with items',
-          (WidgetTester tester) async {
+      testWidgets('shows confirmation dialog for space with items', (
+        WidgetTester tester,
+      ) async {
         // Arrange
         await tester.pumpWidget(buildModalWithProvider());
         await tester.pumpAndSettle();
@@ -328,8 +325,9 @@ void main() {
         expect(find.text('Archive'), findsOneWidget);
       });
 
-      testWidgets('does not show confirmation for empty space',
-          (WidgetTester tester) async {
+      testWidgets('does not show confirmation for empty space', (
+        WidgetTester tester,
+      ) async {
         // Arrange
         await tester.pumpWidget(buildModalWithProvider());
         await tester.pumpAndSettle();
@@ -360,8 +358,7 @@ void main() {
         expect(find.text('Empty Test'), findsNothing); // Should be hidden
       });
 
-      testWidgets('cannot archive current space',
-          (WidgetTester tester) async {
+      testWidgets('cannot archive current space', (WidgetTester tester) async {
         // Arrange
         await tester.pumpWidget(buildModalWithProvider());
         await tester.pumpAndSettle();
@@ -381,8 +378,9 @@ void main() {
         expect(find.text('Switch to another space first'), findsOneWidget);
       });
 
-      testWidgets('confirms and archives space successfully',
-          (WidgetTester tester) async {
+      testWidgets('confirms and archives space successfully', (
+        WidgetTester tester,
+      ) async {
         // Arrange
         await tester.pumpWidget(buildModalWithProvider());
         await tester.pumpAndSettle();
@@ -401,10 +399,7 @@ void main() {
 
         // Assert - Space should be archived and hidden
         expect(find.text('Work'), findsNothing);
-        expect(
-          find.textContaining('Work has been archived'),
-          findsOneWidget,
-        );
+        expect(find.textContaining('Work has been archived'), findsOneWidget);
       });
 
       testWidgets('cancels archive operation', (WidgetTester tester) async {
@@ -431,8 +426,9 @@ void main() {
     });
 
     group('Cannot Switch to Archived Space', () {
-      testWidgets('tapping archived space does nothing',
-          (WidgetTester tester) async {
+      testWidgets('tapping archived space does nothing', (
+        WidgetTester tester,
+      ) async {
         // Arrange
         await tester.pumpWidget(buildModalWithProvider());
         await tester.pumpAndSettle();
@@ -451,8 +447,9 @@ void main() {
         expect(spacesProvider.currentSpace?.id, equals(currentSpaceId));
       });
 
-      testWidgets('archived space is not selectable via keyboard',
-          (WidgetTester tester) async {
+      testWidgets('archived space is not selectable via keyboard', (
+        WidgetTester tester,
+      ) async {
         // This test ensures archived spaces don't respond to selection
         // Keyboard navigation should skip them or they should be disabled
 
@@ -476,8 +473,9 @@ void main() {
     });
 
     group('Restore/Unarchive Functionality', () {
-      testWidgets('shows "Restore Space" option for archived spaces',
-          (WidgetTester tester) async {
+      testWidgets('shows "Restore Space" option for archived spaces', (
+        WidgetTester tester,
+      ) async {
         // Arrange
         await tester.pumpWidget(buildModalWithProvider());
         await tester.pumpAndSettle();
@@ -494,8 +492,9 @@ void main() {
         expect(find.text('Restore Space'), findsOneWidget);
       });
 
-      testWidgets('does not show "Archive Space" for already archived spaces',
-          (WidgetTester tester) async {
+      testWidgets('does not show "Archive Space" for already archived spaces', (
+        WidgetTester tester,
+      ) async {
         // Arrange
         await tester.pumpWidget(buildModalWithProvider());
         await tester.pumpAndSettle();
@@ -512,8 +511,9 @@ void main() {
         expect(find.text('Archive Space'), findsNothing);
       });
 
-      testWidgets('restores archived space successfully',
-          (WidgetTester tester) async {
+      testWidgets('restores archived space successfully', (
+        WidgetTester tester,
+      ) async {
         // Arrange
         await tester.pumpWidget(buildModalWithProvider());
         await tester.pumpAndSettle();
@@ -537,8 +537,9 @@ void main() {
         );
       });
 
-      testWidgets('restored space appears in main list without toggle',
-          (WidgetTester tester) async {
+      testWidgets('restored space appears in main list without toggle', (
+        WidgetTester tester,
+      ) async {
         // Arrange
         await tester.pumpWidget(buildModalWithProvider());
         await tester.pumpAndSettle();
@@ -561,8 +562,9 @@ void main() {
         expect(find.text('Archived Project'), findsOneWidget);
       });
 
-      testWidgets('restored space loses archived visual indicators',
-          (WidgetTester tester) async {
+      testWidgets('restored space loses archived visual indicators', (
+        WidgetTester tester,
+      ) async {
         // Arrange
         await tester.pumpWidget(buildModalWithProvider());
         await tester.pumpAndSettle();
@@ -589,8 +591,9 @@ void main() {
         expect(restoredSpaceFinder, findsNothing);
       });
 
-      testWidgets('handles restore error gracefully',
-          (WidgetTester tester) async {
+      testWidgets('handles restore error gracefully', (
+        WidgetTester tester,
+      ) async {
         // This test would require mocking the repository to fail
         // For now, we'll just verify the error handling structure exists
         // by checking that errors are caught and shown to user
@@ -600,13 +603,17 @@ void main() {
 
         // The implementation should have try-catch blocks
         // that show error snackbars if restore fails
-        expect(find.byType(ScaffoldMessenger), findsNothing); // No errors initially
+        expect(
+          find.byType(ScaffoldMessenger),
+          findsNothing,
+        ); // No errors initially
       });
     });
 
     group('Error Handling', () {
-      testWidgets('shows error snackbar when archive fails',
-          (WidgetTester tester) async {
+      testWidgets('shows error snackbar when archive fails', (
+        WidgetTester tester,
+      ) async {
         // This would require mocking the provider to fail
         // The test verifies that error handling exists in the implementation
 
@@ -617,8 +624,9 @@ void main() {
         expect(find.byType(SpaceSwitcherModal), findsOneWidget);
       });
 
-      testWidgets('shows error when trying to archive current space',
-          (WidgetTester tester) async {
+      testWidgets('shows error when trying to archive current space', (
+        WidgetTester tester,
+      ) async {
         // Arrange
         await tester.pumpWidget(buildModalWithProvider());
         await tester.pumpAndSettle();
@@ -633,8 +641,9 @@ void main() {
     });
 
     group('Integration Tests', () {
-      testWidgets('complete archive and restore workflow',
-          (WidgetTester tester) async {
+      testWidgets('complete archive and restore workflow', (
+        WidgetTester tester,
+      ) async {
         // Arrange
         await tester.pumpWidget(buildModalWithProvider());
         await tester.pumpAndSettle();
@@ -672,8 +681,9 @@ void main() {
         expect(find.text('Work'), findsOneWidget);
       });
 
-      testWidgets('archive updates item count correctly',
-          (WidgetTester tester) async {
+      testWidgets('archive updates item count correctly', (
+        WidgetTester tester,
+      ) async {
         // Arrange
         await tester.pumpWidget(buildModalWithProvider());
         await tester.pumpAndSettle();
@@ -694,8 +704,9 @@ void main() {
         expect(find.text('12'), findsWidgets);
       });
 
-      testWidgets('search filter works with archived spaces',
-          (WidgetTester tester) async {
+      testWidgets('search filter works with archived spaces', (
+        WidgetTester tester,
+      ) async {
         // Arrange
         await tester.pumpWidget(buildModalWithProvider());
         await tester.pumpAndSettle();
@@ -716,8 +727,9 @@ void main() {
     });
 
     group('Accessibility', () {
-      testWidgets('archived spaces have proper semantic labels',
-          (WidgetTester tester) async {
+      testWidgets('archived spaces have proper semantic labels', (
+        WidgetTester tester,
+      ) async {
         // Arrange
         await tester.pumpWidget(buildModalWithProvider());
         await tester.pumpAndSettle();
@@ -728,17 +740,20 @@ void main() {
 
         // Assert - Archived space semantics
         final archivedSemantics = tester.getSemantics(
-          find.ancestor(
-            of: find.text('Archived Project'),
-            matching: find.byType(Semantics),
-          ).first,
+          find
+              .ancestor(
+                of: find.text('Archived Project'),
+                matching: find.byType(Semantics),
+              )
+              .first,
         );
         expect(archivedSemantics.label, contains('Archived Project'));
         expect(archivedSemantics.label, contains('3 items'));
       });
 
-      testWidgets('toggle has proper semantic label',
-          (WidgetTester tester) async {
+      testWidgets('toggle has proper semantic label', (
+        WidgetTester tester,
+      ) async {
         // Act
         await tester.pumpWidget(buildModalWithProvider());
         await tester.pumpAndSettle();
@@ -753,8 +768,9 @@ void main() {
     });
 
     group('Visual Design', () {
-      testWidgets('uses correct colors in light mode for archived toggle',
-          (WidgetTester tester) async {
+      testWidgets('uses correct colors in light mode for archived toggle', (
+        WidgetTester tester,
+      ) async {
         // Act
         await tester.pumpWidget(
           buildModalWithProvider(theme: ThemeData.light()),
@@ -765,8 +781,9 @@ void main() {
         expect(find.byType(SwitchListTile), findsOneWidget);
       });
 
-      testWidgets('uses correct colors in dark mode for archived toggle',
-          (WidgetTester tester) async {
+      testWidgets('uses correct colors in dark mode for archived toggle', (
+        WidgetTester tester,
+      ) async {
         // Act
         await tester.pumpWidget(
           buildModalWithProvider(theme: ThemeData.dark()),
@@ -777,8 +794,9 @@ void main() {
         expect(find.byType(SwitchListTile), findsOneWidget);
       });
 
-      testWidgets('archived badge uses secondary text color',
-          (WidgetTester tester) async {
+      testWidgets('archived badge uses secondary text color', (
+        WidgetTester tester,
+      ) async {
         // Act
         await tester.pumpWidget(
           buildModalWithProvider(theme: ThemeData.light()),

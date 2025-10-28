@@ -36,27 +36,27 @@ class AppTypography {
 
   /// Display Large: 48px, Extrabold - Hero headlines, splash screens
   static TextStyle get displayLarge => GoogleFonts.inter(
-        fontSize: 48,
-        height: 1.17, // 56px line height
-        fontWeight: extraBold,
-        letterSpacing: -0.96, // -0.02em
-      );
+    fontSize: 48,
+    height: 1.17, // 56px line height
+    fontWeight: extraBold,
+    letterSpacing: -0.96, // -0.02em
+  );
 
   /// Display: 40px, Bold - Major section headers, onboarding
   static TextStyle get displayMedium => GoogleFonts.inter(
-        fontSize: 40,
-        height: 1.20, // 48px line height
-        fontWeight: bold,
-        letterSpacing: -0.8, // -0.02em
-      );
+    fontSize: 40,
+    height: 1.20, // 48px line height
+    fontWeight: bold,
+    letterSpacing: -0.8, // -0.02em
+  );
 
   /// Display Small: 36px, Bold - Reserved for future use
   static TextStyle get displaySmall => GoogleFonts.inter(
-        fontSize: 36,
-        height: 1.22, // 44px line height
-        fontWeight: bold,
-        letterSpacing: -0.72, // -0.02em
-      );
+    fontSize: 36,
+    height: 1.22, // 44px line height
+    fontWeight: bold,
+    letterSpacing: -0.72, // -0.02em
+  );
 
   // ============================================================
   // HEADLINE STYLES - Page and section headers
@@ -64,27 +64,27 @@ class AppTypography {
 
   /// H1: 32px, Bold - Page titles, screen headers
   static TextStyle get headlineLarge => GoogleFonts.inter(
-        fontSize: 32,
-        height: 1.25, // 40px line height
-        fontWeight: bold,
-        letterSpacing: -0.32, // -0.01em
-      );
+    fontSize: 32,
+    height: 1.25, // 40px line height
+    fontWeight: bold,
+    letterSpacing: -0.32, // -0.01em
+  );
 
   /// H2: 28px, Semibold - Section headers, modal titles
   static TextStyle get headlineMedium => GoogleFonts.inter(
-        fontSize: 28,
-        height: 1.29, // 36px line height
-        fontWeight: semiBold,
-        letterSpacing: -0.28, // -0.01em
-      );
+    fontSize: 28,
+    height: 1.29, // 36px line height
+    fontWeight: semiBold,
+    letterSpacing: -0.28, // -0.01em
+  );
 
   /// H3: 24px, Semibold - Subsection headers, card titles
   static TextStyle get headlineSmall => GoogleFonts.inter(
-        fontSize: 24,
-        height: 1.33, // 32px line height
-        fontWeight: semiBold,
-        letterSpacing: 0,
-      );
+    fontSize: 24,
+    height: 1.33, // 32px line height
+    fontWeight: semiBold,
+    letterSpacing: 0,
+  );
 
   // ============================================================
   // TITLE STYLES - Subheadings and prominent labels
@@ -92,27 +92,27 @@ class AppTypography {
 
   /// H4: 20px, Semibold - List headers, group titles
   static TextStyle get titleLarge => GoogleFonts.inter(
-        fontSize: 20,
-        height: 1.40, // 28px line height
-        fontWeight: semiBold,
-        letterSpacing: 0,
-      );
+    fontSize: 20,
+    height: 1.40, // 28px line height
+    fontWeight: semiBold,
+    letterSpacing: 0,
+  );
 
   /// H5: 18px, Medium - Small headers, emphasized labels
   static TextStyle get titleMedium => GoogleFonts.inter(
-        fontSize: 18,
-        height: 1.44, // 26px line height
-        fontWeight: medium,
-        letterSpacing: 0,
-      );
+    fontSize: 18,
+    height: 1.44, // 26px line height
+    fontWeight: medium,
+    letterSpacing: 0,
+  );
 
   /// Title Small: 16px, Medium - Compact titles
   static TextStyle get titleSmall => GoogleFonts.inter(
-        fontSize: 16,
-        height: 1.50, // 24px line height
-        fontWeight: medium,
-        letterSpacing: 0,
-      );
+    fontSize: 16,
+    height: 1.50, // 24px line height
+    fontWeight: medium,
+    letterSpacing: 0,
+  );
 
   // ============================================================
   // BODY STYLES - Main content text
@@ -120,27 +120,27 @@ class AppTypography {
 
   /// Body XL: 18px, Regular - Lead paragraphs, featured text
   static TextStyle get bodyLarge => GoogleFonts.inter(
-        fontSize: 18,
-        height: 1.56, // 28px line height
-        fontWeight: regular,
-        letterSpacing: 0,
-      );
+    fontSize: 18,
+    height: 1.56, // 28px line height
+    fontWeight: regular,
+    letterSpacing: 0,
+  );
 
   /// Body (Default): 16px, Regular - Standard UI text, descriptions
   static TextStyle get bodyMedium => GoogleFonts.inter(
-        fontSize: 16,
-        height: 1.50, // 24px line height
-        fontWeight: regular,
-        letterSpacing: 0,
-      );
+    fontSize: 16,
+    height: 1.50, // 24px line height
+    fontWeight: regular,
+    letterSpacing: 0,
+  );
 
   /// Body Small: 14px, Regular - Secondary information, metadata
   static TextStyle get bodySmall => GoogleFonts.inter(
-        fontSize: 14,
-        height: 1.43, // 20px line height
-        fontWeight: regular,
-        letterSpacing: 0,
-      );
+    fontSize: 14,
+    height: 1.43, // 20px line height
+    fontWeight: regular,
+    letterSpacing: 0,
+  );
 
   // ============================================================
   // LABEL STYLES - Buttons, chips, form labels
@@ -148,27 +148,27 @@ class AppTypography {
 
   /// Label Large: 14px, Semibold - Form labels, section labels
   static TextStyle get labelLarge => GoogleFonts.inter(
-        fontSize: 14,
-        height: 1.43, // 20px line height
-        fontWeight: semiBold,
-        letterSpacing: 0.42, // 0.03em for uppercase
-      );
+    fontSize: 14,
+    height: 1.43, // 20px line height
+    fontWeight: semiBold,
+    letterSpacing: 0.42, // 0.03em for uppercase
+  );
 
   /// Caption/Label Medium: 12px, Medium - Timestamps, counts, badges
   static TextStyle get labelMedium => GoogleFonts.inter(
-        fontSize: 12,
-        height: 1.50, // 18px line height
-        fontWeight: medium,
-        letterSpacing: 0.12, // 0.01em
-      );
+    fontSize: 12,
+    height: 1.50, // 18px line height
+    fontWeight: medium,
+    letterSpacing: 0.12, // 0.01em
+  );
 
   /// Overline/Label Small: 11px, Semibold - Tiny labels, status indicators
   static TextStyle get labelSmall => GoogleFonts.inter(
-        fontSize: 11,
-        height: 1.45, // 16px line height
-        fontWeight: semiBold,
-        letterSpacing: 0.88, // 0.08em for uppercase
-      );
+    fontSize: 11,
+    height: 1.45, // 16px line height
+    fontWeight: semiBold,
+    letterSpacing: 0.88, // 0.08em for uppercase
+  );
 
   // ============================================================
   // MONOSPACE STYLES - Code, tags, technical labels
@@ -176,19 +176,19 @@ class AppTypography {
 
   /// Code: 14px, Regular - Tags, IDs, technical labels
   static TextStyle get code => GoogleFonts.jetBrainsMono(
-        fontSize: 14,
-        height: 1.57, // 22px line height
-        fontWeight: regular,
-        letterSpacing: 0,
-      );
+    fontSize: 14,
+    height: 1.57, // 22px line height
+    fontWeight: regular,
+    letterSpacing: 0,
+  );
 
   /// Code Small: 12px, Regular - Small technical labels
   static TextStyle get codeSmall => GoogleFonts.jetBrainsMono(
-        fontSize: 12,
-        height: 1.50, // 18px line height
-        fontWeight: regular,
-        letterSpacing: 0,
-      );
+    fontSize: 12,
+    height: 1.50, // 18px line height
+    fontWeight: regular,
+    letterSpacing: 0,
+  );
 
   // ============================================================
   // CUSTOM STYLES FOR LATER APP
@@ -203,19 +203,19 @@ class AppTypography {
 
   /// Item card title: 18px, Bold - Mobile-first bold design
   static TextStyle get itemTitle => GoogleFonts.inter(
-        fontSize: 18,
-        height: 1.33, // ~24px line height (1.3 for better scannability)
-        fontWeight: bold,
-        letterSpacing: -0.2, // Tighter tracking for bold text
-      );
+    fontSize: 18,
+    height: 1.33, // ~24px line height (1.3 for better scannability)
+    fontWeight: bold,
+    letterSpacing: -0.2, // Tighter tracking for bold text
+  );
 
   /// Item card content preview: 15px, Regular - Mobile-first bold design
   static TextStyle get itemContent => GoogleFonts.inter(
-        fontSize: 15,
-        height: 1.47, // ~22px line height (1.5 for readability)
-        fontWeight: regular,
-        letterSpacing: 0,
-      );
+    fontSize: 15,
+    height: 1.47, // ~22px line height (1.5 for readability)
+    fontWeight: regular,
+    letterSpacing: 0,
+  );
 
   /// Maximum lines for item titles (2 lines for consistent card height)
   static const int itemTitleMaxLines = 2;
@@ -225,11 +225,11 @@ class AppTypography {
 
   /// Button text: 14px, Semibold
   static TextStyle get button => GoogleFonts.inter(
-        fontSize: 14,
-        height: 1.43, // 20px line height
-        fontWeight: semiBold,
-        letterSpacing: 0,
-      );
+    fontSize: 14,
+    height: 1.43, // 20px line height
+    fontWeight: semiBold,
+    letterSpacing: 0,
+  );
 
   /// Input field text: 16px, Regular
   static TextStyle get input => bodyMedium;
@@ -262,9 +262,7 @@ class AppTypography {
     // Add 0.03em to existing letter spacing for uppercase
     final currentSpacing = base.letterSpacing ?? 0;
     final fontSize = base.fontSize ?? 16;
-    return base.copyWith(
-      letterSpacing: currentSpacing + (fontSize * 0.03),
-    );
+    return base.copyWith(letterSpacing: currentSpacing + (fontSize * 0.03));
   }
 
   /// Make text semibold (for emphasis)
@@ -529,4 +527,3 @@ extension GradientTextStyleExtension on TextStyle {
     );
   }
 }
-

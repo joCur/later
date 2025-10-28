@@ -9,7 +9,8 @@ class Breakpoints {
   static const double mobile = 0; // 0px and up (default)
   static const double tablet = 768; // 768px and up
   static const double desktop = 1024; // 1024px and up
-  static const double desktopLarge = 1440; // 1440px and up (optional, for large screens)
+  static const double desktopLarge =
+      1440; // 1440px and up (optional, for large screens)
 
   /// Check if the current screen width is mobile size
   static bool isMobile(BuildContext context) {
@@ -118,12 +119,7 @@ class Breakpoints {
 }
 
 /// Enum representing screen size categories
-enum ScreenSize {
-  mobile,
-  tablet,
-  desktop,
-  desktopLarge,
-}
+enum ScreenSize { mobile, tablet, desktop, desktopLarge }
 
 /// Extension on BuildContext for convenient breakpoint access
 extension BreakpointExtension on BuildContext {
@@ -136,12 +132,7 @@ extension BreakpointExtension on BuildContext {
   ScreenSize get screenSize => Breakpoints.getScreenSize(this);
 
   /// Shorthand for valueWhen
-  T responsive<T>({
-    required T mobile,
-    T? tablet,
-    T? desktop,
-    T? desktopLarge,
-  }) {
+  T responsive<T>({required T mobile, T? tablet, T? desktop, T? desktopLarge}) {
     return Breakpoints.valueWhen<T>(
       context: this,
       mobile: mobile,

@@ -41,8 +41,9 @@ void main() {
     const testWidth = 320.0;
     const testHeight = 568.0;
 
-    testWidgets('Breakpoint detection identifies mobile at 320px',
-        (WidgetTester tester) async {
+    testWidgets('Breakpoint detection identifies mobile at 320px', (
+      WidgetTester tester,
+    ) async {
       bool? isMobile;
       bool? isTablet;
       bool? isDesktop;
@@ -52,9 +53,7 @@ void main() {
           home: Builder(
             builder: (context) {
               return MediaQuery(
-                data: const MediaQueryData(
-                  size: Size(testWidth, testHeight),
-                ),
+                data: const MediaQueryData(size: Size(testWidth, testHeight)),
                 child: Builder(
                   builder: (context) {
                     isMobile = Breakpoints.isMobile(context);
@@ -70,14 +69,21 @@ void main() {
       );
 
       expect(isMobile, isTrue, reason: '320px should be identified as mobile');
-      expect(isTablet, isFalse,
-          reason: '320px should not be identified as tablet');
-      expect(isDesktop, isFalse,
-          reason: '320px should not be identified as desktop');
+      expect(
+        isTablet,
+        isFalse,
+        reason: '320px should not be identified as tablet',
+      );
+      expect(
+        isDesktop,
+        isFalse,
+        reason: '320px should not be identified as desktop',
+      );
     });
 
-    testWidgets('Bottom navigation is visible at 320px',
-        (WidgetTester tester) async {
+    testWidgets('Bottom navigation is visible at 320px', (
+      WidgetTester tester,
+    ) async {
       // Set view size explicitly
       tester.view.physicalSize = const Size(testWidth, testHeight);
       tester.view.devicePixelRatio = 1.0;
@@ -98,10 +104,16 @@ void main() {
 
       // Check actual rendered size
       final size = tester.getSize(find.byType(IconOnlyBottomNav));
-      expect(size.height, equals(64.0),
-          reason: 'Bottom navigation should be 64px tall');
-      expect(size.width, equals(testWidth),
-          reason: 'Bottom navigation should be full width');
+      expect(
+        size.height,
+        equals(64.0),
+        reason: 'Bottom navigation should be 64px tall',
+      );
+      expect(
+        size.width,
+        equals(testWidth),
+        reason: 'Bottom navigation should be full width',
+      );
 
       // Reset
       addTearDown(() => tester.view.resetPhysicalSize());
@@ -110,9 +122,7 @@ void main() {
     testWidgets('Sidebar is hidden at 320px', (WidgetTester tester) async {
       await tester.pumpWidget(
         MediaQuery(
-          data: const MediaQueryData(
-            size: Size(testWidth, testHeight),
-          ),
+          data: const MediaQueryData(size: Size(testWidth, testHeight)),
           child: MaterialApp(
             home: Builder(
               builder: (context) {
@@ -121,12 +131,8 @@ void main() {
                     children: [
                       // Conditionally show sidebar based on breakpoint
                       if (Breakpoints.isDesktopOrLarger(context))
-                        AppSidebar(
-                          onToggleExpanded: () {},
-                        ),
-                      const Expanded(
-                        child: Center(child: Text('Content')),
-                      ),
+                        AppSidebar(onToggleExpanded: () {}),
+                      const Expanded(child: Center(child: Text('Content'))),
                     ],
                   ),
                 );
@@ -137,17 +143,17 @@ void main() {
       );
 
       // Sidebar should not be present on mobile
-      expect(find.byType(AppSidebar), findsNothing,
-          reason: 'Sidebar should be hidden on mobile devices');
+      expect(
+        find.byType(AppSidebar),
+        findsNothing,
+        reason: 'Sidebar should be hidden on mobile devices',
+      );
     });
 
-    testWidgets('Content is full-width at 320px',
-        (WidgetTester tester) async {
+    testWidgets('Content is full-width at 320px', (WidgetTester tester) async {
       await tester.pumpWidget(
         MediaQuery(
-          data: const MediaQueryData(
-            size: Size(testWidth, testHeight),
-          ),
+          data: const MediaQueryData(size: Size(testWidth, testHeight)),
           child: MaterialApp(
             home: Scaffold(
               body: LayoutBuilder(
@@ -165,26 +171,22 @@ void main() {
 
       final size = tester.getSize(find.byType(Container).first);
 
-      expect(size.width, equals(testWidth),
-          reason: 'Content should use full screen width');
+      expect(
+        size.width,
+        equals(testWidth),
+        reason: 'Content should use full screen width',
+      );
     });
 
-    testWidgets('Single-column layout at 320px',
-        (WidgetTester tester) async {
+    testWidgets('Single-column layout at 320px', (WidgetTester tester) async {
       await tester.pumpWidget(
         MediaQuery(
-          data: const MediaQueryData(
-            size: Size(testWidth, testHeight),
-          ),
+          data: const MediaQueryData(size: Size(testWidth, testHeight)),
           child: MaterialApp(
             home: Builder(
               builder: (context) {
                 final columns = Breakpoints.getGridColumns(context);
-                return Scaffold(
-                  body: Center(
-                    child: Text('Columns: $columns'),
-                  ),
-                );
+                return Scaffold(body: Center(child: Text('Columns: $columns')));
               },
             ),
           ),
@@ -192,23 +194,23 @@ void main() {
       );
 
       // Find the text and verify it shows 1 column
-      expect(find.text('Columns: 1'), findsOneWidget,
-          reason: 'Mobile should use single-column layout');
+      expect(
+        find.text('Columns: 1'),
+        findsOneWidget,
+        reason: 'Mobile should use single-column layout',
+      );
     });
 
-    testWidgets('FAB is positioned correctly at 320px',
-        (WidgetTester tester) async {
+    testWidgets('FAB is positioned correctly at 320px', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         MediaQuery(
-          data: const MediaQueryData(
-            size: Size(testWidth, testHeight),
-          ),
+          data: const MediaQueryData(size: Size(testWidth, testHeight)),
           child: MaterialApp(
             home: Scaffold(
               body: const Center(child: Text('Content')),
-              floatingActionButton: QuickCaptureFab(
-                onPressed: () {},
-              ),
+              floatingActionButton: QuickCaptureFab(onPressed: () {}),
             ),
           ),
         ),
@@ -223,13 +225,12 @@ void main() {
       expect(fabSize.height, equals(64.0));
     });
 
-    testWidgets('ResponsiveLayout shows mobile widget at 320px',
-        (WidgetTester tester) async {
+    testWidgets('ResponsiveLayout shows mobile widget at 320px', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         const MediaQuery(
-          data: MediaQueryData(
-            size: Size(testWidth, testHeight),
-          ),
+          data: MediaQueryData(size: Size(testWidth, testHeight)),
           child: MaterialApp(
             home: Scaffold(
               body: ResponsiveLayout(
@@ -252,16 +253,15 @@ void main() {
     const testWidth = 375.0;
     const testHeight = 812.0;
 
-    testWidgets('Breakpoint detection identifies mobile at 375px',
-        (WidgetTester tester) async {
+    testWidgets('Breakpoint detection identifies mobile at 375px', (
+      WidgetTester tester,
+    ) async {
       bool? isMobile;
 
       await tester.pumpWidget(
         MaterialApp(
           home: MediaQuery(
-            data: const MediaQueryData(
-              size: Size(testWidth, testHeight),
-            ),
+            data: const MediaQueryData(size: Size(testWidth, testHeight)),
             child: Builder(
               builder: (context) {
                 isMobile = Breakpoints.isMobile(context);
@@ -272,17 +272,15 @@ void main() {
         ),
       );
 
-      expect(isMobile, isTrue,
-          reason: '375px should be identified as mobile');
+      expect(isMobile, isTrue, reason: '375px should be identified as mobile');
     });
 
-    testWidgets('Bottom navigation visible and properly sized at 375px',
-        (WidgetTester tester) async {
+    testWidgets('Bottom navigation visible and properly sized at 375px', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         MediaQuery(
-          data: const MediaQueryData(
-            size: Size(testWidth, testHeight),
-          ),
+          data: const MediaQueryData(size: Size(testWidth, testHeight)),
           child: MaterialApp(
             home: Scaffold(
               bottomNavigationBar: IconOnlyBottomNav(
@@ -297,17 +295,19 @@ void main() {
       expect(find.byType(IconOnlyBottomNav), findsOneWidget);
 
       final size = tester.getSize(find.byType(IconOnlyBottomNav));
-      expect(size.width, equals(testWidth),
-          reason: 'Bottom nav should span full width');
+      expect(
+        size.width,
+        equals(testWidth),
+        reason: 'Bottom nav should span full width',
+      );
     });
 
-    testWidgets('All 3 navigation items are visible at 375px',
-        (WidgetTester tester) async {
+    testWidgets('All 3 navigation items are visible at 375px', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         MediaQuery(
-          data: const MediaQueryData(
-            size: Size(testWidth, testHeight),
-          ),
+          data: const MediaQueryData(size: Size(testWidth, testHeight)),
           child: MaterialApp(
             home: Scaffold(
               bottomNavigationBar: IconOnlyBottomNav(
@@ -325,13 +325,12 @@ void main() {
       expect(find.text('Settings'), findsOneWidget);
     });
 
-    testWidgets('Content area accounts for bottom nav at 375px',
-        (WidgetTester tester) async {
+    testWidgets('Content area accounts for bottom nav at 375px', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         MediaQuery(
-          data: const MediaQueryData(
-            size: Size(testWidth, testHeight),
-          ),
+          data: const MediaQueryData(size: Size(testWidth, testHeight)),
           child: MaterialApp(
             home: Scaffold(
               body: LayoutBuilder(
@@ -352,17 +351,19 @@ void main() {
 
       // Content should have less height than full screen due to bottom nav
       final contentSize = tester.getSize(find.byType(LayoutBuilder));
-      expect(contentSize.height, lessThan(testHeight),
-          reason: 'Content should be reduced by bottom nav height');
+      expect(
+        contentSize.height,
+        lessThan(testHeight),
+        reason: 'Content should be reduced by bottom nav height',
+      );
     });
 
-    testWidgets('Text remains readable at 375px width',
-        (WidgetTester tester) async {
+    testWidgets('Text remains readable at 375px width', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         const MediaQuery(
-          data: MediaQueryData(
-            size: Size(testWidth, testHeight),
-          ),
+          data: MediaQueryData(size: Size(testWidth, testHeight)),
           child: MaterialApp(
             home: Scaffold(
               body: Padding(
@@ -378,8 +379,11 @@ void main() {
       );
 
       // Verify text renders without errors
-      expect(tester.takeException(), isNull,
-          reason: 'Text should render without overflow errors');
+      expect(
+        tester.takeException(),
+        isNull,
+        reason: 'Text should render without overflow errors',
+      );
     });
   });
 
@@ -387,16 +391,15 @@ void main() {
     const testWidth = 414.0;
     const testHeight = 896.0;
 
-    testWidgets('Breakpoint detection identifies mobile at 414px',
-        (WidgetTester tester) async {
+    testWidgets('Breakpoint detection identifies mobile at 414px', (
+      WidgetTester tester,
+    ) async {
       bool? isMobile;
 
       await tester.pumpWidget(
         MaterialApp(
           home: MediaQuery(
-            data: const MediaQueryData(
-              size: Size(testWidth, testHeight),
-            ),
+            data: const MediaQueryData(size: Size(testWidth, testHeight)),
             child: Builder(
               builder: (context) {
                 isMobile = Breakpoints.isMobile(context);
@@ -407,17 +410,15 @@ void main() {
         ),
       );
 
-      expect(isMobile, isTrue,
-          reason: '414px should be identified as mobile');
+      expect(isMobile, isTrue, reason: '414px should be identified as mobile');
     });
 
-    testWidgets('Bottom navigation spans full width at 414px',
-        (WidgetTester tester) async {
+    testWidgets('Bottom navigation spans full width at 414px', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         MediaQuery(
-          data: const MediaQueryData(
-            size: Size(testWidth, testHeight),
-          ),
+          data: const MediaQueryData(size: Size(testWidth, testHeight)),
           child: MaterialApp(
             home: Scaffold(
               bottomNavigationBar: IconOnlyBottomNav(
@@ -433,13 +434,12 @@ void main() {
       expect(size.width, equals(testWidth));
     });
 
-    testWidgets('Navigation items have adequate spacing at 414px',
-        (WidgetTester tester) async {
+    testWidgets('Navigation items have adequate spacing at 414px', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         MediaQuery(
-          data: const MediaQueryData(
-            size: Size(testWidth, testHeight),
-          ),
+          data: const MediaQueryData(size: Size(testWidth, testHeight)),
           child: MaterialApp(
             home: Scaffold(
               bottomNavigationBar: IconOnlyBottomNav(
@@ -455,46 +455,46 @@ void main() {
       // With 3 items and 414px width, each item gets ~138px
       const minItemWidth = 48.0;
       const availableWidth = testWidth / 3;
-      expect(availableWidth, greaterThanOrEqualTo(minItemWidth),
-          reason: 'Each nav item should have adequate touch target width');
+      expect(
+        availableWidth,
+        greaterThanOrEqualTo(minItemWidth),
+        reason: 'Each nav item should have adequate touch target width',
+      );
     });
 
-    testWidgets('Grid columns remain single column at 414px',
-        (WidgetTester tester) async {
+    testWidgets('Grid columns remain single column at 414px', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         MediaQuery(
-          data: const MediaQueryData(
-            size: Size(testWidth, testHeight),
-          ),
+          data: const MediaQueryData(size: Size(testWidth, testHeight)),
           child: MaterialApp(
             home: Builder(
               builder: (context) {
                 final columns = Breakpoints.getGridColumns(context);
-                return Scaffold(
-                  body: Center(
-                    child: Text('Columns: $columns'),
-                  ),
-                );
+                return Scaffold(body: Center(child: Text('Columns: $columns')));
               },
             ),
           ),
         ),
       );
 
-      expect(find.text('Columns: 1'), findsOneWidget,
-          reason: 'Even at 414px, mobile should use single-column layout');
+      expect(
+        find.text('Columns: 1'),
+        findsOneWidget,
+        reason: 'Even at 414px, mobile should use single-column layout',
+      );
     });
 
-    testWidgets('Max content width is infinite on mobile at 414px',
-        (WidgetTester tester) async {
+    testWidgets('Max content width is infinite on mobile at 414px', (
+      WidgetTester tester,
+    ) async {
       double? maxWidth;
 
       await tester.pumpWidget(
         MaterialApp(
           home: MediaQuery(
-            data: const MediaQueryData(
-              size: Size(testWidth, testHeight),
-            ),
+            data: const MediaQueryData(size: Size(testWidth, testHeight)),
             child: Builder(
               builder: (context) {
                 maxWidth = Breakpoints.getMaxContentWidth(context);
@@ -505,29 +505,27 @@ void main() {
         ),
       );
 
-      expect(maxWidth, equals(double.infinity),
-          reason: 'Mobile devices should not constrain content width');
+      expect(
+        maxWidth,
+        equals(double.infinity),
+        reason: 'Mobile devices should not constrain content width',
+      );
     });
   });
 
   group('Mobile Portrait Orientation Tests', () {
-    testWidgets('Portrait orientation at 320x568',
-        (WidgetTester tester) async {
+    testWidgets('Portrait orientation at 320x568', (WidgetTester tester) async {
       const portraitSize = Size(320.0, 568.0);
 
       await tester.pumpWidget(
         MediaQuery(
-          data: const MediaQueryData(
-            size: portraitSize,
-          ),
+          data: const MediaQueryData(size: portraitSize),
           child: MaterialApp(
             home: Builder(
               builder: (context) {
                 final orientation = MediaQuery.of(context).orientation;
                 return Scaffold(
-                  body: Center(
-                    child: Text('Orientation: ${orientation.name}'),
-                  ),
+                  body: Center(child: Text('Orientation: ${orientation.name}')),
                 );
               },
             ),
@@ -538,23 +536,18 @@ void main() {
       expect(find.text('Orientation: portrait'), findsOneWidget);
     });
 
-    testWidgets('Portrait orientation at 375x812',
-        (WidgetTester tester) async {
+    testWidgets('Portrait orientation at 375x812', (WidgetTester tester) async {
       const portraitSize = Size(375.0, 812.0);
 
       await tester.pumpWidget(
         MediaQuery(
-          data: const MediaQueryData(
-            size: portraitSize,
-          ),
+          data: const MediaQueryData(size: portraitSize),
           child: MaterialApp(
             home: Builder(
               builder: (context) {
                 final orientation = MediaQuery.of(context).orientation;
                 return Scaffold(
-                  body: Center(
-                    child: Text('Orientation: ${orientation.name}'),
-                  ),
+                  body: Center(child: Text('Orientation: ${orientation.name}')),
                 );
               },
             ),
@@ -565,23 +558,21 @@ void main() {
       expect(find.text('Orientation: portrait'), findsOneWidget);
     });
 
-    testWidgets('Layout is usable in portrait mode',
-        (WidgetTester tester) async {
+    testWidgets('Layout is usable in portrait mode', (
+      WidgetTester tester,
+    ) async {
       const portraitSize = Size(375.0, 812.0);
 
       await tester.pumpWidget(
         MediaQuery(
-          data: const MediaQueryData(
-            size: portraitSize,
-          ),
+          data: const MediaQueryData(size: portraitSize),
           child: MaterialApp(
             home: Scaffold(
               appBar: AppBar(title: const Text('App')),
               body: ListView.builder(
                 itemCount: 10,
-                itemBuilder: (context, index) => ListTile(
-                  title: Text('Item $index'),
-                ),
+                itemBuilder: (context, index) =>
+                    ListTile(title: Text('Item $index')),
               ),
               bottomNavigationBar: IconOnlyBottomNav(
                 currentIndex: 0,

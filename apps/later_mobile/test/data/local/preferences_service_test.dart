@@ -44,19 +44,13 @@ void main() {
     group('initialize', () {
       test('should successfully initialize SharedPreferences', () async {
         // Act & Assert - should not throw
-        await expectLater(
-          PreferencesService.initialize(),
-          completes,
-        );
+        await expectLater(PreferencesService.initialize(), completes);
       });
 
       test('should be callable multiple times without error', () async {
         // Act & Assert - should not throw
         await PreferencesService.initialize();
-        await expectLater(
-          PreferencesService.initialize(),
-          completes,
-        );
+        await expectLater(PreferencesService.initialize(), completes);
       });
 
       test('should load SharedPreferences instance that can be used', () async {
@@ -280,10 +274,7 @@ void main() {
         final service = PreferencesService();
 
         // Act & Assert - should not throw
-        await expectLater(
-          service.clearLastSelectedSpaceId(),
-          completes,
-        );
+        await expectLater(service.clearLastSelectedSpaceId(), completes);
 
         final result = service.getLastSelectedSpaceId();
         expect(result, isNull);
@@ -311,10 +302,7 @@ void main() {
         await service.setLastSelectedSpaceId('space-123');
 
         // Act & Assert
-        await expectLater(
-          service.clearLastSelectedSpaceId(),
-          completes,
-        );
+        await expectLater(service.clearLastSelectedSpaceId(), completes);
       });
 
       test('should be idempotent - multiple clears should not throw', () async {
@@ -325,14 +313,8 @@ void main() {
 
         // Act & Assert
         await service.clearLastSelectedSpaceId();
-        await expectLater(
-          service.clearLastSelectedSpaceId(),
-          completes,
-        );
-        await expectLater(
-          service.clearLastSelectedSpaceId(),
-          completes,
-        );
+        await expectLater(service.clearLastSelectedSpaceId(), completes);
+        await expectLater(service.clearLastSelectedSpaceId(), completes);
 
         final result = service.getLastSelectedSpaceId();
         expect(result, isNull);
@@ -355,114 +337,150 @@ void main() {
     });
 
     group('Error Handling', () {
-      test('should throw error when getLastSelectedSpaceId is called before initialization', () {
-        // Arrange - Create service without initializing
-        final service = PreferencesService();
+      test(
+        'should throw error when getLastSelectedSpaceId is called before initialization',
+        () {
+          // Arrange - Create service without initializing
+          final service = PreferencesService();
 
-        // Act & Assert
-        expect(
-          () => service.getLastSelectedSpaceId(),
-          throwsA(isA<StateError>()),
-        );
-      });
+          // Act & Assert
+          expect(
+            () => service.getLastSelectedSpaceId(),
+            throwsA(isA<StateError>()),
+          );
+        },
+      );
 
-      test('should throw error when setLastSelectedSpaceId is called before initialization', () async {
-        // Arrange - Create service without initializing
-        final service = PreferencesService();
+      test(
+        'should throw error when setLastSelectedSpaceId is called before initialization',
+        () async {
+          // Arrange - Create service without initializing
+          final service = PreferencesService();
 
-        // Act & Assert
-        await expectLater(
-          service.setLastSelectedSpaceId('space-123'),
-          throwsA(isA<StateError>()),
-        );
-      });
+          // Act & Assert
+          await expectLater(
+            service.setLastSelectedSpaceId('space-123'),
+            throwsA(isA<StateError>()),
+          );
+        },
+      );
 
-      test('should throw error when clearLastSelectedSpaceId is called before initialization', () async {
-        // Arrange - Create service without initializing
-        final service = PreferencesService();
+      test(
+        'should throw error when clearLastSelectedSpaceId is called before initialization',
+        () async {
+          // Arrange - Create service without initializing
+          final service = PreferencesService();
 
-        // Act & Assert
-        await expectLater(
-          service.clearLastSelectedSpaceId(),
-          throwsA(isA<StateError>()),
-        );
-      });
+          // Act & Assert
+          await expectLater(
+            service.clearLastSelectedSpaceId(),
+            throwsA(isA<StateError>()),
+          );
+        },
+      );
 
-      test('should handle initialization after failed operations gracefully', () async {
-        // Arrange
-        final service = PreferencesService();
+      test(
+        'should handle initialization after failed operations gracefully',
+        () async {
+          // Arrange
+          final service = PreferencesService();
 
-        // Act - Try to use service before initialization (will fail)
-        try {
-          service.getLastSelectedSpaceId();
-        } catch (e) {
-          // Expected to fail
-        }
+          // Act - Try to use service before initialization (will fail)
+          try {
+            service.getLastSelectedSpaceId();
+          } catch (e) {
+            // Expected to fail
+          }
 
-        // Now initialize properly
-        await PreferencesService.initialize();
+          // Now initialize properly
+          await PreferencesService.initialize();
 
-        // Assert - Should work after initialization
-        await service.setLastSelectedSpaceId('space-recovery');
-        final result = service.getLastSelectedSpaceId();
-        expect(result, equals('space-recovery'));
-      });
+          // Assert - Should work after initialization
+          await service.setLastSelectedSpaceId('space-recovery');
+          final result = service.getLastSelectedSpaceId();
+          expect(result, equals('space-recovery'));
+        },
+      );
     });
 
     group('Integration Tests', () {
-      test('should handle complete workflow: set, get, update, clear', () async {
-        // Arrange
-        await PreferencesService.initialize();
-        final service = PreferencesService();
+      test(
+        'should handle complete workflow: set, get, update, clear',
+        () async {
+          // Arrange
+          await PreferencesService.initialize();
+          final service = PreferencesService();
 
-        // Act & Assert - Set initial value
-        await service.setLastSelectedSpaceId('space-initial');
-        expect(service.getLastSelectedSpaceId(), equals('space-initial'));
+          // Act & Assert - Set initial value
+          await service.setLastSelectedSpaceId('space-initial');
+          expect(service.getLastSelectedSpaceId(), equals('space-initial'));
 
-        // Act & Assert - Update value
-        await service.setLastSelectedSpaceId('space-updated');
-        expect(service.getLastSelectedSpaceId(), equals('space-updated'));
+          // Act & Assert - Update value
+          await service.setLastSelectedSpaceId('space-updated');
+          expect(service.getLastSelectedSpaceId(), equals('space-updated'));
 
-        // Act & Assert - Clear value
-        await service.clearLastSelectedSpaceId();
-        expect(service.getLastSelectedSpaceId(), isNull);
+          // Act & Assert - Clear value
+          await service.clearLastSelectedSpaceId();
+          expect(service.getLastSelectedSpaceId(), isNull);
 
-        // Act & Assert - Set again after clearing
-        await service.setLastSelectedSpaceId('space-final');
-        expect(service.getLastSelectedSpaceId(), equals('space-final'));
-      });
+          // Act & Assert - Set again after clearing
+          await service.setLastSelectedSpaceId('space-final');
+          expect(service.getLastSelectedSpaceId(), equals('space-final'));
+        },
+      );
 
-      test('should handle multiple services working with same underlying storage', () async {
-        // Arrange
-        await PreferencesService.initialize();
-        final service1 = PreferencesService();
-        final service2 = PreferencesService();
-        final service3 = PreferencesService();
+      test(
+        'should handle multiple services working with same underlying storage',
+        () async {
+          // Arrange
+          await PreferencesService.initialize();
+          final service1 = PreferencesService();
+          final service2 = PreferencesService();
+          final service3 = PreferencesService();
 
-        // Act
-        await service1.setLastSelectedSpaceId('space-from-service1');
+          // Act
+          await service1.setLastSelectedSpaceId('space-from-service1');
 
-        // Assert
-        expect(service1.getLastSelectedSpaceId(), equals('space-from-service1'));
-        expect(service2.getLastSelectedSpaceId(), equals('space-from-service1'));
-        expect(service3.getLastSelectedSpaceId(), equals('space-from-service1'));
+          // Assert
+          expect(
+            service1.getLastSelectedSpaceId(),
+            equals('space-from-service1'),
+          );
+          expect(
+            service2.getLastSelectedSpaceId(),
+            equals('space-from-service1'),
+          );
+          expect(
+            service3.getLastSelectedSpaceId(),
+            equals('space-from-service1'),
+          );
 
-        // Act
-        await service2.setLastSelectedSpaceId('space-from-service2');
+          // Act
+          await service2.setLastSelectedSpaceId('space-from-service2');
 
-        // Assert
-        expect(service1.getLastSelectedSpaceId(), equals('space-from-service2'));
-        expect(service2.getLastSelectedSpaceId(), equals('space-from-service2'));
-        expect(service3.getLastSelectedSpaceId(), equals('space-from-service2'));
+          // Assert
+          expect(
+            service1.getLastSelectedSpaceId(),
+            equals('space-from-service2'),
+          );
+          expect(
+            service2.getLastSelectedSpaceId(),
+            equals('space-from-service2'),
+          );
+          expect(
+            service3.getLastSelectedSpaceId(),
+            equals('space-from-service2'),
+          );
 
-        // Act
-        await service3.clearLastSelectedSpaceId();
+          // Act
+          await service3.clearLastSelectedSpaceId();
 
-        // Assert
-        expect(service1.getLastSelectedSpaceId(), isNull);
-        expect(service2.getLastSelectedSpaceId(), isNull);
-        expect(service3.getLastSelectedSpaceId(), isNull);
-      });
+          // Assert
+          expect(service1.getLastSelectedSpaceId(), isNull);
+          expect(service2.getLastSelectedSpaceId(), isNull);
+          expect(service3.getLastSelectedSpaceId(), isNull);
+        },
+      );
 
       test('should handle alternating set and clear operations', () async {
         // Arrange
@@ -546,22 +564,25 @@ void main() {
     });
 
     group('Performance Tests', () {
-      test('should handle multiple rapid operations without degradation', () async {
-        // Arrange
-        await PreferencesService.initialize();
-        final service = PreferencesService();
+      test(
+        'should handle multiple rapid operations without degradation',
+        () async {
+          // Arrange
+          await PreferencesService.initialize();
+          final service = PreferencesService();
 
-        // Act - Perform 100 operations
-        for (int i = 0; i < 100; i++) {
-          await service.setLastSelectedSpaceId('space-$i');
-          final result = service.getLastSelectedSpaceId();
-          expect(result, equals('space-$i'));
-        }
+          // Act - Perform 100 operations
+          for (int i = 0; i < 100; i++) {
+            await service.setLastSelectedSpaceId('space-$i');
+            final result = service.getLastSelectedSpaceId();
+            expect(result, equals('space-$i'));
+          }
 
-        // Assert - Final value should be correct
-        final finalResult = service.getLastSelectedSpaceId();
-        expect(finalResult, equals('space-99'));
-      });
+          // Assert - Final value should be correct
+          final finalResult = service.getLastSelectedSpaceId();
+          expect(finalResult, equals('space-99'));
+        },
+      );
 
       test('should complete operations within reasonable time', () async {
         // Arrange

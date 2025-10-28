@@ -37,10 +37,13 @@ class WelcomeState extends StatelessWidget {
     return EmptyState(
       icon: Icons.auto_awesome, // sparkles icon
       title: 'Welcome to later',
-      message: 'Your peaceful place for thoughts, tasks, and everything in between',
+      message:
+          'Your peaceful place for thoughts, tasks, and everything in between',
       actionLabel: 'Create your first item',
       onActionPressed: onActionPressed,
-      secondaryActionLabel: onSecondaryPressed != null ? 'Learn how it works' : null,
+      secondaryActionLabel: onSecondaryPressed != null
+          ? 'Learn how it works'
+          : null,
       onSecondaryPressed: onSecondaryPressed,
     );
   }

@@ -18,7 +18,9 @@ void main() {
 
   group('Glass Morphism Performance Tests', () {
     testWidgets('Static glass surface rendering', (tester) async {
-      await tester.pumpWidget(_buildStaticGlassWidget(AppColors.glassBlurRadius));
+      await tester.pumpWidget(
+        _buildStaticGlassWidget(AppColors.glassBlurRadius),
+      );
       await tester.pumpAndSettle();
 
       // Verify no rendering errors
@@ -43,10 +45,7 @@ void main() {
       });
 
       // Scroll content behind glass surface
-      await tester.drag(
-        find.byType(ListView),
-        const Offset(0, -500),
-      );
+      await tester.drag(find.byType(ListView), const Offset(0, -500));
 
       // Pump frames during scroll
       for (int i = 0; i < 60; i++) {
@@ -59,11 +58,16 @@ void main() {
         final jankyFrames = frames.where((d) => d.inMilliseconds > 16).length;
         final jankyPercentage = (jankyFrames / frames.length) * 100;
 
-        debugPrint('Glass morphism scroll janky frames: ${jankyPercentage.toStringAsFixed(1)}%');
+        debugPrint(
+          'Glass morphism scroll janky frames: ${jankyPercentage.toStringAsFixed(1)}%',
+        );
 
         // Glass morphism is expensive, allow up to 20% janky frames
-        expect(jankyPercentage, lessThan(20),
-          reason: 'Glass morphism should maintain acceptable performance');
+        expect(
+          jankyPercentage,
+          lessThan(20),
+          reason: 'Glass morphism should maintain acceptable performance',
+        );
       }
     });
 
@@ -118,17 +122,24 @@ void main() {
       }
 
       if (frames.isNotEmpty) {
-        final averageFrameTime = frames.fold<Duration>(
-          Duration.zero,
-          (prev, duration) => prev + duration,
-        ) ~/ frames.length;
+        final averageFrameTime =
+            frames.fold<Duration>(
+              Duration.zero,
+              (prev, duration) => prev + duration,
+            ) ~/
+            frames.length;
 
-        debugPrint('Overlapping glass avg frame time: ${averageFrameTime.inMicroseconds / 1000}ms');
+        debugPrint(
+          'Overlapping glass avg frame time: ${averageFrameTime.inMicroseconds / 1000}ms',
+        );
 
         // Multiple overlapping glass surfaces are expensive
         // Allow up to 25ms per frame
-        expect(averageFrameTime.inMilliseconds, lessThan(25),
-          reason: 'Multiple glass surfaces should still be functional');
+        expect(
+          averageFrameTime.inMilliseconds,
+          lessThan(25),
+          reason: 'Multiple glass surfaces should still be functional',
+        );
       }
 
       expect(tester.takeException(), isNull);
@@ -137,7 +148,9 @@ void main() {
     testWidgets('Glass morphism vs solid fallback comparison', (tester) async {
       // Test glass morphism
       final stopwatchGlass = Stopwatch()..start();
-      await tester.pumpWidget(_buildStaticGlassWidget(AppColors.glassBlurRadius));
+      await tester.pumpWidget(
+        _buildStaticGlassWidget(AppColors.glassBlurRadius),
+      );
       await tester.pumpAndSettle();
       stopwatchGlass.stop();
 
@@ -154,7 +167,9 @@ void main() {
       debugPrint('Solid fallback build time: ${solidTime}ms');
 
       // Solid should be faster or comparable
-      debugPrint('Performance ratio: ${(glassTime / solidTime).toStringAsFixed(2)}x');
+      debugPrint(
+        'Performance ratio: ${(glassTime / solidTime).toStringAsFixed(2)}x',
+      );
     });
 
     testWidgets('Glass surface with animated content', (tester) async {
@@ -177,7 +192,9 @@ void main() {
         final jankyFrames = frames.where((d) => d.inMilliseconds > 16).length;
         final jankyPercentage = (jankyFrames / frames.length) * 100;
 
-        debugPrint('Animated glass janky frames: ${jankyPercentage.toStringAsFixed(1)}%');
+        debugPrint(
+          'Animated glass janky frames: ${jankyPercentage.toStringAsFixed(1)}%',
+        );
 
         // Animated content with glass is expensive, allow up to 25%
         expect(jankyPercentage, lessThan(25));
@@ -200,7 +217,9 @@ void main() {
       debugPrint('Glass morphism renders on mobile screen size');
     });
 
-    testWidgets('RepaintBoundary optimization for glass surfaces', (tester) async {
+    testWidgets('RepaintBoundary optimization for glass surfaces', (
+      tester,
+    ) async {
       await tester.pumpWidget(_buildOptimizedGlassWidget());
       await tester.pumpAndSettle();
 
@@ -212,10 +231,7 @@ void main() {
       });
 
       // Trigger updates
-      await tester.drag(
-        find.byType(ListView),
-        const Offset(0, -200),
-      );
+      await tester.drag(find.byType(ListView), const Offset(0, -200));
 
       for (int i = 0; i < 30; i++) {
         await tester.pump(const Duration(milliseconds: 16));
@@ -225,10 +241,15 @@ void main() {
         final jankyFrames = frames.where((d) => d.inMilliseconds > 16).length;
         final jankyPercentage = (jankyFrames / frames.length) * 100;
 
-        debugPrint('Optimized glass janky frames: ${jankyPercentage.toStringAsFixed(1)}%');
+        debugPrint(
+          'Optimized glass janky frames: ${jankyPercentage.toStringAsFixed(1)}%',
+        );
 
-        expect(jankyPercentage, lessThan(15),
-          reason: 'RepaintBoundary should improve performance');
+        expect(
+          jankyPercentage,
+          lessThan(15),
+          reason: 'RepaintBoundary should improve performance',
+        );
       }
     });
   });
@@ -258,20 +279,19 @@ Widget _buildStaticGlassWidget(double blurRadius) {
             child: ClipRRect(
               borderRadius: BorderRadius.circular(16),
               child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: blurRadius, sigmaY: blurRadius),
+                filter: ImageFilter.blur(
+                  sigmaX: blurRadius,
+                  sigmaY: blurRadius,
+                ),
                 child: Container(
                   width: 300,
                   height: 200,
                   decoration: BoxDecoration(
                     color: AppColors.glassLight,
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(
-                      color: AppColors.glassBorderLight,
-                    ),
+                    border: Border.all(color: AppColors.glassBorderLight),
                   ),
-                  child: const Center(
-                    child: Text('Glass Surface'),
-                  ),
+                  child: const Center(child: Text('Glass Surface')),
                 ),
               ),
             ),
@@ -296,16 +316,11 @@ Widget _buildScrollingGlassWidget() {
                 margin: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
                   gradient: const LinearGradient(
-                    colors: [
-                      AppColors.primaryStart,
-                      AppColors.primaryEnd,
-                    ],
+                    colors: [AppColors.primaryStart, AppColors.primaryEnd],
                   ),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: Center(
-                  child: Text('Item $index'),
-                ),
+                child: Center(child: Text('Item $index')),
               );
             },
           ),
@@ -326,13 +341,9 @@ Widget _buildScrollingGlassWidget() {
                   decoration: BoxDecoration(
                     color: AppColors.glassLight,
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(
-                      color: AppColors.glassBorderLight,
-                    ),
+                    border: Border.all(color: AppColors.glassBorderLight),
                   ),
-                  child: const Center(
-                    child: Text('Glass Header'),
-                  ),
+                  child: const Center(child: Text('Glass Header')),
                 ),
               ),
             ),
@@ -372,13 +383,9 @@ Widget _buildOverlappingGlassWidget(int layers) {
                     decoration: BoxDecoration(
                       color: AppColors.glassLight,
                       borderRadius: BorderRadius.circular(16),
-                      border: Border.all(
-                        color: AppColors.glassBorderLight,
-                      ),
+                      border: Border.all(color: AppColors.glassBorderLight),
                     ),
-                    child: Center(
-                      child: Text('Glass Layer $index'),
-                    ),
+                    child: Center(child: Text('Glass Layer $index')),
                   ),
                 ),
               ),
@@ -413,13 +420,9 @@ Widget _buildSolidFallbackWidget() {
               decoration: BoxDecoration(
                 color: AppColors.glassLight,
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(
-                  color: AppColors.glassBorderLight,
-                ),
+                border: Border.all(color: AppColors.glassBorderLight),
               ),
-              child: const Center(
-                child: Text('Solid Surface'),
-              ),
+              child: const Center(child: Text('Solid Surface')),
             ),
           ),
         ],
@@ -451,9 +454,7 @@ Widget _buildAnimatedGlassWidget() {
                     color: AppColors.glassLight,
                     borderRadius: BorderRadius.circular(16),
                   ),
-                  child: const Center(
-                    child: Text('Glass Surface'),
-                  ),
+                  child: const Center(child: Text('Glass Surface')),
                 ),
               ),
             ),
@@ -501,9 +502,7 @@ Widget _buildOptimizedGlassWidget() {
                       color: AppColors.glassLight,
                       borderRadius: BorderRadius.circular(16),
                     ),
-                    child: const Center(
-                      child: Text('Optimized Glass'),
-                    ),
+                    child: const Center(child: Text('Optimized Glass')),
                   ),
                 ),
               ),

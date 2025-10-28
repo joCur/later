@@ -101,14 +101,8 @@ void main() {
 
       test('getBySpace() returns all Notes for a space', () async {
         // Arrange
-        final note1 = createTestNote(
-          id: 'note-1',
-          title: 'Note 1',
-        );
-        final note2 = createTestNote(
-          id: 'note-2',
-          title: 'Note 2',
-        );
+        final note1 = createTestNote(id: 'note-1', title: 'Note 1');
+        final note2 = createTestNote(id: 'note-2', title: 'Note 2');
         final note3 = createTestNote(
           id: 'note-3',
           spaceId: 'space-2',
@@ -125,7 +119,10 @@ void main() {
         // Assert
         expect(result.length, equals(2));
         expect(result.every((note) => note.spaceId == 'space-1'), isTrue);
-        expect(result.map((note) => note.id), containsAll(['note-1', 'note-2']));
+        expect(
+          result.map((note) => note.id),
+          containsAll(['note-1', 'note-2']),
+        );
       });
 
       test('getBySpace() returns empty list when no Notes exist', () async {
@@ -168,10 +165,7 @@ void main() {
         final nonExistentNote = createTestNote(id: 'non-existent');
 
         // Act & Assert
-        expect(
-          () => repository.update(nonExistentNote),
-          throwsException,
-        );
+        expect(() => repository.update(nonExistentNote), throwsException);
       });
 
       test('delete() removes Note', () async {
@@ -198,16 +192,9 @@ void main() {
     group('Bulk operations', () {
       test('deleteAllInSpace() deletes all Notes in space', () async {
         // Arrange
-        final note1 = createTestNote(
-          id: 'note-1',
-        );
-        final note2 = createTestNote(
-          id: 'note-2',
-        );
-        final note3 = createTestNote(
-          id: 'note-3',
-          spaceId: 'space-2',
-        );
+        final note1 = createTestNote(id: 'note-1');
+        final note2 = createTestNote(id: 'note-2');
+        final note3 = createTestNote(id: 'note-3', spaceId: 'space-2');
 
         await repository.create(note1);
         await repository.create(note2);
@@ -223,12 +210,8 @@ void main() {
 
       test('deleteAllInSpace() returns correct count', () async {
         // Arrange
-        final note1 = createTestNote(
-          id: 'note-1',
-        );
-        final note2 = createTestNote(
-          id: 'note-2',
-        );
+        final note1 = createTestNote(id: 'note-1');
+        final note2 = createTestNote(id: 'note-2');
 
         await repository.create(note1);
         await repository.create(note2);
@@ -251,16 +234,9 @@ void main() {
 
       test('countBySpace() returns correct count', () async {
         // Arrange
-        final note1 = createTestNote(
-          id: 'note-1',
-        );
-        final note2 = createTestNote(
-          id: 'note-2',
-        );
-        final note3 = createTestNote(
-          id: 'note-3',
-          spaceId: 'space-2',
-        );
+        final note1 = createTestNote(id: 'note-1');
+        final note2 = createTestNote(id: 'note-2');
+        final note3 = createTestNote(id: 'note-3', spaceId: 'space-2');
 
         await repository.create(note1);
         await repository.create(note2);
@@ -313,17 +289,17 @@ void main() {
 
         // Assert
         expect(workNotes.length, equals(2));
-        expect(workNotes.map((note) => note.id), containsAll(['note-1', 'note-3']));
+        expect(
+          workNotes.map((note) => note.id),
+          containsAll(['note-1', 'note-3']),
+        );
         expect(personalNotes.length, equals(1));
         expect(personalNotes.first.id, equals('note-2'));
       });
 
       test('getByTag() returns empty list when no matches', () async {
         // Arrange
-        final note = createTestNote(
-          id: 'note-1',
-          tags: ['work'],
-        );
+        final note = createTestNote(id: 'note-1', tags: ['work']);
         await repository.create(note);
 
         // Act
@@ -339,10 +315,7 @@ void main() {
           id: 'note-1',
           title: 'Meeting Notes for Monday',
         );
-        final note2 = createTestNote(
-          id: 'note-2',
-          title: 'Project Ideas',
-        );
+        final note2 = createTestNote(id: 'note-2', title: 'Project Ideas');
         final note3 = createTestNote(
           id: 'note-3',
           title: 'Team Meeting Agenda',
@@ -357,7 +330,10 @@ void main() {
 
         // Assert
         expect(result.length, equals(2));
-        expect(result.map((note) => note.id), containsAll(['note-1', 'note-3']));
+        expect(
+          result.map((note) => note.id),
+          containsAll(['note-1', 'note-3']),
+        );
       });
 
       test('search() finds notes by content', () async {
@@ -387,7 +363,10 @@ void main() {
 
         // Assert
         expect(result.length, equals(2));
-        expect(result.map((note) => note.id), containsAll(['note-1', 'note-3']));
+        expect(
+          result.map((note) => note.id),
+          containsAll(['note-1', 'note-3']),
+        );
       });
 
       test('search() is case-insensitive', () async {
@@ -412,10 +391,7 @@ void main() {
 
       test('search() returns empty list when no matches', () async {
         // Arrange
-        final note = createTestNote(
-          id: 'note-1',
-          content: 'Discussion points',
-        );
+        final note = createTestNote(id: 'note-1', content: 'Discussion points');
         await repository.create(note);
 
         // Act
@@ -452,14 +428,15 @@ void main() {
 
         // Assert
         expect(result.length, equals(2));
-        expect(result.map((note) => note.id), containsAll(['note-1', 'note-2']));
+        expect(
+          result.map((note) => note.id),
+          containsAll(['note-1', 'note-2']),
+        );
       });
 
       test('search() handles null content gracefully', () async {
         // Arrange
-        final note = createTestNote(
-          id: 'note-1',
-        );
+        final note = createTestNote(id: 'note-1');
         await repository.create(note);
 
         // Act & Assert - should not throw
@@ -482,15 +459,15 @@ void main() {
 
         // Assert
         expect(result.tags.length, equals(4));
-        expect(result.tags, containsAll(['work', 'important', 'urgent', 'meeting']));
+        expect(
+          result.tags,
+          containsAll(['work', 'important', 'urgent', 'meeting']),
+        );
       });
 
       test('Note with empty tags list', () async {
         // Arrange
-        final note = createTestNote(
-          id: 'note-1',
-          tags: [],
-        );
+        final note = createTestNote(id: 'note-1', tags: []);
 
         // Act
         final result = await repository.create(note);
@@ -501,10 +478,7 @@ void main() {
 
       test('Note with null content', () async {
         // Arrange
-        final note = createTestNote(
-          id: 'note-1',
-          title: 'Title Only Note',
-        );
+        final note = createTestNote(id: 'note-1', title: 'Title Only Note');
 
         // Act
         final result = await repository.create(note);
@@ -517,10 +491,7 @@ void main() {
       test('Note with long content', () async {
         // Arrange
         final longContent = 'This is a very long note content. ' * 100;
-        final note = createTestNote(
-          id: 'note-1',
-          content: longContent,
-        );
+        final note = createTestNote(id: 'note-1', content: longContent);
 
         // Act
         final result = await repository.create(note);
@@ -561,14 +532,8 @@ void main() {
         final result = await repository.create(note);
 
         // Assert
-        expect(
-          result.createdAt.difference(now).inSeconds.abs(),
-          lessThan(2),
-        );
-        expect(
-          result.updatedAt.difference(now).inSeconds.abs(),
-          lessThan(2),
-        );
+        expect(result.createdAt.difference(now).inSeconds.abs(), lessThan(2));
+        expect(result.updatedAt.difference(now).inSeconds.abs(), lessThan(2));
       });
 
       test('search with empty query returns all notes', () async {
@@ -606,18 +571,9 @@ void main() {
 
       test('multiple notes in same space with different tags', () async {
         // Arrange
-        final note1 = createTestNote(
-          id: 'note-1',
-          tags: ['work'],
-        );
-        final note2 = createTestNote(
-          id: 'note-2',
-          tags: ['personal'],
-        );
-        final note3 = createTestNote(
-          id: 'note-3',
-          tags: ['work', 'personal'],
-        );
+        final note1 = createTestNote(id: 'note-1', tags: ['work']);
+        final note2 = createTestNote(id: 'note-2', tags: ['personal']);
+        final note3 = createTestNote(id: 'note-3', tags: ['work', 'personal']);
 
         await repository.create(note1);
         await repository.create(note2);
@@ -636,17 +592,9 @@ void main() {
 
       test('syncStatus field handling', () async {
         // Arrange
-        final note1 = createTestNote(
-          id: 'note-1',
-          syncStatus: 'pending',
-        );
-        final note2 = createTestNote(
-          id: 'note-2',
-          syncStatus: 'synced',
-        );
-        final note3 = createTestNote(
-          id: 'note-3',
-        );
+        final note1 = createTestNote(id: 'note-1', syncStatus: 'pending');
+        final note2 = createTestNote(id: 'note-2', syncStatus: 'synced');
+        final note3 = createTestNote(id: 'note-3');
 
         // Act
         await repository.create(note1);
@@ -726,13 +674,19 @@ void main() {
 
         // Act & Assert
         await Future<void>.delayed(const Duration(milliseconds: 10));
-        final update1 = await repository.update(note.copyWith(title: 'Update 1'));
+        final update1 = await repository.update(
+          note.copyWith(title: 'Update 1'),
+        );
 
         await Future<void>.delayed(const Duration(milliseconds: 10));
-        final update2 = await repository.update(update1.copyWith(title: 'Update 2'));
+        final update2 = await repository.update(
+          update1.copyWith(title: 'Update 2'),
+        );
 
         await Future<void>.delayed(const Duration(milliseconds: 10));
-        final update3 = await repository.update(update2.copyWith(title: 'Update 3'));
+        final update3 = await repository.update(
+          update2.copyWith(title: 'Update 3'),
+        );
 
         expect(update2.updatedAt.isAfter(update1.updatedAt), isTrue);
         expect(update3.updatedAt.isAfter(update2.updatedAt), isTrue);

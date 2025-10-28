@@ -29,11 +29,7 @@ void main() {
 
     // Helper to wrap widget in MaterialApp for testing
     Widget makeTestableWidget(Widget child) {
-      return MaterialApp(
-        home: Scaffold(
-          body: child,
-        ),
-      );
+      return MaterialApp(home: Scaffold(body: child));
     }
 
     group('Rendering', () {
@@ -94,7 +90,10 @@ void main() {
         expect(find.text('Simple item'), findsOneWidget);
         // No notes widget should be rendered
         final textWidgets = tester.widgetList<Text>(find.byType(Text));
-        expect(textWidgets.length, lessThanOrEqualTo(2)); // Title + indicator (or just title)
+        expect(
+          textWidgets.length,
+          lessThanOrEqualTo(2),
+        ); // Title + indicator (or just title)
       });
 
       testWidgets('shows reorder handle icon', (tester) async {
@@ -235,7 +234,9 @@ void main() {
         expect(find.byType(Checkbox), findsOneWidget);
       });
 
-      testWidgets('checkbox shows correct state when not checked', (tester) async {
+      testWidgets('checkbox shows correct state when not checked', (
+        tester,
+      ) async {
         await tester.pumpWidget(
           makeTestableWidget(
             ListItemCard(
@@ -276,13 +277,13 @@ void main() {
           ),
         );
 
-        final textWidget = tester.widget<Text>(
-          find.text('Call dentist'),
-        );
+        final textWidget = tester.widget<Text>(find.text('Call dentist'));
         expect(textWidget.style?.decoration, TextDecoration.lineThrough);
       });
 
-      testWidgets('does not show strikethrough when not checked', (tester) async {
+      testWidgets('does not show strikethrough when not checked', (
+        tester,
+      ) async {
         await tester.pumpWidget(
           makeTestableWidget(
             ListItemCard(
@@ -293,9 +294,7 @@ void main() {
           ),
         );
 
-        final textWidget = tester.widget<Text>(
-          find.text('Buy groceries'),
-        );
+        final textWidget = tester.widget<Text>(find.text('Buy groceries'));
         expect(textWidget.style?.decoration, isNot(TextDecoration.lineThrough));
       });
     });
@@ -320,64 +319,73 @@ void main() {
         expect(tapped, true);
       });
 
-      testWidgets('onCheckboxChanged callback fires when checkbox is tapped (checkboxes style)', (tester) async {
-        bool? newValue;
-        await tester.pumpWidget(
-          makeTestableWidget(
-            ListItemCard(
-              listItem: testListItem,
-              listStyle: ListStyle.checkboxes,
-              itemIndex: 1,
-              onCheckboxChanged: (value) => newValue = value,
+      testWidgets(
+        'onCheckboxChanged callback fires when checkbox is tapped (checkboxes style)',
+        (tester) async {
+          bool? newValue;
+          await tester.pumpWidget(
+            makeTestableWidget(
+              ListItemCard(
+                listItem: testListItem,
+                listStyle: ListStyle.checkboxes,
+                itemIndex: 1,
+                onCheckboxChanged: (value) => newValue = value,
+              ),
             ),
-          ),
-        );
+          );
 
-        await tester.tap(find.byType(Checkbox));
-        await tester.pump();
+          await tester.tap(find.byType(Checkbox));
+          await tester.pump();
 
-        expect(newValue, true);
-      });
+          expect(newValue, true);
+        },
+      );
 
-      testWidgets('onCheckboxChanged callback receives correct value when toggling from checked', (tester) async {
-        bool? newValue;
-        await tester.pumpWidget(
-          makeTestableWidget(
-            ListItemCard(
-              listItem: checkedListItem,
-              listStyle: ListStyle.checkboxes,
-              itemIndex: 1,
-              onCheckboxChanged: (value) => newValue = value,
+      testWidgets(
+        'onCheckboxChanged callback receives correct value when toggling from checked',
+        (tester) async {
+          bool? newValue;
+          await tester.pumpWidget(
+            makeTestableWidget(
+              ListItemCard(
+                listItem: checkedListItem,
+                listStyle: ListStyle.checkboxes,
+                itemIndex: 1,
+                onCheckboxChanged: (value) => newValue = value,
+              ),
             ),
-          ),
-        );
+          );
 
-        await tester.tap(find.byType(Checkbox));
-        await tester.pump();
+          await tester.tap(find.byType(Checkbox));
+          await tester.pump();
 
-        expect(newValue, false);
-      });
+          expect(newValue, false);
+        },
+      );
 
-      testWidgets('onTap triggers checkbox toggle for checkboxes style when callback provided', (tester) async {
-        bool? checkboxValue;
-        await tester.pumpWidget(
-          makeTestableWidget(
-            ListItemCard(
-              listItem: testListItem,
-              listStyle: ListStyle.checkboxes,
-              itemIndex: 1,
-              onCheckboxChanged: (value) => checkboxValue = value,
+      testWidgets(
+        'onTap triggers checkbox toggle for checkboxes style when callback provided',
+        (tester) async {
+          bool? checkboxValue;
+          await tester.pumpWidget(
+            makeTestableWidget(
+              ListItemCard(
+                listItem: testListItem,
+                listStyle: ListStyle.checkboxes,
+                itemIndex: 1,
+                onCheckboxChanged: (value) => checkboxValue = value,
+              ),
             ),
-          ),
-        );
+          );
 
-        // Tap the card (not checkbox)
-        await tester.tap(find.byType(GestureDetector).first);
-        await tester.pump();
+          // Tap the card (not checkbox)
+          await tester.tap(find.byType(GestureDetector).first);
+          await tester.pump();
 
-        // Should trigger checkbox callback
-        expect(checkboxValue, true);
-      });
+          // Should trigger checkbox callback
+          expect(checkboxValue, true);
+        },
+      );
 
       testWidgets('long press callback fires', (tester) async {
         bool longPressed = false;
@@ -398,7 +406,9 @@ void main() {
         expect(longPressed, true);
       });
 
-      testWidgets('checkbox not shown for bullets style even with callback', (tester) async {
+      testWidgets('checkbox not shown for bullets style even with callback', (
+        tester,
+      ) async {
         await tester.pumpWidget(
           makeTestableWidget(
             ListItemCard(
@@ -413,7 +423,9 @@ void main() {
         expect(find.byType(Checkbox), findsNothing);
       });
 
-      testWidgets('checkbox not shown for numbered style even with callback', (tester) async {
+      testWidgets('checkbox not shown for numbered style even with callback', (
+        tester,
+      ) async {
         await tester.pumpWidget(
           makeTestableWidget(
             ListItemCard(
@@ -430,7 +442,9 @@ void main() {
     });
 
     group('Accessibility', () {
-      testWidgets('has correct semantic label for unchecked item with notes', (tester) async {
+      testWidgets('has correct semantic label for unchecked item with notes', (
+        tester,
+      ) async {
         await tester.pumpWidget(
           makeTestableWidget(
             ListItemCard(
@@ -442,12 +456,16 @@ void main() {
         );
 
         expect(
-          find.bySemanticsLabel(RegExp('Buy groceries.*not checked.*Milk, eggs, bread, and cheese')),
+          find.bySemanticsLabel(
+            RegExp('Buy groceries.*not checked.*Milk, eggs, bread, and cheese'),
+          ),
           findsOneWidget,
         );
       });
 
-      testWidgets('has correct semantic label for checked item', (tester) async {
+      testWidgets('has correct semantic label for checked item', (
+        tester,
+      ) async {
         await tester.pumpWidget(
           makeTestableWidget(
             ListItemCard(
@@ -464,7 +482,9 @@ void main() {
         );
       });
 
-      testWidgets('has correct semantic label for bullets style', (tester) async {
+      testWidgets('has correct semantic label for bullets style', (
+        tester,
+      ) async {
         await tester.pumpWidget(
           makeTestableWidget(
             ListItemCard(
@@ -481,7 +501,9 @@ void main() {
         );
       });
 
-      testWidgets('has correct semantic label for numbered style', (tester) async {
+      testWidgets('has correct semantic label for numbered style', (
+        tester,
+      ) async {
         await tester.pumpWidget(
           makeTestableWidget(
             ListItemCard(
@@ -498,7 +520,9 @@ void main() {
         );
       });
 
-      testWidgets('checkbox is marked as checkbox for screen readers', (tester) async {
+      testWidgets('checkbox is marked as checkbox for screen readers', (
+        tester,
+      ) async {
         await tester.pumpWidget(
           makeTestableWidget(
             ListItemCard(
@@ -564,11 +588,7 @@ void main() {
 
     group('Edge Cases', () {
       testWidgets('handles empty title gracefully', (tester) async {
-        final emptyTitleItem = ListItem(
-          id: 'empty',
-          title: '',
-          sortOrder: 0,
-        );
+        final emptyTitleItem = ListItem(id: 'empty', title: '', sortOrder: 0);
 
         await tester.pumpWidget(
           makeTestableWidget(
@@ -586,7 +606,8 @@ void main() {
       testWidgets('handles very long title with ellipsis', (tester) async {
         final longTitleItem = ListItem(
           id: 'long',
-          title: 'This is a very long title that should be truncated with an ellipsis because it exceeds the maximum width available in the card',
+          title:
+              'This is a very long title that should be truncated with an ellipsis because it exceeds the maximum width available in the card',
           sortOrder: 0,
         );
 
@@ -600,9 +621,7 @@ void main() {
           ),
         );
 
-        final textWidget = tester.widget<Text>(
-          find.text(longTitleItem.title),
-        );
+        final textWidget = tester.widget<Text>(find.text(longTitleItem.title));
         expect(textWidget.overflow, TextOverflow.ellipsis);
       });
 
@@ -610,7 +629,8 @@ void main() {
         final longNotesItem = ListItem(
           id: 'long-notes',
           title: 'Item with long notes',
-          notes: 'These are very long notes that should be truncated with an ellipsis because they exceed the maximum number of lines available in the card which is set to 2 lines maximum',
+          notes:
+              'These are very long notes that should be truncated with an ellipsis because they exceed the maximum number of lines available in the card which is set to 2 lines maximum',
           sortOrder: 0,
         );
 
@@ -683,7 +703,9 @@ void main() {
         expect(bulletOffset.dx, lessThan(titleOffset.dx));
       });
 
-      testWidgets('checkbox is on the left for checkboxes style', (tester) async {
+      testWidgets('checkbox is on the left for checkboxes style', (
+        tester,
+      ) async {
         await tester.pumpWidget(
           makeTestableWidget(
             ListItemCard(
@@ -711,7 +733,9 @@ void main() {
           ),
         );
 
-        final handleOffset = tester.getTopRight(find.byIcon(Icons.drag_indicator));
+        final handleOffset = tester.getTopRight(
+          find.byIcon(Icons.drag_indicator),
+        );
         final titleOffset = tester.getTopRight(find.text(testListItem.title));
 
         expect(handleOffset.dx, greaterThan(titleOffset.dx));

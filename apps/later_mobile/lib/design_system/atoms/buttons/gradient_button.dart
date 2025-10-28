@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:later_mobile/core/theme/temporal_flow_theme.dart';
 import 'package:later_mobile/design_system/tokens/tokens.dart';
 
 /// A button with gradient background styling, matching the app's design system.
@@ -58,14 +59,13 @@ class GradientButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final buttonGradient = gradient ??
-        (isDark ? AppColors.primaryGradientDark : AppColors.primaryGradient);
+    final temporalTheme = Theme.of(context).extension<TemporalFlowTheme>()!;
+    final buttonGradient = gradient ?? temporalTheme.primaryGradient;
 
     // Extract first color from gradient for shadow
     final shadowColor = buttonGradient is LinearGradient
         ? buttonGradient.colors.first
-        : (isDark ? AppColors.primaryStartDark : AppColors.primaryStart);
+        : temporalTheme.primaryGradient.colors.first;
 
     return Container(
       decoration: BoxDecoration(

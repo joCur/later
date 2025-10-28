@@ -44,9 +44,7 @@ void main() {
 
         await tester.pumpWidget(
           MaterialApp(
-            home: Scaffold(
-              body: TodoListCard(todoList: todoList),
-            ),
+            home: Scaffold(body: TodoListCard(todoList: todoList)),
           ),
         );
 
@@ -59,16 +57,16 @@ void main() {
 
         await tester.pumpWidget(
           MaterialApp(
-            home: Scaffold(
-              body: TodoListCard(todoList: todoList),
-            ),
+            home: Scaffold(body: TodoListCard(todoList: todoList)),
           ),
         );
 
         expect(find.text('Project Tasks'), findsOneWidget);
       });
 
-      testWidgets('shows progress indicator with correct format', (tester) async {
+      testWidgets('shows progress indicator with correct format', (
+        tester,
+      ) async {
         final todoList = createTodoList(
           items: [
             createTodoItem(id: '1', title: 'Task 1', isCompleted: true),
@@ -83,9 +81,7 @@ void main() {
 
         await tester.pumpWidget(
           MaterialApp(
-            home: Scaffold(
-              body: TodoListCard(todoList: todoList),
-            ),
+            home: Scaffold(body: TodoListCard(todoList: todoList)),
           ),
         );
 
@@ -104,9 +100,7 @@ void main() {
 
         await tester.pumpWidget(
           MaterialApp(
-            home: Scaffold(
-              body: TodoListCard(todoList: todoList),
-            ),
+            home: Scaffold(body: TodoListCard(todoList: todoList)),
           ),
         );
 
@@ -118,9 +112,7 @@ void main() {
 
         await tester.pumpWidget(
           MaterialApp(
-            home: Scaffold(
-              body: TodoListCard(todoList: todoList),
-            ),
+            home: Scaffold(body: TodoListCard(todoList: todoList)),
           ),
         );
 
@@ -132,9 +124,7 @@ void main() {
 
         await tester.pumpWidget(
           MaterialApp(
-            home: Scaffold(
-              body: TodoListCard(todoList: todoList),
-            ),
+            home: Scaffold(body: TodoListCard(todoList: todoList)),
           ),
         );
 
@@ -153,9 +143,7 @@ void main() {
 
         await tester.pumpWidget(
           MaterialApp(
-            home: Scaffold(
-              body: TodoListCard(todoList: todoList),
-            ),
+            home: Scaffold(body: TodoListCard(todoList: todoList)),
           ),
         );
 
@@ -168,9 +156,7 @@ void main() {
 
         await tester.pumpWidget(
           MaterialApp(
-            home: Scaffold(
-              body: TodoListCard(todoList: todoList),
-            ),
+            home: Scaffold(body: TodoListCard(todoList: todoList)),
           ),
         );
 
@@ -178,7 +164,9 @@ void main() {
         expect(find.text('Shopping List'), findsOneWidget);
       });
 
-      testWidgets('shows correct progress for all completed items', (tester) async {
+      testWidgets('shows correct progress for all completed items', (
+        tester,
+      ) async {
         final todoList = createTodoList(
           items: [
             createTodoItem(id: '1', title: 'Task 1', isCompleted: true),
@@ -188,16 +176,16 @@ void main() {
 
         await tester.pumpWidget(
           MaterialApp(
-            home: Scaffold(
-              body: TodoListCard(todoList: todoList),
-            ),
+            home: Scaffold(body: TodoListCard(todoList: todoList)),
           ),
         );
 
         expect(find.textContaining('2'), findsAtLeastNWidgets(1));
       });
 
-      testWidgets('shows correct progress for no completed items', (tester) async {
+      testWidgets('shows correct progress for no completed items', (
+        tester,
+      ) async {
         final todoList = createTodoList(
           items: [
             createTodoItem(id: '1', title: 'Task 1'),
@@ -207,9 +195,7 @@ void main() {
 
         await tester.pumpWidget(
           MaterialApp(
-            home: Scaffold(
-              body: TodoListCard(todoList: todoList),
-            ),
+            home: Scaffold(body: TodoListCard(todoList: todoList)),
           ),
         );
 
@@ -242,7 +228,9 @@ void main() {
         expect(tapped, isTrue);
       });
 
-      testWidgets('onLongPress callback fires when long pressed', (tester) async {
+      testWidgets('onLongPress callback fires when long pressed', (
+        tester,
+      ) async {
         final todoList = createTodoList();
         var longPressed = false;
 
@@ -270,9 +258,7 @@ void main() {
 
         await tester.pumpWidget(
           MaterialApp(
-            home: Scaffold(
-              body: TodoListCard(todoList: todoList),
-            ),
+            home: Scaffold(body: TodoListCard(todoList: todoList)),
           ),
         );
 
@@ -290,9 +276,7 @@ void main() {
 
         await tester.pumpWidget(
           MaterialApp(
-            home: Scaffold(
-              body: TodoListCard(todoList: todoList),
-            ),
+            home: Scaffold(body: TodoListCard(todoList: todoList)),
           ),
         );
 
@@ -310,7 +294,9 @@ void main() {
         expect(semanticsWidget.properties.label, contains('Shopping List'));
       });
 
-      testWidgets('semantic label includes progress information', (tester) async {
+      testWidgets('semantic label includes progress information', (
+        tester,
+      ) async {
         final todoList = createTodoList(
           items: [
             createTodoItem(id: '1', title: 'Task 1', isCompleted: true),
@@ -320,9 +306,7 @@ void main() {
 
         await tester.pumpWidget(
           MaterialApp(
-            home: Scaffold(
-              body: TodoListCard(todoList: todoList),
-            ),
+            home: Scaffold(body: TodoListCard(todoList: todoList)),
           ),
         );
 
@@ -348,9 +332,7 @@ void main() {
 
         await tester.pumpWidget(
           MaterialApp(
-            home: Scaffold(
-              body: TodoListCard(todoList: todoList),
-            ),
+            home: Scaffold(body: TodoListCard(todoList: todoList)),
           ),
         );
 
@@ -368,9 +350,7 @@ void main() {
 
         await tester.pumpWidget(
           MaterialApp(
-            home: Scaffold(
-              body: TodoListCard(todoList: todoList),
-            ),
+            home: Scaffold(body: TodoListCard(todoList: todoList)),
           ),
         );
 
@@ -388,10 +368,7 @@ void main() {
         await tester.pumpWidget(
           MaterialApp(
             home: Scaffold(
-              body: TodoListCard(
-                todoList: todoList,
-                onTap: () {},
-              ),
+              body: TodoListCard(todoList: todoList, onTap: () {}),
             ),
           ),
         );
@@ -413,17 +390,14 @@ void main() {
     });
 
     group('Entrance Animation', () {
-      testWidgets('applies entrance animation with index parameter', (tester) async {
+      testWidgets('applies entrance animation with index parameter', (
+        tester,
+      ) async {
         final todoList = createTodoList();
 
         await tester.pumpWidget(
           MaterialApp(
-            home: Scaffold(
-              body: TodoListCard(
-                todoList: todoList,
-                index: 0,
-              ),
-            ),
+            home: Scaffold(body: TodoListCard(todoList: todoList, index: 0)),
           ),
         );
 
@@ -442,9 +416,7 @@ void main() {
 
         await tester.pumpWidget(
           MaterialApp(
-            home: Scaffold(
-              body: TodoListCard(todoList: todoList),
-            ),
+            home: Scaffold(body: TodoListCard(todoList: todoList)),
           ),
         );
 
@@ -456,10 +428,7 @@ void main() {
       testWidgets('applies staggered delay based on index', (tester) async {
         final todoLists = List.generate(
           3,
-          (index) => createTodoList(
-            id: 'list_$index',
-            name: 'List $index',
-          ),
+          (index) => createTodoList(id: 'list_$index', name: 'List $index'),
         );
 
         await tester.pumpWidget(
@@ -468,10 +437,7 @@ void main() {
               body: ListView.builder(
                 itemCount: todoLists.length,
                 itemBuilder: (context, index) {
-                  return TodoListCard(
-                    todoList: todoLists[index],
-                    index: index,
-                  );
+                  return TodoListCard(todoList: todoLists[index], index: index);
                 },
               ),
             ),
@@ -504,9 +470,7 @@ void main() {
 
         await tester.pumpWidget(
           MaterialApp(
-            home: Scaffold(
-              body: TodoListCard(todoList: todoList),
-            ),
+            home: Scaffold(body: TodoListCard(todoList: todoList)),
           ),
         );
 
@@ -523,9 +487,7 @@ void main() {
 
         await tester.pumpWidget(
           MaterialApp(
-            home: Scaffold(
-              body: TodoListCard(todoList: todoList),
-            ),
+            home: Scaffold(body: TodoListCard(todoList: todoList)),
           ),
         );
 
@@ -546,9 +508,7 @@ void main() {
 
         await tester.pumpWidget(
           MaterialApp(
-            home: Scaffold(
-              body: TodoListCard(todoList: todoList),
-            ),
+            home: Scaffold(body: TodoListCard(todoList: todoList)),
           ),
         );
 
@@ -576,9 +536,7 @@ void main() {
 
         await tester.pumpWidget(
           MaterialApp(
-            home: Scaffold(
-              body: TodoListCard(todoList: todoList),
-            ),
+            home: Scaffold(body: TodoListCard(todoList: todoList)),
           ),
         );
 
@@ -586,7 +544,9 @@ void main() {
         expect(find.byIcon(Icons.calendar_today), findsOneWidget);
       });
 
-      testWidgets('does not show due date when no items have due dates', (tester) async {
+      testWidgets('does not show due date when no items have due dates', (
+        tester,
+      ) async {
         final todoList = createTodoList(
           items: [
             createTodoItem(id: '1', title: 'Task 1'),
@@ -596,9 +556,7 @@ void main() {
 
         await tester.pumpWidget(
           MaterialApp(
-            home: Scaffold(
-              body: TodoListCard(todoList: todoList),
-            ),
+            home: Scaffold(body: TodoListCard(todoList: todoList)),
           ),
         );
 
@@ -610,7 +568,8 @@ void main() {
     group('Edge Cases', () {
       testWidgets('handles very long names', (tester) async {
         final todoList = createTodoList(
-          name: 'This is a very long todo list name that should be truncated with ellipsis when it exceeds the maximum number of lines allowed',
+          name:
+              'This is a very long todo list name that should be truncated with ellipsis when it exceeds the maximum number of lines allowed',
         );
 
         await tester.pumpWidget(
@@ -641,9 +600,7 @@ void main() {
 
         await tester.pumpWidget(
           MaterialApp(
-            home: Scaffold(
-              body: TodoListCard(todoList: todoList),
-            ),
+            home: Scaffold(body: TodoListCard(todoList: todoList)),
           ),
         );
 

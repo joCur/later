@@ -23,13 +23,8 @@ import 'package:mockito/mockito.dart' as _i1;
 // ignore_for_file: subtype_of_sealed_class
 
 class _FakeSpace_0 extends _i1.SmartFake implements _i2.Space {
-  _FakeSpace_0(
-    Object parent,
-    Invocation parentInvocation,
-  ) : super(
-          parent,
-          parentInvocation,
-        );
+  _FakeSpace_0(Object parent, Invocation parentInvocation)
+    : super(parent, parentInvocation);
 }
 
 /// A class which mocks [SpaceRepository].
@@ -41,82 +36,67 @@ class MockSpaceRepository extends _i1.Mock implements _i3.SpaceRepository {
   }
 
   @override
-  _i4.Future<_i2.Space> createSpace(_i2.Space? space) => (super.noSuchMethod(
-        Invocation.method(
-          #createSpace,
-          [space],
-        ),
-        returnValue: _i4.Future<_i2.Space>.value(_FakeSpace_0(
-          this,
-          Invocation.method(
-            #createSpace,
-            [space],
-          ),
-        )),
-      ) as _i4.Future<_i2.Space>);
+  _i4.Future<_i2.Space> createSpace(_i2.Space? space) =>
+      (super.noSuchMethod(
+            Invocation.method(#createSpace, [space]),
+            returnValue: _i4.Future<_i2.Space>.value(
+              _FakeSpace_0(this, Invocation.method(#createSpace, [space])),
+            ),
+          )
+          as _i4.Future<_i2.Space>);
 
   @override
   _i4.Future<List<_i2.Space>> getSpaces({bool? includeArchived = false}) =>
       (super.noSuchMethod(
-        Invocation.method(
-          #getSpaces,
-          [],
-          {#includeArchived: includeArchived},
-        ),
-        returnValue: _i4.Future<List<_i2.Space>>.value(<_i2.Space>[]),
-      ) as _i4.Future<List<_i2.Space>>);
+            Invocation.method(#getSpaces, [], {
+              #includeArchived: includeArchived,
+            }),
+            returnValue: _i4.Future<List<_i2.Space>>.value(<_i2.Space>[]),
+          )
+          as _i4.Future<List<_i2.Space>>);
 
   @override
-  _i4.Future<_i2.Space?> getSpaceById(String? id) => (super.noSuchMethod(
-        Invocation.method(
-          #getSpaceById,
-          [id],
-        ),
-        returnValue: _i4.Future<_i2.Space?>.value(),
-      ) as _i4.Future<_i2.Space?>);
+  _i4.Future<_i2.Space?> getSpaceById(String? id) =>
+      (super.noSuchMethod(
+            Invocation.method(#getSpaceById, [id]),
+            returnValue: _i4.Future<_i2.Space?>.value(),
+          )
+          as _i4.Future<_i2.Space?>);
 
   @override
-  _i4.Future<_i2.Space> updateSpace(_i2.Space? space) => (super.noSuchMethod(
-        Invocation.method(
-          #updateSpace,
-          [space],
-        ),
-        returnValue: _i4.Future<_i2.Space>.value(_FakeSpace_0(
-          this,
-          Invocation.method(
-            #updateSpace,
-            [space],
-          ),
-        )),
-      ) as _i4.Future<_i2.Space>);
+  _i4.Future<_i2.Space> updateSpace(_i2.Space? space) =>
+      (super.noSuchMethod(
+            Invocation.method(#updateSpace, [space]),
+            returnValue: _i4.Future<_i2.Space>.value(
+              _FakeSpace_0(this, Invocation.method(#updateSpace, [space])),
+            ),
+          )
+          as _i4.Future<_i2.Space>);
 
   @override
-  _i4.Future<void> deleteSpace(String? id) => (super.noSuchMethod(
-        Invocation.method(
-          #deleteSpace,
-          [id],
-        ),
-        returnValue: _i4.Future<void>.value(),
-        returnValueForMissingStub: _i4.Future<void>.value(),
-      ) as _i4.Future<void>);
+  _i4.Future<void> deleteSpace(String? id) =>
+      (super.noSuchMethod(
+            Invocation.method(#deleteSpace, [id]),
+            returnValue: _i4.Future<void>.value(),
+            returnValueForMissingStub: _i4.Future<void>.value(),
+          )
+          as _i4.Future<void>);
 
   @override
-  _i4.Future<void> incrementItemCount(String? spaceId) => (super.noSuchMethod(
-        Invocation.method(
-          #incrementItemCount,
-          [spaceId],
-        ),
-        returnValue: _i4.Future<void>.value(),
-        returnValueForMissingStub: _i4.Future<void>.value(),
-      ) as _i4.Future<void>);
+  _i4.Future<void> incrementItemCount(String? spaceId) =>
+      (super.noSuchMethod(
+            Invocation.method(#incrementItemCount, [spaceId]),
+            returnValue: _i4.Future<void>.value(),
+            returnValueForMissingStub: _i4.Future<void>.value(),
+          )
+          as _i4.Future<void>);
 
   @override
-  _i4.Future<void> decrementItemCount(String? spaceId) => (super.noSuchMethod(
-        Invocation.method(
-          #decrementItemCount,
-          [spaceId],
-        ),
-        returnValue: _i4.Future<void>.value(),
-        returnValueForMissingStub: _i4.Future<void>.value(),
-      ) as _i4.Future<void>);
+  _i4.Future<void> decrementItemCount(String? spaceId) =>
+      (super.noSuchMethod(
+            Invocation.method(#decrementItemCount, [spaceId]),
+            returnValue: _i4.Future<void>.value(),
+            returnValueForMissingStub: _i4.Future<void>.value(),
+          )
+          as _i4.Future<void>);
 }

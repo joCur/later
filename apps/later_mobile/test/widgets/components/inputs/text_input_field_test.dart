@@ -8,11 +8,7 @@ void main() {
     testWidgets('renders with label', (tester) async {
       await tester.pumpWidget(
         const MaterialApp(
-          home: Scaffold(
-            body: TextInputField(
-              label: 'Test Label',
-            ),
-          ),
+          home: Scaffold(body: TextInputField(label: 'Test Label')),
         ),
       );
 
@@ -24,10 +20,7 @@ void main() {
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(
-            body: TextInputField(
-              label: 'Label',
-              hintText: 'Enter text here',
-            ),
+            body: TextInputField(label: 'Label', hintText: 'Enter text here'),
           ),
         ),
       );
@@ -41,10 +34,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: TextInputField(
-              label: 'Label',
-              controller: controller,
-            ),
+            body: TextInputField(label: 'Label', controller: controller),
           ),
         ),
       );
@@ -93,12 +83,7 @@ void main() {
     testWidgets('renders in disabled state', (tester) async {
       await tester.pumpWidget(
         const MaterialApp(
-          home: Scaffold(
-            body: TextInputField(
-              label: 'Label',
-              enabled: false,
-            ),
-          ),
+          home: Scaffold(body: TextInputField(label: 'Label', enabled: false)),
         ),
       );
 
@@ -110,10 +95,7 @@ void main() {
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(
-            body: TextInputField(
-              label: 'Label',
-              prefixIcon: Icons.search,
-            ),
+            body: TextInputField(label: 'Label', prefixIcon: Icons.search),
           ),
         ),
       );
@@ -125,10 +107,7 @@ void main() {
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(
-            body: TextInputField(
-              label: 'Label',
-              suffixIcon: Icons.clear,
-            ),
+            body: TextInputField(label: 'Label', suffixIcon: Icons.clear),
           ),
         ),
       );
@@ -140,10 +119,7 @@ void main() {
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(
-            body: TextInputField(
-              label: 'Password',
-              obscureText: true,
-            ),
+            body: TextInputField(label: 'Password', obscureText: true),
           ),
         ),
       );
@@ -208,12 +184,7 @@ void main() {
     testWidgets('auto-focuses when autofocus is true', (tester) async {
       await tester.pumpWidget(
         const MaterialApp(
-          home: Scaffold(
-            body: TextInputField(
-              label: 'Label',
-              autofocus: true,
-            ),
-          ),
+          home: Scaffold(body: TextInputField(label: 'Label', autofocus: true)),
         ),
       );
 
@@ -221,7 +192,9 @@ void main() {
       expect(textField.autofocus, isTrue);
     });
 
-    testWidgets('displays character counter when maxLength provided', (tester) async {
+    testWidgets('displays character counter when maxLength provided', (
+      tester,
+    ) async {
       final controller = TextEditingController(text: 'Test');
 
       await tester.pumpWidget(
@@ -250,20 +223,18 @@ void main() {
       testWidgets('has glass background with 3% opacity', (tester) async {
         await tester.pumpWidget(
           const MaterialApp(
-            home: Scaffold(
-              body: TextInputField(
-                label: 'Label',
-              ),
-            ),
+            home: Scaffold(body: TextInputField(label: 'Label')),
           ),
         );
 
         // Find the outermost AnimatedContainer
         final animatedContainer = tester.widget<AnimatedContainer>(
-          find.ancestor(
-            of: find.byType(TextField),
-            matching: find.byType(AnimatedContainer),
-          ).first,
+          find
+              .ancestor(
+                of: find.byType(TextField),
+                matching: find.byType(AnimatedContainer),
+              )
+              .first,
         );
 
         final decoration = animatedContainer.decoration as BoxDecoration;
@@ -278,14 +249,12 @@ void main() {
         expect(decoration.color, expectedColor);
       });
 
-      testWidgets('shows gradient border on focus in light mode', (tester) async {
+      testWidgets('shows gradient border on focus in light mode', (
+        tester,
+      ) async {
         await tester.pumpWidget(
           const MaterialApp(
-            home: Scaffold(
-              body: TextInputField(
-                label: 'Label',
-              ),
-            ),
+            home: Scaffold(body: TextInputField(label: 'Label')),
           ),
         );
 
@@ -295,10 +264,12 @@ void main() {
 
         // Find the outermost AnimatedContainer which has the gradient
         final animatedContainer = tester.widget<AnimatedContainer>(
-          find.ancestor(
-            of: find.byType(TextField),
-            matching: find.byType(AnimatedContainer),
-          ).first,
+          find
+              .ancestor(
+                of: find.byType(TextField),
+                matching: find.byType(AnimatedContainer),
+              )
+              .first,
         );
 
         final decoration = animatedContainer.decoration as BoxDecoration;
@@ -312,19 +283,20 @@ void main() {
         expect(gradient.colors.length, 2);
         // Check that colors have reduced alpha (30%)
         for (final color in gradient.colors) {
-          expect((color.a * 255.0).round() & 0xff, lessThanOrEqualTo((255 * 0.3).round()));
+          expect(
+            (color.a * 255.0).round() & 0xff,
+            lessThanOrEqualTo((255 * 0.3).round()),
+          );
         }
       });
 
-      testWidgets('shows gradient border on focus in dark mode', (tester) async {
+      testWidgets('shows gradient border on focus in dark mode', (
+        tester,
+      ) async {
         await tester.pumpWidget(
           MaterialApp(
             theme: ThemeData.dark(),
-            home: const Scaffold(
-              body: TextInputField(
-                label: 'Label',
-              ),
-            ),
+            home: const Scaffold(body: TextInputField(label: 'Label')),
           ),
         );
 
@@ -334,10 +306,12 @@ void main() {
 
         // Find the outermost AnimatedContainer which has the gradient
         final animatedContainer = tester.widget<AnimatedContainer>(
-          find.ancestor(
-            of: find.byType(TextField),
-            matching: find.byType(AnimatedContainer),
-          ).first,
+          find
+              .ancestor(
+                of: find.byType(TextField),
+                matching: find.byType(AnimatedContainer),
+              )
+              .first,
         );
 
         final decoration = animatedContainer.decoration as BoxDecoration;
@@ -351,65 +325,67 @@ void main() {
         expect(gradient.colors.length, 2);
         // Check that colors have reduced alpha (30%)
         for (final color in gradient.colors) {
-          expect((color.a * 255.0).round() & 0xff, lessThanOrEqualTo((255 * 0.3).round()));
+          expect(
+            (color.a * 255.0).round() & 0xff,
+            lessThanOrEqualTo((255 * 0.3).round()),
+          );
         }
       });
 
-      testWidgets('shows focus shadow with gradient tint (8px blur, 20% opacity)', (tester) async {
-        await tester.pumpWidget(
-          const MaterialApp(
-            home: Scaffold(
-              body: TextInputField(
-                label: 'Label',
-              ),
+      testWidgets(
+        'shows focus shadow with gradient tint (8px blur, 20% opacity)',
+        (tester) async {
+          await tester.pumpWidget(
+            const MaterialApp(
+              home: Scaffold(body: TextInputField(label: 'Label')),
             ),
-          ),
-        );
+          );
 
-        // Tap to focus the field
-        await tester.tap(find.byType(TextField));
-        await tester.pumpAndSettle();
+          // Tap to focus the field
+          await tester.tap(find.byType(TextField));
+          await tester.pumpAndSettle();
 
-        // Find the outermost AnimatedContainer which has the shadow
-        final animatedContainer = tester.widget<AnimatedContainer>(
-          find.ancestor(
-            of: find.byType(TextField),
-            matching: find.byType(AnimatedContainer),
-          ).first,
-        );
+          // Find the outermost AnimatedContainer which has the shadow
+          final animatedContainer = tester.widget<AnimatedContainer>(
+            find
+                .ancestor(
+                  of: find.byType(TextField),
+                  matching: find.byType(AnimatedContainer),
+                )
+                .first,
+          );
 
-        final decoration = animatedContainer.decoration as BoxDecoration;
+          final decoration = animatedContainer.decoration as BoxDecoration;
 
-        // Check for focus shadow
-        expect(decoration.boxShadow, isNotNull);
-        expect(decoration.boxShadow!.length, greaterThan(0));
+          // Check for focus shadow
+          expect(decoration.boxShadow, isNotNull);
+          expect(decoration.boxShadow!.length, greaterThan(0));
 
-        final shadow = decoration.boxShadow!.first;
-        expect(shadow.blurRadius, 8.0);
-        expect(shadow.offset, const Offset(0, 2));
+          final shadow = decoration.boxShadow!.first;
+          expect(shadow.blurRadius, 8.0);
+          expect(shadow.offset, const Offset(0, 2));
 
-        // Check shadow color has gradient tint at 20% opacity
-        final expectedColor = AppColors.primaryEnd.withValues(alpha: 0.2);
-        expect(shadow.color.toARGB32(), expectedColor.toARGB32());
-      });
+          // Check shadow color has gradient tint at 20% opacity
+          final expectedColor = AppColors.primaryEnd.withValues(alpha: 0.2);
+          expect(shadow.color.toARGB32(), expectedColor.toARGB32());
+        },
+      );
 
       testWidgets('has standard border when not focused', (tester) async {
         await tester.pumpWidget(
           const MaterialApp(
-            home: Scaffold(
-              body: TextInputField(
-                label: 'Label',
-              ),
-            ),
+            home: Scaffold(body: TextInputField(label: 'Label')),
           ),
         );
 
         // Find the outermost AnimatedContainer
         final animatedContainer = tester.widget<AnimatedContainer>(
-          find.ancestor(
-            of: find.byType(TextField),
-            matching: find.byType(AnimatedContainer),
-          ).first,
+          find
+              .ancestor(
+                of: find.byType(TextField),
+                matching: find.byType(AnimatedContainer),
+              )
+              .first,
         );
 
         final decoration = animatedContainer.decoration as BoxDecoration;
@@ -419,24 +395,25 @@ void main() {
         expect(decoration.boxShadow, isNull);
       });
 
-      testWidgets('shows error gradient border when errorText is provided', (tester) async {
+      testWidgets('shows error gradient border when errorText is provided', (
+        tester,
+      ) async {
         await tester.pumpWidget(
           const MaterialApp(
             home: Scaffold(
-              body: TextInputField(
-                label: 'Label',
-                errorText: 'Error message',
-              ),
+              body: TextInputField(label: 'Label', errorText: 'Error message'),
             ),
           ),
         );
 
         // Find the outermost AnimatedContainer
         final animatedContainer = tester.widget<AnimatedContainer>(
-          find.ancestor(
-            of: find.byType(TextField),
-            matching: find.byType(AnimatedContainer),
-          ).first,
+          find
+              .ancestor(
+                of: find.byType(TextField),
+                matching: find.byType(AnimatedContainer),
+              )
+              .first,
         );
 
         final decoration = animatedContainer.decoration as BoxDecoration;
@@ -456,20 +433,19 @@ void main() {
           MaterialApp(
             theme: ThemeData.dark(),
             home: const Scaffold(
-              body: TextInputField(
-                label: 'Label',
-                errorText: 'Error message',
-              ),
+              body: TextInputField(label: 'Label', errorText: 'Error message'),
             ),
           ),
         );
 
         // Find the outermost AnimatedContainer
         final animatedContainer = tester.widget<AnimatedContainer>(
-          find.ancestor(
-            of: find.byType(TextField),
-            matching: find.byType(AnimatedContainer),
-          ).first,
+          find
+              .ancestor(
+                of: find.byType(TextField),
+                matching: find.byType(AnimatedContainer),
+              )
+              .first,
         );
 
         final decoration = animatedContainer.decoration as BoxDecoration;
@@ -503,7 +479,9 @@ void main() {
         controller.dispose();
       });
 
-      testWidgets('character counter shows warning gradient when >80%', (tester) async {
+      testWidgets('character counter shows warning gradient when >80%', (
+        tester,
+      ) async {
         final controller = TextEditingController(text: 'Twelve12');
 
         await tester.pumpWidget(
@@ -534,7 +512,9 @@ void main() {
         controller.dispose();
       });
 
-      testWidgets('character counter shows bold gradient when >90%', (tester) async {
+      testWidgets('character counter shows bold gradient when >90%', (
+        tester,
+      ) async {
         final controller = TextEditingController(text: 'TwelveOne');
 
         await tester.pumpWidget(
@@ -560,16 +540,15 @@ void main() {
         controller.dispose();
       });
 
-      testWidgets('does not show character counter when maxLength is null', (tester) async {
+      testWidgets('does not show character counter when maxLength is null', (
+        tester,
+      ) async {
         final controller = TextEditingController(text: 'Test text');
 
         await tester.pumpWidget(
           MaterialApp(
             home: Scaffold(
-              body: TextInputField(
-                label: 'Label',
-                controller: controller,
-              ),
+              body: TextInputField(label: 'Label', controller: controller),
             ),
           ),
         );
@@ -580,7 +559,9 @@ void main() {
         controller.dispose();
       });
 
-      testWidgets('placeholder has softer colors (60% opacity)', (tester) async {
+      testWidgets('placeholder has softer colors (60% opacity)', (
+        tester,
+      ) async {
         await tester.pumpWidget(
           const MaterialApp(
             home: Scaffold(
@@ -608,20 +589,18 @@ void main() {
       testWidgets('uses correct border radius (10px)', (tester) async {
         await tester.pumpWidget(
           const MaterialApp(
-            home: Scaffold(
-              body: TextInputField(
-                label: 'Label',
-              ),
-            ),
+            home: Scaffold(body: TextInputField(label: 'Label')),
           ),
         );
 
         // Find the outermost AnimatedContainer
         final animatedContainer = tester.widget<AnimatedContainer>(
-          find.ancestor(
-            of: find.byType(TextField),
-            matching: find.byType(AnimatedContainer),
-          ).first,
+          find
+              .ancestor(
+                of: find.byType(TextField),
+                matching: find.byType(AnimatedContainer),
+              )
+              .first,
         );
 
         final decoration = animatedContainer.decoration as BoxDecoration;
@@ -650,7 +629,8 @@ void main() {
         );
 
         // Enter long text
-        const longText = 'This is a very long text that should work correctly '
+        const longText =
+            'This is a very long text that should work correctly '
             'with the new design system and display properly.';
         await tester.enterText(find.byType(TextField), longText);
 
@@ -660,23 +640,23 @@ void main() {
         controller.dispose();
       });
 
-      testWidgets('maintains focus state transitions correctly', (tester) async {
+      testWidgets('maintains focus state transitions correctly', (
+        tester,
+      ) async {
         await tester.pumpWidget(
           const MaterialApp(
-            home: Scaffold(
-              body: TextInputField(
-                label: 'Label',
-              ),
-            ),
+            home: Scaffold(body: TextInputField(label: 'Label')),
           ),
         );
 
         // Initial state: no focus, no gradient
         var animatedContainer = tester.widget<AnimatedContainer>(
-          find.ancestor(
-            of: find.byType(TextField),
-            matching: find.byType(AnimatedContainer),
-          ).first,
+          find
+              .ancestor(
+                of: find.byType(TextField),
+                matching: find.byType(AnimatedContainer),
+              )
+              .first,
         );
         var decoration = animatedContainer.decoration as BoxDecoration;
         expect(decoration.gradient, isNull);
@@ -687,10 +667,12 @@ void main() {
 
         // Focused state: should have gradient border
         animatedContainer = tester.widget<AnimatedContainer>(
-          find.ancestor(
-            of: find.byType(TextField),
-            matching: find.byType(AnimatedContainer),
-          ).first,
+          find
+              .ancestor(
+                of: find.byType(TextField),
+                matching: find.byType(AnimatedContainer),
+              )
+              .first,
         );
         decoration = animatedContainer.decoration as BoxDecoration;
         expect(decoration.gradient, isNotNull);
@@ -702,10 +684,12 @@ void main() {
 
         // Unfocused state: gradient should be removed
         animatedContainer = tester.widget<AnimatedContainer>(
-          find.ancestor(
-            of: find.byType(TextField),
-            matching: find.byType(AnimatedContainer),
-          ).first,
+          find
+              .ancestor(
+                of: find.byType(TextField),
+                matching: find.byType(AnimatedContainer),
+              )
+              .first,
         );
         decoration = animatedContainer.decoration as BoxDecoration;
         expect(decoration.gradient, isNull);
@@ -715,11 +699,7 @@ void main() {
       testWidgets('has smooth focus/blur transitions (200ms)', (tester) async {
         await tester.pumpWidget(
           const MaterialApp(
-            home: Scaffold(
-              body: TextInputField(
-                label: 'Label',
-              ),
-            ),
+            home: Scaffold(body: TextInputField(label: 'Label')),
           ),
         );
 
@@ -741,11 +721,7 @@ void main() {
       testWidgets('gradient border uses 30% opacity on focus', (tester) async {
         await tester.pumpWidget(
           const MaterialApp(
-            home: Scaffold(
-              body: TextInputField(
-                label: 'Label',
-              ),
-            ),
+            home: Scaffold(body: TextInputField(label: 'Label')),
           ),
         );
 
@@ -755,10 +731,12 @@ void main() {
 
         // Find the outermost AnimatedContainer
         final animatedContainer = tester.widget<AnimatedContainer>(
-          find.ancestor(
-            of: find.byType(TextField),
-            matching: find.byType(AnimatedContainer),
-          ).first,
+          find
+              .ancestor(
+                of: find.byType(TextField),
+                matching: find.byType(AnimatedContainer),
+              )
+              .first,
         );
 
         final decoration = animatedContainer.decoration as BoxDecoration;
@@ -767,18 +745,19 @@ void main() {
         final gradient = decoration.gradient as LinearGradient;
         // Gradient should use colors with 30% opacity
         for (final color in gradient.colors) {
-          expect((color.a * 255.0).round() & 0xff, lessThanOrEqualTo((255 * 0.3).round()));
+          expect(
+            (color.a * 255.0).round() & 0xff,
+            lessThanOrEqualTo((255 * 0.3).round()),
+          );
         }
       });
 
-      testWidgets('applies glass effect overlay on focus (5% opacity)', (tester) async {
+      testWidgets('applies glass effect overlay on focus (5% opacity)', (
+        tester,
+      ) async {
         await tester.pumpWidget(
           const MaterialApp(
-            home: Scaffold(
-              body: TextInputField(
-                label: 'Label',
-              ),
-            ),
+            home: Scaffold(body: TextInputField(label: 'Label')),
           ),
         );
 
@@ -798,14 +777,12 @@ void main() {
         expect(animatedContainers.length, 3);
       });
 
-      testWidgets('has proper padding (12px horizontal, 12px vertical)', (tester) async {
+      testWidgets('has proper padding (12px horizontal, 12px vertical)', (
+        tester,
+      ) async {
         await tester.pumpWidget(
           const MaterialApp(
-            home: Scaffold(
-              body: TextInputField(
-                label: 'Label',
-              ),
-            ),
+            home: Scaffold(body: TextInputField(label: 'Label')),
           ),
         );
 

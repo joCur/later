@@ -23,9 +23,9 @@ class Item {
     DateTime? createdAt,
     DateTime? updatedAt,
     this.syncStatus,
-  })  : tags = tags ?? [],
-        createdAt = createdAt ?? DateTime.now(),
-        updatedAt = updatedAt ?? DateTime.now();
+  }) : tags = tags ?? [],
+       createdAt = createdAt ?? DateTime.now(),
+       updatedAt = updatedAt ?? DateTime.now();
 
   /// Create from JSON for future API compatibility
   factory Item.fromJson(Map<String, dynamic> json) {

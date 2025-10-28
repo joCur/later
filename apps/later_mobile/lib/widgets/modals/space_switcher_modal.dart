@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:later_mobile/design_system/tokens/tokens.dart';
+import '../../core/theme/temporal_flow_theme.dart';
 import '../../core/utils/responsive_modal.dart';
 import '../../data/models/space_model.dart';
 import '../../providers/spaces_provider.dart';
@@ -74,10 +75,7 @@ class _SpaceSwitcherModalState extends State<SpaceSwitcherModal> {
   }
 
   /// Handle space selection
-  Future<void> _selectSpace(
-    Space space,
-    String currentSpaceId,
-  ) async {
+  Future<void> _selectSpace(Space space, String currentSpaceId) async {
     final navigator = Navigator.of(context);
     final messenger = ScaffoldMessenger.of(context);
     final spacesProvider = context.read<SpacesProvider>();
@@ -131,8 +129,7 @@ class _SpaceSwitcherModalState extends State<SpaceSwitcherModal> {
     // Number keys 1-9 - select space directly
     if (event.logicalKey.keyId >= LogicalKeyboardKey.digit1.keyId &&
         event.logicalKey.keyId <= LogicalKeyboardKey.digit9.keyId) {
-      final index =
-          event.logicalKey.keyId - LogicalKeyboardKey.digit1.keyId;
+      final index = event.logicalKey.keyId - LogicalKeyboardKey.digit1.keyId;
       if (index < spaces.length) {
         _selectSpace(spaces[index], currentSpaceId);
         return KeyEventResult.handled;
@@ -200,27 +197,26 @@ class _SpaceSwitcherModalState extends State<SpaceSwitcherModal> {
   }
 
   /// Get gradient for space item based on index
-  LinearGradient _getSpaceGradient(int index, bool isDark) {
+  LinearGradient _getSpaceGradient(int index, BuildContext context) {
+    final temporalTheme = Theme.of(context).extension<TemporalFlowTheme>()!;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     // Cycle through type gradients for visual variety
-    final gradients = isDark
-        ? [
-            AppColors.primaryGradientDark,
-            AppColors.secondaryGradientDark,
-            const LinearGradient(
+    final gradients = [
+      temporalTheme.primaryGradient,
+      temporalTheme.secondaryGradient,
+      isDark
+          ? const LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: [AppColors.accentCyanDark, AppColors.accentEmeraldDark],
-            ),
-          ]
-        : [
-            AppColors.primaryGradient,
-            AppColors.secondaryGradient,
-            const LinearGradient(
+            )
+          : const LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: [AppColors.accentCyan, AppColors.accentEmerald],
             ),
-          ];
+    ];
     return gradients[index % gradients.length];
   }
 
@@ -235,7 +231,7 @@ class _SpaceSwitcherModalState extends State<SpaceSwitcherModal> {
   }) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final isArchived = space.isArchived;
-    final gradient = _getSpaceGradient(index, isDark);
+    final gradient = _getSpaceGradient(index, context);
 
     // Wrap entire item in Opacity if archived
     final itemContent = Semantics(
@@ -253,7 +249,8 @@ class _SpaceSwitcherModalState extends State<SpaceSwitcherModal> {
           curve: AppAnimations.springCurve,
           child: Container(
             constraints: const BoxConstraints(
-              minHeight: 56, // Mobile-first: 56px height for comfortable tapping
+              minHeight:
+                  56, // Mobile-first: 56px height for comfortable tapping
             ),
             padding: const EdgeInsets.symmetric(
               horizontal: 20, // Mobile-first: 20px padding
@@ -261,22 +258,17 @@ class _SpaceSwitcherModalState extends State<SpaceSwitcherModal> {
             ),
             decoration: BoxDecoration(
               color: isSelected
-                  ? (isDark
-                      ? AppColors.selectedDark
-                      : AppColors.selectedLight)
+                  ? (isDark ? AppColors.selectedDark : AppColors.selectedLight)
                   : (isKeyboardSelected
-                      ? (isDark
-                          ? AppColors.focusDark.withValues(alpha: 0.1)
-                          : AppColors.focusLight.withValues(alpha: 0.1))
-                      : Colors.transparent),
+                        ? (isDark
+                              ? AppColors.focusDark.withValues(alpha: 0.1)
+                              : AppColors.focusLight.withValues(alpha: 0.1))
+                        : Colors.transparent),
               borderRadius: BorderRadius.circular(AppSpacing.radiusMD),
               // Mobile-first: 3px gradient left border for current space
               border: isSelected
                   ? Border(
-                      left: BorderSide(
-                        width: 3,
-                        color: gradient.colors.first,
-                      ),
+                      left: BorderSide(width: 3, color: gradient.colors.first),
                     )
                   : null,
               gradient: isSelected
@@ -290,23 +282,87 @@ class _SpaceSwitcherModalState extends State<SpaceSwitcherModal> {
                     )
                   : null,
             ),
-          child: Row(
-            children: [
-              // Number indicator for keyboard shortcuts (1-9)
-              if (index < 9)
-                Container(
-                  width: 24,
-                  height: 24,
-                  margin: const EdgeInsets.only(right: AppSpacing.xs),
-                  decoration: BoxDecoration(
-                    color: isDark
-                        ? AppColors.neutral800
-                        : AppColors.neutral100,
-                    borderRadius: BorderRadius.circular(AppSpacing.radiusSM),
+            child: Row(
+              children: [
+                // Number indicator for keyboard shortcuts (1-9)
+                if (index < 9)
+                  Container(
+                    width: 24,
+                    height: 24,
+                    margin: const EdgeInsets.only(right: AppSpacing.xs),
+                    decoration: BoxDecoration(
+                      color: isDark
+                          ? AppColors.neutral800
+                          : AppColors.neutral100,
+                      borderRadius: BorderRadius.circular(AppSpacing.radiusSM),
+                    ),
+                    child: Center(
+                      child: Text(
+                        '${index + 1}',
+                        style: AppTypography.labelSmall.copyWith(
+                          color: isDark
+                              ? AppColors.neutral500
+                              : AppColors.neutral500,
+                        ),
+                      ),
+                    ),
                   ),
-                  child: Center(
+
+                // Space icon - Mobile-first: 24px with gradient tint
+                if (isArchived)
+                  Icon(
+                    Icons.archive,
+                    size: 24,
+                    color: AppColors.textSecondary(context),
+                  )
+                else if (space.icon != null)
+                  Text(space.icon!, style: const TextStyle(fontSize: 24))
+                else
+                  // Gradient-tinted icon for default folder
+                  ShaderMask(
+                    shaderCallback: (bounds) => gradient.createShader(bounds),
+                    blendMode: BlendMode.srcIn,
+                    child: const Icon(
+                      Icons.folder_outlined,
+                      size: 24,
+                      color: Colors.white,
+                    ),
+                  ),
+                const SizedBox(width: AppSpacing.xs),
+
+                // Space name
+                Expanded(
+                  child: Text(
+                    space.name,
+                    style: AppTypography.bodyLarge.copyWith(
+                      color: isDark
+                          ? AppColors.neutral400
+                          : AppColors.neutral600,
+                      fontWeight: isSelected
+                          ? FontWeight.w600
+                          : FontWeight.normal,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+
+                const SizedBox(width: AppSpacing.xs),
+
+                // Archived badge
+                if (isArchived)
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.xs,
+                      vertical: AppSpacing.xxs,
+                    ),
+                    decoration: BoxDecoration(
+                      color: isDark
+                          ? AppColors.neutral500.withValues(alpha: 0.2)
+                          : AppColors.neutral500.withValues(alpha: 0.2),
+                      borderRadius: BorderRadius.circular(AppSpacing.xs),
+                    ),
                     child: Text(
-                      '${index + 1}',
+                      'Archived',
                       style: AppTypography.labelSmall.copyWith(
                         color: isDark
                             ? AppColors.neutral500
@@ -314,67 +370,22 @@ class _SpaceSwitcherModalState extends State<SpaceSwitcherModal> {
                       ),
                     ),
                   ),
-                ),
 
-              // Space icon - Mobile-first: 24px with gradient tint
-              if (isArchived)
-                Icon(
-                  Icons.archive,
-                  size: 24,
-                  color: isDark
-                      ? AppColors.neutral500
-                      : AppColors.neutral500,
-                )
-              else if (space.icon != null)
-                Text(
-                  space.icon!,
-                  style: const TextStyle(fontSize: 24),
-                )
-              else
-                // Gradient-tinted icon for default folder
-                ShaderMask(
-                  shaderCallback: (bounds) => gradient.createShader(bounds),
-                  blendMode: BlendMode.srcIn,
-                  child: const Icon(
-                    Icons.folder_outlined,
-                    size: 24,
-                    color: Colors.white,
-                  ),
-                ),
-              const SizedBox(width: AppSpacing.xs),
+                if (isArchived) const SizedBox(width: AppSpacing.xxs),
 
-              // Space name
-              Expanded(
-                child: Text(
-                  space.name,
-                  style: AppTypography.bodyLarge.copyWith(
-                    color: isDark
-                        ? AppColors.neutral400
-                        : AppColors.neutral600,
-                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-                  ),
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-
-              const SizedBox(width: AppSpacing.xs),
-
-              // Archived badge
-              if (isArchived)
+                // Item count badge
                 Container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: AppSpacing.xs,
                     vertical: AppSpacing.xxs,
                   ),
                   decoration: BoxDecoration(
-                    color: isDark
-                        ? AppColors.neutral500.withValues(alpha: 0.2)
-                        : AppColors.neutral500.withValues(alpha: 0.2),
+                    color: AppColors.surfaceVariant(context),
                     borderRadius: BorderRadius.circular(AppSpacing.xs),
                   ),
                   child: Text(
-                    'Archived',
-                    style: AppTypography.labelSmall.copyWith(
+                    '${space.itemCount}',
+                    style: AppTypography.labelMedium.copyWith(
                       color: isDark
                           ? AppColors.neutral500
                           : AppColors.neutral500,
@@ -382,44 +393,20 @@ class _SpaceSwitcherModalState extends State<SpaceSwitcherModal> {
                   ),
                 ),
 
-              if (isArchived) const SizedBox(width: AppSpacing.xxs),
-
-              // Item count badge
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.xs,
-                  vertical: AppSpacing.xxs,
-                ),
-                decoration: BoxDecoration(
-                  color: isDark
-                      ? AppColors.neutral800
-                      : AppColors.neutral100,
-                  borderRadius: BorderRadius.circular(AppSpacing.xs),
-                ),
-                child: Text(
-                  '${space.itemCount}',
-                  style: AppTypography.labelMedium.copyWith(
-                    color: isDark
-                        ? AppColors.neutral500
-                        : AppColors.neutral500,
+                // Selected indicator
+                if (isSelected)
+                  Padding(
+                    padding: const EdgeInsets.only(left: AppSpacing.xs),
+                    child: Icon(
+                      Icons.check_circle,
+                      size: 20,
+                      color: isDark
+                          ? AppColors.primaryLight
+                          : AppColors.primarySolid,
+                    ),
                   ),
-                ),
-              ),
-
-              // Selected indicator
-              if (isSelected)
-                Padding(
-                  padding: const EdgeInsets.only(left: AppSpacing.xs),
-                  child: Icon(
-                    Icons.check_circle,
-                    size: 20,
-                    color: isDark
-                        ? AppColors.primaryLight
-                        : AppColors.primarySolid,
-                  ),
-                ),
-            ],
-          ),
+              ],
+            ),
           ),
         ),
       ),
@@ -427,10 +414,7 @@ class _SpaceSwitcherModalState extends State<SpaceSwitcherModal> {
 
     // Return with opacity if archived
     if (isArchived) {
-      return Opacity(
-        opacity: 0.5,
-        child: itemContent,
-      );
+      return Opacity(opacity: 0.5, child: itemContent);
     }
 
     return itemContent;
@@ -452,7 +436,7 @@ class _SpaceSwitcherModalState extends State<SpaceSwitcherModal> {
       builder: (BuildContext bottomSheetContext) {
         return Container(
           decoration: BoxDecoration(
-            color: isDark ? AppColors.neutral900 : Colors.white,
+            color: AppColors.surface(context),
             borderRadius: const BorderRadius.vertical(
               top: Radius.circular(AppSpacing.modalRadius),
             ),
@@ -467,10 +451,7 @@ class _SpaceSwitcherModalState extends State<SpaceSwitcherModal> {
                   child: Row(
                     children: [
                       if (space.icon != null)
-                        Text(
-                          space.icon!,
-                          style: const TextStyle(fontSize: 24),
-                        )
+                        Text(space.icon!, style: const TextStyle(fontSize: 24))
                       else
                         Icon(
                           Icons.folder_outlined,
@@ -505,7 +486,7 @@ class _SpaceSwitcherModalState extends State<SpaceSwitcherModal> {
 
                 Divider(
                   height: 1,
-                  color: isDark ? AppColors.neutral700 : AppColors.neutral200,
+                  color: AppColors.border(context),
                 ),
 
                 // Menu options
@@ -533,8 +514,10 @@ class _SpaceSwitcherModalState extends State<SpaceSwitcherModal> {
                     subtitle: isCurrentSpace
                         ? const Text('Switch to another space first')
                         : (space.itemCount > 0
-                            ? Text('This space contains ${space.itemCount} items')
-                            : null),
+                              ? Text(
+                                  'This space contains ${space.itemCount} items',
+                                )
+                              : null),
                     onTap: isCurrentSpace
                         ? null
                         : () {
@@ -543,13 +526,13 @@ class _SpaceSwitcherModalState extends State<SpaceSwitcherModal> {
                           },
                     iconColor: isCurrentSpace
                         ? (isDark
-                            ? AppColors.neutral500.withValues(alpha: 0.5)
-                            : AppColors.neutral500.withValues(alpha: 0.5))
+                              ? AppColors.neutral500.withValues(alpha: 0.5)
+                              : AppColors.neutral500.withValues(alpha: 0.5))
                         : AppColors.error,
                     textColor: isCurrentSpace
                         ? (isDark
-                            ? AppColors.neutral500.withValues(alpha: 0.5)
-                            : AppColors.neutral500.withValues(alpha: 0.5))
+                              ? AppColors.neutral500.withValues(alpha: 0.5)
+                              : AppColors.neutral500.withValues(alpha: 0.5))
                         : AppColors.error,
                     enabled: !isCurrentSpace,
                     minTileHeight: AppSpacing.minTouchTarget,
@@ -599,10 +582,7 @@ class _SpaceSwitcherModalState extends State<SpaceSwitcherModal> {
     // Open CreateSpaceModal in edit mode
     final result = await ResponsiveModal.show<bool>(
       context: context,
-      child: CreateSpaceModal(
-        mode: SpaceModalMode.edit,
-        initialSpace: space,
-      ),
+      child: CreateSpaceModal(mode: SpaceModalMode.edit, initialSpace: space),
     );
 
     // If space was updated, the provider will have been updated automatically
@@ -624,7 +604,9 @@ class _SpaceSwitcherModalState extends State<SpaceSwitcherModal> {
     if (space.id == currentSpaceId) {
       messenger.showSnackBar(
         const SnackBar(
-          content: Text('Cannot archive the current space. Switch to another space first.'),
+          content: Text(
+            'Cannot archive the current space. Switch to another space first.',
+          ),
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -649,9 +631,7 @@ class _SpaceSwitcherModalState extends State<SpaceSwitcherModal> {
             ),
             TextButton(
               onPressed: () => Navigator.of(dialogContext).pop(true),
-              style: TextButton.styleFrom(
-                foregroundColor: AppColors.error,
-              ),
+              style: TextButton.styleFrom(foregroundColor: AppColors.error),
               child: const Text('Archive'),
             ),
           ],
@@ -738,9 +718,7 @@ class _SpaceSwitcherModalState extends State<SpaceSwitcherModal> {
         title: Text(
           'Show Archived Spaces',
           style: AppTypography.bodyMedium.copyWith(
-            color: isDark
-                ? AppColors.neutral400
-                : AppColors.neutral600,
+            color: AppColors.text(context),
           ),
         ),
         value: _showArchivedSpaces,
@@ -758,6 +736,8 @@ class _SpaceSwitcherModalState extends State<SpaceSwitcherModal> {
 
   /// Build create space button with gradient styling
   Widget _buildCreateSpaceButton(bool isDark) {
+    final temporalTheme = Theme.of(context).extension<TemporalFlowTheme>()!;
+
     return Padding(
       padding: const EdgeInsets.symmetric(
         horizontal: AppSpacing.sm,
@@ -768,15 +748,13 @@ class _SpaceSwitcherModalState extends State<SpaceSwitcherModal> {
         label: 'Create new space',
         child: Container(
           decoration: BoxDecoration(
-            gradient: isDark
-                ? AppColors.primaryGradientDark
-                : AppColors.primaryGradient,
+            gradient: temporalTheme.primaryGradient,
             borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
             boxShadow: [
               BoxShadow(
-                color: isDark
-                    ? AppColors.primaryStartDark.withValues(alpha: 0.3)
-                    : AppColors.primaryStart.withValues(alpha: 0.3),
+                color: temporalTheme.primaryGradient.colors.first.withValues(
+                  alpha: 0.3,
+                ),
                 blurRadius: 8,
                 offset: const Offset(0, 2),
               ),
@@ -789,9 +767,7 @@ class _SpaceSwitcherModalState extends State<SpaceSwitcherModal> {
               // Show create space modal
               final result = await ResponsiveModal.show<bool>(
                 context: context,
-                child: const CreateSpaceModal(
-                  mode: SpaceModalMode.create,
-                ),
+                child: const CreateSpaceModal(mode: SpaceModalMode.create),
               );
 
               // If space was created, close this modal and return true
@@ -808,7 +784,11 @@ class _SpaceSwitcherModalState extends State<SpaceSwitcherModal> {
   }
 
   /// Build space list view
-  Widget _buildSpaceList(BuildContext context, String currentSpaceId, bool isDark) {
+  Widget _buildSpaceList(
+    BuildContext context,
+    String currentSpaceId,
+    bool isDark,
+  ) {
     return _filteredSpaces.isEmpty
         ? Padding(
             padding: const EdgeInsets.all(AppSpacing.md),
@@ -818,9 +798,7 @@ class _SpaceSwitcherModalState extends State<SpaceSwitcherModal> {
                     ? 'No spaces found'
                     : 'No spaces available',
                 style: AppTypography.bodyMedium.copyWith(
-                  color: isDark
-                      ? AppColors.neutral500
-                      : AppColors.neutral500,
+                  color: AppColors.textSecondary(context),
                 ),
               ),
             ),
@@ -852,7 +830,10 @@ class _SpaceSwitcherModalState extends State<SpaceSwitcherModal> {
   }
 
   /// Build modal content (for BottomSheetContainer child)
-  Widget _buildModalContent(BuildContext context, SpacesProvider spacesProvider) {
+  Widget _buildModalContent(
+    BuildContext context,
+    SpacesProvider spacesProvider,
+  ) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final currentSpaceId = spacesProvider.currentSpace?.id ?? '';
     final allSpaces = spacesProvider.spaces;
@@ -873,16 +854,14 @@ class _SpaceSwitcherModalState extends State<SpaceSwitcherModal> {
           ),
 
           // Space list
-          Flexible(
-            child: _buildSpaceList(context, currentSpaceId, isDark),
-          ),
+          Flexible(child: _buildSpaceList(context, currentSpaceId, isDark)),
 
           const SizedBox(height: AppSpacing.sm),
 
           // Divider
           Divider(
             height: 1,
-            color: isDark ? AppColors.neutral700 : AppColors.neutral200,
+            color: AppColors.border(context),
           ),
 
           // Show archived toggle
@@ -891,7 +870,7 @@ class _SpaceSwitcherModalState extends State<SpaceSwitcherModal> {
           // Divider
           Divider(
             height: 1,
-            color: isDark ? AppColors.neutral700 : AppColors.neutral200,
+            color: AppColors.border(context),
           ),
 
           // Create space button

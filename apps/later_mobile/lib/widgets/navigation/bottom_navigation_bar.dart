@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:later_mobile/design_system/tokens/tokens.dart';
+import '../../core/theme/temporal_flow_theme.dart';
 
 // Design Constants
 const double _kNavBarHeight = 64.0;
@@ -48,9 +49,9 @@ class AppBottomNavigationBar extends StatefulWidget {
     required this.currentIndex,
     required this.onDestinationSelected,
   }) : assert(
-          currentIndex >= 0 && currentIndex < 3,
-          'currentIndex must be between 0 and 2',
-        );
+         currentIndex >= 0 && currentIndex < 3,
+         'currentIndex must be between 0 and 2',
+       );
 
   /// The index of the currently selected destination.
   final int currentIndex;
@@ -103,6 +104,7 @@ class _AppBottomNavigationBarState extends State<AppBottomNavigationBar>
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDarkMode = theme.brightness == Brightness.dark;
+    final temporalTheme = Theme.of(context).extension<TemporalFlowTheme>()!;
 
     return SafeArea(
       child: ClipRect(
@@ -114,14 +116,8 @@ class _AppBottomNavigationBarState extends State<AppBottomNavigationBar>
           child: Container(
             height: _kNavBarHeight,
             decoration: BoxDecoration(
-              color: isDarkMode ? AppColors.glassDark : AppColors.glassLight,
-              border: Border(
-                top: BorderSide(
-                  color: isDarkMode
-                      ? AppColors.glassBorderDark
-                      : AppColors.glassBorderLight,
-                ),
-              ),
+              color: temporalTheme.glassBackground,
+              border: Border(top: BorderSide(color: temporalTheme.glassBorder)),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -174,6 +170,7 @@ class _AppBottomNavigationBarState extends State<AppBottomNavigationBar>
     required String semanticLabel,
     required bool isDarkMode,
   }) {
+    final temporalTheme = Theme.of(context).extension<TemporalFlowTheme>()!;
     final isSelected = widget.currentIndex == index;
     final theme = Theme.of(context);
 
@@ -196,7 +193,9 @@ class _AppBottomNavigationBarState extends State<AppBottomNavigationBar>
             child: SizedBox(
               height: _kNavBarHeight,
               child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: _kItemVerticalPadding),
+                padding: const EdgeInsets.symmetric(
+                  vertical: _kItemVerticalPadding,
+                ),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   mainAxisSize: MainAxisSize.min,
@@ -213,8 +212,14 @@ class _AppBottomNavigationBarState extends State<AppBottomNavigationBar>
                               animation: _indicatorAnimation,
                               builder: (context, child) {
                                 // Clamp opacity value to 0-1 range (spring curves can overshoot)
-                                final opacity = _indicatorAnimation.value.clamp(0.0, 1.0);
-                                final scale = _indicatorAnimation.value.clamp(0.0, 1.0);
+                                final opacity = _indicatorAnimation.value.clamp(
+                                  0.0,
+                                  1.0,
+                                );
+                                final scale = _indicatorAnimation.value.clamp(
+                                  0.0,
+                                  1.0,
+                                );
 
                                 return Transform.scale(
                                   scale: scale,
@@ -224,10 +229,10 @@ class _AppBottomNavigationBarState extends State<AppBottomNavigationBar>
                                       height: _kIndicatorHeight,
                                       width: _kIndicatorWidth,
                                       decoration: BoxDecoration(
-                                        gradient: isDarkMode
-                                            ? AppColors.primaryGradientDark
-                                            : AppColors.primaryGradient,
-                                        borderRadius: BorderRadius.circular(_kIndicatorRadius),
+                                        gradient: temporalTheme.primaryGradient,
+                                        borderRadius: BorderRadius.circular(
+                                          _kIndicatorRadius,
+                                        ),
                                       ),
                                     ),
                                   ),
@@ -241,8 +246,8 @@ class _AppBottomNavigationBarState extends State<AppBottomNavigationBar>
                             color: isSelected
                                 ? Colors.white
                                 : (isDarkMode
-                                    ? AppColors.neutral400
-                                    : AppColors.neutral600),
+                                      ? AppColors.neutral400
+                                      : AppColors.neutral600),
                             semanticLabel: isSelected
                                 ? '$semanticLabel (selected)'
                                 : semanticLabel,
@@ -256,15 +261,14 @@ class _AppBottomNavigationBarState extends State<AppBottomNavigationBar>
                       label,
                       style: theme.textTheme.labelSmall?.copyWith(
                         fontSize: _kLabelFontSize,
-                        fontWeight:
-                            isSelected ? FontWeight.w600 : FontWeight.w500,
+                        fontWeight: isSelected
+                            ? FontWeight.w600
+                            : FontWeight.w500,
                         color: isSelected
-                            ? (isDarkMode
-                                ? AppColors.primaryStartDark
-                                : AppColors.primarySolid)
+                            ? temporalTheme.primaryGradient.colors.first
                             : (isDarkMode
-                                ? AppColors.neutral500
-                                : AppColors.neutral600),
+                                  ? AppColors.neutral500
+                                  : AppColors.neutral600),
                         height: 1.0,
                       ),
                       maxLines: 1,

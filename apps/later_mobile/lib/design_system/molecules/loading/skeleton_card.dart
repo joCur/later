@@ -3,6 +3,7 @@ import 'package:later_mobile/core/responsive/breakpoints.dart';
 import 'package:later_mobile/design_system/atoms/loading/skeleton_line.dart';
 import 'package:later_mobile/design_system/tokens/tokens.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:later_mobile/core/theme/temporal_flow_theme.dart';
 
 /// A skeleton card component that mimics the ItemCard layout
 ///
@@ -38,24 +39,19 @@ class SkeletonCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final temporalTheme = Theme.of(context).extension<TemporalFlowTheme>()!;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final isMobile = context.isMobile;
 
     // Shimmer colors based on theme
-    final baseColor = isDark
-        ? AppColors.neutral800
-        : AppColors.neutral200;
-    final highlightColor = isDark
-        ? AppColors.neutral900
-        : AppColors.neutral100;
+    final baseColor = isDark ? AppColors.neutral800 : AppColors.neutral200;
+    final highlightColor = isDark ? AppColors.neutral900 : AppColors.neutral100;
 
     // Check for reduce motion preference
     final disableAnimations = MediaQuery.of(context).disableAnimations;
 
     // Card background color
-    final backgroundColor = isDark
-        ? AppColors.neutral900
-        : Colors.white;
+    final backgroundColor = AppColors.surface(context);
 
     return Container(
       margin: const EdgeInsets.only(
@@ -68,7 +64,7 @@ class SkeletonCard extends StatelessWidget {
         ), // Mobile-first: 20px border radius (pill shape)
         boxShadow: [
           BoxShadow(
-            color: isDark ? AppColors.shadowDark : AppColors.shadowLight,
+            color: temporalTheme.shadowColor,
             blurRadius: 3,
             offset: const Offset(0, 1),
           ),

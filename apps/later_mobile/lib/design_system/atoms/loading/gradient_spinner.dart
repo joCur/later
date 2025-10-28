@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:later_mobile/core/theme/temporal_flow_theme.dart';
 import 'package:later_mobile/design_system/tokens/tokens.dart';
 
 /// A custom circular progress indicator with gradient colors.
@@ -27,7 +28,6 @@ import 'package:later_mobile/design_system/tokens/tokens.dart';
 /// )
 /// ```
 class GradientSpinner extends StatefulWidget {
-
   /// Creates a small spinner (16px) for inline loading states.
   const GradientSpinner.small({
     super.key,
@@ -109,13 +109,17 @@ class _GradientSpinnerState extends State<GradientSpinner>
 
     _pulseAnimation = TweenSequence<double>([
       TweenSequenceItem(
-        tween: Tween<double>(begin: 1.0, end: 1.15)
-            .chain(CurveTween(curve: Curves.easeOut)),
+        tween: Tween<double>(
+          begin: 1.0,
+          end: 1.15,
+        ).chain(CurveTween(curve: Curves.easeOut)),
         weight: 50.0,
       ),
       TweenSequenceItem(
-        tween: Tween<double>(begin: 1.15, end: 1.0)
-            .chain(CurveTween(curve: Curves.easeIn)),
+        tween: Tween<double>(
+          begin: 1.15,
+          end: 1.0,
+        ).chain(CurveTween(curve: Curves.easeIn)),
         weight: 50.0,
       ),
     ]).animate(_pulseController);
@@ -134,7 +138,8 @@ class _GradientSpinnerState extends State<GradientSpinner>
 
   @override
   Widget build(BuildContext context) {
-    final gradient = widget.gradient ?? AppColors.primaryGradientAdaptive(context);
+    final temporalTheme = Theme.of(context).extension<TemporalFlowTheme>()!;
+    final gradient = widget.gradient ?? temporalTheme.primaryGradient;
 
     Widget spinner = RepaintBoundary(
       child: SizedBox(
@@ -162,10 +167,7 @@ class _GradientSpinnerState extends State<GradientSpinner>
       spinner = AnimatedBuilder(
         animation: _pulseAnimation,
         builder: (context, child) {
-          return Transform.scale(
-            scale: _pulseAnimation.value,
-            child: child,
-          );
+          return Transform.scale(scale: _pulseAnimation.value, child: child);
         },
         child: spinner,
       );
@@ -180,10 +182,7 @@ class _GradientSpinnerState extends State<GradientSpinner>
 /// Draws 75% of a circle (270 degrees) with a gradient stroke.
 /// The arc starts at -90 degrees (top of circle) and sweeps clockwise.
 class _GradientSpinnerPainter extends CustomPainter {
-  _GradientSpinnerPainter({
-    required this.gradient,
-    required this.strokeWidth,
-  });
+  _GradientSpinnerPainter({required this.gradient, required this.strokeWidth});
 
   final Gradient gradient;
   final double strokeWidth;
@@ -211,13 +210,7 @@ class _GradientSpinnerPainter extends CustomPainter {
     const startAngle = -pi / 2; // -90 degrees
     const sweepAngle = pi * 1.5; // 270 degrees
 
-    canvas.drawArc(
-      rect,
-      startAngle,
-      sweepAngle,
-      false,
-      paint,
-    );
+    canvas.drawArc(rect, startAngle, sweepAngle, false, paint);
   }
 
   @override

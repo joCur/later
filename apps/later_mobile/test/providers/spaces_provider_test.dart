@@ -156,18 +156,8 @@ void main() {
     test('should load spaces successfully', () async {
       // Arrange
       final testSpaces = [
-        Space(
-          id: '1',
-          name: 'Work',
-          icon: '💼',
-          color: '#FF5733',
-        ),
-        Space(
-          id: '2',
-          name: 'Personal',
-          icon: '🏠',
-          color: '#33FF57',
-        ),
+        Space(id: '1', name: 'Work', icon: '💼', color: '#FF5733'),
+        Space(id: '2', name: 'Personal', icon: '🏠', color: '#33FF57'),
       ];
       mockRepository.mockSpaces = testSpaces;
 
@@ -317,25 +307,28 @@ void main() {
       expect(provider.currentSpace?.name, 'Personal');
     });
 
-    test('should fall back to first space when persisted space does not exist', () async {
-      // Arrange
-      final testSpaces = [
-        Space(id: '1', name: 'Work'),
-        Space(id: '2', name: 'Personal'),
-      ];
-      mockRepository.mockSpaces = testSpaces;
+    test(
+      'should fall back to first space when persisted space does not exist',
+      () async {
+        // Arrange
+        final testSpaces = [
+          Space(id: '1', name: 'Work'),
+          Space(id: '2', name: 'Personal'),
+        ];
+        mockRepository.mockSpaces = testSpaces;
 
-      // Persist a space ID that doesn't exist anymore (simulating deleted space)
-      await PreferencesService().setLastSelectedSpaceId('999');
+        // Persist a space ID that doesn't exist anymore (simulating deleted space)
+        await PreferencesService().setLastSelectedSpaceId('999');
 
-      // Act - load spaces (should fall back to first space)
-      await provider.loadSpaces();
+        // Act - load spaces (should fall back to first space)
+        await provider.loadSpaces();
 
-      // Assert - should fall back to first space
-      expect(provider.currentSpace, isNotNull);
-      expect(provider.currentSpace?.id, '1');
-      expect(provider.currentSpace?.name, 'Work');
-    });
+        // Assert - should fall back to first space
+        expect(provider.currentSpace, isNotNull);
+        expect(provider.currentSpace?.id, '1');
+        expect(provider.currentSpace?.name, 'Work');
+      },
+    );
 
     test('should clear persisted space ID when it does not exist', () async {
       // Arrange
@@ -357,25 +350,28 @@ void main() {
       expect(persistedSpaceId, isNull);
     });
 
-    test('should prioritize persisted space over first space on initial load', () async {
-      // Arrange
-      final testSpaces = [
-        Space(id: '1', name: 'Work'),
-        Space(id: '2', name: 'Personal'),
-        Space(id: '3', name: 'Projects'),
-      ];
-      mockRepository.mockSpaces = testSpaces;
+    test(
+      'should prioritize persisted space over first space on initial load',
+      () async {
+        // Arrange
+        final testSpaces = [
+          Space(id: '1', name: 'Work'),
+          Space(id: '2', name: 'Personal'),
+          Space(id: '3', name: 'Projects'),
+        ];
+        mockRepository.mockSpaces = testSpaces;
 
-      // Persist space '3' as the last selected space
-      await PreferencesService().setLastSelectedSpaceId('3');
+        // Persist space '3' as the last selected space
+        await PreferencesService().setLastSelectedSpaceId('3');
 
-      // Act - load spaces on fresh provider (simulating app restart)
-      await provider.loadSpaces();
+        // Act - load spaces on fresh provider (simulating app restart)
+        await provider.loadSpaces();
 
-      // Assert - should load persisted space '3', not default to first space
-      expect(provider.currentSpace?.id, '3');
-      expect(provider.currentSpace?.name, 'Projects');
-    });
+        // Assert - should load persisted space '3', not default to first space
+        expect(provider.currentSpace?.id, '3');
+        expect(provider.currentSpace?.name, 'Projects');
+      },
+    );
 
     test('should handle null persisted space ID gracefully', () async {
       // Arrange
@@ -504,20 +500,23 @@ void main() {
       expect(provider.error, isNull);
     });
 
-    test('should update current space if it is the one being updated', () async {
-      // Arrange
-      final space = Space(id: '1', name: 'Work');
-      mockRepository.mockSpaces = [space];
-      await provider.loadSpaces();
+    test(
+      'should update current space if it is the one being updated',
+      () async {
+        // Arrange
+        final space = Space(id: '1', name: 'Work');
+        mockRepository.mockSpaces = [space];
+        await provider.loadSpaces();
 
-      final updatedSpace = space.copyWith(name: 'Updated Work');
+        final updatedSpace = space.copyWith(name: 'Updated Work');
 
-      // Act
-      await provider.updateSpace(updatedSpace);
+        // Act
+        await provider.updateSpace(updatedSpace);
 
-      // Assert
-      expect(provider.currentSpace?.name, 'Updated Work');
-    });
+        // Assert
+        expect(provider.currentSpace?.name, 'Updated Work');
+      },
+    );
 
     test('should handle error when updating space fails', () async {
       // Arrange
@@ -568,26 +567,29 @@ void main() {
       expect(PreferencesService().getLastSelectedSpaceId(), '1');
     });
 
-    test('should keep persisted space ID when archiving non-current space', () async {
-      // Arrange
-      final space1 = Space(id: '1', name: 'Work');
-      final space2 = Space(id: '2', name: 'Personal');
-      mockRepository.mockSpaces = [space1, space2];
-      await provider.loadSpaces();
+    test(
+      'should keep persisted space ID when archiving non-current space',
+      () async {
+        // Arrange
+        final space1 = Space(id: '1', name: 'Work');
+        final space2 = Space(id: '2', name: 'Personal');
+        mockRepository.mockSpaces = [space1, space2];
+        await provider.loadSpaces();
 
-      // Manually persist space1 (in real usage, switchSpace or addSpace would do this)
-      await PreferencesService().setLastSelectedSpaceId('1');
-      expect(PreferencesService().getLastSelectedSpaceId(), '1');
+        // Manually persist space1 (in real usage, switchSpace or addSpace would do this)
+        await PreferencesService().setLastSelectedSpaceId('1');
+        expect(PreferencesService().getLastSelectedSpaceId(), '1');
 
-      // Act - archive space2 (not the current space)
-      final archivedSpace2 = space2.copyWith(isArchived: true);
-      await provider.updateSpace(archivedSpace2);
+        // Act - archive space2 (not the current space)
+        final archivedSpace2 = space2.copyWith(isArchived: true);
+        await provider.updateSpace(archivedSpace2);
 
-      // Assert
-      expect(provider.currentSpace?.id, '1'); // Current space unchanged
-      // Persisted space ID should remain unchanged
-      expect(PreferencesService().getLastSelectedSpaceId(), '1');
-    });
+        // Assert
+        expect(provider.currentSpace?.id, '1'); // Current space unchanged
+        // Persisted space ID should remain unchanged
+        expect(PreferencesService().getLastSelectedSpaceId(), '1');
+      },
+    );
   });
 
   group('SpacesProvider - deleteSpace', () {
@@ -597,7 +599,9 @@ void main() {
       final space2 = Space(id: '2', name: 'Personal');
       mockRepository.mockSpaces = [space1, space2];
       await provider.loadSpaces();
-      await provider.switchSpace('2'); // Switch to space 2 so we can delete space 1
+      await provider.switchSpace(
+        '2',
+      ); // Switch to space 2 so we can delete space 1
 
       // Act
       await provider.deleteSpace('1');
@@ -622,7 +626,10 @@ void main() {
       expect(provider.error, isNotNull);
       expect(provider.error, contains('current space'));
       expect(provider.spaces, hasLength(1)); // Space should still be there
-      expect(mockRepository.deleteSpaceCallCount, 0); // Should not call repository
+      expect(
+        mockRepository.deleteSpaceCallCount,
+        0,
+      ); // Should not call repository
     });
 
     test('should handle error when deleting space fails', () async {
@@ -662,51 +669,57 @@ void main() {
       expect(notifyCount, greaterThan(0));
     });
 
-    test('should clear persisted space ID when deleting a persisted space', () async {
-      // Arrange
-      final space1 = Space(id: '1', name: 'Work');
-      final space2 = Space(id: '2', name: 'Personal');
-      final space3 = Space(id: '3', name: 'Hobby');
-      mockRepository.mockSpaces = [space1, space2, space3];
-      await provider.loadSpaces();
+    test(
+      'should clear persisted space ID when deleting a persisted space',
+      () async {
+        // Arrange
+        final space1 = Space(id: '1', name: 'Work');
+        final space2 = Space(id: '2', name: 'Personal');
+        final space3 = Space(id: '3', name: 'Hobby');
+        mockRepository.mockSpaces = [space1, space2, space3];
+        await provider.loadSpaces();
 
-      // Switch to space2 (this will persist '2')
-      await provider.switchSpace('2');
-      expect(PreferencesService().getLastSelectedSpaceId(), '2');
+        // Switch to space2 (this will persist '2')
+        await provider.switchSpace('2');
+        expect(PreferencesService().getLastSelectedSpaceId(), '2');
 
-      // Manually set the persisted space to space3 (simulating a previous session)
-      await PreferencesService().setLastSelectedSpaceId('3');
-      expect(PreferencesService().getLastSelectedSpaceId(), '3');
+        // Manually set the persisted space to space3 (simulating a previous session)
+        await PreferencesService().setLastSelectedSpaceId('3');
+        expect(PreferencesService().getLastSelectedSpaceId(), '3');
 
-      // Act - delete space3 (the persisted one, but not the current one)
-      await provider.deleteSpace('3');
+        // Act - delete space3 (the persisted one, but not the current one)
+        await provider.deleteSpace('3');
 
-      // Assert
-      expect(provider.spaces, hasLength(2));
-      // The persisted space ID should be cleared since we deleted the persisted space
-      expect(PreferencesService().getLastSelectedSpaceId(), isNull);
-    });
+        // Assert
+        expect(provider.spaces, hasLength(2));
+        // The persisted space ID should be cleared since we deleted the persisted space
+        expect(PreferencesService().getLastSelectedSpaceId(), isNull);
+      },
+    );
 
-    test('should not clear persisted space ID when deleting a non-persisted space', () async {
-      // Arrange
-      final space1 = Space(id: '1', name: 'Work');
-      final space2 = Space(id: '2', name: 'Personal');
-      final space3 = Space(id: '3', name: 'Hobby');
-      mockRepository.mockSpaces = [space1, space2, space3];
-      await provider.loadSpaces();
+    test(
+      'should not clear persisted space ID when deleting a non-persisted space',
+      () async {
+        // Arrange
+        final space1 = Space(id: '1', name: 'Work');
+        final space2 = Space(id: '2', name: 'Personal');
+        final space3 = Space(id: '3', name: 'Hobby');
+        mockRepository.mockSpaces = [space1, space2, space3];
+        await provider.loadSpaces();
 
-      // Switch to space2 (this will persist '2')
-      await provider.switchSpace('2');
-      expect(PreferencesService().getLastSelectedSpaceId(), '2');
+        // Switch to space2 (this will persist '2')
+        await provider.switchSpace('2');
+        expect(PreferencesService().getLastSelectedSpaceId(), '2');
 
-      // Act - delete space3 (neither current nor persisted)
-      await provider.deleteSpace('3');
+        // Act - delete space3 (neither current nor persisted)
+        await provider.deleteSpace('3');
 
-      // Assert
-      expect(provider.spaces, hasLength(2));
-      // The persisted space ID should still be '2' since we didn't delete it
-      expect(PreferencesService().getLastSelectedSpaceId(), '2');
-    });
+        // Assert
+        expect(provider.spaces, hasLength(2));
+        // The persisted space ID should still be '2' since we didn't delete it
+        expect(PreferencesService().getLastSelectedSpaceId(), '2');
+      },
+    );
   });
 
   group('SpacesProvider - switchSpace', () {

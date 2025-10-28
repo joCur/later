@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:later_mobile/core/theme/temporal_flow_theme.dart';
 import 'package:later_mobile/design_system/tokens/tokens.dart';
 
 /// A pill-shaped filter chip component with gradient border when selected
@@ -22,7 +23,6 @@ import 'package:later_mobile/design_system/tokens/tokens.dart';
 ///   label: 'All',
 ///   isSelected: selectedFilter == FilterType.all,
 ///   onSelected: () => setState(() => selectedFilter = FilterType.all),
-///   isDark: isDarkMode,
 ///   icon: Icons.grid_view_rounded,
 /// )
 /// ```
@@ -43,7 +43,6 @@ class TemporalFilterChip extends StatefulWidget {
     required this.label,
     required this.isSelected,
     required this.onSelected,
-    required this.isDark,
     this.icon,
   });
 
@@ -55,9 +54,6 @@ class TemporalFilterChip extends StatefulWidget {
 
   /// Callback invoked when the chip is tapped
   final VoidCallback onSelected;
-
-  /// Whether to use dark theme colors
-  final bool isDark;
 
   /// Optional icon displayed before the label (16px size)
   final IconData? icon;
@@ -132,21 +128,20 @@ class _TemporalFilterChipState extends State<TemporalFilterChip>
   }
 
   Widget _buildChipContent() {
-    final isDark = widget.isDark;
+    final temporalTheme = Theme.of(context).extension<TemporalFlowTheme>()!;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     if (widget.isSelected) {
       return Container(
         height: 36,
         decoration: BoxDecoration(
-          gradient: isDark
-              ? AppColors.primaryGradientDark
-              : AppColors.primaryGradient,
+          gradient: temporalTheme.primaryGradient,
           borderRadius: BorderRadius.circular(20), // Pill shape
         ),
         child: Container(
           margin: const EdgeInsets.all(2), // 2px border width
           decoration: BoxDecoration(
-            color: isDark ? AppColors.neutral900 : Colors.white,
+            color: temporalTheme.glassBackground,
             borderRadius: BorderRadius.circular(18), // 20 - 2 = 18
           ),
           child: Material(

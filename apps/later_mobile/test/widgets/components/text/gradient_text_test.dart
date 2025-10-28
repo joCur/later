@@ -6,11 +6,7 @@ void main() {
   group('GradientText Widget Tests', () {
     testWidgets('renders text with ShaderMask', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: GradientText('Hello World'),
-          ),
-        ),
+        const MaterialApp(home: Scaffold(body: GradientText('Hello World'))),
       );
 
       // Verify ShaderMask exists
@@ -24,13 +20,11 @@ void main() {
       expect(find.text('Hello World'), findsOneWidget);
     });
 
-    testWidgets('uses default primary gradient when no gradient specified', (tester) async {
+    testWidgets('uses default primary gradient when no gradient specified', (
+      tester,
+    ) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: GradientText('Test'),
-          ),
-        ),
+        const MaterialApp(home: Scaffold(body: GradientText('Test'))),
       );
 
       final shaderMask = tester.widget<ShaderMask>(find.byType(ShaderMask));
@@ -43,17 +37,12 @@ void main() {
     });
 
     testWidgets('accepts custom gradient', (tester) async {
-      const customGradient = LinearGradient(
-        colors: [Colors.red, Colors.blue],
-      );
+      const customGradient = LinearGradient(colors: [Colors.red, Colors.blue]);
 
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(
-            body: GradientText(
-              'Custom',
-              gradient: customGradient,
-            ),
+            body: GradientText('Custom', gradient: customGradient),
           ),
         ),
       );
@@ -63,19 +52,11 @@ void main() {
     });
 
     testWidgets('applies custom TextStyle', (tester) async {
-      const customStyle = TextStyle(
-        fontSize: 24,
-        fontWeight: FontWeight.bold,
-      );
+      const customStyle = TextStyle(fontSize: 24, fontWeight: FontWeight.bold);
 
       await tester.pumpWidget(
         const MaterialApp(
-          home: Scaffold(
-            body: GradientText(
-              'Styled',
-              style: customStyle,
-            ),
-          ),
+          home: Scaffold(body: GradientText('Styled', style: customStyle)),
         ),
       );
 
@@ -90,10 +71,7 @@ void main() {
           home: Scaffold(
             body: SizedBox(
               width: 200,
-              child: GradientText(
-                'Centered',
-                textAlign: TextAlign.center,
-              ),
+              child: GradientText('Centered', textAlign: TextAlign.center),
             ),
           ),
         ),
@@ -130,9 +108,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           theme: ThemeData.light(),
-          home: const Scaffold(
-            body: GradientText('Light Mode'),
-          ),
+          home: const Scaffold(body: GradientText('Light Mode')),
         ),
       );
 
@@ -144,9 +120,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           theme: ThemeData.dark(),
-          home: const Scaffold(
-            body: GradientText('Dark Mode'),
-          ),
+          home: const Scaffold(body: GradientText('Dark Mode')),
         ),
       );
 
@@ -158,24 +132,18 @@ void main() {
   group('GradientText Factory Constructors', () {
     testWidgets('GradientText.primary uses primary gradient', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: GradientText.primary('Primary'),
-          ),
-        ),
+        MaterialApp(home: Scaffold(body: GradientText.primary('Primary'))),
       );
 
       expect(find.text('Primary'), findsOneWidget);
       expect(find.byType(ShaderMask), findsOneWidget);
     });
 
-    testWidgets('GradientText.secondary uses secondary gradient', (tester) async {
+    testWidgets('GradientText.secondary uses secondary gradient', (
+      tester,
+    ) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: GradientText.secondary('Secondary'),
-          ),
-        ),
+        MaterialApp(home: Scaffold(body: GradientText.secondary('Secondary'))),
       );
 
       expect(find.text('Secondary'), findsOneWidget);
@@ -184,11 +152,7 @@ void main() {
 
     testWidgets('GradientText.task uses task gradient', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: GradientText.task('Task'),
-          ),
-        ),
+        MaterialApp(home: Scaffold(body: GradientText.task('Task'))),
       );
 
       expect(find.text('Task'), findsOneWidget);
@@ -197,11 +161,7 @@ void main() {
 
     testWidgets('GradientText.note uses note gradient', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: GradientText.note('Note'),
-          ),
-        ),
+        MaterialApp(home: Scaffold(body: GradientText.note('Note'))),
       );
 
       expect(find.text('Note'), findsOneWidget);
@@ -210,11 +170,7 @@ void main() {
 
     testWidgets('GradientText.list uses list gradient', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: GradientText.list('List'),
-          ),
-        ),
+        MaterialApp(home: Scaffold(body: GradientText.list('List'))),
       );
 
       expect(find.text('List'), findsOneWidget);
@@ -223,11 +179,7 @@ void main() {
 
     testWidgets('GradientText.subtle applies reduced opacity', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: GradientText.subtle('Subtle'),
-          ),
-        ),
+        MaterialApp(home: Scaffold(body: GradientText.subtle('Subtle'))),
       );
 
       expect(find.text('Subtle'), findsOneWidget);
@@ -240,10 +192,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: GradientText.primary(
-              'Styled Primary',
-              style: customStyle,
-            ),
+            body: GradientText.primary('Styled Primary', style: customStyle),
           ),
         ),
       );
@@ -275,11 +224,7 @@ void main() {
   group('GradientText Edge Cases', () {
     testWidgets('handles empty string', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: GradientText(''),
-          ),
-        ),
+        const MaterialApp(home: Scaffold(body: GradientText(''))),
       );
 
       expect(find.byType(ShaderMask), findsOneWidget);
@@ -289,11 +234,7 @@ void main() {
       final longText = 'A' * 1000;
 
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: GradientText(longText),
-          ),
-        ),
+        MaterialApp(home: Scaffold(body: GradientText(longText))),
       );
 
       expect(find.byType(ShaderMask), findsOneWidget);
@@ -303,11 +244,7 @@ void main() {
       const specialText = 'Hello 👋 World! @#\$%^&*()';
 
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: GradientText(specialText),
-          ),
-        ),
+        const MaterialApp(home: Scaffold(body: GradientText(specialText))),
       );
 
       expect(find.text(specialText), findsOneWidget);
@@ -315,13 +252,7 @@ void main() {
 
     testWidgets('handles null overflow', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: GradientText(
-              'Test',
-            ),
-          ),
-        ),
+        const MaterialApp(home: Scaffold(body: GradientText('Test'))),
       );
 
       expect(find.text('Test'), findsOneWidget);

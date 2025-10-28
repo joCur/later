@@ -87,17 +87,16 @@ void main() {
           theme: theme ?? ThemeData.light(),
           home: ChangeNotifierProvider<SpacesProvider>.value(
             value: spacesProvider,
-            child: const Scaffold(
-              body: SpaceSwitcherModal(),
-            ),
+            child: const Scaffold(body: SpaceSwitcherModal()),
           ),
         ),
       );
     }
 
     group('Long Press Menu', () {
-      testWidgets('long-press on space item shows context menu',
-          (WidgetTester tester) async {
+      testWidgets('long-press on space item shows context menu', (
+        WidgetTester tester,
+      ) async {
         // Arrange
         await tester.pumpWidget(buildModalWithProvider());
         await tester.pumpAndSettle();
@@ -112,8 +111,9 @@ void main() {
         expect(find.text('Cancel'), findsOneWidget);
       });
 
-      testWidgets('long-press menu has proper icons',
-          (WidgetTester tester) async {
+      testWidgets('long-press menu has proper icons', (
+        WidgetTester tester,
+      ) async {
         // Arrange
         await tester.pumpWidget(buildModalWithProvider());
         await tester.pumpAndSettle();
@@ -143,8 +143,9 @@ void main() {
         expect(find.text('Edit Space'), findsNothing);
       });
 
-      testWidgets('archive option is disabled for current space',
-          (WidgetTester tester) async {
+      testWidgets('archive option is disabled for current space', (
+        WidgetTester tester,
+      ) async {
         // Arrange
         await tester.pumpWidget(buildModalWithProvider());
         await tester.pumpAndSettle();
@@ -164,8 +165,9 @@ void main() {
         expect(find.textContaining('current space'), findsOneWidget);
       });
 
-      testWidgets('shows item count warning for non-empty spaces',
-          (WidgetTester tester) async {
+      testWidgets('shows item count warning for non-empty spaces', (
+        WidgetTester tester,
+      ) async {
         // Arrange
         await tester.pumpWidget(buildModalWithProvider());
         await tester.pumpAndSettle();
@@ -179,7 +181,9 @@ void main() {
         expect(find.textContaining('12'), findsWidgets);
       });
 
-      testWidgets('tapping outside menu closes it', (WidgetTester tester) async {
+      testWidgets('tapping outside menu closes it', (
+        WidgetTester tester,
+      ) async {
         // Arrange
         await tester.pumpWidget(buildModalWithProvider());
         await tester.pumpAndSettle();
@@ -198,8 +202,9 @@ void main() {
     });
 
     group('Edit Space Flow', () {
-      testWidgets('edit space option opens CreateSpaceModal in edit mode',
-          (WidgetTester tester) async {
+      testWidgets('edit space option opens CreateSpaceModal in edit mode', (
+        WidgetTester tester,
+      ) async {
         // Arrange
         await tester.pumpWidget(buildModalWithProvider());
         await tester.pumpAndSettle();
@@ -218,8 +223,9 @@ void main() {
         expect(find.text('Work'), findsWidgets);
       });
 
-      testWidgets('editing space name updates the space list',
-          (WidgetTester tester) async {
+      testWidgets('editing space name updates the space list', (
+        WidgetTester tester,
+      ) async {
         // Arrange
         await tester.pumpWidget(buildModalWithProvider());
         await tester.pumpAndSettle();
@@ -247,8 +253,9 @@ void main() {
         expect(find.text('Work'), findsNothing);
       });
 
-      testWidgets('editing space icon updates the space',
-          (WidgetTester tester) async {
+      testWidgets('editing space icon updates the space', (
+        WidgetTester tester,
+      ) async {
         // Arrange
         await tester.pumpWidget(buildModalWithProvider());
         await tester.pumpAndSettle();
@@ -274,8 +281,9 @@ void main() {
         expect(find.text('Save'), findsNothing);
       });
 
-      testWidgets('editing space color updates the space',
-          (WidgetTester tester) async {
+      testWidgets('editing space color updates the space', (
+        WidgetTester tester,
+      ) async {
         // Arrange
         await tester.pumpWidget(buildModalWithProvider());
         await tester.pumpAndSettle();
@@ -309,8 +317,9 @@ void main() {
         expect(find.text('Save'), findsNothing);
       });
 
-      testWidgets('cannot save space with empty name',
-          (WidgetTester tester) async {
+      testWidgets('cannot save space with empty name', (
+        WidgetTester tester,
+      ) async {
         // Arrange
         await tester.pumpWidget(buildModalWithProvider());
         await tester.pumpAndSettle();
@@ -334,8 +343,9 @@ void main() {
         expect(button.onPressed, isNull);
       });
 
-      testWidgets('space edit updates immediately in UI',
-          (WidgetTester tester) async {
+      testWidgets('space edit updates immediately in UI', (
+        WidgetTester tester,
+      ) async {
         // Arrange
         await tester.pumpWidget(buildModalWithProvider());
         await tester.pumpAndSettle();
@@ -361,8 +371,9 @@ void main() {
         expect(spacesProvider.spaces.any((s) => s.name == newName), isTrue);
       });
 
-      testWidgets('edit modal closes after successful save',
-          (WidgetTester tester) async {
+      testWidgets('edit modal closes after successful save', (
+        WidgetTester tester,
+      ) async {
         // Arrange
         await tester.pumpWidget(buildModalWithProvider());
         await tester.pumpAndSettle();
@@ -415,8 +426,9 @@ void main() {
     });
 
     group('Keyboard Accessibility', () {
-      testWidgets('menu options are keyboard accessible',
-          (WidgetTester tester) async {
+      testWidgets('menu options are keyboard accessible', (
+        WidgetTester tester,
+      ) async {
         // Arrange
         await tester.pumpWidget(buildModalWithProvider());
         await tester.pumpAndSettle();
@@ -437,8 +449,9 @@ void main() {
         // This is a basic test; more sophisticated focus management may be needed
       });
 
-      testWidgets('escape key closes context menu',
-          (WidgetTester tester) async {
+      testWidgets('escape key closes context menu', (
+        WidgetTester tester,
+      ) async {
         // Arrange
         await tester.pumpWidget(buildModalWithProvider());
         await tester.pumpAndSettle();
@@ -458,8 +471,9 @@ void main() {
     });
 
     group('Design System Compliance', () {
-      testWidgets('destructive actions use red color',
-          (WidgetTester tester) async {
+      testWidgets('destructive actions use red color', (
+        WidgetTester tester,
+      ) async {
         // Arrange
         await tester.pumpWidget(buildModalWithProvider());
         await tester.pumpAndSettle();
@@ -486,7 +500,9 @@ void main() {
         }
       });
 
-      testWidgets('menu follows Material 3 design', (WidgetTester tester) async {
+      testWidgets('menu follows Material 3 design', (
+        WidgetTester tester,
+      ) async {
         // Arrange
         await tester.pumpWidget(buildModalWithProvider());
         await tester.pumpAndSettle();
@@ -500,8 +516,9 @@ void main() {
         expect(find.byType(BottomSheet), findsOneWidget);
       });
 
-      testWidgets('menu has proper spacing and padding',
-          (WidgetTester tester) async {
+      testWidgets('menu has proper spacing and padding', (
+        WidgetTester tester,
+      ) async {
         // Arrange
         await tester.pumpWidget(buildModalWithProvider());
         await tester.pumpAndSettle();
@@ -525,9 +542,7 @@ void main() {
     group('Responsive Behavior', () {
       testWidgets('shows bottom sheet on mobile', (WidgetTester tester) async {
         // Arrange
-        await tester.pumpWidget(
-          buildModalWithProvider(),
-        );
+        await tester.pumpWidget(buildModalWithProvider());
         await tester.pumpAndSettle();
 
         // Act
@@ -580,8 +595,9 @@ void main() {
         // Error handling would show a snackbar if save fails
       });
 
-      testWidgets('menu does not show for archived spaces',
-          (WidgetTester tester) async {
+      testWidgets('menu does not show for archived spaces', (
+        WidgetTester tester,
+      ) async {
         // Arrange - Archive a space first
         final archivedSpace = testSpaces[2].copyWith(isArchived: true);
         await repository.updateSpace(archivedSpace);

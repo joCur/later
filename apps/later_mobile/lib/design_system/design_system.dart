@@ -5,6 +5,9 @@ library;
 // Design Tokens
 export 'tokens/tokens.dart';
 
+// Theme Extensions
+export '../core/theme/theme_extensions.dart';
+
 // Atomic Components
 export 'atoms/atoms.dart';
 export 'molecules/molecules.dart';

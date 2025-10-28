@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:later_mobile/design_system/tokens/tokens.dart';
+import '../../core/theme/temporal_flow_theme.dart';
 
 // Design Constants (Phase 2 - Mobile-First Bold Redesign)
 const double _kNavBarHeight = 60.0; // Reduced from 64px
@@ -48,9 +49,9 @@ class IconOnlyBottomNav extends StatefulWidget {
     required this.currentIndex,
     required this.onDestinationSelected,
   }) : assert(
-          currentIndex >= 0 && currentIndex < 3,
-          'currentIndex must be between 0 and 2',
-        );
+         currentIndex >= 0 && currentIndex < 3,
+         'currentIndex must be between 0 and 2',
+       );
 
   /// The index of the currently selected destination.
   final int currentIndex;
@@ -110,7 +111,7 @@ class _IconOnlyBottomNavState extends State<IconOnlyBottomNav>
         height: _kNavBarHeight,
         constraints: const BoxConstraints(minHeight: _kNavBarHeight),
         decoration: BoxDecoration(
-          color: isDarkMode ? AppColors.neutral900 : Colors.white,
+          color: AppColors.surface(context),
           border: Border(
             top: BorderSide(
               color: isDarkMode
@@ -183,9 +184,7 @@ class _IconOnlyBottomNavState extends State<IconOnlyBottomNav>
             splashColor: AppColors.ripple(context),
             highlightColor: Colors.transparent,
             child: Semantics(
-              label: isSelected
-                  ? '$semanticLabel (selected)'
-                  : semanticLabel,
+              label: isSelected ? '$semanticLabel (selected)' : semanticLabel,
               selected: isSelected,
               button: true,
               child: SizedBox(
@@ -202,13 +201,13 @@ class _IconOnlyBottomNavState extends State<IconOnlyBottomNav>
                       color: isSelected
                           ? Colors.white
                           : (isDarkMode
-                              ? AppColors.neutral400
-                              : AppColors.neutral600),
+                                ? AppColors.neutral400
+                                : AppColors.neutral600),
                     ),
                     // Spacing
                     const SizedBox(height: 4.0),
                     // Gradient underline (only for active tab)
-                    _buildUnderline(isSelected, isDarkMode),
+                    _buildUnderline(context, isSelected),
                   ],
                 ),
               ),
@@ -219,14 +218,13 @@ class _IconOnlyBottomNavState extends State<IconOnlyBottomNav>
     );
   }
 
-  Widget _buildUnderline(bool isSelected, bool isDarkMode) {
+  Widget _buildUnderline(BuildContext context, bool isSelected) {
     if (!isSelected) {
       // Inactive: no underline, just placeholder spacing
-      return const SizedBox(
-        height: _kUnderlineHeight,
-        width: _kUnderlineWidth,
-      );
+      return const SizedBox(height: _kUnderlineHeight, width: _kUnderlineWidth);
     }
+
+    final temporalTheme = Theme.of(context).extension<TemporalFlowTheme>()!;
 
     // Active: animated gradient underline
     return AnimatedBuilder(
@@ -246,9 +244,7 @@ class _IconOnlyBottomNavState extends State<IconOnlyBottomNav>
             maxWidth: _kUnderlineWidth,
           ),
           decoration: BoxDecoration(
-            gradient: isDarkMode
-                ? AppColors.primaryGradientDark
-                : AppColors.primaryGradient,
+            gradient: temporalTheme.primaryGradient,
             borderRadius: BorderRadius.circular(1.5), // Rounded ends
           ),
           child: Opacity(

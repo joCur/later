@@ -77,11 +77,7 @@ class ErrorHandler {
 
     final context = details.context?.toString();
 
-    ErrorLogger.logError(
-      appError,
-      stackTrace: details.stack,
-      context: context,
-    );
+    ErrorLogger.logError(appError, stackTrace: details.stack, context: context);
 
     // Also report to Flutter's default error handler in debug mode
     FlutterError.presentError(details);
@@ -102,11 +98,8 @@ class ErrorHandler {
   }) {
     showDialog<void>(
       context: context,
-      builder: (context) => ErrorDialog(
-        error: error,
-        title: title,
-        onRetry: onRetry,
-      ),
+      builder: (context) =>
+          ErrorDialog(error: error, title: title, onRetry: onRetry),
     );
   }
 
@@ -151,9 +144,7 @@ class ErrorHandler {
       );
     }
 
-    return AppError.unknown(
-      message: error.toString(),
-    );
+    return AppError.unknown(message: error.toString());
   }
 
   /// Gets the last error that was handled.

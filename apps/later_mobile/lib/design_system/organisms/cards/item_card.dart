@@ -5,6 +5,7 @@ import '../../../data/models/item_model.dart';
 import 'package:later_mobile/design_system/atoms/text/gradient_text.dart';
 import 'package:later_mobile/design_system/atoms/borders/gradient_pill_border.dart';
 import 'package:intl/intl.dart';
+import 'package:later_mobile/core/theme/temporal_flow_theme.dart';
 
 /// Item card component for Notes (dual-model architecture)
 /// Mobile-First Bold Redesign
@@ -81,14 +82,14 @@ class _ItemCardState extends State<ItemCard> with TickerProviderStateMixin {
     );
 
     // Create press scale animation: 1.0 -> 0.98 (scale down on press)
-    _pressScaleAnimation = Tween<double>(
-      begin: 1.0,
-      end: AppAnimations.itemPressScale,
-    ).animate(CurvedAnimation(
-      parent: _pressAnimationController,
-      curve: Curves.easeOut,
-      reverseCurve: Curves.easeOutBack,
-    ));
+    _pressScaleAnimation =
+        Tween<double>(begin: 1.0, end: AppAnimations.itemPressScale).animate(
+          CurvedAnimation(
+            parent: _pressAnimationController,
+            curve: Curves.easeOut,
+            reverseCurve: Curves.easeOutBack,
+          ),
+        );
   }
 
   @override
@@ -105,10 +106,7 @@ class _ItemCardState extends State<ItemCard> with TickerProviderStateMixin {
 
   /// Get background color with subtle gradient tint (5% opacity)
   Color _getBackgroundTint(bool isDark) {
-    return AppColors.typeLightBg(
-      'note',
-      isDark: isDark,
-    );
+    return AppColors.typeLightBg('note', isDark: isDark);
   }
 
   /// Get leading icon for notes
@@ -139,12 +137,11 @@ class _ItemCardState extends State<ItemCard> with TickerProviderStateMixin {
 
   /// Build title with proper styling
   Widget _buildTitle(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Text(
       widget.item.title,
       style: AppTypography.itemTitle.copyWith(
-        color: isDark ? AppColors.neutral400 : AppColors.neutral600,
+        color: AppColors.text(context),
       ),
       maxLines: AppTypography.itemTitleMaxLines,
       overflow: TextOverflow.ellipsis,
@@ -157,14 +154,14 @@ class _ItemCardState extends State<ItemCard> with TickerProviderStateMixin {
       return null;
     }
 
-    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Text(
       widget.item.content!,
       style: AppTypography.itemContent.copyWith(
-        color: isDark ? AppColors.neutral500 : AppColors.neutral500,
+        color: AppColors.textSecondary(context),
       ),
-      maxLines: 2, // Fixed 2 lines for consistent card height (mobile-first design)
+      maxLines:
+          2, // Fixed 2 lines for consistent card height (mobile-first design)
       overflow: TextOverflow.ellipsis,
     );
   }
@@ -173,19 +170,17 @@ class _ItemCardState extends State<ItemCard> with TickerProviderStateMixin {
   Widget? _buildMetadata(BuildContext context) {
     if (!widget.showMetadata) return null;
 
+    final temporalTheme = Theme.of(context).extension<TemporalFlowTheme>()!;
     final dateFormat = DateFormat('MMM d, y');
 
     return Row(
       children: [
         // Icon with gradient tint for created dates
         ShaderMask(
-          shaderCallback: (bounds) => AppColors.primaryGradientAdaptive(context).createShader(bounds),
+          shaderCallback: (bounds) =>
+              temporalTheme.primaryGradient.createShader(bounds),
           blendMode: BlendMode.srcIn,
-          child: const Icon(
-            Icons.access_time,
-            size: 12,
-            color: Colors.white,
-          ),
+          child: const Icon(Icons.access_time, size: 12, color: Colors.white),
         ),
         const SizedBox(width: AppSpacing.xxs),
         // Created date with subtle primary gradient
@@ -230,23 +225,20 @@ class _ItemCardState extends State<ItemCard> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final temporalTheme = theme.extension<TemporalFlowTheme>()!;
     final isDark = theme.brightness == Brightness.dark;
 
     // Base background color with subtle gradient tint (5% opacity)
-    final baseBgColor = isDark ? AppColors.neutral900 : Colors.white;
+    final baseBgColor = AppColors.surface(context);
     final tintColor = _getBackgroundTint(isDark);
 
     // Background color based on state with glass morphism for hover/selected
     Color backgroundColor;
     if (widget.isSelected) {
       // Glass morphism overlay (3% opacity) for selected state
-      backgroundColor = isDark
-          ? AppColors.glass(context).withValues(alpha: 0.03)
-          : AppColors.glass(context).withValues(alpha: 0.03);
+      backgroundColor = temporalTheme.glassBackground.withValues(alpha: 0.03);
     } else if (_isPressed) {
-      backgroundColor = isDark
-          ? AppColors.neutral800
-          : AppColors.neutral100;
+      backgroundColor = AppColors.surfaceVariant(context);
     } else {
       // Blend base color with subtle type-specific tint
       backgroundColor = Color.alphaBlend(
@@ -283,61 +275,69 @@ class _ItemCardState extends State<ItemCard> with TickerProviderStateMixin {
             child: Opacity(
               opacity: opacity,
               child: Container(
-              margin: const EdgeInsets.only(bottom: AppSpacing.cardSpacing), // 16px spacing
-              // Wrap entire card with gradient pill border (6px width, 20px radius)
-              child: GradientPillBorder(
-                gradient: _getBorderGradient(),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: backgroundColor,
-                    borderRadius: BorderRadius.circular(AppSpacing.cardRadius - AppSpacing.cardBorderWidth), // Inner radius reduced by border width to maintain consistent corner appearance
-                    // Mobile-optimized shadow: 4px offset, 8px blur, 12% opacity
-                    boxShadow: _isPressed
-                        ? null
-                        : [
-                            BoxShadow(
-                              color: (isDark ? AppColors.shadowDark : AppColors.shadowLight)
-                                  .withValues(alpha: 0.12),
-                              blurRadius: 8,
-                              offset: const Offset(0, 4),
-                            ),
-                          ],
-                  ),
-                  // Clip the content to follow the border radius
-                  clipBehavior: Clip.antiAlias,
-                  // Main content with 20px padding (mobile-first comfortable touch zones)
-                  padding: const EdgeInsets.all(AppSpacing.cardPaddingMobile), // 20px
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Leading element (checkbox or icon)
-                      _buildLeadingElement(),
-                      const SizedBox(width: AppSpacing.xs), // 8px
-
-                      // Content
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            // Title (18px bold, max 2 lines)
-                            _buildTitle(context),
-
-                            // Content preview (15px, 2 lines)
-                            if (_buildContentPreview(context) != null) ...[
-                              const SizedBox(height: AppSpacing.xxs), // 4px
-                              _buildContentPreview(context)!,
+                margin: const EdgeInsets.only(
+                  bottom: AppSpacing.cardSpacing,
+                ), // 16px spacing
+                // Wrap entire card with gradient pill border (6px width, 20px radius)
+                child: GradientPillBorder(
+                  gradient: _getBorderGradient(),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: backgroundColor,
+                      borderRadius: BorderRadius.circular(
+                        AppSpacing.cardRadius - AppSpacing.cardBorderWidth,
+                      ), // Inner radius reduced by border width to maintain consistent corner appearance
+                      // Mobile-optimized shadow: 4px offset, 8px blur, 12% opacity
+                      boxShadow: _isPressed
+                          ? null
+                          : [
+                              BoxShadow(
+                                color: Theme.of(context)
+                                    .extension<TemporalFlowTheme>()!
+                                    .shadowColor
+                                    .withValues(alpha: 0.12),
+                                blurRadius: 8,
+                                offset: const Offset(0, 4),
+                              ),
                             ],
+                    ),
+                    // Clip the content to follow the border radius
+                    clipBehavior: Clip.antiAlias,
+                    // Main content with 20px padding (mobile-first comfortable touch zones)
+                    padding: const EdgeInsets.all(
+                      AppSpacing.cardPaddingMobile,
+                    ), // 20px
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Leading element (checkbox or icon)
+                        _buildLeadingElement(),
+                        const SizedBox(width: AppSpacing.xs), // 8px
+                        // Content
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              // Title (18px bold, max 2 lines)
+                              _buildTitle(context),
 
-                            // Metadata (gradient text)
-                            if (_buildMetadata(context) != null) ...[
-                              const SizedBox(height: AppSpacing.xs), // 8px
-                              _buildMetadata(context)!,
+                              // Content preview (15px, 2 lines)
+                              if (_buildContentPreview(context) != null) ...[
+                                const SizedBox(height: AppSpacing.xxs), // 4px
+                                _buildContentPreview(context)!,
+                              ],
+
+                              // Metadata (gradient text)
+                              if (_buildMetadata(context) != null) ...[
+                                const SizedBox(height: AppSpacing.xs), // 8px
+                                _buildMetadata(context)!,
+                              ],
                             ],
-                          ],
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -345,30 +345,37 @@ class _ItemCardState extends State<ItemCard> with TickerProviderStateMixin {
           ),
         ),
       ),
-      ),
     );
 
     // Apply entrance animation if index is provided (Phase 5 optimized)
     if (widget.index != null) {
       final delay = AppAnimations.itemEntranceStagger * widget.index!;
-      final duration = AppAnimations.getDuration(context, AppAnimations.itemEntrance);
+      final duration = AppAnimations.getDuration(
+        context,
+        AppAnimations.itemEntrance,
+      );
 
       return cardWidget
           .animate()
           .fadeIn(
             duration: duration,
             delay: delay,
-            curve: Curves.easeOut, // Phase 5: Use easeOut instead of springCurve for entrance
+            curve: Curves
+                .easeOut, // Phase 5: Use easeOut instead of springCurve for entrance
           )
           .slideY(
-            begin: AppAnimations.itemEntranceSlideDistance, // Phase 5: Use 8px distance instead of percentage
+            begin: AppAnimations
+                .itemEntranceSlideDistance, // Phase 5: Use 8px distance instead of percentage
             end: 0,
             duration: duration,
             delay: delay,
             curve: Curves.easeOut,
           )
           .scale(
-            begin: const Offset(AppAnimations.itemEntranceScale, AppAnimations.itemEntranceScale),
+            begin: const Offset(
+              AppAnimations.itemEntranceScale,
+              AppAnimations.itemEntranceScale,
+            ),
             end: const Offset(1.0, 1.0),
             duration: duration,
             delay: delay,

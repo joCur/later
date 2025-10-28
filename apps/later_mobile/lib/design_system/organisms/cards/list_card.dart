@@ -3,6 +3,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:later_mobile/design_system/tokens/tokens.dart';
 import '../../../data/models/list_model.dart';
 import 'package:later_mobile/design_system/atoms/borders/gradient_pill_border.dart';
+import 'package:later_mobile/core/theme/temporal_flow_theme.dart';
 
 /// List card component for displaying lists with item previews
 /// Mobile-First Bold Redesign
@@ -66,14 +67,14 @@ class _ListCardState extends State<ListCard> with TickerProviderStateMixin {
     );
 
     // Create press scale animation: 1.0 -> 0.98 (scale down on press)
-    _pressScaleAnimation = Tween<double>(
-      begin: 1.0,
-      end: AppAnimations.itemPressScale,
-    ).animate(CurvedAnimation(
-      parent: _pressAnimationController,
-      curve: Curves.easeOut,
-      reverseCurve: Curves.easeOutBack,
-    ));
+    _pressScaleAnimation =
+        Tween<double>(begin: 1.0, end: AppAnimations.itemPressScale).animate(
+          CurvedAnimation(
+            parent: _pressAnimationController,
+            curve: Curves.easeOut,
+            reverseCurve: Curves.easeOutBack,
+          ),
+        );
   }
 
   @override
@@ -117,10 +118,7 @@ class _ListCardState extends State<ListCard> with TickerProviderStateMixin {
         width: 48,
         height: 48,
         child: Center(
-          child: Text(
-            iconString,
-            style: const TextStyle(fontSize: 20),
-          ),
+          child: Text(iconString, style: const TextStyle(fontSize: 20)),
         ),
       );
     } else {
@@ -147,12 +145,11 @@ class _ListCardState extends State<ListCard> with TickerProviderStateMixin {
 
   /// Build title with proper styling
   Widget _buildTitle(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Text(
       widget.list.name,
       style: AppTypography.itemTitle.copyWith(
-        color: isDark ? AppColors.neutral400 : AppColors.neutral600,
+        color: AppColors.text(context),
       ),
       maxLines: AppTypography.itemTitleMaxLines,
       overflow: TextOverflow.ellipsis,
@@ -164,14 +161,13 @@ class _ListCardState extends State<ListCard> with TickerProviderStateMixin {
   /// Returns "1 item" for single item, "N items" for multiple items
   /// Examples: "1 item", "5 items", "0 items"
   Widget _buildItemCount(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     final count = widget.list.totalItems;
     final text = count == 1 ? '1 item' : '$count items';
 
     return Text(
       text,
       style: AppTypography.metadata.copyWith(
-        color: isDark ? AppColors.neutral500 : AppColors.neutral500,
+        color: AppColors.textSecondary(context),
       ),
     );
   }
@@ -182,13 +178,12 @@ class _ListCardState extends State<ListCard> with TickerProviderStateMixin {
   /// Adds "..." if more than 3 items exist
   /// Shows "No items" when list is empty
   Widget _buildItemPreview(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     final preview = _getItemPreview();
 
     return Text(
       preview,
       style: AppTypography.itemContent.copyWith(
-        color: isDark ? AppColors.neutral500 : AppColors.neutral500,
+        color: AppColors.textSecondary(context),
       ),
       maxLines: 2,
       overflow: TextOverflow.ellipsis,
@@ -207,7 +202,10 @@ class _ListCardState extends State<ListCard> with TickerProviderStateMixin {
       return 'No items';
     }
 
-    final firstThree = widget.list.items.take(3).map((item) => item.title).toList();
+    final firstThree = widget.list.items
+        .take(3)
+        .map((item) => item.title)
+        .toList();
     final preview = firstThree.join(', ');
 
     // Add ellipsis if there are more than 3 items
@@ -254,15 +252,13 @@ class _ListCardState extends State<ListCard> with TickerProviderStateMixin {
     final isDark = theme.brightness == Brightness.dark;
 
     // Base background color with subtle gradient tint (5% opacity)
-    final baseBgColor = isDark ? AppColors.neutral900 : Colors.white;
+    final baseBgColor = AppColors.surface(context);
     final tintColor = _getBackgroundTint(isDark);
 
     // Background color based on state
     Color backgroundColor;
     if (_isPressed) {
-      backgroundColor = isDark
-          ? AppColors.neutral800
-          : AppColors.neutral100;
+      backgroundColor = AppColors.surfaceVariant(context);
     } else {
       // Blend base color with subtle type-specific tint
       backgroundColor = Color.alphaBlend(
@@ -272,7 +268,8 @@ class _ListCardState extends State<ListCard> with TickerProviderStateMixin {
     }
 
     // Build the semantic label
-    final semanticLabel = 'List: ${widget.list.name}, '
+    final semanticLabel =
+        'List: ${widget.list.name}, '
         '${widget.list.totalItems} ${widget.list.totalItems == 1 ? 'item' : 'items'}';
 
     // Build the card widget with mobile-first bold design
@@ -298,20 +295,26 @@ class _ListCardState extends State<ListCard> with TickerProviderStateMixin {
             onTap: _handleTap,
             onLongPress: _handleLongPress,
             child: Container(
-              margin: const EdgeInsets.only(bottom: AppSpacing.cardSpacing), // 16px spacing
+              margin: const EdgeInsets.only(
+                bottom: AppSpacing.cardSpacing,
+              ), // 16px spacing
               // Wrap entire card with gradient pill border (6px width, 20px radius)
               child: GradientPillBorder(
                 gradient: _getBorderGradient(),
                 child: Container(
                   decoration: BoxDecoration(
                     color: backgroundColor,
-                    borderRadius: BorderRadius.circular(AppSpacing.cardRadius - AppSpacing.cardBorderWidth), // Inner radius reduced by border width
+                    borderRadius: BorderRadius.circular(
+                      AppSpacing.cardRadius - AppSpacing.cardBorderWidth,
+                    ), // Inner radius reduced by border width
                     // Mobile-optimized shadow: 4px offset, 8px blur, 12% opacity
                     boxShadow: _isPressed
                         ? null
                         : [
                             BoxShadow(
-                              color: (isDark ? AppColors.shadowDark : AppColors.shadowLight)
+                              color: Theme.of(context)
+                                  .extension<TemporalFlowTheme>()!
+                                  .shadowColor
                                   .withValues(alpha: 0.12),
                               blurRadius: 8,
                               offset: const Offset(0, 4),
@@ -321,14 +324,15 @@ class _ListCardState extends State<ListCard> with TickerProviderStateMixin {
                   // Clip the content to follow the border radius
                   clipBehavior: Clip.antiAlias,
                   // Main content with 20px padding (mobile-first comfortable touch zones)
-                  padding: const EdgeInsets.all(AppSpacing.cardPaddingMobile), // 20px
+                  padding: const EdgeInsets.all(
+                    AppSpacing.cardPaddingMobile,
+                  ), // 20px
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       // Leading icon
                       _buildLeadingIcon(),
                       const SizedBox(width: AppSpacing.xs), // 8px
-
                       // Content
                       Expanded(
                         child: Column(
@@ -361,24 +365,32 @@ class _ListCardState extends State<ListCard> with TickerProviderStateMixin {
     // Apply entrance animation if index is provided (Phase 5 optimized)
     if (widget.index != null) {
       final delay = AppAnimations.itemEntranceStagger * widget.index!;
-      final duration = AppAnimations.getDuration(context, AppAnimations.itemEntrance);
+      final duration = AppAnimations.getDuration(
+        context,
+        AppAnimations.itemEntrance,
+      );
 
       return cardWidget
           .animate()
           .fadeIn(
             duration: duration,
             delay: delay,
-            curve: Curves.easeOut, // Phase 5: Use easeOut instead of springCurve for entrance
+            curve: Curves
+                .easeOut, // Phase 5: Use easeOut instead of springCurve for entrance
           )
           .slideY(
-            begin: AppAnimations.itemEntranceSlideDistance, // Phase 5: Use 8px distance instead of percentage
+            begin: AppAnimations
+                .itemEntranceSlideDistance, // Phase 5: Use 8px distance instead of percentage
             end: 0,
             duration: duration,
             delay: delay,
             curve: Curves.easeOut,
           )
           .scale(
-            begin: const Offset(AppAnimations.itemEntranceScale, AppAnimations.itemEntranceScale),
+            begin: const Offset(
+              AppAnimations.itemEntranceScale,
+              AppAnimations.itemEntranceScale,
+            ),
             end: const Offset(1.0, 1.0),
             duration: duration,
             delay: delay,

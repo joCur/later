@@ -22,9 +22,7 @@ void main() {
         theme: AppTheme.lightTheme,
         darkTheme: AppTheme.darkTheme,
         themeMode: themeProvider.themeMode,
-        home: const Scaffold(
-          body: ThemeToggleButton(),
-        ),
+        home: const Scaffold(body: ThemeToggleButton()),
       ),
     );
   }
@@ -54,14 +52,18 @@ void main() {
       expect(iconButton.tooltip, contains('Switch to'));
     });
 
-    testWidgets('should use AnimatedSwitcher for icon transitions', (tester) async {
+    testWidgets('should use AnimatedSwitcher for icon transitions', (
+      tester,
+    ) async {
       final themeProvider = ThemeProvider();
       await tester.pumpWidget(createTestWidget(themeProvider));
 
       expect(find.byType(AnimatedSwitcher), findsOneWidget);
     });
 
-    testWidgets('AnimatedSwitcher should use correct animation duration', (tester) async {
+    testWidgets('AnimatedSwitcher should use correct animation duration', (
+      tester,
+    ) async {
       final themeProvider = ThemeProvider();
       await tester.pumpWidget(createTestWidget(themeProvider));
 
@@ -102,7 +104,9 @@ void main() {
       expect(find.byType(Consumer<ThemeProvider>), findsOneWidget);
     });
 
-    testWidgets('AnimatedSwitcher should have transition builder', (tester) async {
+    testWidgets('AnimatedSwitcher should have transition builder', (
+      tester,
+    ) async {
       final themeProvider = ThemeProvider();
       await tester.pumpWidget(createTestWidget(themeProvider));
 
@@ -130,10 +134,7 @@ void main() {
       // Tooltip should mention switching (to either light or dark)
       expect(
         iconButton.tooltip,
-        anyOf(
-          equals('Switch to light mode'),
-          equals('Switch to dark mode'),
-        ),
+        anyOf(equals('Switch to light mode'), equals('Switch to dark mode')),
       );
     });
 

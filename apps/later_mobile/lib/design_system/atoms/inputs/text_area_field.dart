@@ -207,8 +207,9 @@ class _TextAreaFieldState extends State<TextAreaField> {
         : Colors.white.withValues(alpha: 0.03);
 
     // Standard border color (when not focused)
-    final standardBorderColor =
-        isDark ? AppColors.neutral700 : AppColors.neutral200;
+    final standardBorderColor = isDark
+        ? AppColors.neutral700
+        : AppColors.neutral200;
 
     // Focus shadow
     List<BoxShadow>? boxShadow;
@@ -242,12 +243,8 @@ class _TextAreaFieldState extends State<TextAreaField> {
               widget.label!,
               style: AppTypography.labelMedium.copyWith(
                 color: widget.enabled
-                    ? (isDark
-                        ? AppColors.neutral400
-                        : AppColors.neutral600)
-                    : (isDark
-                        ? AppColors.neutral600
-                        : AppColors.neutral400),
+                    ? (AppColors.text(context))
+                    : (AppColors.textDisabled(context)),
               ),
             ),
           ),
@@ -269,9 +266,7 @@ class _TextAreaFieldState extends State<TextAreaField> {
               color: backgroundColor,
               borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
               border: borderGradient == null
-                  ? Border.all(
-                      color: standardBorderColor,
-                    )
+                  ? Border.all(color: standardBorderColor)
                   : null,
             ),
             // Add padding to create border effect when gradient is used
@@ -302,18 +297,12 @@ class _TextAreaFieldState extends State<TextAreaField> {
                 textCapitalization: widget.textCapitalization,
                 style: AppTypography.input.copyWith(
                   color: widget.enabled
-                      ? (isDark
-                          ? AppColors.neutral400
-                          : AppColors.neutral600)
-                      : (isDark
-                          ? AppColors.neutral600
-                          : AppColors.neutral400),
+                      ? (AppColors.text(context))
+                      : (AppColors.textDisabled(context)),
                 ),
                 decoration: InputDecoration(
                   hintText: widget.hintText,
-                  hintStyle: AppTypography.input.copyWith(
-                    color: hintColor,
-                  ),
+                  hintStyle: AppTypography.input.copyWith(color: hintColor),
                   border: InputBorder.none,
                   // Updated padding: 12px horizontal, 16px vertical for multi-line
                   contentPadding: const EdgeInsets.symmetric(
@@ -350,8 +339,7 @@ class _TextAreaFieldState extends State<TextAreaField> {
                   ),
 
                 // Character counter
-                if (widget.maxLength != null)
-                  _buildCharacterCounter(isDark),
+                if (widget.maxLength != null) _buildCharacterCounter(isDark),
               ],
             ),
           ),
@@ -397,9 +385,7 @@ class _TextAreaFieldState extends State<TextAreaField> {
     return Text(
       counterText,
       style: AppTypography.labelSmall.copyWith(
-        color: isDark
-            ? AppColors.neutral500
-            : AppColors.neutral500,
+        color: AppColors.textSecondary(context),
       ),
     );
   }

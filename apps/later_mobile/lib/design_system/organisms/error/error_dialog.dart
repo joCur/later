@@ -27,12 +27,7 @@ class ErrorDialog extends StatelessWidget {
   ///   - [error]: The AppError to display
   ///   - [title]: Optional custom title (defaults to "Something Went Wrong")
   ///   - [onRetry]: Optional callback when retry button is tapped
-  const ErrorDialog({
-    super.key,
-    required this.error,
-    this.title,
-    this.onRetry,
-  });
+  const ErrorDialog({super.key, required this.error, this.title, this.onRetry});
 
   /// The error to display.
   final AppError error;
@@ -46,9 +41,7 @@ class ErrorDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Dialog(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 360),
         child: Padding(
@@ -78,7 +71,9 @@ class ErrorDialog extends StatelessWidget {
               Text(
                 error.getUserMessage(),
                 style: AppTypography.bodyLarge.copyWith(
-                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.8),
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withValues(alpha: 0.8),
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -89,7 +84,9 @@ class ErrorDialog extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.surfaceContainerHighest,
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Column(

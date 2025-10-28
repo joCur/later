@@ -36,44 +36,44 @@ class MockContentProvider extends _i1.Mock implements _i2.ContentProvider {
   }
 
   @override
-  List<_i3.TodoList> get todoLists => (super.noSuchMethod(
-        Invocation.getter(#todoLists),
-        returnValue: <_i3.TodoList>[],
-      ) as List<_i3.TodoList>);
+  List<_i3.TodoList> get todoLists =>
+      (super.noSuchMethod(
+            Invocation.getter(#todoLists),
+            returnValue: <_i3.TodoList>[],
+          )
+          as List<_i3.TodoList>);
 
   @override
-  List<_i4.ListModel> get lists => (super.noSuchMethod(
-        Invocation.getter(#lists),
-        returnValue: <_i4.ListModel>[],
-      ) as List<_i4.ListModel>);
+  List<_i4.ListModel> get lists =>
+      (super.noSuchMethod(
+            Invocation.getter(#lists),
+            returnValue: <_i4.ListModel>[],
+          )
+          as List<_i4.ListModel>);
 
   @override
-  List<_i5.Item> get notes => (super.noSuchMethod(
-        Invocation.getter(#notes),
-        returnValue: <_i5.Item>[],
-      ) as List<_i5.Item>);
+  List<_i5.Item> get notes =>
+      (super.noSuchMethod(Invocation.getter(#notes), returnValue: <_i5.Item>[])
+          as List<_i5.Item>);
 
   @override
-  bool get isLoading => (super.noSuchMethod(
-        Invocation.getter(#isLoading),
-        returnValue: false,
-      ) as bool);
+  bool get isLoading =>
+      (super.noSuchMethod(Invocation.getter(#isLoading), returnValue: false)
+          as bool);
 
   @override
-  bool get hasListeners => (super.noSuchMethod(
-        Invocation.getter(#hasListeners),
-        returnValue: false,
-      ) as bool);
+  bool get hasListeners =>
+      (super.noSuchMethod(Invocation.getter(#hasListeners), returnValue: false)
+          as bool);
 
   @override
-  _i6.Future<void> loadSpaceContent(String? spaceId) => (super.noSuchMethod(
-        Invocation.method(
-          #loadSpaceContent,
-          [spaceId],
-        ),
-        returnValue: _i6.Future<void>.value(),
-        returnValueForMissingStub: _i6.Future<void>.value(),
-      ) as _i6.Future<void>);
+  _i6.Future<void> loadSpaceContent(String? spaceId) =>
+      (super.noSuchMethod(
+            Invocation.method(#loadSpaceContent, [spaceId]),
+            returnValue: _i6.Future<void>.value(),
+            returnValueForMissingStub: _i6.Future<void>.value(),
+          )
+          as _i6.Future<void>);
 
   @override
   _i6.Future<void> createTodoList(
@@ -81,27 +81,20 @@ class MockContentProvider extends _i1.Mock implements _i2.ContentProvider {
     _i7.SpacesProvider? spacesProvider,
   ) =>
       (super.noSuchMethod(
-        Invocation.method(
-          #createTodoList,
-          [
-            todoList,
-            spacesProvider,
-          ],
-        ),
-        returnValue: _i6.Future<void>.value(),
-        returnValueForMissingStub: _i6.Future<void>.value(),
-      ) as _i6.Future<void>);
+            Invocation.method(#createTodoList, [todoList, spacesProvider]),
+            returnValue: _i6.Future<void>.value(),
+            returnValueForMissingStub: _i6.Future<void>.value(),
+          )
+          as _i6.Future<void>);
 
   @override
   _i6.Future<void> updateTodoList(_i3.TodoList? todoList) =>
       (super.noSuchMethod(
-        Invocation.method(
-          #updateTodoList,
-          [todoList],
-        ),
-        returnValue: _i6.Future<void>.value(),
-        returnValueForMissingStub: _i6.Future<void>.value(),
-      ) as _i6.Future<void>);
+            Invocation.method(#updateTodoList, [todoList]),
+            returnValue: _i6.Future<void>.value(),
+            returnValueForMissingStub: _i6.Future<void>.value(),
+          )
+          as _i6.Future<void>);
 
   @override
   _i6.Future<void> deleteTodoList(
@@ -109,33 +102,20 @@ class MockContentProvider extends _i1.Mock implements _i2.ContentProvider {
     _i7.SpacesProvider? spacesProvider,
   ) =>
       (super.noSuchMethod(
-        Invocation.method(
-          #deleteTodoList,
-          [
-            id,
-            spacesProvider,
-          ],
-        ),
-        returnValue: _i6.Future<void>.value(),
-        returnValueForMissingStub: _i6.Future<void>.value(),
-      ) as _i6.Future<void>);
+            Invocation.method(#deleteTodoList, [id, spacesProvider]),
+            returnValue: _i6.Future<void>.value(),
+            returnValueForMissingStub: _i6.Future<void>.value(),
+          )
+          as _i6.Future<void>);
 
   @override
-  _i6.Future<void> addTodoItem(
-    String? listId,
-    _i3.TodoItem? item,
-  ) =>
+  _i6.Future<void> addTodoItem(String? listId, _i3.TodoItem? item) =>
       (super.noSuchMethod(
-        Invocation.method(
-          #addTodoItem,
-          [
-            listId,
-            item,
-          ],
-        ),
-        returnValue: _i6.Future<void>.value(),
-        returnValueForMissingStub: _i6.Future<void>.value(),
-      ) as _i6.Future<void>);
+            Invocation.method(#addTodoItem, [listId, item]),
+            returnValue: _i6.Future<void>.value(),
+            returnValueForMissingStub: _i6.Future<void>.value(),
+          )
+          as _i6.Future<void>);
 
   @override
   _i6.Future<void> updateTodoItem(
@@ -144,51 +124,29 @@ class MockContentProvider extends _i1.Mock implements _i2.ContentProvider {
     _i3.TodoItem? item,
   ) =>
       (super.noSuchMethod(
-        Invocation.method(
-          #updateTodoItem,
-          [
-            listId,
-            itemId,
-            item,
-          ],
-        ),
-        returnValue: _i6.Future<void>.value(),
-        returnValueForMissingStub: _i6.Future<void>.value(),
-      ) as _i6.Future<void>);
+            Invocation.method(#updateTodoItem, [listId, itemId, item]),
+            returnValue: _i6.Future<void>.value(),
+            returnValueForMissingStub: _i6.Future<void>.value(),
+          )
+          as _i6.Future<void>);
 
   @override
-  _i6.Future<void> deleteTodoItem(
-    String? listId,
-    String? itemId,
-  ) =>
+  _i6.Future<void> deleteTodoItem(String? listId, String? itemId) =>
       (super.noSuchMethod(
-        Invocation.method(
-          #deleteTodoItem,
-          [
-            listId,
-            itemId,
-          ],
-        ),
-        returnValue: _i6.Future<void>.value(),
-        returnValueForMissingStub: _i6.Future<void>.value(),
-      ) as _i6.Future<void>);
+            Invocation.method(#deleteTodoItem, [listId, itemId]),
+            returnValue: _i6.Future<void>.value(),
+            returnValueForMissingStub: _i6.Future<void>.value(),
+          )
+          as _i6.Future<void>);
 
   @override
-  _i6.Future<void> toggleTodoItem(
-    String? listId,
-    String? itemId,
-  ) =>
+  _i6.Future<void> toggleTodoItem(String? listId, String? itemId) =>
       (super.noSuchMethod(
-        Invocation.method(
-          #toggleTodoItem,
-          [
-            listId,
-            itemId,
-          ],
-        ),
-        returnValue: _i6.Future<void>.value(),
-        returnValueForMissingStub: _i6.Future<void>.value(),
-      ) as _i6.Future<void>);
+            Invocation.method(#toggleTodoItem, [listId, itemId]),
+            returnValue: _i6.Future<void>.value(),
+            returnValueForMissingStub: _i6.Future<void>.value(),
+          )
+          as _i6.Future<void>);
 
   @override
   _i6.Future<void> reorderTodoItems(
@@ -197,17 +155,11 @@ class MockContentProvider extends _i1.Mock implements _i2.ContentProvider {
     int? newIndex,
   ) =>
       (super.noSuchMethod(
-        Invocation.method(
-          #reorderTodoItems,
-          [
-            listId,
-            oldIndex,
-            newIndex,
-          ],
-        ),
-        returnValue: _i6.Future<void>.value(),
-        returnValueForMissingStub: _i6.Future<void>.value(),
-      ) as _i6.Future<void>);
+            Invocation.method(#reorderTodoItems, [listId, oldIndex, newIndex]),
+            returnValue: _i6.Future<void>.value(),
+            returnValueForMissingStub: _i6.Future<void>.value(),
+          )
+          as _i6.Future<void>);
 
   @override
   _i6.Future<void> createList(
@@ -215,60 +167,38 @@ class MockContentProvider extends _i1.Mock implements _i2.ContentProvider {
     _i7.SpacesProvider? spacesProvider,
   ) =>
       (super.noSuchMethod(
-        Invocation.method(
-          #createList,
-          [
-            list,
-            spacesProvider,
-          ],
-        ),
-        returnValue: _i6.Future<void>.value(),
-        returnValueForMissingStub: _i6.Future<void>.value(),
-      ) as _i6.Future<void>);
+            Invocation.method(#createList, [list, spacesProvider]),
+            returnValue: _i6.Future<void>.value(),
+            returnValueForMissingStub: _i6.Future<void>.value(),
+          )
+          as _i6.Future<void>);
 
   @override
-  _i6.Future<void> updateList(_i4.ListModel? list) => (super.noSuchMethod(
-        Invocation.method(
-          #updateList,
-          [list],
-        ),
-        returnValue: _i6.Future<void>.value(),
-        returnValueForMissingStub: _i6.Future<void>.value(),
-      ) as _i6.Future<void>);
-
-  @override
-  _i6.Future<void> deleteList(
-    String? id,
-    _i7.SpacesProvider? spacesProvider,
-  ) =>
+  _i6.Future<void> updateList(_i4.ListModel? list) =>
       (super.noSuchMethod(
-        Invocation.method(
-          #deleteList,
-          [
-            id,
-            spacesProvider,
-          ],
-        ),
-        returnValue: _i6.Future<void>.value(),
-        returnValueForMissingStub: _i6.Future<void>.value(),
-      ) as _i6.Future<void>);
+            Invocation.method(#updateList, [list]),
+            returnValue: _i6.Future<void>.value(),
+            returnValueForMissingStub: _i6.Future<void>.value(),
+          )
+          as _i6.Future<void>);
 
   @override
-  _i6.Future<void> addListItem(
-    String? listId,
-    _i4.ListItem? item,
-  ) =>
+  _i6.Future<void> deleteList(String? id, _i7.SpacesProvider? spacesProvider) =>
       (super.noSuchMethod(
-        Invocation.method(
-          #addListItem,
-          [
-            listId,
-            item,
-          ],
-        ),
-        returnValue: _i6.Future<void>.value(),
-        returnValueForMissingStub: _i6.Future<void>.value(),
-      ) as _i6.Future<void>);
+            Invocation.method(#deleteList, [id, spacesProvider]),
+            returnValue: _i6.Future<void>.value(),
+            returnValueForMissingStub: _i6.Future<void>.value(),
+          )
+          as _i6.Future<void>);
+
+  @override
+  _i6.Future<void> addListItem(String? listId, _i4.ListItem? item) =>
+      (super.noSuchMethod(
+            Invocation.method(#addListItem, [listId, item]),
+            returnValue: _i6.Future<void>.value(),
+            returnValueForMissingStub: _i6.Future<void>.value(),
+          )
+          as _i6.Future<void>);
 
   @override
   _i6.Future<void> updateListItem(
@@ -277,51 +207,29 @@ class MockContentProvider extends _i1.Mock implements _i2.ContentProvider {
     _i4.ListItem? item,
   ) =>
       (super.noSuchMethod(
-        Invocation.method(
-          #updateListItem,
-          [
-            listId,
-            itemId,
-            item,
-          ],
-        ),
-        returnValue: _i6.Future<void>.value(),
-        returnValueForMissingStub: _i6.Future<void>.value(),
-      ) as _i6.Future<void>);
+            Invocation.method(#updateListItem, [listId, itemId, item]),
+            returnValue: _i6.Future<void>.value(),
+            returnValueForMissingStub: _i6.Future<void>.value(),
+          )
+          as _i6.Future<void>);
 
   @override
-  _i6.Future<void> deleteListItem(
-    String? listId,
-    String? itemId,
-  ) =>
+  _i6.Future<void> deleteListItem(String? listId, String? itemId) =>
       (super.noSuchMethod(
-        Invocation.method(
-          #deleteListItem,
-          [
-            listId,
-            itemId,
-          ],
-        ),
-        returnValue: _i6.Future<void>.value(),
-        returnValueForMissingStub: _i6.Future<void>.value(),
-      ) as _i6.Future<void>);
+            Invocation.method(#deleteListItem, [listId, itemId]),
+            returnValue: _i6.Future<void>.value(),
+            returnValueForMissingStub: _i6.Future<void>.value(),
+          )
+          as _i6.Future<void>);
 
   @override
-  _i6.Future<void> toggleListItem(
-    String? listId,
-    String? itemId,
-  ) =>
+  _i6.Future<void> toggleListItem(String? listId, String? itemId) =>
       (super.noSuchMethod(
-        Invocation.method(
-          #toggleListItem,
-          [
-            listId,
-            itemId,
-          ],
-        ),
-        returnValue: _i6.Future<void>.value(),
-        returnValueForMissingStub: _i6.Future<void>.value(),
-      ) as _i6.Future<void>);
+            Invocation.method(#toggleListItem, [listId, itemId]),
+            returnValue: _i6.Future<void>.value(),
+            returnValueForMissingStub: _i6.Future<void>.value(),
+          )
+          as _i6.Future<void>);
 
   @override
   _i6.Future<void> reorderListItems(
@@ -330,17 +238,11 @@ class MockContentProvider extends _i1.Mock implements _i2.ContentProvider {
     int? newIndex,
   ) =>
       (super.noSuchMethod(
-        Invocation.method(
-          #reorderListItems,
-          [
-            listId,
-            oldIndex,
-            newIndex,
-          ],
-        ),
-        returnValue: _i6.Future<void>.value(),
-        returnValueForMissingStub: _i6.Future<void>.value(),
-      ) as _i6.Future<void>);
+            Invocation.method(#reorderListItems, [listId, oldIndex, newIndex]),
+            returnValue: _i6.Future<void>.value(),
+            returnValueForMissingStub: _i6.Future<void>.value(),
+          )
+          as _i6.Future<void>);
 
   @override
   _i6.Future<void> createNote(
@@ -348,125 +250,88 @@ class MockContentProvider extends _i1.Mock implements _i2.ContentProvider {
     _i7.SpacesProvider? spacesProvider,
   ) =>
       (super.noSuchMethod(
-        Invocation.method(
-          #createNote,
-          [
-            note,
-            spacesProvider,
-          ],
-        ),
-        returnValue: _i6.Future<void>.value(),
-        returnValueForMissingStub: _i6.Future<void>.value(),
-      ) as _i6.Future<void>);
+            Invocation.method(#createNote, [note, spacesProvider]),
+            returnValue: _i6.Future<void>.value(),
+            returnValueForMissingStub: _i6.Future<void>.value(),
+          )
+          as _i6.Future<void>);
 
   @override
-  _i6.Future<void> updateNote(_i5.Item? note) => (super.noSuchMethod(
-        Invocation.method(
-          #updateNote,
-          [note],
-        ),
-        returnValue: _i6.Future<void>.value(),
-        returnValueForMissingStub: _i6.Future<void>.value(),
-      ) as _i6.Future<void>);
-
-  @override
-  _i6.Future<void> deleteNote(
-    String? id,
-    _i7.SpacesProvider? spacesProvider,
-  ) =>
+  _i6.Future<void> updateNote(_i5.Item? note) =>
       (super.noSuchMethod(
-        Invocation.method(
-          #deleteNote,
-          [
-            id,
-            spacesProvider,
-          ],
-        ),
-        returnValue: _i6.Future<void>.value(),
-        returnValueForMissingStub: _i6.Future<void>.value(),
-      ) as _i6.Future<void>);
+            Invocation.method(#updateNote, [note]),
+            returnValue: _i6.Future<void>.value(),
+            returnValueForMissingStub: _i6.Future<void>.value(),
+          )
+          as _i6.Future<void>);
+
+  @override
+  _i6.Future<void> deleteNote(String? id, _i7.SpacesProvider? spacesProvider) =>
+      (super.noSuchMethod(
+            Invocation.method(#deleteNote, [id, spacesProvider]),
+            returnValue: _i6.Future<void>.value(),
+            returnValueForMissingStub: _i6.Future<void>.value(),
+          )
+          as _i6.Future<void>);
 
   @override
   List<dynamic> getFilteredContent(_i2.ContentFilter? filter) =>
       (super.noSuchMethod(
-        Invocation.method(
-          #getFilteredContent,
-          [filter],
-        ),
-        returnValue: <dynamic>[],
-      ) as List<dynamic>);
+            Invocation.method(#getFilteredContent, [filter]),
+            returnValue: <dynamic>[],
+          )
+          as List<dynamic>);
 
   @override
-  int getTotalCount() => (super.noSuchMethod(
-        Invocation.method(
-          #getTotalCount,
-          [],
-        ),
-        returnValue: 0,
-      ) as int);
+  int getTotalCount() =>
+      (super.noSuchMethod(Invocation.method(#getTotalCount, []), returnValue: 0)
+          as int);
 
   @override
-  List<dynamic> search(String? query) => (super.noSuchMethod(
-        Invocation.method(
-          #search,
-          [query],
-        ),
-        returnValue: <dynamic>[],
-      ) as List<dynamic>);
+  List<dynamic> search(String? query) =>
+      (super.noSuchMethod(
+            Invocation.method(#search, [query]),
+            returnValue: <dynamic>[],
+          )
+          as List<dynamic>);
 
   @override
-  List<_i3.TodoList> getTodosWithDueDate(DateTime? date) => (super.noSuchMethod(
-        Invocation.method(
-          #getTodosWithDueDate,
-          [date],
-        ),
-        returnValue: <_i3.TodoList>[],
-      ) as List<_i3.TodoList>);
+  List<_i3.TodoList> getTodosWithDueDate(DateTime? date) =>
+      (super.noSuchMethod(
+            Invocation.method(#getTodosWithDueDate, [date]),
+            returnValue: <_i3.TodoList>[],
+          )
+          as List<_i3.TodoList>);
 
   @override
   void clearError() => super.noSuchMethod(
-        Invocation.method(
-          #clearError,
-          [],
-        ),
-        returnValueForMissingStub: null,
-      );
+    Invocation.method(#clearError, []),
+    returnValueForMissingStub: null,
+  );
 
   @override
   void addListener(_i8.VoidCallback? listener) => super.noSuchMethod(
-        Invocation.method(
-          #addListener,
-          [listener],
-        ),
-        returnValueForMissingStub: null,
-      );
+    Invocation.method(#addListener, [listener]),
+    returnValueForMissingStub: null,
+  );
 
   @override
   void removeListener(_i8.VoidCallback? listener) => super.noSuchMethod(
-        Invocation.method(
-          #removeListener,
-          [listener],
-        ),
-        returnValueForMissingStub: null,
-      );
+    Invocation.method(#removeListener, [listener]),
+    returnValueForMissingStub: null,
+  );
 
   @override
   void dispose() => super.noSuchMethod(
-        Invocation.method(
-          #dispose,
-          [],
-        ),
-        returnValueForMissingStub: null,
-      );
+    Invocation.method(#dispose, []),
+    returnValueForMissingStub: null,
+  );
 
   @override
   void notifyListeners() => super.noSuchMethod(
-        Invocation.method(
-          #notifyListeners,
-          [],
-        ),
-        returnValueForMissingStub: null,
-      );
+    Invocation.method(#notifyListeners, []),
+    returnValueForMissingStub: null,
+  );
 }
 
 /// A class which mocks [SpacesProvider].
@@ -478,139 +343,115 @@ class MockSpacesProvider extends _i1.Mock implements _i7.SpacesProvider {
   }
 
   @override
-  List<_i9.Space> get spaces => (super.noSuchMethod(
-        Invocation.getter(#spaces),
-        returnValue: <_i9.Space>[],
-      ) as List<_i9.Space>);
+  List<_i9.Space> get spaces =>
+      (super.noSuchMethod(
+            Invocation.getter(#spaces),
+            returnValue: <_i9.Space>[],
+          )
+          as List<_i9.Space>);
 
   @override
-  bool get isLoading => (super.noSuchMethod(
-        Invocation.getter(#isLoading),
-        returnValue: false,
-      ) as bool);
+  bool get isLoading =>
+      (super.noSuchMethod(Invocation.getter(#isLoading), returnValue: false)
+          as bool);
 
   @override
-  bool get hasListeners => (super.noSuchMethod(
-        Invocation.getter(#hasListeners),
-        returnValue: false,
-      ) as bool);
+  bool get hasListeners =>
+      (super.noSuchMethod(Invocation.getter(#hasListeners), returnValue: false)
+          as bool);
 
   @override
   _i6.Future<void> loadSpaces({bool? includeArchived = false}) =>
       (super.noSuchMethod(
-        Invocation.method(
-          #loadSpaces,
-          [],
-          {#includeArchived: includeArchived},
-        ),
-        returnValue: _i6.Future<void>.value(),
-        returnValueForMissingStub: _i6.Future<void>.value(),
-      ) as _i6.Future<void>);
+            Invocation.method(#loadSpaces, [], {
+              #includeArchived: includeArchived,
+            }),
+            returnValue: _i6.Future<void>.value(),
+            returnValueForMissingStub: _i6.Future<void>.value(),
+          )
+          as _i6.Future<void>);
 
   @override
-  _i6.Future<void> addSpace(_i9.Space? space) => (super.noSuchMethod(
-        Invocation.method(
-          #addSpace,
-          [space],
-        ),
-        returnValue: _i6.Future<void>.value(),
-        returnValueForMissingStub: _i6.Future<void>.value(),
-      ) as _i6.Future<void>);
+  _i6.Future<void> addSpace(_i9.Space? space) =>
+      (super.noSuchMethod(
+            Invocation.method(#addSpace, [space]),
+            returnValue: _i6.Future<void>.value(),
+            returnValueForMissingStub: _i6.Future<void>.value(),
+          )
+          as _i6.Future<void>);
 
   @override
-  _i6.Future<void> updateSpace(_i9.Space? space) => (super.noSuchMethod(
-        Invocation.method(
-          #updateSpace,
-          [space],
-        ),
-        returnValue: _i6.Future<void>.value(),
-        returnValueForMissingStub: _i6.Future<void>.value(),
-      ) as _i6.Future<void>);
+  _i6.Future<void> updateSpace(_i9.Space? space) =>
+      (super.noSuchMethod(
+            Invocation.method(#updateSpace, [space]),
+            returnValue: _i6.Future<void>.value(),
+            returnValueForMissingStub: _i6.Future<void>.value(),
+          )
+          as _i6.Future<void>);
 
   @override
-  _i6.Future<void> deleteSpace(String? id) => (super.noSuchMethod(
-        Invocation.method(
-          #deleteSpace,
-          [id],
-        ),
-        returnValue: _i6.Future<void>.value(),
-        returnValueForMissingStub: _i6.Future<void>.value(),
-      ) as _i6.Future<void>);
+  _i6.Future<void> deleteSpace(String? id) =>
+      (super.noSuchMethod(
+            Invocation.method(#deleteSpace, [id]),
+            returnValue: _i6.Future<void>.value(),
+            returnValueForMissingStub: _i6.Future<void>.value(),
+          )
+          as _i6.Future<void>);
 
   @override
-  _i6.Future<void> switchSpace(String? spaceId) => (super.noSuchMethod(
-        Invocation.method(
-          #switchSpace,
-          [spaceId],
-        ),
-        returnValue: _i6.Future<void>.value(),
-        returnValueForMissingStub: _i6.Future<void>.value(),
-      ) as _i6.Future<void>);
+  _i6.Future<void> switchSpace(String? spaceId) =>
+      (super.noSuchMethod(
+            Invocation.method(#switchSpace, [spaceId]),
+            returnValue: _i6.Future<void>.value(),
+            returnValueForMissingStub: _i6.Future<void>.value(),
+          )
+          as _i6.Future<void>);
 
   @override
   _i6.Future<void> incrementSpaceItemCount(String? spaceId) =>
       (super.noSuchMethod(
-        Invocation.method(
-          #incrementSpaceItemCount,
-          [spaceId],
-        ),
-        returnValue: _i6.Future<void>.value(),
-        returnValueForMissingStub: _i6.Future<void>.value(),
-      ) as _i6.Future<void>);
+            Invocation.method(#incrementSpaceItemCount, [spaceId]),
+            returnValue: _i6.Future<void>.value(),
+            returnValueForMissingStub: _i6.Future<void>.value(),
+          )
+          as _i6.Future<void>);
 
   @override
   _i6.Future<void> decrementSpaceItemCount(String? spaceId) =>
       (super.noSuchMethod(
-        Invocation.method(
-          #decrementSpaceItemCount,
-          [spaceId],
-        ),
-        returnValue: _i6.Future<void>.value(),
-        returnValueForMissingStub: _i6.Future<void>.value(),
-      ) as _i6.Future<void>);
+            Invocation.method(#decrementSpaceItemCount, [spaceId]),
+            returnValue: _i6.Future<void>.value(),
+            returnValueForMissingStub: _i6.Future<void>.value(),
+          )
+          as _i6.Future<void>);
 
   @override
   void clearError() => super.noSuchMethod(
-        Invocation.method(
-          #clearError,
-          [],
-        ),
-        returnValueForMissingStub: null,
-      );
+    Invocation.method(#clearError, []),
+    returnValueForMissingStub: null,
+  );
 
   @override
   void addListener(_i8.VoidCallback? listener) => super.noSuchMethod(
-        Invocation.method(
-          #addListener,
-          [listener],
-        ),
-        returnValueForMissingStub: null,
-      );
+    Invocation.method(#addListener, [listener]),
+    returnValueForMissingStub: null,
+  );
 
   @override
   void removeListener(_i8.VoidCallback? listener) => super.noSuchMethod(
-        Invocation.method(
-          #removeListener,
-          [listener],
-        ),
-        returnValueForMissingStub: null,
-      );
+    Invocation.method(#removeListener, [listener]),
+    returnValueForMissingStub: null,
+  );
 
   @override
   void dispose() => super.noSuchMethod(
-        Invocation.method(
-          #dispose,
-          [],
-        ),
-        returnValueForMissingStub: null,
-      );
+    Invocation.method(#dispose, []),
+    returnValueForMissingStub: null,
+  );
 
   @override
   void notifyListeners() => super.noSuchMethod(
-        Invocation.method(
-          #notifyListeners,
-          [],
-        ),
-        returnValueForMissingStub: null,
-      );
+    Invocation.method(#notifyListeners, []),
+    returnValueForMissingStub: null,
+  );
 }

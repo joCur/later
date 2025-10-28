@@ -46,9 +46,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: MediaQuery(
-            data: const MediaQueryData(
-              size: Size(767.0, 1024.0),
-            ),
+            data: const MediaQueryData(size: Size(767.0, 1024.0)),
             child: Builder(
               builder: (context) {
                 isMobile = Breakpoints.isMobile(context);
@@ -71,9 +69,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: MediaQuery(
-            data: const MediaQueryData(
-              size: Size(768.0, 1024.0),
-            ),
+            data: const MediaQueryData(size: Size(768.0, 1024.0)),
             child: Builder(
               builder: (context) {
                 isMobile = Breakpoints.isMobile(context);
@@ -95,9 +91,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: MediaQuery(
-            data: const MediaQueryData(
-              size: Size(769.0, 1024.0),
-            ),
+            data: const MediaQueryData(size: Size(769.0, 1024.0)),
             child: Builder(
               builder: (context) {
                 isTablet = Breakpoints.isTablet(context);
@@ -111,14 +105,13 @@ void main() {
       expect(isTablet, isTrue, reason: '769px should be tablet');
     });
 
-    testWidgets('Bottom nav appears at 767px, disappears at 768px',
-        (WidgetTester tester) async {
+    testWidgets('Bottom nav appears at 767px, disappears at 768px', (
+      WidgetTester tester,
+    ) async {
       // Test at 767px (mobile)
       await tester.pumpWidget(
         MediaQuery(
-          data: const MediaQueryData(
-            size: Size(767.0, 1024.0),
-          ),
+          data: const MediaQueryData(size: Size(767.0, 1024.0)),
           child: MaterialApp(
             home: Builder(
               builder: (context) {
@@ -138,15 +131,16 @@ void main() {
         ),
       );
 
-      expect(find.byType(IconOnlyBottomNav), findsOneWidget,
-          reason: 'Bottom nav should be visible at 767px');
+      expect(
+        find.byType(IconOnlyBottomNav),
+        findsOneWidget,
+        reason: 'Bottom nav should be visible at 767px',
+      );
 
       // Test at 768px (tablet)
       await tester.pumpWidget(
         MediaQuery(
-          data: const MediaQueryData(
-            size: Size(768.0, 1024.0),
-          ),
+          data: const MediaQueryData(size: Size(768.0, 1024.0)),
           child: MaterialApp(
             home: Builder(
               builder: (context) {
@@ -168,12 +162,16 @@ void main() {
 
       await tester.pump();
 
-      expect(find.byType(IconOnlyBottomNav), findsNothing,
-          reason: 'Bottom nav should be hidden at 768px');
+      expect(
+        find.byType(IconOnlyBottomNav),
+        findsNothing,
+        reason: 'Bottom nav should be hidden at 768px',
+      );
     });
 
-    testWidgets('Grid columns change from 1 to 2 at 768px',
-        (WidgetTester tester) async {
+    testWidgets('Grid columns change from 1 to 2 at 768px', (
+      WidgetTester tester,
+    ) async {
       int? columns767;
       int? columns768;
 
@@ -181,9 +179,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: MediaQuery(
-            data: const MediaQueryData(
-              size: Size(767.0, 1024.0),
-            ),
+            data: const MediaQueryData(size: Size(767.0, 1024.0)),
             child: Builder(
               builder: (context) {
                 columns767 = Breakpoints.getGridColumns(context);
@@ -198,9 +194,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: MediaQuery(
-            data: const MediaQueryData(
-              size: Size(768.0, 1024.0),
-            ),
+            data: const MediaQueryData(size: Size(768.0, 1024.0)),
             child: Builder(
               builder: (context) {
                 columns768 = Breakpoints.getGridColumns(context);
@@ -215,14 +209,13 @@ void main() {
       expect(columns768, equals(2), reason: '768px should have 2 columns');
     });
 
-    testWidgets('ResponsiveLayout switches at 768px',
-        (WidgetTester tester) async {
+    testWidgets('ResponsiveLayout switches at 768px', (
+      WidgetTester tester,
+    ) async {
       // Test at 767px (mobile)
       await tester.pumpWidget(
         const MediaQuery(
-          data: MediaQueryData(
-            size: Size(767.0, 1024.0),
-          ),
+          data: MediaQueryData(size: Size(767.0, 1024.0)),
           child: MaterialApp(
             home: Scaffold(
               body: ResponsiveLayout(
@@ -240,9 +233,7 @@ void main() {
       // Test at 768px (tablet)
       await tester.pumpWidget(
         const MediaQuery(
-          data: MediaQueryData(
-            size: Size(768.0, 1024.0),
-          ),
+          data: MediaQueryData(size: Size(768.0, 1024.0)),
           child: MaterialApp(
             home: Scaffold(
               body: ResponsiveLayout(
@@ -269,9 +260,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: MediaQuery(
-            data: const MediaQueryData(
-              size: Size(1023.0, 768.0),
-            ),
+            data: const MediaQueryData(size: Size(1023.0, 768.0)),
             child: Builder(
               builder: (context) {
                 isTablet = Breakpoints.isTablet(context);
@@ -294,9 +283,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: MediaQuery(
-            data: const MediaQueryData(
-              size: Size(1024.0, 768.0),
-            ),
+            data: const MediaQueryData(size: Size(1024.0, 768.0)),
             child: Builder(
               builder: (context) {
                 isTablet = Breakpoints.isTablet(context);
@@ -318,9 +305,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: MediaQuery(
-            data: const MediaQueryData(
-              size: Size(1025.0, 768.0),
-            ),
+            data: const MediaQueryData(size: Size(1025.0, 768.0)),
             child: Builder(
               builder: (context) {
                 isDesktop = Breakpoints.isDesktop(context);
@@ -338,9 +323,7 @@ void main() {
       // Test at 1023px (tablet - no sidebar)
       await tester.pumpWidget(
         MediaQuery(
-          data: const MediaQueryData(
-            size: Size(1023.0, 768.0),
-          ),
+          data: const MediaQueryData(size: Size(1023.0, 768.0)),
           child: MaterialApp(
             home: Builder(
               builder: (context) {
@@ -348,13 +331,8 @@ void main() {
                 return Scaffold(
                   body: Row(
                     children: [
-                      if (showSidebar)
-                        AppSidebar(
-                          onToggleExpanded: () {},
-                        ),
-                      const Expanded(
-                        child: Center(child: Text('Content')),
-                      ),
+                      if (showSidebar) AppSidebar(onToggleExpanded: () {}),
+                      const Expanded(child: Center(child: Text('Content'))),
                     ],
                   ),
                 );
@@ -364,15 +342,16 @@ void main() {
         ),
       );
 
-      expect(find.byType(AppSidebar), findsNothing,
-          reason: 'Sidebar should not be visible at 1023px');
+      expect(
+        find.byType(AppSidebar),
+        findsNothing,
+        reason: 'Sidebar should not be visible at 1023px',
+      );
 
       // Test at 1024px (desktop - sidebar appears)
       await tester.pumpWidget(
         MediaQuery(
-          data: const MediaQueryData(
-            size: Size(1024.0, 768.0),
-          ),
+          data: const MediaQueryData(size: Size(1024.0, 768.0)),
           child: MaterialApp(
             home: Builder(
               builder: (context) {
@@ -380,13 +359,8 @@ void main() {
                 return Scaffold(
                   body: Row(
                     children: [
-                      if (showSidebar)
-                        AppSidebar(
-                          onToggleExpanded: () {},
-                        ),
-                      const Expanded(
-                        child: Center(child: Text('Content')),
-                      ),
+                      if (showSidebar) AppSidebar(onToggleExpanded: () {}),
+                      const Expanded(child: Center(child: Text('Content'))),
                     ],
                   ),
                 );
@@ -398,12 +372,16 @@ void main() {
 
       await tester.pump();
 
-      expect(find.byType(AppSidebar), findsOneWidget,
-          reason: 'Sidebar should appear at 1024px');
+      expect(
+        find.byType(AppSidebar),
+        findsOneWidget,
+        reason: 'Sidebar should appear at 1024px',
+      );
     });
 
-    testWidgets('Grid columns change from 2 to 3 at 1024px',
-        (WidgetTester tester) async {
+    testWidgets('Grid columns change from 2 to 3 at 1024px', (
+      WidgetTester tester,
+    ) async {
       int? columns1023;
       int? columns1024;
 
@@ -411,9 +389,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: MediaQuery(
-            data: const MediaQueryData(
-              size: Size(1023.0, 768.0),
-            ),
+            data: const MediaQueryData(size: Size(1023.0, 768.0)),
             child: Builder(
               builder: (context) {
                 columns1023 = Breakpoints.getGridColumns(context);
@@ -428,9 +404,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: MediaQuery(
-            data: const MediaQueryData(
-              size: Size(1024.0, 768.0),
-            ),
+            data: const MediaQueryData(size: Size(1024.0, 768.0)),
             child: Builder(
               builder: (context) {
                 columns1024 = Breakpoints.getGridColumns(context);
@@ -445,8 +419,9 @@ void main() {
       expect(columns1024, equals(3), reason: '1024px should have 3 columns');
     });
 
-    testWidgets('Max content width changes at 1024px',
-        (WidgetTester tester) async {
+    testWidgets('Max content width changes at 1024px', (
+      WidgetTester tester,
+    ) async {
       double? maxWidth1023;
       double? maxWidth1024;
 
@@ -454,9 +429,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: MediaQuery(
-            data: const MediaQueryData(
-              size: Size(1023.0, 768.0),
-            ),
+            data: const MediaQueryData(size: Size(1023.0, 768.0)),
             child: Builder(
               builder: (context) {
                 maxWidth1023 = Breakpoints.getMaxContentWidth(context);
@@ -471,9 +444,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: MediaQuery(
-            data: const MediaQueryData(
-              size: Size(1024.0, 768.0),
-            ),
+            data: const MediaQueryData(size: Size(1024.0, 768.0)),
             child: Builder(
               builder: (context) {
                 maxWidth1024 = Breakpoints.getMaxContentWidth(context);
@@ -484,10 +455,16 @@ void main() {
         ),
       );
 
-      expect(maxWidth1023, equals(768.0),
-          reason: 'Tablet max content width should be 768px');
-      expect(maxWidth1024, equals(1024.0),
-          reason: 'Desktop max content width should be 1024px');
+      expect(
+        maxWidth1023,
+        equals(768.0),
+        reason: 'Tablet max content width should be 768px',
+      );
+      expect(
+        maxWidth1024,
+        equals(1024.0),
+        reason: 'Desktop max content width should be 1024px',
+      );
     });
   });
 
@@ -499,9 +476,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: MediaQuery(
-            data: const MediaQueryData(
-              size: Size(1439.0, 900.0),
-            ),
+            data: const MediaQueryData(size: Size(1439.0, 900.0)),
             child: Builder(
               builder: (context) {
                 isDesktopLarge = Breakpoints.isDesktopLarge(context);
@@ -513,22 +488,24 @@ void main() {
         ),
       );
 
-      expect(isDesktopLarge, isFalse,
-          reason: '1439px should not be desktopLarge');
+      expect(
+        isDesktopLarge,
+        isFalse,
+        reason: '1439px should not be desktopLarge',
+      );
       expect(screenSize, equals(ScreenSize.desktop));
     });
 
-    testWidgets('1440px is detected as desktopLarge',
-        (WidgetTester tester) async {
+    testWidgets('1440px is detected as desktopLarge', (
+      WidgetTester tester,
+    ) async {
       bool? isDesktopLarge;
       ScreenSize? screenSize;
 
       await tester.pumpWidget(
         MaterialApp(
           home: MediaQuery(
-            data: const MediaQueryData(
-              size: Size(1440.0, 900.0),
-            ),
+            data: const MediaQueryData(size: Size(1440.0, 900.0)),
             child: Builder(
               builder: (context) {
                 isDesktopLarge = Breakpoints.isDesktopLarge(context);
@@ -544,8 +521,9 @@ void main() {
       expect(screenSize, equals(ScreenSize.desktopLarge));
     });
 
-    testWidgets('Grid columns change from 3 to 4 at 1440px',
-        (WidgetTester tester) async {
+    testWidgets('Grid columns change from 3 to 4 at 1440px', (
+      WidgetTester tester,
+    ) async {
       int? columns1439;
       int? columns1440;
 
@@ -553,9 +531,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: MediaQuery(
-            data: const MediaQueryData(
-              size: Size(1439.0, 900.0),
-            ),
+            data: const MediaQueryData(size: Size(1439.0, 900.0)),
             child: Builder(
               builder: (context) {
                 columns1439 = Breakpoints.getGridColumns(context);
@@ -570,9 +546,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: MediaQuery(
-            data: const MediaQueryData(
-              size: Size(1440.0, 900.0),
-            ),
+            data: const MediaQueryData(size: Size(1440.0, 900.0)),
             child: Builder(
               builder: (context) {
                 columns1440 = Breakpoints.getGridColumns(context);
@@ -587,8 +561,9 @@ void main() {
       expect(columns1440, equals(4), reason: '1440px should have 4 columns');
     });
 
-    testWidgets('Max content width remains 1200px after 1440px',
-        (WidgetTester tester) async {
+    testWidgets('Max content width remains 1200px after 1440px', (
+      WidgetTester tester,
+    ) async {
       double? maxWidth1440;
       double? maxWidth1920;
 
@@ -596,9 +571,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: MediaQuery(
-            data: const MediaQueryData(
-              size: Size(1440.0, 900.0),
-            ),
+            data: const MediaQueryData(size: Size(1440.0, 900.0)),
             child: Builder(
               builder: (context) {
                 maxWidth1440 = Breakpoints.getMaxContentWidth(context);
@@ -613,9 +586,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: MediaQuery(
-            data: const MediaQueryData(
-              size: Size(1920.0, 1080.0),
-            ),
+            data: const MediaQueryData(size: Size(1920.0, 1080.0)),
             child: Builder(
               builder: (context) {
                 maxWidth1920 = Breakpoints.getMaxContentWidth(context);
@@ -626,23 +597,28 @@ void main() {
         ),
       );
 
-      expect(maxWidth1440, equals(1200.0),
-          reason: 'DesktopLarge max content width should be 1200px');
-      expect(maxWidth1920, equals(1200.0),
-          reason: 'Max content width should remain 1200px at ultra-wide');
+      expect(
+        maxWidth1440,
+        equals(1200.0),
+        reason: 'DesktopLarge max content width should be 1200px',
+      );
+      expect(
+        maxWidth1920,
+        equals(1200.0),
+        reason: 'Max content width should remain 1200px at ultra-wide',
+      );
     });
   });
 
   group('Smooth Transition Tests', () {
-    testWidgets('No layout errors during resize simulation',
-        (WidgetTester tester) async {
+    testWidgets('No layout errors during resize simulation', (
+      WidgetTester tester,
+    ) async {
       // Simulate gradual resize from mobile to tablet
       for (double width = 767.0; width <= 769.0; width += 0.5) {
         await tester.pumpWidget(
           MediaQuery(
-            data: MediaQueryData(
-              size: Size(width, 1024.0),
-            ),
+            data: MediaQueryData(size: Size(width, 1024.0)),
             child: MaterialApp(
               home: Scaffold(
                 body: Builder(
@@ -661,21 +637,23 @@ void main() {
         await tester.pump();
 
         // Verify no errors occurred
-        expect(tester.takeException(), isNull,
-            reason: 'No errors should occur at $width px');
+        expect(
+          tester.takeException(),
+          isNull,
+          reason: 'No errors should occur at $width px',
+        );
       }
     });
 
-    testWidgets('Content constraints update smoothly',
-        (WidgetTester tester) async {
+    testWidgets('Content constraints update smoothly', (
+      WidgetTester tester,
+    ) async {
       final widths = [767.0, 768.0, 1023.0, 1024.0, 1439.0, 1440.0];
 
       for (final width in widths) {
         await tester.pumpWidget(
           MediaQuery(
-            data: MediaQueryData(
-              size: Size(width, 800.0),
-            ),
+            data: MediaQueryData(size: Size(width, 800.0)),
             child: MaterialApp(
               home: Scaffold(
                 body: LayoutBuilder(
@@ -693,8 +671,11 @@ void main() {
         await tester.pump();
 
         // Verify layout is rendered correctly
-        expect(find.textContaining('Width:'), findsOneWidget,
-            reason: 'Layout should render at $width px');
+        expect(
+          find.textContaining('Width:'),
+          findsOneWidget,
+          reason: 'Layout should render at $width px',
+        );
       }
     });
   });

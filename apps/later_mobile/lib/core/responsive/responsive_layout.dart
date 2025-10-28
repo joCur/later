@@ -50,10 +50,7 @@ class ResponsiveLayout extends StatelessWidget {
 /// A responsive builder that provides the screen size
 /// Useful when you need to customize parts of a widget based on screen size
 class ResponsiveBuilder extends StatelessWidget {
-  const ResponsiveBuilder({
-    super.key,
-    required this.builder,
-  });
+  const ResponsiveBuilder({super.key, required this.builder});
 
   /// Builder function that receives the current screen size
   final Widget Function(BuildContext context, ScreenSize screenSize) builder;
@@ -106,44 +103,34 @@ class ResponsiveVisibility extends StatelessWidget {
   });
 
   /// Show only on mobile
-  const ResponsiveVisibility.mobileOnly({
-    super.key,
-    required this.child,
-  })  : visibleOnMobile = true,
-        visibleOnTablet = false,
-        visibleOnDesktop = false;
+  const ResponsiveVisibility.mobileOnly({super.key, required this.child})
+    : visibleOnMobile = true,
+      visibleOnTablet = false,
+      visibleOnDesktop = false;
 
   /// Show only on tablet
-  const ResponsiveVisibility.tabletOnly({
-    super.key,
-    required this.child,
-  })  : visibleOnMobile = false,
-        visibleOnTablet = true,
-        visibleOnDesktop = false;
+  const ResponsiveVisibility.tabletOnly({super.key, required this.child})
+    : visibleOnMobile = false,
+      visibleOnTablet = true,
+      visibleOnDesktop = false;
 
   /// Show only on desktop
-  const ResponsiveVisibility.desktopOnly({
-    super.key,
-    required this.child,
-  })  : visibleOnMobile = false,
-        visibleOnTablet = false,
-        visibleOnDesktop = true;
+  const ResponsiveVisibility.desktopOnly({super.key, required this.child})
+    : visibleOnMobile = false,
+      visibleOnTablet = false,
+      visibleOnDesktop = true;
 
   /// Show on tablet and larger
-  const ResponsiveVisibility.tabletAndLarger({
-    super.key,
-    required this.child,
-  })  : visibleOnMobile = false,
-        visibleOnTablet = true,
-        visibleOnDesktop = true;
+  const ResponsiveVisibility.tabletAndLarger({super.key, required this.child})
+    : visibleOnMobile = false,
+      visibleOnTablet = true,
+      visibleOnDesktop = true;
 
   /// Show on desktop and larger
-  const ResponsiveVisibility.desktopAndLarger({
-    super.key,
-    required this.child,
-  })  : visibleOnMobile = false,
-        visibleOnTablet = false,
-        visibleOnDesktop = true;
+  const ResponsiveVisibility.desktopAndLarger({super.key, required this.child})
+    : visibleOnMobile = false,
+      visibleOnTablet = false,
+      visibleOnDesktop = true;
 
   final Widget child;
   final bool visibleOnMobile;
@@ -209,7 +196,9 @@ class ResponsiveGrid extends StatelessWidget {
       runSpacing: runSpacing,
       children: children.map((child) {
         return SizedBox(
-          width: (MediaQuery.of(context).size.width - (spacing * (columns + 1))) / columns,
+          width:
+              (MediaQuery.of(context).size.width - (spacing * (columns + 1))) /
+              columns,
           child: child,
         );
       }).toList(),

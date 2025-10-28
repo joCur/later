@@ -5,6 +5,7 @@ import '../../../data/models/item_model.dart';
 import 'package:later_mobile/design_system/atoms/text/gradient_text.dart';
 import 'package:later_mobile/design_system/atoms/borders/gradient_pill_border.dart';
 import 'package:intl/intl.dart';
+import 'package:later_mobile/core/theme/temporal_flow_theme.dart';
 
 /// Note card component for displaying notes with content preview and tags
 /// Mobile-First Bold Redesign
@@ -73,14 +74,14 @@ class _NoteCardState extends State<NoteCard> with TickerProviderStateMixin {
     );
 
     // Create press scale animation: 1.0 -> 0.98 (scale down on press)
-    _pressScaleAnimation = Tween<double>(
-      begin: 1.0,
-      end: AppAnimations.itemPressScale,
-    ).animate(CurvedAnimation(
-      parent: _pressAnimationController,
-      curve: Curves.easeOut,
-      reverseCurve: Curves.easeOutBack,
-    ));
+    _pressScaleAnimation =
+        Tween<double>(begin: 1.0, end: AppAnimations.itemPressScale).animate(
+          CurvedAnimation(
+            parent: _pressAnimationController,
+            curve: Curves.easeOut,
+            reverseCurve: Curves.easeOutBack,
+          ),
+        );
   }
 
   @override
@@ -121,12 +122,11 @@ class _NoteCardState extends State<NoteCard> with TickerProviderStateMixin {
 
   /// Build title with proper styling
   Widget _buildTitle(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Text(
       widget.item.title,
       style: AppTypography.itemTitle.copyWith(
-        color: isDark ? AppColors.neutral400 : AppColors.neutral600,
+        color: AppColors.text(context),
       ),
       maxLines: AppTypography.itemTitleMaxLines,
       overflow: TextOverflow.ellipsis,
@@ -158,13 +158,12 @@ class _NoteCardState extends State<NoteCard> with TickerProviderStateMixin {
       return null;
     }
 
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     final truncatedContent = _truncateContent(widget.item.content!);
 
     return Text(
       truncatedContent,
       style: AppTypography.itemContent.copyWith(
-        color: isDark ? AppColors.neutral500 : AppColors.neutral500,
+        color: AppColors.textSecondary(context),
       ),
       maxLines: 2, // Fixed 2 lines for consistent card height
       overflow: TextOverflow.ellipsis,
@@ -189,8 +188,7 @@ class _NoteCardState extends State<NoteCard> with TickerProviderStateMixin {
         ...visibleTags.map((tag) => _buildTagChip(tag, isDark)),
 
         // Show "+X more" if there are more tags
-        if (remainingCount > 0)
-          _buildMoreTagsChip(remainingCount, isDark),
+        if (remainingCount > 0) _buildMoreTagsChip(remainingCount, isDark),
       ],
     );
   }
@@ -238,15 +236,13 @@ class _NoteCardState extends State<NoteCard> with TickerProviderStateMixin {
             : AppColors.neutral200,
         borderRadius: BorderRadius.circular(AppSpacing.radiusSM), // 8px
         border: Border.all(
-          color: isDark
-              ? AppColors.neutral600
-              : AppColors.neutral300,
+          color: AppColors.textDisabled(context),
         ),
       ),
       child: Text(
         '+$count more',
         style: AppTypography.metadata.copyWith(
-          color: isDark ? AppColors.neutral500 : AppColors.neutral500,
+          color: AppColors.textSecondary(context),
           fontSize: 11,
         ),
       ),
@@ -257,19 +253,17 @@ class _NoteCardState extends State<NoteCard> with TickerProviderStateMixin {
   Widget? _buildMetadata(BuildContext context) {
     if (!widget.showMetadata) return null;
 
+    final temporalTheme = Theme.of(context).extension<TemporalFlowTheme>()!;
     final dateFormat = DateFormat('MMM d, y');
 
     return Row(
       children: [
         // Icon with gradient tint for created dates
         ShaderMask(
-          shaderCallback: (bounds) => AppColors.primaryGradientAdaptive(context).createShader(bounds),
+          shaderCallback: (bounds) =>
+              temporalTheme.primaryGradient.createShader(bounds),
           blendMode: BlendMode.srcIn,
-          child: const Icon(
-            Icons.access_time,
-            size: 12,
-            color: Colors.white,
-          ),
+          child: const Icon(Icons.access_time, size: 12, color: Colors.white),
         ),
         const SizedBox(width: AppSpacing.xxs),
         // Created date with subtle primary gradient
@@ -317,7 +311,9 @@ class _NoteCardState extends State<NoteCard> with TickerProviderStateMixin {
 
     // Add tag count if tags exist
     if (widget.item.tags.isNotEmpty) {
-      buffer.write(', ${widget.item.tags.length} ${widget.item.tags.length == 1 ? 'tag' : 'tags'}');
+      buffer.write(
+        ', ${widget.item.tags.length} ${widget.item.tags.length == 1 ? 'tag' : 'tags'}',
+      );
     }
 
     // Add content preview if exists
@@ -335,15 +331,13 @@ class _NoteCardState extends State<NoteCard> with TickerProviderStateMixin {
     final isDark = theme.brightness == Brightness.dark;
 
     // Base background color with subtle gradient tint (5% opacity)
-    final baseBgColor = isDark ? AppColors.neutral900 : Colors.white;
+    final baseBgColor = AppColors.surface(context);
     final tintColor = _getBackgroundTint(isDark);
 
     // Background color based on state
     Color backgroundColor;
     if (_isPressed) {
-      backgroundColor = isDark
-          ? AppColors.neutral800
-          : AppColors.neutral100;
+      backgroundColor = AppColors.surfaceVariant(context);
     } else {
       // Blend base color with subtle type-specific tint
       backgroundColor = Color.alphaBlend(
@@ -378,20 +372,26 @@ class _NoteCardState extends State<NoteCard> with TickerProviderStateMixin {
             onTap: _handleTap,
             onLongPress: _handleLongPress,
             child: Container(
-              margin: const EdgeInsets.only(bottom: AppSpacing.cardSpacing), // 16px spacing
+              margin: const EdgeInsets.only(
+                bottom: AppSpacing.cardSpacing,
+              ), // 16px spacing
               // Wrap entire card with gradient pill border (6px width, 20px radius)
               child: GradientPillBorder(
                 gradient: _getBorderGradient(),
                 child: Container(
                   decoration: BoxDecoration(
                     color: backgroundColor,
-                    borderRadius: BorderRadius.circular(AppSpacing.cardRadius - AppSpacing.cardBorderWidth), // Inner radius reduced by border width
+                    borderRadius: BorderRadius.circular(
+                      AppSpacing.cardRadius - AppSpacing.cardBorderWidth,
+                    ), // Inner radius reduced by border width
                     // Mobile-optimized shadow: 4px offset, 8px blur, 12% opacity
                     boxShadow: _isPressed
                         ? null
                         : [
                             BoxShadow(
-                              color: (isDark ? AppColors.shadowDark : AppColors.shadowLight)
+                              color: Theme.of(context)
+                                  .extension<TemporalFlowTheme>()!
+                                  .shadowColor
                                   .withValues(alpha: 0.12),
                               blurRadius: 8,
                               offset: const Offset(0, 4),
@@ -401,14 +401,15 @@ class _NoteCardState extends State<NoteCard> with TickerProviderStateMixin {
                   // Clip the content to follow the border radius
                   clipBehavior: Clip.antiAlias,
                   // Main content with 20px padding (mobile-first comfortable touch zones)
-                  padding: const EdgeInsets.all(AppSpacing.cardPaddingMobile), // 20px
+                  padding: const EdgeInsets.all(
+                    AppSpacing.cardPaddingMobile,
+                  ), // 20px
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       // Leading icon (document icon)
                       _buildLeadingIcon(),
                       const SizedBox(width: AppSpacing.xs), // 8px
-
                       // Content
                       Expanded(
                         child: Column(
@@ -451,24 +452,32 @@ class _NoteCardState extends State<NoteCard> with TickerProviderStateMixin {
     // Apply entrance animation if index is provided (Phase 5 optimized)
     if (widget.index != null) {
       final delay = AppAnimations.itemEntranceStagger * widget.index!;
-      final duration = AppAnimations.getDuration(context, AppAnimations.itemEntrance);
+      final duration = AppAnimations.getDuration(
+        context,
+        AppAnimations.itemEntrance,
+      );
 
       return cardWidget
           .animate()
           .fadeIn(
             duration: duration,
             delay: delay,
-            curve: Curves.easeOut, // Phase 5: Use easeOut instead of springCurve for entrance
+            curve: Curves
+                .easeOut, // Phase 5: Use easeOut instead of springCurve for entrance
           )
           .slideY(
-            begin: AppAnimations.itemEntranceSlideDistance, // Phase 5: Use 8px distance instead of percentage
+            begin: AppAnimations
+                .itemEntranceSlideDistance, // Phase 5: Use 8px distance instead of percentage
             end: 0,
             duration: duration,
             delay: delay,
             curve: Curves.easeOut,
           )
           .scale(
-            begin: const Offset(AppAnimations.itemEntranceScale, AppAnimations.itemEntranceScale),
+            begin: const Offset(
+              AppAnimations.itemEntranceScale,
+              AppAnimations.itemEntranceScale,
+            ),
             end: const Offset(1.0, 1.0),
             duration: duration,
             delay: delay,

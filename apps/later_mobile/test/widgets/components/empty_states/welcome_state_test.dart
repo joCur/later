@@ -8,11 +8,7 @@ void main() {
       // Act
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(
-            body: WelcomeState(
-              onActionPressed: () {},
-            ),
-          ),
+          home: Scaffold(body: WelcomeState(onActionPressed: () {})),
         ),
       );
 
@@ -24,11 +20,7 @@ void main() {
       // Act
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(
-            body: WelcomeState(
-              onActionPressed: () {},
-            ),
-          ),
+          home: Scaffold(body: WelcomeState(onActionPressed: () {})),
         ),
       );
 
@@ -40,11 +32,7 @@ void main() {
       // Act
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(
-            body: WelcomeState(
-              onActionPressed: () {},
-            ),
-          ),
+          home: Scaffold(body: WelcomeState(onActionPressed: () {})),
         ),
       );
 
@@ -57,16 +45,13 @@ void main() {
       );
     });
 
-    testWidgets('displays Create your first item button',
-        (WidgetTester tester) async {
+    testWidgets('displays Create your first item button', (
+      WidgetTester tester,
+    ) async {
       // Act
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(
-            body: WelcomeState(
-              onActionPressed: () {},
-            ),
-          ),
+          home: Scaffold(body: WelcomeState(onActionPressed: () {})),
         ),
       );
 
@@ -74,8 +59,9 @@ void main() {
       expect(find.text('Create your first item'), findsOneWidget);
     });
 
-    testWidgets('calls onActionPressed when button pressed',
-        (WidgetTester tester) async {
+    testWidgets('calls onActionPressed when button pressed', (
+      WidgetTester tester,
+    ) async {
       // Arrange
       var buttonPressed = false;
 
@@ -100,8 +86,9 @@ void main() {
       expect(buttonPressed, isTrue);
     });
 
-    testWidgets('displays secondary Learn how it works link when provided',
-        (WidgetTester tester) async {
+    testWidgets('displays secondary Learn how it works link when provided', (
+      WidgetTester tester,
+    ) async {
       // Act
       await tester.pumpWidget(
         MaterialApp(
@@ -118,16 +105,13 @@ void main() {
       expect(find.text('Learn how it works'), findsOneWidget);
     });
 
-    testWidgets('does not display Learn how it works link when not provided',
-        (WidgetTester tester) async {
+    testWidgets('does not display Learn how it works link when not provided', (
+      WidgetTester tester,
+    ) async {
       // Act
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(
-            body: WelcomeState(
-              onActionPressed: () {},
-            ),
-          ),
+          home: Scaffold(body: WelcomeState(onActionPressed: () {})),
         ),
       );
 
@@ -135,8 +119,9 @@ void main() {
       expect(find.text('Learn how it works'), findsNothing);
     });
 
-    testWidgets('calls onSecondaryPressed when secondary link pressed',
-        (WidgetTester tester) async {
+    testWidgets('calls onSecondaryPressed when secondary link pressed', (
+      WidgetTester tester,
+    ) async {
       // Arrange
       var linkPressed = false;
 
@@ -166,11 +151,7 @@ void main() {
       // Act
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(
-            body: WelcomeState(
-              onActionPressed: () {},
-            ),
-          ),
+          home: Scaffold(body: WelcomeState(onActionPressed: () {})),
         ),
       );
 
@@ -183,11 +164,7 @@ void main() {
       // Act
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(
-            body: WelcomeState(
-              onActionPressed: () {},
-            ),
-          ),
+          home: Scaffold(body: WelcomeState(onActionPressed: () {})),
         ),
       );
 
@@ -195,17 +172,14 @@ void main() {
       expect(find.byType(Center), findsWidgets);
     });
 
-    testWidgets('renders in both light and dark mode',
-        (WidgetTester tester) async {
+    testWidgets('renders in both light and dark mode', (
+      WidgetTester tester,
+    ) async {
       // Test light mode
       await tester.pumpWidget(
         MaterialApp(
           theme: ThemeData.light(),
-          home: Scaffold(
-            body: WelcomeState(
-              onActionPressed: () {},
-            ),
-          ),
+          home: Scaffold(body: WelcomeState(onActionPressed: () {})),
         ),
       );
 
@@ -215,11 +189,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           theme: ThemeData.dark(),
-          home: Scaffold(
-            body: WelcomeState(
-              onActionPressed: () {},
-            ),
-          ),
+          home: Scaffold(body: WelcomeState(onActionPressed: () {})),
         ),
       );
 
@@ -230,11 +200,7 @@ void main() {
       // Act
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(
-            body: WelcomeState(
-              onActionPressed: () {},
-            ),
-          ),
+          home: Scaffold(body: WelcomeState(onActionPressed: () {})),
         ),
       );
 
@@ -249,8 +215,9 @@ void main() {
       expect(find.text('Create your first item'), findsOneWidget);
     });
 
-    testWidgets('displays both button and link together',
-        (WidgetTester tester) async {
+    testWidgets('displays both button and link together', (
+      WidgetTester tester,
+    ) async {
       // Arrange
       var buttonPressed = false;
       var linkPressed = false;

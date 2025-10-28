@@ -10,11 +10,7 @@ void main() {
   group('SkeletonLine', () {
     testWidgets('renders with default dimensions', (WidgetTester tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: SkeletonLine(),
-          ),
-        ),
+        const MaterialApp(home: Scaffold(body: SkeletonLine())),
       );
 
       // Find the skeleton line widget
@@ -30,17 +26,16 @@ void main() {
       expect(container.decoration, isNotNull);
     });
 
-    testWidgets('renders with custom width and height', (WidgetTester tester) async {
+    testWidgets('renders with custom width and height', (
+      WidgetTester tester,
+    ) async {
       const testWidth = 200.0;
       const testHeight = 20.0;
 
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(
-            body: SkeletonLine(
-              width: testWidth,
-              height: testHeight,
-            ),
+            body: SkeletonLine(width: testWidth, height: testHeight),
           ),
         ),
       );
@@ -54,13 +49,11 @@ void main() {
       expect(sizedBox.height, equals(testHeight));
     });
 
-    testWidgets('renders with correct border radius', (WidgetTester tester) async {
+    testWidgets('renders with correct border radius', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: SkeletonLine(),
-          ),
-        ),
+        const MaterialApp(home: Scaffold(body: SkeletonLine())),
       );
 
       // Find the container with decoration
@@ -73,13 +66,13 @@ void main() {
       expect(decoration!.borderRadius, isNotNull);
     });
 
-    testWidgets('uses correct colors in light mode', (WidgetTester tester) async {
+    testWidgets('uses correct colors in light mode', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
           theme: ThemeData.light(),
-          home: const Scaffold(
-            body: SkeletonLine(),
-          ),
+          home: const Scaffold(body: SkeletonLine()),
         ),
       );
 
@@ -95,13 +88,13 @@ void main() {
       expect(decoration!.color, equals(AppColors.neutral200));
     });
 
-    testWidgets('uses correct colors in dark mode', (WidgetTester tester) async {
+    testWidgets('uses correct colors in dark mode', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
           theme: ThemeData.dark(),
-          home: const Scaffold(
-            body: SkeletonLine(),
-          ),
+          home: const Scaffold(body: SkeletonLine()),
         ),
       );
 
@@ -117,15 +110,15 @@ void main() {
       expect(decoration!.color, equals(AppColors.neutral800));
     });
 
-    testWidgets('can be configured with different widths', (WidgetTester tester) async {
+    testWidgets('can be configured with different widths', (
+      WidgetTester tester,
+    ) async {
       const widths = [50.0, 100.0, 150.0, 200.0];
 
       for (final width in widths) {
         await tester.pumpWidget(
           MaterialApp(
-            home: Scaffold(
-              body: SkeletonLine(width: width),
-            ),
+            home: Scaffold(body: SkeletonLine(width: width)),
           ),
         );
 
@@ -139,11 +132,7 @@ void main() {
   group('SkeletonCard', () {
     testWidgets('renders skeleton card structure', (WidgetTester tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: SkeletonCard(),
-          ),
-        ),
+        const MaterialApp(home: Scaffold(body: SkeletonCard())),
       );
 
       // Should render a shimmer widget
@@ -155,13 +144,11 @@ void main() {
       expect(skeletonLineFinder, findsWidgets);
     });
 
-    testWidgets('has correct card shape with border radius', (WidgetTester tester) async {
+    testWidgets('has correct card shape with border radius', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: SkeletonCard(),
-          ),
-        ),
+        const MaterialApp(home: Scaffold(body: SkeletonCard())),
       );
 
       await tester.pump();
@@ -174,11 +161,14 @@ void main() {
       bool foundBorderRadius = false;
       for (final element in containerFinder.evaluate()) {
         final Container container = element.widget as Container;
-        final BoxDecoration? decoration = container.decoration as BoxDecoration?;
+        final BoxDecoration? decoration =
+            container.decoration as BoxDecoration?;
 
         if (decoration?.borderRadius != null) {
-          final BorderRadius? borderRadius = decoration!.borderRadius as BorderRadius?;
-          if (borderRadius != null && borderRadius.topLeft.x == AppSpacing.cardRadius) {
+          final BorderRadius? borderRadius =
+              decoration!.borderRadius as BorderRadius?;
+          if (borderRadius != null &&
+              borderRadius.topLeft.x == AppSpacing.cardRadius) {
             foundBorderRadius = true;
             break;
           }
@@ -190,11 +180,7 @@ void main() {
 
     testWidgets('displays shimmer animation', (WidgetTester tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: SkeletonCard(),
-          ),
-        ),
+        const MaterialApp(home: Scaffold(body: SkeletonCard())),
       );
 
       // Find shimmer widget
@@ -207,13 +193,13 @@ void main() {
       expect(shimmer.period, equals(const Duration(milliseconds: 1200)));
     });
 
-    testWidgets('uses correct shimmer colors in light mode', (WidgetTester tester) async {
+    testWidgets('uses correct shimmer colors in light mode', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
           theme: ThemeData.light(),
-          home: const Scaffold(
-            body: SkeletonCard(),
-          ),
+          home: const Scaffold(body: SkeletonCard()),
         ),
       );
 
@@ -232,13 +218,13 @@ void main() {
       }
     });
 
-    testWidgets('uses correct shimmer colors in dark mode', (WidgetTester tester) async {
+    testWidgets('uses correct shimmer colors in dark mode', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
           theme: ThemeData.dark(),
-          home: const Scaffold(
-            body: SkeletonCard(),
-          ),
+          home: const Scaffold(body: SkeletonCard()),
         ),
       );
 
@@ -257,13 +243,11 @@ void main() {
       }
     });
 
-    testWidgets('matches item card layout structure', (WidgetTester tester) async {
+    testWidgets('matches item card layout structure', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: SkeletonCard(),
-          ),
-        ),
+        const MaterialApp(home: Scaffold(body: SkeletonCard())),
       );
 
       await tester.pump();
@@ -276,13 +260,11 @@ void main() {
       expect(skeletonLineFinder.evaluate().length, greaterThanOrEqualTo(3));
     });
 
-    testWidgets('has leading element space (for icon/checkbox)', (WidgetTester tester) async {
+    testWidgets('has leading element space (for icon/checkbox)', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: SkeletonCard(),
-          ),
-        ),
+        const MaterialApp(home: Scaffold(body: SkeletonCard())),
       );
 
       await tester.pump();
@@ -296,17 +278,15 @@ void main() {
       expect(rowFinder, findsWidgets);
     });
 
-    testWidgets('respects reduce motion preferences', (WidgetTester tester) async {
+    testWidgets('respects reduce motion preferences', (
+      WidgetTester tester,
+    ) async {
       // Set accessibility settings to reduce motion
       tester.view.platformDispatcher.accessibilityFeaturesTestValue =
           FakeAccessibilityFeatures.allOn(reduceMotion: true);
 
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: SkeletonCard(),
-          ),
-        ),
+        const MaterialApp(home: Scaffold(body: SkeletonCard())),
       );
 
       await tester.pump();
@@ -320,7 +300,9 @@ void main() {
       expect(shimmerFinder, findsNothing);
     });
 
-    testWidgets('renders multiple skeleton cards correctly', (WidgetTester tester) async {
+    testWidgets('renders multiple skeleton cards correctly', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(
@@ -346,13 +328,11 @@ void main() {
       expect(skeletonCardFinder, findsNWidgets(3));
     });
 
-    testWidgets('has proper spacing between elements', (WidgetTester tester) async {
+    testWidgets('has proper spacing between elements', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: SkeletonCard(),
-          ),
-        ),
+        const MaterialApp(home: Scaffold(body: SkeletonCard())),
       );
 
       await tester.pump();
@@ -366,13 +346,11 @@ void main() {
       expect(sizedBoxFinder, findsWidgets);
     });
 
-    testWidgets('shimmer animation uses linear curve', (WidgetTester tester) async {
+    testWidgets('shimmer animation uses linear curve', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: SkeletonCard(),
-          ),
-        ),
+        const MaterialApp(home: Scaffold(body: SkeletonCard())),
       );
 
       await tester.pump();
@@ -392,26 +370,22 @@ void main() {
       }
     });
 
-    testWidgets('supports variant for different card types', (WidgetTester tester) async {
+    testWidgets('supports variant for different card types', (
+      WidgetTester tester,
+    ) async {
       // Test default variant
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: SkeletonCard(),
-          ),
-        ),
+        const MaterialApp(home: Scaffold(body: SkeletonCard())),
       );
 
       expect(find.byType(SkeletonCard), findsOneWidget);
     });
 
-    testWidgets('maintains 12px border radius consistently', (WidgetTester tester) async {
+    testWidgets('maintains 12px border radius consistently', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: SkeletonCard(),
-          ),
-        ),
+        const MaterialApp(home: Scaffold(body: SkeletonCard())),
       );
 
       await tester.pump();
@@ -422,10 +396,12 @@ void main() {
 
       for (final element in containerFinder.evaluate()) {
         final Container container = element.widget as Container;
-        final BoxDecoration? decoration = container.decoration as BoxDecoration?;
+        final BoxDecoration? decoration =
+            container.decoration as BoxDecoration?;
 
         if (decoration?.borderRadius != null) {
-          final BorderRadius? borderRadius = decoration!.borderRadius as BorderRadius?;
+          final BorderRadius? borderRadius =
+              decoration!.borderRadius as BorderRadius?;
           if (borderRadius != null && borderRadius.topLeft.x == 12.0) {
             foundCorrectBorderRadius = true;
             break;
@@ -438,13 +414,11 @@ void main() {
   });
 
   group('SkeletonCard Accessibility', () {
-    testWidgets('is semantically labeled for screen readers', (WidgetTester tester) async {
+    testWidgets('is semantically labeled for screen readers', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: SkeletonCard(),
-          ),
-        ),
+        const MaterialApp(home: Scaffold(body: SkeletonCard())),
       );
 
       await tester.pumpAndSettle();
@@ -458,17 +432,15 @@ void main() {
       expect(element, isNotNull);
     });
 
-    testWidgets('respects system accessibility settings', (WidgetTester tester) async {
+    testWidgets('respects system accessibility settings', (
+      WidgetTester tester,
+    ) async {
       // Enable high contrast
       tester.view.platformDispatcher.accessibilityFeaturesTestValue =
           FakeAccessibilityFeatures.allOn(highContrast: true);
 
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: SkeletonCard(),
-          ),
-        ),
+        const MaterialApp(home: Scaffold(body: SkeletonCard())),
       );
 
       await tester.pumpAndSettle();
@@ -479,7 +451,9 @@ void main() {
   });
 
   group('SkeletonCard Performance', () {
-    testWidgets('renders efficiently without excessive rebuilds', (WidgetTester tester) async {
+    testWidgets('renders efficiently without excessive rebuilds', (
+      WidgetTester tester,
+    ) async {
       int buildCount = 0;
 
       await tester.pumpWidget(

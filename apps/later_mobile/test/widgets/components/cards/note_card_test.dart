@@ -32,9 +32,7 @@ void main() {
 
         await tester.pumpWidget(
           MaterialApp(
-            home: Scaffold(
-              body: NoteCard(item: note),
-            ),
+            home: Scaffold(body: NoteCard(item: note)),
           ),
         );
 
@@ -47,9 +45,7 @@ void main() {
 
         await tester.pumpWidget(
           MaterialApp(
-            home: Scaffold(
-              body: NoteCard(item: note),
-            ),
+            home: Scaffold(body: NoteCard(item: note)),
           ),
         );
 
@@ -63,24 +59,22 @@ void main() {
 
         await tester.pumpWidget(
           MaterialApp(
-            home: Scaffold(
-              body: NoteCard(item: note),
-            ),
+            home: Scaffold(body: NoteCard(item: note)),
           ),
         );
 
         expect(find.textContaining('This is a short note'), findsOneWidget);
       });
 
-      testWidgets('truncates content to 100 chars with ellipsis', (tester) async {
+      testWidgets('truncates content to 100 chars with ellipsis', (
+        tester,
+      ) async {
         final longContent = 'A' * 150; // 150 characters
         final note = createNote(content: longContent);
 
         await tester.pumpWidget(
           MaterialApp(
-            home: Scaffold(
-              body: NoteCard(item: note),
-            ),
+            home: Scaffold(body: NoteCard(item: note)),
           ),
         );
 
@@ -97,23 +91,21 @@ void main() {
 
         await tester.pumpWidget(
           MaterialApp(
-            home: Scaffold(
-              body: NoteCard(item: note),
-            ),
+            home: Scaffold(body: NoteCard(item: note)),
           ),
         );
 
         expect(find.byIcon(Icons.description_outlined), findsOneWidget);
       });
 
-      testWidgets('renders blue-cyan gradient border (noteGradient)', (tester) async {
+      testWidgets('renders blue-cyan gradient border (noteGradient)', (
+        tester,
+      ) async {
         final note = createNote();
 
         await tester.pumpWidget(
           MaterialApp(
-            home: Scaffold(
-              body: NoteCard(item: note),
-            ),
+            home: Scaffold(body: NoteCard(item: note)),
           ),
         );
 
@@ -122,15 +114,11 @@ void main() {
       });
 
       testWidgets('displays tags as chips', (tester) async {
-        final note = createNote(
-          tags: ['work', 'important', 'review'],
-        );
+        final note = createNote(tags: ['work', 'important', 'review']);
 
         await tester.pumpWidget(
           MaterialApp(
-            home: Scaffold(
-              body: NoteCard(item: note),
-            ),
+            home: Scaffold(body: NoteCard(item: note)),
           ),
         );
 
@@ -141,15 +129,11 @@ void main() {
       });
 
       testWidgets('shows first 3 tags only', (tester) async {
-        final note = createNote(
-          tags: ['tag1', 'tag2', 'tag3', 'tag4', 'tag5'],
-        );
+        final note = createNote(tags: ['tag1', 'tag2', 'tag3', 'tag4', 'tag5']);
 
         await tester.pumpWidget(
           MaterialApp(
-            home: Scaffold(
-              body: NoteCard(item: note),
-            ),
+            home: Scaffold(body: NoteCard(item: note)),
           ),
         );
 
@@ -163,15 +147,11 @@ void main() {
       });
 
       testWidgets('shows "+X more" when more than 3 tags', (tester) async {
-        final note = createNote(
-          tags: ['tag1', 'tag2', 'tag3', 'tag4'],
-        );
+        final note = createNote(tags: ['tag1', 'tag2', 'tag3', 'tag4']);
 
         await tester.pumpWidget(
           MaterialApp(
-            home: Scaffold(
-              body: NoteCard(item: note),
-            ),
+            home: Scaffold(body: NoteCard(item: note)),
           ),
         );
 
@@ -184,9 +164,7 @@ void main() {
 
         await tester.pumpWidget(
           MaterialApp(
-            home: Scaffold(
-              body: NoteCard(item: note),
-            ),
+            home: Scaffold(body: NoteCard(item: note)),
           ),
         );
 
@@ -200,9 +178,7 @@ void main() {
 
         await tester.pumpWidget(
           MaterialApp(
-            home: Scaffold(
-              body: NoteCard(item: note),
-            ),
+            home: Scaffold(body: NoteCard(item: note)),
           ),
         );
 
@@ -210,14 +186,14 @@ void main() {
         expect(find.text('Meeting Notes'), findsOneWidget);
       });
 
-      testWidgets('handles empty string content (no preview shown)', (tester) async {
+      testWidgets('handles empty string content (no preview shown)', (
+        tester,
+      ) async {
         final note = createNote(content: '');
 
         await tester.pumpWidget(
           MaterialApp(
-            home: Scaffold(
-              body: NoteCard(item: note),
-            ),
+            home: Scaffold(body: NoteCard(item: note)),
           ),
         );
 
@@ -230,9 +206,7 @@ void main() {
 
         await tester.pumpWidget(
           MaterialApp(
-            home: Scaffold(
-              body: NoteCard(item: note),
-            ),
+            home: Scaffold(body: NoteCard(item: note)),
           ),
         );
 
@@ -245,9 +219,7 @@ void main() {
 
         await tester.pumpWidget(
           MaterialApp(
-            home: Scaffold(
-              body: NoteCard(item: note),
-            ),
+            home: Scaffold(body: NoteCard(item: note)),
           ),
         );
 
@@ -261,9 +233,7 @@ void main() {
 
         await tester.pumpWidget(
           MaterialApp(
-            home: Scaffold(
-              body: NoteCard(item: note),
-            ),
+            home: Scaffold(body: NoteCard(item: note)),
           ),
         );
 
@@ -275,14 +245,13 @@ void main() {
 
       testWidgets('content preview is 2 lines max', (tester) async {
         final note = createNote(
-          content: 'Line one content here. Line two content here. Line three should be cut off.',
+          content:
+              'Line one content here. Line two content here. Line three should be cut off.',
         );
 
         await tester.pumpWidget(
           MaterialApp(
-            home: Scaffold(
-              body: NoteCard(item: note),
-            ),
+            home: Scaffold(body: NoteCard(item: note)),
           ),
         );
 
@@ -314,7 +283,9 @@ void main() {
         expect(tapped, isTrue);
       });
 
-      testWidgets('onLongPress callback fires when long pressed', (tester) async {
+      testWidgets('onLongPress callback fires when long pressed', (
+        tester,
+      ) async {
         final note = createNote();
         var longPressed = false;
 
@@ -342,9 +313,7 @@ void main() {
 
         await tester.pumpWidget(
           MaterialApp(
-            home: Scaffold(
-              body: NoteCard(item: note),
-            ),
+            home: Scaffold(body: NoteCard(item: note)),
           ),
         );
 
@@ -362,9 +331,7 @@ void main() {
 
         await tester.pumpWidget(
           MaterialApp(
-            home: Scaffold(
-              body: NoteCard(item: note),
-            ),
+            home: Scaffold(body: NoteCard(item: note)),
           ),
         );
 
@@ -391,9 +358,7 @@ void main() {
 
         await tester.pumpWidget(
           MaterialApp(
-            home: Scaffold(
-              body: NoteCard(item: note),
-            ),
+            home: Scaffold(body: NoteCard(item: note)),
           ),
         );
 
@@ -419,9 +384,7 @@ void main() {
 
         await tester.pumpWidget(
           MaterialApp(
-            home: Scaffold(
-              body: NoteCard(item: note),
-            ),
+            home: Scaffold(body: NoteCard(item: note)),
           ),
         );
 
@@ -430,16 +393,11 @@ void main() {
       });
 
       testWidgets('displays with correct layout structure', (tester) async {
-        final note = createNote(
-          content: 'Some content',
-          tags: ['tag1'],
-        );
+        final note = createNote(content: 'Some content', tags: ['tag1']);
 
         await tester.pumpWidget(
           MaterialApp(
-            home: Scaffold(
-              body: NoteCard(item: note),
-            ),
+            home: Scaffold(body: NoteCard(item: note)),
           ),
         );
 
@@ -455,9 +413,7 @@ void main() {
 
         await tester.pumpWidget(
           MaterialApp(
-            home: Scaffold(
-              body: NoteCard(item: note),
-            ),
+            home: Scaffold(body: NoteCard(item: note)),
           ),
         );
 
@@ -473,10 +429,7 @@ void main() {
         await tester.pumpWidget(
           MaterialApp(
             home: Scaffold(
-              body: NoteCard(
-                item: note,
-                onTap: () {},
-              ),
+              body: NoteCard(item: note, onTap: () {}),
             ),
           ),
         );
@@ -498,17 +451,14 @@ void main() {
     });
 
     group('Entrance Animation', () {
-      testWidgets('applies entrance animation with index parameter', (tester) async {
+      testWidgets('applies entrance animation with index parameter', (
+        tester,
+      ) async {
         final note = createNote();
 
         await tester.pumpWidget(
           MaterialApp(
-            home: Scaffold(
-              body: NoteCard(
-                item: note,
-                index: 0,
-              ),
-            ),
+            home: Scaffold(body: NoteCard(item: note, index: 0)),
           ),
         );
 
@@ -527,9 +477,7 @@ void main() {
 
         await tester.pumpWidget(
           MaterialApp(
-            home: Scaffold(
-              body: NoteCard(item: note),
-            ),
+            home: Scaffold(body: NoteCard(item: note)),
           ),
         );
 
@@ -541,10 +489,7 @@ void main() {
       testWidgets('applies staggered delay based on index', (tester) async {
         final notes = List.generate(
           3,
-          (index) => createNote(
-            id: 'note_$index',
-            title: 'Note $index',
-          ),
+          (index) => createNote(id: 'note_$index', title: 'Note $index'),
         );
 
         await tester.pumpWidget(
@@ -553,10 +498,7 @@ void main() {
               body: ListView.builder(
                 itemCount: notes.length,
                 itemBuilder: (context, index) {
-                  return NoteCard(
-                    item: notes[index],
-                    index: index,
-                  );
+                  return NoteCard(item: notes[index], index: index);
                 },
               ),
             ),
@@ -577,15 +519,15 @@ void main() {
     });
 
     group('Content Truncation', () {
-      testWidgets('content at exactly 100 chars shows without ellipsis', (tester) async {
+      testWidgets('content at exactly 100 chars shows without ellipsis', (
+        tester,
+      ) async {
         final content = 'A' * 100;
         final note = createNote(content: content);
 
         await tester.pumpWidget(
           MaterialApp(
-            home: Scaffold(
-              body: NoteCard(item: note),
-            ),
+            home: Scaffold(body: NoteCard(item: note)),
           ),
         );
 
@@ -598,9 +540,7 @@ void main() {
 
         await tester.pumpWidget(
           MaterialApp(
-            home: Scaffold(
-              body: NoteCard(item: note),
-            ),
+            home: Scaffold(body: NoteCard(item: note)),
           ),
         );
 
@@ -613,9 +553,7 @@ void main() {
 
         await tester.pumpWidget(
           MaterialApp(
-            home: Scaffold(
-              body: NoteCard(item: note),
-            ),
+            home: Scaffold(body: NoteCard(item: note)),
           ),
         );
 
@@ -626,16 +564,14 @@ void main() {
     group('Edge Cases', () {
       testWidgets('handles very long title', (tester) async {
         final note = createNote(
-          title: 'This is a very long note title that should be truncated with ellipsis when it exceeds the maximum number of lines allowed',
+          title:
+              'This is a very long note title that should be truncated with ellipsis when it exceeds the maximum number of lines allowed',
         );
 
         await tester.pumpWidget(
           MaterialApp(
             home: Scaffold(
-              body: SizedBox(
-                width: 300,
-                child: NoteCard(item: note),
-              ),
+              body: SizedBox(width: 300, child: NoteCard(item: note)),
             ),
           ),
         );
@@ -649,9 +585,7 @@ void main() {
 
         await tester.pumpWidget(
           MaterialApp(
-            home: Scaffold(
-              body: NoteCard(item: note),
-            ),
+            home: Scaffold(body: NoteCard(item: note)),
           ),
         );
 
@@ -672,10 +606,7 @@ void main() {
         await tester.pumpWidget(
           MaterialApp(
             home: Scaffold(
-              body: SizedBox(
-                width: 300,
-                child: NoteCard(item: note),
-              ),
+              body: SizedBox(width: 300, child: NoteCard(item: note)),
             ),
           ),
         );
@@ -692,9 +623,7 @@ void main() {
 
         await tester.pumpWidget(
           MaterialApp(
-            home: Scaffold(
-              body: NoteCard(item: note),
-            ),
+            home: Scaffold(body: NoteCard(item: note)),
           ),
         );
 
@@ -706,9 +635,7 @@ void main() {
 
         await tester.pumpWidget(
           MaterialApp(
-            home: Scaffold(
-              body: NoteCard(item: note),
-            ),
+            home: Scaffold(body: NoteCard(item: note)),
           ),
         );
 
@@ -722,11 +649,7 @@ void main() {
 
         await tester.pumpWidget(
           MaterialApp(
-            home: Scaffold(
-              body: NoteCard(
-                item: note,
-              ),
-            ),
+            home: Scaffold(body: NoteCard(item: note)),
           ),
         );
 
@@ -739,12 +662,7 @@ void main() {
 
         await tester.pumpWidget(
           MaterialApp(
-            home: Scaffold(
-              body: NoteCard(
-                item: note,
-                showMetadata: false,
-              ),
-            ),
+            home: Scaffold(body: NoteCard(item: note, showMetadata: false)),
           ),
         );
 

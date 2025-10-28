@@ -31,11 +31,7 @@ enum SpaceModalMode {
 /// - Auto-switch to newly created space
 /// - Support for both create and edit modes
 class CreateSpaceModal extends StatefulWidget {
-  const CreateSpaceModal({
-    required this.mode,
-    this.initialSpace,
-    super.key,
-  });
+  const CreateSpaceModal({required this.mode, this.initialSpace, super.key});
 
   /// The mode for the modal (create or edit)
   final SpaceModalMode mode;
@@ -224,8 +220,7 @@ class _CreateSpaceModalState extends State<CreateSpaceModal> {
         Text(
           'Icon',
           style: AppTypography.labelLarge.copyWith(
-            color:
-                isDark ? AppColors.neutral400 : AppColors.neutral600,
+            color: AppColors.text(context),
           ),
         ),
         const SizedBox(height: AppSpacing.xs),
@@ -246,11 +241,9 @@ class _CreateSpaceModalState extends State<CreateSpaceModal> {
                 decoration: BoxDecoration(
                   color: isSelected
                       ? (isDark
-                          ? AppColors.selectedDark
-                          : AppColors.selectedLight)
-                      : (isDark
-                          ? AppColors.neutral800
-                          : AppColors.neutral100),
+                            ? AppColors.selectedDark
+                            : AppColors.selectedLight)
+                      : (AppColors.surfaceVariant(context)),
                   borderRadius: BorderRadius.circular(AppSpacing.radiusSM),
                   border: isSelected
                       ? Border.all(
@@ -264,10 +257,7 @@ class _CreateSpaceModalState extends State<CreateSpaceModal> {
                 child: Stack(
                   children: [
                     Center(
-                      child: Text(
-                        icon,
-                        style: const TextStyle(fontSize: 24),
-                      ),
+                      child: Text(icon, style: const TextStyle(fontSize: 24)),
                     ),
                     if (isSelected)
                       const Positioned(
@@ -297,8 +287,7 @@ class _CreateSpaceModalState extends State<CreateSpaceModal> {
         Text(
           'Color',
           style: AppTypography.labelLarge.copyWith(
-            color:
-                isDark ? AppColors.neutral400 : AppColors.neutral600,
+            color: AppColors.text(context),
           ),
         ),
         const SizedBox(height: AppSpacing.xs),
@@ -338,11 +327,7 @@ class _CreateSpaceModalState extends State<CreateSpaceModal> {
                 ),
                 child: isSelected
                     ? const Center(
-                        child: Icon(
-                          Icons.check,
-                          color: Colors.white,
-                          size: 24,
-                        ),
+                        child: Icon(Icons.check, color: Colors.white, size: 24),
                       )
                     : null,
               ),
@@ -378,8 +363,12 @@ class _CreateSpaceModalState extends State<CreateSpaceModal> {
   @override
   Widget build(BuildContext context) {
     return BottomSheetContainer(
-      title: widget.mode == SpaceModalMode.create ? 'Create Space' : 'Edit Space',
-      primaryButtonText: widget.mode == SpaceModalMode.create ? 'Create' : 'Save',
+      title: widget.mode == SpaceModalMode.create
+          ? 'Create Space'
+          : 'Edit Space',
+      primaryButtonText: widget.mode == SpaceModalMode.create
+          ? 'Create'
+          : 'Save',
       onPrimaryPressed: _isSubmitting ? null : _handleSubmit,
       isPrimaryButtonEnabled: !_isSubmitting && _isFormValid,
       isPrimaryButtonLoading: _isSubmitting,

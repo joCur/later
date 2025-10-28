@@ -113,9 +113,7 @@ class TodoListRepository {
       }
 
       // Update the updatedAt timestamp
-      final updatedTodoList = todoList.copyWith(
-        updatedAt: DateTime.now(),
-      );
+      final updatedTodoList = todoList.copyWith(updatedAt: DateTime.now());
 
       await _box.put(updatedTodoList.id, updatedTodoList);
       return updatedTodoList;
@@ -205,7 +203,11 @@ class TodoListRepository {
   ///   item.copyWith(title: 'Updated title'),
   /// );
   /// ```
-  Future<TodoList> updateItem(String listId, String itemId, TodoItem updatedItem) async {
+  Future<TodoList> updateItem(
+    String listId,
+    String itemId,
+    TodoItem updatedItem,
+  ) async {
     try {
       final todoList = await getById(listId);
       if (todoList == null) {
@@ -214,7 +216,9 @@ class TodoListRepository {
 
       final itemIndex = todoList.items.indexWhere((item) => item.id == itemId);
       if (itemIndex == -1) {
-        throw Exception('TodoItem with id $itemId does not exist in list $listId');
+        throw Exception(
+          'TodoItem with id $itemId does not exist in list $listId',
+        );
       }
 
       final updatedItems = [...todoList.items];
@@ -255,7 +259,9 @@ class TodoListRepository {
         throw Exception('TodoList with id $listId does not exist');
       }
 
-      final updatedItems = todoList.items.where((item) => item.id != itemId).toList();
+      final updatedItems = todoList.items
+          .where((item) => item.id != itemId)
+          .toList();
 
       final updatedTodoList = todoList.copyWith(
         items: updatedItems,
@@ -294,7 +300,9 @@ class TodoListRepository {
 
       final itemIndex = todoList.items.indexWhere((item) => item.id == itemId);
       if (itemIndex == -1) {
-        throw Exception('TodoItem with id $itemId does not exist in list $listId');
+        throw Exception(
+          'TodoItem with id $itemId does not exist in list $listId',
+        );
       }
 
       final updatedItems = [...todoList.items];
@@ -331,16 +339,24 @@ class TodoListRepository {
   /// ```dart
   /// final updated = await repository.reorderItems('todo-1', 0, 2);
   /// ```
-  Future<TodoList> reorderItems(String listId, int oldIndex, int newIndex) async {
+  Future<TodoList> reorderItems(
+    String listId,
+    int oldIndex,
+    int newIndex,
+  ) async {
     try {
       final todoList = await getById(listId);
       if (todoList == null) {
         throw Exception('TodoList with id $listId does not exist');
       }
 
-      if (oldIndex < 0 || oldIndex >= todoList.items.length ||
-          newIndex < 0 || newIndex >= todoList.items.length) {
-        throw Exception('Invalid reorder indices: oldIndex=$oldIndex, newIndex=$newIndex');
+      if (oldIndex < 0 ||
+          oldIndex >= todoList.items.length ||
+          newIndex < 0 ||
+          newIndex >= todoList.items.length) {
+        throw Exception(
+          'Invalid reorder indices: oldIndex=$oldIndex, newIndex=$newIndex',
+        );
       }
 
       final updatedItems = [...todoList.items];

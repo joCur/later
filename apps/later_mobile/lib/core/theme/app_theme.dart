@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import '../../design_system/tokens/colors.dart';
 import '../../design_system/tokens/typography.dart';
 import '../../design_system/tokens/spacing.dart';
+import 'temporal_flow_theme.dart';
 
 /// Temporal Flow Design System - Theme Configuration
 /// Integrates colors, typography, spacing, and animations into Material ThemeData
@@ -18,6 +19,7 @@ class AppTheme {
       useMaterial3: true,
       colorScheme: colorScheme,
       scaffoldBackgroundColor: AppColors.neutral50,
+      extensions: <ThemeExtension<dynamic>>[TemporalFlowTheme.light()],
 
       // Typography - Using Google Fonts Inter
       textTheme: AppTypography.themedTextTheme(
@@ -46,9 +48,7 @@ class AppTheme {
         shadowColor: AppColors.shadowLight,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
-          side: const BorderSide(
-            color: AppColors.neutral200,
-          ),
+          side: const BorderSide(color: AppColors.neutral200),
         ),
       ),
 
@@ -82,9 +82,7 @@ class AppTheme {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
           ),
-          side: const BorderSide(
-            color: AppColors.neutral200,
-          ),
+          side: const BorderSide(color: AppColors.neutral200),
           minimumSize: const Size(0, AppSpacing.touchTargetMedium),
         ),
       ),
@@ -132,15 +130,11 @@ class AppTheme {
         ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
-          borderSide: const BorderSide(
-            color: AppColors.neutral200,
-          ),
+          borderSide: const BorderSide(color: AppColors.neutral200),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
-          borderSide: const BorderSide(
-            color: AppColors.neutral200,
-          ),
+          borderSide: const BorderSide(color: AppColors.neutral200),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
@@ -151,9 +145,7 @@ class AppTheme {
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
-          borderSide: const BorderSide(
-            color: AppColors.error,
-          ),
+          borderSide: const BorderSide(color: AppColors.error),
         ),
         focusedErrorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
@@ -162,9 +154,7 @@ class AppTheme {
             width: AppSpacing.borderWidthMedium,
           ),
         ),
-        hintStyle: AppTypography.input.copyWith(
-          color: AppColors.neutral400,
-        ),
+        hintStyle: AppTypography.input.copyWith(color: AppColors.neutral400),
         labelStyle: AppTypography.inputLabel.copyWith(
           color: AppColors.neutral500,
         ),
@@ -194,9 +184,7 @@ class AppTheme {
         shadowColor: AppColors.shadowLight,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppSpacing.modalRadius),
-          side: const BorderSide(
-            color: AppColors.glassBorderLight,
-          ),
+          side: const BorderSide(color: AppColors.glassBorderLight),
         ),
       ),
 
@@ -209,9 +197,7 @@ class AppTheme {
           borderRadius: BorderRadius.vertical(
             top: Radius.circular(AppSpacing.modalRadius),
           ),
-          side: BorderSide(
-            color: AppColors.glassBorderLight,
-          ),
+          side: BorderSide(color: AppColors.glassBorderLight),
         ),
       ),
 
@@ -236,10 +222,7 @@ class AppTheme {
       ),
 
       // Icon theme
-      iconTheme: const IconThemeData(
-        color: AppColors.neutral700,
-        size: 24,
-      ),
+      iconTheme: const IconThemeData(color: AppColors.neutral700, size: 24),
 
       // Checkbox theme - Success gradient on checked
       checkboxTheme: CheckboxThemeData(
@@ -330,6 +313,7 @@ class AppTheme {
       useMaterial3: true,
       colorScheme: colorScheme,
       scaffoldBackgroundColor: AppColors.neutral950,
+      extensions: <ThemeExtension<dynamic>>[TemporalFlowTheme.dark()],
 
       // Typography
       textTheme: AppTypography.themedTextTheme(
@@ -358,9 +342,7 @@ class AppTheme {
         shadowColor: AppColors.shadowDark,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
-          side: const BorderSide(
-            color: AppColors.neutral700,
-          ),
+          side: const BorderSide(color: AppColors.neutral700),
         ),
       ),
 
@@ -394,9 +376,7 @@ class AppTheme {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
           ),
-          side: const BorderSide(
-            color: AppColors.neutral700,
-          ),
+          side: const BorderSide(color: AppColors.neutral700),
           minimumSize: const Size(0, AppSpacing.touchTargetMedium),
         ),
       ),
@@ -444,15 +424,11 @@ class AppTheme {
         ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
-          borderSide: const BorderSide(
-            color: AppColors.neutral700,
-          ),
+          borderSide: const BorderSide(color: AppColors.neutral700),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
-          borderSide: const BorderSide(
-            color: AppColors.neutral700,
-          ),
+          borderSide: const BorderSide(color: AppColors.neutral700),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
@@ -463,9 +439,7 @@ class AppTheme {
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
-          borderSide: const BorderSide(
-            color: AppColors.error,
-          ),
+          borderSide: const BorderSide(color: AppColors.error),
         ),
         focusedErrorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppSpacing.inputRadius),
@@ -474,9 +448,7 @@ class AppTheme {
             width: AppSpacing.borderWidthMedium,
           ),
         ),
-        hintStyle: AppTypography.input.copyWith(
-          color: AppColors.neutral600,
-        ),
+        hintStyle: AppTypography.input.copyWith(color: AppColors.neutral600),
         labelStyle: AppTypography.inputLabel.copyWith(
           color: AppColors.neutral500,
         ),
@@ -508,9 +480,7 @@ class AppTheme {
         shadowColor: AppColors.shadowDark,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppSpacing.modalRadius),
-          side: const BorderSide(
-            color: AppColors.glassBorderDark,
-          ),
+          side: const BorderSide(color: AppColors.glassBorderDark),
         ),
       ),
 
@@ -523,9 +493,7 @@ class AppTheme {
           borderRadius: BorderRadius.vertical(
             top: Radius.circular(AppSpacing.modalRadius),
           ),
-          side: BorderSide(
-            color: AppColors.glassBorderDark,
-          ),
+          side: BorderSide(color: AppColors.glassBorderDark),
         ),
       ),
 
@@ -550,10 +518,7 @@ class AppTheme {
       ),
 
       // Icon theme
-      iconTheme: const IconThemeData(
-        color: AppColors.neutral300,
-        size: 24,
-      ),
+      iconTheme: const IconThemeData(color: AppColors.neutral300, size: 24),
 
       // Checkbox theme
       checkboxTheme: CheckboxThemeData(

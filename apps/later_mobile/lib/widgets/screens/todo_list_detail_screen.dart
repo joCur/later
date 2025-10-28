@@ -392,7 +392,8 @@ class _TodoListDetailScreenState extends State<TodoListDetailScreen> {
     final confirmed = await showDeleteConfirmationDialog(
       context: context,
       title: 'Delete TodoList',
-      message: 'Are you sure you want to delete "${_currentTodoList.name}"?\n\n'
+      message:
+          'Are you sure you want to delete "${_currentTodoList.name}"?\n\n'
           'This will delete all ${_currentTodoList.items.length} items in this list. '
           'This action cannot be undone.',
     );

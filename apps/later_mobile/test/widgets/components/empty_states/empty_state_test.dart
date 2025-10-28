@@ -6,8 +6,9 @@ import 'package:later_mobile/design_system/atoms/buttons/ghost_button.dart';
 
 void main() {
   group('EmptyState Base Component Tests', () {
-    testWidgets('renders with icon, title, and description',
-        (WidgetTester tester) async {
+    testWidgets('renders with icon, title, and description', (
+      WidgetTester tester,
+    ) async {
       // Arrange
       const title = 'Empty State Title';
       const description = 'Empty state description';
@@ -80,8 +81,9 @@ void main() {
       expect(buttonPressed, isTrue);
     });
 
-    testWidgets('renders with secondary action button',
-        (WidgetTester tester) async {
+    testWidgets('renders with secondary action button', (
+      WidgetTester tester,
+    ) async {
       // Arrange
       var secondaryButtonPressed = false;
 
@@ -114,8 +116,9 @@ void main() {
       expect(secondaryButtonPressed, isTrue);
     });
 
-    testWidgets('does not render CTA when not provided',
-        (WidgetTester tester) async {
+    testWidgets('does not render CTA when not provided', (
+      WidgetTester tester,
+    ) async {
       // Act
       await tester.pumpWidget(
         const MaterialApp(
@@ -133,8 +136,9 @@ void main() {
       expect(find.byType(PrimaryButton), findsNothing);
     });
 
-    testWidgets('does not render secondary action when not provided',
-        (WidgetTester tester) async {
+    testWidgets('does not render secondary action when not provided', (
+      WidgetTester tester,
+    ) async {
       // Act
       await tester.pumpWidget(
         const MaterialApp(
@@ -152,8 +156,9 @@ void main() {
       expect(find.byType(GhostButton), findsNothing);
     });
 
-    testWidgets('uses correct colors in light mode',
-        (WidgetTester tester) async {
+    testWidgets('uses correct colors in light mode', (
+      WidgetTester tester,
+    ) async {
       // Act
       await tester.pumpWidget(
         MaterialApp(
@@ -173,8 +178,9 @@ void main() {
       expect(iconWidget.color, isNotNull);
     });
 
-    testWidgets('uses correct colors in dark mode',
-        (WidgetTester tester) async {
+    testWidgets('uses correct colors in dark mode', (
+      WidgetTester tester,
+    ) async {
       // Act
       await tester.pumpWidget(
         MaterialApp(
@@ -235,8 +241,9 @@ void main() {
       expect(column.mainAxisAlignment, MainAxisAlignment.center);
     });
 
-    testWidgets('centers content horizontally and vertically',
-        (WidgetTester tester) async {
+    testWidgets('centers content horizontally and vertically', (
+      WidgetTester tester,
+    ) async {
       // Act
       await tester.pumpWidget(
         const MaterialApp(
@@ -302,8 +309,9 @@ void main() {
       expect(find.byType(PrimaryButton), findsOneWidget);
     });
 
-    testWidgets('renders both primary and secondary actions together',
-        (WidgetTester tester) async {
+    testWidgets('renders both primary and secondary actions together', (
+      WidgetTester tester,
+    ) async {
       // Act
       await tester.pumpWidget(
         MaterialApp(
@@ -328,8 +336,9 @@ void main() {
       expect(find.byType(GhostButton), findsOneWidget);
     });
 
-    testWidgets('has proper semantic labels for accessibility',
-        (WidgetTester tester) async {
+    testWidgets('has proper semantic labels for accessibility', (
+      WidgetTester tester,
+    ) async {
       // Act
       await tester.pumpWidget(
         const MaterialApp(
@@ -348,8 +357,9 @@ void main() {
       expect(find.text('Description'), findsOneWidget);
     });
 
-    testWidgets('respects vertical spacing of 64px between sections',
-        (WidgetTester tester) async {
+    testWidgets('respects vertical spacing of 64px between sections', (
+      WidgetTester tester,
+    ) async {
       // Act
       await tester.pumpWidget(
         MaterialApp(

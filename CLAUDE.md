@@ -216,6 +216,38 @@ When adding new models, use IDs starting from 30+.
 
 ## Design System Guidelines
 
+### Theme Extensions
+
+The app uses Flutter's `ThemeExtension` API for custom design tokens via `TemporalFlowTheme`. This provides automatic light/dark mode handling and smooth theme transitions.
+
+**Accessing theme in components:**
+```dart
+// Get the theme extension
+final temporalTheme = Theme.of(context).extension<TemporalFlowTheme>()!;
+
+// Access themed properties
+final gradient = temporalTheme.primaryGradient;       // Auto light/dark
+final glassColor = temporalTheme.glassBackground;     // Auto light/dark
+final shadow = temporalTheme.shadowColor;             // Auto light/dark
+```
+
+**Available properties:**
+- `primaryGradient` - Main brand gradient (indigo → purple)
+- `secondaryGradient` - Secondary brand gradient (amber → pink)
+- `taskGradient` - Task-specific gradient (red → orange)
+- `noteGradient` - Note-specific gradient (blue → cyan)
+- `listGradient` - List-specific gradient (violet)
+- `glassBackground` - Glassmorphism background color
+- `glassBorder` - Glassmorphism border color
+- `taskColor`, `noteColor`, `listColor` - Type-specific accent colors
+- `shadowColor` - Shadow color for elevation
+
+**Deprecated helpers:**
+The following `AppColors` helper methods are deprecated in favor of `TemporalFlowTheme`:
+- ~~`AppColors.primaryGradientAdaptive(context)`~~ → Use `temporalTheme.primaryGradient`
+- ~~`AppColors.glass(context)`~~ → Use `temporalTheme.glassBackground`
+- ~~`AppColors.shadow(context)`~~ → Use `temporalTheme.shadowColor`
+
 ### Colors
 
 Import tokens: `import 'package:later_mobile/design_system/design_system.dart';`

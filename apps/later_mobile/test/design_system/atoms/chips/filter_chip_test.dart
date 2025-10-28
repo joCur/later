@@ -36,7 +36,6 @@ void main() {
               label: 'Test Filter',
               isSelected: false,
               onSelected: () {},
-              isDark: false,
             ),
           ),
         ),
@@ -45,8 +44,9 @@ void main() {
       expect(find.text('Test Filter'), findsOneWidget);
     });
 
-    testWidgets('Selected state shows gradient border',
-        (WidgetTester tester) async {
+    testWidgets('Selected state shows gradient border', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -54,16 +54,13 @@ void main() {
               label: 'Selected',
               isSelected: true,
               onSelected: () {},
-              isDark: false,
             ),
           ),
         ),
       );
 
       // Find the outer container with gradient
-      final container = tester.widget<Container>(
-        find.byType(Container).first,
-      );
+      final container = tester.widget<Container>(find.byType(Container).first);
 
       // Verify gradient decoration exists
       expect(container.decoration, isA<BoxDecoration>());
@@ -78,8 +75,9 @@ void main() {
       expect(innerContainer.margin, equals(const EdgeInsets.all(2)));
     });
 
-    testWidgets('Selected state shows gradient border in dark mode',
-        (WidgetTester tester) async {
+    testWidgets('Selected state shows gradient border in dark mode', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -87,24 +85,22 @@ void main() {
               label: 'Selected',
               isSelected: true,
               onSelected: () {},
-              isDark: true,
             ),
           ),
         ),
       );
 
       // Find the outer container with gradient
-      final container = tester.widget<Container>(
-        find.byType(Container).first,
-      );
+      final container = tester.widget<Container>(find.byType(Container).first);
 
       // Verify dark mode gradient
       final decoration = container.decoration as BoxDecoration;
       expect(decoration.gradient, equals(AppColors.primaryGradientDark));
     });
 
-    testWidgets('Unselected state shows solid border',
-        (WidgetTester tester) async {
+    testWidgets('Unselected state shows solid border', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -112,16 +108,13 @@ void main() {
               label: 'Unselected',
               isSelected: false,
               onSelected: () {},
-              isDark: false,
             ),
           ),
         ),
       );
 
       // Find the container with border
-      final container = tester.widget<Container>(
-        find.byType(Container).first,
-      );
+      final container = tester.widget<Container>(find.byType(Container).first);
 
       // Verify solid border decoration
       expect(container.decoration, isA<BoxDecoration>());
@@ -131,8 +124,9 @@ void main() {
       expect(decoration.borderRadius, equals(BorderRadius.circular(20)));
     });
 
-    testWidgets('Unselected state shows solid border in dark mode',
-        (WidgetTester tester) async {
+    testWidgets('Unselected state shows solid border in dark mode', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -140,16 +134,13 @@ void main() {
               label: 'Unselected',
               isSelected: false,
               onSelected: () {},
-              isDark: true,
             ),
           ),
         ),
       );
 
       // Find the container with border
-      final container = tester.widget<Container>(
-        find.byType(Container).first,
-      );
+      final container = tester.widget<Container>(find.byType(Container).first);
 
       // Verify solid border exists in dark mode
       final decoration = container.decoration as BoxDecoration;
@@ -170,7 +161,6 @@ void main() {
                 onSelected: () {
                   callbackInvoked = true;
                 },
-                isDark: false,
               ),
             ),
           ),
@@ -192,7 +182,6 @@ void main() {
               label: 'Animate',
               isSelected: false,
               onSelected: () {},
-              isDark: false,
             ),
           ),
         ),
@@ -213,10 +202,7 @@ void main() {
       final animatedTransform = tester.widget<Transform>(
         find.byType(Transform).first,
       );
-      expect(
-        animatedTransform.transform.getMaxScaleOnAxis(),
-        greaterThan(1.0),
-      );
+      expect(animatedTransform.transform.getMaxScaleOnAxis(), greaterThan(1.0));
 
       // Complete animation
       await tester.pumpAndSettle();
@@ -236,7 +222,6 @@ void main() {
               label: 'With Icon',
               isSelected: false,
               onSelected: () {},
-              isDark: false,
               icon: Icons.filter_list,
             ),
           ),
@@ -259,7 +244,6 @@ void main() {
               label: 'No Icon',
               isSelected: false,
               onSelected: () {},
-              isDark: false,
             ),
           ),
         ),
@@ -269,8 +253,9 @@ void main() {
       expect(find.byType(Icon), findsNothing);
     });
 
-    testWidgets('Light theme uses correct text colors',
-        (WidgetTester tester) async {
+    testWidgets('Light theme uses correct text colors', (
+      WidgetTester tester,
+    ) async {
       // Test selected state
       await tester.pumpWidget(
         MaterialApp(
@@ -279,17 +264,13 @@ void main() {
               label: 'Selected',
               isSelected: true,
               onSelected: () {},
-              isDark: false,
             ),
           ),
         ),
       );
 
       final selectedText = tester.widget<Text>(find.text('Selected'));
-      expect(
-        selectedText.style?.color,
-        equals(AppColors.neutral600),
-      );
+      expect(selectedText.style?.color, equals(AppColors.neutral600));
 
       // Test unselected state
       await tester.pumpWidget(
@@ -299,21 +280,18 @@ void main() {
               label: 'Unselected',
               isSelected: false,
               onSelected: () {},
-              isDark: false,
             ),
           ),
         ),
       );
 
       final unselectedText = tester.widget<Text>(find.text('Unselected'));
-      expect(
-        unselectedText.style?.color,
-        equals(AppColors.neutral500),
-      );
+      expect(unselectedText.style?.color, equals(AppColors.neutral500));
     });
 
-    testWidgets('Dark theme uses correct text colors',
-        (WidgetTester tester) async {
+    testWidgets('Dark theme uses correct text colors', (
+      WidgetTester tester,
+    ) async {
       // Test selected state
       await tester.pumpWidget(
         MaterialApp(
@@ -322,17 +300,13 @@ void main() {
               label: 'Selected',
               isSelected: true,
               onSelected: () {},
-              isDark: true,
             ),
           ),
         ),
       );
 
       final selectedText = tester.widget<Text>(find.text('Selected'));
-      expect(
-        selectedText.style?.color,
-        equals(AppColors.neutral400),
-      );
+      expect(selectedText.style?.color, equals(AppColors.neutral400));
 
       // Test unselected state
       await tester.pumpWidget(
@@ -342,21 +316,18 @@ void main() {
               label: 'Unselected',
               isSelected: false,
               onSelected: () {},
-              isDark: true,
             ),
           ),
         ),
       );
 
       final unselectedText = tester.widget<Text>(find.text('Unselected'));
-      expect(
-        unselectedText.style?.color,
-        equals(AppColors.neutral500),
-      );
+      expect(unselectedText.style?.color, equals(AppColors.neutral500));
     });
 
-    testWidgets('Icon uses correct colors in light theme',
-        (WidgetTester tester) async {
+    testWidgets('Icon uses correct colors in light theme', (
+      WidgetTester tester,
+    ) async {
       // Test selected state
       await tester.pumpWidget(
         MaterialApp(
@@ -365,7 +336,6 @@ void main() {
               label: 'Selected',
               isSelected: true,
               onSelected: () {},
-              isDark: false,
               icon: Icons.star,
             ),
           ),
@@ -383,7 +353,6 @@ void main() {
               label: 'Unselected',
               isSelected: false,
               onSelected: () {},
-              isDark: false,
               icon: Icons.star,
             ),
           ),
@@ -394,8 +363,9 @@ void main() {
       expect(unselectedIcon.color, equals(AppColors.neutral500));
     });
 
-    testWidgets('Icon uses correct colors in dark theme',
-        (WidgetTester tester) async {
+    testWidgets('Icon uses correct colors in dark theme', (
+      WidgetTester tester,
+    ) async {
       // Test selected state
       await tester.pumpWidget(
         MaterialApp(
@@ -404,7 +374,6 @@ void main() {
               label: 'Selected',
               isSelected: true,
               onSelected: () {},
-              isDark: true,
               icon: Icons.star,
             ),
           ),
@@ -422,7 +391,6 @@ void main() {
               label: 'Unselected',
               isSelected: false,
               onSelected: () {},
-              isDark: true,
               icon: Icons.star,
             ),
           ),
@@ -441,16 +409,13 @@ void main() {
               label: 'Height Test',
               isSelected: false,
               onSelected: () {},
-              isDark: false,
             ),
           ),
         ),
       );
 
       // Find the container that defines height
-      final container = tester.widget<Container>(
-        find.byType(Container).first,
-      );
+      final container = tester.widget<Container>(find.byType(Container).first);
 
       // Height is set directly on the container using BoxConstraints
       // The outer container has height: 36
@@ -466,8 +431,9 @@ void main() {
       expect(renderBox.size.height, equals(36.0));
     });
 
-    testWidgets('Text uses correct font size and weight',
-        (WidgetTester tester) async {
+    testWidgets('Text uses correct font size and weight', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -475,7 +441,6 @@ void main() {
               label: 'Typography Test',
               isSelected: false,
               onSelected: () {},
-              isDark: false,
             ),
           ),
         ),
@@ -496,19 +461,16 @@ void main() {
                   label: 'First',
                   isSelected: true,
                   onSelected: () {},
-                  isDark: false,
                 ),
                 TemporalFilterChip(
                   label: 'Second',
                   isSelected: false,
                   onSelected: () {},
-                  isDark: false,
                 ),
                 TemporalFilterChip(
                   label: 'Third',
                   isSelected: false,
                   onSelected: () {},
-                  isDark: false,
                   icon: Icons.filter,
                 ),
               ],
@@ -523,8 +485,9 @@ void main() {
       expect(find.byIcon(Icons.filter), findsOneWidget);
     });
 
-    testWidgets('State changes update visual appearance',
-        (WidgetTester tester) async {
+    testWidgets('State changes update visual appearance', (
+      WidgetTester tester,
+    ) async {
       bool isSelected = false;
 
       await tester.pumpWidget(
@@ -541,7 +504,6 @@ void main() {
                         isSelected = !isSelected;
                       });
                     },
-                    isDark: false,
                   ),
                 ),
               ),
@@ -551,9 +513,7 @@ void main() {
       );
 
       // Initially unselected - should have border
-      var container = tester.widget<Container>(
-        find.byType(Container).first,
-      );
+      var container = tester.widget<Container>(find.byType(Container).first);
       var decoration = container.decoration as BoxDecoration;
       expect(decoration.border, isNotNull);
       expect(decoration.gradient, isNull);
@@ -563,9 +523,7 @@ void main() {
       await tester.pumpAndSettle();
 
       // Now selected - should have gradient
-      container = tester.widget<Container>(
-        find.byType(Container).first,
-      );
+      container = tester.widget<Container>(find.byType(Container).first);
       decoration = container.decoration as BoxDecoration;
       expect(decoration.gradient, equals(AppColors.primaryGradient));
     });

@@ -20,7 +20,6 @@ import 'package:later_mobile/design_system/tokens/tokens.dart';
 /// )
 /// ```
 class GradientPillBorder extends StatelessWidget {
-
   const GradientPillBorder({
     super.key,
     required this.gradient,
@@ -28,6 +27,7 @@ class GradientPillBorder extends StatelessWidget {
     this.borderWidth = AppSpacing.cardBorderWidth,
     this.borderRadius = AppSpacing.cardRadius,
   });
+
   /// The gradient to use for the border
   final Gradient gradient;
 
@@ -49,10 +49,7 @@ class GradientPillBorder extends StatelessWidget {
           borderWidth: borderWidth,
           borderRadius: borderRadius,
         ),
-        child: Padding(
-          padding: EdgeInsets.all(borderWidth),
-          child: child,
-        ),
+        child: Padding(padding: EdgeInsets.all(borderWidth), child: child),
       ),
     );
   }
@@ -65,7 +62,6 @@ class GradientPillBorder extends StatelessWidget {
 /// - Applies gradient via shader
 /// - Minimal repaints with RepaintBoundary
 class _GradientBorderPainter extends CustomPainter {
-
   _GradientBorderPainter({
     required this.gradient,
     required this.borderWidth,
@@ -85,10 +81,7 @@ class _GradientBorderPainter extends CustomPainter {
       size.height - borderWidth,
     );
 
-    final rrect = RRect.fromRectAndRadius(
-      rect,
-      Radius.circular(borderRadius),
-    );
+    final rrect = RRect.fromRectAndRadius(rect, Radius.circular(borderRadius));
 
     // Create paint with gradient shader
     final paint = Paint()

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:later_mobile/design_system/tokens/tokens.dart';
+import 'package:later_mobile/core/theme/temporal_flow_theme.dart';
 
 /// Quick Capture Floating Action Button - Mobile-First Bold Design
 ///
@@ -65,16 +66,17 @@ class _QuickCaptureFabState extends State<QuickCaptureFab>
       reverseDuration: const Duration(milliseconds: 150),
       vsync: this,
     );
-    _scaleAnimation = Tween<double>(
-      begin: 1.0,
-      end: 0.9, // Scale down to 0.9 on press (mobile-first design)
-    ).animate(
-      CurvedAnimation(
-        parent: _scaleController,
-        curve: Curves.easeOut,
-        reverseCurve: Curves.easeOutBack,
-      ),
-    );
+    _scaleAnimation =
+        Tween<double>(
+          begin: 1.0,
+          end: 0.9, // Scale down to 0.9 on press (mobile-first design)
+        ).animate(
+          CurvedAnimation(
+            parent: _scaleController,
+            curve: Curves.easeOut,
+            reverseCurve: Curves.easeOutBack,
+          ),
+        );
   }
 
   @override
@@ -112,18 +114,14 @@ class _QuickCaptureFabState extends State<QuickCaptureFab>
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
+    final temporalTheme = Theme.of(context).extension<TemporalFlowTheme>()!;
     final isExtended = widget.label != null;
 
     // Get the appropriate gradient for the current theme
-    final gradient = isDark
-        ? AppColors.primaryGradientDark
-        : AppColors.primaryGradient;
+    final gradient = temporalTheme.primaryGradient;
 
     // Simplified shadow: 8px offset, 16px blur, 15% opacity (mobile-first design)
-    final shadowColor = (isDark ? AppColors.primaryEndDark : AppColors.primaryEnd)
-        .withValues(alpha: 0.15);
+    final shadowColor = gradient.colors.last.withValues(alpha: 0.15);
 
     // FAB content: simple static icon (no rotation for mobile-first design)
     Widget fabContent;
@@ -139,9 +137,7 @@ class _QuickCaptureFabState extends State<QuickCaptureFab>
           const SizedBox(width: AppSpacing.xxs),
           Text(
             widget.label!,
-            style: AppTypography.button.copyWith(
-              color: Colors.white,
-            ),
+            style: AppTypography.button.copyWith(color: Colors.white),
           ),
         ],
       );
@@ -203,7 +199,9 @@ class _QuickCaptureFabState extends State<QuickCaptureFab>
                 foregroundDecoration: widget.useGradient
                     ? BoxDecoration(
                         color: Colors.white.withValues(alpha: 0.3),
-                        borderRadius: BorderRadius.circular(AppSpacing.fabRadius),
+                        borderRadius: BorderRadius.circular(
+                          AppSpacing.fabRadius,
+                        ),
                       )
                     : null,
                 child: Center(child: fabContent),

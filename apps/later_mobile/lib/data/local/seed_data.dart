@@ -70,9 +70,7 @@ class SeedData {
     await _createSampleItems(space.id);
 
     // Update the space's item count (3 notes in dual-model architecture)
-    await _spaceRepository.updateSpace(
-      space.copyWith(itemCount: 3),
-    );
+    await _spaceRepository.updateSpace(space.copyWith(itemCount: 3));
   }
 
   /// Create the default "Personal" space.
@@ -115,7 +113,8 @@ class SeedData {
     final welcomeNote = Item(
       id: _uuid.v4(),
       title: 'Welcome to Later!',
-      content: 'This is your personal space for capturing thoughts, ideas, and notes. '
+      content:
+          'This is your personal space for capturing thoughts, ideas, and notes. '
           'Get started by creating your first note using the + button below.',
       spaceId: spaceId,
       tags: ['onboarding'],
@@ -125,7 +124,8 @@ class SeedData {
     final gettingStartedNote = Item(
       id: _uuid.v4(),
       title: 'Getting Started with Later',
-      content: 'Later helps you capture and organize your thoughts in one place. '
+      content:
+          'Later helps you capture and organize your thoughts in one place. '
           'Use spaces to organize different areas of your life. '
           '\n\nTip: You can switch spaces by tapping the space name at the top. '
           '\n\nTip: Long-press on a note to select multiple notes for batch operations.',
@@ -137,7 +137,8 @@ class SeedData {
     final featureIdeasNote = Item(
       id: _uuid.v4(),
       title: 'Feature Ideas',
-      content: '• Add tags to organize notes\n'
+      content:
+          '• Add tags to organize notes\n'
           '• Create more spaces for different projects\n'
           '• Use rich text formatting\n'
           '• Add images and attachments\n'

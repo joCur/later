@@ -452,27 +452,6 @@ class AppColors {
         : neutral700;
   }
 
-  /// Get adaptive glass background based on theme
-  static Color glass(BuildContext context) {
-    return Theme.of(context).brightness == Brightness.light
-        ? glassLight
-        : glassDark;
-  }
-
-  /// Get adaptive glass border based on theme
-  static Color glassBorder(BuildContext context) {
-    return Theme.of(context).brightness == Brightness.light
-        ? glassBorderLight
-        : glassBorderDark;
-  }
-
-  /// Get adaptive shadow color based on theme
-  static Color shadow(BuildContext context) {
-    return Theme.of(context).brightness == Brightness.light
-        ? shadowLight
-        : shadowDark;
-  }
-
   /// Get adaptive overlay color based on theme
   static Color overlay(BuildContext context) {
     return Theme.of(context).brightness == Brightness.light
@@ -499,20 +478,6 @@ class AppColors {
     return Theme.of(context).brightness == Brightness.light
         ? selectedLight
         : selectedDark;
-  }
-
-  /// Get adaptive primary gradient based on theme
-  static LinearGradient primaryGradientAdaptive(BuildContext context) {
-    return Theme.of(context).brightness == Brightness.light
-        ? primaryGradient
-        : primaryGradientDark;
-  }
-
-  /// Get adaptive secondary gradient based on theme
-  static LinearGradient secondaryGradientAdaptive(BuildContext context) {
-    return Theme.of(context).brightness == Brightness.light
-        ? secondaryGradient
-        : secondaryGradientDark;
   }
 
   /// Get gradient for item type

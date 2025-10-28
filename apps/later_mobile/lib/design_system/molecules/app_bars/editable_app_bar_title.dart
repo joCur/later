@@ -209,11 +209,7 @@ class _EditableAppBarTitleState extends State<EditableAppBarTitle> {
             ),
           ),
           const SizedBox(width: AppSpacing.xs),
-          Icon(
-            Icons.edit,
-            size: 16,
-            color: AppColors.textSecondary(context),
-          ),
+          Icon(Icons.edit, size: 16, color: AppColors.textSecondary(context)),
         ],
       ),
     );

@@ -24,7 +24,9 @@ void main() {
       expect(find.text('Settings'), findsOneWidget);
     });
 
-    testWidgets('uses BackdropFilter for glass morphism effect', (tester) async {
+    testWidgets('uses BackdropFilter for glass morphism effect', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -40,11 +42,15 @@ void main() {
       expect(find.byType(BackdropFilter), findsOneWidget);
 
       // Verify blur filter is configured correctly (20px blur)
-      final backdropFilter = tester.widget<BackdropFilter>(find.byType(BackdropFilter));
+      final backdropFilter = tester.widget<BackdropFilter>(
+        find.byType(BackdropFilter),
+      );
       expect(backdropFilter.filter, isA<ImageFilter>());
     });
 
-    testWidgets('has glass background with correct opacity in light mode', (tester) async {
+    testWidgets('has glass background with correct opacity in light mode', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
           theme: ThemeData.light(),
@@ -59,17 +65,21 @@ void main() {
 
       // Find Container with glass background
       final container = tester.widget<Container>(
-        find.descendant(
-          of: find.byType(AppBottomNavigationBar),
-          matching: find.byType(Container),
-        ).first,
+        find
+            .descendant(
+              of: find.byType(AppBottomNavigationBar),
+              matching: find.byType(Container),
+            )
+            .first,
       );
 
       final decoration = container.decoration as BoxDecoration?;
       expect(decoration?.color, equals(AppColors.glassLight));
     });
 
-    testWidgets('has glass background with correct opacity in dark mode', (tester) async {
+    testWidgets('has glass background with correct opacity in dark mode', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
           theme: ThemeData.dark(),
@@ -84,75 +94,79 @@ void main() {
 
       // Find Container with glass background
       final container = tester.widget<Container>(
-        find.descendant(
-          of: find.byType(AppBottomNavigationBar),
-          matching: find.byType(Container),
-        ).first,
+        find
+            .descendant(
+              of: find.byType(AppBottomNavigationBar),
+              matching: find.byType(Container),
+            )
+            .first,
       );
 
       final decoration = container.decoration as BoxDecoration?;
       expect(decoration?.color, equals(AppColors.glassDark));
     });
 
-    testWidgets('displays gradient active indicator with correct colors in light mode', (tester) async {
-      await tester.pumpWidget(
-        MaterialApp(
-          theme: ThemeData.light(),
-          home: Scaffold(
-            bottomNavigationBar: AppBottomNavigationBar(
-              currentIndex: 0,
-              onDestinationSelected: (_) {},
+    testWidgets(
+      'displays gradient active indicator with correct colors in light mode',
+      (tester) async {
+        await tester.pumpWidget(
+          MaterialApp(
+            theme: ThemeData.light(),
+            home: Scaffold(
+              bottomNavigationBar: AppBottomNavigationBar(
+                currentIndex: 0,
+                onDestinationSelected: (_) {},
+              ),
             ),
           ),
-        ),
-      );
+        );
 
-      await tester.pumpAndSettle();
+        await tester.pumpAndSettle();
 
-      // Find all containers and look for the gradient indicator
-      final containers = tester.widgetList<Container>(find.byType(Container));
+        // Find all containers and look for the gradient indicator
+        final containers = tester.widgetList<Container>(find.byType(Container));
 
-      // Find the indicator container with gradient decoration
-      final indicatorContainer = containers.firstWhere(
-        (container) {
+        // Find the indicator container with gradient decoration
+        final indicatorContainer = containers.firstWhere((container) {
           final decoration = container.decoration;
           return decoration is BoxDecoration && decoration.gradient != null;
-        },
-      );
+        });
 
-      final decoration = indicatorContainer.decoration as BoxDecoration;
-      expect(decoration.gradient, equals(AppColors.primaryGradient));
-    });
+        final decoration = indicatorContainer.decoration as BoxDecoration;
+        expect(decoration.gradient, equals(AppColors.primaryGradient));
+      },
+    );
 
-    testWidgets('displays gradient active indicator with correct colors in dark mode', (tester) async {
-      await tester.pumpWidget(
-        MaterialApp(
-          theme: ThemeData.dark(),
-          home: Scaffold(
-            bottomNavigationBar: AppBottomNavigationBar(
-              currentIndex: 0,
-              onDestinationSelected: (_) {},
+    testWidgets(
+      'displays gradient active indicator with correct colors in dark mode',
+      (tester) async {
+        await tester.pumpWidget(
+          MaterialApp(
+            theme: ThemeData.dark(),
+            home: Scaffold(
+              bottomNavigationBar: AppBottomNavigationBar(
+                currentIndex: 0,
+                onDestinationSelected: (_) {},
+              ),
             ),
           ),
-        ),
-      );
+        );
 
-      await tester.pumpAndSettle();
+        await tester.pumpAndSettle();
 
-      // Find all containers and look for the gradient indicator
-      final containers = tester.widgetList<Container>(find.byType(Container));
+        // Find all containers and look for the gradient indicator
+        final containers = tester.widgetList<Container>(find.byType(Container));
 
-      // Find the indicator container with gradient decoration
-      final indicatorContainer = containers.firstWhere(
-        (container) {
+        // Find the indicator container with gradient decoration
+        final indicatorContainer = containers.firstWhere((container) {
           final decoration = container.decoration;
           return decoration is BoxDecoration && decoration.gradient != null;
-        },
-      );
+        });
 
-      final decoration = indicatorContainer.decoration as BoxDecoration;
-      expect(decoration.gradient, equals(AppColors.primaryGradientDark));
-    });
+        final decoration = indicatorContainer.decoration as BoxDecoration;
+        expect(decoration.gradient, equals(AppColors.primaryGradientDark));
+      },
+    );
 
     testWidgets('indicator has pill shape with 40px height', (tester) async {
       await tester.pumpWidget(
@@ -172,12 +186,10 @@ void main() {
       final containers = tester.widgetList<Container>(find.byType(Container));
 
       // Find the indicator container with gradient decoration
-      final indicatorContainer = containers.firstWhere(
-        (container) {
-          final decoration = container.decoration;
-          return decoration is BoxDecoration && decoration.gradient != null;
-        },
-      );
+      final indicatorContainer = containers.firstWhere((container) {
+        final decoration = container.decoration;
+        return decoration is BoxDecoration && decoration.gradient != null;
+      });
 
       final decoration = indicatorContainer.decoration as BoxDecoration;
       expect(decoration.gradient, isNotNull);
@@ -356,7 +368,9 @@ void main() {
       );
     });
 
-    testWidgets('indicator animates smoothly with 250ms spring curve', (tester) async {
+    testWidgets('indicator animates smoothly with 250ms spring curve', (
+      tester,
+    ) async {
       int currentIndex = 0;
 
       await tester.pumpWidget(

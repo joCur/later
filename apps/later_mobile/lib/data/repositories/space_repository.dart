@@ -111,9 +111,7 @@ class SpaceRepository {
     }
 
     // Update the updatedAt timestamp
-    final updatedSpace = space.copyWith(
-      updatedAt: DateTime.now(),
-    );
+    final updatedSpace = space.copyWith(updatedAt: DateTime.now());
 
     await _box.put(updatedSpace.id, updatedSpace);
     return updatedSpace;

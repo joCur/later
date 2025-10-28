@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:later_mobile/core/theme/temporal_flow_theme.dart';
 import 'package:later_mobile/design_system/tokens/tokens.dart';
 import 'primary_button.dart';
 
@@ -155,23 +156,17 @@ class _DangerButtonState extends State<DangerButton> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
+    final temporalTheme = Theme.of(context).extension<TemporalFlowTheme>()!;
 
     // Danger gradient: Error colors (Red-600 → Red-500)
     // Provides strong visual warning for destructive actions
-    final gradient = LinearGradient(
+    const gradient = LinearGradient(
       begin: Alignment.topLeft,
       end: Alignment.bottomRight,
-      colors: isDark
-          ? [
-              AppColors.errorDark, // Red-600 for dark mode
-              AppColors.error, // Red-500 for dark mode
-            ]
-          : [
-              AppColors.errorDark, // Red-600 for light mode
-              AppColors.error, // Red-500 for light mode
-            ],
+      colors: [
+        AppColors.errorDark, // Red-600
+        AppColors.error, // Red-500
+      ],
     );
 
     // White text for maximum contrast against red background
@@ -191,11 +186,7 @@ class _DangerButtonState extends State<DangerButton> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               if (widget.icon != null) ...[
-                Icon(
-                  widget.icon,
-                  size: _iconSize,
-                  color: foregroundColor,
-                ),
+                Icon(widget.icon, size: _iconSize, color: foregroundColor),
                 const SizedBox(width: AppSpacing.xs),
               ],
               Text(
@@ -221,9 +212,7 @@ class _DangerButtonState extends State<DangerButton> {
           boxShadow: _isEnabled && !_isPressed
               ? [
                   BoxShadow(
-                    color: isDark
-                        ? AppColors.shadowDark
-                        : AppColors.shadowLight,
+                    color: temporalTheme.shadowColor,
                     blurRadius: 4.0,
                     offset: const Offset(0, 2),
                   ),

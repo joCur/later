@@ -133,9 +133,9 @@ class ListModel {
     this.style = ListStyle.bullets,
     DateTime? createdAt,
     DateTime? updatedAt,
-  })  : items = items ?? [],
-        createdAt = createdAt ?? DateTime.now(),
-        updatedAt = updatedAt ?? DateTime.now();
+  }) : items = items ?? [],
+       createdAt = createdAt ?? DateTime.now(),
+       updatedAt = updatedAt ?? DateTime.now();
 
   /// Create from JSON for serialization
   factory ListModel.fromJson(Map<String, dynamic> json) {
@@ -144,7 +144,8 @@ class ListModel {
       spaceId: json['spaceId'] as String,
       name: json['name'] as String,
       icon: json['icon'] as String?,
-      items: (json['items'] as List<dynamic>?)
+      items:
+          (json['items'] as List<dynamic>?)
               ?.map((item) => ListItem.fromJson(item as Map<String, dynamic>))
               .toList() ??
           [],

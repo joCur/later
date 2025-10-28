@@ -255,17 +255,15 @@ class SpacesProvider extends ChangeNotifier {
     if (_currentSpace?.id == id) {
       _error = AppError.validation(
         message: 'Cannot delete the current space',
-        userMessage: 'Cannot delete the current space. Please switch to another space first.',
+        userMessage:
+            'Cannot delete the current space. Please switch to another space first.',
       );
       notifyListeners();
       return;
     }
 
     try {
-      await _executeWithRetry(
-        () => _repository.deleteSpace(id),
-        'deleteSpace',
-      );
+      await _executeWithRetry(() => _repository.deleteSpace(id), 'deleteSpace');
       _spaces = _spaces.where((space) => space.id != id).toList();
 
       // Clear persisted space ID if we're deleting the persisted space
@@ -496,6 +494,7 @@ class SpacesProvider extends ChangeNotifier {
     }
 
     // This should never be reached, but throw the last error just in case
-    throw lastError ?? AppError.unknown(message: 'Unknown error in $operationName');
+    throw lastError ??
+        AppError.unknown(message: 'Unknown error in $operationName');
   }
 }

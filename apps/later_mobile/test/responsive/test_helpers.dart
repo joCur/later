@@ -20,11 +20,7 @@ class ResponsiveTestHelper {
 
   /// Wraps a widget with MaterialApp for testing
   static Widget wrapWithApp(Widget child) {
-    return MaterialApp(
-      home: Scaffold(
-        body: child,
-      ),
-    );
+    return MaterialApp(home: Scaffold(body: child));
   }
 
   /// Cleans up view size after test

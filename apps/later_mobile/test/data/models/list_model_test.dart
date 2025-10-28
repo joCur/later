@@ -62,11 +62,7 @@ void main() {
       });
 
       test('defaults isChecked to false', () {
-        final item = ListItem(
-          id: 'item-3',
-          title: 'Task',
-          sortOrder: 0,
-        );
+        final item = ListItem(id: 'item-3', title: 'Task', sortOrder: 0);
 
         expect(item.isChecked, false);
       });
@@ -91,11 +87,7 @@ void main() {
       });
 
       test('toJson handles null notes', () {
-        final item = ListItem(
-          id: 'item-5',
-          title: 'Simple item',
-          sortOrder: 0,
-        );
+        final item = ListItem(id: 'item-5', title: 'Simple item', sortOrder: 0);
 
         final json = item.toJson();
 
@@ -121,11 +113,7 @@ void main() {
       });
 
       test('fromJson handles null optional fields', () {
-        final json = {
-          'id': 'item-7',
-          'title': 'Minimal item',
-          'sortOrder': 0,
-        };
+        final json = {'id': 'item-7', 'title': 'Minimal item', 'sortOrder': 0};
 
         final item = ListItem.fromJson(json);
 
@@ -255,20 +243,13 @@ void main() {
           sortOrder: 0,
         );
 
-        final updated = original.copyWith(
-          notes: 'New notes',
-          clearNotes: true,
-        );
+        final updated = original.copyWith(notes: 'New notes', clearNotes: true);
 
         expect(updated.notes, isNull);
       });
 
       test('can update all fields', () {
-        final original = ListItem(
-          id: 'item-16',
-          title: 'Old',
-          sortOrder: 0,
-        );
+        final original = ListItem(id: 'item-16', title: 'Old', sortOrder: 0);
 
         final updated = original.copyWith(
           id: 'item-17',
@@ -308,27 +289,15 @@ void main() {
       });
 
       test('different ids are not equal', () {
-        final item1 = ListItem(
-          id: 'id-1',
-          title: 'Same title',
-          sortOrder: 0,
-        );
+        final item1 = ListItem(id: 'id-1', title: 'Same title', sortOrder: 0);
 
-        final item2 = ListItem(
-          id: 'id-2',
-          title: 'Same title',
-          sortOrder: 0,
-        );
+        final item2 = ListItem(id: 'id-2', title: 'Same title', sortOrder: 0);
 
         expect(item1, isNot(equals(item2)));
       });
 
       test('identical items are equal', () {
-        final item = ListItem(
-          id: 'item-18',
-          title: 'Item',
-          sortOrder: 0,
-        );
+        final item = ListItem(id: 'item-18', title: 'Item', sortOrder: 0);
 
         expect(item, equals(item));
       });
@@ -352,11 +321,7 @@ void main() {
       });
 
       test('has readable format', () {
-        final item = ListItem(
-          id: 'item-20',
-          title: 'Item',
-          sortOrder: 0,
-        );
+        final item = ListItem(id: 'item-20', title: 'Item', sortOrder: 0);
 
         final string = item.toString();
 
@@ -368,22 +333,14 @@ void main() {
 
     group('edge cases', () {
       test('handles empty string title', () {
-        final item = ListItem(
-          id: 'item-21',
-          title: '',
-          sortOrder: 0,
-        );
+        final item = ListItem(id: 'item-21', title: '', sortOrder: 0);
 
         expect(item.title, '');
       });
 
       test('handles very long title', () {
         final longTitle = 'A' * 1000;
-        final item = ListItem(
-          id: 'item-22',
-          title: longTitle,
-          sortOrder: 0,
-        );
+        final item = ListItem(id: 'item-22', title: longTitle, sortOrder: 0);
 
         expect(item.title, longTitle);
       });
@@ -401,21 +358,13 @@ void main() {
       });
 
       test('handles negative sort order', () {
-        final item = ListItem(
-          id: 'item-24',
-          title: 'Item',
-          sortOrder: -1,
-        );
+        final item = ListItem(id: 'item-24', title: 'Item', sortOrder: -1);
 
         expect(item.sortOrder, -1);
       });
 
       test('handles large sort order', () {
-        final item = ListItem(
-          id: 'item-25',
-          title: 'Item',
-          sortOrder: 999999,
-        );
+        final item = ListItem(id: 'item-25', title: 'Item', sortOrder: 999999);
 
         expect(item.sortOrder, 999999);
       });
@@ -482,28 +431,32 @@ void main() {
       });
 
       test('defaults style to bullets', () {
-        final list = ListModel(
-          id: 'list-4',
-          spaceId: 'space-4',
-          name: 'List',
-        );
+        final list = ListModel(id: 'list-4', spaceId: 'space-4', name: 'List');
 
         expect(list.style, ListStyle.bullets);
       });
 
       test('defaults createdAt and updatedAt to now when null', () {
         final before = DateTime.now();
-        final list = ListModel(
-          id: 'list-5',
-          spaceId: 'space-5',
-          name: 'List',
-        );
+        final list = ListModel(id: 'list-5', spaceId: 'space-5', name: 'List');
         final after = DateTime.now();
 
-        expect(list.createdAt.isAfter(before.subtract(const Duration(seconds: 1))), true);
-        expect(list.createdAt.isBefore(after.add(const Duration(seconds: 1))), true);
-        expect(list.updatedAt.isAfter(before.subtract(const Duration(seconds: 1))), true);
-        expect(list.updatedAt.isBefore(after.add(const Duration(seconds: 1))), true);
+        expect(
+          list.createdAt.isAfter(before.subtract(const Duration(seconds: 1))),
+          true,
+        );
+        expect(
+          list.createdAt.isBefore(after.add(const Duration(seconds: 1))),
+          true,
+        );
+        expect(
+          list.updatedAt.isAfter(before.subtract(const Duration(seconds: 1))),
+          true,
+        );
+        expect(
+          list.updatedAt.isBefore(after.add(const Duration(seconds: 1))),
+          true,
+        );
       });
     });
 
@@ -563,11 +516,7 @@ void main() {
       });
 
       test('toJson serializes empty items list', () {
-        final list = ListModel(
-          id: 'list-8',
-          spaceId: 'space-8',
-          name: 'Empty',
-        );
+        final list = ListModel(id: 'list-8', spaceId: 'space-8', name: 'Empty');
 
         final json = list.toJson();
 
@@ -724,9 +673,7 @@ void main() {
           icon: 'star',
         );
 
-        final updated = original.copyWith(
-          name: 'Updated Name',
-        );
+        final updated = original.copyWith(name: 'Updated Name');
 
         expect(updated.id, original.id);
         expect(updated.spaceId, original.spaceId);
@@ -741,9 +688,7 @@ void main() {
       test('preserves unchanged fields', () {
         final createdAt = DateTime(2025);
         final updatedAt = DateTime(2025, 10, 25);
-        final items = [
-          ListItem(id: 'item-1', title: 'Item', sortOrder: 0),
-        ];
+        final items = [ListItem(id: 'item-1', title: 'Item', sortOrder: 0)];
 
         final original = ListModel(
           id: 'list-17',
@@ -803,10 +748,7 @@ void main() {
           icon: 'old-icon',
         );
 
-        final updated = original.copyWith(
-          icon: 'new-icon',
-          clearIcon: true,
-        );
+        final updated = original.copyWith(icon: 'new-icon', clearIcon: true);
 
         expect(updated.icon, isNull);
       });
@@ -893,9 +835,19 @@ void main() {
 
       test('checkedItems returns correct count when some items checked', () {
         final items = [
-          ListItem(id: 'item-1', title: 'Item 1', isChecked: true, sortOrder: 0),
+          ListItem(
+            id: 'item-1',
+            title: 'Item 1',
+            isChecked: true,
+            sortOrder: 0,
+          ),
           ListItem(id: 'item-2', title: 'Item 2', sortOrder: 1),
-          ListItem(id: 'item-3', title: 'Item 3', isChecked: true, sortOrder: 2),
+          ListItem(
+            id: 'item-3',
+            title: 'Item 3',
+            isChecked: true,
+            sortOrder: 2,
+          ),
           ListItem(id: 'item-4', title: 'Item 4', sortOrder: 3),
         ];
 
@@ -912,8 +864,18 @@ void main() {
 
       test('checkedItems returns correct count when all items checked', () {
         final items = [
-          ListItem(id: 'item-1', title: 'Item 1', isChecked: true, sortOrder: 0),
-          ListItem(id: 'item-2', title: 'Item 2', isChecked: true, sortOrder: 1),
+          ListItem(
+            id: 'item-1',
+            title: 'Item 1',
+            isChecked: true,
+            sortOrder: 0,
+          ),
+          ListItem(
+            id: 'item-2',
+            title: 'Item 2',
+            isChecked: true,
+            sortOrder: 1,
+          ),
         ];
 
         final list = ListModel(
@@ -929,7 +891,12 @@ void main() {
 
       test('checkedItems works for non-checkbox styles', () {
         final items = [
-          ListItem(id: 'item-1', title: 'Item 1', isChecked: true, sortOrder: 0),
+          ListItem(
+            id: 'item-1',
+            title: 'Item 1',
+            isChecked: true,
+            sortOrder: 0,
+          ),
           ListItem(id: 'item-2', title: 'Item 2', sortOrder: 1),
         ];
 
@@ -973,8 +940,18 @@ void main() {
 
       test('progress returns 1.0 when all items checked', () {
         final items = [
-          ListItem(id: 'item-1', title: 'Item 1', isChecked: true, sortOrder: 0),
-          ListItem(id: 'item-2', title: 'Item 2', isChecked: true, sortOrder: 1),
+          ListItem(
+            id: 'item-1',
+            title: 'Item 1',
+            isChecked: true,
+            sortOrder: 0,
+          ),
+          ListItem(
+            id: 'item-2',
+            title: 'Item 2',
+            isChecked: true,
+            sortOrder: 1,
+          ),
         ];
 
         final list = ListModel(
@@ -990,7 +967,12 @@ void main() {
 
       test('progress calculates correctly for partial completion', () {
         final items = [
-          ListItem(id: 'item-1', title: 'Item 1', isChecked: true, sortOrder: 0),
+          ListItem(
+            id: 'item-1',
+            title: 'Item 1',
+            isChecked: true,
+            sortOrder: 0,
+          ),
           ListItem(id: 'item-2', title: 'Item 2', sortOrder: 1),
           ListItem(id: 'item-3', title: 'Item 3', sortOrder: 2),
           ListItem(id: 'item-4', title: 'Item 4', sortOrder: 3),
@@ -1009,8 +991,18 @@ void main() {
 
       test('progress calculates correctly for 50% completion', () {
         final items = [
-          ListItem(id: 'item-1', title: 'Item 1', isChecked: true, sortOrder: 0),
-          ListItem(id: 'item-2', title: 'Item 2', isChecked: true, sortOrder: 1),
+          ListItem(
+            id: 'item-1',
+            title: 'Item 1',
+            isChecked: true,
+            sortOrder: 0,
+          ),
+          ListItem(
+            id: 'item-2',
+            title: 'Item 2',
+            isChecked: true,
+            sortOrder: 1,
+          ),
           ListItem(id: 'item-3', title: 'Item 3', sortOrder: 2),
           ListItem(id: 'item-4', title: 'Item 4', sortOrder: 3),
         ];
@@ -1039,7 +1031,12 @@ void main() {
 
       test('progress works for non-checkbox styles', () {
         final items = [
-          ListItem(id: 'item-1', title: 'Item 1', isChecked: true, sortOrder: 0),
+          ListItem(
+            id: 'item-1',
+            title: 'Item 1',
+            isChecked: true,
+            sortOrder: 0,
+          ),
           ListItem(id: 'item-2', title: 'Item 2', sortOrder: 1),
         ];
 
@@ -1106,7 +1103,12 @@ void main() {
     group('toString', () {
       test('includes key identifying fields', () {
         final items = [
-          ListItem(id: 'item-1', title: 'Item 1', isChecked: true, sortOrder: 0),
+          ListItem(
+            id: 'item-1',
+            title: 'Item 1',
+            isChecked: true,
+            sortOrder: 0,
+          ),
           ListItem(id: 'item-2', title: 'Item 2', sortOrder: 1),
         ];
 
@@ -1147,11 +1149,7 @@ void main() {
 
     group('edge cases', () {
       test('handles empty string name', () {
-        final list = ListModel(
-          id: 'list-39',
-          spaceId: 'space-39',
-          name: '',
-        );
+        final list = ListModel(id: 'list-39', spaceId: 'space-39', name: '');
 
         expect(list.name, '');
       });

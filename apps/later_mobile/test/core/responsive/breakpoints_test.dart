@@ -74,8 +74,9 @@ void main() {
       );
     });
 
-    testWidgets('valueWhen returns correct value based on screen size',
-        (tester) async {
+    testWidgets('valueWhen returns correct value based on screen size', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
           home: MediaQuery(

@@ -39,7 +39,11 @@ class MockTodoListRepository extends TodoListRepository {
   }
 
   @override
-  Future<TodoList> updateItem(String listId, String itemId, TodoItem updatedItem) async {
+  Future<TodoList> updateItem(
+    String listId,
+    String itemId,
+    TodoItem updatedItem,
+  ) async {
     final listIndex = mockTodoLists.indexWhere((t) => t.id == listId);
     if (listIndex == -1) throw Exception('TodoList not found');
 
@@ -58,7 +62,9 @@ class MockTodoListRepository extends TodoListRepository {
     final listIndex = mockTodoLists.indexWhere((t) => t.id == listId);
     if (listIndex == -1) throw Exception('TodoList not found');
 
-    final items = mockTodoLists[listIndex].items.where((i) => i.id != itemId).toList();
+    final items = mockTodoLists[listIndex].items
+        .where((i) => i.id != itemId)
+        .toList();
     final updated = mockTodoLists[listIndex].copyWith(items: items);
     mockTodoLists[listIndex] = updated;
     return updated;
@@ -130,12 +136,12 @@ void main() {
   }) {
     Widget widget = MultiProvider(
       providers: [
-        ChangeNotifierProvider<ContentProvider>.value(value: mockContentProvider),
+        ChangeNotifierProvider<ContentProvider>.value(
+          value: mockContentProvider,
+        ),
         ChangeNotifierProvider<SpacesProvider>.value(value: mockSpacesProvider),
       ],
-      child: MaterialApp(
-        home: TodoListDetailScreen(todoList: todoList),
-      ),
+      child: MaterialApp(home: TodoListDetailScreen(todoList: todoList)),
     );
 
     if (screenSize != null) {
@@ -178,29 +184,38 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('No tasks yet'), findsOneWidget);
-      expect(find.text('Tap the + button to add your first task'), findsOneWidget);
+      expect(
+        find.text('Tap the + button to add your first task'),
+        findsOneWidget,
+      );
     });
   });
 
   group('TodoListDetailScreen - Responsive FAB', () {
     testWidgets('should render ResponsiveFab on mobile', (tester) async {
       // Mobile screen size
-      await tester.pumpWidget(createTestWidget(
-        todoList: testTodoList,
-        screenSize: const Size(375, 812),
-      ));
+      await tester.pumpWidget(
+        createTestWidget(
+          todoList: testTodoList,
+          screenSize: const Size(375, 812),
+        ),
+      );
       await tester.pumpAndSettle();
 
       // ResponsiveFab should exist
       expect(find.byType(ResponsiveFab), findsOneWidget);
     });
 
-    testWidgets('should render ResponsiveFab on desktop with label', (tester) async {
+    testWidgets('should render ResponsiveFab on desktop with label', (
+      tester,
+    ) async {
       // Desktop screen size
-      await tester.pumpWidget(createTestWidget(
-        todoList: testTodoList,
-        screenSize: const Size(1200, 800),
-      ));
+      await tester.pumpWidget(
+        createTestWidget(
+          todoList: testTodoList,
+          screenSize: const Size(1200, 800),
+        ),
+      );
       await tester.pumpAndSettle();
 
       // ResponsiveFab should exist
@@ -210,7 +225,9 @@ void main() {
       expect(find.text('Add Todo'), findsOneWidget);
     });
 
-    testWidgets('FAB should open add TodoItem modal when tapped', (tester) async {
+    testWidgets('FAB should open add TodoItem modal when tapped', (
+      tester,
+    ) async {
       await tester.pumpWidget(createTestWidget(todoList: testTodoList));
       await tester.pumpAndSettle();
 
@@ -225,12 +242,16 @@ void main() {
   });
 
   group('TodoListDetailScreen - Responsive Modal', () {
-    testWidgets('should show bottom sheet on mobile when adding TodoItem', (tester) async {
+    testWidgets('should show bottom sheet on mobile when adding TodoItem', (
+      tester,
+    ) async {
       // Mobile screen size
-      await tester.pumpWidget(createTestWidget(
-        todoList: testTodoList,
-        screenSize: const Size(375, 812),
-      ));
+      await tester.pumpWidget(
+        createTestWidget(
+          todoList: testTodoList,
+          screenSize: const Size(375, 812),
+        ),
+      );
       await tester.pumpAndSettle();
 
       // Tap FAB to open modal
@@ -240,18 +261,21 @@ void main() {
       // On mobile, should see bottom sheet container with drag handle
       // The drag handle is a Container with specific dimensions
       final dragHandle = find.byWidgetPredicate(
-        (widget) => widget is Container &&
-                     widget.constraints?.maxWidth == 32,
+        (widget) => widget is Container && widget.constraints?.maxWidth == 32,
       );
       expect(dragHandle, findsAtLeastNWidgets(1));
     });
 
-    testWidgets('should show dialog on desktop when adding TodoItem', (tester) async {
+    testWidgets('should show dialog on desktop when adding TodoItem', (
+      tester,
+    ) async {
       // Desktop screen size
-      await tester.pumpWidget(createTestWidget(
-        todoList: testTodoList,
-        screenSize: const Size(1200, 800),
-      ));
+      await tester.pumpWidget(
+        createTestWidget(
+          todoList: testTodoList,
+          screenSize: const Size(1200, 800),
+        ),
+      );
       await tester.pumpAndSettle();
 
       // Tap FAB to open modal
@@ -263,7 +287,9 @@ void main() {
       expect(find.text('Add TodoItem'), findsOneWidget);
     });
 
-    testWidgets('should show edit modal when long-pressing TodoItem', (tester) async {
+    testWidgets('should show edit modal when long-pressing TodoItem', (
+      tester,
+    ) async {
       await tester.pumpWidget(createTestWidget(todoList: testTodoList));
       await tester.pumpAndSettle();
 
@@ -329,7 +355,9 @@ void main() {
   });
 
   group('TodoListDetailScreen - Dismissible Background', () {
-    testWidgets('should show delete background when swiping TodoItem', (tester) async {
+    testWidgets('should show delete background when swiping TodoItem', (
+      tester,
+    ) async {
       await tester.pumpWidget(createTestWidget(todoList: testTodoList));
       await tester.pumpAndSettle();
 
@@ -344,7 +372,9 @@ void main() {
       expect(find.byIcon(Icons.delete), findsAtLeastNWidgets(1));
     });
 
-    testWidgets('should show delete confirmation when dismissing', (tester) async {
+    testWidgets('should show delete confirmation when dismissing', (
+      tester,
+    ) async {
       await tester.pumpWidget(createTestWidget(todoList: testTodoList));
       await tester.pumpAndSettle();
 
@@ -354,10 +384,15 @@ void main() {
 
       // Should show confirmation dialog
       expect(find.text('Delete TodoItem'), findsOneWidget);
-      expect(find.text('Are you sure you want to delete "Test Item 1"?'), findsOneWidget);
+      expect(
+        find.text('Are you sure you want to delete "Test Item 1"?'),
+        findsOneWidget,
+      );
     });
 
-    testWidgets('Dismissible background should have correct styling', (tester) async {
+    testWidgets('Dismissible background should have correct styling', (
+      tester,
+    ) async {
       await tester.pumpWidget(createTestWidget(todoList: testTodoList));
       await tester.pumpAndSettle();
 
@@ -370,15 +405,15 @@ void main() {
 
       // Find the ClipRRect with border radius
       final clipRRect = find.byWidgetPredicate(
-        (widget) => widget is ClipRRect &&
-                     widget.borderRadius == BorderRadius.circular(8.0),
+        (widget) =>
+            widget is ClipRRect &&
+            widget.borderRadius == BorderRadius.circular(8.0),
       );
       expect(clipRRect, findsAtLeastNWidgets(1));
 
       // Find the background container with error color
       final backgroundContainer = find.byWidgetPredicate(
-        (widget) => widget is Container &&
-                     widget.color == AppColors.error,
+        (widget) => widget is Container && widget.color == AppColors.error,
       );
       expect(backgroundContainer, findsAtLeastNWidgets(1));
     });
@@ -397,7 +432,9 @@ void main() {
       expect(find.text('Delete List'), findsOneWidget);
     });
 
-    testWidgets('should show delete confirmation when deleting list', (tester) async {
+    testWidgets('should show delete confirmation when deleting list', (
+      tester,
+    ) async {
       await tester.pumpWidget(createTestWidget(todoList: testTodoList));
       await tester.pumpAndSettle();
 
@@ -411,7 +448,10 @@ void main() {
 
       // Should show confirmation
       expect(find.text('Delete TodoList'), findsOneWidget);
-      expect(find.textContaining('Are you sure you want to delete "Test TodoList"?'), findsOneWidget);
+      expect(
+        find.textContaining('Are you sure you want to delete "Test TodoList"?'),
+        findsOneWidget,
+      );
     });
   });
 }

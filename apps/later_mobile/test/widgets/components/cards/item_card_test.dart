@@ -6,17 +6,11 @@ import 'package:later_mobile/design_system/organisms/cards/item_card.dart';
 void main() {
   group('ItemCard', () {
     testWidgets('renders task card with title', (tester) async {
-      final item = Item(
-        id: '1',
-        title: 'Buy groceries',
-        spaceId: 'space1',
-      );
+      final item = Item(id: '1', title: 'Buy groceries', spaceId: 'space1');
 
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(
-            body: ItemCard(item: item),
-          ),
+          home: Scaffold(body: ItemCard(item: item)),
         ),
       );
 
@@ -35,28 +29,23 @@ void main() {
 
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(
-            body: ItemCard(item: item),
-          ),
+          home: Scaffold(body: ItemCard(item: item)),
         ),
       );
 
       expect(find.text('Meeting Notes'), findsOneWidget);
-      expect(find.text('Discussed project timeline and deliverables'), findsOneWidget);
+      expect(
+        find.text('Discussed project timeline and deliverables'),
+        findsOneWidget,
+      );
     });
 
     testWidgets('renders list card with title', (tester) async {
-      final item = Item(
-        id: '3',
-        title: 'Shopping List',
-        spaceId: 'space1',
-      );
+      final item = Item(id: '3', title: 'Shopping List', spaceId: 'space1');
 
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(
-            body: ItemCard(item: item),
-          ),
+          home: Scaffold(body: ItemCard(item: item)),
         ),
       );
 
@@ -64,11 +53,7 @@ void main() {
     });
 
     testWidgets('calls onTap when tapped', (tester) async {
-      final item = Item(
-        id: '1',
-        title: 'Test Task',
-        spaceId: 'space1',
-      );
+      final item = Item(id: '1', title: 'Test Task', spaceId: 'space1');
 
       var tapped = false;
 
@@ -92,11 +77,7 @@ void main() {
     });
 
     testWidgets('calls onLongPress when long pressed', (tester) async {
-      final item = Item(
-        id: '1',
-        title: 'Test Task',
-        spaceId: 'space1',
-      );
+      final item = Item(id: '1', title: 'Test Task', spaceId: 'space1');
 
       var longPressed = false;
 
@@ -123,20 +104,11 @@ void main() {
     // TodoItem and ListItem have their own dedicated card components with checkbox functionality
 
     testWidgets('shows selected state when isSelected is true', (tester) async {
-      final item = Item(
-        id: '1',
-        title: 'Selected Task',
-        spaceId: 'space1',
-      );
+      final item = Item(id: '1', title: 'Selected Task', spaceId: 'space1');
 
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(
-            body: ItemCard(
-              item: item,
-              isSelected: true,
-            ),
-          ),
+          home: Scaffold(body: ItemCard(item: item, isSelected: true)),
         ),
       );
 
@@ -154,10 +126,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: SizedBox(
-              width: 300,
-              child: ItemCard(item: item),
-            ),
+            body: SizedBox(width: 300, child: ItemCard(item: item)),
           ),
         ),
       );
@@ -166,17 +135,11 @@ void main() {
     });
 
     testWidgets('displays task border color', (tester) async {
-      final item = Item(
-        id: '1',
-        title: 'Task',
-        spaceId: 'space1',
-      );
+      final item = Item(id: '1', title: 'Task', spaceId: 'space1');
 
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(
-            body: ItemCard(item: item),
-          ),
+          home: Scaffold(body: ItemCard(item: item)),
         ),
       );
 
@@ -184,17 +147,11 @@ void main() {
     });
 
     testWidgets('displays note border color', (tester) async {
-      final item = Item(
-        id: '2',
-        title: 'Note',
-        spaceId: 'space1',
-      );
+      final item = Item(id: '2', title: 'Note', spaceId: 'space1');
 
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(
-            body: ItemCard(item: item),
-          ),
+          home: Scaffold(body: ItemCard(item: item)),
         ),
       );
 
@@ -202,17 +159,11 @@ void main() {
     });
 
     testWidgets('displays list border color', (tester) async {
-      final item = Item(
-        id: '3',
-        title: 'List',
-        spaceId: 'space1',
-      );
+      final item = Item(id: '3', title: 'List', spaceId: 'space1');
 
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(
-            body: ItemCard(item: item),
-          ),
+          home: Scaffold(body: ItemCard(item: item)),
         ),
       );
 
@@ -223,21 +174,14 @@ void main() {
     // Checkbox animations are tested in TodoItemCard and ListItemCard test suites
 
     group('Entrance Animations', () {
-      testWidgets('applies entrance animation with index parameter', (tester) async {
-        final item = Item(
-          id: '1',
-          title: 'Test Task',
-          spaceId: 'space1',
-        );
+      testWidgets('applies entrance animation with index parameter', (
+        tester,
+      ) async {
+        final item = Item(id: '1', title: 'Test Task', spaceId: 'space1');
 
         await tester.pumpWidget(
           MaterialApp(
-            home: Scaffold(
-              body: ItemCard(
-                item: item,
-                index: 0,
-              ),
-            ),
+            home: Scaffold(body: ItemCard(item: item, index: 0)),
           ),
         );
 
@@ -254,11 +198,8 @@ void main() {
       testWidgets('applies staggered delay based on index', (tester) async {
         final items = List.generate(
           3,
-          (index) => Item(
-            id: 'item_$index',
-            title: 'Task $index',
-            spaceId: 'space1',
-          ),
+          (index) =>
+              Item(id: 'item_$index', title: 'Task $index', spaceId: 'space1'),
         );
 
         await tester.pumpWidget(
@@ -267,10 +208,7 @@ void main() {
               body: ListView.builder(
                 itemCount: items.length,
                 itemBuilder: (context, index) {
-                  return ItemCard(
-                    item: items[index],
-                    index: index,
-                  );
+                  return ItemCard(item: items[index], index: index);
                 },
               ),
             ),
@@ -282,7 +220,9 @@ void main() {
 
         // Pump frames to allow staggered animations to start
         await tester.pump(const Duration(milliseconds: 50)); // First item delay
-        await tester.pump(const Duration(milliseconds: 50)); // Second item delay
+        await tester.pump(
+          const Duration(milliseconds: 50),
+        ); // Second item delay
         await tester.pump(const Duration(milliseconds: 50)); // Third item delay
 
         // Complete all animations
@@ -295,11 +235,7 @@ void main() {
       });
 
       testWidgets('entrance animation respects reduced motion', (tester) async {
-        final item = Item(
-          id: '1',
-          title: 'Test Task',
-          spaceId: 'space1',
-        );
+        final item = Item(id: '1', title: 'Test Task', spaceId: 'space1');
 
         await tester.pumpWidget(
           MaterialApp(
@@ -307,12 +243,7 @@ void main() {
               data: const MediaQueryData(
                 disableAnimations: true, // Simulate reduced motion
               ),
-              child: Scaffold(
-                body: ItemCard(
-                  item: item,
-                  index: 0,
-                ),
-              ),
+              child: Scaffold(body: ItemCard(item: item, index: 0)),
             ),
           ),
         );
@@ -330,18 +261,14 @@ void main() {
         await tester.pumpAndSettle();
       });
 
-      testWidgets('entrance animation works without index parameter', (tester) async {
-        final item = Item(
-          id: '1',
-          title: 'Test Task',
-          spaceId: 'space1',
-        );
+      testWidgets('entrance animation works without index parameter', (
+        tester,
+      ) async {
+        final item = Item(id: '1', title: 'Test Task', spaceId: 'space1');
 
         await tester.pumpWidget(
           MaterialApp(
-            home: Scaffold(
-              body: ItemCard(item: item),
-            ),
+            home: Scaffold(body: ItemCard(item: item)),
           ),
         );
 
@@ -350,21 +277,14 @@ void main() {
         expect(find.text('Test Task'), findsOneWidget);
       });
 
-      testWidgets('entrance animation completes within expected duration', (tester) async {
-        final item = Item(
-          id: '1',
-          title: 'Test Task',
-          spaceId: 'space1',
-        );
+      testWidgets('entrance animation completes within expected duration', (
+        tester,
+      ) async {
+        final item = Item(id: '1', title: 'Test Task', spaceId: 'space1');
 
         await tester.pumpWidget(
           MaterialApp(
-            home: Scaffold(
-              body: ItemCard(
-                item: item,
-                index: 0,
-              ),
-            ),
+            home: Scaffold(body: ItemCard(item: item, index: 0)),
           ),
         );
 
@@ -384,12 +304,10 @@ void main() {
         expect(find.text('Test Task'), findsOneWidget);
       });
 
-      testWidgets('entrance animation works with large list indices', (tester) async {
-        final item = Item(
-          id: '100',
-          title: 'Task 100',
-          spaceId: 'space1',
-        );
+      testWidgets('entrance animation works with large list indices', (
+        tester,
+      ) async {
+        final item = Item(id: '100', title: 'Task 100', spaceId: 'space1');
 
         await tester.pumpWidget(
           MaterialApp(

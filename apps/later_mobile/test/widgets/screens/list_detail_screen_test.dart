@@ -81,7 +81,11 @@ class FakeListRepository implements ListRepository {
   }
 
   @override
-  Future<ListModel> updateItem(String listId, String itemId, ListItem updatedItem) async {
+  Future<ListModel> updateItem(
+    String listId,
+    String itemId,
+    ListItem updatedItem,
+  ) async {
     if (_shouldThrowError) throw Exception('UpdateItem failed');
     final list = await getById(listId);
     if (list == null) throw Exception('List not found');
@@ -133,7 +137,11 @@ class FakeListRepository implements ListRepository {
   }
 
   @override
-  Future<ListModel> reorderItems(String listId, int oldIndex, int newIndex) async {
+  Future<ListModel> reorderItems(
+    String listId,
+    int oldIndex,
+    int newIndex,
+  ) async {
     if (_shouldThrowError) throw Exception('ReorderItems failed');
     final list = await getById(listId);
     if (list == null) throw Exception('List not found');
@@ -256,9 +264,7 @@ void main() {
         ChangeNotifierProvider<ContentProvider>.value(value: contentProvider),
         ChangeNotifierProvider<SpacesProvider>.value(value: spacesProvider),
       ],
-      child: MaterialApp(
-        home: ListDetailScreen(list: list),
-      ),
+      child: MaterialApp(home: ListDetailScreen(list: list)),
     );
 
     // Wrap with MediaQuery if custom screen size is provided
@@ -274,7 +280,10 @@ void main() {
 
   /// Helper to set mobile viewport size (< 768px)
   Widget createMobileTestWidget(ListModel list) {
-    return createTestWidget(list, screenSize: const Size(375, 812)); // iPhone size
+    return createTestWidget(
+      list,
+      screenSize: const Size(375, 812),
+    ); // iPhone size
   }
 
   /// Helper to set desktop viewport size (>= 1024px)
@@ -283,7 +292,9 @@ void main() {
   }
 
   group('ListDetailScreen - Rendering', () {
-    testWidgets('renders with list name in AppBar', (WidgetTester tester) async {
+    testWidgets('renders with list name in AppBar', (
+      WidgetTester tester,
+    ) async {
       final list = ListModel(
         id: 'list-1',
         spaceId: 'space-1',
@@ -317,7 +328,9 @@ void main() {
       expect(find.text('🛒'), findsOneWidget);
     });
 
-    testWidgets('renders empty state when no items', (WidgetTester tester) async {
+    testWidgets('renders empty state when no items', (
+      WidgetTester tester,
+    ) async {
       final list = ListModel(
         id: 'list-1',
         spaceId: 'space-1',
@@ -331,10 +344,15 @@ void main() {
 
       // Check for empty state
       expect(find.text('No items yet'), findsOneWidget);
-      expect(find.text('Tap the + button to add your first item'), findsOneWidget);
+      expect(
+        find.text('Tap the + button to add your first item'),
+        findsOneWidget,
+      );
     });
 
-    testWidgets('renders list items in correct style - bullets', (WidgetTester tester) async {
+    testWidgets('renders list items in correct style - bullets', (
+      WidgetTester tester,
+    ) async {
       final list = ListModel(
         id: 'list-1',
         spaceId: 'space-1',
@@ -355,7 +373,9 @@ void main() {
       expect(find.byType(ListItemCard), findsNWidgets(2));
     });
 
-    testWidgets('renders list items in correct style - numbered', (WidgetTester tester) async {
+    testWidgets('renders list items in correct style - numbered', (
+      WidgetTester tester,
+    ) async {
       final list = ListModel(
         id: 'list-1',
         spaceId: 'space-1',
@@ -377,7 +397,9 @@ void main() {
       expect(find.byType(ListItemCard), findsNWidgets(2));
     });
 
-    testWidgets('renders list items in correct style - checkboxes', (WidgetTester tester) async {
+    testWidgets('renders list items in correct style - checkboxes', (
+      WidgetTester tester,
+    ) async {
       final list = ListModel(
         id: 'list-1',
         spaceId: 'space-1',
@@ -385,7 +407,12 @@ void main() {
         style: ListStyle.checkboxes,
         items: [
           ListItem(id: 'item-1', title: 'Task 1', sortOrder: 0),
-          ListItem(id: 'item-2', title: 'Task 2', isChecked: true, sortOrder: 1),
+          ListItem(
+            id: 'item-2',
+            title: 'Task 2',
+            isChecked: true,
+            sortOrder: 1,
+          ),
         ],
       );
       fakeListRepository.setLists([list]);
@@ -399,7 +426,9 @@ void main() {
       expect(find.byType(Checkbox), findsNWidgets(2));
     });
 
-    testWidgets('renders ResponsiveFab for adding items', (WidgetTester tester) async {
+    testWidgets('renders ResponsiveFab for adding items', (
+      WidgetTester tester,
+    ) async {
       final list = ListModel(
         id: 'list-1',
         spaceId: 'space-1',
@@ -468,7 +497,9 @@ void main() {
       expect(updatedList.name, 'Updated Name');
     });
 
-    testWidgets('shows loading indicator while saving', (WidgetTester tester) async {
+    testWidgets('shows loading indicator while saving', (
+      WidgetTester tester,
+    ) async {
       final list = ListModel(
         id: 'list-1',
         spaceId: 'space-1',
@@ -579,7 +610,10 @@ void main() {
 
       // We have dialog open, enter text in the title field
       // Find the first TextField inside the dialog (by checking for label)
-      await tester.enterText(find.widgetWithText(TextField, 'Title *'), 'New Item');
+      await tester.enterText(
+        find.widgetWithText(TextField, 'Title *'),
+        'New Item',
+      );
       await tester.pumpAndSettle();
 
       // Tap Add button in dialog
@@ -597,9 +631,7 @@ void main() {
         id: 'list-1',
         spaceId: 'space-1',
         name: 'List',
-        items: [
-          ListItem(id: 'item-1', title: 'Existing Item', sortOrder: 0),
-        ],
+        items: [ListItem(id: 'item-1', title: 'Existing Item', sortOrder: 0)],
       );
       fakeListRepository.setLists([list]);
 
@@ -614,15 +646,15 @@ void main() {
       expect(find.text('Edit Item'), findsOneWidget);
     });
 
-    testWidgets('toggles checkbox for checkboxes style', (WidgetTester tester) async {
+    testWidgets('toggles checkbox for checkboxes style', (
+      WidgetTester tester,
+    ) async {
       final list = ListModel(
         id: 'list-1',
         spaceId: 'space-1',
         name: 'Tasks',
         style: ListStyle.checkboxes,
-        items: [
-          ListItem(id: 'item-1', title: 'Task', sortOrder: 0),
-        ],
+        items: [ListItem(id: 'item-1', title: 'Task', sortOrder: 0)],
       );
       fakeListRepository.setLists([list]);
 
@@ -646,9 +678,7 @@ void main() {
         id: 'list-1',
         spaceId: 'space-1',
         name: 'List',
-        items: [
-          ListItem(id: 'item-1', title: 'Item to Delete', sortOrder: 0),
-        ],
+        items: [ListItem(id: 'item-1', title: 'Item to Delete', sortOrder: 0)],
       );
       fakeListRepository.setLists([list]);
 
@@ -667,14 +697,14 @@ void main() {
       expect(find.text('Delete Item'), findsOneWidget);
     });
 
-    testWidgets('confirms deletion before removing item', (WidgetTester tester) async {
+    testWidgets('confirms deletion before removing item', (
+      WidgetTester tester,
+    ) async {
       final list = ListModel(
         id: 'list-1',
         spaceId: 'space-1',
         name: 'List',
-        items: [
-          ListItem(id: 'item-1', title: 'Item to Delete', sortOrder: 0),
-        ],
+        items: [ListItem(id: 'item-1', title: 'Item to Delete', sortOrder: 0)],
       );
       fakeListRepository.setLists([list]);
 
@@ -695,7 +725,9 @@ void main() {
   });
 
   group('ListDetailScreen - Reordering', () {
-    testWidgets('supports drag-and-drop reordering', (WidgetTester tester) async {
+    testWidgets('supports drag-and-drop reordering', (
+      WidgetTester tester,
+    ) async {
       final list = ListModel(
         id: 'list-1',
         spaceId: 'space-1',
@@ -795,9 +827,7 @@ void main() {
         id: 'list-1',
         spaceId: 'space-1',
         name: 'List to Delete',
-        items: [
-          ListItem(id: 'item-1', title: 'Item', sortOrder: 0),
-        ],
+        items: [ListItem(id: 'item-1', title: 'Item', sortOrder: 0)],
       );
       fakeListRepository.setLists([list]);
 
@@ -813,23 +843,38 @@ void main() {
       await tester.pumpAndSettle();
 
       // Should show confirmation
-      expect(find.text('Delete List'), findsOneWidget); // Title (button text is just 'Delete')
+      expect(
+        find.text('Delete List'),
+        findsOneWidget,
+      ); // Title (button text is just 'Delete')
       expect(find.textContaining('Are you sure'), findsOneWidget);
       expect(find.textContaining('1 items'), findsOneWidget);
     });
   });
 
   group('ListDetailScreen - Progress Display (Checkboxes)', () {
-    testWidgets('shows progress for checkboxes style', (WidgetTester tester) async {
+    testWidgets('shows progress for checkboxes style', (
+      WidgetTester tester,
+    ) async {
       final list = ListModel(
         id: 'list-1',
         spaceId: 'space-1',
         name: 'Tasks',
         style: ListStyle.checkboxes,
         items: [
-          ListItem(id: 'item-1', title: 'Task 1', isChecked: true, sortOrder: 0),
+          ListItem(
+            id: 'item-1',
+            title: 'Task 1',
+            isChecked: true,
+            sortOrder: 0,
+          ),
           ListItem(id: 'item-2', title: 'Task 2', sortOrder: 1),
-          ListItem(id: 'item-3', title: 'Task 3', isChecked: true, sortOrder: 2),
+          ListItem(
+            id: 'item-3',
+            title: 'Task 3',
+            isChecked: true,
+            sortOrder: 2,
+          ),
         ],
       );
       fakeListRepository.setLists([list]);
@@ -844,7 +889,9 @@ void main() {
       expect(find.byType(LinearProgressIndicator), findsOneWidget);
     });
 
-    testWidgets('hides progress for non-checkbox styles', (WidgetTester tester) async {
+    testWidgets('hides progress for non-checkbox styles', (
+      WidgetTester tester,
+    ) async {
       final list = ListModel(
         id: 'list-1',
         spaceId: 'space-1',
@@ -866,7 +913,9 @@ void main() {
   });
 
   group('ListDetailScreen - Error Handling', () {
-    testWidgets('shows error snackbar on save failure', (WidgetTester tester) async {
+    testWidgets('shows error snackbar on save failure', (
+      WidgetTester tester,
+    ) async {
       final list = ListModel(
         id: 'list-1',
         spaceId: 'space-1',
@@ -900,7 +949,9 @@ void main() {
   });
 
   group('ListDetailScreen - Auto-save', () {
-    testWidgets('auto-saves after debounce period', (WidgetTester tester) async {
+    testWidgets('auto-saves after debounce period', (
+      WidgetTester tester,
+    ) async {
       final list = ListModel(
         id: 'list-1',
         spaceId: 'space-1',
@@ -935,9 +986,7 @@ void main() {
         spaceId: 'space-1',
         name: 'Accessible List',
         style: ListStyle.checkboxes,
-        items: [
-          ListItem(id: 'item-1', title: 'Item 1', sortOrder: 0),
-        ],
+        items: [ListItem(id: 'item-1', title: 'Item 1', sortOrder: 0)],
       );
       fakeListRepository.setLists([list]);
 
@@ -1038,7 +1087,9 @@ void main() {
   });
 
   group('ListDetailScreen - Responsive Modals (Add/Edit Item)', () {
-    testWidgets('shows bottom sheet on mobile when adding item', (WidgetTester tester) async {
+    testWidgets('shows bottom sheet on mobile when adding item', (
+      WidgetTester tester,
+    ) async {
       final list = ListModel(
         id: 'list-1',
         spaceId: 'space-1',
@@ -1060,8 +1111,7 @@ void main() {
 
       // Should have drag handle on mobile (Container with specific dimensions)
       final dragHandle = find.byWidgetPredicate(
-        (widget) => widget is Container &&
-                     widget.constraints?.maxWidth == 32,
+        (widget) => widget is Container && widget.constraints?.maxWidth == 32,
       );
       expect(dragHandle, findsAtLeastNWidgets(1));
 
@@ -1070,7 +1120,9 @@ void main() {
       expect(find.text('Notes'), findsOneWidget);
     });
 
-    testWidgets('shows dialog on desktop when adding item', (WidgetTester tester) async {
+    testWidgets('shows dialog on desktop when adding item', (
+      WidgetTester tester,
+    ) async {
       final list = ListModel(
         id: 'list-1',
         spaceId: 'space-1',
@@ -1096,14 +1148,14 @@ void main() {
       expect(find.text('Notes'), findsOneWidget);
     });
 
-    testWidgets('shows bottom sheet on mobile when editing item', (WidgetTester tester) async {
+    testWidgets('shows bottom sheet on mobile when editing item', (
+      WidgetTester tester,
+    ) async {
       final list = ListModel(
         id: 'list-1',
         spaceId: 'space-1',
         name: 'List',
-        items: [
-          ListItem(id: 'item-1', title: 'Existing Item', sortOrder: 0),
-        ],
+        items: [ListItem(id: 'item-1', title: 'Existing Item', sortOrder: 0)],
       );
       fakeListRepository.setLists([list]);
 
@@ -1120,20 +1172,19 @@ void main() {
 
       // Should have drag handle on mobile
       final dragHandle = find.byWidgetPredicate(
-        (widget) => widget is Container &&
-                     widget.constraints?.maxWidth == 32,
+        (widget) => widget is Container && widget.constraints?.maxWidth == 32,
       );
       expect(dragHandle, findsAtLeastNWidgets(1));
     });
 
-    testWidgets('shows dialog on desktop when editing item', (WidgetTester tester) async {
+    testWidgets('shows dialog on desktop when editing item', (
+      WidgetTester tester,
+    ) async {
       final list = ListModel(
         id: 'list-1',
         spaceId: 'space-1',
         name: 'List',
-        items: [
-          ListItem(id: 'item-1', title: 'Existing Item', sortOrder: 0),
-        ],
+        items: [ListItem(id: 'item-1', title: 'Existing Item', sortOrder: 0)],
       );
       fakeListRepository.setLists([list]);
 
@@ -1152,7 +1203,9 @@ void main() {
   });
 
   group('ListDetailScreen - Responsive Modals (Style Selection)', () {
-    testWidgets('shows bottom sheet on mobile for style selection', (WidgetTester tester) async {
+    testWidgets('shows bottom sheet on mobile for style selection', (
+      WidgetTester tester,
+    ) async {
       final list = ListModel(
         id: 'list-1',
         spaceId: 'space-1',
@@ -1177,8 +1230,7 @@ void main() {
 
       // Should have drag handle on mobile
       final dragHandle = find.byWidgetPredicate(
-        (widget) => widget is Container &&
-                     widget.constraints?.maxWidth == 32,
+        (widget) => widget is Container && widget.constraints?.maxWidth == 32,
       );
       expect(dragHandle, findsAtLeastNWidgets(1));
 
@@ -1188,7 +1240,9 @@ void main() {
       expect(find.text('Checkboxes'), findsOneWidget);
     });
 
-    testWidgets('shows dialog on desktop for style selection', (WidgetTester tester) async {
+    testWidgets('shows dialog on desktop for style selection', (
+      WidgetTester tester,
+    ) async {
       final list = ListModel(
         id: 'list-1',
         spaceId: 'space-1',
@@ -1220,7 +1274,9 @@ void main() {
   });
 
   group('ListDetailScreen - Responsive Modals (Icon Selection)', () {
-    testWidgets('shows bottom sheet on mobile for icon selection', (WidgetTester tester) async {
+    testWidgets('shows bottom sheet on mobile for icon selection', (
+      WidgetTester tester,
+    ) async {
       final list = ListModel(
         id: 'list-1',
         spaceId: 'space-1',
@@ -1245,8 +1301,7 @@ void main() {
 
       // Should have drag handle on mobile
       final dragHandle = find.byWidgetPredicate(
-        (widget) => widget is Container &&
-                     widget.constraints?.maxWidth == 32,
+        (widget) => widget is Container && widget.constraints?.maxWidth == 32,
       );
       expect(dragHandle, findsAtLeastNWidgets(1));
 
@@ -1255,7 +1310,9 @@ void main() {
       expect(find.text('📋'), findsOneWidget);
     });
 
-    testWidgets('shows dialog on desktop for icon selection', (WidgetTester tester) async {
+    testWidgets('shows dialog on desktop for icon selection', (
+      WidgetTester tester,
+    ) async {
       final list = ListModel(
         id: 'list-1',
         spaceId: 'space-1',
@@ -1286,44 +1343,46 @@ void main() {
   });
 
   group('ListDetailScreen - Dismissible Background Styling', () {
-    testWidgets('Dismissible background has ClipRRect with correct borderRadius', (WidgetTester tester) async {
+    testWidgets(
+      'Dismissible background has ClipRRect with correct borderRadius',
+      (WidgetTester tester) async {
+        final list = ListModel(
+          id: 'list-1',
+          spaceId: 'space-1',
+          name: 'List',
+          items: [ListItem(id: 'item-1', title: 'Test Item', sortOrder: 0)],
+        );
+        fakeListRepository.setLists([list]);
+
+        await tester.pumpWidget(createTestWidget(list));
+        await tester.pumpAndSettle();
+
+        // Find the dismissible
+        final dismissible = find.byType(Dismissible);
+        expect(dismissible, findsOneWidget);
+
+        // Start swipe to reveal background
+        await tester.drag(dismissible, const Offset(-200, 0));
+        await tester.pump();
+
+        // Should have ClipRRect with 8px borderRadius
+        final clipRRect = find.byWidgetPredicate(
+          (widget) =>
+              widget is ClipRRect &&
+              widget.borderRadius == BorderRadius.circular(8.0),
+        );
+        expect(clipRRect, findsAtLeastNWidgets(1));
+      },
+    );
+
+    testWidgets('Dismissible background has Padding with bottom: 8px', (
+      WidgetTester tester,
+    ) async {
       final list = ListModel(
         id: 'list-1',
         spaceId: 'space-1',
         name: 'List',
-        items: [
-          ListItem(id: 'item-1', title: 'Test Item', sortOrder: 0),
-        ],
-      );
-      fakeListRepository.setLists([list]);
-
-      await tester.pumpWidget(createTestWidget(list));
-      await tester.pumpAndSettle();
-
-      // Find the dismissible
-      final dismissible = find.byType(Dismissible);
-      expect(dismissible, findsOneWidget);
-
-      // Start swipe to reveal background
-      await tester.drag(dismissible, const Offset(-200, 0));
-      await tester.pump();
-
-      // Should have ClipRRect with 8px borderRadius
-      final clipRRect = find.byWidgetPredicate(
-        (widget) => widget is ClipRRect &&
-                     widget.borderRadius == BorderRadius.circular(8.0),
-      );
-      expect(clipRRect, findsAtLeastNWidgets(1));
-    });
-
-    testWidgets('Dismissible background has Padding with bottom: 8px', (WidgetTester tester) async {
-      final list = ListModel(
-        id: 'list-1',
-        spaceId: 'space-1',
-        name: 'List',
-        items: [
-          ListItem(id: 'item-1', title: 'Test Item', sortOrder: 0),
-        ],
+        items: [ListItem(id: 'item-1', title: 'Test Item', sortOrder: 0)],
       );
       fakeListRepository.setLists([list]);
 
@@ -1339,52 +1398,54 @@ void main() {
 
       // Should have Padding with bottom: 8.0
       final padding = find.byWidgetPredicate(
-        (widget) => widget is Padding &&
-                     widget.padding == const EdgeInsets.only(bottom: 8.0),
+        (widget) =>
+            widget is Padding &&
+            widget.padding == const EdgeInsets.only(bottom: 8.0),
       );
       expect(padding, findsAtLeastNWidgets(1));
     });
 
-    testWidgets('Dismissible background shows delete icon with proper alignment', (WidgetTester tester) async {
+    testWidgets(
+      'Dismissible background shows delete icon with proper alignment',
+      (WidgetTester tester) async {
+        final list = ListModel(
+          id: 'list-1',
+          spaceId: 'space-1',
+          name: 'List',
+          items: [ListItem(id: 'item-1', title: 'Test Item', sortOrder: 0)],
+        );
+        fakeListRepository.setLists([list]);
+
+        await tester.pumpWidget(createTestWidget(list));
+        await tester.pumpAndSettle();
+
+        // Find the dismissible
+        final dismissible = find.byType(Dismissible);
+
+        // Start swipe to reveal background
+        await tester.drag(dismissible, const Offset(-200, 0));
+        await tester.pump();
+
+        // Should show delete icon
+        expect(find.byIcon(Icons.delete), findsAtLeastNWidgets(1));
+
+        // Container should have centerRight alignment
+        final alignedContainer = find.byWidgetPredicate(
+          (widget) =>
+              widget is Container && widget.alignment == Alignment.centerRight,
+        );
+        expect(alignedContainer, findsAtLeastNWidgets(1));
+      },
+    );
+
+    testWidgets('Dismissible background has correct container structure', (
+      WidgetTester tester,
+    ) async {
       final list = ListModel(
         id: 'list-1',
         spaceId: 'space-1',
         name: 'List',
-        items: [
-          ListItem(id: 'item-1', title: 'Test Item', sortOrder: 0),
-        ],
-      );
-      fakeListRepository.setLists([list]);
-
-      await tester.pumpWidget(createTestWidget(list));
-      await tester.pumpAndSettle();
-
-      // Find the dismissible
-      final dismissible = find.byType(Dismissible);
-
-      // Start swipe to reveal background
-      await tester.drag(dismissible, const Offset(-200, 0));
-      await tester.pump();
-
-      // Should show delete icon
-      expect(find.byIcon(Icons.delete), findsAtLeastNWidgets(1));
-
-      // Container should have centerRight alignment
-      final alignedContainer = find.byWidgetPredicate(
-        (widget) => widget is Container &&
-                     widget.alignment == Alignment.centerRight,
-      );
-      expect(alignedContainer, findsAtLeastNWidgets(1));
-    });
-
-    testWidgets('Dismissible background has correct container structure', (WidgetTester tester) async {
-      final list = ListModel(
-        id: 'list-1',
-        spaceId: 'space-1',
-        name: 'List',
-        items: [
-          ListItem(id: 'item-1', title: 'Test Item', sortOrder: 0),
-        ],
+        items: [ListItem(id: 'item-1', title: 'Test Item', sortOrder: 0)],
       );
       fakeListRepository.setLists([list]);
 
@@ -1402,12 +1463,14 @@ void main() {
       // Find Padding containing ClipRRect
       final paddingWithClipRRect = find.ancestor(
         of: find.byWidgetPredicate(
-          (widget) => widget is ClipRRect &&
-                       widget.borderRadius == BorderRadius.circular(8.0),
+          (widget) =>
+              widget is ClipRRect &&
+              widget.borderRadius == BorderRadius.circular(8.0),
         ),
         matching: find.byWidgetPredicate(
-          (widget) => widget is Padding &&
-                       widget.padding == const EdgeInsets.only(bottom: 8.0),
+          (widget) =>
+              widget is Padding &&
+              widget.padding == const EdgeInsets.only(bottom: 8.0),
         ),
       );
       expect(paddingWithClipRRect, findsAtLeastNWidgets(1));

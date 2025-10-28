@@ -4,10 +4,7 @@ import 'package:later_mobile/data/models/space_model.dart';
 void main() {
   group('SpaceModel', () {
     test('creates a space with all required fields', () {
-      final space = Space(
-        id: 'space-1',
-        name: 'Personal',
-      );
+      final space = Space(id: 'space-1', name: 'Personal');
 
       expect(space.id, 'space-1');
       expect(space.name, 'Personal');
@@ -113,34 +110,18 @@ void main() {
     });
 
     test('equality is based on id', () {
-      final space1 = Space(
-        id: 'same-id',
-        name: 'Name 1',
-        itemCount: 5,
-      );
+      final space1 = Space(id: 'same-id', name: 'Name 1', itemCount: 5);
 
-      final space2 = Space(
-        id: 'same-id',
-        name: 'Name 2',
-        itemCount: 10,
-      );
+      final space2 = Space(id: 'same-id', name: 'Name 2', itemCount: 10);
 
-      final space3 = Space(
-        id: 'different-id',
-        name: 'Name 1',
-        itemCount: 5,
-      );
+      final space3 = Space(id: 'different-id', name: 'Name 1', itemCount: 5);
 
       expect(space1, equals(space2));
       expect(space1, isNot(equals(space3)));
     });
 
     test('toString includes key fields', () {
-      final space = Space(
-        id: 'space-1',
-        name: 'Work',
-        itemCount: 8,
-      );
+      final space = Space(id: 'space-1', name: 'Work', itemCount: 8);
 
       final string = space.toString();
 
@@ -151,10 +132,7 @@ void main() {
     });
 
     test('archived spaces can be identified', () {
-      final activeSpace = Space(
-        id: 'space-1',
-        name: 'Active',
-      );
+      final activeSpace = Space(id: 'space-1', name: 'Active');
 
       final archivedSpace = Space(
         id: 'space-2',

@@ -32,7 +32,11 @@ void main() {
       final elapsed = stopwatch.elapsedMilliseconds;
 
       // Expect rendering to complete in reasonable time (relaxed for test environment)
-      expect(elapsed, lessThan(500), reason: '10 gradients should render quickly');
+      expect(
+        elapsed,
+        lessThan(500),
+        reason: '10 gradients should render quickly',
+      );
 
       debugPrint('10 gradients rendered in ${elapsed}ms');
     });
@@ -46,7 +50,11 @@ void main() {
       stopwatch.stop();
       final elapsed = stopwatch.elapsedMilliseconds;
 
-      expect(elapsed, lessThan(600), reason: '25 gradients should render efficiently');
+      expect(
+        elapsed,
+        lessThan(600),
+        reason: '25 gradients should render efficiently',
+      );
 
       debugPrint('25 gradients rendered in ${elapsed}ms');
     });
@@ -60,7 +68,11 @@ void main() {
       stopwatch.stop();
       final elapsed = stopwatch.elapsedMilliseconds;
 
-      expect(elapsed, lessThan(800), reason: '50 gradients should maintain performance');
+      expect(
+        elapsed,
+        lessThan(800),
+        reason: '50 gradients should maintain performance',
+      );
 
       debugPrint('50 gradients rendered in ${elapsed}ms');
     });
@@ -75,12 +87,18 @@ void main() {
       final elapsed = stopwatch.elapsedMilliseconds;
 
       // More lenient threshold for large number of gradients
-      expect(elapsed, lessThan(1200), reason: '100 gradients should remain functional');
+      expect(
+        elapsed,
+        lessThan(1200),
+        reason: '100 gradients should remain functional',
+      );
 
       debugPrint('100 gradients rendered in ${elapsed}ms');
     });
 
-    testWidgets('Frame rate test: Multiple gradients during scroll', (tester) async {
+    testWidgets('Frame rate test: Multiple gradients during scroll', (
+      tester,
+    ) async {
       await tester.pumpWidget(_buildScrollableGradientList(50));
       await tester.pumpAndSettle();
 
@@ -93,11 +111,7 @@ void main() {
       });
 
       // Simulate scrolling
-      await tester.fling(
-        find.byType(ListView),
-        const Offset(0, -500),
-        1000,
-      );
+      await tester.fling(find.byType(ListView), const Offset(0, -500), 1000);
 
       // Pump frames during scroll
       for (int i = 0; i < 60; i++) {
@@ -108,23 +122,32 @@ void main() {
 
       // Analyze frame times
       if (frames.isNotEmpty) {
-        final averageFrameTime = frames.fold<Duration>(
-          Duration.zero,
-          (prev, duration) => prev + duration,
-        ) ~/ frames.length;
+        final averageFrameTime =
+            frames.fold<Duration>(
+              Duration.zero,
+              (prev, duration) => prev + duration,
+            ) ~/
+            frames.length;
 
-        debugPrint('Average frame time: ${averageFrameTime.inMicroseconds / 1000}ms');
+        debugPrint(
+          'Average frame time: ${averageFrameTime.inMicroseconds / 1000}ms',
+        );
         debugPrint('Total frames: ${frames.length}');
 
         // Count janky frames (>16.67ms = 60fps threshold)
         final jankyFrames = frames.where((d) => d.inMilliseconds > 16).length;
         final jankyPercentage = (jankyFrames / frames.length) * 100;
 
-        debugPrint('Janky frames: $jankyFrames (${jankyPercentage.toStringAsFixed(1)}%)');
+        debugPrint(
+          'Janky frames: $jankyFrames (${jankyPercentage.toStringAsFixed(1)}%)',
+        );
 
         // Allow up to 10% janky frames during complex scroll animations
-        expect(jankyPercentage, lessThan(10),
-          reason: 'Should maintain 60fps with <10% janky frames');
+        expect(
+          jankyPercentage,
+          lessThan(10),
+          reason: 'Should maintain 60fps with <10% janky frames',
+        );
       }
     });
 
@@ -145,8 +168,11 @@ void main() {
       debugPrint('Gradient rebuild time: ${rebuildTime}ms');
 
       // Rebuild should be fast due to shader caching
-      expect(rebuildTime, lessThan(50),
-        reason: 'Shader caching should make rebuilds fast');
+      expect(
+        rebuildTime,
+        lessThan(50),
+        reason: 'Shader caching should make rebuilds fast',
+      );
     });
 
     testWidgets('Animated gradient performance', (tester) async {
@@ -166,16 +192,23 @@ void main() {
       }
 
       if (frames.isNotEmpty) {
-        final averageFrameTime = frames.fold<Duration>(
-          Duration.zero,
-          (prev, duration) => prev + duration,
-        ) ~/ frames.length;
+        final averageFrameTime =
+            frames.fold<Duration>(
+              Duration.zero,
+              (prev, duration) => prev + duration,
+            ) ~/
+            frames.length;
 
-        debugPrint('Animated gradient avg frame time: ${averageFrameTime.inMicroseconds / 1000}ms');
+        debugPrint(
+          'Animated gradient avg frame time: ${averageFrameTime.inMicroseconds / 1000}ms',
+        );
 
         // Should maintain 60fps during animation
-        expect(averageFrameTime.inMilliseconds, lessThanOrEqualTo(16),
-          reason: 'Animated gradients should maintain 60fps');
+        expect(
+          averageFrameTime.inMilliseconds,
+          lessThanOrEqualTo(16),
+          reason: 'Animated gradients should maintain 60fps',
+        );
       }
     });
 
@@ -237,11 +270,7 @@ void main() {
       });
 
       // Scroll through mixed gradients
-      await tester.fling(
-        find.byType(ListView),
-        const Offset(0, -300),
-        500,
-      );
+      await tester.fling(find.byType(ListView), const Offset(0, -300), 500);
 
       for (int i = 0; i < 30; i++) {
         await tester.pump(const Duration(milliseconds: 16));
@@ -253,7 +282,9 @@ void main() {
         final jankyFrames = frames.where((d) => d.inMilliseconds > 16).length;
         final jankyPercentage = (jankyFrames / frames.length) * 100;
 
-        debugPrint('Mixed gradients janky frames: ${jankyPercentage.toStringAsFixed(1)}%');
+        debugPrint(
+          'Mixed gradients janky frames: ${jankyPercentage.toStringAsFixed(1)}%',
+        );
 
         expect(jankyPercentage, lessThan(15));
       }
@@ -286,9 +317,7 @@ Widget _buildGradientGrid(int count) {
         itemBuilder: (context, index) {
           return Container(
             margin: const EdgeInsets.all(2),
-            decoration: BoxDecoration(
-              gradient: _getGradientForIndex(index),
-            ),
+            decoration: BoxDecoration(gradient: _getGradientForIndex(index)),
           );
         },
       ),
@@ -309,9 +338,7 @@ Widget _buildScrollableGradientList(int count) {
               gradient: _getGradientForIndex(index),
               borderRadius: BorderRadius.circular(12),
             ),
-            child: Center(
-              child: Text('Item $index'),
-            ),
+            child: Center(child: Text('Item $index')),
           );
         },
       ),
@@ -343,11 +370,7 @@ Widget _buildRepeatedGradientWidget() {
 
 Widget _buildAnimatedGradientWidget() {
   return MaterialApp(
-    home: Scaffold(
-      body: Center(
-        child: _AnimatedGradientBox(),
-      ),
-    ),
+    home: Scaffold(body: Center(child: _AnimatedGradientBox())),
   );
 }
 

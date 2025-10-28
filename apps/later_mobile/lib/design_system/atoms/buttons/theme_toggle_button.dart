@@ -45,10 +45,7 @@ class ThemeToggleButton extends StatelessWidget {
               // Combine rotation and fade for smooth transition
               return RotationTransition(
                 turns: animation,
-                child: FadeTransition(
-                  opacity: animation,
-                  child: child,
-                ),
+                child: FadeTransition(opacity: animation, child: child),
               );
             },
             child: Icon(

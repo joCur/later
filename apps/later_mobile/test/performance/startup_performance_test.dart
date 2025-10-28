@@ -29,8 +29,11 @@ void main() {
 
       debugPrint('Theme initialization: ${elapsed}ms');
 
-      expect(elapsed, lessThan(100),
-        reason: 'Theme initialization should be fast');
+      expect(
+        elapsed,
+        lessThan(100),
+        reason: 'Theme initialization should be fast',
+      );
     });
 
     testWidgets('Provider setup time', (tester) async {
@@ -38,13 +41,9 @@ void main() {
 
       await tester.pumpWidget(
         MultiProvider(
-          providers: [
-            ChangeNotifierProvider(create: (_) => ThemeProvider()),
-          ],
+          providers: [ChangeNotifierProvider(create: (_) => ThemeProvider())],
           child: const MaterialApp(
-            home: Scaffold(
-              body: Center(child: Text('Test')),
-            ),
+            home: Scaffold(body: Center(child: Text('Test'))),
           ),
         ),
       );
@@ -55,8 +54,11 @@ void main() {
       final elapsed = stopwatch.elapsedMilliseconds;
       debugPrint('Provider setup: ${elapsed}ms');
 
-      expect(elapsed, lessThan(500),
-        reason: 'Provider setup should complete quickly');
+      expect(
+        elapsed,
+        lessThan(500),
+        reason: 'Provider setup should complete quickly',
+      );
     });
 
     testWidgets('First frame render time', (tester) async {
@@ -64,9 +66,7 @@ void main() {
 
       await tester.pumpWidget(
         const MaterialApp(
-          home: Scaffold(
-            body: Center(child: Text('Test')),
-          ),
+          home: Scaffold(body: Center(child: Text('Test'))),
         ),
       );
 
@@ -76,8 +76,11 @@ void main() {
       final elapsed = stopwatch.elapsedMilliseconds;
       debugPrint('First frame render: ${elapsed}ms');
 
-      expect(elapsed, lessThan(200),
-        reason: 'First frame should render quickly');
+      expect(
+        elapsed,
+        lessThan(200),
+        reason: 'First frame should render quickly',
+      );
     });
 
     testWidgets('Complex app initialization', (tester) async {
@@ -85,9 +88,7 @@ void main() {
 
       await tester.pumpWidget(
         MultiProvider(
-          providers: [
-            ChangeNotifierProvider(create: (_) => ThemeProvider()),
-          ],
+          providers: [ChangeNotifierProvider(create: (_) => ThemeProvider())],
           child: MaterialApp(
             theme: ThemeData.light(),
             darkTheme: ThemeData.dark(),
@@ -96,9 +97,7 @@ void main() {
                 decoration: const BoxDecoration(
                   gradient: AppColors.primaryGradient,
                 ),
-                child: const Center(
-                  child: Text('App Home'),
-                ),
+                child: const Center(child: Text('App Home')),
               ),
             ),
           ),
@@ -111,8 +110,11 @@ void main() {
       final elapsed = stopwatch.elapsedMilliseconds;
       debugPrint('Complex app initialization: ${elapsed}ms');
 
-      expect(elapsed, lessThan(1000),
-        reason: 'App should initialize within 1 second');
+      expect(
+        elapsed,
+        lessThan(1000),
+        reason: 'App should initialize within 1 second',
+      );
     });
 
     testWidgets('Memory footprint on startup', (tester) async {
@@ -129,9 +131,7 @@ void main() {
                   decoration: const BoxDecoration(
                     gradient: AppColors.primaryGradient,
                   ),
-                  child: Center(
-                    child: Text('Item $index'),
-                  ),
+                  child: Center(child: Text('Item $index')),
                 );
               },
             ),
@@ -185,8 +185,11 @@ void main() {
       final elapsed = stopwatch.elapsedMilliseconds;
       debugPrint('Gradient shader compilation: ${elapsed}ms');
 
-      expect(elapsed, lessThan(500),
-        reason: 'Shader compilation should be reasonably fast');
+      expect(
+        elapsed,
+        lessThan(500),
+        reason: 'Shader compilation should be reasonably fast',
+      );
     });
   });
 }

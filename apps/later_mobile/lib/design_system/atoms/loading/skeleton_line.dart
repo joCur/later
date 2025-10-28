@@ -17,11 +17,7 @@ import 'package:later_mobile/design_system/tokens/tokens.dart';
 /// )
 /// ```
 class SkeletonLine extends StatelessWidget {
-  const SkeletonLine({
-    super.key,
-    this.width,
-    this.height = 16,
-  });
+  const SkeletonLine({super.key, this.width, this.height = 16});
 
   /// Width of the skeleton line
   /// If null, takes full available width
@@ -36,9 +32,7 @@ class SkeletonLine extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     // Base color based on theme
-    final baseColor = isDark
-        ? AppColors.neutral800
-        : AppColors.neutral200;
+    final baseColor = isDark ? AppColors.neutral800 : AppColors.neutral200;
 
     return SizedBox(
       width: width,

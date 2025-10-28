@@ -91,7 +91,8 @@ void main() {
                       result = await ResponsiveModal.show<String>(
                         context: context,
                         child: ElevatedButton(
-                          onPressed: () => Navigator.of(context).pop('test-result'),
+                          onPressed: () =>
+                              Navigator.of(context).pop('test-result'),
                           child: const Text('Close with Result'),
                         ),
                       );
@@ -132,7 +133,8 @@ void main() {
                       result = await ResponsiveModal.show<String>(
                         context: context,
                         child: ElevatedButton(
-                          onPressed: () => Navigator.of(context).pop('test-result'),
+                          onPressed: () =>
+                              Navigator.of(context).pop('test-result'),
                           child: const Text('Close with Result'),
                         ),
                       );

@@ -90,7 +90,9 @@ class ErrorLogger {
       context: context,
       technicalDetails: error.technicalDetails,
       hasStackTrace: stackTrace != null,
-      additionalData: additionalData != null ? _sanitizeData(additionalData) : null,
+      additionalData: additionalData != null
+          ? _sanitizeData(additionalData)
+          : null,
     );
   }
 
@@ -104,11 +106,7 @@ class ErrorLogger {
     String? context,
   }) {
     final appError = AppError.fromException(exception);
-    logError(
-      appError,
-      stackTrace: stackTrace,
-      context: context,
-    );
+    logError(appError, stackTrace: stackTrace, context: context);
   }
 
   /// Formats an AppError into a readable string.
@@ -185,7 +183,9 @@ class ErrorLogger {
       final key = entry.key.toLowerCase();
 
       // Check if the key contains any sensitive keywords
-      final isSensitive = _sensitiveKeys.any((sensitiveKey) => key.contains(sensitiveKey));
+      final isSensitive = _sensitiveKeys.any(
+        (sensitiveKey) => key.contains(sensitiveKey),
+      );
 
       if (isSensitive) {
         // Skip sensitive data entirely
