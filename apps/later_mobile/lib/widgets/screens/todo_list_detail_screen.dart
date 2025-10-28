@@ -540,8 +540,10 @@ class _TodoListDetailScreenState extends State<TodoListDetailScreen> {
                       },
                       itemBuilder: (context, index) {
                         final item = _currentTodoList.items[index];
+                        final itemKey = ValueKey(item.id);
                         return DismissibleListItem(
-                          itemKey: ValueKey(item.id),
+                          key: itemKey,
+                          itemKey: itemKey,
                           itemName: item.title,
                           onDelete: () => _performDeleteTodoItem(item),
                           child: TodoItemCard(

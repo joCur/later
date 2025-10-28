@@ -606,8 +606,10 @@ class _ListDetailScreenState extends State<ListDetailScreen>
                       },
                       itemBuilder: (context, index) {
                         final item = _currentList.items[index];
+                        final itemKey = ValueKey(item.id);
                         return DismissibleListItem(
-                          itemKey: ValueKey(item.id),
+                          key: itemKey,
+                          itemKey: itemKey,
                           itemName: item.title,
                           onDelete: () => _performDeleteListItem(item),
                           child: ListItemCard(
