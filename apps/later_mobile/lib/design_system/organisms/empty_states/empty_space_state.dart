@@ -8,13 +8,13 @@ import 'empty_state.dart';
 /// Features:
 /// - Dynamic space name in title
 /// - Inbox icon (64px)
-/// - Quick Capture CTA
+/// - Create CTA
 ///
 /// Example usage:
 /// ```dart
 /// EmptySpaceState(
 ///   spaceName: 'Work',
-///   onActionPressed: () => _showQuickCapture(),
+///   onActionPressed: () => _showCreateContent(),
 /// )
 /// ```
 class EmptySpaceState extends StatelessWidget {
@@ -28,7 +28,7 @@ class EmptySpaceState extends StatelessWidget {
   /// Name of the current space
   final String spaceName;
 
-  /// Callback when Quick Capture button is pressed
+  /// Callback when Create button is pressed
   final VoidCallback onActionPressed;
 
   @override
@@ -37,7 +37,7 @@ class EmptySpaceState extends StatelessWidget {
       icon: Icons.inbox,
       title: 'Your $spaceName is empty',
       message: 'Start capturing your thoughts, tasks, and ideas',
-      actionLabel: 'Quick Capture',
+      actionLabel: 'Create',
       onActionPressed: onActionPressed,
     );
   }

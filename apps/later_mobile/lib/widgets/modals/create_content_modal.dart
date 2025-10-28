@@ -19,7 +19,7 @@ import '../../data/models/todo_list_model.dart';
 import '../../providers/content_provider.dart';
 import '../../providers/spaces_provider.dart';
 
-/// Type option for Quick Capture content type selector
+/// Type option for Create Content content type selector
 class TypeOption {
   const TypeOption({
     required this.label,
@@ -34,29 +34,29 @@ class TypeOption {
   final Color? color;
 }
 
-/// Quick Capture Modal widget
+/// Create Content Modal widget
 ///
-/// A responsive modal for quickly capturing tasks, notes, and lists
-/// with auto-save, type detection, and keyboard shortcuts.
+/// A responsive modal for creating new content (tasks, notes, and lists)
+/// with explicit save, type detection, and keyboard shortcuts.
 ///
 /// Features:
 /// - Responsive layout (mobile bottom sheet, desktop centered modal)
-/// - Auto-save with debounce (500ms)
+/// - Explicit save with keyboard shortcut support
 /// - Smart type detection
-/// - Keyboard shortcuts (Esc to close, Cmd/Ctrl+Enter to save and close)
+/// - Keyboard shortcuts (Esc to close, Cmd/Ctrl+Enter to create)
 /// - Voice and image input buttons (placeholders)
 /// - Space selector
-class QuickCaptureModal extends StatefulWidget {
-  const QuickCaptureModal({super.key, required this.onClose});
+class CreateContentModal extends StatefulWidget {
+  const CreateContentModal({super.key, required this.onClose});
 
   /// Callback when modal is closed
   final VoidCallback onClose;
 
   @override
-  State<QuickCaptureModal> createState() => _QuickCaptureModalState();
+  State<CreateContentModal> createState() => _CreateContentModalState();
 }
 
-class _QuickCaptureModalState extends State<QuickCaptureModal>
+class _CreateContentModalState extends State<CreateContentModal>
     with TickerProviderStateMixin {
   final TextEditingController _textController = TextEditingController();
   final FocusNode _focusNode = FocusNode();
@@ -168,7 +168,7 @@ class _QuickCaptureModalState extends State<QuickCaptureModal>
       final spacesProvider = context.read<SpacesProvider>();
       _selectedSpaceId = spacesProvider.currentSpace?.id;
       debugPrint(
-        'QuickCapture: didChangeDependencies - _selectedSpaceId initialized to: $_selectedSpaceId',
+        'CreateContent: didChangeDependencies - _selectedSpaceId initialized to: $_selectedSpaceId',
       );
     }
   }
@@ -230,13 +230,13 @@ class _QuickCaptureModalState extends State<QuickCaptureModal>
     final currentSpace = spacesProvider.currentSpace;
 
     if (currentSpace == null) {
-      debugPrint('QuickCapture: Cannot save - no current space');
+      debugPrint('CreateContent: Cannot save - no current space');
       return;
     }
 
     // Safety check: Ensure selected space ID is valid
     if (_selectedSpaceId == null) {
-      debugPrint('QuickCapture: Cannot save - _selectedSpaceId is null');
+      debugPrint('CreateContent: Cannot save - _selectedSpaceId is null');
       return;
     }
 
@@ -247,7 +247,7 @@ class _QuickCaptureModalState extends State<QuickCaptureModal>
     final targetSpaceId = spaceExists ? _selectedSpaceId! : currentSpace.id;
 
     debugPrint(
-      'QuickCapture: Creating item - _selectedSpaceId: $_selectedSpaceId, '
+      'CreateContent: Creating item - _selectedSpaceId: $_selectedSpaceId, '
       'currentSpace: ${currentSpace.id}, targetSpaceId: $targetSpaceId, '
       'spaceExists: $spaceExists',
     );
@@ -319,7 +319,7 @@ class _QuickCaptureModalState extends State<QuickCaptureModal>
         _isSaved = true;
       });
     } catch (e) {
-      debugPrint('QuickCapture: Error saving item - $e');
+      debugPrint('CreateContent: Error saving item - $e');
       setState(() {
         _isSaving = false;
         _isSaved = false;
@@ -641,9 +641,9 @@ class _QuickCaptureModalState extends State<QuickCaptureModal>
         children: [
           Expanded(
             child: Semantics(
-              label: 'Quick Capture',
+              label: 'Create',
               child: Text(
-                'Quick Capture',
+                'Create',
                 style: AppTypography.h3.copyWith(
                   color: AppColors.text(context),
                 ),
@@ -916,13 +916,13 @@ class _QuickCaptureModalState extends State<QuickCaptureModal>
           onSelected: (spaceId) {
             // Update only local state, not global provider
             debugPrint(
-              'QuickCapture: Space selected in dropdown - spaceId: $spaceId',
+              'CreateContent: Space selected in dropdown - spaceId: $spaceId',
             );
             if (mounted) {
               setState(() {
                 _selectedSpaceId = spaceId;
                 debugPrint(
-                  'QuickCapture: _selectedSpaceId updated to: $_selectedSpaceId',
+                  'CreateContent: _selectedSpaceId updated to: $_selectedSpaceId',
                 );
               });
             }

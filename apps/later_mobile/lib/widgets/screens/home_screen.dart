@@ -14,13 +14,13 @@ import '../../providers/spaces_provider.dart';
 import 'package:later_mobile/design_system/organisms/cards/todo_list_card.dart';
 import 'package:later_mobile/design_system/organisms/cards/list_card.dart';
 import 'package:later_mobile/design_system/organisms/cards/note_card.dart';
-import 'package:later_mobile/design_system/molecules/fab/quick_capture_fab.dart';
+import 'package:later_mobile/design_system/molecules/fab/create_content_fab.dart';
 import 'package:later_mobile/design_system/organisms/empty_states/empty_space_state.dart';
 import 'package:later_mobile/design_system/organisms/empty_states/welcome_state.dart';
 import '../navigation/icon_only_bottom_nav.dart';
 import '../navigation/app_sidebar.dart';
 import '../modals/space_switcher_modal.dart';
-import '../modals/quick_capture_modal.dart';
+import '../modals/create_content_modal.dart';
 import 'todo_list_detail_screen.dart';
 import 'list_detail_screen.dart';
 import 'note_detail_screen.dart';
@@ -136,11 +136,11 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  /// Show quick capture modal
-  void _showQuickCaptureModal() {
+  /// Show create content modal
+  void _showCreateContentModal() {
     ResponsiveModal.show<void>(
       context: context,
-      child: QuickCaptureModal(onClose: () => Navigator.of(context).pop()),
+      child: CreateContentModal(onClose: () => Navigator.of(context).pop()),
     );
   }
 
@@ -153,7 +153,7 @@ class _HomeScreenState extends State<HomeScreen> {
       if (isNKey &&
           (HardwareKeyboard.instance.isControlPressed ||
               HardwareKeyboard.instance.isMetaPressed)) {
-        _showQuickCaptureModal();
+        _showCreateContentModal();
         return KeyEventResult.handled;
       }
     }
@@ -365,12 +365,12 @@ class _HomeScreenState extends State<HomeScreen> {
 
       if (isNewUser) {
         // Show welcome state for first-time users
-        return WelcomeState(onActionPressed: _showQuickCaptureModal);
+        return WelcomeState(onActionPressed: _showCreateContentModal);
       } else {
         // Show empty space state for existing users with empty spaces
         return EmptySpaceState(
           spaceName: currentSpace?.name ?? 'space',
-          onActionPressed: _showQuickCaptureModal,
+          onActionPressed: _showCreateContentModal,
         );
       }
     }
@@ -540,8 +540,8 @@ class _HomeScreenState extends State<HomeScreen> {
           setState(() => _selectedNavIndex = index);
         },
       ),
-      floatingActionButton: QuickCaptureFab(
-        onPressed: _showQuickCaptureModal,
+      floatingActionButton: CreateContentFab(
+        onPressed: _showCreateContentModal,
         tooltip: 'Quick capture',
       ),
     );
@@ -631,8 +631,8 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
-      floatingActionButton: QuickCaptureFab(
-        onPressed: _showQuickCaptureModal,
+      floatingActionButton: CreateContentFab(
+        onPressed: _showCreateContentModal,
         tooltip: 'Quick capture',
       ),
     );

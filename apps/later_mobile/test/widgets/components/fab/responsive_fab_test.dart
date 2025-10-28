@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:later_mobile/design_system/molecules/fab/quick_capture_fab.dart';
+import 'package:later_mobile/design_system/molecules/fab/create_content_fab.dart';
 import 'package:later_mobile/design_system/organisms/fab/responsive_fab.dart';
 
 void main() {
@@ -21,8 +21,8 @@ void main() {
         ),
       );
 
-      // Verify QuickCaptureFab is used on mobile
-      expect(find.byType(QuickCaptureFab), findsOneWidget);
+      // Verify CreateContentFab is used on mobile
+      expect(find.byType(CreateContentFab), findsOneWidget);
 
       // Verify the icon is present
       expect(find.byIcon(Icons.add), findsOneWidget);
@@ -76,7 +76,7 @@ void main() {
       );
 
       // Tap the FAB
-      await tester.tap(find.byType(QuickCaptureFab));
+      await tester.tap(find.byType(CreateContentFab));
       await tester.pumpAndSettle();
 
       // Verify callback was called
@@ -142,7 +142,7 @@ void main() {
       );
 
       // Verify FAB is rendered
-      expect(find.byType(QuickCaptureFab), findsOneWidget);
+      expect(find.byType(CreateContentFab), findsOneWidget);
     });
 
     testWidgets('uses tooltip when provided', (tester) async {
@@ -163,7 +163,7 @@ void main() {
       );
 
       // Verify FAB is rendered
-      expect(find.byType(QuickCaptureFab), findsOneWidget);
+      expect(find.byType(CreateContentFab), findsOneWidget);
     });
 
     testWidgets('uses label as tooltip when tooltip not provided', (
@@ -185,7 +185,7 @@ void main() {
       );
 
       // Verify FAB is rendered
-      expect(find.byType(QuickCaptureFab), findsOneWidget);
+      expect(find.byType(CreateContentFab), findsOneWidget);
     });
 
     testWidgets('supports custom heroTag', (tester) async {
@@ -206,7 +206,7 @@ void main() {
       );
 
       // Verify FAB is rendered
-      expect(find.byType(QuickCaptureFab), findsOneWidget);
+      expect(find.byType(CreateContentFab), findsOneWidget);
     });
 
     testWidgets('renders in light theme', (tester) async {
@@ -227,7 +227,7 @@ void main() {
       );
 
       // Verify FAB is rendered
-      expect(find.byType(QuickCaptureFab), findsOneWidget);
+      expect(find.byType(CreateContentFab), findsOneWidget);
     });
 
     testWidgets('renders in dark theme', (tester) async {
@@ -248,7 +248,7 @@ void main() {
       );
 
       // Verify FAB is rendered
-      expect(find.byType(QuickCaptureFab), findsOneWidget);
+      expect(find.byType(CreateContentFab), findsOneWidget);
     });
 
     testWidgets('adapts from mobile to desktop on resize', (tester) async {
@@ -269,7 +269,7 @@ void main() {
       );
 
       // Verify mobile FAB
-      expect(find.byType(QuickCaptureFab), findsOneWidget);
+      expect(find.byType(CreateContentFab), findsOneWidget);
 
       // Resize to desktop
       await tester.pumpWidget(

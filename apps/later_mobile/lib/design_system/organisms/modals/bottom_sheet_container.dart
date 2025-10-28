@@ -10,7 +10,7 @@ import 'package:later_mobile/core/theme/temporal_flow_theme.dart';
 /// A responsive container widget that adapts between mobile bottom sheet
 /// and desktop dialog presentations.
 ///
-/// Copied structure from QuickCaptureModal for consistency.
+/// Copied structure from CreateContentModal for consistency.
 class BottomSheetContainer extends StatelessWidget {
   const BottomSheetContainer({
     super.key,
@@ -54,7 +54,7 @@ class BottomSheetContainer extends StatelessWidget {
     );
   }
 
-  /// Copied from QuickCaptureModal._buildMobileLayout()
+  /// Copied from CreateContentModal._buildMobileLayout()
   Widget _buildMobileLayout() {
     return Builder(
       builder: (context) {
@@ -128,7 +128,7 @@ class BottomSheetContainer extends StatelessWidget {
     );
   }
 
-  /// Copied from QuickCaptureModal._buildDesktopLayout()
+  /// Copied from CreateContentModal._buildDesktopLayout()
   Widget _buildDesktopLayout() {
     return Builder(
       builder: (context) {
@@ -215,7 +215,7 @@ class BottomSheetContainer extends StatelessWidget {
     );
   }
 
-  /// Copied from QuickCaptureModal._buildDragHandle()
+  /// Copied from CreateContentModal._buildDragHandle()
   Widget _buildDragHandle() {
     return Padding(
       padding: const EdgeInsets.only(top: AppSpacing.xs),
@@ -232,7 +232,7 @@ class BottomSheetContainer extends StatelessWidget {
     );
   }
 
-  /// Copied from QuickCaptureModal._buildHeader()
+  /// Copied from CreateContentModal._buildHeader()
   Widget _buildHeader(
     BuildContext context,
     bool isDark, {

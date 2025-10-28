@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:later_mobile/design_system/tokens/tokens.dart';
-import 'package:later_mobile/design_system/molecules/fab/quick_capture_fab.dart';
+import 'package:later_mobile/design_system/molecules/fab/create_content_fab.dart';
 import 'package:later_mobile/core/theme/app_theme.dart';
 import 'package:hive/hive.dart';
 
@@ -120,13 +120,13 @@ void main() {
           child: MaterialApp(
             theme: AppTheme.lightTheme,
             home: Scaffold(
-              floatingActionButton: QuickCaptureFab(onPressed: () {}),
+              floatingActionButton: CreateContentFab(onPressed: () {}),
             ),
           ),
         ),
       );
 
-      expect(find.byType(QuickCaptureFab), findsOneWidget);
+      expect(find.byType(CreateContentFab), findsOneWidget);
       expect(
         tester.takeException(),
         isNull,

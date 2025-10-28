@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:later_mobile/design_system/tokens/tokens.dart';
 import 'package:later_mobile/core/theme/temporal_flow_theme.dart';
 
-/// Quick Capture Floating Action Button - Mobile-First Bold Design
+/// Create Content Floating Action Button - Mobile-First Bold Design
 ///
 /// Features:
 /// - Circular shape: 56×56px (Android standard, mobile-first design)
@@ -14,14 +14,14 @@ import 'package:later_mobile/core/theme/temporal_flow_theme.dart';
 /// - Position: 16px from bottom/right edges
 /// - Hero animation tag for modal transition
 /// - Haptic feedback on press
-class QuickCaptureFab extends StatefulWidget {
-  const QuickCaptureFab({
+class CreateContentFab extends StatefulWidget {
+  const CreateContentFab({
     super.key,
     required this.onPressed,
     this.icon = Icons.add,
     this.label,
     this.tooltip,
-    this.heroTag = 'quick-capture-fab',
+    this.heroTag = 'create-content-fab',
     this.useGradient = true,
     this.isOpen = false,
   });
@@ -48,10 +48,10 @@ class QuickCaptureFab extends StatefulWidget {
   final bool isOpen;
 
   @override
-  State<QuickCaptureFab> createState() => _QuickCaptureFabState();
+  State<CreateContentFab> createState() => _CreateContentFabState();
 }
 
-class _QuickCaptureFabState extends State<QuickCaptureFab>
+class _CreateContentFabState extends State<CreateContentFab>
     with SingleTickerProviderStateMixin {
   late AnimationController _scaleController;
   late Animation<double> _scaleAnimation;
@@ -154,7 +154,7 @@ class _QuickCaptureFabState extends State<QuickCaptureFab>
       child: Semantics(
         button: true,
         enabled: widget.onPressed != null,
-        label: widget.tooltip ?? (widget.label ?? 'Quick Capture'),
+        label: widget.tooltip ?? (widget.label ?? 'Create'),
         child: Tooltip(
           message: widget.tooltip ?? '',
           child: ScaleTransition(

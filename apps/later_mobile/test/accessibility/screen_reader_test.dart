@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:later_mobile/design_system/atoms/buttons/primary_button.dart';
-import 'package:later_mobile/design_system/molecules/fab/quick_capture_fab.dart';
+import 'package:later_mobile/design_system/molecules/fab/create_content_fab.dart';
 import 'package:later_mobile/design_system/organisms/cards/item_card.dart';
 import 'package:later_mobile/data/models/item_model.dart';
 
@@ -43,7 +43,7 @@ void main() {
                 PrimaryButton(text: 'Get Started', onPressed: () {}),
               ],
             ),
-            floatingActionButton: QuickCaptureFab(onPressed: () {}),
+            floatingActionButton: CreateContentFab(onPressed: () {}),
           ),
         ),
       );
@@ -424,7 +424,7 @@ void main() {
         MaterialApp(
           home: Scaffold(
             body: Center(
-              child: QuickCaptureFab(
+              child: CreateContentFab(
                 onPressed: () {},
                 tooltip: 'Create new item',
               ),
@@ -438,7 +438,7 @@ void main() {
       await tester.pumpAndSettle();
 
       // Get semantics
-      final fabFinder = find.byType(QuickCaptureFab);
+      final fabFinder = find.byType(CreateContentFab);
       final semantics = tester.getSemantics(fabFinder);
 
       // Assert: FAB should have accessible label

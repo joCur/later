@@ -14,7 +14,7 @@ import 'empty_state.dart';
 /// Example usage:
 /// ```dart
 /// WelcomeState(
-///   onActionPressed: () => _showQuickCapture(),
+///   onActionPressed: () => _showCreateContent(),
 ///   onSecondaryPressed: () => _showOnboarding(), // optional
 /// )
 /// ```

@@ -4,7 +4,7 @@ import 'package:later_mobile/core/responsive/breakpoints.dart';
 import 'package:later_mobile/core/responsive/responsive_layout.dart';
 import 'package:later_mobile/widgets/navigation/app_sidebar.dart';
 import 'package:later_mobile/widgets/navigation/icon_only_bottom_nav.dart';
-import 'package:later_mobile/design_system/molecules/fab/quick_capture_fab.dart';
+import 'package:later_mobile/design_system/molecules/fab/create_content_fab.dart';
 import 'package:hive/hive.dart';
 
 /// Responsive Behavior Test Suite: Mobile Layout (320px - 767px)
@@ -210,17 +210,17 @@ void main() {
           child: MaterialApp(
             home: Scaffold(
               body: const Center(child: Text('Content')),
-              floatingActionButton: QuickCaptureFab(onPressed: () {}),
+              floatingActionButton: CreateContentFab(onPressed: () {}),
             ),
           ),
         ),
       );
 
       // Verify FAB is present
-      expect(find.byType(QuickCaptureFab), findsOneWidget);
+      expect(find.byType(CreateContentFab), findsOneWidget);
 
       // FAB should be 64x64px
-      final fabSize = tester.getSize(find.byType(QuickCaptureFab));
+      final fabSize = tester.getSize(find.byType(CreateContentFab));
       expect(fabSize.width, equals(64.0));
       expect(fabSize.height, equals(64.0));
     });

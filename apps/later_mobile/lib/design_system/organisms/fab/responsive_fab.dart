@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:later_mobile/design_system/tokens/tokens.dart';
 import '../../../core/responsive/breakpoints.dart';
-import 'package:later_mobile/design_system/molecules/fab/quick_capture_fab.dart';
+import 'package:later_mobile/design_system/molecules/fab/create_content_fab.dart';
 import 'package:later_mobile/core/theme/temporal_flow_theme.dart';
 
 /// A responsive Floating Action Button that adapts between mobile and desktop layouts.
@@ -9,7 +9,7 @@ import 'package:later_mobile/core/theme/temporal_flow_theme.dart';
 /// On mobile (< 768px):
 /// - Displays as a circular FAB (56×56px)
 /// - Icon only, no label
-/// - Uses QuickCaptureFab component for consistent styling
+/// - Uses CreateContentFab component for consistent styling
 /// - Gradient background with 30% white overlay
 ///
 /// On desktop/tablet (>= 768px):
@@ -69,9 +69,9 @@ class ResponsiveFab extends StatelessWidget {
     }
   }
 
-  /// Build mobile circular FAB using QuickCaptureFab
+  /// Build mobile circular FAB using CreateContentFab
   Widget _buildMobileFab(BuildContext context) {
-    return QuickCaptureFab(
+    return CreateContentFab(
       icon: icon,
       onPressed: onPressed,
       tooltip: tooltip ?? label ?? 'Action',

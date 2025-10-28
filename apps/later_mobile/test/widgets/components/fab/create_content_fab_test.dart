@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:later_mobile/design_system/molecules/fab/quick_capture_fab.dart';
+import 'package:later_mobile/design_system/molecules/fab/create_content_fab.dart';
 
 void main() {
-  group('QuickCaptureFab', () {
+  group('CreateContentFab', () {
     testWidgets('renders FAB with icon', (tester) async {
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(body: QuickCaptureFab(onPressed: () {})),
+          home: Scaffold(body: CreateContentFab(onPressed: () {})),
         ),
       );
 
-      expect(find.byType(QuickCaptureFab), findsOneWidget);
+      expect(find.byType(CreateContentFab), findsOneWidget);
       expect(find.byIcon(Icons.add), findsOneWidget);
     });
 
@@ -21,7 +21,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: QuickCaptureFab(
+            body: CreateContentFab(
               onPressed: () {
                 pressed = true;
               },
@@ -30,7 +30,7 @@ void main() {
         ),
       );
 
-      await tester.tap(find.byType(QuickCaptureFab));
+      await tester.tap(find.byType(CreateContentFab));
       await tester.pump();
 
       expect(pressed, isTrue);
@@ -39,13 +39,13 @@ void main() {
     testWidgets('has correct size', (tester) async {
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(body: QuickCaptureFab(onPressed: () {})),
+          home: Scaffold(body: CreateContentFab(onPressed: () {})),
         ),
       );
 
       final container = tester.widget<Container>(
         find.descendant(
-          of: find.byType(QuickCaptureFab),
+          of: find.byType(CreateContentFab),
           matching: find.byType(Container),
         ),
       );
@@ -59,7 +59,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: QuickCaptureFab(icon: Icons.edit, onPressed: () {}),
+            body: CreateContentFab(icon: Icons.edit, onPressed: () {}),
           ),
         ),
       );
@@ -71,7 +71,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: QuickCaptureFab(label: 'Create', onPressed: () {}),
+            body: CreateContentFab(label: 'Create', onPressed: () {}),
           ),
         ),
       );
@@ -83,7 +83,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: QuickCaptureFab(label: 'Create Item', onPressed: () {}),
+            body: CreateContentFab(label: 'Create Item', onPressed: () {}),
           ),
         ),
       );
@@ -96,43 +96,43 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: QuickCaptureFab(tooltip: 'Quick Capture', onPressed: () {}),
+            body: CreateContentFab(tooltip: 'Quick Capture', onPressed: () {}),
           ),
         ),
       );
 
-      expect(find.byType(QuickCaptureFab), findsOneWidget);
+      expect(find.byType(CreateContentFab), findsOneWidget);
     });
 
     testWidgets('is disabled when onPressed is null', (tester) async {
       await tester.pumpWidget(
         const MaterialApp(
-          home: Scaffold(body: QuickCaptureFab(onPressed: null)),
+          home: Scaffold(body: CreateContentFab(onPressed: null)),
         ),
       );
 
-      final fab = tester.widget<QuickCaptureFab>(find.byType(QuickCaptureFab));
+      final fab = tester.widget<CreateContentFab>(find.byType(CreateContentFab));
       expect(fab.onPressed, isNull);
     });
 
     testWidgets('has hero tag when provided', (tester) async {
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(body: QuickCaptureFab(onPressed: () {})),
+          home: Scaffold(body: CreateContentFab(onPressed: () {})),
         ),
       );
 
-      expect(find.byType(QuickCaptureFab), findsOneWidget);
+      expect(find.byType(CreateContentFab), findsOneWidget);
     });
 
     testWidgets('has elevation shadow', (tester) async {
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(body: QuickCaptureFab(onPressed: () {})),
+          home: Scaffold(body: CreateContentFab(onPressed: () {})),
         ),
       );
 
-      expect(find.byType(QuickCaptureFab), findsOneWidget);
+      expect(find.byType(CreateContentFab), findsOneWidget);
     });
   });
 }
