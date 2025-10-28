@@ -218,21 +218,39 @@ class _TodoListDetailScreenState extends State<TodoListDetailScreen> {
     }
   }
 
-  /// Reorder TodoItems
+  /// Reorder TodoItems with optimistic UI update
   Future<void> _reorderTodoItems(int oldIndex, int newIndex) async {
+    // Adjust newIndex when moving item down (Flutter's ReorderableListView pattern)
+    if (newIndex > oldIndex) {
+      newIndex -= 1;
+    }
+
+    // Optimistically update local state first for immediate UI feedback
+    final reorderedItems = List<TodoItem>.from(_currentTodoList.items);
+    final item = reorderedItems.removeAt(oldIndex);
+    reorderedItems.insert(newIndex, item);
+
+    setState(() {
+      _currentTodoList = _currentTodoList.copyWith(items: reorderedItems);
+    });
+
+    // Then persist to provider in the background
     try {
       final provider = Provider.of<ContentProvider>(context, listen: false);
       await provider.reorderTodoItems(_currentTodoList.id, oldIndex, newIndex);
+    } catch (e) {
+      // On error, check mounted before any context usage
+      if (!mounted) return;
 
-      // Reload current todo list
+      // Show error to user and revert state
+      _showSnackBar('Failed to reorder items: $e', isError: true);
+      final provider = Provider.of<ContentProvider>(context, listen: false);
       final updated = provider.todoLists.firstWhere(
         (tl) => tl.id == _currentTodoList.id,
       );
       setState(() {
         _currentTodoList = updated;
       });
-    } catch (e) {
-      _showSnackBar('Failed to reorder items: $e', isError: true);
     }
   }
 
@@ -532,12 +550,7 @@ class _TodoListDetailScreenState extends State<TodoListDetailScreen> {
                   : ReorderableListView.builder(
                       padding: const EdgeInsets.all(AppSpacing.md),
                       itemCount: _currentTodoList.items.length,
-                      onReorder: (oldIndex, newIndex) {
-                        if (newIndex > oldIndex) {
-                          newIndex -= 1;
-                        }
-                        _reorderTodoItems(oldIndex, newIndex);
-                      },
+                      onReorder: _reorderTodoItems,
                       itemBuilder: (context, index) {
                         final item = _currentTodoList.items[index];
                         final itemKey = ValueKey(item.id);
@@ -548,6 +561,7 @@ class _TodoListDetailScreenState extends State<TodoListDetailScreen> {
                           onDelete: () => _performDeleteTodoItem(item),
                           child: TodoItemCard(
                             todoItem: item,
+                            index: index,
                             onCheckboxChanged: (value) => _toggleTodoItem(item),
                             onLongPress: () => _editTodoItem(item),
                           ),

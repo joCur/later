@@ -41,6 +41,7 @@ class TodoItemCard extends StatefulWidget {
   const TodoItemCard({
     super.key,
     required this.todoItem,
+    this.index,
     this.onTap,
     this.onCheckboxChanged,
     this.onLongPress,
@@ -48,6 +49,9 @@ class TodoItemCard extends StatefulWidget {
 
   /// TodoItem data to display
   final TodoItem todoItem;
+
+  /// Index in the ReorderableListView (required for drag functionality)
+  final int? index;
 
   /// Callback when card is tapped
   final VoidCallback? onTap;
@@ -297,12 +301,22 @@ class _TodoItemCardState extends State<TodoItemCard> {
 
           const SizedBox(width: _reorderHandleSpacing),
 
-          // Reorder handle
-          Icon(
-            Icons.drag_indicator,
-            size: _reorderHandleSize,
-            color: AppColors.textDisabled(context),
-          ),
+          // Reorder handle with drag functionality
+          if (widget.index != null)
+            ReorderableDragStartListener(
+              index: widget.index!,
+              child: Icon(
+                Icons.drag_indicator,
+                size: _reorderHandleSize,
+                color: AppColors.textDisabled(context),
+              ),
+            )
+          else
+            Icon(
+              Icons.drag_indicator,
+              size: _reorderHandleSize,
+              color: AppColors.textDisabled(context),
+            ),
         ],
       ),
     );

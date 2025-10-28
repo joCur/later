@@ -190,19 +190,37 @@ class _ListDetailScreenState extends State<ListDetailScreen>
     }
   }
 
-  /// Reorder ListItems
+  /// Reorder ListItems with optimistic UI update
   Future<void> _reorderListItems(int oldIndex, int newIndex) async {
+    // Adjust newIndex when moving item down (Flutter's ReorderableListView pattern)
+    if (newIndex > oldIndex) {
+      newIndex -= 1;
+    }
+
+    // Optimistically update local state first for immediate UI feedback
+    final reorderedItems = List<ListItem>.from(_currentList.items);
+    final item = reorderedItems.removeAt(oldIndex);
+    reorderedItems.insert(newIndex, item);
+
+    setState(() {
+      _currentList = _currentList.copyWith(items: reorderedItems);
+    });
+
+    // Then persist to provider in the background
     try {
       final provider = Provider.of<ContentProvider>(context, listen: false);
       await provider.reorderListItems(_currentList.id, oldIndex, newIndex);
+    } catch (e) {
+      // On error, check mounted before any context usage
+      if (!mounted) return;
 
-      // Reload current list
+      // Show error to user and revert state
+      _showSnackBar('Failed to reorder items: $e', isError: true);
+      final provider = Provider.of<ContentProvider>(context, listen: false);
       final updated = provider.lists.firstWhere((l) => l.id == _currentList.id);
       setState(() {
         _currentList = updated;
       });
-    } catch (e) {
-      _showSnackBar('Failed to reorder items: $e', isError: true);
     }
   }
 
@@ -598,12 +616,7 @@ class _ListDetailScreenState extends State<ListDetailScreen>
                   : ReorderableListView.builder(
                       padding: const EdgeInsets.all(AppSpacing.md),
                       itemCount: _currentList.items.length,
-                      onReorder: (oldIndex, newIndex) {
-                        if (newIndex > oldIndex) {
-                          newIndex -= 1;
-                        }
-                        _reorderListItems(oldIndex, newIndex);
-                      },
+                      onReorder: _reorderListItems,
                       itemBuilder: (context, index) {
                         final item = _currentList.items[index];
                         final itemKey = ValueKey(item.id);
@@ -615,7 +628,7 @@ class _ListDetailScreenState extends State<ListDetailScreen>
                           child: ListItemCard(
                             listItem: item,
                             listStyle: _currentList.style,
-                            itemIndex: index + 1, // 1-based for display
+                            itemIndex: index,
                             onCheckboxChanged:
                                 _currentList.style == ListStyle.checkboxes
                                 ? (value) => _toggleListItem(item)
