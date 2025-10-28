@@ -145,12 +145,11 @@ class _ListCardState extends State<ListCard> with TickerProviderStateMixin {
 
   /// Build title with proper styling
   Widget _buildTitle(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Text(
       widget.list.name,
       style: AppTypography.itemTitle.copyWith(
-        color: isDark ? AppColors.neutral400 : AppColors.neutral600,
+        color: AppColors.text(context),
       ),
       maxLines: AppTypography.itemTitleMaxLines,
       overflow: TextOverflow.ellipsis,
@@ -162,14 +161,13 @@ class _ListCardState extends State<ListCard> with TickerProviderStateMixin {
   /// Returns "1 item" for single item, "N items" for multiple items
   /// Examples: "1 item", "5 items", "0 items"
   Widget _buildItemCount(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     final count = widget.list.totalItems;
     final text = count == 1 ? '1 item' : '$count items';
 
     return Text(
       text,
       style: AppTypography.metadata.copyWith(
-        color: isDark ? AppColors.neutral500 : AppColors.neutral500,
+        color: AppColors.textSecondary(context),
       ),
     );
   }
@@ -180,13 +178,12 @@ class _ListCardState extends State<ListCard> with TickerProviderStateMixin {
   /// Adds "..." if more than 3 items exist
   /// Shows "No items" when list is empty
   Widget _buildItemPreview(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     final preview = _getItemPreview();
 
     return Text(
       preview,
       style: AppTypography.itemContent.copyWith(
-        color: isDark ? AppColors.neutral500 : AppColors.neutral500,
+        color: AppColors.textSecondary(context),
       ),
       maxLines: 2,
       overflow: TextOverflow.ellipsis,
@@ -255,13 +252,13 @@ class _ListCardState extends State<ListCard> with TickerProviderStateMixin {
     final isDark = theme.brightness == Brightness.dark;
 
     // Base background color with subtle gradient tint (5% opacity)
-    final baseBgColor = isDark ? AppColors.neutral900 : Colors.white;
+    final baseBgColor = AppColors.surface(context);
     final tintColor = _getBackgroundTint(isDark);
 
     // Background color based on state
     Color backgroundColor;
     if (_isPressed) {
-      backgroundColor = isDark ? AppColors.neutral800 : AppColors.neutral100;
+      backgroundColor = AppColors.surfaceVariant(context);
     } else {
       // Blend base color with subtle type-specific tint
       backgroundColor = Color.alphaBlend(

@@ -60,7 +60,7 @@ class BottomSheetContainer extends StatelessWidget {
       builder: (context) {
         final temporalTheme = Theme.of(context).extension<TemporalFlowTheme>()!;
         final isDark = Theme.of(context).brightness == Brightness.dark;
-        final surfaceColor = isDark ? AppColors.neutral900 : Colors.white;
+        final surfaceColor = AppColors.surface(context);
         final primaryGradient = temporalTheme.primaryGradient;
         final keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
 
@@ -134,7 +134,7 @@ class BottomSheetContainer extends StatelessWidget {
       builder: (context) {
         final temporalTheme = Theme.of(context).extension<TemporalFlowTheme>()!;
         final isDark = Theme.of(context).brightness == Brightness.dark;
-        final surfaceColor = isDark ? AppColors.neutral900 : Colors.white;
+        final surfaceColor = AppColors.surface(context);
         final primaryGradient = temporalTheme.primaryGradient;
 
         return GestureDetector(
@@ -253,14 +253,14 @@ class BottomSheetContainer extends StatelessWidget {
             child: Text(
               title ?? '',
               style: AppTypography.h3.copyWith(
-                color: isDark ? AppColors.neutral400 : AppColors.neutral600,
+                color: AppColors.text(context),
               ),
             ),
           ),
           IconButton(
             icon: Icon(
               Icons.close,
-              color: isDark ? AppColors.neutral500 : AppColors.neutral500,
+              color: AppColors.textSecondary(context),
             ),
             onPressed: () => Navigator.of(context).pop(),
             iconSize: 24,

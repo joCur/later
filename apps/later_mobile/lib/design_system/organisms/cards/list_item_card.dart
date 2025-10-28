@@ -165,7 +165,7 @@ class _ListItemCardState extends State<ListItemCard> {
     return Text(
       widget.listItem.notes!,
       style: AppTypography.bodySmall.copyWith(
-        color: isDark ? AppColors.neutral500 : AppColors.neutral500,
+        color: AppColors.textSecondary(context),
       ),
       maxLines: _notesMaxLines,
       overflow: TextOverflow.ellipsis,
@@ -231,8 +231,8 @@ class _ListItemCardState extends State<ListItemCard> {
 
     // Background color based on hover state
     final backgroundColor = _isHovered
-        ? (isDark ? AppColors.neutral800 : AppColors.neutral100)
-        : (isDark ? AppColors.neutral900 : Colors.white);
+        ? (AppColors.surfaceVariant(context))
+        : (AppColors.surface(context));
 
     // Build semantic label
     final semanticLabel = _buildSemanticLabel();
@@ -255,7 +255,7 @@ class _ListItemCardState extends State<ListItemCard> {
         color: backgroundColor,
         borderRadius: BorderRadius.circular(_cardBorderRadius),
         border: Border.all(
-          color: isDark ? AppColors.neutral700 : AppColors.neutral200,
+          color: AppColors.border(context),
         ),
       ),
       child: Row(
@@ -275,7 +275,7 @@ class _ListItemCardState extends State<ListItemCard> {
                 Text(
                   widget.listItem.title,
                   style: AppTypography.titleSmall.copyWith(
-                    color: isDark ? AppColors.neutral400 : AppColors.neutral600,
+                    color: AppColors.text(context),
                     decoration: isChecked ? TextDecoration.lineThrough : null,
                   ),
                   maxLines: 1,
@@ -297,7 +297,7 @@ class _ListItemCardState extends State<ListItemCard> {
           Icon(
             Icons.drag_indicator,
             size: _reorderHandleSize,
-            color: isDark ? AppColors.neutral600 : AppColors.neutral400,
+            color: AppColors.textDisabled(context),
           ),
         ],
       ),

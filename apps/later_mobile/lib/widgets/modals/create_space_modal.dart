@@ -220,7 +220,7 @@ class _CreateSpaceModalState extends State<CreateSpaceModal> {
         Text(
           'Icon',
           style: AppTypography.labelLarge.copyWith(
-            color: isDark ? AppColors.neutral400 : AppColors.neutral600,
+            color: AppColors.text(context),
           ),
         ),
         const SizedBox(height: AppSpacing.xs),
@@ -243,7 +243,7 @@ class _CreateSpaceModalState extends State<CreateSpaceModal> {
                       ? (isDark
                             ? AppColors.selectedDark
                             : AppColors.selectedLight)
-                      : (isDark ? AppColors.neutral800 : AppColors.neutral100),
+                      : (AppColors.surfaceVariant(context)),
                   borderRadius: BorderRadius.circular(AppSpacing.radiusSM),
                   border: isSelected
                       ? Border.all(
@@ -287,7 +287,7 @@ class _CreateSpaceModalState extends State<CreateSpaceModal> {
         Text(
           'Color',
           style: AppTypography.labelLarge.copyWith(
-            color: isDark ? AppColors.neutral400 : AppColors.neutral600,
+            color: AppColors.text(context),
           ),
         ),
         const SizedBox(height: AppSpacing.xs),

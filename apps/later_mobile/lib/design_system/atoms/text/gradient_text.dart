@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:later_mobile/core/theme/temporal_flow_theme.dart';
 import 'package:later_mobile/design_system/tokens/tokens.dart';
 
 /// A text widget that applies a gradient shader to its content.
@@ -256,8 +257,8 @@ class GradientText extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Get theme-adaptive gradient
-    final effectiveGradient =
-        gradient ?? AppColors.primaryGradientAdaptive(context);
+    final temporalTheme = Theme.of(context).extension<TemporalFlowTheme>()!;
+    final effectiveGradient = gradient ?? temporalTheme.primaryGradient;
 
     return ShaderMask(
       shaderCallback: (bounds) => effectiveGradient.createShader(

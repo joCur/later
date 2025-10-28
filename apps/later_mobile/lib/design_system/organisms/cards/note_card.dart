@@ -122,12 +122,11 @@ class _NoteCardState extends State<NoteCard> with TickerProviderStateMixin {
 
   /// Build title with proper styling
   Widget _buildTitle(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Text(
       widget.item.title,
       style: AppTypography.itemTitle.copyWith(
-        color: isDark ? AppColors.neutral400 : AppColors.neutral600,
+        color: AppColors.text(context),
       ),
       maxLines: AppTypography.itemTitleMaxLines,
       overflow: TextOverflow.ellipsis,
@@ -159,13 +158,12 @@ class _NoteCardState extends State<NoteCard> with TickerProviderStateMixin {
       return null;
     }
 
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     final truncatedContent = _truncateContent(widget.item.content!);
 
     return Text(
       truncatedContent,
       style: AppTypography.itemContent.copyWith(
-        color: isDark ? AppColors.neutral500 : AppColors.neutral500,
+        color: AppColors.textSecondary(context),
       ),
       maxLines: 2, // Fixed 2 lines for consistent card height
       overflow: TextOverflow.ellipsis,
@@ -238,13 +236,13 @@ class _NoteCardState extends State<NoteCard> with TickerProviderStateMixin {
             : AppColors.neutral200,
         borderRadius: BorderRadius.circular(AppSpacing.radiusSM), // 8px
         border: Border.all(
-          color: isDark ? AppColors.neutral600 : AppColors.neutral300,
+          color: AppColors.textDisabled(context),
         ),
       ),
       child: Text(
         '+$count more',
         style: AppTypography.metadata.copyWith(
-          color: isDark ? AppColors.neutral500 : AppColors.neutral500,
+          color: AppColors.textSecondary(context),
           fontSize: 11,
         ),
       ),
@@ -255,6 +253,7 @@ class _NoteCardState extends State<NoteCard> with TickerProviderStateMixin {
   Widget? _buildMetadata(BuildContext context) {
     if (!widget.showMetadata) return null;
 
+    final temporalTheme = Theme.of(context).extension<TemporalFlowTheme>()!;
     final dateFormat = DateFormat('MMM d, y');
 
     return Row(
@@ -262,7 +261,7 @@ class _NoteCardState extends State<NoteCard> with TickerProviderStateMixin {
         // Icon with gradient tint for created dates
         ShaderMask(
           shaderCallback: (bounds) =>
-              AppColors.primaryGradientAdaptive(context).createShader(bounds),
+              temporalTheme.primaryGradient.createShader(bounds),
           blendMode: BlendMode.srcIn,
           child: const Icon(Icons.access_time, size: 12, color: Colors.white),
         ),
@@ -332,13 +331,13 @@ class _NoteCardState extends State<NoteCard> with TickerProviderStateMixin {
     final isDark = theme.brightness == Brightness.dark;
 
     // Base background color with subtle gradient tint (5% opacity)
-    final baseBgColor = isDark ? AppColors.neutral900 : Colors.white;
+    final baseBgColor = AppColors.surface(context);
     final tintColor = _getBackgroundTint(isDark);
 
     // Background color based on state
     Color backgroundColor;
     if (_isPressed) {
-      backgroundColor = isDark ? AppColors.neutral800 : AppColors.neutral100;
+      backgroundColor = AppColors.surfaceVariant(context);
     } else {
       // Blend base color with subtle type-specific tint
       backgroundColor = Color.alphaBlend(

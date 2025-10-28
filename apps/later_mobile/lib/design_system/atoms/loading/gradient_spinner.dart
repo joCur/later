@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:later_mobile/core/theme/temporal_flow_theme.dart';
 import 'package:later_mobile/design_system/tokens/tokens.dart';
 
 /// A custom circular progress indicator with gradient colors.
@@ -137,8 +138,8 @@ class _GradientSpinnerState extends State<GradientSpinner>
 
   @override
   Widget build(BuildContext context) {
-    final gradient =
-        widget.gradient ?? AppColors.primaryGradientAdaptive(context);
+    final temporalTheme = Theme.of(context).extension<TemporalFlowTheme>()!;
+    final gradient = widget.gradient ?? temporalTheme.primaryGradient;
 
     Widget spinner = RepaintBoundary(
       child: SizedBox(

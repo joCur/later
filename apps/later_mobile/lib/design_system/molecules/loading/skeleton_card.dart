@@ -51,7 +51,7 @@ class SkeletonCard extends StatelessWidget {
     final disableAnimations = MediaQuery.of(context).disableAnimations;
 
     // Card background color
-    final backgroundColor = isDark ? AppColors.neutral900 : Colors.white;
+    final backgroundColor = AppColors.surface(context);
 
     return Container(
       margin: const EdgeInsets.only(

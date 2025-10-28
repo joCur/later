@@ -151,13 +151,13 @@ class _TodoItemCardState extends State<TodoItemCard> {
         Icon(
           Icons.calendar_today,
           size: _dueDateIconSize,
-          color: isDark ? AppColors.neutral500 : AppColors.neutral500,
+          color: AppColors.textSecondary(context),
         ),
         const SizedBox(width: _dueDateIconSpacing),
         Text(
           _formatDueDate(dueDate),
           style: AppTypography.metadata.copyWith(
-            color: isDark ? AppColors.neutral500 : AppColors.neutral500,
+            color: AppColors.textSecondary(context),
           ),
         ),
       ],
@@ -215,8 +215,8 @@ class _TodoItemCardState extends State<TodoItemCard> {
 
     // Background color based on hover state
     final backgroundColor = _isHovered
-        ? (isDark ? AppColors.neutral800 : AppColors.neutral100)
-        : (isDark ? AppColors.neutral900 : Colors.white);
+        ? (AppColors.surfaceVariant(context))
+        : (AppColors.surface(context));
 
     // Build semantic label
     final semanticLabel = _buildSemanticLabel();
@@ -235,7 +235,7 @@ class _TodoItemCardState extends State<TodoItemCard> {
         color: backgroundColor,
         borderRadius: BorderRadius.circular(_cardBorderRadius),
         border: Border.all(
-          color: isDark ? AppColors.neutral700 : AppColors.neutral200,
+          color: AppColors.border(context),
         ),
       ),
       child: Row(
@@ -264,7 +264,7 @@ class _TodoItemCardState extends State<TodoItemCard> {
                 Text(
                   widget.todoItem.title,
                   style: AppTypography.titleSmall.copyWith(
-                    color: isDark ? AppColors.neutral400 : AppColors.neutral600,
+                    color: AppColors.text(context),
                     decoration: widget.todoItem.isCompleted
                         ? TextDecoration.lineThrough
                         : null,
@@ -301,7 +301,7 @@ class _TodoItemCardState extends State<TodoItemCard> {
           Icon(
             Icons.drag_indicator,
             size: _reorderHandleSize,
-            color: isDark ? AppColors.neutral600 : AppColors.neutral400,
+            color: AppColors.textDisabled(context),
           ),
         ],
       ),

@@ -263,8 +263,8 @@ class _TextInputFieldState extends State<TextInputField> {
               widget.label!,
               style: AppTypography.labelMedium.copyWith(
                 color: widget.enabled
-                    ? (isDark ? AppColors.neutral400 : AppColors.neutral600)
-                    : (isDark ? AppColors.neutral600 : AppColors.neutral400),
+                    ? (AppColors.text(context))
+                    : (AppColors.textDisabled(context)),
               ),
             ),
           ),
@@ -317,8 +317,8 @@ class _TextInputFieldState extends State<TextInputField> {
                 maxLines: widget.maxLines,
                 style: AppTypography.input.copyWith(
                   color: widget.enabled
-                      ? (isDark ? AppColors.neutral400 : AppColors.neutral600)
-                      : (isDark ? AppColors.neutral600 : AppColors.neutral400),
+                      ? (AppColors.text(context))
+                      : (AppColors.textDisabled(context)),
                 ),
                 decoration: InputDecoration(
                   hintText: widget.hintText,
@@ -426,7 +426,7 @@ class _TextInputFieldState extends State<TextInputField> {
     return Text(
       counterText,
       style: AppTypography.labelSmall.copyWith(
-        color: isDark ? AppColors.neutral500 : AppColors.neutral500,
+        color: AppColors.textSecondary(context),
       ),
     );
   }

@@ -313,7 +313,7 @@ class _SpaceSwitcherModalState extends State<SpaceSwitcherModal> {
                   Icon(
                     Icons.archive,
                     size: 24,
-                    color: isDark ? AppColors.neutral500 : AppColors.neutral500,
+                    color: AppColors.textSecondary(context),
                   )
                 else if (space.icon != null)
                   Text(space.icon!, style: const TextStyle(fontSize: 24))
@@ -380,7 +380,7 @@ class _SpaceSwitcherModalState extends State<SpaceSwitcherModal> {
                     vertical: AppSpacing.xxs,
                   ),
                   decoration: BoxDecoration(
-                    color: isDark ? AppColors.neutral800 : AppColors.neutral100,
+                    color: AppColors.surfaceVariant(context),
                     borderRadius: BorderRadius.circular(AppSpacing.xs),
                   ),
                   child: Text(
@@ -436,7 +436,7 @@ class _SpaceSwitcherModalState extends State<SpaceSwitcherModal> {
       builder: (BuildContext bottomSheetContext) {
         return Container(
           decoration: BoxDecoration(
-            color: isDark ? AppColors.neutral900 : Colors.white,
+            color: AppColors.surface(context),
             borderRadius: const BorderRadius.vertical(
               top: Radius.circular(AppSpacing.modalRadius),
             ),
@@ -486,7 +486,7 @@ class _SpaceSwitcherModalState extends State<SpaceSwitcherModal> {
 
                 Divider(
                   height: 1,
-                  color: isDark ? AppColors.neutral700 : AppColors.neutral200,
+                  color: AppColors.border(context),
                 ),
 
                 // Menu options
@@ -718,7 +718,7 @@ class _SpaceSwitcherModalState extends State<SpaceSwitcherModal> {
         title: Text(
           'Show Archived Spaces',
           style: AppTypography.bodyMedium.copyWith(
-            color: isDark ? AppColors.neutral400 : AppColors.neutral600,
+            color: AppColors.text(context),
           ),
         ),
         value: _showArchivedSpaces,
@@ -798,7 +798,7 @@ class _SpaceSwitcherModalState extends State<SpaceSwitcherModal> {
                     ? 'No spaces found'
                     : 'No spaces available',
                 style: AppTypography.bodyMedium.copyWith(
-                  color: isDark ? AppColors.neutral500 : AppColors.neutral500,
+                  color: AppColors.textSecondary(context),
                 ),
               ),
             ),
@@ -861,7 +861,7 @@ class _SpaceSwitcherModalState extends State<SpaceSwitcherModal> {
           // Divider
           Divider(
             height: 1,
-            color: isDark ? AppColors.neutral700 : AppColors.neutral200,
+            color: AppColors.border(context),
           ),
 
           // Show archived toggle
@@ -870,7 +870,7 @@ class _SpaceSwitcherModalState extends State<SpaceSwitcherModal> {
           // Divider
           Divider(
             height: 1,
-            color: isDark ? AppColors.neutral700 : AppColors.neutral200,
+            color: AppColors.border(context),
           ),
 
           // Create space button

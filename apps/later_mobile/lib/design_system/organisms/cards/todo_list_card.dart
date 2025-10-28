@@ -123,12 +123,11 @@ class _TodoListCardState extends State<TodoListCard>
 
   /// Build title with proper styling
   Widget _buildTitle(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Text(
       widget.todoList.name,
       style: AppTypography.itemTitle.copyWith(
-        color: isDark ? AppColors.neutral400 : AppColors.neutral600,
+        color: AppColors.text(context),
       ),
       maxLines: AppTypography.itemTitleMaxLines,
       overflow: TextOverflow.ellipsis,
@@ -137,14 +136,13 @@ class _TodoListCardState extends State<TodoListCard>
 
   /// Build progress text (e.g., "4 of 7 completed")
   Widget _buildProgressText(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     final completed = widget.todoList.completedItems;
     final total = widget.todoList.totalItems;
 
     return Text(
       '$completed of $total completed',
       style: AppTypography.metadata.copyWith(
-        color: isDark ? AppColors.neutral500 : AppColors.neutral500,
+        color: AppColors.textSecondary(context),
       ),
     );
   }
@@ -243,13 +241,13 @@ class _TodoListCardState extends State<TodoListCard>
     final isDark = theme.brightness == Brightness.dark;
 
     // Base background color with subtle gradient tint (5% opacity)
-    final baseBgColor = isDark ? AppColors.neutral900 : Colors.white;
+    final baseBgColor = AppColors.surface(context);
     final tintColor = _getBackgroundTint(isDark);
 
     // Background color based on state
     Color backgroundColor;
     if (_isPressed) {
-      backgroundColor = isDark ? AppColors.neutral800 : AppColors.neutral100;
+      backgroundColor = AppColors.surfaceVariant(context);
     } else {
       // Blend base color with subtle type-specific tint
       backgroundColor = Color.alphaBlend(

@@ -134,7 +134,7 @@ class _SkeletonLoaderState extends State<SkeletonLoader>
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     // Base color: neutral-100 (light mode), neutral-800 (dark mode)
-    final baseColor = isDark ? AppColors.neutral800 : AppColors.neutral100;
+    final baseColor = AppColors.surfaceVariant(context);
 
     // Calculate border radius based on shape
     BorderRadius? effectiveBorderRadius;

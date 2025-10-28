@@ -134,7 +134,7 @@ class _AppSidebarState extends State<AppSidebar> {
                 ),
                 child: Container(
                   decoration: BoxDecoration(
-                    color: (isDarkMode ? AppColors.neutral900 : Colors.white)
+                    color: (AppColors.surface(context))
                         .withValues(alpha: 0.9),
                     border: Border(
                       right: BorderSide(
@@ -210,7 +210,7 @@ class _AppSidebarState extends State<AppSidebar> {
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
-                color: isDarkMode ? AppColors.neutral400 : AppColors.neutral600,
+                color: AppColors.text(context),
               ),
             ),
           if (widget.onToggleExpanded != null)
@@ -221,7 +221,7 @@ class _AppSidebarState extends State<AppSidebar> {
               child: IconButton(
                 icon: Icon(widget.isExpanded ? Icons.menu_open : Icons.menu),
                 onPressed: widget.onToggleExpanded,
-                color: isDarkMode ? AppColors.neutral500 : AppColors.neutral500,
+                color: AppColors.textSecondary(context),
               ),
             ),
         ],
@@ -413,8 +413,8 @@ class _SpaceListItemState extends State<_SpaceListItem> {
     final gradient = _getTypeGradient(context);
 
     final textColor = widget.isSelected
-        ? (widget.isDarkMode ? AppColors.neutral400 : AppColors.neutral600)
-        : (widget.isDarkMode ? AppColors.neutral500 : AppColors.neutral500);
+        ? AppColors.text(context)
+        : AppColors.textSecondary(context);
 
     return Padding(
       padding: const EdgeInsets.symmetric(

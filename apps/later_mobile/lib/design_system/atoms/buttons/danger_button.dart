@@ -160,7 +160,7 @@ class _DangerButtonState extends State<DangerButton> {
 
     // Danger gradient: Error colors (Red-600 → Red-500)
     // Provides strong visual warning for destructive actions
-    final gradient = LinearGradient(
+    const gradient = LinearGradient(
       begin: Alignment.topLeft,
       end: Alignment.bottomRight,
       colors: [

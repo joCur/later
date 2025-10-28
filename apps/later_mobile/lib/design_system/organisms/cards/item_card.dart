@@ -137,12 +137,11 @@ class _ItemCardState extends State<ItemCard> with TickerProviderStateMixin {
 
   /// Build title with proper styling
   Widget _buildTitle(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Text(
       widget.item.title,
       style: AppTypography.itemTitle.copyWith(
-        color: isDark ? AppColors.neutral400 : AppColors.neutral600,
+        color: AppColors.text(context),
       ),
       maxLines: AppTypography.itemTitleMaxLines,
       overflow: TextOverflow.ellipsis,
@@ -155,12 +154,11 @@ class _ItemCardState extends State<ItemCard> with TickerProviderStateMixin {
       return null;
     }
 
-    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Text(
       widget.item.content!,
       style: AppTypography.itemContent.copyWith(
-        color: isDark ? AppColors.neutral500 : AppColors.neutral500,
+        color: AppColors.textSecondary(context),
       ),
       maxLines:
           2, // Fixed 2 lines for consistent card height (mobile-first design)
@@ -172,6 +170,7 @@ class _ItemCardState extends State<ItemCard> with TickerProviderStateMixin {
   Widget? _buildMetadata(BuildContext context) {
     if (!widget.showMetadata) return null;
 
+    final temporalTheme = Theme.of(context).extension<TemporalFlowTheme>()!;
     final dateFormat = DateFormat('MMM d, y');
 
     return Row(
@@ -179,7 +178,7 @@ class _ItemCardState extends State<ItemCard> with TickerProviderStateMixin {
         // Icon with gradient tint for created dates
         ShaderMask(
           shaderCallback: (bounds) =>
-              AppColors.primaryGradientAdaptive(context).createShader(bounds),
+              temporalTheme.primaryGradient.createShader(bounds),
           blendMode: BlendMode.srcIn,
           child: const Icon(Icons.access_time, size: 12, color: Colors.white),
         ),
@@ -226,21 +225,20 @@ class _ItemCardState extends State<ItemCard> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final temporalTheme = theme.extension<TemporalFlowTheme>()!;
     final isDark = theme.brightness == Brightness.dark;
 
     // Base background color with subtle gradient tint (5% opacity)
-    final baseBgColor = isDark ? AppColors.neutral900 : Colors.white;
+    final baseBgColor = AppColors.surface(context);
     final tintColor = _getBackgroundTint(isDark);
 
     // Background color based on state with glass morphism for hover/selected
     Color backgroundColor;
     if (widget.isSelected) {
       // Glass morphism overlay (3% opacity) for selected state
-      backgroundColor = isDark
-          ? AppColors.glass(context).withValues(alpha: 0.03)
-          : AppColors.glass(context).withValues(alpha: 0.03);
+      backgroundColor = temporalTheme.glassBackground.withValues(alpha: 0.03);
     } else if (_isPressed) {
-      backgroundColor = isDark ? AppColors.neutral800 : AppColors.neutral100;
+      backgroundColor = AppColors.surfaceVariant(context);
     } else {
       // Blend base color with subtle type-specific tint
       backgroundColor = Color.alphaBlend(

@@ -171,7 +171,7 @@ class _HomeScreenState extends State<HomeScreen> {
     // - Elevation: 0 (flat, modern look)
     // - Height: 56px (Android standard - default AppBar)
     return AppBar(
-      backgroundColor: isDark ? AppColors.neutral900 : Colors.white,
+      backgroundColor: AppColors.surface(context),
       elevation: 0, // Flat design
       automaticallyImplyLeading: false,
       shape: Border(
@@ -271,7 +271,7 @@ class _HomeScreenState extends State<HomeScreen> {
             debugPrint('Search tapped');
           },
           tooltip: 'Search',
-          color: isDark ? AppColors.neutral500 : AppColors.neutral500,
+          color: AppColors.textSecondary(context),
         ),
 
         // Menu button
@@ -281,7 +281,7 @@ class _HomeScreenState extends State<HomeScreen> {
             debugPrint('Menu tapped');
           },
           tooltip: 'Menu',
-          color: isDark ? AppColors.neutral500 : AppColors.neutral500,
+          color: AppColors.textSecondary(context),
         ),
       ],
     );
@@ -476,7 +476,6 @@ class _HomeScreenState extends State<HomeScreen> {
     SpacesProvider spacesProvider,
   ) {
     final filteredContent = _getFilteredContent(contentProvider);
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     final temporalTheme = Theme.of(context).extension<TemporalFlowTheme>()!;
 
     return Scaffold(
@@ -495,7 +494,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: RefreshIndicator(
                   onRefresh: _handleRefresh,
                   color: temporalTheme.primaryGradient.colors.first,
-                  backgroundColor: isDark ? AppColors.neutral900 : Colors.white,
+                  backgroundColor: AppColors.surface(context),
                   child: contentProvider.isLoading
                       ? const Center(child: CircularProgressIndicator())
                       : _buildContentList(
