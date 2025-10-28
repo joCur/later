@@ -312,16 +312,12 @@ void main() {
 
     testWidgets('does not pulse by default on mobile', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: MediaQuery(
-            data: const MediaQueryData(size: Size(375, 812)), // Mobile size
-            child: Scaffold(
-              body: ResponsiveFab(
-                icon: Icons.add,
-                label: 'Add Item',
-                onPressed: () {},
-              ),
-            ),
+        createTestApp(
+          size: const Size(375, 812), // Mobile size
+          child: ResponsiveFab(
+            icon: Icons.add,
+            label: 'Add Item',
+            onPressed: () {},
           ),
         ),
       );
@@ -336,17 +332,13 @@ void main() {
       tester,
     ) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: MediaQuery(
-            data: const MediaQueryData(size: Size(375, 812)), // Mobile size
-            child: Scaffold(
-              body: ResponsiveFab(
-                icon: Icons.add,
-                label: 'Add Item',
-                onPressed: () {},
-                enablePulse: true,
-              ),
-            ),
+        createTestApp(
+          size: const Size(375, 812), // Mobile size
+          child: ResponsiveFab(
+            icon: Icons.add,
+            label: 'Add Item',
+            onPressed: () {},
+            enablePulse: true,
           ),
         ),
       );
@@ -366,17 +358,13 @@ void main() {
 
     testWidgets('pulses on desktop when enablePulse is true', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: MediaQuery(
-            data: const MediaQueryData(size: Size(1440, 900)), // Desktop size
-            child: Scaffold(
-              body: ResponsiveFab(
-                icon: Icons.add,
-                label: 'Add Item',
-                onPressed: () {},
-                enablePulse: true,
-              ),
-            ),
+        createTestApp(
+          size: const Size(1440, 900), // Desktop size
+          child: ResponsiveFab(
+            icon: Icons.add,
+            label: 'Add Item',
+            onPressed: () {},
+            enablePulse: true,
           ),
         ),
       );
@@ -450,20 +438,14 @@ void main() {
 
     testWidgets('respects reduced motion on mobile', (tester) async {
       await tester.pumpWidget(
-        MediaQuery(
-          data: const MediaQueryData(
-            size: Size(375, 812), // Mobile size
-            disableAnimations: true,
-          ),
-          child: MaterialApp(
-            home: Scaffold(
-              body: ResponsiveFab(
-                icon: Icons.add,
-                label: 'Add Item',
-                onPressed: () {},
-                enablePulse: true,
-              ),
-            ),
+        createTestApp(
+          size: const Size(375, 812), // Mobile size
+          disableAnimations: true,
+          child: ResponsiveFab(
+            icon: Icons.add,
+            label: 'Add Item',
+            onPressed: () {},
+            enablePulse: true,
           ),
         ),
       );
@@ -478,20 +460,14 @@ void main() {
 
     testWidgets('respects reduced motion on desktop', (tester) async {
       await tester.pumpWidget(
-        MediaQuery(
-          data: const MediaQueryData(
-            size: Size(1440, 900), // Desktop size
-            disableAnimations: true,
-          ),
-          child: MaterialApp(
-            home: Scaffold(
-              body: ResponsiveFab(
-                icon: Icons.add,
-                label: 'Add Item',
-                onPressed: () {},
-                enablePulse: true,
-              ),
-            ),
+        createTestApp(
+          size: const Size(1440, 900), // Desktop size
+          disableAnimations: true,
+          child: ResponsiveFab(
+            icon: Icons.add,
+            label: 'Add Item',
+            onPressed: () {},
+            enablePulse: true,
           ),
         ),
       );

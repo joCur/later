@@ -69,8 +69,8 @@ class _AnimatedEmptyStateState extends State<AnimatedEmptyState> {
 
     // Schedule FAB pulse to start after entrance animation completes
     if (widget.enableFabPulse != null) {
-      // Entrance animation completes at ~500ms
-      Future.delayed(const Duration(milliseconds: 500), () {
+      // Use animation duration to sync with entrance animation completion
+      Future.delayed(AppAnimations.gentle, () {
         if (mounted) {
           widget.enableFabPulse?.call(true);
         }
@@ -81,10 +81,7 @@ class _AnimatedEmptyStateState extends State<AnimatedEmptyState> {
   @override
   void dispose() {
     // Ensure FAB pulse stops when widget is disposed
-    // Use post-frame callback to avoid calling setState during dispose
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      widget.enableFabPulse?.call(false);
-    });
+    widget.enableFabPulse?.call(false);
     super.dispose();
   }
 
