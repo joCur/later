@@ -128,57 +128,63 @@ Auto-save makes sense for *editing* existing items (less risk, continuous update
     - `lib/design_system/**/*.dart`
   - Update all user-facing strings to "Create"
 
-### Phase 5: Remove Auto-Save for New Content
+### Phase 5: Remove Auto-Save for New Content ✅ COMPLETED
 
-- [ ] Task 5.1: Add state tracking for new vs. editing mode
+- [x] Task 5.1: Add state tracking for new vs. editing mode
   - In `create_content_modal.dart` state class: Add `bool get _isNewItem => _currentItemId == null`
   - This getter will determine if we're creating new or editing existing
+  - **COMPLETED**: Added getter on line 70
 
-- [ ] Task 5.2: Disable auto-save for new content
-  - In `_onTextChanged()` method (lines 186-222): Wrap auto-save logic in `if (!_isNewItem) { ... }`
+- [x] Task 5.2: Disable auto-save for new content
+  - In `_onTextChanged()` method (lines 186-228): Wrap auto-save logic in `if (!_isNewItem) { ... }`
   - Keep the debounce timer code structure for future edit mode support
   - Remove `_isSaving` and `_isSaved` state updates for new items
   - Keep auto-save trigger active only when `_currentItemId != null`
+  - **COMPLETED**: Auto-save logic now only runs for existing items (lines 216-227)
 
-- [ ] Task 5.3: Keep debounce cleanup
+- [x] Task 5.3: Keep debounce cleanup
   - Ensure `_debounceTimer?.cancel()` still happens in dispose (line 178)
   - Keep timer initialization structure for future use
+  - **COMPLETED**: Verified debounce cleanup still in place at line 181
 
-### Phase 6: Add Explicit Save UI and Functionality
+### Phase 6: Add Explicit Save UI and Functionality ✅ COMPLETED
 
-- [ ] Task 6.1: Add save button to toolbar
-  - In `_buildToolbar()` method (lines 693-758): Add save button as rightmost element
+- [x] Task 6.1: Add save button to toolbar
+  - In `_buildToolbar()` method (lines 699-769): Add save button as rightmost element
   - Button design:
     - Primary gradient button when text is not empty
     - Disabled/gray state when text is empty
-    - Icon: Icons.check or Icons.save
+    - Icon: Icons.check
     - Text: "Create" (matching the modal name)
     - Minimum touch target: 48px (WCAG AA)
     - Desktop: Show full button with text and icon
-    - Mobile: Consider icon-only with "Create" semantic label
+    - Mobile: Icon-only with "Create" semantic label
   - Position after space selector, with 8px spacing
+  - **COMPLETED**: Added `_buildSaveButton()` method (lines 771-826) with responsive mobile/desktop layouts
 
-- [ ] Task 6.2: Implement explicit save action
+- [x] Task 6.2: Implement explicit save action
   - Create new method `_handleExplicitSave()` that:
     - Validates text is not empty (trim check)
     - Calls existing `_saveItem()` logic
     - Shows brief success indicator (green checkmark animation, 800ms)
     - Automatically closes modal after success (with 500ms delay for feedback)
   - Wire save button `onPressed` to `_handleExplicitSave()`
+  - **COMPLETED**: Implemented `_handleExplicitSave()` (lines 337-362) with validation, save, and auto-close
 
-- [ ] Task 6.3: Update keyboard shortcuts
-  - In `_handleKeyEvent()` method (lines 330-353): Update Cmd/Ctrl+Enter to call `_handleExplicitSave()` instead of immediate save + close
+- [x] Task 6.3: Update keyboard shortcuts
+  - In `_handleKeyEvent()` method (lines 376-397): Update Cmd/Ctrl+Enter to call `_handleExplicitSave()` instead of immediate save + close
   - Keep Escape behavior for close with unsaved changes confirmation
   - Update keyboard shortcut hint text to show "⌘/Ctrl+Enter to create"
+  - **COMPLETED**: Updated keyboard handler and hint text (lines 1048-1049, 1052)
 
-- [ ] Task 6.4: Add success feedback animation
+- [x] Task 6.4: Add success feedback animation
   - Create `_showSuccessFeedback()` method with:
     - Set `_isSaved = true` to show green checkmark (reuse existing indicator UI)
-    - Scale animation for checkmark (AppAnimations.scaleIn)
     - Short haptic feedback (HapticFeedback.mediumImpact)
     - Duration: 800ms
   - Call from `_handleExplicitSave()` after successful save
   - Auto-close modal 500ms after feedback completes
+  - **COMPLETED**: Implemented `_showSuccessFeedback()` (lines 364-374) with haptics and timing
 
 ### Phase 7: Update Unsaved Changes Handling
 

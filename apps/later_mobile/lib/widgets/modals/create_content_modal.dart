@@ -5,6 +5,7 @@ import 'dart:ui' show ImageFilter;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:later_mobile/design_system/atoms/buttons/ghost_button.dart';
+import 'package:later_mobile/design_system/atoms/buttons/gradient_button.dart';
 import 'package:later_mobile/design_system/atoms/inputs/text_area_field.dart';
 import 'package:later_mobile/design_system/tokens/tokens.dart';
 import 'package:provider/provider.dart';
@@ -65,6 +66,9 @@ class _CreateContentModalState extends State<CreateContentModal>
   bool _isSaving = false;
   bool _isSaved = false;
   String? _selectedSpaceId; // Local state for space selection (modal-only)
+
+  // Check if we're creating a new item or editing an existing one
+  bool get _isNewItem => _currentItemId == null;
 
   // Type selection for content creation
   static const List<TypeOption> _typeOptions = [
@@ -209,16 +213,19 @@ class _CreateContentModalState extends State<CreateContentModal>
       }
     }
 
-    // Show saving indicator
-    setState(() {
-      _isSaving = true;
-      _isSaved = false;
-    });
+    // Only auto-save for existing items (editing mode), not for new items
+    if (!_isNewItem) {
+      // Show saving indicator
+      setState(() {
+        _isSaving = true;
+        _isSaved = false;
+      });
 
-    // Debounce save
-    _debounceTimer = Timer(AppAnimations.autoSaveDebounce, () {
-      _saveItem();
-    });
+      // Debounce save
+      _debounceTimer = Timer(AppAnimations.autoSaveDebounce, () {
+        _saveItem();
+      });
+    }
   }
 
   Future<void> _saveItem() async {
@@ -327,6 +334,45 @@ class _CreateContentModalState extends State<CreateContentModal>
     }
   }
 
+  /// Handles explicit save action from save button or keyboard shortcut
+  Future<void> _handleExplicitSave() async {
+    final text = _textController.text.trim();
+
+    // Validate that text is not empty
+    if (text.isEmpty) return;
+
+    // Prevent multiple simultaneous saves
+    if (_isSaving) return;
+
+    // Call the existing save logic
+    await _saveItem();
+
+    // Show success feedback if save was successful
+    if (_isSaved && mounted) {
+      await _showSuccessFeedback();
+
+      // Close modal after success feedback delay
+      if (mounted) {
+        await Future<void>.delayed(const Duration(milliseconds: 500));
+        if (mounted) {
+          _close();
+        }
+      }
+    }
+  }
+
+  /// Shows success feedback animation with haptics
+  Future<void> _showSuccessFeedback() async {
+    // Trigger haptic feedback
+    HapticFeedback.mediumImpact();
+
+    // The _isSaved state is already set to true by _saveItem()
+    // The UI will show the checkmark via _buildAutoSaveIndicator()
+
+    // Wait for animation duration
+    await Future<void>.delayed(const Duration(milliseconds: 800));
+  }
+
   Future<void> _handleKeyEvent(KeyEvent event) async {
     if (event is KeyDownEvent) {
       // Escape to close (with confirmation if unsaved)
@@ -335,17 +381,15 @@ class _CreateContentModalState extends State<CreateContentModal>
         return;
       }
 
-      // Cmd/Ctrl + Enter to save and close
+      // Cmd/Ctrl + Enter to create (explicit save)
       if (event.logicalKey == LogicalKeyboardKey.enter) {
         final isModifierPressed =
             HardwareKeyboard.instance.isMetaPressed ||
             HardwareKeyboard.instance.isControlPressed;
 
         if (isModifierPressed) {
-          // Cancel debounce and save immediately
-          _debounceTimer?.cancel();
-          await _saveItem();
-          _close();
+          // Use explicit save which includes success feedback and auto-close
+          await _handleExplicitSave();
           return;
         }
       }
@@ -752,9 +796,70 @@ class _CreateContentModalState extends State<CreateContentModal>
 
           // Space selector
           _buildSpaceSelector(),
+          const SizedBox(width: AppSpacing.xs),
+
+          // Save button
+          _buildSaveButton(),
         ],
       ),
     );
+  }
+
+  Widget _buildSaveButton() {
+    final isMobile = context.isMobile;
+    final hasText = _textController.text.trim().isNotEmpty;
+
+    if (isMobile) {
+      // Mobile: Icon-only button
+      return Semantics(
+        label: 'Create',
+        button: true,
+        child: Container(
+          decoration: BoxDecoration(
+            gradient: hasText
+                ? Theme.of(context).extension<TemporalFlowTheme>()!.primaryGradient
+                : null,
+            color: hasText ? null : AppColors.neutral300,
+            borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
+            boxShadow: hasText
+                ? [
+                    BoxShadow(
+                      color: Theme.of(context)
+                          .extension<TemporalFlowTheme>()!
+                          .primaryGradient
+                          .colors
+                          .first
+                          .withValues(alpha: 0.3),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ]
+                : null,
+          ),
+          child: IconButton(
+            key: const Key('save_button'),
+            icon: const Icon(
+              Icons.check,
+              color: Colors.white,
+            ),
+            onPressed: hasText ? _handleExplicitSave : null,
+            iconSize: 20,
+            constraints: const BoxConstraints(
+              minWidth: AppSpacing.minTouchTarget,
+              minHeight: AppSpacing.minTouchTarget,
+            ),
+          ),
+        ),
+      );
+    } else {
+      // Desktop: Full button with text and icon
+      return GradientButton.icon(
+        key: const Key('save_button'),
+        onPressed: hasText ? _handleExplicitSave : null,
+        icon: Icons.check,
+        label: 'Create',
+      );
+    }
   }
 
   Widget _buildTypeSelector() {
@@ -940,11 +1045,11 @@ class _CreateContentModalState extends State<CreateContentModal>
       try {
         final isMacOS = Platform.isMacOS;
         return isMacOS
-            ? '⌘+Enter to save • Esc to close'
-            : 'Ctrl+Enter to save • Esc to close';
+            ? '⌘+Enter to create • Esc to close'
+            : 'Ctrl+Enter to create • Esc to close';
       } catch (e) {
         // Fallback for web or platforms without Platform API
-        return 'Ctrl+Enter to save • Esc to close';
+        return 'Ctrl+Enter to create • Esc to close';
       }
     }
 
