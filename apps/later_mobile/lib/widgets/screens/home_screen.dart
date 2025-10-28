@@ -5,6 +5,7 @@ import 'package:later_mobile/design_system/tokens/tokens.dart';
 import '../../core/responsive/breakpoints.dart';
 import '../../core/theme/temporal_flow_theme.dart';
 import '../../core/utils/responsive_modal.dart';
+import '../../core/utils/item_type_detector.dart';
 import '../../data/models/item_model.dart';
 import '../../data/models/space_model.dart';
 import '../../data/models/todo_list_model.dart';
@@ -14,7 +15,7 @@ import '../../providers/spaces_provider.dart';
 import 'package:later_mobile/design_system/organisms/cards/todo_list_card.dart';
 import 'package:later_mobile/design_system/organisms/cards/list_card.dart';
 import 'package:later_mobile/design_system/organisms/cards/note_card.dart';
-import 'package:later_mobile/design_system/molecules/fab/create_content_fab.dart';
+import 'package:later_mobile/design_system/molecules/fab/expandable_create_fab.dart';
 import 'package:later_mobile/design_system/organisms/empty_states/empty_space_state.dart';
 import 'package:later_mobile/design_system/organisms/empty_states/welcome_state.dart';
 import '../navigation/icon_only_bottom_nav.dart';
@@ -137,10 +138,13 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   /// Show create content modal
-  void _showCreateContentModal() {
+  void _showCreateContentModal([ContentType? initialType]) {
     ResponsiveModal.show<void>(
       context: context,
-      child: CreateContentModal(onClose: () => Navigator.of(context).pop()),
+      child: CreateContentModal(
+        onClose: () => Navigator.of(context).pop(),
+        initialType: initialType,
+      ),
     );
   }
 
@@ -540,9 +544,8 @@ class _HomeScreenState extends State<HomeScreen> {
           setState(() => _selectedNavIndex = index);
         },
       ),
-      floatingActionButton: CreateContentFab(
-        onPressed: _showCreateContentModal,
-        tooltip: 'Quick capture',
+      floatingActionButton: ExpandableCreateFab(
+        onOptionSelected: _showCreateContentModal,
       ),
     );
   }
@@ -631,9 +634,8 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
-      floatingActionButton: CreateContentFab(
-        onPressed: _showCreateContentModal,
-        tooltip: 'Quick capture',
+      floatingActionButton: ExpandableCreateFab(
+        onOptionSelected: _showCreateContentModal,
       ),
     );
   }

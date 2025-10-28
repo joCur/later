@@ -13,7 +13,7 @@ import 'package:uuid/uuid.dart';
 
 import '../../core/responsive/breakpoints.dart';
 import '../../core/theme/temporal_flow_theme.dart';
-import '../../core/utils/item_type_detector.dart';
+import '../../core/utils/item_type_detector.dart'; // For ContentType enum
 import '../../data/models/item_model.dart';
 import '../../data/models/list_model.dart';
 import '../../data/models/todo_list_model.dart';
@@ -31,7 +31,7 @@ class TypeOption {
 
   final String label;
   final IconData icon;
-  final ContentType? type; // null for "Auto"
+  final ContentType type;
   final Color? color;
 }
 
@@ -48,20 +48,27 @@ enum _CloseAction {
 /// Create Content Modal widget
 ///
 /// A responsive modal for creating new content (tasks, notes, and lists)
-/// with explicit save, type detection, and keyboard shortcuts.
+/// with explicit save and keyboard shortcuts.
 ///
 /// Features:
 /// - Responsive layout (mobile bottom sheet, desktop centered modal)
 /// - Explicit save with keyboard shortcut support
-/// - Smart type detection
+/// - Manual type selection with pre-selected initial type
 /// - Keyboard shortcuts (Esc to close, Cmd/Ctrl+Enter to create)
 /// - Voice and image input buttons (placeholders)
 /// - Space selector
 class CreateContentModal extends StatefulWidget {
-  const CreateContentModal({super.key, required this.onClose});
+  const CreateContentModal({
+    super.key,
+    required this.onClose,
+    this.initialType,
+  });
 
   /// Callback when modal is closed
   final VoidCallback onClose;
+
+  /// Initial content type to pre-select (optional)
+  final ContentType? initialType;
 
   @override
   State<CreateContentModal> createState() => _CreateContentModalState();
@@ -80,7 +87,6 @@ class _CreateContentModalState extends State<CreateContentModal>
 
   // Type selection for content creation
   static const List<TypeOption> _typeOptions = [
-    TypeOption(label: 'Auto', icon: Icons.auto_awesome, type: null),
     TypeOption(
       label: 'Todo',
       icon: Icons.check_box_outlined,
@@ -101,8 +107,7 @@ class _CreateContentModalState extends State<CreateContentModal>
     ),
   ];
 
-  ContentType? _selectedType; // null = Auto
-  ContentType? _detectedType; // Tracks auto-detected type
+  ContentType? _selectedType; // User-selected type
 
   late AnimationController _animationController;
   late Animation<double> _scaleAnimation;
@@ -114,6 +119,10 @@ class _CreateContentModalState extends State<CreateContentModal>
   @override
   void initState() {
     super.initState();
+
+    // Initialize selected type from widget parameter
+    _selectedType = widget.initialType;
+
     _textController.addListener(_onTextChanged);
     _focusNode.addListener(() {
       setState(
@@ -195,25 +204,9 @@ class _CreateContentModalState extends State<CreateContentModal>
   }
 
   void _onTextChanged() {
-    final text = _textController.text.trim();
-
-    if (text.isEmpty) {
-      setState(() {
-        _detectedType = null;
-      });
-      return;
-    }
-
-    // Detect type if in Auto mode
-    if (_selectedType == null) {
-      final newDetectedType = ItemTypeDetector.detectType(text);
-      if (_detectedType != newDetectedType) {
-        setState(() {
-          _detectedType = newDetectedType;
-        });
-        _typeIconAnimationController.forward(from: 0.0);
-      }
-    }
+    // Simply trigger rebuild for button state updates
+    // No auto-detection - user must manually select type if desired
+    setState(() {});
   }
 
   Future<void> _saveItem() async {
@@ -254,8 +247,8 @@ class _CreateContentModalState extends State<CreateContentModal>
       );
     }
 
-    // Determine content type (either user-selected or auto-detected)
-    final contentType = _selectedType ?? _detectedType ?? ContentType.note;
+    // Determine content type (user-selected, defaults to note if not specified)
+    final contentType = _selectedType ?? ContentType.note;
 
     try {
       if (_currentItemId == null) {
@@ -672,10 +665,8 @@ class _CreateContentModalState extends State<CreateContentModal>
   }
 
   String _getHeaderTitle() {
-    // Determine the current type (user-selected or auto-detected)
-    final currentType = _selectedType ?? _detectedType;
-
-    switch (currentType) {
+    // Use the user-selected type
+    switch (_selectedType) {
       case ContentType.todoList:
         return 'Create Todo';
       case ContentType.list:
@@ -821,13 +812,10 @@ class _CreateContentModalState extends State<CreateContentModal>
   }
 
   Widget _buildTypeSelector() {
-
-    // Determine which option to display
-    // If user selected a type, use that, otherwise show detected or Auto
-    final displayType = _selectedType ?? _detectedType;
+    // Find the selected option, default to Note if none selected
     final selectedOption = _typeOptions.firstWhere(
-      (option) => option.type == displayType,
-      orElse: () => _typeOptions[0], // Default to Auto
+      (option) => option.type == _selectedType,
+      orElse: () => _typeOptions[2], // Default to Note (index 2)
     );
 
     return PopupMenuButton<TypeOption>(
@@ -897,16 +885,9 @@ class _CreateContentModalState extends State<CreateContentModal>
       onSelected: (option) {
         setState(() {
           _selectedType = option.type;
-          // If user explicitly selects Auto, reset detected type
-          if (option.type == null) {
-            _detectedType = null;
-            // Re-run detection on current text
-            final text = _textController.text.trim();
-            if (text.isNotEmpty) {
-              _detectedType = ItemTypeDetector.detectType(text);
-            }
-          }
         });
+        // Animate the type icon change
+        _typeIconAnimationController.forward(from: 0.0);
       },
     );
   }

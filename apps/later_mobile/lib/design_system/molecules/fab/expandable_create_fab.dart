@@ -34,7 +34,7 @@ class ExpandableCreateFab extends StatefulWidget {
   });
 
   /// Callback when an option is selected
-  final Function(ContentType) onOptionSelected;
+  final void Function(ContentType) onOptionSelected;
 
   /// Hero tag for animation
   final Object heroTag;
