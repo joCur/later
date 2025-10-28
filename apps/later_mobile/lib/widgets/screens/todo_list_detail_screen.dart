@@ -218,20 +218,31 @@ class _TodoListDetailScreenState extends State<TodoListDetailScreen> {
     }
   }
 
-  /// Reorder TodoItems
+  /// Reorder TodoItems with optimistic UI update
   Future<void> _reorderTodoItems(int oldIndex, int newIndex) async {
+    // Optimistically update local state first for immediate UI feedback
+    final reorderedItems = List<TodoItem>.from(_currentTodoList.items);
+    final item = reorderedItems.removeAt(oldIndex);
+    reorderedItems.insert(newIndex, item);
+
+    setState(() {
+      _currentTodoList = _currentTodoList.copyWith(items: reorderedItems);
+    });
+
+    // Then persist to provider in the background
     try {
       final provider = Provider.of<ContentProvider>(context, listen: false);
       await provider.reorderTodoItems(_currentTodoList.id, oldIndex, newIndex);
-
-      // Reload current todo list
+    } catch (e) {
+      // On error, reload from provider to revert
+      if (!mounted) return;
+      final provider = Provider.of<ContentProvider>(context, listen: false);
       final updated = provider.todoLists.firstWhere(
         (tl) => tl.id == _currentTodoList.id,
       );
       setState(() {
         _currentTodoList = updated;
       });
-    } catch (e) {
       _showSnackBar('Failed to reorder items: $e', isError: true);
     }
   }
@@ -548,6 +559,7 @@ class _TodoListDetailScreenState extends State<TodoListDetailScreen> {
                           onDelete: () => _performDeleteTodoItem(item),
                           child: TodoItemCard(
                             todoItem: item,
+                            index: index,
                             onCheckboxChanged: (value) => _toggleTodoItem(item),
                             onLongPress: () => _editTodoItem(item),
                           ),

@@ -128,7 +128,7 @@ class _ListItemCardState extends State<ListItemCard> {
           ),
           child: Center(
             child: Text(
-              '${widget.itemIndex}.',
+              '${widget.itemIndex + 1}.',
               style: AppTypography.labelMedium.copyWith(
                 color: isDark
                     ? AppColors.listGradientEnd
@@ -187,7 +187,7 @@ class _ListItemCardState extends State<ListItemCard> {
         buffer.write(', bullet');
         break;
       case ListStyle.numbered:
-        buffer.write(', number ${widget.itemIndex}');
+        buffer.write(', number ${widget.itemIndex + 1}');
         break;
       case ListStyle.checkboxes:
         buffer.write(widget.listItem.isChecked ? ', checked' : ', not checked');
@@ -293,11 +293,14 @@ class _ListItemCardState extends State<ListItemCard> {
 
           const SizedBox(width: _reorderHandleSpacing),
 
-          // Reorder handle
-          Icon(
-            Icons.drag_indicator,
-            size: _reorderHandleSize,
-            color: AppColors.textDisabled(context),
+          // Reorder handle with drag functionality
+          ReorderableDragStartListener(
+            index: widget.itemIndex,
+            child: Icon(
+              Icons.drag_indicator,
+              size: _reorderHandleSize,
+              color: AppColors.textDisabled(context),
+            ),
           ),
         ],
       ),

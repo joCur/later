@@ -190,18 +190,29 @@ class _ListDetailScreenState extends State<ListDetailScreen>
     }
   }
 
-  /// Reorder ListItems
+  /// Reorder ListItems with optimistic UI update
   Future<void> _reorderListItems(int oldIndex, int newIndex) async {
+    // Optimistically update local state first for immediate UI feedback
+    final reorderedItems = List<ListItem>.from(_currentList.items);
+    final item = reorderedItems.removeAt(oldIndex);
+    reorderedItems.insert(newIndex, item);
+
+    setState(() {
+      _currentList = _currentList.copyWith(items: reorderedItems);
+    });
+
+    // Then persist to provider in the background
     try {
       final provider = Provider.of<ContentProvider>(context, listen: false);
       await provider.reorderListItems(_currentList.id, oldIndex, newIndex);
-
-      // Reload current list
+    } catch (e) {
+      // On error, reload from provider to revert
+      if (!mounted) return;
+      final provider = Provider.of<ContentProvider>(context, listen: false);
       final updated = provider.lists.firstWhere((l) => l.id == _currentList.id);
       setState(() {
         _currentList = updated;
       });
-    } catch (e) {
       _showSnackBar('Failed to reorder items: $e', isError: true);
     }
   }
@@ -615,7 +626,7 @@ class _ListDetailScreenState extends State<ListDetailScreen>
                           child: ListItemCard(
                             listItem: item,
                             listStyle: _currentList.style,
-                            itemIndex: index + 1, // 1-based for display
+                            itemIndex: index,
                             onCheckboxChanged:
                                 _currentList.style == ListStyle.checkboxes
                                 ? (value) => _toggleListItem(item)
