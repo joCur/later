@@ -48,19 +48,21 @@ This enhancement aims to improve user onboarding and make the "create first item
   - Update `apps/later_mobile/lib/design_system/atoms/atoms.dart` to include indicators
 
 ### Phase 2: Create Pulsing Animation for FAB
-- [ ] Task 2.1: Add pulse animation state to QuickCaptureFab
-  - Modify `apps/later_mobile/lib/design_system/molecules/fab/quick_capture_fab.dart`
-  - Add optional `enablePulse` boolean parameter (default false)
-  - Create new `AnimationController` for pulse animation (2000ms duration, repeating)
-  - Add scale animation: 1.0 → 1.08 → 1.0 using `AppAnimations.bouncySpring`
-  - Ensure pulse animation stops on user interaction or after 10 seconds
-  - Use `Animate` package's `.animate().scale()` with repeat
+- [x] Task 2.1: Add pulse animation state to QuickCaptureFab
+  - Modified `apps/later_mobile/lib/design_system/molecules/fab/quick_capture_fab.dart`
+  - Added optional `enablePulse` boolean parameter (default false)
+  - Implemented pulse animation using `flutter_animate` with scale 1.0 → 1.08 → 1.0
+  - Pulse animation stops on user interaction or after 10 seconds
+  - Used `flutter_animate`'s `.animate().scale()` with repeat and bouncy spring curve
+  - Respects reduced motion preferences via `AppAnimations.prefersReducedMotion(context)`
 
-- [ ] Task 2.2: Add pulse animation to ResponsiveFab
-  - Modify `apps/later_mobile/lib/design_system/organisms/fab/responsive_fab.dart`
-  - Add optional `enablePulse` boolean parameter (default false)
-  - Pass `enablePulse` to internal FAB implementation
-  - Ensure pulse respects reduced motion preferences
+- [x] Task 2.2: Add pulse animation to ResponsiveFab
+  - Modified `apps/later_mobile/lib/design_system/organisms/fab/responsive_fab.dart`
+  - Converted to StatefulWidget to manage pulse state
+  - Added optional `enablePulse` boolean parameter (default false)
+  - Passes `enablePulse` to QuickCaptureFab for mobile layout
+  - Implemented pulse animation for desktop extended FAB
+  - Pulse respects reduced motion preferences
 
 ### Phase 3: Create Animated Empty State Component
 - [ ] Task 3.1: Create AnimatedEmptyState organism
