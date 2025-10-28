@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'empty_state.dart';
+import 'animated_empty_state.dart';
 
 /// Welcome state for first app launch
 ///
@@ -10,12 +10,14 @@ import 'empty_state.dart';
 /// - Welcoming message
 /// - Create first item CTA
 /// - Optional "Learn how it works" secondary action
+/// - Entrance animations and FAB pulse
 ///
 /// Example usage:
 /// ```dart
 /// WelcomeState(
 ///   onActionPressed: () => _showQuickCapture(),
 ///   onSecondaryPressed: () => _showOnboarding(), // optional
+///   enableFabPulse: (enabled) => setState(() => _fabPulse = enabled),
 /// )
 /// ```
 class WelcomeState extends StatelessWidget {
@@ -24,6 +26,7 @@ class WelcomeState extends StatelessWidget {
     super.key,
     required this.onActionPressed,
     this.onSecondaryPressed,
+    this.enableFabPulse,
   });
 
   /// Callback when "Create your first item" button is pressed
@@ -32,19 +35,22 @@ class WelcomeState extends StatelessWidget {
   /// Optional callback when "Learn how it works" secondary action is pressed
   final VoidCallback? onSecondaryPressed;
 
+  /// Optional callback to enable/disable FAB pulse animation
+  final ValueChanged<bool>? enableFabPulse;
+
   @override
   Widget build(BuildContext context) {
-    return EmptyState(
-      icon: Icons.auto_awesome, // sparkles icon
+    return AnimatedEmptyState(
+      icon: Icons.auto_awesome,
       title: 'Welcome to later',
       message:
           'Your peaceful place for thoughts, tasks, and everything in between',
       actionLabel: 'Create your first item',
       onActionPressed: onActionPressed,
-      secondaryActionLabel: onSecondaryPressed != null
-          ? 'Learn how it works'
-          : null,
+      secondaryActionLabel:
+          onSecondaryPressed != null ? 'Learn how it works' : null,
       onSecondaryPressed: onSecondaryPressed,
+      enableFabPulse: enableFabPulse,
     );
   }
 }

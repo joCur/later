@@ -8,3 +8,4 @@ export 'inputs/inputs.dart';
 export 'text/gradient_text.dart';
 export 'borders/gradient_pill_border.dart';
 export 'loading/loading.dart';
+export 'indicators/indicators.dart';

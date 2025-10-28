@@ -1,9 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:later_mobile/core/theme/temporal_flow_theme.dart';
 import 'package:later_mobile/design_system/molecules/fab/quick_capture_fab.dart';
 import 'package:later_mobile/design_system/organisms/fab/responsive_fab.dart';
 
 void main() {
+  Widget createTestApp({
+    required Widget child,
+    Size size = const Size(375, 812),
+    bool disableAnimations = false,
+  }) {
+    return MediaQuery(
+      data: MediaQueryData(size: size, disableAnimations: disableAnimations),
+      child: MaterialApp(
+        theme: ThemeData(
+          brightness: Brightness.light,
+          extensions: [TemporalFlowTheme.light()],
+        ),
+        home: Scaffold(body: child),
+      ),
+    );
+  }
+
   group('ResponsiveFab', () {
     testWidgets('renders circular FAB without label on mobile', (tester) async {
       await tester.pumpWidget(
@@ -290,6 +308,176 @@ void main() {
       // Verify desktop FAB with label
       expect(find.byType(FloatingActionButton), findsOneWidget);
       expect(find.text('Add Item'), findsOneWidget);
+    });
+
+    testWidgets('does not pulse by default on mobile', (tester) async {
+      await tester.pumpWidget(
+        createTestApp(
+          size: const Size(375, 812), // Mobile size
+          child: ResponsiveFab(
+            icon: Icons.add,
+            label: 'Add Item',
+            onPressed: () {},
+          ),
+        ),
+      );
+
+      final responsiveFab = tester.widget<ResponsiveFab>(
+        find.byType(ResponsiveFab),
+      );
+      expect(responsiveFab.enablePulse, isFalse);
+    });
+
+    testWidgets('passes enablePulse to QuickCaptureFab on mobile', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        createTestApp(
+          size: const Size(375, 812), // Mobile size
+          child: ResponsiveFab(
+            icon: Icons.add,
+            label: 'Add Item',
+            onPressed: () {},
+            enablePulse: true,
+          ),
+        ),
+      );
+
+      // Verify ResponsiveFab has pulse enabled
+      final responsiveFab = tester.widget<ResponsiveFab>(
+        find.byType(ResponsiveFab),
+      );
+      expect(responsiveFab.enablePulse, isTrue);
+
+      // Verify QuickCaptureFab has pulse enabled
+      final quickCaptureFab = tester.widget<QuickCaptureFab>(
+        find.byType(QuickCaptureFab),
+      );
+      expect(quickCaptureFab.enablePulse, isTrue);
+    });
+
+    testWidgets('pulses on desktop when enablePulse is true', (tester) async {
+      await tester.pumpWidget(
+        createTestApp(
+          size: const Size(1440, 900), // Desktop size
+          child: ResponsiveFab(
+            icon: Icons.add,
+            label: 'Add Item',
+            onPressed: () {},
+            enablePulse: true,
+          ),
+        ),
+      );
+
+      // Verify ResponsiveFab has pulse enabled
+      final responsiveFab = tester.widget<ResponsiveFab>(
+        find.byType(ResponsiveFab),
+      );
+      expect(responsiveFab.enablePulse, isTrue);
+
+      // Pump frames to allow animation to start
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 500));
+    });
+
+    testWidgets('stops pulsing on user interaction on mobile', (tester) async {
+      bool pressed = false;
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: MediaQuery(
+            data: const MediaQueryData(size: Size(375, 812)), // Mobile size
+            child: Scaffold(
+              body: ResponsiveFab(
+                icon: Icons.add,
+                label: 'Add Item',
+                onPressed: () => pressed = true,
+                enablePulse: true,
+              ),
+            ),
+          ),
+        ),
+      );
+
+      // Tap the FAB
+      await tester.tap(find.byType(QuickCaptureFab));
+      await tester.pump();
+
+      // Verify callback was called
+      expect(pressed, isTrue);
+    });
+
+    testWidgets('stops pulsing on user interaction on desktop', (
+      tester,
+    ) async {
+      bool pressed = false;
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: MediaQuery(
+            data: const MediaQueryData(size: Size(1440, 900)), // Desktop size
+            child: Scaffold(
+              body: ResponsiveFab(
+                icon: Icons.add,
+                label: 'Add Item',
+                onPressed: () => pressed = true,
+                enablePulse: true,
+              ),
+            ),
+          ),
+        ),
+      );
+
+      // Tap the FAB
+      await tester.tap(find.byType(FloatingActionButton));
+      await tester.pump();
+
+      // Verify callback was called
+      expect(pressed, isTrue);
+    });
+
+    testWidgets('respects reduced motion on mobile', (tester) async {
+      await tester.pumpWidget(
+        createTestApp(
+          size: const Size(375, 812), // Mobile size
+          disableAnimations: true,
+          child: ResponsiveFab(
+            icon: Icons.add,
+            label: 'Add Item',
+            onPressed: () {},
+            enablePulse: true,
+          ),
+        ),
+      );
+
+      // Verify FAB is rendered
+      expect(find.byType(QuickCaptureFab), findsOneWidget);
+
+      // Pump frames to allow animation to start
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 500));
+    });
+
+    testWidgets('respects reduced motion on desktop', (tester) async {
+      await tester.pumpWidget(
+        createTestApp(
+          size: const Size(1440, 900), // Desktop size
+          disableAnimations: true,
+          child: ResponsiveFab(
+            icon: Icons.add,
+            label: 'Add Item',
+            onPressed: () {},
+            enablePulse: true,
+          ),
+        ),
+      );
+
+      // Verify FAB is rendered
+      expect(find.byType(FloatingActionButton), findsOneWidget);
+
+      // Pump frames to allow animation to start
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 500));
     });
   });
 }
