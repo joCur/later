@@ -239,10 +239,11 @@ class _TodoListDetailScreenState extends State<TodoListDetailScreen> {
       final provider = Provider.of<ContentProvider>(context, listen: false);
       await provider.reorderTodoItems(_currentTodoList.id, oldIndex, newIndex);
     } catch (e) {
-      // On error, show snackbar and revert state if still mounted
-      _showSnackBar('Failed to reorder items: $e', isError: true);
-
+      // On error, check mounted before any context usage
       if (!mounted) return;
+
+      // Show error to user and revert state
+      _showSnackBar('Failed to reorder items: $e', isError: true);
       final provider = Provider.of<ContentProvider>(context, listen: false);
       final updated = provider.todoLists.firstWhere(
         (tl) => tl.id == _currentTodoList.id,
