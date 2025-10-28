@@ -7,5 +7,4 @@ export 'fab/responsive_fab.dart';
 export 'modals/bottom_sheet_container.dart';
 export 'dialogs/delete_confirmation_dialog.dart';
 export 'empty_states/empty_states.dart';
-export 'error/error_dialog.dart';
-export 'error/error_snackbar.dart';
+export 'error/error.dart';

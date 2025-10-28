@@ -60,31 +60,31 @@ Fix the critical bug preventing users from adding new TodoItems and ListItems (c
 
 ### Phase 2: Create Custom Error Widget Component
 
-- [ ] Task 2.1: Create CustomErrorWidget component
-  - Create new file: `lib/design_system/organisms/error/custom_error_widget.dart`
-  - Import required packages: `flutter/material.dart`, `flutter/foundation.dart` (for kDebugMode), `design_system.dart`
-  - Create `CustomErrorWidget` as a `StatelessWidget` accepting `FlutterErrorDetails details` parameter
-  - Implement build method with Material wrapper and themed Container using `TemporalFlowTheme`
-  - Add centered Column with error icon (Icons.error_outline, size 64)
-  - Add "Something went wrong" heading using `AppTypography.h3`
-  - Add user-friendly message from converted `AppError` using `AppTypography.bodyLarge`
-  - Add conditional debug info section (wrapped in `if (kDebugMode)`) showing exception and first 5 stack trace lines
-  - Use `temporalTheme.glassBackground`, `temporalTheme.shadowColor`, etc. for theme-aware styling
+- [x] Task 2.1: Create CustomErrorWidget component
+  - ✓ Created new file: `lib/design_system/organisms/error/custom_error_widget.dart`
+  - ✓ Imported required packages: `flutter/material.dart`, `flutter/foundation.dart` (for kDebugMode)
+  - ✓ Created `CustomErrorWidget` as a `StatelessWidget` accepting `FlutterErrorDetails details` parameter
+  - ✓ Implemented build method with Material wrapper and themed Container using `TemporalFlowTheme`
+  - ✓ Added centered Column with error icon (Icons.error_outline, size 64)
+  - ✓ Added "Something went wrong" heading using `AppTypography.headlineSmall`
+  - ✓ Added user-friendly message from converted `AppError` using `AppTypography.bodyLarge`
+  - ✓ Added conditional debug info section (wrapped in `if (kDebugMode)`) showing exception and first 5 stack trace lines
+  - ✓ Used `temporalTheme.glassBackground`, `temporalTheme.shadowColor`, etc. for theme-aware styling with fallbacks
+  - ✓ Fixed all linting issues (removed unused imports, fixed deprecated withOpacity calls)
 
-- [ ] Task 2.2: Export CustomErrorWidget in design system
-  - Open `lib/design_system/organisms/error/error.dart` (or create if doesn't exist)
-  - Add export: `export 'custom_error_widget.dart';`
-  - Open `lib/design_system/organisms/organisms.dart`
-  - Add export: `export 'error/error.dart';`
-  - Verify design_system barrel export includes organisms
+- [x] Task 2.2: Export CustomErrorWidget in design system
+  - ✓ Created `lib/design_system/organisms/error/error.dart` barrel file
+  - ✓ Added export: `export 'custom_error_widget.dart';`
+  - ✓ Updated `lib/design_system/organisms/organisms.dart` to export `error/error.dart`
+  - ✓ Fixed dangling library doc comment warning
 
-- [ ] Task 2.3: Update ErrorHandler to configure ErrorWidget.builder
-  - Open `lib/core/error/error_handler.dart`
-  - In `ErrorHandler.initialize()` method (around line 32), add `ErrorWidget.builder` configuration BEFORE existing `FlutterError.onError` setup
-  - Set `ErrorWidget.builder = (FlutterErrorDetails details) { ... }`
-  - Inside builder: call `handleFlutterError(details)` to log error
-  - Return `CustomErrorWidget(details: details)`
-  - Ensure proper import of `CustomErrorWidget` from design system
+- [x] Task 2.3: Update ErrorHandler to configure ErrorWidget.builder
+  - ✓ Opened `lib/core/error/error_handler.dart`
+  - ✓ Added `ErrorWidget.builder` configuration in `ErrorHandler.initialize()` method BEFORE existing `FlutterError.onError` setup
+  - ✓ Set `ErrorWidget.builder = (FlutterErrorDetails details) { ... }`
+  - ✓ Inside builder: calls `handleFlutterError(details)` to log error
+  - ✓ Returns `CustomErrorWidget(details: details)`
+  - ✓ Added proper import of `CustomErrorWidget` from design system
 
 ### Phase 3: Testing and Verification
 

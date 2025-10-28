@@ -2,6 +2,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'app_error.dart';
 import 'error_logger.dart';
+import 'package:later_mobile/design_system/organisms/error/custom_error_widget.dart';
 import 'package:later_mobile/design_system/organisms/error/error_dialog.dart';
 import 'package:later_mobile/design_system/organisms/error/error_snackbar.dart';
 
@@ -30,6 +31,14 @@ class ErrorHandler {
   ///
   /// Call this in main() before runApp().
   static void initialize() {
+    // Configure custom error widget builder
+    ErrorWidget.builder = (FlutterErrorDetails details) {
+      // Log the error using our error handler
+      handleFlutterError(details);
+      // Return our custom error widget
+      return CustomErrorWidget(details: details);
+    };
+
     // Handle Flutter framework errors
     FlutterError.onError = (FlutterErrorDetails details) {
       handleFlutterError(details);
