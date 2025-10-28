@@ -206,14 +206,15 @@ class _ListDetailScreenState extends State<ListDetailScreen>
       final provider = Provider.of<ContentProvider>(context, listen: false);
       await provider.reorderListItems(_currentList.id, oldIndex, newIndex);
     } catch (e) {
-      // On error, reload from provider to revert
+      // On error, show snackbar and revert state if still mounted
+      _showSnackBar('Failed to reorder items: $e', isError: true);
+
       if (!mounted) return;
       final provider = Provider.of<ContentProvider>(context, listen: false);
       final updated = provider.lists.firstWhere((l) => l.id == _currentList.id);
       setState(() {
         _currentList = updated;
       });
-      _showSnackBar('Failed to reorder items: $e', isError: true);
     }
   }
 

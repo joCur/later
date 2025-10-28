@@ -234,7 +234,9 @@ class _TodoListDetailScreenState extends State<TodoListDetailScreen> {
       final provider = Provider.of<ContentProvider>(context, listen: false);
       await provider.reorderTodoItems(_currentTodoList.id, oldIndex, newIndex);
     } catch (e) {
-      // On error, reload from provider to revert
+      // On error, show snackbar and revert state if still mounted
+      _showSnackBar('Failed to reorder items: $e', isError: true);
+
       if (!mounted) return;
       final provider = Provider.of<ContentProvider>(context, listen: false);
       final updated = provider.todoLists.firstWhere(
@@ -243,7 +245,6 @@ class _TodoListDetailScreenState extends State<TodoListDetailScreen> {
       setState(() {
         _currentTodoList = updated;
       });
-      _showSnackBar('Failed to reorder items: $e', isError: true);
     }
   }
 
