@@ -194,6 +194,11 @@ class _ListDetailScreenState extends State<ListDetailScreen>
 
   /// Reorder ListItems with optimistic UI update
   Future<void> _reorderListItems(int oldIndex, int newIndex) async {
+    // Adjust newIndex when moving item down (Flutter's ReorderableListView pattern)
+    if (newIndex > oldIndex) {
+      newIndex -= 1;
+    }
+
     // Optimistically update local state first for immediate UI feedback
     final reorderedItems = List<ListItem>.from(_currentList.items);
     final item = reorderedItems.removeAt(oldIndex);
@@ -208,14 +213,16 @@ class _ListDetailScreenState extends State<ListDetailScreen>
       final provider = Provider.of<ContentProvider>(context, listen: false);
       await provider.reorderListItems(_currentList.id, oldIndex, newIndex);
     } catch (e) {
-      // On error, reload from provider to revert
+      // On error, check mounted before any context usage
       if (!mounted) return;
+
+      // Show error to user and revert state
+      _showSnackBar('Failed to reorder items: $e', isError: true);
       final provider = Provider.of<ContentProvider>(context, listen: false);
       final updated = provider.lists.firstWhere((l) => l.id == _currentList.id);
       setState(() {
         _currentList = updated;
       });
-      _showSnackBar('Failed to reorder items: $e', isError: true);
     }
   }
 
@@ -611,12 +618,7 @@ class _ListDetailScreenState extends State<ListDetailScreen>
                   : ReorderableListView.builder(
                       padding: const EdgeInsets.all(AppSpacing.md),
                       itemCount: _currentList.items.length,
-                      onReorder: (oldIndex, newIndex) {
-                        if (newIndex > oldIndex) {
-                          newIndex -= 1;
-                        }
-                        _reorderListItems(oldIndex, newIndex);
-                      },
+                      onReorder: _reorderListItems,
                       itemBuilder: (context, index) {
                         final item = _currentList.items[index];
                         final itemKey = ValueKey(item.id);
