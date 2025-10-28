@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:io' show Platform;
 import 'dart:ui' show ImageFilter;
 
@@ -6,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:later_mobile/design_system/atoms/buttons/ghost_button.dart';
 import 'package:later_mobile/design_system/atoms/buttons/gradient_button.dart';
+import 'package:later_mobile/design_system/atoms/buttons/primary_button.dart';
 import 'package:later_mobile/design_system/atoms/inputs/text_area_field.dart';
 import 'package:later_mobile/design_system/tokens/tokens.dart';
 import 'package:provider/provider.dart';
@@ -35,6 +35,16 @@ class TypeOption {
   final Color? color;
 }
 
+/// Action to take when closing the modal with unsaved changes
+enum _CloseAction {
+  /// Discard unsaved changes and close
+  discard,
+  /// Create the item and close immediately
+  createAndClose,
+  /// Cancel (stay open)
+  cancel,
+}
+
 /// Create Content Modal widget
 ///
 /// A responsive modal for creating new content (tasks, notes, and lists)
@@ -61,10 +71,8 @@ class _CreateContentModalState extends State<CreateContentModal>
     with TickerProviderStateMixin {
   final TextEditingController _textController = TextEditingController();
   final FocusNode _focusNode = FocusNode();
-  Timer? _debounceTimer;
   String? _currentItemId;
   bool _isSaving = false;
-  bool _isSaved = false;
   String? _selectedSpaceId; // Local state for space selection (modal-only)
 
   // Check if we're creating a new item or editing an existing one
@@ -179,7 +187,6 @@ class _CreateContentModalState extends State<CreateContentModal>
 
   @override
   void dispose() {
-    _debounceTimer?.cancel();
     _textController.dispose();
     _focusNode.dispose();
     _animationController.dispose();
@@ -190,13 +197,8 @@ class _CreateContentModalState extends State<CreateContentModal>
   void _onTextChanged() {
     final text = _textController.text.trim();
 
-    // Cancel existing timer
-    _debounceTimer?.cancel();
-
     if (text.isEmpty) {
       setState(() {
-        _isSaving = false;
-        _isSaved = false;
         _detectedType = null;
       });
       return;
@@ -211,20 +213,6 @@ class _CreateContentModalState extends State<CreateContentModal>
         });
         _typeIconAnimationController.forward(from: 0.0);
       }
-    }
-
-    // Only auto-save for existing items (editing mode), not for new items
-    if (!_isNewItem) {
-      // Show saving indicator
-      setState(() {
-        _isSaving = true;
-        _isSaved = false;
-      });
-
-      // Debounce save
-      _debounceTimer = Timer(AppAnimations.autoSaveDebounce, () {
-        _saveItem();
-      });
     }
   }
 
@@ -323,14 +311,13 @@ class _CreateContentModalState extends State<CreateContentModal>
 
       setState(() {
         _isSaving = false;
-        _isSaved = true;
       });
     } catch (e) {
       debugPrint('CreateContent: Error saving item - $e');
       setState(() {
         _isSaving = false;
-        _isSaved = false;
       });
+      rethrow; // Rethrow so _handleExplicitSave can handle the error
     }
   }
 
@@ -344,20 +331,27 @@ class _CreateContentModalState extends State<CreateContentModal>
     // Prevent multiple simultaneous saves
     if (_isSaving) return;
 
-    // Call the existing save logic
-    await _saveItem();
+    setState(() {
+      _isSaving = true;
+    });
 
-    // Show success feedback if save was successful
-    if (_isSaved && mounted) {
-      await _showSuccessFeedback();
+    try {
+      // Call the existing save logic
+      await _saveItem();
 
-      // Close modal after success feedback delay
+      // Show success feedback and close
       if (mounted) {
+        await _showSuccessFeedback();
+
+        // Close modal after success feedback delay
         await Future<void>.delayed(const Duration(milliseconds: 500));
         if (mounted) {
           _close();
         }
       }
+    } catch (e) {
+      // Error already logged in _saveItem, just ensure loading state is cleared
+      debugPrint('CreateContent: Failed to save item - $e');
     }
   }
 
@@ -366,10 +360,7 @@ class _CreateContentModalState extends State<CreateContentModal>
     // Trigger haptic feedback
     HapticFeedback.mediumImpact();
 
-    // The _isSaved state is already set to true by _saveItem()
-    // The UI will show the checkmark via _buildAutoSaveIndicator()
-
-    // Wait for animation duration
+    // Wait for animation duration to allow user to see the loading state complete
     await Future<void>.delayed(const Duration(milliseconds: 800));
   }
 
@@ -408,30 +399,35 @@ class _CreateContentModalState extends State<CreateContentModal>
 
   Future<void> _handleClose() async {
     final hasContent = _textController.text.trim().isNotEmpty;
-    final hasUnsavedChanges = hasContent && !_isSaved;
+    // Only show confirmation for new items with unsaved content
+    final hasUnsavedChanges = hasContent && _isNewItem;
 
     if (hasUnsavedChanges) {
-      // Show confirmation dialog
-      final shouldClose = await _showCloseConfirmation();
-      if (shouldClose == true) {
-        // Save before closing
+      // Show confirmation dialog with option to discard or create & close
+      final action = await _showCloseConfirmation();
+      if (action == _CloseAction.createAndClose) {
+        // Create the item and close immediately (without delay)
         await _saveItem();
         if (mounted) {
           _close();
         }
+      } else if (action == _CloseAction.discard) {
+        // Discard and close
+        _close();
       }
+      // If action is null or cancel, do nothing (stay open)
     } else {
       // No unsaved changes, close immediately
       _close();
     }
   }
 
-  Future<bool?> _showCloseConfirmation() async {
+  Future<_CloseAction?> _showCloseConfirmation() async {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final temporalTheme = Theme.of(context).extension<TemporalFlowTheme>()!;
     final surfaceColor = AppColors.surface(context);
 
-    return showDialog<bool>(
+    return showDialog<_CloseAction>(
       context: context,
       barrierColor: (isDark ? AppColors.overlayDark : AppColors.overlayLight),
       builder: (context) => BackdropFilter(
@@ -465,14 +461,14 @@ class _CreateContentModalState extends State<CreateContentModal>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Save changes?',
+                  'Discard unsaved content?',
                   style: AppTypography.h4.copyWith(
                     color: AppColors.text(context),
                   ),
                 ),
                 const SizedBox(height: AppSpacing.md),
                 Text(
-                  'You have unsaved changes. Would you like to save them before closing?',
+                  'You haven\'t created this item yet. Would you like to create it or discard your changes?',
                   style: AppTypography.bodyMedium.copyWith(
                     color: AppColors.textSecondary(context),
                   ),
@@ -482,13 +478,18 @@ class _CreateContentModalState extends State<CreateContentModal>
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     GhostButton(
-                      text: 'Discard',
-                      onPressed: () => Navigator.of(context).pop(false),
+                      text: 'Cancel',
+                      onPressed: () => Navigator.of(context).pop(_CloseAction.cancel),
                     ),
                     const SizedBox(width: AppSpacing.xs),
                     GhostButton(
-                      text: 'Save',
-                      onPressed: () => Navigator.of(context).pop(true),
+                      text: 'Discard',
+                      onPressed: () => Navigator.of(context).pop(_CloseAction.discard),
+                    ),
+                    const SizedBox(width: AppSpacing.xs),
+                    GradientButton(
+                      label: 'Create & Close',
+                      onPressed: () => Navigator.of(context).pop(_CloseAction.createAndClose),
                     ),
                   ],
                 ),
@@ -647,7 +648,8 @@ class _CreateContentModalState extends State<CreateContentModal>
         // Auto-save indicator
         _buildAutoSaveIndicator(),
 
-        SizedBox(height: isMobile ? AppSpacing.md : AppSpacing.sm),
+        // Footer with action button
+        _buildFooter(isMobile: isMobile),
       ],
     );
   }
@@ -796,70 +798,9 @@ class _CreateContentModalState extends State<CreateContentModal>
 
           // Space selector
           _buildSpaceSelector(),
-          const SizedBox(width: AppSpacing.xs),
-
-          // Save button
-          _buildSaveButton(),
         ],
       ),
     );
-  }
-
-  Widget _buildSaveButton() {
-    final isMobile = context.isMobile;
-    final hasText = _textController.text.trim().isNotEmpty;
-
-    if (isMobile) {
-      // Mobile: Icon-only button
-      return Semantics(
-        label: 'Create',
-        button: true,
-        child: Container(
-          decoration: BoxDecoration(
-            gradient: hasText
-                ? Theme.of(context).extension<TemporalFlowTheme>()!.primaryGradient
-                : null,
-            color: hasText ? null : AppColors.neutral300,
-            borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
-            boxShadow: hasText
-                ? [
-                    BoxShadow(
-                      color: Theme.of(context)
-                          .extension<TemporalFlowTheme>()!
-                          .primaryGradient
-                          .colors
-                          .first
-                          .withValues(alpha: 0.3),
-                      blurRadius: 8,
-                      offset: const Offset(0, 2),
-                    ),
-                  ]
-                : null,
-          ),
-          child: IconButton(
-            key: const Key('save_button'),
-            icon: const Icon(
-              Icons.check,
-              color: Colors.white,
-            ),
-            onPressed: hasText ? _handleExplicitSave : null,
-            iconSize: 20,
-            constraints: const BoxConstraints(
-              minWidth: AppSpacing.minTouchTarget,
-              minHeight: AppSpacing.minTouchTarget,
-            ),
-          ),
-        ),
-      );
-    } else {
-      // Desktop: Full button with text and icon
-      return GradientButton.icon(
-        key: const Key('save_button'),
-        onPressed: hasText ? _handleExplicitSave : null,
-        icon: Icons.check,
-        label: 'Create',
-      );
-    }
   }
 
   Widget _buildTypeSelector() {
@@ -1063,65 +1004,39 @@ class _CreateContentModalState extends State<CreateContentModal>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Row(
-            key: const Key('autosave_indicator'),
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              if (_isSaving || _isSaved)
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppSpacing.xs,
-                    vertical: AppSpacing.xxs,
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      if (_isSaving)
-                        const SizedBox(
-                          width: 12,
-                          height: 12,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            valueColor: AlwaysStoppedAnimation<Color>(
-                              AppColors.neutral500,
-                            ),
-                          ),
-                        )
-                      else if (_isSaved)
-                        const Icon(
-                          Icons.check,
-                          size: 12,
-                          color: AppColors.success,
-                        ),
-                      const SizedBox(width: AppSpacing.xxs),
-                      Text(
-                        _isSaving ? 'Saving...' : 'Saved',
-                        style: AppTypography.labelSmall.copyWith(
-                          color: _isSaving
-                              ? AppColors.neutral500
-                              : AppColors.success,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-            ],
-          ),
           // Keyboard shortcuts hint (visible when focused, desktop only)
           if (!isMobile && _focusNode.hasFocus)
-            Padding(
-              padding: const EdgeInsets.only(top: AppSpacing.xxs),
-              child: Text(
-                getKeyboardShortcutText(),
-                key: const Key('keyboard_hints'),
-                textAlign: TextAlign.right,
-                style: AppTypography.labelSmall.copyWith(
-                  color: AppColors.textSecondary(context),
-                ),
+            Text(
+              getKeyboardShortcutText(),
+              key: const Key('keyboard_hints'),
+              textAlign: TextAlign.right,
+              style: AppTypography.labelSmall.copyWith(
+                color: AppColors.textSecondary(context),
               ),
             ),
         ],
       ),
+    );
+  }
+
+  Widget _buildFooter({required bool isMobile}) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(AppSpacing.sm),
+          child: PrimaryButton(
+            key: const Key('save_button'),
+            text: 'Create',
+            icon: Icons.check,
+            onPressed: _textController.text.trim().isNotEmpty ? _handleExplicitSave : null,
+            isLoading: _isSaving,
+            isExpanded: true,
+          ),
+        ),
+        // Bottom padding for mobile (safe area + keyboard)
+        if (isMobile) SizedBox(height: MediaQuery.of(context).padding.bottom),
+      ],
     );
   }
 }

@@ -186,18 +186,20 @@ Auto-save makes sense for *editing* existing items (less risk, continuous update
   - Auto-close modal 500ms after feedback completes
   - **COMPLETED**: Implemented `_showSuccessFeedback()` (lines 364-374) with haptics and timing
 
-### Phase 7: Update Unsaved Changes Handling
+### Phase 7: Update Unsaved Changes Handling ✅ COMPLETED
 
-- [ ] Task 7.1: Update close confirmation logic
-  - In `_handleClose()` method (lines 365-383): Update condition for unsaved changes
-  - Show confirmation dialog only if: `_textController.text.trim().isNotEmpty && _currentItemId == null`
-  - Dialog text: "Discard unsaved content?" / "You haven't created this item yet. Discard?"
-  - Actions: "Discard" (destructive), "Cancel" (default), "Create & Close"
+- [x] Task 7.1: Update close confirmation logic
+  - In `_handleClose()` method (lines 409-432): Update condition for unsaved changes
+  - Show confirmation dialog only if: `_textController.text.trim().isNotEmpty && _isNewItem`
+  - Dialog text: "Discard unsaved content?" / "You haven't created this item yet. Would you like to create it or discard your changes?"
+  - Actions: "Cancel", "Discard", "Create & Close"
+  - **COMPLETED**: Added `_CloseAction` enum and updated logic to handle three actions (lines 38-46, 444-521)
 
-- [ ] Task 7.2: Add "Create & Close" to confirmation
-  - In confirmation dialog (lines 385-457): Add third action "Create & Close"
-  - On "Create & Close": Call `_handleExplicitSave()` without auto-close delay, then close immediately
-  - Make "Create & Close" the primary/suggested action (blue color)
+- [x] Task 7.2: Add "Create & Close" to confirmation
+  - In confirmation dialog (lines 444-521): Add third action "Create & Close"
+  - On "Create & Close": Calls `_saveItem()` and closes immediately (lines 417-422)
+  - Made "Create & Close" the primary action using `GradientButton` with gradient styling (lines 509-512)
+  - **COMPLETED**: Dialog now shows three options with proper styling and functionality
 
 ### Phase 8: Update Auto-Save Indicator UI
 
