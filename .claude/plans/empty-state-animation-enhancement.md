@@ -109,17 +109,19 @@ This enhancement aims to improve user onboarding and make the "create first item
   - App launches and runs without errors
 
 ### Phase 5: Integrate Animations in Detail Screens
-- [ ] Task 5.1: Update TodoListDetailScreen empty state
-  - Modify `apps/later_mobile/lib/widgets/screens/todo_list_detail_screen.dart`
-  - Update `_buildEmptyState()` method to use `AnimatedEmptyState`
-  - Enable FAB pulse when list is empty
-  - Arrow points to FAB in bottom-right
+- [x] Task 5.1: Update TodoListDetailScreen empty state
+  - Modified `apps/later_mobile/lib/widgets/screens/todo_list_detail_screen.dart`
+  - Updated `_buildEmptyState()` method to use `AnimatedEmptyState`
+  - Added `_enableFabPulse` state variable
+  - Enabled FAB pulse when list is empty via `enablePulse` parameter
+  - Added `enableFabPulse` callback to trigger FAB animation
 
-- [ ] Task 5.2: Update ListDetailScreen empty state
-  - Modify `apps/later_mobile/lib/widgets/screens/list_detail_screen.dart`
-  - Update `_buildEmptyState()` method to use `AnimatedEmptyState`
-  - Enable FAB pulse when list is empty
-  - Arrow points to FAB in bottom-right
+- [x] Task 5.2: Update ListDetailScreen empty state
+  - Modified `apps/later_mobile/lib/widgets/screens/list_detail_screen.dart`
+  - Updated `_buildEmptyState()` method to use `AnimatedEmptyState`
+  - Added `_enableFabPulse` state variable
+  - Enabled FAB pulse when list is empty via `enablePulse` parameter
+  - Added `enableFabPulse` callback to trigger FAB animation
 
 ### Phase 6: Add Persistence and Polish (SIMPLIFIED)
 - [x] ~~Task 6.1: Add shared preferences for animation state~~ (Removed - animations always show now)
