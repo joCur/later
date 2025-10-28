@@ -65,25 +65,28 @@ This enhancement aims to improve user onboarding and make the "create first item
   - Pulse respects reduced motion preferences
 
 ### Phase 3: Create Animated Empty State Component
-- [ ] Task 3.1: Create AnimatedEmptyState organism
-  - Create new file `apps/later_mobile/lib/design_system/organisms/empty_states/animated_empty_state.dart`
-  - Accept `EmptyState` properties plus `fabPosition` and `showArrow` parameters
-  - Use `LayoutBuilder` to calculate FAB position relative to empty state
-  - Position curved arrow from message text to FAB location (bottom-right)
-  - Stagger animations: empty state content (0ms) → arrow (300ms) → FAB pulse (600ms)
-  - Add optional dismiss button (X icon) in top-right corner
-  - Emit callback when dismissed so parent can update state
+- [x] Task 3.1: Create AnimatedEmptyState organism
+  - Created new file `apps/later_mobile/lib/design_system/organisms/empty_states/animated_empty_state.dart`
+  - Accepts `EmptyState` properties plus `fabPosition`, `showArrow`, `onDismissed`, and `enableFabPulse` parameters
+  - Uses `LayoutBuilder` to calculate FAB position relative to empty state
+  - Positions curved arrow from message text to FAB location (bottom-right)
+  - Staggers animations: empty state content (0ms) → arrow (300ms) → dismiss button (600ms) → FAB pulse (700ms)
+  - Added dismiss button (X icon) in top-right corner
+  - Emits callbacks when dismissed and to enable FAB pulse
+  - Includes auto-dismiss after 10 seconds
 
-- [ ] Task 3.2: Implement animation sequencing
-  - Use `flutter_animate`'s delay feature for staggering
-  - Empty state: fade in + slight scale (0.95 → 1.0) with `AppAnimations.gentleSpring`
-  - Arrow: fade in + draw animation (path progress 0 → 1) with `AppAnimations.smoothSpring`
-  - FAB pulse: start after arrow completes, repeat 3-4 times then stop
-  - Total sequence duration: ~3 seconds (entrance) + 8 seconds (pulse cycles)
+- [x] Task 3.2: Implement animation sequencing
+  - Used `flutter_animate`'s delay feature for staggering
+  - Empty state: fade in + scale (0.95 → 1.0) with `AppAnimations.gentleSpring`
+  - Arrow: fade in with 300ms delay + built-in draw animation from CurvedArrowPointer
+  - Dismiss button: fade in + scale with 600ms delay
+  - FAB pulse: triggered via callback after arrow completes (700ms)
+  - Total sequence duration: ~3 seconds (entrance) + auto-dismiss after 10 seconds
+  - Respects reduced motion preferences
 
-- [ ] Task 3.3: Export animated empty state
-  - Update `apps/later_mobile/lib/design_system/organisms/empty_states/empty_states.dart`
-  - Export `AnimatedEmptyState`
+- [x] Task 3.3: Export animated empty state
+  - Updated `apps/later_mobile/lib/design_system/organisms/empty_states/empty_states.dart`
+  - Exported `AnimatedEmptyState`
 
 ### Phase 4: Integrate Animations in Home Screen
 - [ ] Task 4.1: Update WelcomeState to use animations
