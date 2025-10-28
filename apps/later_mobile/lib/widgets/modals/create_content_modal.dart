@@ -671,8 +671,25 @@ class _CreateContentModalState extends State<CreateContentModal>
     );
   }
 
+  String _getHeaderTitle() {
+    // Determine the current type (user-selected or auto-detected)
+    final currentType = _selectedType ?? _detectedType;
+
+    switch (currentType) {
+      case ContentType.todoList:
+        return 'Create Todo';
+      case ContentType.list:
+        return 'Create List';
+      case ContentType.note:
+        return 'Create Note';
+      case null:
+        return 'Create';
+    }
+  }
+
   Widget _buildHeader() {
     final isMobile = context.isMobile;
+    final title = _getHeaderTitle();
 
     return Padding(
       padding: EdgeInsets.fromLTRB(
@@ -687,9 +704,9 @@ class _CreateContentModalState extends State<CreateContentModal>
         children: [
           Expanded(
             child: Semantics(
-              label: 'Create',
+              label: title,
               child: Text(
-                'Create',
+                title,
                 style: AppTypography.h3.copyWith(
                   color: AppColors.text(context),
                 ),
@@ -1020,6 +1037,8 @@ class _CreateContentModalState extends State<CreateContentModal>
   }
 
   Widget _buildFooter({required bool isMobile}) {
+    final buttonText = _getHeaderTitle();
+
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -1027,7 +1046,7 @@ class _CreateContentModalState extends State<CreateContentModal>
           padding: const EdgeInsets.all(AppSpacing.sm),
           child: PrimaryButton(
             key: const Key('save_button'),
-            text: 'Create',
+            text: buttonText,
             icon: Icons.check,
             onPressed: _textController.text.trim().isNotEmpty ? _handleExplicitSave : null,
             isLoading: _isSaving,
