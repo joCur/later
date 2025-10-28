@@ -220,6 +220,11 @@ class _TodoListDetailScreenState extends State<TodoListDetailScreen> {
 
   /// Reorder TodoItems with optimistic UI update
   Future<void> _reorderTodoItems(int oldIndex, int newIndex) async {
+    // Adjust newIndex when moving item down (Flutter's ReorderableListView pattern)
+    if (newIndex > oldIndex) {
+      newIndex -= 1;
+    }
+
     // Optimistically update local state first for immediate UI feedback
     final reorderedItems = List<TodoItem>.from(_currentTodoList.items);
     final item = reorderedItems.removeAt(oldIndex);
@@ -544,12 +549,7 @@ class _TodoListDetailScreenState extends State<TodoListDetailScreen> {
                   : ReorderableListView.builder(
                       padding: const EdgeInsets.all(AppSpacing.md),
                       itemCount: _currentTodoList.items.length,
-                      onReorder: (oldIndex, newIndex) {
-                        if (newIndex > oldIndex) {
-                          newIndex -= 1;
-                        }
-                        _reorderTodoItems(oldIndex, newIndex);
-                      },
+                      onReorder: _reorderTodoItems,
                       itemBuilder: (context, index) {
                         final item = _currentTodoList.items[index];
                         final itemKey = ValueKey(item.id);

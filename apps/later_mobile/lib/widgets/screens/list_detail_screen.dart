@@ -192,6 +192,11 @@ class _ListDetailScreenState extends State<ListDetailScreen>
 
   /// Reorder ListItems with optimistic UI update
   Future<void> _reorderListItems(int oldIndex, int newIndex) async {
+    // Adjust newIndex when moving item down (Flutter's ReorderableListView pattern)
+    if (newIndex > oldIndex) {
+      newIndex -= 1;
+    }
+
     // Optimistically update local state first for immediate UI feedback
     final reorderedItems = List<ListItem>.from(_currentList.items);
     final item = reorderedItems.removeAt(oldIndex);
@@ -610,12 +615,7 @@ class _ListDetailScreenState extends State<ListDetailScreen>
                   : ReorderableListView.builder(
                       padding: const EdgeInsets.all(AppSpacing.md),
                       itemCount: _currentList.items.length,
-                      onReorder: (oldIndex, newIndex) {
-                        if (newIndex > oldIndex) {
-                          newIndex -= 1;
-                        }
-                        _reorderListItems(oldIndex, newIndex);
-                      },
+                      onReorder: _reorderListItems,
                       itemBuilder: (context, index) {
                         final item = _currentList.items[index];
                         final itemKey = ValueKey(item.id);
