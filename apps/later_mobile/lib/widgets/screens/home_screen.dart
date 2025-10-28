@@ -65,6 +65,9 @@ class _HomeScreenState extends State<HomeScreen> {
   int _currentItemCount = 100; // Initially load 100 items
   bool _isLoadingMore = false;
 
+  // Animation state for empty state FAB pulse
+  bool _enableFabPulse = false;
+
   @override
   void initState() {
     super.initState();
@@ -365,12 +368,28 @@ class _HomeScreenState extends State<HomeScreen> {
 
       if (isNewUser) {
         // Show welcome state for first-time users
-        return WelcomeState(onActionPressed: _showQuickCaptureModal);
+        return WelcomeState(
+          onActionPressed: _showQuickCaptureModal,
+          enableFabPulse: (enabled) {
+            if (mounted) {
+              setState(() {
+                _enableFabPulse = enabled;
+              });
+            }
+          },
+        );
       } else {
         // Show empty space state for existing users with empty spaces
         return EmptySpaceState(
           spaceName: currentSpace?.name ?? 'space',
           onActionPressed: _showQuickCaptureModal,
+          enableFabPulse: (enabled) {
+            if (mounted) {
+              setState(() {
+                _enableFabPulse = enabled;
+              });
+            }
+          },
         );
       }
     }
@@ -543,6 +562,7 @@ class _HomeScreenState extends State<HomeScreen> {
       floatingActionButton: QuickCaptureFab(
         onPressed: _showQuickCaptureModal,
         tooltip: 'Quick capture',
+        enablePulse: _enableFabPulse,
       ),
     );
   }
@@ -634,6 +654,7 @@ class _HomeScreenState extends State<HomeScreen> {
       floatingActionButton: QuickCaptureFab(
         onPressed: _showQuickCaptureModal,
         tooltip: 'Quick capture',
+        enablePulse: _enableFabPulse,
       ),
     );
   }

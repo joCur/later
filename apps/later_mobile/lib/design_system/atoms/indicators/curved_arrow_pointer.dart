@@ -29,8 +29,8 @@ class CurvedArrowPointer extends StatelessWidget {
     required this.startPosition,
     required this.endPosition,
     this.color,
-    this.strokeWidth = 2.5,
-    this.arrowHeadSize = 12.0,
+    this.strokeWidth = 12.0,
+    this.arrowHeadSize = 36.0,
     this.animate = true,
   });
 
@@ -55,10 +55,7 @@ class CurvedArrowPointer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final temporalTheme = Theme.of(context).extension<TemporalFlowTheme>()!;
-
-    // Use provided color or default to primary gradient color with opacity
-    final arrowColor = color ??
-        temporalTheme.primaryGradient.colors.first.withValues(alpha: 0.6);
+    final arrowColor = color ?? temporalTheme.primaryGradient.colors.first.withValues(alpha: 0.85);
 
     final arrow = CustomPaint(
       painter: _CurvedArrowPainter(
@@ -136,11 +133,16 @@ class _CurvedArrowPainter extends CustomPainter {
     final midY = (startPosition.dy + endPosition.dy) / 2;
 
     // Offset control point to create curved path
-    // Curve upward if end is below start, otherwise curve downward
-    final verticalOffset = (endPosition.dy - startPosition.dy).abs() * 0.3;
-    final horizontalOffset = (endPosition.dx - startPosition.dx).abs() * 0.2;
+    // Use perpendicular offset for a more pronounced curve
+    final dx = endPosition.dx - startPosition.dx;
+    final dy = endPosition.dy - startPosition.dy;
 
-    final controlPoint = Offset(midX - horizontalOffset, midY - verticalOffset);
+    // Create perpendicular vector and scale it for curve amount
+    // This makes the curve bow to the side instead of just shifting the midpoint
+    final perpX = -dy * 0.25;  // Perpendicular to the line direction
+    final perpY = dx * 0.25;
+
+    final controlPoint = Offset(midX + perpX, midY + perpY);
 
     // Create the curved path
     final path = Path()
@@ -191,16 +193,16 @@ class _CurvedArrowPainter extends CustomPainter {
     final arrowPath = Path();
     final tipPoint = tangent.position;
 
-    // Left point of arrow head
+    // Left point of arrow head (wider angle for more prominent arrow)
     final leftPoint = Offset(
-      tipPoint.dx - arrowHeadSize * math.cos(angle - math.pi / 6),
-      tipPoint.dy - arrowHeadSize * math.sin(angle - math.pi / 6),
+      tipPoint.dx - arrowHeadSize * math.cos(angle - math.pi / 4.5),
+      tipPoint.dy - arrowHeadSize * math.sin(angle - math.pi / 4.5),
     );
 
-    // Right point of arrow head
+    // Right point of arrow head (wider angle for more prominent arrow)
     final rightPoint = Offset(
-      tipPoint.dx - arrowHeadSize * math.cos(angle + math.pi / 6),
-      tipPoint.dy - arrowHeadSize * math.sin(angle + math.pi / 6),
+      tipPoint.dx - arrowHeadSize * math.cos(angle + math.pi / 4.5),
+      tipPoint.dy - arrowHeadSize * math.sin(angle + math.pi / 4.5),
     );
 
     arrowPath.moveTo(tipPoint.dx, tipPoint.dy);

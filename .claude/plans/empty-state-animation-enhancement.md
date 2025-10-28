@@ -3,11 +3,13 @@
 ## Objective and Scope
 
 Enhance empty state screens (HomeScreen, TodoListDetailScreen, ListDetailScreen) with engaging animations that guide users to create their first item. The animations will feature:
-- Curved arrow pointing from empty state to the FAB/create button
+- ~~Curved arrow pointing from empty state to the FAB/create button~~ (REMOVED - not working as expected)
 - Pulsing/bouncing animation on the create button
 - Smooth entrance animations for the empty state content
 
 This enhancement aims to improve user onboarding and make the "create first item" action more discoverable and inviting.
+
+**Note**: The curved arrow pointer has been removed from the implementation as it didn't work as expected. Focus is now on entrance animations and FAB pulse animation.
 
 ## Technical Approach and Reasoning
 
@@ -33,19 +35,11 @@ This enhancement aims to improve user onboarding and make the "create first item
 
 ## Implementation Phases
 
-### Phase 1: Create Curved Arrow Component
-- [x] Task 1.1: Create `CurvedArrowPointer` atom component
-  - Create new file `apps/later_mobile/lib/design_system/atoms/indicators/curved_arrow_pointer.dart`
-  - Implement `CustomPainter` subclass for drawing curved arrow using `Path.quadraticBezierTo()`
-  - Support parameters: `startPosition`, `endPosition`, `color`, `strokeWidth`, `arrowHeadSize`
-  - Add entrance animation: fade in + slide along curve path
-  - Use `AppAnimations.gentleSpring` for smooth entrance
-  - Add arrow head rotation to align with curve tangent at end point
+### Phase 1: Create Curved Arrow Component (REMOVED)
+- [x] ~~Task 1.1: Create `CurvedArrowPointer` atom component~~ (Removed - arrow not working as expected)
+- [x] ~~Task 1.2: Add arrow to design system exports~~ (Removed - arrow not working as expected)
 
-- [x] Task 1.2: Add arrow to design system exports
-  - Create `apps/later_mobile/lib/design_system/atoms/indicators/indicators.dart` barrel file
-  - Export `CurvedArrowPointer` from barrel file
-  - Update `apps/later_mobile/lib/design_system/atoms/atoms.dart` to include indicators
+**Decision**: The curved arrow pointer feature has been removed from the implementation as it didn't work as expected. The component files remain in the codebase but are no longer used.
 
 ### Phase 2: Create Pulsing Animation for FAB
 - [x] Task 2.1: Add pulse animation state to QuickCaptureFab
@@ -65,23 +59,21 @@ This enhancement aims to improve user onboarding and make the "create first item
   - Pulse respects reduced motion preferences
 
 ### Phase 3: Create Animated Empty State Component
-- [x] Task 3.1: Create AnimatedEmptyState organism
+- [x] Task 3.1: Create AnimatedEmptyState organism (SIMPLIFIED - arrow removed)
   - Created new file `apps/later_mobile/lib/design_system/organisms/empty_states/animated_empty_state.dart`
-  - Accepts `EmptyState` properties plus `fabPosition`, `showArrow`, `onDismissed`, and `enableFabPulse` parameters
-  - Uses `LayoutBuilder` to calculate FAB position relative to empty state
-  - Positions curved arrow from message text to FAB location (bottom-right)
-  - Staggers animations: empty state content (0ms) → arrow (300ms) → dismiss button (600ms) → FAB pulse (700ms)
-  - Added dismiss button (X icon) in top-right corner
-  - Emits callbacks when dismissed and to enable FAB pulse
-  - Includes auto-dismiss after 10 seconds
+  - Accepts `EmptyState` properties plus `enableFabPulse` parameter
+  - ~~Uses `LayoutBuilder` to calculate FAB position relative to empty state~~ (Removed)
+  - ~~Positions curved arrow from message text to FAB location~~ (Removed)
+  - Simplified to just entrance animations and FAB pulse trigger
+  - ~~Added dismiss button (X icon) in top-right corner~~ (Removed)
+  - Emits callback to enable FAB pulse after entrance animation completes
 
-- [x] Task 3.2: Implement animation sequencing
-  - Used `flutter_animate`'s delay feature for staggering
+- [x] Task 3.2: Implement animation sequencing (SIMPLIFIED)
+  - Used `flutter_animate` for entrance animations
   - Empty state: fade in + scale (0.95 → 1.0) with `AppAnimations.gentleSpring`
-  - Arrow: fade in with 300ms delay + built-in draw animation from CurvedArrowPointer
-  - Dismiss button: fade in + scale with 600ms delay
-  - FAB pulse: triggered via callback after arrow completes (700ms)
-  - Total sequence duration: ~3 seconds (entrance) + auto-dismiss after 10 seconds
+  - ~~Arrow: fade in with 300ms delay + built-in draw animation~~ (Removed)
+  - ~~Dismiss button: fade in + scale with 600ms delay~~ (Removed)
+  - FAB pulse: triggered via callback after entrance completes (~500ms)
   - Respects reduced motion preferences
 
 - [x] Task 3.3: Export animated empty state
@@ -89,22 +81,32 @@ This enhancement aims to improve user onboarding and make the "create first item
   - Exported `AnimatedEmptyState`
 
 ### Phase 4: Integrate Animations in Home Screen
-- [ ] Task 4.1: Update WelcomeState to use animations
-  - Modify `apps/later_mobile/lib/design_system/organisms/empty_states/welcome_state.dart`
-  - Wrap existing `EmptyState` with animation logic for first-time users
-  - Calculate FAB position from screen dimensions (bottom-right: 16px offset)
-  - Show animated version on first mount only
+- [x] Task 4.1: Update WelcomeState to use animations (SIMPLIFIED)
+  - Modified `apps/later_mobile/lib/design_system/organisms/empty_states/welcome_state.dart`
+  - Converted to StatelessWidget (simplified - no state tracking needed)
+  - ~~Implemented SharedPreferences for animation state tracking~~ (Removed - animations always show now)
+  - Uses AnimatedEmptyState for entrance animations
+  - Added `enableFabPulse` callback parameter to control FAB pulse animation
 
-- [ ] Task 4.2: Update EmptySpaceState to use animations
-  - Modify `apps/later_mobile/lib/design_system/organisms/empty_states/empty_space_state.dart`
-  - Add animation support similar to WelcomeState
-  - Ensure animation respects user preferences
+- [x] Task 4.2: Update EmptySpaceState to use animations (SIMPLIFIED)
+  - Modified `apps/later_mobile/lib/design_system/organisms/empty_states/empty_space_state.dart`
+  - Converted to StatelessWidget (simplified - no state tracking needed)
+  - ~~Added SharedPreferences integration~~ (Removed - animations always show now)
+  - Uses AnimatedEmptyState for entrance animations
+  - Added `enableFabPulse` callback parameter
 
-- [ ] Task 4.3: Connect animations to HomeScreen
-  - Modify `apps/later_mobile/lib/widgets/screens/home_screen.dart`
-  - Pass `enablePulse: true` to QuickCaptureFab when showing empty state
-  - Ensure FAB position is accessible to empty state for arrow calculation
-  - Use `GlobalKey` to get FAB position if needed, or calculate from screen size
+- [x] Task 4.3: Connect animations to HomeScreen (SIMPLIFIED)
+  - Modified `apps/later_mobile/lib/widgets/screens/home_screen.dart`
+  - Added `_enableFabPulse` state variable
+  - ~~Added `_fabKey` GlobalKey~~ (Removed - no longer needed without arrow)
+  - Pass `enableFabPulse` callback to both WelcomeState and EmptySpaceState
+  - Pass `enablePulse: _enableFabPulse` to QuickCaptureFab
+  - FAB pulse state is managed by empty state components via callbacks
+
+- [x] Task 4.4: Fix layout issues in AnimatedEmptyState (SIMPLIFIED)
+  - Simplified component removed all layout calculation logic
+  - No RenderBox issues since arrow positioning was removed
+  - App launches and runs without errors
 
 ### Phase 5: Integrate Animations in Detail Screens
 - [ ] Task 5.1: Update TodoListDetailScreen empty state
@@ -119,22 +121,15 @@ This enhancement aims to improve user onboarding and make the "create first item
   - Enable FAB pulse when list is empty
   - Arrow points to FAB in bottom-right
 
-### Phase 6: Add Persistence and Polish
-- [ ] Task 6.1: Add shared preferences for animation state
-  - Create utility function to check if animations have been shown
-  - Store flag in `SharedPreferences` when animation is dismissed or completed
-  - Key format: `animation_shown_{screen_name}` (e.g., `animation_shown_welcome`)
-  - Animation shows once per screen type
+### Phase 6: Add Persistence and Polish (SIMPLIFIED)
+- [x] ~~Task 6.1: Add shared preferences for animation state~~ (Removed - animations always show now)
 
-- [ ] Task 6.2: Add auto-dismiss after duration
-  - Implement timer to auto-dismiss animation after 10 seconds
-  - Smoothly fade out arrow and stop FAB pulse
-  - Mark as completed in preferences
+- [x] ~~Task 6.2: Add auto-dismiss after duration~~ (Removed - no dismiss functionality)
 
-- [ ] Task 6.3: Respect reduced motion preferences
-  - Check `MediaQuery.of(context).disableAnimations`
-  - If true, skip animations or use instant transitions
-  - Ensure arrow still visible but without animation
+- [x] Task 6.3: Respect reduced motion preferences
+  - AnimatedEmptyState checks `MediaQuery.of(context).disableAnimations`
+  - If true, skip animations and show content immediately
+  - Already implemented in AnimatedEmptyState
 
 ### Phase 7: Testing and Refinement
 - [ ] Task 7.1: Add widget tests for new components

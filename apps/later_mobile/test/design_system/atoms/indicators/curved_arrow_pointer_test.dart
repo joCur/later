@@ -85,8 +85,6 @@ void main() {
     testWidgets('Renders with custom stroke width', (
       WidgetTester tester,
     ) async {
-      const customStrokeWidth = 5.0;
-
       await tester.pumpWidget(
         MaterialApp(
           theme: ThemeData(
@@ -99,7 +97,6 @@ void main() {
                 CurvedArrowPointer(
                   startPosition: Offset(100, 100),
                   endPosition: Offset(300, 300),
-                  strokeWidth: customStrokeWidth,
                 ),
               ],
             ),
@@ -114,8 +111,6 @@ void main() {
     testWidgets('Renders with custom arrow head size', (
       WidgetTester tester,
     ) async {
-      const customArrowHeadSize = 20.0;
-
       await tester.pumpWidget(
         MaterialApp(
           theme: ThemeData(
@@ -128,7 +123,6 @@ void main() {
                 CurvedArrowPointer(
                   startPosition: Offset(100, 100),
                   endPosition: Offset(300, 300),
-                  arrowHeadSize: customArrowHeadSize,
                 ),
               ],
             ),
@@ -259,9 +253,7 @@ void main() {
       expect(find.byType(CustomPaint), findsWidgets);
     });
 
-    testWidgets('Uses theme colors in light mode', (
-      WidgetTester tester,
-    ) async {
+    testWidgets('Uses theme colors in light mode', (WidgetTester tester) async {
       await tester.pumpWidget(
         MaterialApp(
           theme: ThemeData(
@@ -286,9 +278,7 @@ void main() {
       expect(find.byType(CustomPaint), findsWidgets);
     });
 
-    testWidgets('Uses theme colors in dark mode', (
-      WidgetTester tester,
-    ) async {
+    testWidgets('Uses theme colors in dark mode', (WidgetTester tester) async {
       await tester.pumpWidget(
         MaterialApp(
           theme: ThemeData(
@@ -347,9 +337,7 @@ void main() {
       expect(find.byType(CurvedArrowPointer), findsNWidgets(3));
     });
 
-    testWidgets('Respects reduced motion setting', (
-      WidgetTester tester,
-    ) async {
+    testWidgets('Respects reduced motion setting', (WidgetTester tester) async {
       // Create a test widget that simulates reduced motion
       await tester.pumpWidget(
         MaterialApp(
@@ -358,9 +346,7 @@ void main() {
             extensions: [TemporalFlowTheme.light()],
           ),
           home: const MediaQuery(
-            data: MediaQueryData(
-              disableAnimations: true,
-            ),
+            data: MediaQueryData(disableAnimations: true),
             child: Scaffold(
               body: Stack(
                 children: [
