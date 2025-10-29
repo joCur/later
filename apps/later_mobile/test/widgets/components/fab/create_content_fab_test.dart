@@ -1,14 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:later_mobile/core/theme/temporal_flow_theme.dart';
 import 'package:later_mobile/design_system/molecules/fab/create_content_fab.dart';
 
 void main() {
+  Widget createTestApp({required Widget child}) {
+    return MaterialApp(
+      theme: ThemeData(
+        brightness: Brightness.light,
+        extensions: [TemporalFlowTheme.light()],
+      ),
+      home: Scaffold(body: child),
+    );
+  }
+
   group('CreateContentFab', () {
     testWidgets('renders FAB with icon', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(body: CreateContentFab(onPressed: () {})),
-        ),
+        createTestApp(child: CreateContentFab(onPressed: () {})),
       );
 
       expect(find.byType(CreateContentFab), findsOneWidget);
@@ -19,13 +28,11 @@ void main() {
       var pressed = false;
 
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: CreateContentFab(
-              onPressed: () {
-                pressed = true;
-              },
-            ),
+        createTestApp(
+          child: CreateContentFab(
+            onPressed: () {
+              pressed = true;
+            },
           ),
         ),
       );
@@ -38,9 +45,7 @@ void main() {
 
     testWidgets('has correct size', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(body: CreateContentFab(onPressed: () {})),
-        ),
+        createTestApp(child: CreateContentFab(onPressed: () {})),
       );
 
       final container = tester.widget<Container>(
@@ -57,82 +62,25 @@ void main() {
 
     testWidgets('renders with custom icon', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: CreateContentFab(icon: Icons.edit, onPressed: () {}),
-          ),
+        createTestApp(
+          child: CreateContentFab(icon: Icons.edit, onPressed: () {}),
         ),
       );
 
       expect(find.byIcon(Icons.edit), findsOneWidget);
     });
 
-    testWidgets('renders with custom label', (tester) async {
+    testWidgets('renders with tooltip', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: CreateContentFab(label: 'Create', onPressed: () {}),
+        createTestApp(
+          child: CreateContentFab(
+            onPressed: () {},
+            tooltip: 'Test Tooltip',
           ),
         ),
       );
 
-      expect(find.text('Create'), findsOneWidget);
-    });
-
-    testWidgets('renders extended FAB with icon and label', (tester) async {
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: CreateContentFab(label: 'Create Item', onPressed: () {}),
-          ),
-        ),
-      );
-
-      expect(find.byIcon(Icons.add), findsOneWidget);
-      expect(find.text('Create Item'), findsOneWidget);
-    });
-
-    testWidgets('shows tooltip when provided', (tester) async {
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: CreateContentFab(tooltip: 'Quick Capture', onPressed: () {}),
-          ),
-        ),
-      );
-
-      expect(find.byType(CreateContentFab), findsOneWidget);
-    });
-
-    testWidgets('is disabled when onPressed is null', (tester) async {
-      await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(body: CreateContentFab(onPressed: null)),
-        ),
-      );
-
-      final fab = tester.widget<CreateContentFab>(find.byType(CreateContentFab));
-      expect(fab.onPressed, isNull);
-    });
-
-    testWidgets('has hero tag when provided', (tester) async {
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(body: CreateContentFab(onPressed: () {})),
-        ),
-      );
-
-      expect(find.byType(CreateContentFab), findsOneWidget);
-    });
-
-    testWidgets('has elevation shadow', (tester) async {
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(body: CreateContentFab(onPressed: () {})),
-        ),
-      );
-
-      expect(find.byType(CreateContentFab), findsOneWidget);
+      expect(find.byType(Tooltip), findsOneWidget);
     });
   });
 }

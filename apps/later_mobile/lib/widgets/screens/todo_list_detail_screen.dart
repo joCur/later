@@ -16,6 +16,7 @@ import 'package:later_mobile/design_system/atoms/inputs/text_area_field.dart';
 import 'package:later_mobile/design_system/organisms/dialogs/delete_confirmation_dialog.dart';
 import 'package:later_mobile/design_system/molecules/app_bars/editable_app_bar_title.dart';
 import 'package:later_mobile/design_system/molecules/lists/dismissible_list_item.dart';
+import 'package:later_mobile/design_system/organisms/empty_states/animated_empty_state.dart';
 
 /// TodoList Detail Screen for viewing and editing TodoList with TodoItems
 ///
@@ -51,6 +52,7 @@ class _TodoListDetailScreenState extends State<TodoListDetailScreen> {
   Timer? _deletionTimer;
   bool _isSaving = false;
   bool _hasChanges = false;
+  bool _enableFabPulse = false;
 
   @override
   void initState() {
@@ -576,41 +578,24 @@ class _TodoListDetailScreenState extends State<TodoListDetailScreen> {
           icon: Icons.add,
           label: 'Add Todo',
           gradient: AppColors.taskGradient,
+          enablePulse: _enableFabPulse,
         ),
       ),
     );
   }
 
   Widget _buildEmptyState() {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.xl),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.check_circle_outline,
-              size: 64,
-              color: AppColors.taskGradient.colors.first.withValues(alpha: 0.3),
-            ),
-            const SizedBox(height: AppSpacing.md),
-            Text(
-              'No tasks yet',
-              style: AppTypography.h3.copyWith(
-                color: AppColors.textSecondary(context),
-              ),
-            ),
-            const SizedBox(height: AppSpacing.sm),
-            Text(
-              'Tap the + button to add your first task',
-              style: AppTypography.bodyMedium.copyWith(
-                color: AppColors.textSecondary(context),
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
-      ),
+    return AnimatedEmptyState(
+      icon: Icons.check_circle_outline,
+      title: 'No tasks yet',
+      message: 'Tap the + button to add your first task',
+      enableFabPulse: (enabled) {
+        if (mounted) {
+          setState(() {
+            _enableFabPulse = enabled;
+          });
+        }
+      },
     );
   }
 }

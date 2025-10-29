@@ -16,6 +16,7 @@ import 'package:later_mobile/design_system/organisms/dialogs/delete_confirmation
 import 'package:later_mobile/design_system/molecules/app_bars/editable_app_bar_title.dart';
 import 'package:later_mobile/design_system/molecules/lists/dismissible_list_item.dart';
 import 'package:later_mobile/core/mixins/auto_save_mixin.dart';
+import 'package:later_mobile/design_system/organisms/empty_states/animated_empty_state.dart';
 
 /// List Detail Screen for viewing and editing List with ListItems
 ///
@@ -47,6 +48,7 @@ class _ListDetailScreenState extends State<ListDetailScreen>
 
   // Local state
   late ListModel _currentList;
+  bool _enableFabPulse = false;
 
   @override
   void initState() {
@@ -646,41 +648,24 @@ class _ListDetailScreenState extends State<ListDetailScreen>
           label: 'Add Item',
           onPressed: _addListItem,
           gradient: AppColors.listGradient,
+          enablePulse: _enableFabPulse,
         ),
       ),
     );
   }
 
   Widget _buildEmptyState() {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.xl),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.list_alt,
-              size: 64,
-              color: AppColors.listGradient.colors.first.withValues(alpha: 0.3),
-            ),
-            const SizedBox(height: AppSpacing.md),
-            Text(
-              'No items yet',
-              style: AppTypography.h3.copyWith(
-                color: AppColors.textSecondary(context),
-              ),
-            ),
-            const SizedBox(height: AppSpacing.sm),
-            Text(
-              'Tap the + button to add your first item',
-              style: AppTypography.bodyMedium.copyWith(
-                color: AppColors.textSecondary(context),
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
-      ),
+    return AnimatedEmptyState(
+      icon: Icons.list_alt,
+      title: 'No items yet',
+      message: 'Tap the + button to add your first item',
+      enableFabPulse: (enabled) {
+        if (mounted) {
+          setState(() {
+            _enableFabPulse = enabled;
+          });
+        }
+      },
     );
   }
 }

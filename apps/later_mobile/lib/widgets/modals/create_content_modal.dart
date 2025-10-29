@@ -88,7 +88,7 @@ class _CreateContentModalState extends State<CreateContentModal>
   // Type selection for content creation
   static const List<TypeOption> _typeOptions = [
     TypeOption(
-      label: 'Todo',
+      label: 'Todo List',
       icon: Icons.check_box_outlined,
       type: ContentType.todoList,
       color: AppColors.info,
@@ -719,7 +719,9 @@ class _CreateContentModalState extends State<CreateContentModal>
     // Find the selected option, default to Note if none selected
     final selectedOption = _typeOptions.firstWhere(
       (option) => option.type == _selectedType,
-      orElse: () => _typeOptions[2], // Default to Note (index 2)
+      orElse: () => _typeOptions.firstWhere(
+        (option) => option.type == ContentType.note,
+      ),
     );
 
     return PopupMenuButton<TypeOption>(
@@ -991,7 +993,7 @@ class _CreateContentModalState extends State<CreateContentModal>
     String buttonText;
     switch (_selectedType) {
       case ContentType.todoList:
-        buttonText = 'Create Todo';
+        buttonText = 'Create Todo List';
         break;
       case ContentType.list:
         buttonText = 'Create List';

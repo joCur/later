@@ -1,4 +1,6 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:later_mobile/design_system/tokens/tokens.dart';
 import '../../../core/responsive/breakpoints.dart';
 import 'package:later_mobile/design_system/molecules/fab/create_content_fab.dart';
@@ -26,7 +28,7 @@ import 'package:later_mobile/core/theme/temporal_flow_theme.dart';
 ///   gradient: AppColors.taskGradient,
 /// )
 /// ```
-class ResponsiveFab extends StatelessWidget {
+class ResponsiveFab extends StatefulWidget {
   const ResponsiveFab({
     super.key,
     required this.icon,
@@ -35,6 +37,7 @@ class ResponsiveFab extends StatelessWidget {
     this.gradient,
     this.tooltip,
     this.heroTag,
+    this.enablePulse = false,
   });
 
   /// The icon to display in the FAB
@@ -58,6 +61,73 @@ class ResponsiveFab extends StatelessWidget {
   /// Optional hero tag for animations
   final Object? heroTag;
 
+  /// Whether to enable pulsing animation (for empty state hints)
+  final bool enablePulse;
+
+  @override
+  State<ResponsiveFab> createState() => _ResponsiveFabState();
+}
+
+class _ResponsiveFabState extends State<ResponsiveFab> {
+  bool _isPulsing = false;
+  Timer? _pulseTimer;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.enablePulse) {
+      _startPulsing();
+    }
+  }
+
+  @override
+  void didUpdateWidget(ResponsiveFab oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.enablePulse != oldWidget.enablePulse) {
+      if (widget.enablePulse) {
+        _startPulsing();
+      } else {
+        _stopPulsing();
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    _pulseTimer?.cancel();
+    super.dispose();
+  }
+
+  void _startPulsing() {
+    setState(() {
+      _isPulsing = true;
+    });
+
+    // Auto-stop after 10 seconds
+    _pulseTimer = Timer(const Duration(seconds: 10), () {
+      if (mounted) {
+        _stopPulsing();
+      }
+    });
+  }
+
+  void _stopPulsing() {
+    _pulseTimer?.cancel();
+    _pulseTimer = null;
+    if (mounted) {
+      setState(() {
+        _isPulsing = false;
+      });
+    }
+  }
+
+  void _handleTap() {
+    if (_isPulsing) {
+      _stopPulsing();
+    }
+    widget.onPressed?.call();
+  }
+
   @override
   Widget build(BuildContext context) {
     final isMobile = Breakpoints.isMobile(context);
@@ -72,11 +142,12 @@ class ResponsiveFab extends StatelessWidget {
   /// Build mobile circular FAB using CreateContentFab
   Widget _buildMobileFab(BuildContext context) {
     return CreateContentFab(
-      icon: icon,
-      onPressed: onPressed,
-      tooltip: tooltip ?? label ?? 'Action',
-      heroTag: heroTag,
-      useGradient: gradient != null,
+      icon: widget.icon,
+      onPressed: _handleTap,
+      tooltip: widget.tooltip ?? widget.label ?? 'Action',
+      heroTag: widget.heroTag,
+      useGradient: widget.gradient != null,
+      enablePulse: widget.enablePulse,
     );
   }
 
@@ -85,17 +156,17 @@ class ResponsiveFab extends StatelessWidget {
     final temporalTheme = Theme.of(context).extension<TemporalFlowTheme>()!;
 
     // Get the appropriate gradient
-    final effectiveGradient = gradient ?? temporalTheme.primaryGradient;
+    final effectiveGradient = widget.gradient ?? temporalTheme.primaryGradient;
 
     // Get shadow color from gradient
     final shadowColor = effectiveGradient is LinearGradient
         ? (effectiveGradient.colors.last).withValues(alpha: 0.15)
         : AppColors.primaryEnd.withValues(alpha: 0.15);
 
-    return FloatingActionButton.extended(
-      onPressed: onPressed,
-      heroTag: heroTag,
-      tooltip: tooltip ?? label,
+    Widget fabWidget = FloatingActionButton.extended(
+      onPressed: _handleTap,
+      heroTag: widget.heroTag,
+      tooltip: widget.tooltip ?? widget.label,
       elevation: 0,
       highlightElevation: 0,
       backgroundColor: Colors.transparent,
@@ -124,11 +195,11 @@ class ResponsiveFab extends StatelessWidget {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, color: Colors.white, size: 24),
-            if (label != null) ...[
+            Icon(widget.icon, color: Colors.white, size: 24),
+            if (widget.label != null) ...[
               const SizedBox(width: AppSpacing.xs),
               Text(
-                label!,
+                widget.label!,
                 style: AppTypography.button.copyWith(color: Colors.white),
               ),
             ],
@@ -136,5 +207,28 @@ class ResponsiveFab extends StatelessWidget {
         ),
       ),
     );
+
+    // Apply pulse animation if enabled and pulsing
+    if (_isPulsing && !AppAnimations.prefersReducedMotion(context)) {
+      fabWidget = fabWidget
+          .animate(
+            onPlay: (controller) => controller.repeat(),
+          )
+          .scale(
+            begin: const Offset(1.0, 1.0),
+            end: const Offset(1.08, 1.08),
+            duration: const Duration(milliseconds: 1000),
+            curve: AppAnimations.bouncySpringCurve,
+          )
+          .then()
+          .scale(
+            begin: const Offset(1.08, 1.08),
+            end: const Offset(1.0, 1.0),
+            duration: const Duration(milliseconds: 1000),
+            curve: AppAnimations.bouncySpringCurve,
+          );
+    }
+
+    return fabWidget;
   }
 }

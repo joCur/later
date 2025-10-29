@@ -1,4 +1,6 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:later_mobile/design_system/tokens/tokens.dart';
 import 'package:later_mobile/core/theme/temporal_flow_theme.dart';
 
@@ -24,6 +26,7 @@ class CreateContentFab extends StatefulWidget {
     this.heroTag = 'create-content-fab',
     this.useGradient = true,
     this.isOpen = false,
+    this.enablePulse = false,
   });
 
   /// Callback when FAB is pressed
@@ -47,6 +50,9 @@ class CreateContentFab extends StatefulWidget {
   /// Whether the FAB is in an "open" state (kept for API compatibility, not used for rotation)
   final bool isOpen;
 
+  /// Whether to enable pulsing animation (for empty state hints)
+  final bool enablePulse;
+
   @override
   State<CreateContentFab> createState() => _CreateContentFabState();
 }
@@ -55,6 +61,8 @@ class _CreateContentFabState extends State<CreateContentFab>
     with SingleTickerProviderStateMixin {
   late AnimationController _scaleController;
   late Animation<double> _scaleAnimation;
+  bool _isPulsing = false;
+  Timer? _pulseTimer;
 
   @override
   void initState() {
@@ -77,12 +85,54 @@ class _CreateContentFabState extends State<CreateContentFab>
             reverseCurve: Curves.easeOutBack,
           ),
         );
+
+    // Start pulse animation if enabled
+    if (widget.enablePulse) {
+      _startPulsing();
+    }
+  }
+
+  @override
+  void didUpdateWidget(CreateContentFab oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Handle enable/disable pulse changes
+    if (widget.enablePulse != oldWidget.enablePulse) {
+      if (widget.enablePulse) {
+        _startPulsing();
+      } else {
+        _stopPulsing();
+      }
+    }
   }
 
   @override
   void dispose() {
+    _pulseTimer?.cancel();
     _scaleController.dispose();
     super.dispose();
+  }
+
+  void _startPulsing() {
+    setState(() {
+      _isPulsing = true;
+    });
+
+    // Auto-stop after 10 seconds
+    _pulseTimer = Timer(const Duration(seconds: 10), () {
+      if (mounted) {
+        _stopPulsing();
+      }
+    });
+  }
+
+  void _stopPulsing() {
+    _pulseTimer?.cancel();
+    _pulseTimer = null;
+    if (mounted) {
+      setState(() {
+        _isPulsing = false;
+      });
+    }
   }
 
   void _handleTapDown(TapDownDetails details) {
@@ -108,6 +158,10 @@ class _CreateContentFabState extends State<CreateContentFab>
 
   void _handleTap() {
     if (widget.onPressed != null) {
+      // Stop pulsing on user interaction
+      if (_isPulsing) {
+        _stopPulsing();
+      }
       widget.onPressed?.call();
     }
   }
@@ -149,7 +203,7 @@ class _CreateContentFabState extends State<CreateContentFab>
       );
     }
 
-    return Hero(
+    Widget fabWidget = Hero(
       tag: widget.heroTag ?? UniqueKey(),
       child: Semantics(
         button: true,
@@ -211,5 +265,28 @@ class _CreateContentFabState extends State<CreateContentFab>
         ),
       ),
     );
+
+    // Apply pulse animation if enabled and pulsing
+    if (_isPulsing && !AppAnimations.prefersReducedMotion(context)) {
+      fabWidget = fabWidget
+          .animate(
+            onPlay: (controller) => controller.repeat(),
+          )
+          .scale(
+            begin: const Offset(1.0, 1.0),
+            end: const Offset(1.08, 1.08),
+            duration: const Duration(milliseconds: 1000),
+            curve: AppAnimations.bouncySpringCurve,
+          )
+          .then()
+          .scale(
+            begin: const Offset(1.08, 1.08),
+            end: const Offset(1.0, 1.0),
+            duration: const Duration(milliseconds: 1000),
+            curve: AppAnimations.bouncySpringCurve,
+          );
+    }
+
+    return fabWidget;
   }
 }
