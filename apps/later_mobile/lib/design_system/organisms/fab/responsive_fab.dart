@@ -68,6 +68,14 @@ class ResponsiveFab extends StatefulWidget {
   State<ResponsiveFab> createState() => _ResponsiveFabState();
 }
 
+/// Configuration for FAB pulse behavior
+class FabPulseConfig {
+  const FabPulseConfig._();
+
+  /// Duration before auto-stopping the pulse (null = never auto-stop)
+  static const Duration? autoStopDuration = null;
+}
+
 class _ResponsiveFabState extends State<ResponsiveFab> {
   bool _isPulsing = false;
   Timer? _pulseTimer;
@@ -103,12 +111,14 @@ class _ResponsiveFabState extends State<ResponsiveFab> {
       _isPulsing = true;
     });
 
-    // Auto-stop after 10 seconds
-    _pulseTimer = Timer(const Duration(seconds: 10), () {
-      if (mounted) {
-        _stopPulsing();
-      }
-    });
+    // Auto-stop after configured duration (if set)
+    if (FabPulseConfig.autoStopDuration != null) {
+      _pulseTimer = Timer(FabPulseConfig.autoStopDuration!, () {
+        if (mounted) {
+          _stopPulsing();
+        }
+      });
+    }
   }
 
   void _stopPulsing() {
@@ -211,9 +221,7 @@ class _ResponsiveFabState extends State<ResponsiveFab> {
     // Apply pulse animation if enabled and pulsing
     if (_isPulsing && !AppAnimations.prefersReducedMotion(context)) {
       fabWidget = fabWidget
-          .animate(
-            onPlay: (controller) => controller.repeat(),
-          )
+          .animate(onPlay: (controller) => controller.repeat())
           .scale(
             begin: const Offset(1.0, 1.0),
             end: const Offset(1.08, 1.08),

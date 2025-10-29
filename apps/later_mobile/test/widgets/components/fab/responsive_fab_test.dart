@@ -313,7 +313,6 @@ void main() {
     testWidgets('does not pulse by default on mobile', (tester) async {
       await tester.pumpWidget(
         createTestApp(
-          size: const Size(375, 812), // Mobile size
           child: ResponsiveFab(
             icon: Icons.add,
             label: 'Add Item',
@@ -333,7 +332,6 @@ void main() {
     ) async {
       await tester.pumpWidget(
         createTestApp(
-          size: const Size(375, 812), // Mobile size
           child: ResponsiveFab(
             icon: Icons.add,
             label: 'Add Item',
@@ -407,9 +405,7 @@ void main() {
       expect(pressed, isTrue);
     });
 
-    testWidgets('stops pulsing on user interaction on desktop', (
-      tester,
-    ) async {
+    testWidgets('stops pulsing on user interaction on desktop', (tester) async {
       bool pressed = false;
 
       await tester.pumpWidget(
@@ -439,7 +435,6 @@ void main() {
     testWidgets('respects reduced motion on mobile', (tester) async {
       await tester.pumpWidget(
         createTestApp(
-          size: const Size(375, 812), // Mobile size
           disableAnimations: true,
           child: ResponsiveFab(
             icon: Icons.add,

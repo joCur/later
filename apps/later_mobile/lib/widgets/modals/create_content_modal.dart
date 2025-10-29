@@ -39,8 +39,10 @@ class TypeOption {
 enum _CloseAction {
   /// Discard unsaved changes and close
   discard,
+
   /// Create the item and close immediately
   createAndClose,
+
   /// Cancel (stay open)
   cancel,
 }
@@ -114,7 +116,6 @@ class _CreateContentModalState extends State<CreateContentModal>
   late Animation<double> _fadeAnimation;
   late Animation<Offset> _slideAnimation;
   late AnimationController _typeIconAnimationController;
-  late Animation<double> _typeIconScaleAnimation;
 
   @override
   void initState() {
@@ -166,13 +167,6 @@ class _CreateContentModalState extends State<CreateContentModal>
     _typeIconAnimationController = AnimationController(
       duration: AppAnimations.normal,
       vsync: this,
-    );
-
-    _typeIconScaleAnimation = Tween<double>(begin: 1.0, end: 1.3).animate(
-      CurvedAnimation(
-        parent: _typeIconAnimationController,
-        curve: Curves.elasticOut,
-      ),
     );
 
     // Start entrance animation
@@ -472,17 +466,21 @@ class _CreateContentModalState extends State<CreateContentModal>
                   children: [
                     GhostButton(
                       text: 'Cancel',
-                      onPressed: () => Navigator.of(context).pop(_CloseAction.cancel),
+                      onPressed: () =>
+                          Navigator.of(context).pop(_CloseAction.cancel),
                     ),
                     const SizedBox(width: AppSpacing.xs),
                     GhostButton(
                       text: 'Discard',
-                      onPressed: () => Navigator.of(context).pop(_CloseAction.discard),
+                      onPressed: () =>
+                          Navigator.of(context).pop(_CloseAction.discard),
                     ),
                     const SizedBox(width: AppSpacing.xs),
                     GradientButton(
                       label: 'Create & Close',
-                      onPressed: () => Navigator.of(context).pop(_CloseAction.createAndClose),
+                      onPressed: () => Navigator.of(
+                        context,
+                      ).pop(_CloseAction.createAndClose),
                     ),
                   ],
                 ),
@@ -681,9 +679,7 @@ class _CreateContentModalState extends State<CreateContentModal>
           // "Create" text
           Text(
             'Create ',
-            style: AppTypography.h3.copyWith(
-              color: AppColors.text(context),
-            ),
+            style: AppTypography.h3.copyWith(color: AppColors.text(context)),
           ),
 
           // Inline type selector
@@ -697,10 +693,7 @@ class _CreateContentModalState extends State<CreateContentModal>
             button: true,
             child: IconButton(
               key: const Key('close_button'),
-              icon: Icon(
-                Icons.close,
-                color: AppColors.textSecondary(context),
-              ),
+              icon: Icon(Icons.close, color: AppColors.textSecondary(context)),
               onPressed: _handleClose,
               iconSize: 24,
               constraints: const BoxConstraints(
@@ -719,9 +712,8 @@ class _CreateContentModalState extends State<CreateContentModal>
     // Find the selected option, default to Note if none selected
     final selectedOption = _typeOptions.firstWhere(
       (option) => option.type == _selectedType,
-      orElse: () => _typeOptions.firstWhere(
-        (option) => option.type == ContentType.note,
-      ),
+      orElse: () =>
+          _typeOptions.firstWhere((option) => option.type == ContentType.note),
     );
 
     return PopupMenuButton<TypeOption>(
@@ -731,26 +723,16 @@ class _CreateContentModalState extends State<CreateContentModal>
         mainAxisSize: MainAxisSize.min,
         children: [
           // Type icon
-          Icon(
-            selectedOption.icon,
-            size: 20,
-            color: selectedOption.color,
-          ),
+          Icon(selectedOption.icon, size: 20, color: selectedOption.color),
           const SizedBox(width: AppSpacing.xxs),
           // Type label with type-specific color
           Text(
             selectedOption.label,
-            style: AppTypography.h3.copyWith(
-              color: selectedOption.color,
-            ),
+            style: AppTypography.h3.copyWith(color: selectedOption.color),
           ),
           const SizedBox(width: 2),
           // Dropdown arrow with type-specific color
-          Icon(
-            Icons.arrow_drop_down,
-            size: 20,
-            color: selectedOption.color,
-          ),
+          Icon(Icons.arrow_drop_down, size: 20, color: selectedOption.color),
         ],
       ),
       itemBuilder: (context) {
@@ -884,9 +866,7 @@ class _CreateContentModalState extends State<CreateContentModal>
               vertical: AppSpacing.xxs,
             ),
             decoration: BoxDecoration(
-              border: Border.all(
-                color: AppColors.border(context),
-              ),
+              border: Border.all(color: AppColors.border(context)),
               borderRadius: BorderRadius.circular(AppSpacing.radiusSM),
             ),
             child: Row(
@@ -1015,7 +995,9 @@ class _CreateContentModalState extends State<CreateContentModal>
             key: const Key('save_button'),
             text: buttonText,
             icon: Icons.check,
-            onPressed: _textController.text.trim().isNotEmpty ? _handleExplicitSave : null,
+            onPressed: _textController.text.trim().isNotEmpty
+                ? _handleExplicitSave
+                : null,
             isLoading: _isSaving,
             isExpanded: true,
           ),

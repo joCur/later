@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:later_mobile/design_system/tokens/tokens.dart';
 import 'package:later_mobile/core/theme/temporal_flow_theme.dart';
+import 'package:later_mobile/design_system/organisms/fab/responsive_fab.dart';
 
 /// Create Content Floating Action Button - Mobile-First Bold Design
 ///
@@ -117,12 +118,14 @@ class _CreateContentFabState extends State<CreateContentFab>
       _isPulsing = true;
     });
 
-    // Auto-stop after 10 seconds
-    _pulseTimer = Timer(const Duration(seconds: 10), () {
-      if (mounted) {
-        _stopPulsing();
-      }
-    });
+    // Auto-stop after configured duration (if set)
+    if (FabPulseConfig.autoStopDuration != null) {
+      _pulseTimer = Timer(FabPulseConfig.autoStopDuration!, () {
+        if (mounted) {
+          _stopPulsing();
+        }
+      });
+    }
   }
 
   void _stopPulsing() {
@@ -269,9 +272,7 @@ class _CreateContentFabState extends State<CreateContentFab>
     // Apply pulse animation if enabled and pulsing
     if (_isPulsing && !AppAnimations.prefersReducedMotion(context)) {
       fabWidget = fabWidget
-          .animate(
-            onPlay: (controller) => controller.repeat(),
-          )
+          .animate(onPlay: (controller) => controller.repeat())
           .scale(
             begin: const Offset(1.0, 1.0),
             end: const Offset(1.08, 1.08),
