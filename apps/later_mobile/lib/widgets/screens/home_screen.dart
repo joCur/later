@@ -420,28 +420,35 @@ class _HomeScreenState extends State<HomeScreen> {
     final temporalTheme = Theme.of(context).extension<TemporalFlowTheme>()!;
     final gradient = temporalTheme.primaryGradient;
 
-    return FloatingActionButton(
-      onPressed: _showCreateContentModal,
-      backgroundColor: Colors.transparent,
-      elevation: 0,
-      child: Container(
-        width: 56,
-        height: 56,
-        decoration: BoxDecoration(
-          gradient: gradient,
-          shape: BoxShape.circle,
-          boxShadow: [
-            BoxShadow(
-              color: gradient.colors.last.withValues(alpha: 0.3),
-              blurRadius: 16,
-              offset: const Offset(0, 8),
+    return Semantics(
+      label: 'Create content',
+      button: true,
+      child: Tooltip(
+        message: 'Create content',
+        child: FloatingActionButton(
+          onPressed: _showCreateContentModal,
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          child: Container(
+            width: 56,
+            height: 56,
+            decoration: BoxDecoration(
+              gradient: gradient,
+              shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  color: gradient.colors.last.withValues(alpha: 0.3),
+                  blurRadius: 16,
+                  offset: const Offset(0, 8),
+                ),
+              ],
             ),
-          ],
-        ),
-        child: const Icon(
-          Icons.add,
-          color: Colors.white,
-          size: 24,
+            child: const Icon(
+              Icons.add,
+              color: Colors.white,
+              size: 24,
+            ),
+          ),
         ),
       ),
     );
