@@ -664,23 +664,8 @@ class _CreateContentModalState extends State<CreateContentModal>
     );
   }
 
-  String _getHeaderTitle() {
-    // Use the user-selected type
-    switch (_selectedType) {
-      case ContentType.todoList:
-        return 'Create Todo';
-      case ContentType.list:
-        return 'Create List';
-      case ContentType.note:
-        return 'Create Note';
-      case null:
-        return 'Create';
-    }
-  }
-
   Widget _buildHeader() {
     final isMobile = context.isMobile;
-    final title = _getHeaderTitle();
 
     return Padding(
       padding: EdgeInsets.fromLTRB(
@@ -693,17 +678,20 @@ class _CreateContentModalState extends State<CreateContentModal>
       ),
       child: Row(
         children: [
-          Expanded(
-            child: Semantics(
-              label: title,
-              child: Text(
-                title,
-                style: AppTypography.h3.copyWith(
-                  color: AppColors.text(context),
-                ),
-              ),
+          // "Create" text
+          Text(
+            'Create ',
+            style: AppTypography.h3.copyWith(
+              color: AppColors.text(context),
             ),
           ),
+
+          // Inline type selector
+          _buildInlineTypeSelector(),
+
+          const Spacer(),
+
+          // Close button
           Semantics(
             label: 'Close',
             button: true,
@@ -723,6 +711,72 @@ class _CreateContentModalState extends State<CreateContentModal>
           ),
         ],
       ),
+    );
+  }
+
+  /// Build inline type selector for the header (e.g., "Create Note")
+  Widget _buildInlineTypeSelector() {
+    // Find the selected option, default to Note if none selected
+    final selectedOption = _typeOptions.firstWhere(
+      (option) => option.type == _selectedType,
+      orElse: () => _typeOptions[2], // Default to Note (index 2)
+    );
+
+    return PopupMenuButton<TypeOption>(
+      key: const Key('inline_type_selector'),
+      offset: const Offset(0, 40),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // Type icon
+          Icon(
+            selectedOption.icon,
+            size: 20,
+            color: selectedOption.color,
+          ),
+          const SizedBox(width: AppSpacing.xxs),
+          // Type label with type-specific color
+          Text(
+            selectedOption.label,
+            style: AppTypography.h3.copyWith(
+              color: selectedOption.color,
+            ),
+          ),
+          const SizedBox(width: 2),
+          // Dropdown arrow with type-specific color
+          Icon(
+            Icons.arrow_drop_down,
+            size: 20,
+            color: selectedOption.color,
+          ),
+        ],
+      ),
+      itemBuilder: (context) {
+        return _typeOptions.map((option) {
+          return PopupMenuItem<TypeOption>(
+            value: option,
+            child: Row(
+              children: [
+                Icon(
+                  option.icon,
+                  key: Key('inline_type_icon_${option.label.toLowerCase()}'),
+                  size: 20,
+                  color: option.color ?? AppColors.text(context),
+                ),
+                const SizedBox(width: AppSpacing.xs),
+                Text(option.label),
+              ],
+            ),
+          );
+        }).toList();
+      },
+      onSelected: (option) {
+        setState(() {
+          _selectedType = option.type;
+        });
+        // Animate the type icon change
+        _typeIconAnimationController.forward(from: 0.0);
+      },
     );
   }
 
@@ -800,95 +854,10 @@ class _CreateContentModalState extends State<CreateContentModal>
 
           const Spacer(),
 
-          // Type selector
-          _buildTypeSelector(),
-          const SizedBox(width: AppSpacing.xs),
-
           // Space selector
           _buildSpaceSelector(),
         ],
       ),
-    );
-  }
-
-  Widget _buildTypeSelector() {
-    // Find the selected option, default to Note if none selected
-    final selectedOption = _typeOptions.firstWhere(
-      (option) => option.type == _selectedType,
-      orElse: () => _typeOptions[2], // Default to Note (index 2)
-    );
-
-    return PopupMenuButton<TypeOption>(
-      key: const Key('type_selector'),
-      child: Container(
-        padding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.xs,
-          vertical: AppSpacing.xxs,
-        ),
-        decoration: BoxDecoration(
-          border: Border.all(
-            color: AppColors.border(context),
-          ),
-          borderRadius: BorderRadius.circular(AppSpacing.radiusSM),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ScaleTransition(
-              key: const Key('type_icon_animated'),
-              scale: _typeIconScaleAnimation,
-              child: Icon(
-                selectedOption.icon,
-                size: 16,
-                color:
-                    selectedOption.color ??
-                    (AppColors.text(context)),
-              ),
-            ),
-            const SizedBox(width: AppSpacing.xxs),
-            Text(
-              selectedOption.label,
-              style: AppTypography.labelMedium.copyWith(
-                color: AppColors.text(context),
-              ),
-            ),
-            const SizedBox(width: AppSpacing.xxs),
-            Icon(
-              Icons.arrow_drop_down,
-              size: 16,
-              color: AppColors.textSecondary(context),
-            ),
-          ],
-        ),
-      ),
-      itemBuilder: (context) {
-        return _typeOptions.map((option) {
-          return PopupMenuItem<TypeOption>(
-            value: option,
-            child: Row(
-              children: [
-                Icon(
-                  option.icon,
-                  key: Key('type_icon_${option.label.toLowerCase()}'),
-                  size: 20,
-                  color:
-                      option.color ??
-                      (AppColors.text(context)),
-                ),
-                const SizedBox(width: AppSpacing.xs),
-                Text(option.label),
-              ],
-            ),
-          );
-        }).toList();
-      },
-      onSelected: (option) {
-        setState(() {
-          _selectedType = option.type;
-        });
-        // Animate the type icon change
-        _typeIconAnimationController.forward(from: 0.0);
-      },
     );
   }
 
@@ -1018,7 +987,22 @@ class _CreateContentModalState extends State<CreateContentModal>
   }
 
   Widget _buildFooter({required bool isMobile}) {
-    final buttonText = _getHeaderTitle();
+    // Get button text from selected type
+    String buttonText;
+    switch (_selectedType) {
+      case ContentType.todoList:
+        buttonText = 'Create Todo';
+        break;
+      case ContentType.list:
+        buttonText = 'Create List';
+        break;
+      case ContentType.note:
+        buttonText = 'Create Note';
+        break;
+      case null:
+        buttonText = 'Create';
+        break;
+    }
 
     return Column(
       mainAxisSize: MainAxisSize.min,

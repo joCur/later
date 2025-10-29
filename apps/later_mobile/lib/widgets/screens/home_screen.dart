@@ -15,7 +15,6 @@ import '../../providers/spaces_provider.dart';
 import 'package:later_mobile/design_system/organisms/cards/todo_list_card.dart';
 import 'package:later_mobile/design_system/organisms/cards/list_card.dart';
 import 'package:later_mobile/design_system/organisms/cards/note_card.dart';
-import 'package:later_mobile/design_system/molecules/fab/expandable_create_fab.dart';
 import 'package:later_mobile/design_system/organisms/empty_states/empty_space_state.dart';
 import 'package:later_mobile/design_system/organisms/empty_states/welcome_state.dart';
 import '../navigation/icon_only_bottom_nav.dart';
@@ -416,6 +415,38 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  /// Build simple FAB for creating content
+  Widget _buildFAB(BuildContext context) {
+    final temporalTheme = Theme.of(context).extension<TemporalFlowTheme>()!;
+    final gradient = temporalTheme.primaryGradient;
+
+    return FloatingActionButton(
+      onPressed: _showCreateContentModal,
+      backgroundColor: Colors.transparent,
+      elevation: 0,
+      child: Container(
+        width: 56,
+        height: 56,
+        decoration: BoxDecoration(
+          gradient: gradient,
+          shape: BoxShape.circle,
+          boxShadow: [
+            BoxShadow(
+              color: gradient.colors.last.withValues(alpha: 0.3),
+              blurRadius: 16,
+              offset: const Offset(0, 8),
+            ),
+          ],
+        ),
+        child: const Icon(
+          Icons.add,
+          color: Colors.white,
+          size: 24,
+        ),
+      ),
+    );
+  }
+
   /// Build the appropriate card widget for each content type
   Widget _buildContentCard(dynamic item, int index) {
     // Use type checking to render correct card
@@ -544,9 +575,7 @@ class _HomeScreenState extends State<HomeScreen> {
           setState(() => _selectedNavIndex = index);
         },
       ),
-      floatingActionButton: ExpandableCreateFab(
-        onOptionSelected: _showCreateContentModal,
-      ),
+      floatingActionButton: _buildFAB(context),
     );
   }
 
@@ -634,9 +663,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
-      floatingActionButton: ExpandableCreateFab(
-        onOptionSelected: _showCreateContentModal,
-      ),
+      floatingActionButton: _buildFAB(context),
     );
   }
 
