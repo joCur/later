@@ -221,19 +221,14 @@ class _ResponsiveFabState extends State<ResponsiveFab> {
     // Apply pulse animation if enabled and pulsing
     if (_isPulsing && !AppAnimations.prefersReducedMotion(context)) {
       fabWidget = fabWidget
-          .animate(onPlay: (controller) => controller.repeat())
+          .animate(
+            onPlay: (controller) => controller.repeat(reverse: true),
+          )
           .scale(
             begin: const Offset(1.0, 1.0),
-            end: const Offset(1.08, 1.08),
+            end: const Offset(1.10, 1.10),
             duration: const Duration(milliseconds: 1000),
-            curve: AppAnimations.bouncySpringCurve,
-          )
-          .then()
-          .scale(
-            begin: const Offset(1.08, 1.08),
-            end: const Offset(1.0, 1.0),
-            duration: const Duration(milliseconds: 1000),
-            curve: AppAnimations.bouncySpringCurve,
+            curve: Curves.easeInOut,
           );
     }
 
