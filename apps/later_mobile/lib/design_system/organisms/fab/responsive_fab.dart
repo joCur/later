@@ -68,7 +68,37 @@ class ResponsiveFab extends StatefulWidget {
   State<ResponsiveFab> createState() => _ResponsiveFabState();
 }
 
-/// Configuration for FAB pulse behavior
+/// Configuration for FAB pulse animation behavior.
+///
+/// This class controls the auto-stop behavior of the pulsing animation
+/// that can be applied to FAB components (ResponsiveFab and CreateContentFab).
+///
+/// The pulse animation is typically used to draw user attention to the FAB,
+/// especially in empty states or to encourage first-time user interaction.
+///
+/// ## Usage
+///
+/// To enable continuous pulsing without auto-stop (current configuration):
+/// ```dart
+/// ResponsiveFab(
+///   enablePulse: true,
+///   // ... other properties
+/// )
+/// ```
+///
+/// The pulse will continue until the user interacts with the FAB or
+/// the widget is disposed/updated with `enablePulse: false`.
+///
+/// ## Auto-Stop Configuration
+///
+/// Set [autoStopDuration] to automatically stop the pulse after a duration:
+/// ```dart
+/// // In FabPulseConfig class:
+/// static const Duration? autoStopDuration = Duration(seconds: 10);
+/// ```
+///
+/// Setting [autoStopDuration] to `null` (current value) disables the
+/// auto-stop feature, allowing the pulse to continue indefinitely.
 class FabPulseConfig {
   const FabPulseConfig._();
 
