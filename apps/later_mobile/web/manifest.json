@@ -1,11 +1,11 @@
 {
-    "name": "later_mobile",
-    "short_name": "later_mobile",
+    "name": "Later",
+    "short_name": "Later",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
     "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "description": "Flexible, offline-first task and note organizer.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

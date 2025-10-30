@@ -1,4 +1,4 @@
-package com.example.later_mobile
+package dev.curth.later
 
 import io.flutter.embedding.android.FlutterActivity
 
