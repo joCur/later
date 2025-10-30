@@ -1,0 +1,85 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Later App Icon: Pinned Notes (No Background) -->
+  <!-- Just the notes with transparent background -->
+
+  <defs>
+    <linearGradient id="taskGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#EF4444;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#F97316;stop-opacity:1" />
+    </linearGradient>
+
+    <linearGradient id="noteGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#3B82F6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#06B6D4;stop-opacity:1" />
+    </linearGradient>
+
+    <linearGradient id="listGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#8B5CF6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#A78BFA;stop-opacity:1" />
+    </linearGradient>
+
+    <filter id="noteShadow">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="8"/>
+      <feOffset dx="0" dy="4"/>
+      <feComponentTransfer>
+        <feFuncA type="linear" slope="0.3"/>
+      </feComponentTransfer>
+      <feMerge>
+        <feMergeNode/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Bottom left note (Task - Red) - rotated left -->
+  <g transform="rotate(-12 275 680)">
+    <rect x="50" y="455" width="450" height="450" rx="28" fill="url(#taskGrad)" filter="url(#noteShadow)"/>
+    <!-- Pin -->
+    <circle cx="275" cy="520" r="32" fill="#DC2626"/>
+    <circle cx="275" cy="520" r="18" fill="#991B1B"/>
+    <!-- Lines on note -->
+    <line x1="120" y1="620" x2="430" y2="620" stroke="white" stroke-width="14" opacity="0.5" stroke-linecap="round"/>
+    <line x1="120" y1="690" x2="390" y2="690" stroke="white" stroke-width="14" opacity="0.5" stroke-linecap="round"/>
+    <line x1="120" y1="760" x2="420" y2="760" stroke="white" stroke-width="14" opacity="0.5" stroke-linecap="round"/>
+    <line x1="120" y1="830" x2="400" y2="830" stroke="white" stroke-width="14" opacity="0.5" stroke-linecap="round"/>
+  </g>
+
+  <!-- Bottom right note (Note - Blue) - rotated right -->
+  <g transform="rotate(10 749 680)">
+    <rect x="524" y="455" width="450" height="450" rx="28" fill="url(#noteGrad)" filter="url(#noteShadow)"/>
+    <!-- Pin -->
+    <circle cx="749" cy="520" r="32" fill="#2563EB"/>
+    <circle cx="749" cy="520" r="18" fill="#1E40AF"/>
+    <!-- Lines on note -->
+    <line x1="594" y1="620" x2="904" y2="620" stroke="white" stroke-width="14" opacity="0.5" stroke-linecap="round"/>
+    <line x1="594" y1="690" x2="864" y2="690" stroke="white" stroke-width="14" opacity="0.5" stroke-linecap="round"/>
+    <line x1="594" y1="760" x2="894" y2="760" stroke="white" stroke-width="14" opacity="0.5" stroke-linecap="round"/>
+    <line x1="594" y1="830" x2="874" y2="830" stroke="white" stroke-width="14" opacity="0.5" stroke-linecap="round"/>
+  </g>
+
+  <!-- Front center note (List - Purple) - slightly rotated -->
+  <g transform="rotate(-5 512 365)">
+    <rect x="287" y="140" width="450" height="450" rx="28" fill="url(#listGrad)" filter="url(#noteShadow)"/>
+    <!-- Pin -->
+    <circle cx="512" cy="210" r="32" fill="#7C3AED"/>
+    <circle cx="512" cy="210" r="18" fill="#6D28D9"/>
+    <!-- Lines on note (more visible on front note) -->
+    <line x1="357" y1="310" x2="667" y2="310" stroke="white" stroke-width="16" opacity="0.7" stroke-linecap="round"/>
+    <line x1="357" y1="380" x2="637" y2="380" stroke="white" stroke-width="16" opacity="0.7" stroke-linecap="round"/>
+    <line x1="357" y1="450" x2="657" y2="450" stroke="white" stroke-width="16" opacity="0.7" stroke-linecap="round"/>
+    <line x1="357" y1="520" x2="647" y2="520" stroke="white" stroke-width="16" opacity="0.7" stroke-linecap="round"/>
+  </g>
+
+  <!-- Design Notes:
+  - No background board - transparent background
+  - Notes are VERY LARGE: 450x450px (fills almost entire canvas!)
+  - Minimal border space - left note starts at x=50, right ends at x=974
+  - Nearly edge-to-edge horizontally
+  - Still have personality with slight rotations
+  - Large pins (32px radius) for maximum visibility
+  - 4 content lines per note, thicker strokes (14-16px)
+  - Maximum use of space - fills the entire icon area
+  - Will be extremely visible at small sizes
+  -->
+
+</svg>
