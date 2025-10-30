@@ -8,14 +8,14 @@ import 'animated_empty_state.dart';
 /// Features:
 /// - Dynamic space name in title
 /// - Inbox icon (64px)
-/// - Quick Capture CTA
-/// - Entrance animations and FAB pulse
+/// - Create CTA
+/// - Entrance animations and optional FAB pulse
 ///
 /// Example usage:
 /// ```dart
 /// EmptySpaceState(
 ///   spaceName: 'Work',
-///   onActionPressed: () => _showQuickCapture(),
+///   onActionPressed: () => _showCreateContent(),
 ///   enableFabPulse: (enabled) => setState(() => _fabPulse = enabled),
 /// )
 /// ```
@@ -31,7 +31,7 @@ class EmptySpaceState extends StatelessWidget {
   /// Name of the current space
   final String spaceName;
 
-  /// Callback when Quick Capture button is pressed
+  /// Callback when Create button is pressed
   final VoidCallback onActionPressed;
 
   /// Optional callback to enable/disable FAB pulse animation
@@ -43,7 +43,7 @@ class EmptySpaceState extends StatelessWidget {
       icon: Icons.inbox,
       title: 'Your $spaceName is empty',
       message: 'Start capturing your thoughts, tasks, and ideas',
-      actionLabel: 'Quick Capture',
+      actionLabel: 'Create',
       onActionPressed: onActionPressed,
       enableFabPulse: enableFabPulse,
     );

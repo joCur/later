@@ -1,10 +1,11 @@
-import 'dart:async';
 import 'dart:io' show Platform;
 import 'dart:ui' show ImageFilter;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:later_mobile/design_system/atoms/buttons/ghost_button.dart';
+import 'package:later_mobile/design_system/atoms/buttons/gradient_button.dart';
+import 'package:later_mobile/design_system/atoms/buttons/primary_button.dart';
 import 'package:later_mobile/design_system/atoms/inputs/text_area_field.dart';
 import 'package:later_mobile/design_system/tokens/tokens.dart';
 import 'package:provider/provider.dart';
@@ -12,14 +13,14 @@ import 'package:uuid/uuid.dart';
 
 import '../../core/responsive/breakpoints.dart';
 import '../../core/theme/temporal_flow_theme.dart';
-import '../../core/utils/item_type_detector.dart';
+import '../../core/utils/item_type_detector.dart'; // For ContentType enum
 import '../../data/models/item_model.dart';
 import '../../data/models/list_model.dart';
 import '../../data/models/todo_list_model.dart';
 import '../../providers/content_provider.dart';
 import '../../providers/spaces_provider.dart';
 
-/// Type option for Quick Capture content type selector
+/// Type option for Create Content content type selector
 class TypeOption {
   const TypeOption({
     required this.label,
@@ -30,47 +31,66 @@ class TypeOption {
 
   final String label;
   final IconData icon;
-  final ContentType? type; // null for "Auto"
+  final ContentType type;
   final Color? color;
 }
 
-/// Quick Capture Modal widget
+/// Action to take when closing the modal with unsaved changes
+enum _CloseAction {
+  /// Discard unsaved changes and close
+  discard,
+
+  /// Create the item and close immediately
+  createAndClose,
+
+  /// Cancel (stay open)
+  cancel,
+}
+
+/// Create Content Modal widget
 ///
-/// A responsive modal for quickly capturing tasks, notes, and lists
-/// with auto-save, type detection, and keyboard shortcuts.
+/// A responsive modal for creating new content (tasks, notes, and lists)
+/// with explicit save and keyboard shortcuts.
 ///
 /// Features:
 /// - Responsive layout (mobile bottom sheet, desktop centered modal)
-/// - Auto-save with debounce (500ms)
-/// - Smart type detection
-/// - Keyboard shortcuts (Esc to close, Cmd/Ctrl+Enter to save and close)
+/// - Explicit save with keyboard shortcut support
+/// - Manual type selection with pre-selected initial type
+/// - Keyboard shortcuts (Esc to close, Cmd/Ctrl+Enter to create)
 /// - Voice and image input buttons (placeholders)
 /// - Space selector
-class QuickCaptureModal extends StatefulWidget {
-  const QuickCaptureModal({super.key, required this.onClose});
+class CreateContentModal extends StatefulWidget {
+  const CreateContentModal({
+    super.key,
+    required this.onClose,
+    this.initialType,
+  });
 
   /// Callback when modal is closed
   final VoidCallback onClose;
 
+  /// Initial content type to pre-select (optional)
+  final ContentType? initialType;
+
   @override
-  State<QuickCaptureModal> createState() => _QuickCaptureModalState();
+  State<CreateContentModal> createState() => _CreateContentModalState();
 }
 
-class _QuickCaptureModalState extends State<QuickCaptureModal>
+class _CreateContentModalState extends State<CreateContentModal>
     with TickerProviderStateMixin {
   final TextEditingController _textController = TextEditingController();
   final FocusNode _focusNode = FocusNode();
-  Timer? _debounceTimer;
   String? _currentItemId;
   bool _isSaving = false;
-  bool _isSaved = false;
   String? _selectedSpaceId; // Local state for space selection (modal-only)
+
+  // Check if we're creating a new item or editing an existing one
+  bool get _isNewItem => _currentItemId == null;
 
   // Type selection for content creation
   static const List<TypeOption> _typeOptions = [
-    TypeOption(label: 'Auto', icon: Icons.auto_awesome, type: null),
     TypeOption(
-      label: 'Todo',
+      label: 'Todo List',
       icon: Icons.check_box_outlined,
       type: ContentType.todoList,
       color: AppColors.info,
@@ -89,19 +109,21 @@ class _QuickCaptureModalState extends State<QuickCaptureModal>
     ),
   ];
 
-  ContentType? _selectedType; // null = Auto
-  ContentType? _detectedType; // Tracks auto-detected type
+  ContentType? _selectedType; // User-selected type
 
   late AnimationController _animationController;
   late Animation<double> _scaleAnimation;
   late Animation<double> _fadeAnimation;
   late Animation<Offset> _slideAnimation;
   late AnimationController _typeIconAnimationController;
-  late Animation<double> _typeIconScaleAnimation;
 
   @override
   void initState() {
     super.initState();
+
+    // Initialize selected type from widget parameter
+    _selectedType = widget.initialType;
+
     _textController.addListener(_onTextChanged);
     _focusNode.addListener(() {
       setState(
@@ -147,13 +169,6 @@ class _QuickCaptureModalState extends State<QuickCaptureModal>
       vsync: this,
     );
 
-    _typeIconScaleAnimation = Tween<double>(begin: 1.0, end: 1.3).animate(
-      CurvedAnimation(
-        parent: _typeIconAnimationController,
-        curve: Curves.elasticOut,
-      ),
-    );
-
     // Start entrance animation
     _animationController.forward();
   }
@@ -168,14 +183,13 @@ class _QuickCaptureModalState extends State<QuickCaptureModal>
       final spacesProvider = context.read<SpacesProvider>();
       _selectedSpaceId = spacesProvider.currentSpace?.id;
       debugPrint(
-        'QuickCapture: didChangeDependencies - _selectedSpaceId initialized to: $_selectedSpaceId',
+        'CreateContent: didChangeDependencies - _selectedSpaceId initialized to: $_selectedSpaceId',
       );
     }
   }
 
   @override
   void dispose() {
-    _debounceTimer?.cancel();
     _textController.dispose();
     _focusNode.dispose();
     _animationController.dispose();
@@ -184,41 +198,9 @@ class _QuickCaptureModalState extends State<QuickCaptureModal>
   }
 
   void _onTextChanged() {
-    final text = _textController.text.trim();
-
-    // Cancel existing timer
-    _debounceTimer?.cancel();
-
-    if (text.isEmpty) {
-      setState(() {
-        _isSaving = false;
-        _isSaved = false;
-        _detectedType = null;
-      });
-      return;
-    }
-
-    // Detect type if in Auto mode
-    if (_selectedType == null) {
-      final newDetectedType = ItemTypeDetector.detectType(text);
-      if (_detectedType != newDetectedType) {
-        setState(() {
-          _detectedType = newDetectedType;
-        });
-        _typeIconAnimationController.forward(from: 0.0);
-      }
-    }
-
-    // Show saving indicator
-    setState(() {
-      _isSaving = true;
-      _isSaved = false;
-    });
-
-    // Debounce save
-    _debounceTimer = Timer(AppAnimations.autoSaveDebounce, () {
-      _saveItem();
-    });
+    // Simply trigger rebuild for button state updates
+    // No auto-detection - user must manually select type if desired
+    setState(() {});
   }
 
   Future<void> _saveItem() async {
@@ -230,13 +212,13 @@ class _QuickCaptureModalState extends State<QuickCaptureModal>
     final currentSpace = spacesProvider.currentSpace;
 
     if (currentSpace == null) {
-      debugPrint('QuickCapture: Cannot save - no current space');
+      debugPrint('CreateContent: Cannot save - no current space');
       return;
     }
 
     // Safety check: Ensure selected space ID is valid
     if (_selectedSpaceId == null) {
-      debugPrint('QuickCapture: Cannot save - _selectedSpaceId is null');
+      debugPrint('CreateContent: Cannot save - _selectedSpaceId is null');
       return;
     }
 
@@ -247,7 +229,7 @@ class _QuickCaptureModalState extends State<QuickCaptureModal>
     final targetSpaceId = spaceExists ? _selectedSpaceId! : currentSpace.id;
 
     debugPrint(
-      'QuickCapture: Creating item - _selectedSpaceId: $_selectedSpaceId, '
+      'CreateContent: Creating item - _selectedSpaceId: $_selectedSpaceId, '
       'currentSpace: ${currentSpace.id}, targetSpaceId: $targetSpaceId, '
       'spaceExists: $spaceExists',
     );
@@ -259,8 +241,8 @@ class _QuickCaptureModalState extends State<QuickCaptureModal>
       );
     }
 
-    // Determine content type (either user-selected or auto-detected)
-    final contentType = _selectedType ?? _detectedType ?? ContentType.note;
+    // Determine content type (user-selected, defaults to note if not specified)
+    final contentType = _selectedType ?? ContentType.note;
 
     try {
       if (_currentItemId == null) {
@@ -316,15 +298,57 @@ class _QuickCaptureModalState extends State<QuickCaptureModal>
 
       setState(() {
         _isSaving = false;
-        _isSaved = true;
       });
     } catch (e) {
-      debugPrint('QuickCapture: Error saving item - $e');
+      debugPrint('CreateContent: Error saving item - $e');
       setState(() {
         _isSaving = false;
-        _isSaved = false;
       });
+      rethrow; // Rethrow so _handleExplicitSave can handle the error
     }
+  }
+
+  /// Handles explicit save action from save button or keyboard shortcut
+  Future<void> _handleExplicitSave() async {
+    final text = _textController.text.trim();
+
+    // Validate that text is not empty
+    if (text.isEmpty) return;
+
+    // Prevent multiple simultaneous saves
+    if (_isSaving) return;
+
+    setState(() {
+      _isSaving = true;
+    });
+
+    try {
+      // Call the existing save logic
+      await _saveItem();
+
+      // Show success feedback and close
+      if (mounted) {
+        await _showSuccessFeedback();
+
+        // Close modal after success feedback delay
+        await Future<void>.delayed(const Duration(milliseconds: 500));
+        if (mounted) {
+          _close();
+        }
+      }
+    } catch (e) {
+      // Error already logged in _saveItem, just ensure loading state is cleared
+      debugPrint('CreateContent: Failed to save item - $e');
+    }
+  }
+
+  /// Shows success feedback animation with haptics
+  Future<void> _showSuccessFeedback() async {
+    // Trigger haptic feedback
+    HapticFeedback.mediumImpact();
+
+    // Wait for animation duration to allow user to see the loading state complete
+    await Future<void>.delayed(const Duration(milliseconds: 800));
   }
 
   Future<void> _handleKeyEvent(KeyEvent event) async {
@@ -335,17 +359,15 @@ class _QuickCaptureModalState extends State<QuickCaptureModal>
         return;
       }
 
-      // Cmd/Ctrl + Enter to save and close
+      // Cmd/Ctrl + Enter to create (explicit save)
       if (event.logicalKey == LogicalKeyboardKey.enter) {
         final isModifierPressed =
             HardwareKeyboard.instance.isMetaPressed ||
             HardwareKeyboard.instance.isControlPressed;
 
         if (isModifierPressed) {
-          // Cancel debounce and save immediately
-          _debounceTimer?.cancel();
-          await _saveItem();
-          _close();
+          // Use explicit save which includes success feedback and auto-close
+          await _handleExplicitSave();
           return;
         }
       }
@@ -364,30 +386,35 @@ class _QuickCaptureModalState extends State<QuickCaptureModal>
 
   Future<void> _handleClose() async {
     final hasContent = _textController.text.trim().isNotEmpty;
-    final hasUnsavedChanges = hasContent && !_isSaved;
+    // Only show confirmation for new items with unsaved content
+    final hasUnsavedChanges = hasContent && _isNewItem;
 
     if (hasUnsavedChanges) {
-      // Show confirmation dialog
-      final shouldClose = await _showCloseConfirmation();
-      if (shouldClose == true) {
-        // Save before closing
+      // Show confirmation dialog with option to discard or create & close
+      final action = await _showCloseConfirmation();
+      if (action == _CloseAction.createAndClose) {
+        // Create the item and close immediately (without delay)
         await _saveItem();
         if (mounted) {
           _close();
         }
+      } else if (action == _CloseAction.discard) {
+        // Discard and close
+        _close();
       }
+      // If action is null or cancel, do nothing (stay open)
     } else {
       // No unsaved changes, close immediately
       _close();
     }
   }
 
-  Future<bool?> _showCloseConfirmation() async {
+  Future<_CloseAction?> _showCloseConfirmation() async {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final temporalTheme = Theme.of(context).extension<TemporalFlowTheme>()!;
     final surfaceColor = AppColors.surface(context);
 
-    return showDialog<bool>(
+    return showDialog<_CloseAction>(
       context: context,
       barrierColor: (isDark ? AppColors.overlayDark : AppColors.overlayLight),
       builder: (context) => BackdropFilter(
@@ -421,14 +448,14 @@ class _QuickCaptureModalState extends State<QuickCaptureModal>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Save changes?',
+                  'Discard unsaved content?',
                   style: AppTypography.h4.copyWith(
                     color: AppColors.text(context),
                   ),
                 ),
                 const SizedBox(height: AppSpacing.md),
                 Text(
-                  'You have unsaved changes. Would you like to save them before closing?',
+                  'You haven\'t created this item yet. Would you like to create it or discard your changes?',
                   style: AppTypography.bodyMedium.copyWith(
                     color: AppColors.textSecondary(context),
                   ),
@@ -438,13 +465,22 @@ class _QuickCaptureModalState extends State<QuickCaptureModal>
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     GhostButton(
-                      text: 'Discard',
-                      onPressed: () => Navigator.of(context).pop(false),
+                      text: 'Cancel',
+                      onPressed: () =>
+                          Navigator.of(context).pop(_CloseAction.cancel),
                     ),
                     const SizedBox(width: AppSpacing.xs),
                     GhostButton(
-                      text: 'Save',
-                      onPressed: () => Navigator.of(context).pop(true),
+                      text: 'Discard',
+                      onPressed: () =>
+                          Navigator.of(context).pop(_CloseAction.discard),
+                    ),
+                    const SizedBox(width: AppSpacing.xs),
+                    GradientButton(
+                      label: 'Create & Close',
+                      onPressed: () => Navigator.of(
+                        context,
+                      ).pop(_CloseAction.createAndClose),
                     ),
                   ],
                 ),
@@ -603,7 +639,8 @@ class _QuickCaptureModalState extends State<QuickCaptureModal>
         // Auto-save indicator
         _buildAutoSaveIndicator(),
 
-        SizedBox(height: isMobile ? AppSpacing.md : AppSpacing.sm),
+        // Footer with action button
+        _buildFooter(isMobile: isMobile),
       ],
     );
   }
@@ -639,26 +676,24 @@ class _QuickCaptureModalState extends State<QuickCaptureModal>
       ),
       child: Row(
         children: [
-          Expanded(
-            child: Semantics(
-              label: 'Quick Capture',
-              child: Text(
-                'Quick Capture',
-                style: AppTypography.h3.copyWith(
-                  color: AppColors.text(context),
-                ),
-              ),
-            ),
+          // "Create" text
+          Text(
+            'Create ',
+            style: AppTypography.h3.copyWith(color: AppColors.text(context)),
           ),
+
+          // Inline type selector
+          _buildInlineTypeSelector(),
+
+          const Spacer(),
+
+          // Close button
           Semantics(
             label: 'Close',
             button: true,
             child: IconButton(
               key: const Key('close_button'),
-              icon: Icon(
-                Icons.close,
-                color: AppColors.textSecondary(context),
-              ),
+              icon: Icon(Icons.close, color: AppColors.textSecondary(context)),
               onPressed: _handleClose,
               iconSize: 24,
               constraints: const BoxConstraints(
@@ -669,6 +704,63 @@ class _QuickCaptureModalState extends State<QuickCaptureModal>
           ),
         ],
       ),
+    );
+  }
+
+  /// Build inline type selector for the header (e.g., "Create Note")
+  Widget _buildInlineTypeSelector() {
+    // Find the selected option, default to Note if none selected
+    final selectedOption = _typeOptions.firstWhere(
+      (option) => option.type == _selectedType,
+      orElse: () =>
+          _typeOptions.firstWhere((option) => option.type == ContentType.note),
+    );
+
+    return PopupMenuButton<TypeOption>(
+      key: const Key('inline_type_selector'),
+      offset: const Offset(0, 40),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // Type icon
+          Icon(selectedOption.icon, size: 20, color: selectedOption.color),
+          const SizedBox(width: AppSpacing.xxs),
+          // Type label with type-specific color
+          Text(
+            selectedOption.label,
+            style: AppTypography.h3.copyWith(color: selectedOption.color),
+          ),
+          const SizedBox(width: 2),
+          // Dropdown arrow with type-specific color
+          Icon(Icons.arrow_drop_down, size: 20, color: selectedOption.color),
+        ],
+      ),
+      itemBuilder: (context) {
+        return _typeOptions.map((option) {
+          return PopupMenuItem<TypeOption>(
+            value: option,
+            child: Row(
+              children: [
+                Icon(
+                  option.icon,
+                  key: Key('inline_type_icon_${option.label.toLowerCase()}'),
+                  size: 20,
+                  color: option.color ?? AppColors.text(context),
+                ),
+                const SizedBox(width: AppSpacing.xs),
+                Text(option.label),
+              ],
+            ),
+          );
+        }).toList();
+      },
+      onSelected: (option) {
+        setState(() {
+          _selectedType = option.type;
+        });
+        // Animate the type icon change
+        _typeIconAnimationController.forward(from: 0.0);
+      },
     );
   }
 
@@ -746,105 +838,10 @@ class _QuickCaptureModalState extends State<QuickCaptureModal>
 
           const Spacer(),
 
-          // Type selector
-          _buildTypeSelector(),
-          const SizedBox(width: AppSpacing.xs),
-
           // Space selector
           _buildSpaceSelector(),
         ],
       ),
-    );
-  }
-
-  Widget _buildTypeSelector() {
-
-    // Determine which option to display
-    // If user selected a type, use that, otherwise show detected or Auto
-    final displayType = _selectedType ?? _detectedType;
-    final selectedOption = _typeOptions.firstWhere(
-      (option) => option.type == displayType,
-      orElse: () => _typeOptions[0], // Default to Auto
-    );
-
-    return PopupMenuButton<TypeOption>(
-      key: const Key('type_selector'),
-      child: Container(
-        padding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.xs,
-          vertical: AppSpacing.xxs,
-        ),
-        decoration: BoxDecoration(
-          border: Border.all(
-            color: AppColors.border(context),
-          ),
-          borderRadius: BorderRadius.circular(AppSpacing.radiusSM),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ScaleTransition(
-              key: const Key('type_icon_animated'),
-              scale: _typeIconScaleAnimation,
-              child: Icon(
-                selectedOption.icon,
-                size: 16,
-                color:
-                    selectedOption.color ??
-                    (AppColors.text(context)),
-              ),
-            ),
-            const SizedBox(width: AppSpacing.xxs),
-            Text(
-              selectedOption.label,
-              style: AppTypography.labelMedium.copyWith(
-                color: AppColors.text(context),
-              ),
-            ),
-            const SizedBox(width: AppSpacing.xxs),
-            Icon(
-              Icons.arrow_drop_down,
-              size: 16,
-              color: AppColors.textSecondary(context),
-            ),
-          ],
-        ),
-      ),
-      itemBuilder: (context) {
-        return _typeOptions.map((option) {
-          return PopupMenuItem<TypeOption>(
-            value: option,
-            child: Row(
-              children: [
-                Icon(
-                  option.icon,
-                  key: Key('type_icon_${option.label.toLowerCase()}'),
-                  size: 20,
-                  color:
-                      option.color ??
-                      (AppColors.text(context)),
-                ),
-                const SizedBox(width: AppSpacing.xs),
-                Text(option.label),
-              ],
-            ),
-          );
-        }).toList();
-      },
-      onSelected: (option) {
-        setState(() {
-          _selectedType = option.type;
-          // If user explicitly selects Auto, reset detected type
-          if (option.type == null) {
-            _detectedType = null;
-            // Re-run detection on current text
-            final text = _textController.text.trim();
-            if (text.isNotEmpty) {
-              _detectedType = ItemTypeDetector.detectType(text);
-            }
-          }
-        });
-      },
     );
   }
 
@@ -869,9 +866,7 @@ class _QuickCaptureModalState extends State<QuickCaptureModal>
               vertical: AppSpacing.xxs,
             ),
             decoration: BoxDecoration(
-              border: Border.all(
-                color: AppColors.border(context),
-              ),
+              border: Border.all(color: AppColors.border(context)),
               borderRadius: BorderRadius.circular(AppSpacing.radiusSM),
             ),
             child: Row(
@@ -916,13 +911,13 @@ class _QuickCaptureModalState extends State<QuickCaptureModal>
           onSelected: (spaceId) {
             // Update only local state, not global provider
             debugPrint(
-              'QuickCapture: Space selected in dropdown - spaceId: $spaceId',
+              'CreateContent: Space selected in dropdown - spaceId: $spaceId',
             );
             if (mounted) {
               setState(() {
                 _selectedSpaceId = spaceId;
                 debugPrint(
-                  'QuickCapture: _selectedSpaceId updated to: $_selectedSpaceId',
+                  'CreateContent: _selectedSpaceId updated to: $_selectedSpaceId',
                 );
               });
             }
@@ -940,11 +935,11 @@ class _QuickCaptureModalState extends State<QuickCaptureModal>
       try {
         final isMacOS = Platform.isMacOS;
         return isMacOS
-            ? '⌘+Enter to save • Esc to close'
-            : 'Ctrl+Enter to save • Esc to close';
+            ? '⌘+Enter to create • Esc to close'
+            : 'Ctrl+Enter to create • Esc to close';
       } catch (e) {
         // Fallback for web or platforms without Platform API
-        return 'Ctrl+Enter to save • Esc to close';
+        return 'Ctrl+Enter to create • Esc to close';
       }
     }
 
@@ -958,65 +953,58 @@ class _QuickCaptureModalState extends State<QuickCaptureModal>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Row(
-            key: const Key('autosave_indicator'),
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              if (_isSaving || _isSaved)
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppSpacing.xs,
-                    vertical: AppSpacing.xxs,
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      if (_isSaving)
-                        const SizedBox(
-                          width: 12,
-                          height: 12,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            valueColor: AlwaysStoppedAnimation<Color>(
-                              AppColors.neutral500,
-                            ),
-                          ),
-                        )
-                      else if (_isSaved)
-                        const Icon(
-                          Icons.check,
-                          size: 12,
-                          color: AppColors.success,
-                        ),
-                      const SizedBox(width: AppSpacing.xxs),
-                      Text(
-                        _isSaving ? 'Saving...' : 'Saved',
-                        style: AppTypography.labelSmall.copyWith(
-                          color: _isSaving
-                              ? AppColors.neutral500
-                              : AppColors.success,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-            ],
-          ),
           // Keyboard shortcuts hint (visible when focused, desktop only)
           if (!isMobile && _focusNode.hasFocus)
-            Padding(
-              padding: const EdgeInsets.only(top: AppSpacing.xxs),
-              child: Text(
-                getKeyboardShortcutText(),
-                key: const Key('keyboard_hints'),
-                textAlign: TextAlign.right,
-                style: AppTypography.labelSmall.copyWith(
-                  color: AppColors.textSecondary(context),
-                ),
+            Text(
+              getKeyboardShortcutText(),
+              key: const Key('keyboard_hints'),
+              textAlign: TextAlign.right,
+              style: AppTypography.labelSmall.copyWith(
+                color: AppColors.textSecondary(context),
               ),
             ),
         ],
       ),
+    );
+  }
+
+  Widget _buildFooter({required bool isMobile}) {
+    // Get button text from selected type
+    String buttonText;
+    switch (_selectedType) {
+      case ContentType.todoList:
+        buttonText = 'Create Todo List';
+        break;
+      case ContentType.list:
+        buttonText = 'Create List';
+        break;
+      case ContentType.note:
+        buttonText = 'Create Note';
+        break;
+      case null:
+        buttonText = 'Create';
+        break;
+    }
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(AppSpacing.sm),
+          child: PrimaryButton(
+            key: const Key('save_button'),
+            text: buttonText,
+            icon: Icons.check,
+            onPressed: _textController.text.trim().isNotEmpty
+                ? _handleExplicitSave
+                : null,
+            isLoading: _isSaving,
+            isExpanded: true,
+          ),
+        ),
+        // Bottom padding for mobile (safe area + keyboard)
+        if (isMobile) SizedBox(height: MediaQuery.of(context).padding.bottom),
+      ],
     );
   }
 }

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:later_mobile/core/theme/temporal_flow_theme.dart';
-import 'package:later_mobile/design_system/molecules/fab/quick_capture_fab.dart';
+import 'package:later_mobile/design_system/molecules/fab/create_content_fab.dart';
 import 'package:later_mobile/design_system/organisms/fab/responsive_fab.dart';
 
 void main() {
@@ -39,8 +39,8 @@ void main() {
         ),
       );
 
-      // Verify QuickCaptureFab is used on mobile
-      expect(find.byType(QuickCaptureFab), findsOneWidget);
+      // Verify CreateContentFab is used on mobile
+      expect(find.byType(CreateContentFab), findsOneWidget);
 
       // Verify the icon is present
       expect(find.byIcon(Icons.add), findsOneWidget);
@@ -94,7 +94,7 @@ void main() {
       );
 
       // Tap the FAB
-      await tester.tap(find.byType(QuickCaptureFab));
+      await tester.tap(find.byType(CreateContentFab));
       await tester.pumpAndSettle();
 
       // Verify callback was called
@@ -160,7 +160,7 @@ void main() {
       );
 
       // Verify FAB is rendered
-      expect(find.byType(QuickCaptureFab), findsOneWidget);
+      expect(find.byType(CreateContentFab), findsOneWidget);
     });
 
     testWidgets('uses tooltip when provided', (tester) async {
@@ -181,7 +181,7 @@ void main() {
       );
 
       // Verify FAB is rendered
-      expect(find.byType(QuickCaptureFab), findsOneWidget);
+      expect(find.byType(CreateContentFab), findsOneWidget);
     });
 
     testWidgets('uses label as tooltip when tooltip not provided', (
@@ -203,7 +203,7 @@ void main() {
       );
 
       // Verify FAB is rendered
-      expect(find.byType(QuickCaptureFab), findsOneWidget);
+      expect(find.byType(CreateContentFab), findsOneWidget);
     });
 
     testWidgets('supports custom heroTag', (tester) async {
@@ -224,7 +224,7 @@ void main() {
       );
 
       // Verify FAB is rendered
-      expect(find.byType(QuickCaptureFab), findsOneWidget);
+      expect(find.byType(CreateContentFab), findsOneWidget);
     });
 
     testWidgets('renders in light theme', (tester) async {
@@ -245,7 +245,7 @@ void main() {
       );
 
       // Verify FAB is rendered
-      expect(find.byType(QuickCaptureFab), findsOneWidget);
+      expect(find.byType(CreateContentFab), findsOneWidget);
     });
 
     testWidgets('renders in dark theme', (tester) async {
@@ -266,7 +266,7 @@ void main() {
       );
 
       // Verify FAB is rendered
-      expect(find.byType(QuickCaptureFab), findsOneWidget);
+      expect(find.byType(CreateContentFab), findsOneWidget);
     });
 
     testWidgets('adapts from mobile to desktop on resize', (tester) async {
@@ -287,7 +287,7 @@ void main() {
       );
 
       // Verify mobile FAB
-      expect(find.byType(QuickCaptureFab), findsOneWidget);
+      expect(find.byType(CreateContentFab), findsOneWidget);
 
       // Resize to desktop
       await tester.pumpWidget(
@@ -313,7 +313,6 @@ void main() {
     testWidgets('does not pulse by default on mobile', (tester) async {
       await tester.pumpWidget(
         createTestApp(
-          size: const Size(375, 812), // Mobile size
           child: ResponsiveFab(
             icon: Icons.add,
             label: 'Add Item',
@@ -333,7 +332,6 @@ void main() {
     ) async {
       await tester.pumpWidget(
         createTestApp(
-          size: const Size(375, 812), // Mobile size
           child: ResponsiveFab(
             icon: Icons.add,
             label: 'Add Item',
@@ -349,11 +347,11 @@ void main() {
       );
       expect(responsiveFab.enablePulse, isTrue);
 
-      // Verify QuickCaptureFab has pulse enabled
-      final quickCaptureFab = tester.widget<QuickCaptureFab>(
-        find.byType(QuickCaptureFab),
+      // Verify CreateContentFab has pulse enabled
+      final createContentFab = tester.widget<CreateContentFab>(
+        find.byType(CreateContentFab),
       );
-      expect(quickCaptureFab.enablePulse, isTrue);
+      expect(createContentFab.enablePulse, isTrue);
     });
 
     testWidgets('pulses on desktop when enablePulse is true', (tester) async {
@@ -400,16 +398,14 @@ void main() {
       );
 
       // Tap the FAB
-      await tester.tap(find.byType(QuickCaptureFab));
+      await tester.tap(find.byType(CreateContentFab));
       await tester.pump();
 
       // Verify callback was called
       expect(pressed, isTrue);
     });
 
-    testWidgets('stops pulsing on user interaction on desktop', (
-      tester,
-    ) async {
+    testWidgets('stops pulsing on user interaction on desktop', (tester) async {
       bool pressed = false;
 
       await tester.pumpWidget(
@@ -439,7 +435,6 @@ void main() {
     testWidgets('respects reduced motion on mobile', (tester) async {
       await tester.pumpWidget(
         createTestApp(
-          size: const Size(375, 812), // Mobile size
           disableAnimations: true,
           child: ResponsiveFab(
             icon: Icons.add,
@@ -451,7 +446,7 @@ void main() {
       );
 
       // Verify FAB is rendered
-      expect(find.byType(QuickCaptureFab), findsOneWidget);
+      expect(find.byType(CreateContentFab), findsOneWidget);
 
       // Pump frames to allow animation to start
       await tester.pump();

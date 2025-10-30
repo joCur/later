@@ -14,7 +14,9 @@
       "mcp__dart__connect_dart_tooling_daemon",
       "Bash(xargs:*)",
       "Bash(perl -i -pe:*)",
-      "Bash(lib/widgets/**/*.dart)"
+      "Bash(lib/widgets/**/*.dart)",
+      "Bash(gh pr view:*)",
+      "Bash(gh api:*)"
     ],
     "deny": [],
     "ask": []

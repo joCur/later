@@ -1,31 +1,33 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:provider/provider.dart';
-import 'package:later_mobile/design_system/tokens/tokens.dart';
-import '../../core/responsive/breakpoints.dart';
-import '../../core/theme/temporal_flow_theme.dart';
-import '../../core/utils/responsive_modal.dart';
-import '../../data/models/item_model.dart';
-import '../../data/models/space_model.dart';
-import '../../data/models/todo_list_model.dart';
-import '../../data/models/list_model.dart';
-import '../../providers/content_provider.dart';
-import '../../providers/spaces_provider.dart';
-import 'package:later_mobile/design_system/organisms/cards/todo_list_card.dart';
-import 'package:later_mobile/design_system/organisms/cards/list_card.dart';
-import 'package:later_mobile/design_system/organisms/cards/note_card.dart';
-import 'package:later_mobile/design_system/molecules/fab/quick_capture_fab.dart';
-import 'package:later_mobile/design_system/organisms/empty_states/empty_space_state.dart';
-import 'package:later_mobile/design_system/organisms/empty_states/welcome_state.dart';
-import '../navigation/icon_only_bottom_nav.dart';
-import '../navigation/app_sidebar.dart';
-import '../modals/space_switcher_modal.dart';
-import '../modals/quick_capture_modal.dart';
-import 'todo_list_detail_screen.dart';
-import 'list_detail_screen.dart';
-import 'note_detail_screen.dart';
 import 'package:later_mobile/design_system/atoms/buttons/primary_button.dart';
 import 'package:later_mobile/design_system/atoms/chips/filter_chip.dart';
+import 'package:later_mobile/design_system/organisms/cards/list_card.dart';
+import 'package:later_mobile/design_system/organisms/cards/note_card.dart';
+import 'package:later_mobile/design_system/organisms/cards/todo_list_card.dart';
+import 'package:later_mobile/design_system/organisms/empty_states/empty_space_state.dart';
+import 'package:later_mobile/design_system/organisms/empty_states/welcome_state.dart';
+import 'package:later_mobile/design_system/organisms/fab/responsive_fab.dart';
+import 'package:later_mobile/design_system/tokens/tokens.dart';
+import 'package:provider/provider.dart';
+
+import '../../core/responsive/breakpoints.dart';
+import '../../core/theme/temporal_flow_theme.dart';
+import '../../core/utils/item_type_detector.dart';
+import '../../core/utils/responsive_modal.dart';
+import '../../data/models/item_model.dart';
+import '../../data/models/list_model.dart';
+import '../../data/models/space_model.dart';
+import '../../data/models/todo_list_model.dart';
+import '../../providers/content_provider.dart';
+import '../../providers/spaces_provider.dart';
+import '../modals/create_content_modal.dart';
+import '../modals/space_switcher_modal.dart';
+import '../navigation/app_sidebar.dart';
+import '../navigation/icon_only_bottom_nav.dart';
+import 'list_detail_screen.dart';
+import 'note_detail_screen.dart';
+import 'todo_list_detail_screen.dart';
 
 /// Main home screen for the Later app
 ///
@@ -65,7 +67,7 @@ class _HomeScreenState extends State<HomeScreen> {
   int _currentItemCount = 100; // Initially load 100 items
   bool _isLoadingMore = false;
 
-  // Animation state for empty state FAB pulse
+  // FAB pulse state
   bool _enableFabPulse = false;
 
   @override
@@ -139,11 +141,14 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  /// Show quick capture modal
-  void _showQuickCaptureModal() {
+  /// Show create content modal
+  void _showCreateContentModal([ContentType? initialType]) {
     ResponsiveModal.show<void>(
       context: context,
-      child: QuickCaptureModal(onClose: () => Navigator.of(context).pop()),
+      child: CreateContentModal(
+        onClose: () => Navigator.of(context).pop(),
+        initialType: initialType,
+      ),
     );
   }
 
@@ -156,7 +161,7 @@ class _HomeScreenState extends State<HomeScreen> {
       if (isNKey &&
           (HardwareKeyboard.instance.isControlPressed ||
               HardwareKeyboard.instance.isMetaPressed)) {
-        _showQuickCaptureModal();
+        _showCreateContentModal();
         return KeyEventResult.handled;
       }
     }
@@ -369,7 +374,7 @@ class _HomeScreenState extends State<HomeScreen> {
       if (isNewUser) {
         // Show welcome state for first-time users
         return WelcomeState(
-          onActionPressed: _showQuickCaptureModal,
+          onActionPressed: _showCreateContentModal,
           enableFabPulse: (enabled) {
             if (mounted) {
               setState(() {
@@ -382,7 +387,7 @@ class _HomeScreenState extends State<HomeScreen> {
         // Show empty space state for existing users with empty spaces
         return EmptySpaceState(
           spaceName: currentSpace?.name ?? 'space',
-          onActionPressed: _showQuickCaptureModal,
+          onActionPressed: _showCreateContentModal,
           enableFabPulse: (enabled) {
             if (mounted) {
               setState(() {
@@ -428,6 +433,18 @@ class _HomeScreenState extends State<HomeScreen> {
         // Render different card types based on content type
         return _buildContentCard(item, index);
       },
+    );
+  }
+
+  /// Build simple FAB for creating content
+  Widget _buildFAB(BuildContext context) {
+    return ResponsiveFab(
+      icon: Icons.add,
+      label: 'Create',
+      onPressed: _showCreateContentModal,
+      tooltip: 'Create content',
+      enablePulse: _enableFabPulse,
+      gradient: AppColors.listGradient,
     );
   }
 
@@ -559,11 +576,7 @@ class _HomeScreenState extends State<HomeScreen> {
           setState(() => _selectedNavIndex = index);
         },
       ),
-      floatingActionButton: QuickCaptureFab(
-        onPressed: _showQuickCaptureModal,
-        tooltip: 'Quick capture',
-        enablePulse: _enableFabPulse,
-      ),
+      floatingActionButton: _buildFAB(context),
     );
   }
 
@@ -651,11 +664,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
-      floatingActionButton: QuickCaptureFab(
-        onPressed: _showQuickCaptureModal,
-        tooltip: 'Quick capture',
-        enablePulse: _enableFabPulse,
-      ),
+      floatingActionButton: _buildFAB(context),
     );
   }
 

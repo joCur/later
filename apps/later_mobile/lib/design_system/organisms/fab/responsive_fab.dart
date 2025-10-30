@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:later_mobile/design_system/tokens/tokens.dart';
 import '../../../core/responsive/breakpoints.dart';
-import 'package:later_mobile/design_system/molecules/fab/quick_capture_fab.dart';
+import 'package:later_mobile/design_system/molecules/fab/create_content_fab.dart';
 import 'package:later_mobile/core/theme/temporal_flow_theme.dart';
 
 /// A responsive Floating Action Button that adapts between mobile and desktop layouts.
@@ -11,7 +11,7 @@ import 'package:later_mobile/core/theme/temporal_flow_theme.dart';
 /// On mobile (< 768px):
 /// - Displays as a circular FAB (56×56px)
 /// - Icon only, no label
-/// - Uses QuickCaptureFab component for consistent styling
+/// - Uses CreateContentFab component for consistent styling
 /// - Gradient background with 30% white overlay
 ///
 /// On desktop/tablet (>= 768px):
@@ -68,6 +68,44 @@ class ResponsiveFab extends StatefulWidget {
   State<ResponsiveFab> createState() => _ResponsiveFabState();
 }
 
+/// Configuration for FAB pulse animation behavior.
+///
+/// This class controls the auto-stop behavior of the pulsing animation
+/// that can be applied to FAB components (ResponsiveFab and CreateContentFab).
+///
+/// The pulse animation is typically used to draw user attention to the FAB,
+/// especially in empty states or to encourage first-time user interaction.
+///
+/// ## Usage
+///
+/// To enable continuous pulsing without auto-stop (current configuration):
+/// ```dart
+/// ResponsiveFab(
+///   enablePulse: true,
+///   // ... other properties
+/// )
+/// ```
+///
+/// The pulse will continue until the user interacts with the FAB or
+/// the widget is disposed/updated with `enablePulse: false`.
+///
+/// ## Auto-Stop Configuration
+///
+/// Set [autoStopDuration] to automatically stop the pulse after a duration:
+/// ```dart
+/// // In FabPulseConfig class:
+/// static const Duration? autoStopDuration = Duration(seconds: 10);
+/// ```
+///
+/// Setting [autoStopDuration] to `null` (current value) disables the
+/// auto-stop feature, allowing the pulse to continue indefinitely.
+class FabPulseConfig {
+  const FabPulseConfig._();
+
+  /// Duration before auto-stopping the pulse (null = never auto-stop)
+  static const Duration? autoStopDuration = null;
+}
+
 class _ResponsiveFabState extends State<ResponsiveFab> {
   bool _isPulsing = false;
   Timer? _pulseTimer;
@@ -103,12 +141,14 @@ class _ResponsiveFabState extends State<ResponsiveFab> {
       _isPulsing = true;
     });
 
-    // Auto-stop after 10 seconds
-    _pulseTimer = Timer(const Duration(seconds: 10), () {
-      if (mounted) {
-        _stopPulsing();
-      }
-    });
+    // Auto-stop after configured duration (if set)
+    if (FabPulseConfig.autoStopDuration != null) {
+      _pulseTimer = Timer(FabPulseConfig.autoStopDuration!, () {
+        if (mounted) {
+          _stopPulsing();
+        }
+      });
+    }
   }
 
   void _stopPulsing() {
@@ -139,9 +179,9 @@ class _ResponsiveFabState extends State<ResponsiveFab> {
     }
   }
 
-  /// Build mobile circular FAB using QuickCaptureFab
+  /// Build mobile circular FAB using CreateContentFab
   Widget _buildMobileFab(BuildContext context) {
-    return QuickCaptureFab(
+    return CreateContentFab(
       icon: widget.icon,
       onPressed: _handleTap,
       tooltip: widget.tooltip ?? widget.label ?? 'Action',
@@ -212,20 +252,13 @@ class _ResponsiveFabState extends State<ResponsiveFab> {
     if (_isPulsing && !AppAnimations.prefersReducedMotion(context)) {
       fabWidget = fabWidget
           .animate(
-            onPlay: (controller) => controller.repeat(),
+            onPlay: (controller) => controller.repeat(reverse: true),
           )
           .scale(
             begin: const Offset(1.0, 1.0),
-            end: const Offset(1.08, 1.08),
+            end: const Offset(1.10, 1.10),
             duration: const Duration(milliseconds: 1000),
-            curve: AppAnimations.bouncySpringCurve,
-          )
-          .then()
-          .scale(
-            begin: const Offset(1.08, 1.08),
-            end: const Offset(1.0, 1.0),
-            duration: const Duration(milliseconds: 1000),
-            curve: AppAnimations.bouncySpringCurve,
+            curve: Curves.easeInOut,
           );
     }
 

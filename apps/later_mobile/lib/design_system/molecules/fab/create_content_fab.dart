@@ -3,8 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:later_mobile/design_system/tokens/tokens.dart';
 import 'package:later_mobile/core/theme/temporal_flow_theme.dart';
+import 'package:later_mobile/design_system/organisms/fab/responsive_fab.dart';
 
-/// Quick Capture Floating Action Button - Mobile-First Bold Design
+/// Create Content Floating Action Button - Mobile-First Bold Design
 ///
 /// Features:
 /// - Circular shape: 56×56px (Android standard, mobile-first design)
@@ -16,14 +17,14 @@ import 'package:later_mobile/core/theme/temporal_flow_theme.dart';
 /// - Position: 16px from bottom/right edges
 /// - Hero animation tag for modal transition
 /// - Haptic feedback on press
-class QuickCaptureFab extends StatefulWidget {
-  const QuickCaptureFab({
+class CreateContentFab extends StatefulWidget {
+  const CreateContentFab({
     super.key,
     required this.onPressed,
     this.icon = Icons.add,
     this.label,
     this.tooltip,
-    this.heroTag = 'quick-capture-fab',
+    this.heroTag = 'create-content-fab',
     this.useGradient = true,
     this.isOpen = false,
     this.enablePulse = false,
@@ -54,10 +55,10 @@ class QuickCaptureFab extends StatefulWidget {
   final bool enablePulse;
 
   @override
-  State<QuickCaptureFab> createState() => _QuickCaptureFabState();
+  State<CreateContentFab> createState() => _CreateContentFabState();
 }
 
-class _QuickCaptureFabState extends State<QuickCaptureFab>
+class _CreateContentFabState extends State<CreateContentFab>
     with SingleTickerProviderStateMixin {
   late AnimationController _scaleController;
   late Animation<double> _scaleAnimation;
@@ -93,7 +94,7 @@ class _QuickCaptureFabState extends State<QuickCaptureFab>
   }
 
   @override
-  void didUpdateWidget(QuickCaptureFab oldWidget) {
+  void didUpdateWidget(CreateContentFab oldWidget) {
     super.didUpdateWidget(oldWidget);
     // Handle enable/disable pulse changes
     if (widget.enablePulse != oldWidget.enablePulse) {
@@ -117,12 +118,14 @@ class _QuickCaptureFabState extends State<QuickCaptureFab>
       _isPulsing = true;
     });
 
-    // Auto-stop after 10 seconds
-    _pulseTimer = Timer(const Duration(seconds: 10), () {
-      if (mounted) {
-        _stopPulsing();
-      }
-    });
+    // Auto-stop after configured duration (if set)
+    if (FabPulseConfig.autoStopDuration != null) {
+      _pulseTimer = Timer(FabPulseConfig.autoStopDuration!, () {
+        if (mounted) {
+          _stopPulsing();
+        }
+      });
+    }
   }
 
   void _stopPulsing() {
@@ -208,7 +211,7 @@ class _QuickCaptureFabState extends State<QuickCaptureFab>
       child: Semantics(
         button: true,
         enabled: widget.onPressed != null,
-        label: widget.tooltip ?? (widget.label ?? 'Quick Capture'),
+        label: widget.tooltip ?? (widget.label ?? 'Create'),
         child: Tooltip(
           message: widget.tooltip ?? '',
           child: ScaleTransition(
@@ -270,20 +273,13 @@ class _QuickCaptureFabState extends State<QuickCaptureFab>
     if (_isPulsing && !AppAnimations.prefersReducedMotion(context)) {
       fabWidget = fabWidget
           .animate(
-            onPlay: (controller) => controller.repeat(),
+            onPlay: (controller) => controller.repeat(reverse: true),
           )
           .scale(
             begin: const Offset(1.0, 1.0),
-            end: const Offset(1.08, 1.08),
+            end: const Offset(1.10, 1.10),
             duration: const Duration(milliseconds: 1000),
-            curve: AppAnimations.bouncySpringCurve,
-          )
-          .then()
-          .scale(
-            begin: const Offset(1.08, 1.08),
-            end: const Offset(1.0, 1.0),
-            duration: const Duration(milliseconds: 1000),
-            curve: AppAnimations.bouncySpringCurve,
+            curve: Curves.easeInOut,
           );
     }
 
