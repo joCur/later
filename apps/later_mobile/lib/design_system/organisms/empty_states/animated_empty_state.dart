@@ -82,11 +82,9 @@ class _AnimatedEmptyStateState extends State<AnimatedEmptyState> {
   void dispose() {
     // Ensure FAB pulse stops when widget is disposed
     // Schedule after frame to avoid calling setState during build
-    if (widget.enableFabPulse != null) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        widget.enableFabPulse?.call(false);
-      });
-    }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      widget.enableFabPulse?.call(false);
+    });
     super.dispose();
   }
 
