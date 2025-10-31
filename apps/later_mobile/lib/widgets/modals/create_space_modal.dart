@@ -162,7 +162,6 @@ class _CreateSpaceModalState extends State<CreateSpaceModal> {
         name: name,
         icon: _selectedIcon,
         color: _selectedColor,
-        itemCount: widget.initialSpace?.itemCount ?? 0,
         isArchived: widget.initialSpace?.isArchived ?? false,
         createdAt: widget.initialSpace?.createdAt,
         updatedAt: DateTime.now(),
