@@ -1703,7 +1703,7 @@ void main() {
 
         // Assert
         expect(provider.error, isNotNull);
-          expect(provider.todoLists, isEmpty);
+        expect(provider.todoLists, isEmpty);
       },
     );
 

@@ -240,7 +240,7 @@ class _SpaceSwitcherModalState extends State<SpaceSwitcherModal> {
         child: Text(
           '${_cachedCounts[spaceId]}',
           style: AppTypography.labelMedium.copyWith(
-            color: isDark ? AppColors.neutral500 : AppColors.neutral500,
+            color: AppColors.neutral500,
           ),
         ),
       );
