@@ -235,6 +235,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen>
   }
 
   /// Delete the note
+  /// Note: Navigation is handled in _showDeleteConfirmation(), not here
   Future<void> _deleteNote() async {
     try {
       final provider = Provider.of<ContentProvider>(context, listen: false);
@@ -245,11 +246,8 @@ class _NoteDetailScreenState extends State<NoteDetailScreen>
 
       await provider.deleteNote(_currentNote.id, spacesProvider);
 
-      if (mounted) {
-        Navigator.of(context).pop();
-      }
-
-      if (mounted) _showSnackBar('Note deleted');
+      // Navigation already handled in confirmation dialog
+      // Success feedback is provided by UI update (note removed from list)
     } catch (e) {
       if (mounted) _showSnackBar('Failed to delete note: $e', isError: true);
     }

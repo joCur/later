@@ -271,6 +271,7 @@ class _ListDetailScreenState extends State<ListDetailScreen>
   }
 
   /// Delete the entire List
+  /// Note: Navigation is handled in _showDeleteListConfirmation(), not here
   Future<void> _deleteList() async {
     try {
       final provider = Provider.of<ContentProvider>(context, listen: false);
@@ -281,11 +282,8 @@ class _ListDetailScreenState extends State<ListDetailScreen>
 
       await provider.deleteList(_currentList.id, spacesProvider);
 
-      if (mounted) {
-        Navigator.of(context).pop();
-      }
-
-      if (mounted) _showSnackBar('List deleted');
+      // Navigation already handled in confirmation dialog
+      // Success feedback is provided by UI update (list removed from list)
     } catch (e) {
       if (mounted) _showSnackBar('Failed to delete list: $e', isError: true);
     }

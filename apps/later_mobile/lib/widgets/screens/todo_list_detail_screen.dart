@@ -257,6 +257,7 @@ class _TodoListDetailScreenState extends State<TodoListDetailScreen> {
   }
 
   /// Delete the entire TodoList
+  /// Note: Navigation is handled in _showDeleteListConfirmation(), not here
   Future<void> _deleteTodoList() async {
     try {
       final provider = Provider.of<ContentProvider>(context, listen: false);
@@ -267,11 +268,8 @@ class _TodoListDetailScreenState extends State<TodoListDetailScreen> {
 
       await provider.deleteTodoList(_currentTodoList.id, spacesProvider);
 
-      if (mounted) {
-        Navigator.of(context).pop();
-      }
-
-      if (mounted) _showSnackBar('TodoList deleted');
+      // Navigation already handled in confirmation dialog
+      // Success feedback is provided by UI update (todo list removed from list)
     } catch (e) {
       if (mounted) _showSnackBar('Failed to delete list: $e', isError: true);
     }
