@@ -134,33 +134,40 @@ Replace the manual counter-based item count system with calculated counts derive
   - ✅ Fixed error message assertions to use `.toString()` for AppError objects
   - ✅ **Result: All 44 provider tests passing**
 
-### Phase 5: Remove Counter Updates from ContentProvider
-- [ ] Task 5.1: Remove counter updates from TodoList operations
-  - Navigate to `lib/providers/content_provider.dart`
-  - In `createTodoList()` method (line ~161), remove call to `spacesProvider.incrementSpaceItemCount()`
-  - In `deleteTodoList()` method (line ~187), remove call to `spacesProvider.decrementSpaceItemCount()`
-  - Remove `spacesProvider` parameter from both methods if no longer needed
-  - Update all call sites to remove `spacesProvider` argument
+### Phase 5: Remove Counter Updates from ContentProvider ✅ COMPLETED
+- [x] Task 5.1: Remove counter updates from TodoList operations
+  - ✅ Navigated to `lib/providers/content_provider.dart`
+  - ✅ In `createTodoList()` method, removed call to `spacesProvider.incrementSpaceItemCount()`
+  - ✅ In `deleteTodoList()` method, removed call to `spacesProvider.decrementSpaceItemCount()`
+  - ✅ Removed `spacesProvider` parameter from both methods
+  - ✅ Updated all call sites to remove `spacesProvider` argument
 
-- [ ] Task 5.2: Remove counter updates from List operations
-  - Navigate to `lib/providers/content_provider.dart`
-  - In `createList()` method (line ~494), remove call to `spacesProvider.incrementSpaceItemCount()`
-  - In `deleteList()` method (line ~516), remove call to `spacesProvider.decrementSpaceItemCount()`
-  - Remove `spacesProvider` parameter from both methods if no longer needed
-  - Update all call sites to remove `spacesProvider` argument
+- [x] Task 5.2: Remove counter updates from List operations
+  - ✅ Navigated to `lib/providers/content_provider.dart`
+  - ✅ In `createList()` method, removed call to `spacesProvider.incrementSpaceItemCount()`
+  - ✅ In `deleteList()` method, removed call to `spacesProvider.decrementSpaceItemCount()`
+  - ✅ Removed `spacesProvider` parameter from both methods
+  - ✅ Updated all call sites to remove `spacesProvider` argument
 
-- [ ] Task 5.3: Remove counter updates from Note operations
-  - Navigate to `lib/providers/content_provider.dart`
-  - In `createNote()` method (line ~820), remove call to `spacesProvider.incrementSpaceItemCount()`
-  - In `deleteNote()` method (line ~897), remove call to `spacesProvider.decrementSpaceItemCount()`
-  - Remove `spacesProvider` parameter from both methods if no longer needed
-  - Update all call sites to remove `spacesProvider` argument
+- [x] Task 5.3: Remove counter updates from Note operations
+  - ✅ Navigated to `lib/providers/content_provider.dart`
+  - ✅ In `createNote()` method, removed call to `spacesProvider.incrementSpaceItemCount()`
+  - ✅ In `deleteNote()` method, removed call to `spacesProvider.decrementSpaceItemCount()`
+  - ✅ Removed `spacesProvider` parameter from both methods
+  - ✅ Updated all call sites to remove `spacesProvider` argument
+  - ✅ Updated call sites in:
+    - `lib/widgets/screens/todo_list_detail_screen.dart`
+    - `lib/widgets/screens/note_detail_screen.dart`
+    - `lib/widgets/screens/list_detail_screen.dart`
+    - `lib/widgets/modals/create_content_modal.dart`
 
-- [ ] Task 5.4: Update ContentProvider tests
-  - Navigate to `test/providers/content_provider_test.dart`
-  - Remove all mock expectations for `incrementSpaceItemCount` and `decrementSpaceItemCount`
-  - Update test assertions to no longer verify counter updates
-  - Ensure tests still verify item creation/deletion works correctly
+- [x] Task 5.4: Update ContentProvider tests
+  - ✅ Navigated to `test/providers/content_provider_test.dart`
+  - ✅ Removed increment/decrement counter tracking methods from MockSpacesProvider
+  - ✅ Removed all mock expectations for `incrementSpaceItemCount` and `decrementSpaceItemCount`
+  - ✅ Updated test assertions to no longer verify counter updates
+  - ✅ Updated all test method calls to remove `spacesProvider` parameter
+  - ✅ Tests pass (69 passing, 3 pre-existing failures unrelated to this change)
 
 ### Phase 6: Update UI to Handle Async Counts
 - [ ] Task 6.1: Update SpaceSwitcherModal to use async count loading

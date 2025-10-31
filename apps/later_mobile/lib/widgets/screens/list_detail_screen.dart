@@ -5,7 +5,6 @@ import 'package:uuid/uuid.dart';
 import 'package:later_mobile/design_system/tokens/tokens.dart';
 import '../../data/models/list_model.dart';
 import '../../providers/content_provider.dart';
-import '../../providers/spaces_provider.dart';
 import 'package:later_mobile/design_system/organisms/cards/list_item_card.dart';
 import 'package:later_mobile/design_system/organisms/fab/responsive_fab.dart';
 import 'package:later_mobile/design_system/organisms/modals/bottom_sheet_container.dart';
@@ -275,12 +274,8 @@ class _ListDetailScreenState extends State<ListDetailScreen>
   Future<void> _deleteList() async {
     try {
       final provider = Provider.of<ContentProvider>(context, listen: false);
-      final spacesProvider = Provider.of<SpacesProvider>(
-        context,
-        listen: false,
-      );
 
-      await provider.deleteList(_currentList.id, spacesProvider);
+      await provider.deleteList(_currentList.id);
 
       // Navigation already handled in confirmation dialog
       // Success feedback is provided by UI update (list removed from list)

@@ -257,7 +257,7 @@ class _CreateContentModalState extends State<CreateContentModal>
               name: text,
               items: [],
             );
-            await contentProvider.createTodoList(todoList, spacesProvider);
+            await contentProvider.createTodoList(todoList);
             _currentItemId = id;
             break;
 
@@ -268,13 +268,13 @@ class _CreateContentModalState extends State<CreateContentModal>
               name: text,
               items: [],
             );
-            await contentProvider.createList(listModel, spacesProvider);
+            await contentProvider.createList(listModel);
             _currentItemId = id;
             break;
 
           case ContentType.note:
             final note = Item(id: id, title: text, spaceId: targetSpaceId);
-            await contentProvider.createNote(note, spacesProvider);
+            await contentProvider.createNote(note);
             _currentItemId = id;
             break;
         }

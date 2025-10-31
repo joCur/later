@@ -460,43 +460,10 @@ class MockSpacesProvider extends SpacesProvider {
   bool shouldThrowError = false;
   String? errorMessage;
 
-  // Track method calls for verification
-  int incrementSpaceItemCountCallCount = 0;
-  int decrementSpaceItemCountCallCount = 0;
-  Map<String, int> spaceItemCounts = {};
-
   void reset() {
     shouldThrowError = false;
     errorMessage = null;
-    incrementSpaceItemCountCallCount = 0;
-    decrementSpaceItemCountCallCount = 0;
-    spaceItemCounts.clear();
     mockRepo.reset();
-  }
-
-  @override
-  Future<void> incrementSpaceItemCount(String spaceId) async {
-    incrementSpaceItemCountCallCount++;
-    mockRepo.incrementItemCountCallCount++;
-    if (shouldThrowError) {
-      throw Exception(errorMessage ?? 'Failed to increment space item count');
-    }
-    spaceItemCounts[spaceId] = (spaceItemCounts[spaceId] ?? 0) + 1;
-    mockRepo.spaceItemCounts[spaceId] = spaceItemCounts[spaceId]!;
-  }
-
-  @override
-  Future<void> decrementSpaceItemCount(String spaceId) async {
-    decrementSpaceItemCountCallCount++;
-    mockRepo.decrementItemCountCallCount++;
-    if (shouldThrowError) {
-      throw Exception(errorMessage ?? 'Failed to decrement space item count');
-    }
-    spaceItemCounts[spaceId] = ((spaceItemCounts[spaceId] ?? 1) - 1).clamp(
-      0,
-      999,
-    );
-    mockRepo.spaceItemCounts[spaceId] = spaceItemCounts[spaceId]!;
   }
 }
 
@@ -783,14 +750,12 @@ void main() {
       );
 
       // Act
-      await provider.createTodoList(todoList, mockSpacesProvider);
+      await provider.createTodoList(todoList);
 
       // Assert
       expect(provider.todoLists.length, 1);
       expect(provider.todoLists.first.id, 'todo-1');
       expect(mockTodoListRepo.createCallCount, 1);
-      expect(mockSpacesProvider.incrementSpaceItemCountCallCount, 1);
-      expect(mockSpacesProvider.spaceItemCounts['space-1'], 1);
     });
 
     test('should handle create todo list error', () async {
@@ -799,12 +764,11 @@ void main() {
       final todoList = TodoList(id: 'todo-1', spaceId: 'space-1', name: 'Test');
 
       // Act
-      await provider.createTodoList(todoList, mockSpacesProvider);
+      await provider.createTodoList(todoList);
 
       // Assert
       expect(provider.error, isNotNull);
       expect(provider.todoLists, isEmpty);
-      expect(mockSpacesProvider.incrementSpaceItemCountCallCount, 0);
     });
 
     test('should update existing todo list', () async {
@@ -814,7 +778,7 @@ void main() {
         spaceId: 'space-1',
         name: 'Original',
       );
-      await provider.createTodoList(original, mockSpacesProvider);
+      await provider.createTodoList(original);
 
       final updated = original.copyWith(name: 'Updated');
 
@@ -845,21 +809,20 @@ void main() {
     test('should delete todo list and decrement space count', () async {
       // Arrange
       final todoList = TodoList(id: 'todo-1', spaceId: 'space-1', name: 'Test');
-      await provider.createTodoList(todoList, mockSpacesProvider);
+      await provider.createTodoList(todoList);
       expect(provider.todoLists.length, 1);
 
       // Act
-      await provider.deleteTodoList('todo-1', mockSpacesProvider);
+      await provider.deleteTodoList('todo-1');
 
       // Assert
       expect(provider.todoLists, isEmpty);
       expect(mockTodoListRepo.deleteCallCount, 1);
-      expect(mockSpacesProvider.decrementSpaceItemCountCallCount, 1);
     });
 
     test('should handle delete non-existent todo list', () async {
       // Act
-      await provider.deleteTodoList('non-existent', mockSpacesProvider);
+      await provider.deleteTodoList('non-existent');
 
       // Assert
       expect(provider.error, isNotNull);
@@ -871,7 +834,7 @@ void main() {
       notifyListenersCallCount = 0;
 
       // Act & Assert - create
-      await provider.createTodoList(todoList, mockSpacesProvider);
+      await provider.createTodoList(todoList);
       expect(notifyListenersCallCount, greaterThan(0));
 
       // Act & Assert - update
@@ -881,7 +844,7 @@ void main() {
 
       // Act & Assert - delete
       notifyListenersCallCount = 0;
-      await provider.deleteTodoList('todo-1', mockSpacesProvider);
+      await provider.deleteTodoList('todo-1');
       expect(notifyListenersCallCount, greaterThan(0));
     });
   });
@@ -890,7 +853,7 @@ void main() {
     test('should add todo item to list', () async {
       // Arrange
       final todoList = TodoList(id: 'todo-1', spaceId: 'space-1', name: 'Test');
-      await provider.createTodoList(todoList, mockSpacesProvider);
+      await provider.createTodoList(todoList);
 
       final item = TodoItem(id: 'item-1', title: 'Task 1', sortOrder: 0);
 
@@ -911,7 +874,7 @@ void main() {
         name: 'Test',
         items: [item],
       );
-      await provider.createTodoList(todoList, mockSpacesProvider);
+      await provider.createTodoList(todoList);
 
       final updatedItem = item.copyWith(title: 'Updated');
 
@@ -931,7 +894,7 @@ void main() {
         name: 'Test',
         items: [item],
       );
-      await provider.createTodoList(todoList, mockSpacesProvider);
+      await provider.createTodoList(todoList);
 
       // Act
       await provider.deleteTodoItem('todo-1', 'item-1');
@@ -949,7 +912,7 @@ void main() {
         name: 'Test',
         items: [item],
       );
-      await provider.createTodoList(todoList, mockSpacesProvider);
+      await provider.createTodoList(todoList);
 
       // Act
       await provider.toggleTodoItem('todo-1', 'item-1');
@@ -977,7 +940,7 @@ void main() {
         name: 'Test',
         items: items,
       );
-      await provider.createTodoList(todoList, mockSpacesProvider);
+      await provider.createTodoList(todoList);
 
       // Act - move item from index 0 to index 2
       await provider.reorderTodoItems('todo-1', 0, 2);
@@ -991,7 +954,7 @@ void main() {
     test('should handle todo item operation errors', () async {
       // Arrange
       final todoList = TodoList(id: 'todo-1', spaceId: 'space-1', name: 'Test');
-      await provider.createTodoList(todoList, mockSpacesProvider);
+      await provider.createTodoList(todoList);
 
       mockTodoListRepo.shouldThrowError = true;
       final item = TodoItem(id: 'item-1', title: 'Task 1', sortOrder: 0);
@@ -1030,7 +993,7 @@ void main() {
         name: 'Test',
         items: [item],
       );
-      await provider.createTodoList(todoList, mockSpacesProvider);
+      await provider.createTodoList(todoList);
 
       // Test each operation
       notifyListenersCallCount = 0;
@@ -1065,13 +1028,12 @@ void main() {
       );
 
       // Act
-      await provider.createList(list, mockSpacesProvider);
+      await provider.createList(list);
 
       // Assert
       expect(provider.lists.length, 1);
       expect(provider.lists.first.id, 'list-1');
       expect(mockListRepo.createCallCount, 1);
-      expect(mockSpacesProvider.incrementSpaceItemCountCallCount, 1);
     });
 
     test('should handle create list error', () async {
@@ -1080,7 +1042,7 @@ void main() {
       final list = ListModel(id: 'list-1', spaceId: 'space-1', name: 'Test');
 
       // Act
-      await provider.createList(list, mockSpacesProvider);
+      await provider.createList(list);
 
       // Assert
       expect(provider.error, isNotNull);
@@ -1094,7 +1056,7 @@ void main() {
         spaceId: 'space-1',
         name: 'Original',
       );
-      await provider.createList(original, mockSpacesProvider);
+      await provider.createList(original);
 
       final updated = original.copyWith(name: 'Updated');
 
@@ -1125,20 +1087,19 @@ void main() {
     test('should delete list and decrement space count', () async {
       // Arrange
       final list = ListModel(id: 'list-1', spaceId: 'space-1', name: 'Test');
-      await provider.createList(list, mockSpacesProvider);
+      await provider.createList(list);
 
       // Act
-      await provider.deleteList('list-1', mockSpacesProvider);
+      await provider.deleteList('list-1');
 
       // Assert
       expect(provider.lists, isEmpty);
       expect(mockListRepo.deleteCallCount, 1);
-      expect(mockSpacesProvider.decrementSpaceItemCountCallCount, 1);
     });
 
     test('should handle delete non-existent list', () async {
       // Act
-      await provider.deleteList('non-existent', mockSpacesProvider);
+      await provider.deleteList('non-existent');
 
       // Assert
       expect(provider.error, isNotNull);
@@ -1150,7 +1111,7 @@ void main() {
 
       // Create
       notifyListenersCallCount = 0;
-      await provider.createList(list, mockSpacesProvider);
+      await provider.createList(list);
       expect(notifyListenersCallCount, greaterThan(0));
 
       // Update
@@ -1160,7 +1121,7 @@ void main() {
 
       // Delete
       notifyListenersCallCount = 0;
-      await provider.deleteList('list-1', mockSpacesProvider);
+      await provider.deleteList('list-1');
       expect(notifyListenersCallCount, greaterThan(0));
     });
   });
@@ -1169,7 +1130,7 @@ void main() {
     test('should add list item', () async {
       // Arrange
       final list = ListModel(id: 'list-1', spaceId: 'space-1', name: 'Test');
-      await provider.createList(list, mockSpacesProvider);
+      await provider.createList(list);
 
       final item = ListItem(id: 'item-1', title: 'Item 1', sortOrder: 0);
 
@@ -1190,7 +1151,7 @@ void main() {
         name: 'Test',
         items: [item],
       );
-      await provider.createList(list, mockSpacesProvider);
+      await provider.createList(list);
 
       final updatedItem = item.copyWith(title: 'Updated');
 
@@ -1210,7 +1171,7 @@ void main() {
         name: 'Test',
         items: [item],
       );
-      await provider.createList(list, mockSpacesProvider);
+      await provider.createList(list);
 
       // Act
       await provider.deleteListItem('list-1', 'item-1');
@@ -1229,7 +1190,7 @@ void main() {
         style: ListStyle.checkboxes,
         items: [item],
       );
-      await provider.createList(list, mockSpacesProvider);
+      await provider.createList(list);
 
       // Act
       await provider.toggleListItem('list-1', 'item-1');
@@ -1257,7 +1218,7 @@ void main() {
         name: 'Test',
         items: items,
       );
-      await provider.createList(list, mockSpacesProvider);
+      await provider.createList(list);
 
       // Act - move item from index 0 to index 2
       await provider.reorderListItems('list-1', 0, 2);
@@ -1271,7 +1232,7 @@ void main() {
     test('should handle list item operation errors', () async {
       // Arrange
       final list = ListModel(id: 'list-1', spaceId: 'space-1', name: 'Test');
-      await provider.createList(list, mockSpacesProvider);
+      await provider.createList(list);
 
       mockListRepo.shouldThrowError = true;
       final item = ListItem(id: 'item-1', title: 'Item 1', sortOrder: 0);
@@ -1306,7 +1267,7 @@ void main() {
         name: 'Test',
         items: [item],
       );
-      await provider.createList(list, mockSpacesProvider);
+      await provider.createList(list);
 
       // Test each operation
       notifyListenersCallCount = 0;
@@ -1341,13 +1302,12 @@ void main() {
       );
 
       // Act
-      await provider.createNote(note, mockSpacesProvider);
+      await provider.createNote(note);
 
       // Assert
       expect(provider.notes.length, 1);
       expect(provider.notes.first.id, 'note-1');
       expect(mockNoteRepo.createCallCount, 1);
-      expect(mockSpacesProvider.incrementSpaceItemCountCallCount, 1);
     });
 
     test('should handle create note error', () async {
@@ -1356,7 +1316,7 @@ void main() {
       final note = Item(id: 'note-1', title: 'Test', spaceId: 'space-1');
 
       // Act
-      await provider.createNote(note, mockSpacesProvider);
+      await provider.createNote(note);
 
       // Assert
       expect(provider.error, isNotNull);
@@ -1370,7 +1330,7 @@ void main() {
         title: 'Original',
         spaceId: 'space-1',
       );
-      await provider.createNote(original, mockSpacesProvider);
+      await provider.createNote(original);
 
       final updated = original.copyWith(title: 'Updated');
 
@@ -1397,20 +1357,19 @@ void main() {
     test('should delete note and decrement space count', () async {
       // Arrange
       final note = Item(id: 'note-1', title: 'Test', spaceId: 'space-1');
-      await provider.createNote(note, mockSpacesProvider);
+      await provider.createNote(note);
 
       // Act
-      await provider.deleteNote('note-1', mockSpacesProvider);
+      await provider.deleteNote('note-1');
 
       // Assert
       expect(provider.notes, isEmpty);
       expect(mockNoteRepo.deleteCallCount, 1);
-      expect(mockSpacesProvider.decrementSpaceItemCountCallCount, 1);
     });
 
     test('should handle delete non-existent note', () async {
       // Act
-      await provider.deleteNote('non-existent', mockSpacesProvider);
+      await provider.deleteNote('non-existent');
 
       // Assert
       expect(provider.error, isNotNull);
@@ -1422,7 +1381,7 @@ void main() {
 
       // Create
       notifyListenersCallCount = 0;
-      await provider.createNote(note, mockSpacesProvider);
+      await provider.createNote(note);
       expect(notifyListenersCallCount, greaterThan(0));
 
       // Update
@@ -1432,7 +1391,7 @@ void main() {
 
       // Delete
       notifyListenersCallCount = 0;
-      await provider.deleteNote('note-1', mockSpacesProvider);
+      await provider.deleteNote('note-1');
       expect(notifyListenersCallCount, greaterThan(0));
     });
   });
@@ -1736,7 +1695,7 @@ void main() {
         // Act - try another operation that succeeds
         mockTodoListRepo.shouldThrowError = false;
         final note = Item(id: 'note-1', title: 'Test', spaceId: 'space-1');
-        await provider.createNote(note, mockSpacesProvider);
+        await provider.createNote(note);
 
         // Assert - error should be cleared by successful operation
         expect(provider.error, isNull);
@@ -1768,12 +1727,11 @@ void main() {
         );
 
         // Act
-        await provider.createTodoList(todoList, mockSpacesProvider);
+        await provider.createTodoList(todoList);
 
         // Assert
         expect(provider.error, isNotNull);
-        expect(mockSpacesProvider.incrementSpaceItemCountCallCount, 0);
-        expect(provider.todoLists, isEmpty);
+          expect(provider.todoLists, isEmpty);
       },
     );
 
@@ -1786,16 +1744,14 @@ void main() {
           spaceId: 'space-1',
           name: 'Test',
         );
-        await provider.createTodoList(todoList, mockSpacesProvider);
+        await provider.createTodoList(todoList);
 
         // Act - cause error on delete
         mockTodoListRepo.shouldThrowError = true;
-        await provider.deleteTodoList('todo-1', mockSpacesProvider);
+        await provider.deleteTodoList('todo-1');
 
         // Assert
         expect(provider.error, isNotNull);
-        // Count should have been incremented on create but not decremented on failed delete
-        expect(mockSpacesProvider.decrementSpaceItemCountCallCount, 0);
       },
     );
 

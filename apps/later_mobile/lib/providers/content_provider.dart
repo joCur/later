@@ -6,7 +6,6 @@ import '../data/models/todo_list_model.dart';
 import '../data/repositories/list_repository.dart';
 import '../data/repositories/note_repository.dart';
 import '../data/repositories/todo_list_repository.dart';
-import 'spaces_provider.dart';
 
 /// Enum to filter content by type
 enum ContentFilter { all, todoLists, lists, notes }
@@ -19,7 +18,6 @@ enum ContentFilter { all, todoLists, lists, notes }
 /// - Notes: Standalone documentation items
 ///
 /// It manages loading states, error states, and notifies listeners of state changes.
-/// All content operations automatically update space item counts via SpacesProvider.
 ///
 /// Example usage:
 /// ```dart
@@ -142,11 +140,10 @@ class ContentProvider extends ChangeNotifier {
     }
   }
 
-  /// Creates a new todo list and increments the space item count.
+  /// Creates a new todo list.
   ///
   /// Parameters:
   ///   - [todoList]: The todo list to create
-  ///   - [spacesProvider]: The spaces provider to update item count
   ///
   /// Example:
   /// ```dart
@@ -156,12 +153,9 @@ class ContentProvider extends ChangeNotifier {
   ///   name: 'Weekly Tasks',
   ///   items: [],
   /// );
-  /// await provider.createTodoList(todoList, spacesProvider);
+  /// await provider.createTodoList(todoList);
   /// ```
-  Future<void> createTodoList(
-    TodoList todoList,
-    SpacesProvider spacesProvider,
-  ) async {
+  Future<void> createTodoList(TodoList todoList) async {
     _error = null;
 
     try {
@@ -170,9 +164,6 @@ class ContentProvider extends ChangeNotifier {
         'createTodoList',
       );
       _todoLists = [..._todoLists, created];
-
-      // Increment space item count
-      await spacesProvider.incrementSpaceItemCount(todoList.spaceId);
 
       _error = null;
       notifyListeners();
@@ -225,31 +216,24 @@ class ContentProvider extends ChangeNotifier {
     }
   }
 
-  /// Deletes a todo list and decrements the space item count.
+  /// Deletes a todo list.
   ///
   /// Parameters:
   ///   - [id]: The ID of the todo list to delete
-  ///   - [spacesProvider]: The spaces provider to update item count
   ///
   /// Example:
   /// ```dart
-  /// await provider.deleteTodoList('todo-1', spacesProvider);
+  /// await provider.deleteTodoList('todo-1');
   /// ```
-  Future<void> deleteTodoList(String id, SpacesProvider spacesProvider) async {
+  Future<void> deleteTodoList(String id) async {
     _error = null;
 
     try {
-      // Get the todo list to find its spaceId before deleting
-      final todoList = _todoLists.firstWhere((t) => t.id == id);
-
       await _executeWithRetry(
         () => _todoListRepository.delete(id),
         'deleteTodoList',
       );
       _todoLists = _todoLists.where((t) => t.id != id).toList();
-
-      // Decrement space item count
-      await spacesProvider.decrementSpaceItemCount(todoList.spaceId);
 
       _error = null;
       notifyListeners();
@@ -474,11 +458,10 @@ class ContentProvider extends ChangeNotifier {
     }
   }
 
-  /// Creates a new list and increments the space item count.
+  /// Creates a new list.
   ///
   /// Parameters:
   ///   - [list]: The list to create
-  ///   - [spacesProvider]: The spaces provider to update item count
   ///
   /// Example:
   /// ```dart
@@ -489,9 +472,9 @@ class ContentProvider extends ChangeNotifier {
   ///   style: ListStyle.checkboxes,
   ///   items: [],
   /// );
-  /// await provider.createList(list, spacesProvider);
+  /// await provider.createList(list);
   /// ```
-  Future<void> createList(ListModel list, SpacesProvider spacesProvider) async {
+  Future<void> createList(ListModel list) async {
     _error = null;
 
     try {
@@ -500,9 +483,6 @@ class ContentProvider extends ChangeNotifier {
         'createList',
       );
       _lists = [..._lists, created];
-
-      // Increment space item count
-      await spacesProvider.incrementSpaceItemCount(list.spaceId);
 
       _error = null;
       notifyListeners();
@@ -555,28 +535,21 @@ class ContentProvider extends ChangeNotifier {
     }
   }
 
-  /// Deletes a list and decrements the space item count.
+  /// Deletes a list.
   ///
   /// Parameters:
   ///   - [id]: The ID of the list to delete
-  ///   - [spacesProvider]: The spaces provider to update item count
   ///
   /// Example:
   /// ```dart
-  /// await provider.deleteList('list-1', spacesProvider);
+  /// await provider.deleteList('list-1');
   /// ```
-  Future<void> deleteList(String id, SpacesProvider spacesProvider) async {
+  Future<void> deleteList(String id) async {
     _error = null;
 
     try {
-      // Get the list to find its spaceId before deleting
-      final list = _lists.firstWhere((l) => l.id == id);
-
       await _executeWithRetry(() => _listRepository.delete(id), 'deleteList');
       _lists = _lists.where((l) => l.id != id).toList();
-
-      // Decrement space item count
-      await spacesProvider.decrementSpaceItemCount(list.spaceId);
 
       _error = null;
       notifyListeners();
@@ -801,11 +774,10 @@ class ContentProvider extends ChangeNotifier {
     }
   }
 
-  /// Creates a new note and increments the space item count.
+  /// Creates a new note.
   ///
   /// Parameters:
   ///   - [note]: The note to create
-  ///   - [spacesProvider]: The spaces provider to update item count
   ///
   /// Example:
   /// ```dart
@@ -815,9 +787,9 @@ class ContentProvider extends ChangeNotifier {
   ///   content: 'Discussion points...',
   ///   spaceId: 'space-1',
   /// );
-  /// await provider.createNote(note, spacesProvider);
+  /// await provider.createNote(note);
   /// ```
-  Future<void> createNote(Item note, SpacesProvider spacesProvider) async {
+  Future<void> createNote(Item note) async {
     _error = null;
 
     try {
@@ -826,9 +798,6 @@ class ContentProvider extends ChangeNotifier {
         'createNote',
       );
       _notes = [..._notes, created];
-
-      // Increment space item count
-      await spacesProvider.incrementSpaceItemCount(note.spaceId);
 
       _error = null;
       notifyListeners();
@@ -884,28 +853,21 @@ class ContentProvider extends ChangeNotifier {
     }
   }
 
-  /// Deletes a note and decrements the space item count.
+  /// Deletes a note.
   ///
   /// Parameters:
   ///   - [id]: The ID of the note to delete
-  ///   - [spacesProvider]: The spaces provider to update item count
   ///
   /// Example:
   /// ```dart
-  /// await provider.deleteNote('note-1', spacesProvider);
+  /// await provider.deleteNote('note-1');
   /// ```
-  Future<void> deleteNote(String id, SpacesProvider spacesProvider) async {
+  Future<void> deleteNote(String id) async {
     _error = null;
 
     try {
-      // Get the note to find its spaceId before deleting
-      final note = _notes.firstWhere((n) => n.id == id);
-
       await _executeWithRetry(() => _noteRepository.delete(id), 'deleteNote');
       _notes = _notes.where((n) => n.id != id).toList();
-
-      // Decrement space item count
-      await spacesProvider.decrementSpaceItemCount(note.spaceId);
 
       _error = null;
       notifyListeners();
