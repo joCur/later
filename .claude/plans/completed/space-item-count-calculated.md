@@ -235,27 +235,38 @@ Replace the manual counter-based item count system with calculated counts derive
   - ✅ All item count access now goes through `getItemCount()` method
   - ✅ Only unrelated reference: `SkeletonListView.itemCount` parameter in skeleton_loader.dart
 
-### Phase 8: Migration and Cleanup
-- [ ] Task 8.1: Add migration logic for existing data
-  - Navigate to `lib/core/services/hive_database.dart`
-  - In `initialize()` method, after boxes are opened
-  - Check for migration flag in shared preferences: `prefs.getBool('migrated_to_calculated_counts_v2')`
-  - If not migrated:
-    - Log: "Running migration: removing stored item counts"
-    - Iterate through all spaces
-    - For each space, reload from Hive (this will drop the itemCount field automatically)
-    - Set migration flag: `prefs.setBool('migrated_to_calculated_counts_v2', true)`
-  - Note: Hive will automatically drop unknown fields, so explicit migration may not be needed
+### Phase 8: Migration and Cleanup ✅ COMPLETED
+- [x] Task 8.1: Add migration logic for existing data
+  - ✅ Updated `PreferencesService` to add migration flag support
+  - ✅ Added `_migratedToCalculatedCountsKey` constant
+  - ✅ Added `hasMigratedToCalculatedCounts()` getter method
+  - ✅ Added `setMigratedToCalculatedCounts()` setter method
+  - ✅ Updated `getAllPreferences()` to include migration status
+  - ✅ Updated `HiveDatabase.initialize()` to call `_runMigrations()` after boxes are opened
+  - ✅ Created `_runMigrations()` static method that:
+    - Checks migration flag via PreferencesService
+    - If not migrated: reads all spaces to trigger Hive field cleanup
+    - Hive automatically drops unknown `itemCount` field during deserialization
+    - Sets migration flag to prevent re-running
+    - Handles errors gracefully (non-critical migration)
+  - ✅ Added comprehensive logging for migration process
 
-- [ ] Task 8.2: Clean up imports and unused code
-  - Search for unused imports related to counter logic
-  - Remove any helper methods or utilities that were only used for counter maintenance
-  - Update documentation and comments referencing the old counter system
+- [x] Task 8.2: Clean up imports and unused code
+  - ✅ Removed leftover increment/decrement methods from `test/providers/content_provider_test.dart` MockSpaceRepository
+  - ✅ Removed tracking variables (`incrementItemCountCallCount`, `decrementItemCountCallCount`, `spaceItemCounts`) from mock
+  - ✅ Ran `flutter analyze` - reduced warnings from 4 to 2 (pre-existing unrelated warnings remain)
+  - ✅ Verified no references to old counter methods remain in codebase
+  - ✅ All counter-related code successfully removed
 
-- [ ] Task 8.3: Update documentation
-  - Update `CLAUDE.md` to remove references to increment/decrement counter pattern
-  - Add note about calculated counts being the source of truth
-  - Update architecture documentation if it references counter logic
+- [x] Task 8.3: Update documentation
+  - ✅ Updated `CLAUDE.md` Space model section to note that item counts are calculated dynamically
+  - ✅ Added new "Item Count Calculation" section to `CLAUDE.md` with:
+    - Explanation of calculated counts architecture
+    - How to get item counts (Repository, Provider, UI patterns)
+    - Performance characteristics
+    - Migration notes about removed `itemCount` field
+  - ✅ Referenced `SpaceSwitcherModal` and `AppSidebar` as implementation examples
+  - ✅ No references to old increment/decrement pattern found in documentation
 
 ## Dependencies and Prerequisites
 

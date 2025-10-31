@@ -418,37 +418,9 @@ class MockSpaceRepository extends SpaceRepository {
   bool shouldThrowError = false;
   String? errorMessage;
 
-  int incrementItemCountCallCount = 0;
-  int decrementItemCountCallCount = 0;
-  Map<String, int> spaceItemCounts = {};
-
   void reset() {
     shouldThrowError = false;
     errorMessage = null;
-    incrementItemCountCallCount = 0;
-    decrementItemCountCallCount = 0;
-    spaceItemCounts.clear();
-  }
-
-  @override
-  Future<void> incrementItemCount(String spaceId) async {
-    incrementItemCountCallCount++;
-    if (shouldThrowError) {
-      throw Exception(errorMessage ?? 'Failed to increment space item count');
-    }
-    spaceItemCounts[spaceId] = (spaceItemCounts[spaceId] ?? 0) + 1;
-  }
-
-  @override
-  Future<void> decrementItemCount(String spaceId) async {
-    decrementItemCountCallCount++;
-    if (shouldThrowError) {
-      throw Exception(errorMessage ?? 'Failed to decrement space item count');
-    }
-    spaceItemCounts[spaceId] = ((spaceItemCounts[spaceId] ?? 1) - 1).clamp(
-      0,
-      999,
-    );
   }
 }
 
