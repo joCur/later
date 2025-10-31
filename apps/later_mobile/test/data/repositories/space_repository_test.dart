@@ -523,7 +523,6 @@ void main() {
             name: 'List 1',
             spaceId: 'space-1',
             items: [],
-            style: ListStyle.bullets,
           ),
         );
         await listsBox.put(
@@ -533,7 +532,6 @@ void main() {
             name: 'List 2',
             spaceId: 'space-1',
             items: [],
-            style: ListStyle.bullets,
           ),
         );
 
@@ -588,7 +586,6 @@ void main() {
             name: 'List 1',
             spaceId: 'space-1',
             items: [],
-            style: ListStyle.bullets,
           ),
         );
         await listsBox.put(
@@ -598,7 +595,6 @@ void main() {
             name: 'List 2',
             spaceId: 'space-1',
             items: [],
-            style: ListStyle.bullets,
           ),
         );
         await listsBox.put(
@@ -608,7 +604,6 @@ void main() {
             name: 'List 3',
             spaceId: 'space-1',
             items: [],
-            style: ListStyle.bullets,
           ),
         );
 
@@ -663,7 +658,6 @@ void main() {
             name: 'List in Space 2',
             spaceId: 'space-2',
             items: [],
-            style: ListStyle.bullets,
           ),
         );
 

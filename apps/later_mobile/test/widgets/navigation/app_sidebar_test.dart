@@ -2,6 +2,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:later_mobile/core/theme/temporal_flow_theme.dart';
 import 'package:later_mobile/data/models/space_model.dart';
 import 'package:later_mobile/data/repositories/space_repository.dart';
 import 'package:later_mobile/providers/spaces_provider.dart';
@@ -67,31 +68,15 @@ class MockSpaceRepository extends SpaceRepository {
     mockSpaces.removeWhere((space) => space.id == id);
   }
 
-  @override
-  Future<void> incrementItemCount(String spaceId) async {
-    if (shouldThrowError) {
-      throw Exception(errorMessage ?? 'Failed to increment item count');
-    }
-    final index = mockSpaces.indexWhere((s) => s.id == spaceId);
-    if (index != -1) {
-      mockSpaces[index] = mockSpaces[index].copyWith(
-        itemCount: mockSpaces[index].itemCount + 1,
-      );
-    }
-  }
+  // Test-only map to mock item counts for testing async count display
+  Map<String, int> mockItemCounts = {};
 
   @override
-  Future<void> decrementItemCount(String spaceId) async {
+  Future<int> getItemCount(String spaceId) async {
     if (shouldThrowError) {
-      throw Exception(errorMessage ?? 'Failed to decrement item count');
+      throw Exception(errorMessage ?? 'Failed to get item count');
     }
-    final index = mockSpaces.indexWhere((s) => s.id == spaceId);
-    if (index != -1) {
-      final currentCount = mockSpaces[index].itemCount;
-      mockSpaces[index] = mockSpaces[index].copyWith(
-        itemCount: currentCount > 0 ? currentCount - 1 : 0,
-      );
-    }
+    return mockItemCounts[spaceId] ?? 0;
   }
 }
 
@@ -110,6 +95,12 @@ void main() {
       VoidCallback? onToggleExpanded,
     }) {
       return MaterialApp(
+        theme: ThemeData.light().copyWith(
+          extensions: [TemporalFlowTheme.light()],
+        ),
+        darkTheme: ThemeData.dark().copyWith(
+          extensions: [TemporalFlowTheme.dark()],
+        ),
         home: ChangeNotifierProvider<SpacesProvider>.value(
           value: spacesProvider,
           child: Scaffold(
@@ -150,11 +141,16 @@ void main() {
 
     testWidgets('displays space list with item counts', (tester) async {
       final spaces = [
-        Space(id: 'space-1', name: 'Work', icon: '💼', itemCount: 5),
-        Space(id: 'space-2', name: 'Personal', icon: '🏠', itemCount: 3),
+        Space(id: 'space-1', name: 'Work', icon: '💼'),
+        Space(id: 'space-2', name: 'Personal', icon: '🏠'),
       ];
 
       mockRepository.mockSpaces = spaces;
+      // Set up mock item counts for async loading
+      mockRepository.mockItemCounts = {
+        'space-1': 5,
+        'space-2': 3,
+      };
 
       await spacesProvider.loadSpaces();
 
@@ -169,15 +165,15 @@ void main() {
       expect(find.text('💼'), findsOneWidget);
       expect(find.text('🏠'), findsOneWidget);
 
-      // Verify item counts are displayed
+      // Verify item counts are displayed after async loading
       expect(find.text('5'), findsOneWidget);
       expect(find.text('3'), findsOneWidget);
     });
 
     testWidgets('highlights selected space', (tester) async {
       final spaces = [
-        Space(id: 'space-1', name: 'Work', itemCount: 5),
-        Space(id: 'space-2', name: 'Personal', itemCount: 3),
+        Space(id: 'space-1', name: 'Work'),
+        Space(id: 'space-2', name: 'Personal'),
       ];
 
       mockRepository.mockSpaces = spaces;
@@ -193,8 +189,8 @@ void main() {
 
     testWidgets('switches space on tap', (tester) async {
       final spaces = [
-        Space(id: 'space-1', name: 'Work', itemCount: 5),
-        Space(id: 'space-2', name: 'Personal', itemCount: 3),
+        Space(id: 'space-1', name: 'Work'),
+        Space(id: 'space-2', name: 'Personal'),
       ];
 
       mockRepository.mockSpaces = spaces;
@@ -292,8 +288,8 @@ void main() {
 
     testWidgets('keyboard shortcut 1 switches to first space', (tester) async {
       final spaces = [
-        Space(id: 'space-1', name: 'Work', itemCount: 5),
-        Space(id: 'space-2', name: 'Personal', itemCount: 3),
+        Space(id: 'space-1', name: 'Work'),
+        Space(id: 'space-2', name: 'Personal'),
       ];
 
       mockRepository.mockSpaces = spaces;
@@ -314,8 +310,8 @@ void main() {
 
     testWidgets('keyboard shortcut 2 switches to second space', (tester) async {
       final spaces = [
-        Space(id: 'space-1', name: 'Work', itemCount: 5),
-        Space(id: 'space-2', name: 'Personal', itemCount: 3),
+        Space(id: 'space-1', name: 'Work'),
+        Space(id: 'space-2', name: 'Personal'),
       ];
 
       mockRepository.mockSpaces = spaces;
@@ -333,10 +329,9 @@ void main() {
     });
 
     testWidgets('keyboard shortcuts work for spaces 1-9', (tester) async {
-      final spaces = List.generate(
+      final spaces = List<Space>.generate(
         9,
-        (i) =>
-            Space(id: 'space-${i + 1}', name: 'Space ${i + 1}', itemCount: i),
+        (i) => Space(id: 'space-${i + 1}', name: 'Space ${i + 1}'),
       );
 
       mockRepository.mockSpaces = spaces;
@@ -376,10 +371,12 @@ void main() {
 
     testWidgets('has proper semantic labels for accessibility', (tester) async {
       final spaces = [
-        Space(id: 'space-1', name: 'Work', icon: '💼', itemCount: 5),
+        Space(id: 'space-1', name: 'Work', icon: '💼'),
       ];
 
       mockRepository.mockSpaces = spaces;
+      // Set up mock item count for async loading
+      mockRepository.mockItemCounts = {'space-1': 5};
 
       await spacesProvider.loadSpaces();
 
@@ -396,7 +393,7 @@ void main() {
     });
 
     testWidgets('displays tooltips on hover', (tester) async {
-      final spaces = [Space(id: 'space-1', name: 'Work', itemCount: 5)];
+      final spaces = [Space(id: 'space-1', name: 'Work')];
 
       mockRepository.mockSpaces = spaces;
 
@@ -413,8 +410,8 @@ void main() {
       tester,
     ) async {
       final spaces = [
-        Space(id: 'space-1', name: 'Work', icon: '💼', itemCount: 5),
-        Space(id: 'space-2', name: 'Personal', itemCount: 3),
+        Space(id: 'space-1', name: 'Work', icon: '💼'),
+        Space(id: 'space-2', name: 'Personal'),
       ];
 
       mockRepository.mockSpaces = spaces;
@@ -431,7 +428,7 @@ void main() {
     });
 
     testWidgets('maintains minimum touch target size', (tester) async {
-      final spaces = [Space(id: 'space-1', name: 'Work', itemCount: 5)];
+      final spaces = [Space(id: 'space-1', name: 'Work')];
 
       mockRepository.mockSpaces = spaces;
 
@@ -507,7 +504,7 @@ void main() {
 
     testWidgets('space item has gradient hover state', (tester) async {
       final spaces = [
-        Space(id: 'space-1', name: 'Work', icon: '💼', itemCount: 5),
+        Space(id: 'space-1', name: 'Work', icon: '💼'),
       ];
 
       mockRepository.mockSpaces = spaces;
@@ -545,8 +542,8 @@ void main() {
       tester,
     ) async {
       final spaces = [
-        Space(id: 'space-1', name: 'Work', icon: '💼', itemCount: 5),
-        Space(id: 'space-2', name: 'Personal', icon: '🏠', itemCount: 3),
+        Space(id: 'space-1', name: 'Work', icon: '💼'),
+        Space(id: 'space-2', name: 'Personal', icon: '🏠'),
       ];
 
       mockRepository.mockSpaces = spaces;
@@ -573,7 +570,6 @@ void main() {
           id: 'space-1',
           name: 'Work',
           icon: '💼',
-          itemCount: 5,
           color: 'red',
         ),
       ];
@@ -646,7 +642,7 @@ void main() {
       tester,
     ) async {
       final spaces = [
-        Space(id: 'space-1', name: 'Work', icon: '💼', itemCount: 5),
+        Space(id: 'space-1', name: 'Work', icon: '💼'),
       ];
 
       mockRepository.mockSpaces = spaces;
@@ -701,10 +697,9 @@ void main() {
     testWidgets('keyboard shortcuts still work with gradient redesign', (
       tester,
     ) async {
-      final spaces = List.generate(
+      final spaces = List<Space>.generate(
         5,
-        (i) =>
-            Space(id: 'space-${i + 1}', name: 'Space ${i + 1}', itemCount: i),
+        (i) => Space(id: 'space-${i + 1}', name: 'Space ${i + 1}'),
       );
 
       mockRepository.mockSpaces = spaces;

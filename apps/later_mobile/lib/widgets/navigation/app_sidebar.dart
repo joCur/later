@@ -54,6 +54,7 @@ class AppSidebar extends StatefulWidget {
 
 class _AppSidebarState extends State<AppSidebar> {
   final FocusNode _focusNode = FocusNode();
+  final Map<String, int> _cachedCounts = {};
 
   @override
   void initState() {
@@ -61,13 +62,30 @@ class _AppSidebarState extends State<AppSidebar> {
     // Request focus to enable keyboard shortcuts
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _focusNode.requestFocus();
+      _preFetchItemCounts();
     });
   }
 
   @override
   void dispose() {
     _focusNode.dispose();
+    _cachedCounts.clear();
     super.dispose();
+  }
+
+  /// Pre-fetch item counts for all spaces to prevent flicker
+  Future<void> _preFetchItemCounts() async {
+    final spacesProvider = context.read<SpacesProvider>();
+    final spaces = spacesProvider.spaces;
+
+    for (final space in spaces) {
+      final count = await spacesProvider.getSpaceItemCount(space.id);
+      if (mounted) {
+        setState(() {
+          _cachedCounts[space.id] = count;
+        });
+      }
+    }
   }
 
   void _handleKeyEvent(KeyEvent event, SpacesProvider spacesProvider) {
@@ -257,6 +275,7 @@ class _AppSidebarState extends State<AppSidebar> {
           isExpanded: widget.isExpanded,
           isDarkMode: isDarkMode,
           keyboardShortcut: keyboardShortcut,
+          cachedCount: _cachedCounts[space.id],
           onTap: () {
             // Only trigger haptic if actually changing spaces
             if (spacesProvider.currentSpace?.id != space.id) {
@@ -371,6 +390,7 @@ class _SpaceListItem extends StatefulWidget {
     required this.isDarkMode,
     required this.onTap,
     this.keyboardShortcut,
+    this.cachedCount,
   });
 
   final Space space;
@@ -379,6 +399,7 @@ class _SpaceListItem extends StatefulWidget {
   final bool isDarkMode;
   final VoidCallback onTap;
   final String? keyboardShortcut;
+  final int? cachedCount;
 
   @override
   State<_SpaceListItem> createState() => _SpaceListItemState();
@@ -386,6 +407,26 @@ class _SpaceListItem extends StatefulWidget {
 
 class _SpaceListItemState extends State<_SpaceListItem> {
   bool _isHovered = false;
+
+  /// Build item count widget with async loading support
+  Widget _buildItemCount(BuildContext context) {
+    // If we have a cached count, use it immediately
+    if (widget.cachedCount != null) {
+      return Text(widget.cachedCount.toString());
+    }
+
+    // Otherwise, load asynchronously
+    final spacesProvider = context.read<SpacesProvider>();
+    return FutureBuilder<int>(
+      future: spacesProvider.getSpaceItemCount(widget.space.id),
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          return Text(snapshot.data.toString());
+        }
+        return const Text('...');
+      },
+    );
+  }
 
   LinearGradient _getTypeGradient(BuildContext context) {
     final temporalTheme = Theme.of(context).extension<TemporalFlowTheme>()!;
@@ -423,7 +464,7 @@ class _SpaceListItemState extends State<_SpaceListItem> {
       ),
       child: Semantics(
         label: widget.isExpanded
-            ? '${widget.space.name}, ${widget.space.itemCount} items${widget.keyboardShortcut != null ? ", keyboard shortcut ${widget.keyboardShortcut}" : ""}'
+            ? '${widget.space.name}, ${widget.cachedCount ?? "..."} items${widget.keyboardShortcut != null ? ", keyboard shortcut ${widget.keyboardShortcut}" : ""}'
             : widget.space.name,
         selected: widget.isSelected,
         button: true,
@@ -435,7 +476,7 @@ class _SpaceListItemState extends State<_SpaceListItem> {
                 ? (widget.keyboardShortcut != null
                       ? 'Press ${widget.keyboardShortcut} to switch'
                       : widget.space.name)
-                : '${widget.space.name} (${widget.space.itemCount} items)',
+                : '${widget.space.name} (${widget.cachedCount ?? "..."} items)',
             child: InkWell(
               onTap: widget.onTap,
               borderRadius: const BorderRadius.all(
@@ -533,7 +574,8 @@ class _SpaceListItemState extends State<_SpaceListItem> {
                           ),
 
                         // Item count badge
-                        if (widget.isExpanded && widget.space.itemCount > 0)
+                        if (widget.isExpanded &&
+                            (widget.cachedCount ?? 0) > 0)
                           Container(
                             padding: const EdgeInsets.symmetric(
                               horizontal: AppSpacing.xs,
@@ -547,13 +589,13 @@ class _SpaceListItemState extends State<_SpaceListItem> {
                                 AppSpacing.radiusFull,
                               ),
                             ),
-                            child: Text(
-                              widget.space.itemCount.toString(),
+                            child: DefaultTextStyle(
                               style: TextStyle(
                                 fontSize: 12,
                                 color: textColor,
                                 fontWeight: FontWeight.w500,
                               ),
+                              child: _buildItemCount(context),
                             ),
                           ),
                       ],

@@ -33,17 +33,16 @@ void main() {
 
       // Create test spaces (mix of active and archived)
       testSpaces = [
-        Space(id: 'space-1', name: 'Personal', icon: '🏠', itemCount: 5),
-        Space(id: 'space-2', name: 'Work', icon: '💼', itemCount: 12),
+        Space(id: 'space-1', name: 'Personal', icon: '🏠'),
+        Space(id: 'space-2', name: 'Work', icon: '💼'),
         Space(
           id: 'space-3',
           name: 'Archived Project',
           icon: '📦',
-          itemCount: 3,
           isArchived: true,
         ),
         Space(id: 'space-4', name: 'Old Ideas', icon: '💡', isArchived: true),
-        Space(id: 'space-5', name: 'Shopping', icon: '🛒', itemCount: 2),
+        Space(id: 'space-5', name: 'Shopping', icon: '🛒'),
       ];
 
       // Add test spaces to repository

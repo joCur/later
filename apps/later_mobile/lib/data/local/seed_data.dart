@@ -69,8 +69,7 @@ class SeedData {
     // Create sample items
     await _createSampleItems(space.id);
 
-    // Update the space's item count (3 notes in dual-model architecture)
-    await _spaceRepository.updateSpace(space.copyWith(itemCount: 3));
+    // Item count will be calculated from database when needed
   }
 
   /// Create the default "Personal" space.
@@ -79,7 +78,6 @@ class SeedData {
   /// - Name: "Personal"
   /// - Icon: "🏠" (home emoji)
   /// - Color: "#6366F1" (indigo - app's primary color)
-  /// - itemCount: 0 (will be updated after items are created)
   ///
   /// Returns the created Space object.
   static Future<Space> _createDefaultSpace() async {

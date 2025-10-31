@@ -96,7 +96,6 @@ void main() {
         id: id,
         name: name,
         spaceId: spaceId,
-        style: ListStyle.bullets,
       );
     }
 

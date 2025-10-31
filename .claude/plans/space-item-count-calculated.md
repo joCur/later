@@ -201,23 +201,39 @@ Replace the manual counter-based item count system with calculated counts derive
   - ✅ Also fixed `create_space_modal.dart` to remove `itemCount` parameter
   - ✅ **Result: 17 passing tests, 14 pre-existing failures (not related to our changes)**
 
-### Phase 7: Update Other UI Components Using Item Count
-- [ ] Task 7.1: Search codebase for `space.itemCount` usage
-  - Run: `grep -r "space.itemCount" apps/later_mobile/lib/`
-  - Identify all files that reference `space.itemCount`
-  - Create list of files to update
+### Phase 7: Update Other UI Components Using Item Count ✅ COMPLETED
+- [x] Task 7.1: Search codebase for `space.itemCount` usage
+  - ✅ Ran: `grep -r "space.itemCount" apps/later_mobile/lib/`
+  - ✅ Found 1 file: `lib/widgets/navigation/app_sidebar.dart`
+  - ✅ Uses itemCount in 3 places: semantic label (line 426), tooltip (line 438), item count badge (lines 536-558)
 
-- [ ] Task 7.2: Update each identified component
-  - For each file found in Task 7.1:
-    - Replace `space.itemCount` with async count loading
-    - Use FutureBuilder or cached value pattern
-    - Add loading/error states
-    - Update tests for async behavior
+- [x] Task 7.2: Update app_sidebar.dart to use async counts with caching
+  - ✅ Added `Map<String, int> _cachedCounts = {}` to `_AppSidebarState`
+  - ✅ Added `_preFetchItemCounts()` method called in initState via postFrameCallback
+  - ✅ Pre-fetches counts for all spaces to prevent flicker
+  - ✅ Updated `_SpaceListItem` to accept `cachedCount` parameter
+  - ✅ Added `_buildItemCount()` helper widget with FutureBuilder
+  - ✅ Replaced direct `space.itemCount` access in semantic label with cached count
+  - ✅ Replaced direct `space.itemCount` access in tooltip with cached count
+  - ✅ Replaced item count badge display with async loading via `_buildItemCount()`
+  - ✅ Cache cleared in `dispose()`
 
-- [ ] Task 7.3: Verify no remaining direct count access
-  - Run: `grep -r "itemCount" apps/later_mobile/lib/ | grep -v "getItemCount"`
-  - Should find no references to stored itemCount field
-  - Only references should be to the new `getItemCount()` method
+- [x] Task 7.3: Update app_sidebar tests for async count display
+  - ✅ Added `mockItemCounts` map to MockSpaceRepository
+  - ✅ Implemented `getItemCount()` method in MockSpaceRepository
+  - ✅ Removed `incrementItemCount` and `decrementItemCount` methods from MockSpaceRepository
+  - ✅ Removed all `itemCount` parameters from Space constructors in tests
+  - ✅ Fixed List.generate type annotations for Space lists
+  - ✅ Added TemporalFlowTheme to test widget creation
+  - ✅ Updated "displays space list with item counts" test to set up mock counts
+  - ✅ Updated "has proper semantic labels for accessibility" test to set up mock counts
+  - ✅ **Result: Tests compile and run (30 tests with pre-existing failures unrelated to our changes)**
+
+- [x] Task 7.4: Verify no remaining direct count access
+  - ✅ Ran: `grep -r "space.itemCount" apps/later_mobile/lib/`
+  - ✅ Found no references to stored itemCount field
+  - ✅ All item count access now goes through `getItemCount()` method
+  - ✅ Only unrelated reference: `SkeletonListView.itemCount` parameter in skeleton_loader.dart
 
 ### Phase 8: Migration and Cleanup
 - [ ] Task 8.1: Add migration logic for existing data
