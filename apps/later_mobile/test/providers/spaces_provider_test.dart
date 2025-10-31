@@ -15,8 +15,9 @@ class MockSpaceRepository extends SpaceRepository {
   int createSpaceCallCount = 0;
   int updateSpaceCallCount = 0;
   int deleteSpaceCallCount = 0;
-  int incrementItemCountCallCount = 0;
-  int decrementItemCountCallCount = 0;
+
+  // Allow overriding getItemCount behavior for tests
+  Future<int> Function(String)? _getItemCountOverride;
 
   @override
   Future<List<Space>> getSpaces({bool includeArchived = false}) async {
@@ -75,32 +76,21 @@ class MockSpaceRepository extends SpaceRepository {
   }
 
   @override
-  Future<void> incrementItemCount(String spaceId) async {
-    incrementItemCountCallCount++;
-    if (shouldThrowError) {
-      throw Exception(errorMessage ?? 'Failed to increment item count');
+  Future<int> getItemCount(String spaceId) async {
+    if (_getItemCountOverride != null) {
+      return _getItemCountOverride!(spaceId);
     }
-    final space = mockSpaces.firstWhere(
-      (s) => s.id == spaceId,
-      orElse: () => throw Exception('Space with id $spaceId does not exist'),
-    );
-    final index = mockSpaces.indexOf(space);
-    mockSpaces[index] = space.copyWith(itemCount: space.itemCount + 1);
+    if (shouldThrowError) {
+      throw Exception(errorMessage ?? 'Failed to get item count');
+    }
+    // For testing purposes, return a mock count
+    // In real tests, this can be overridden with specific values
+    return 0;
   }
 
-  @override
-  Future<void> decrementItemCount(String spaceId) async {
-    decrementItemCountCallCount++;
-    if (shouldThrowError) {
-      throw Exception(errorMessage ?? 'Failed to decrement item count');
-    }
-    final space = mockSpaces.firstWhere(
-      (s) => s.id == spaceId,
-      orElse: () => throw Exception('Space with id $spaceId does not exist'),
-    );
-    final index = mockSpaces.indexOf(space);
-    final newCount = space.itemCount > 0 ? space.itemCount - 1 : 0;
-    mockSpaces[index] = space.copyWith(itemCount: newCount);
+  /// Allows overriding getItemCount behavior for specific tests
+  void setGetItemCountOverride(Future<int> Function(String) fn) {
+    _getItemCountOverride = fn;
   }
 
   /// Helper method to reset the mock state
@@ -111,8 +101,7 @@ class MockSpaceRepository extends SpaceRepository {
     createSpaceCallCount = 0;
     updateSpaceCallCount = 0;
     deleteSpaceCallCount = 0;
-    incrementItemCountCallCount = 0;
-    decrementItemCountCallCount = 0;
+    _getItemCountOverride = null;
   }
 }
 
@@ -249,7 +238,7 @@ void main() {
 
       // Assert
       expect(provider.error, isNotNull);
-      expect(provider.error, contains('Network error'));
+      expect(provider.error.toString(), contains('Network error'));
       expect(provider.isLoading, isFalse);
       expect(provider.spaces, isEmpty);
     });
@@ -543,7 +532,7 @@ void main() {
 
       // Assert
       expect(provider.error, isNotNull);
-      expect(provider.error, contains('does not exist'));
+      expect(provider.error.toString(), contains('does not exist'));
     });
 
     test('should keep persisted space ID when archiving current space', () async {
@@ -624,7 +613,7 @@ void main() {
 
       // Assert
       expect(provider.error, isNotNull);
-      expect(provider.error, contains('current space'));
+      expect(provider.error.toString(), contains('current space'));
       expect(provider.spaces, hasLength(1)); // Space should still be there
       expect(
         mockRepository.deleteSpaceCallCount,
@@ -765,7 +754,7 @@ void main() {
 
       // Assert
       expect(provider.error, isNotNull);
-      expect(provider.error, contains('not found'));
+      expect(provider.error.toString(), contains('not found'));
       expect(provider.currentSpace?.id, '1'); // Should remain unchanged
     });
 
@@ -805,124 +794,27 @@ void main() {
     });
   });
 
-  group('SpacesProvider - incrementSpaceItemCount', () {
-    test('should increment item count successfully', () async {
+  group('SpacesProvider - getSpaceItemCount', () {
+    test('should return count from repository', () async {
       // Arrange
-      final space = Space(id: '1', name: 'Work', itemCount: 5);
-      mockRepository.mockSpaces = [space];
-      await provider.loadSpaces();
+      mockRepository.setGetItemCountOverride((String spaceId) async => 5);
 
       // Act
-      await provider.incrementSpaceItemCount('1');
+      final count = await provider.getSpaceItemCount('1');
 
       // Assert
-      expect(provider.spaces.first.itemCount, 6);
-      expect(mockRepository.incrementItemCountCallCount, 1);
-      expect(provider.error, isNull);
+      expect(count, 5);
     });
 
-    test('should update current space if it is being incremented', () async {
+    test('should return 0 on error', () async {
       // Arrange
-      final space = Space(id: '1', name: 'Work', itemCount: 5);
-      mockRepository.mockSpaces = [space];
-      await provider.loadSpaces();
-
-      // Act
-      await provider.incrementSpaceItemCount('1');
-
-      // Assert
-      expect(provider.currentSpace?.itemCount, 6);
-    });
-
-    test('should handle error when incrementing fails', () async {
-      // Arrange
-      final space = Space(id: '1', name: 'Work', itemCount: 5);
-      mockRepository.mockSpaces = [space];
-      await provider.loadSpaces();
-
       mockRepository.shouldThrowError = true;
 
       // Act
-      await provider.incrementSpaceItemCount('1');
+      final count = await provider.getSpaceItemCount('1');
 
       // Assert
-      expect(provider.error, isNotNull);
-      expect(provider.spaces.first.itemCount, 5); // Should remain unchanged
-    });
-
-    test('should handle incrementing non-existent space', () async {
-      // Act
-      await provider.incrementSpaceItemCount('999');
-
-      // Assert
-      expect(provider.error, isNotNull);
-    });
-  });
-
-  group('SpacesProvider - decrementSpaceItemCount', () {
-    test('should decrement item count successfully', () async {
-      // Arrange
-      final space = Space(id: '1', name: 'Work', itemCount: 5);
-      mockRepository.mockSpaces = [space];
-      await provider.loadSpaces();
-
-      // Act
-      await provider.decrementSpaceItemCount('1');
-
-      // Assert
-      expect(provider.spaces.first.itemCount, 4);
-      expect(mockRepository.decrementItemCountCallCount, 1);
-      expect(provider.error, isNull);
-    });
-
-    test('should update current space if it is being decremented', () async {
-      // Arrange
-      final space = Space(id: '1', name: 'Work', itemCount: 5);
-      mockRepository.mockSpaces = [space];
-      await provider.loadSpaces();
-
-      // Act
-      await provider.decrementSpaceItemCount('1');
-
-      // Assert
-      expect(provider.currentSpace?.itemCount, 4);
-    });
-
-    test('should not go below zero', () async {
-      // Arrange
-      final space = Space(id: '1', name: 'Work');
-      mockRepository.mockSpaces = [space];
-      await provider.loadSpaces();
-
-      // Act
-      await provider.decrementSpaceItemCount('1');
-
-      // Assert
-      expect(provider.spaces.first.itemCount, 0);
-    });
-
-    test('should handle error when decrementing fails', () async {
-      // Arrange
-      final space = Space(id: '1', name: 'Work', itemCount: 5);
-      mockRepository.mockSpaces = [space];
-      await provider.loadSpaces();
-
-      mockRepository.shouldThrowError = true;
-
-      // Act
-      await provider.decrementSpaceItemCount('1');
-
-      // Assert
-      expect(provider.error, isNotNull);
-      expect(provider.spaces.first.itemCount, 5); // Should remain unchanged
-    });
-
-    test('should handle decrementing non-existent space', () async {
-      // Act
-      await provider.decrementSpaceItemCount('999');
-
-      // Assert
-      expect(provider.error, isNotNull);
+      expect(count, 0);
     });
   });
 

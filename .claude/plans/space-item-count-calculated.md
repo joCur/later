@@ -75,7 +75,7 @@ Replace the manual counter-based item count system with calculated counts derive
   - ✅ Verified `lib/data/models/space_model.g.dart` is regenerated without itemCount field
   - ✅ No compilation errors - all tests pass
 
-### Phase 3: Update SpaceRepository
+### Phase 3: Update SpaceRepository ✅ COMPLETED
 - [x] Task 3.1: Remove increment/decrement methods from `SpaceRepository`
   - ✅ Navigated to `lib/data/repositories/space_repository.dart`
   - ✅ Deleted `incrementItemCount()` method (lines 135-163)
@@ -89,35 +89,50 @@ Replace the manual counter-based item count system with calculated counts derive
   - ✅ Implementation: delegates to `SpaceItemCountService.calculateItemCount(spaceId)`
   - ✅ Added comprehensive documentation explaining calculated counts
 
-- [ ] Task 3.3: Update repository tests (IN PROGRESS)
-  - Navigate to `test/data/repositories/space_repository_test.dart`
-  - Delete test group for `incrementItemCount`
-  - Delete test group for `decrementItemCount`
-  - Add test group for `getItemCount`
-  - Test case: delegates to SpaceItemCountService correctly
-  - Test case: returns correct count for given spaceId
+- [x] Task 3.3: Update repository tests ✅ COMPLETED
+  - ✅ Navigated to `test/data/repositories/space_repository_test.dart`
+  - ✅ Deleted test group for `incrementItemCount` (lines 382-448)
+  - ✅ Deleted test group for `decrementItemCount` (lines 450-529)
+  - ✅ Removed itemCount references from other test cases
+  - ✅ Added comprehensive test group for `getItemCount` with 7 test cases:
+    - ✅ Test case: returns 0 for space with no items
+    - ✅ Test case: counts notes only (3 notes)
+    - ✅ Test case: counts todo lists only (2 lists)
+    - ✅ Test case: counts regular lists only (2 lists)
+    - ✅ Test case: sums all item types (2 notes + 1 todo + 3 lists = 6)
+    - ✅ Test case: filters by spaceId correctly (items in multiple spaces)
+    - ✅ Test case: returns 0 for non-existent space
+  - ✅ Added necessary imports for Item, TodoList, and ListModel
+  - ✅ Added Hive adapter registrations in setUp for test isolation
+  - ✅ **Result: All 29 repository tests passing**
 
-### Phase 4: Update SpacesProvider
-- [ ] Task 4.1: Remove increment/decrement methods from `SpacesProvider`
-  - Navigate to `lib/providers/spaces_provider.dart`
-  - Delete `incrementSpaceItemCount()` method (lines ~348-387)
-  - Delete `decrementSpaceItemCount()` method (lines ~403-442)
-  - Remove any imports or dependencies related to these methods
+### Phase 4: Update SpacesProvider ✅ COMPLETED
+- [x] Task 4.1: Remove increment/decrement methods from `SpacesProvider`
+  - ✅ Navigated to `lib/providers/spaces_provider.dart`
+  - ✅ Deleted `incrementSpaceItemCount()` method (lines 336-388)
+  - ✅ Deleted `decrementSpaceItemCount()` method (lines 390-443)
+  - ✅ Updated class documentation to remove item count management reference
 
-- [ ] Task 4.2: Add `getSpaceItemCount()` method to `SpacesProvider`
-  - Navigate to `lib/providers/spaces_provider.dart`
-  - Add new method after space CRUD operations
-  - Method signature: `Future<int> getSpaceItemCount(String spaceId)`
-  - Implementation: call `_repository.getItemCount(spaceId)` with retry logic
-  - Return the calculated count
+- [x] Task 4.2: Add `getSpaceItemCount()` method to `SpacesProvider`
+  - ✅ Navigated to `lib/providers/spaces_provider.dart`
+  - ✅ Added new method after `switchSpace` method
+  - ✅ Method signature: `Future<int> getSpaceItemCount(String spaceId)`
+  - ✅ Implementation: calls `_repository.getItemCount(spaceId)` with retry logic via `_executeWithRetry`
+  - ✅ Returns 0 as graceful fallback on error
+  - ✅ Added comprehensive documentation
 
-- [ ] Task 4.3: Update provider tests
-  - Navigate to `test/providers/spaces_provider_test.dart`
-  - Delete test group for `incrementSpaceItemCount`
-  - Delete test group for `decrementSpaceItemCount`
-  - Add test group for `getSpaceItemCount`
-  - Test case: returns count from repository
-  - Test case: handles errors gracefully with retry logic
+- [x] Task 4.3: Update provider tests
+  - ✅ Navigated to `test/providers/spaces_provider_test.dart`
+  - ✅ Removed call count trackers for increment/decrement methods from MockSpaceRepository
+  - ✅ Deleted increment/decrement methods from MockSpaceRepository
+  - ✅ Added `getItemCount` method to MockSpaceRepository with override capability
+  - ✅ Deleted test group for `incrementSpaceItemCount` (lines 808-860)
+  - ✅ Deleted test group for `decrementSpaceItemCount` (lines 862-927)
+  - ✅ Added test group for `getSpaceItemCount` with 2 test cases:
+    - ✅ Test case: returns count from repository
+    - ✅ Test case: returns 0 on error
+  - ✅ Fixed error message assertions to use `.toString()` for AppError objects
+  - ✅ **Result: All 44 provider tests passing**
 
 ### Phase 5: Remove Counter Updates from ContentProvider
 - [ ] Task 5.1: Remove counter updates from TodoList operations

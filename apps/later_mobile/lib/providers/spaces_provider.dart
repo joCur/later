@@ -8,8 +8,8 @@ import '../data/repositories/space_repository.dart';
 ///
 /// This provider handles all space-related operations including loading,
 /// creating, updating, and deleting spaces. It also manages the current
-/// active space and item count updates. It manages loading states,
-/// error states, and notifies listeners of state changes.
+/// active space. It manages loading states, error states, and notifies
+/// listeners of state changes.
 ///
 /// Example usage:
 /// ```dart
@@ -333,112 +333,33 @@ class SpacesProvider extends ChangeNotifier {
     }
   }
 
-  /// Increments the item count for a space by 1.
+  /// Gets the calculated item count for a space.
   ///
-  /// This should be called when an item is added to the space.
-  /// Updates both the space in the list and the current space if applicable.
+  /// This method returns the actual count of items (notes, todo lists, and
+  /// regular lists) that belong to the specified space by querying the
+  /// database directly. The count is calculated on-demand and represents
+  /// the single source of truth for space item counts.
   ///
   /// Parameters:
-  ///   - [spaceId]: The ID of the space to increment
+  ///   - [spaceId]: The ID of the space to get the count for
+  ///
+  /// Returns the calculated item count for the space.
   ///
   /// Example:
   /// ```dart
-  /// await provider.incrementSpaceItemCount('space-1');
+  /// final count = await provider.getSpaceItemCount('space-1');
+  /// print('Space has $count items');
   /// ```
-  Future<void> incrementSpaceItemCount(String spaceId) async {
-    _error = null;
-
+  Future<int> getSpaceItemCount(String spaceId) async {
     try {
-      await _executeWithRetry(
-        () => _repository.incrementItemCount(spaceId),
-        'incrementSpaceItemCount',
+      return await _executeWithRetry(
+        () => _repository.getItemCount(spaceId),
+        'getSpaceItemCount',
       );
-
-      // Reload the updated space
-      final updatedSpace = await _executeWithRetry(
-        () => _repository.getSpaceById(spaceId),
-        'getSpaceById',
-      );
-      if (updatedSpace != null) {
-        final index = _spaces.indexWhere((s) => s.id == spaceId);
-        if (index != -1) {
-          _spaces = [
-            ..._spaces.sublist(0, index),
-            updatedSpace,
-            ..._spaces.sublist(index + 1),
-          ];
-        }
-
-        // Update current space if it's the one being incremented
-        if (_currentSpace?.id == spaceId) {
-          _currentSpace = updatedSpace;
-        }
-      }
-
-      _error = null;
-      notifyListeners();
     } catch (e) {
-      if (e is AppError) {
-        _error = e;
-      } else {
-        _error = AppError.fromException(e);
-      }
-      notifyListeners();
-    }
-  }
-
-  /// Decrements the item count for a space by 1.
-  ///
-  /// This should be called when an item is removed from the space.
-  /// The count will not go below 0.
-  /// Updates both the space in the list and the current space if applicable.
-  ///
-  /// Parameters:
-  ///   - [spaceId]: The ID of the space to decrement
-  ///
-  /// Example:
-  /// ```dart
-  /// await provider.decrementSpaceItemCount('space-1');
-  /// ```
-  Future<void> decrementSpaceItemCount(String spaceId) async {
-    _error = null;
-
-    try {
-      await _executeWithRetry(
-        () => _repository.decrementItemCount(spaceId),
-        'decrementSpaceItemCount',
-      );
-
-      // Reload the updated space
-      final updatedSpace = await _executeWithRetry(
-        () => _repository.getSpaceById(spaceId),
-        'getSpaceById',
-      );
-      if (updatedSpace != null) {
-        final index = _spaces.indexWhere((s) => s.id == spaceId);
-        if (index != -1) {
-          _spaces = [
-            ..._spaces.sublist(0, index),
-            updatedSpace,
-            ..._spaces.sublist(index + 1),
-          ];
-        }
-
-        // Update current space if it's the one being decremented
-        if (_currentSpace?.id == spaceId) {
-          _currentSpace = updatedSpace;
-        }
-      }
-
-      _error = null;
-      notifyListeners();
-    } catch (e) {
-      if (e is AppError) {
-        _error = e;
-      } else {
-        _error = AppError.fromException(e);
-      }
-      notifyListeners();
+      // Log error but return 0 as fallback
+      debugPrint('Failed to get item count for space $spaceId: $e');
+      return 0;
     }
   }
 
