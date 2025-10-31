@@ -8,7 +8,6 @@ void main() {
 
       expect(space.id, 'space-1');
       expect(space.name, 'Personal');
-      expect(space.itemCount, 0);
       expect(space.isArchived, false);
       expect(space.icon, isNull);
       expect(space.color, isNull);
@@ -20,12 +19,10 @@ void main() {
         name: 'Work',
         icon: '💼',
         color: '#FF5733',
-        itemCount: 5,
       );
 
       expect(space.icon, '💼');
       expect(space.color, '#FF5733');
-      expect(space.itemCount, 5);
       expect(space.isArchived, false);
     });
 
@@ -33,18 +30,15 @@ void main() {
       final original = Space(
         id: 'space-1',
         name: 'Original Name',
-        itemCount: 3,
       );
 
       final updated = original.copyWith(
         name: 'Updated Name',
-        itemCount: 5,
         isArchived: true,
       );
 
       expect(updated.id, original.id);
       expect(updated.name, 'Updated Name');
-      expect(updated.itemCount, 5);
       expect(updated.isArchived, true);
     });
 
@@ -54,7 +48,6 @@ void main() {
         name: 'Work',
         icon: '💼',
         color: '#FF5733',
-        itemCount: 10,
       );
 
       final json = space.toJson();
@@ -63,7 +56,6 @@ void main() {
       expect(json['name'], 'Work');
       expect(json['icon'], '💼');
       expect(json['color'], '#FF5733');
-      expect(json['itemCount'], 10);
       expect(json['isArchived'], false);
     });
 
@@ -73,7 +65,6 @@ void main() {
         'name': 'Personal',
         'icon': '🏠',
         'color': '#3498db',
-        'itemCount': 7,
         'isArchived': false,
         'createdAt': '2024-01-01T00:00:00.000Z',
         'updatedAt': '2024-01-02T00:00:00.000Z',
@@ -85,7 +76,6 @@ void main() {
       expect(space.name, 'Personal');
       expect(space.icon, '🏠');
       expect(space.color, '#3498db');
-      expect(space.itemCount, 7);
       expect(space.isArchived, false);
     });
 
@@ -95,7 +85,6 @@ void main() {
         name: 'Projects',
         icon: '📁',
         color: '#9b59b6',
-        itemCount: 15,
       );
 
       final json = original.toJson();
@@ -105,29 +94,27 @@ void main() {
       expect(restored.name, original.name);
       expect(restored.icon, original.icon);
       expect(restored.color, original.color);
-      expect(restored.itemCount, original.itemCount);
       expect(restored.isArchived, original.isArchived);
     });
 
     test('equality is based on id', () {
-      final space1 = Space(id: 'same-id', name: 'Name 1', itemCount: 5);
+      final space1 = Space(id: 'same-id', name: 'Name 1');
 
-      final space2 = Space(id: 'same-id', name: 'Name 2', itemCount: 10);
+      final space2 = Space(id: 'same-id', name: 'Name 2');
 
-      final space3 = Space(id: 'different-id', name: 'Name 1', itemCount: 5);
+      final space3 = Space(id: 'different-id', name: 'Name 1');
 
       expect(space1, equals(space2));
       expect(space1, isNot(equals(space3)));
     });
 
     test('toString includes key fields', () {
-      final space = Space(id: 'space-1', name: 'Work', itemCount: 8);
+      final space = Space(id: 'space-1', name: 'Work');
 
       final string = space.toString();
 
       expect(string, contains('space-1'));
       expect(string, contains('Work'));
-      expect(string, contains('8'));
       expect(string, contains('false'));
     });
 

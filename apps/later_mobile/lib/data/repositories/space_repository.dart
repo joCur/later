@@ -1,10 +1,12 @@
 import 'package:hive/hive.dart';
+import '../../core/services/space_item_count_service.dart';
 import '../models/space_model.dart';
 
 /// Repository for managing Space entities in Hive local storage.
 ///
-/// Provides CRUD operations, filtering capabilities, and item count management
-/// for spaces. Uses Hive box 'spaces' for persistence.
+/// Provides CRUD operations and filtering capabilities for spaces.
+/// Uses Hive box 'spaces' for persistence.
+/// Item counts are calculated dynamically via SpaceItemCountService.
 class SpaceRepository {
   /// Gets the Hive box for spaces
   Box<Space> get _box => Hive.box<Space>('spaces');
@@ -132,67 +134,24 @@ class SpaceRepository {
     await _box.delete(id);
   }
 
-  /// Increments the item count for a space by 1.
+  /// Calculates the total number of items in a space.
   ///
-  /// This should be called when an item is added to the space.
-  /// Automatically updates the updatedAt timestamp.
-  /// Throws an exception if the space does not exist.
+  /// This count is calculated dynamically from the actual items stored in
+  /// Hive boxes (notes, todo_lists, lists), ensuring it's always accurate
+  /// and synchronized with the database.
   ///
   /// Parameters:
-  ///   - [spaceId]: The ID of the space to update
+  ///   - [spaceId]: The ID of the space to count items for
   ///
-  /// Throws:
-  ///   Exception if the space with the given ID does not exist
+  /// Returns:
+  ///   The total number of items in the space
   ///
   /// Example:
   /// ```dart
-  /// await repository.incrementItemCount('space-1');
+  /// final count = await repository.getItemCount('space-1');
+  /// print('Space has $count items');
   /// ```
-  Future<void> incrementItemCount(String spaceId) async {
-    final space = _box.get(spaceId);
-    if (space == null) {
-      throw Exception('Space with id $spaceId does not exist');
-    }
-
-    final updatedSpace = space.copyWith(
-      itemCount: space.itemCount + 1,
-      updatedAt: DateTime.now(),
-    );
-
-    await _box.put(spaceId, updatedSpace);
-  }
-
-  /// Decrements the item count for a space by 1.
-  ///
-  /// This should be called when an item is removed from the space.
-  /// The count will not go below 0.
-  /// Automatically updates the updatedAt timestamp.
-  /// Throws an exception if the space does not exist.
-  ///
-  /// Parameters:
-  ///   - [spaceId]: The ID of the space to update
-  ///
-  /// Throws:
-  ///   Exception if the space with the given ID does not exist
-  ///
-  /// Example:
-  /// ```dart
-  /// await repository.decrementItemCount('space-1');
-  /// ```
-  Future<void> decrementItemCount(String spaceId) async {
-    final space = _box.get(spaceId);
-    if (space == null) {
-      throw Exception('Space with id $spaceId does not exist');
-    }
-
-    // Ensure count doesn't go below 0
-    final newCount = space.itemCount > 0 ? space.itemCount - 1 : 0;
-
-    final updatedSpace = space.copyWith(
-      itemCount: newCount,
-      updatedAt: DateTime.now(),
-    );
-
-    await _box.put(spaceId, updatedSpace);
+  Future<int> getItemCount(String spaceId) async {
+    return SpaceItemCountService.calculateItemCount(spaceId);
   }
 }

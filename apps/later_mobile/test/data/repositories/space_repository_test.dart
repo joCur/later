@@ -36,7 +36,6 @@ void main() {
       String name = 'Test Space',
       String? icon,
       String? color,
-      int itemCount = 0,
       bool isArchived = false,
     }) {
       return Space(
@@ -44,7 +43,6 @@ void main() {
         name: name,
         icon: icon,
         color: color,
-        itemCount: itemCount,
         isArchived: isArchived,
       );
     }
