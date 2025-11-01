@@ -47,15 +47,15 @@ class Space {
   final String? color;
 
   /// Whether the space is archived
-  @HiveField(4)
+  @HiveField(5)
   final bool isArchived;
 
   /// When the space was created
-  @HiveField(5)
+  @HiveField(6)
   final DateTime createdAt;
 
   /// When the space was last updated
-  @HiveField(6)
+  @HiveField(7)
   final DateTime updatedAt;
 
   /// Create a copy of this space with updated fields

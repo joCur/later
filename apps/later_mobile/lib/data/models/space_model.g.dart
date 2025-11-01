@@ -21,9 +21,9 @@ class SpaceAdapter extends TypeAdapter<Space> {
       name: fields[1] as String,
       icon: fields[2] as String?,
       color: fields[3] as String?,
-      isArchived: fields[4] as bool,
-      createdAt: fields[5] as DateTime?,
-      updatedAt: fields[6] as DateTime?,
+      isArchived: fields[5] as bool,
+      createdAt: fields[6] as DateTime?,
+      updatedAt: fields[7] as DateTime?,
     );
   }
 
@@ -39,11 +39,11 @@ class SpaceAdapter extends TypeAdapter<Space> {
       ..write(obj.icon)
       ..writeByte(3)
       ..write(obj.color)
-      ..writeByte(4)
-      ..write(obj.isArchived)
       ..writeByte(5)
-      ..write(obj.createdAt)
+      ..write(obj.isArchived)
       ..writeByte(6)
+      ..write(obj.createdAt)
+      ..writeByte(7)
       ..write(obj.updatedAt);
   }
 
