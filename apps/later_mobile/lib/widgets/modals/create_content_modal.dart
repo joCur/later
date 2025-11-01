@@ -7,6 +7,7 @@ import 'package:later_mobile/design_system/atoms/buttons/ghost_button.dart';
 import 'package:later_mobile/design_system/atoms/buttons/gradient_button.dart';
 import 'package:later_mobile/design_system/atoms/buttons/primary_button.dart';
 import 'package:later_mobile/design_system/atoms/inputs/text_area_field.dart';
+import 'package:later_mobile/design_system/atoms/inputs/text_input_field.dart';
 import 'package:later_mobile/design_system/molecules/controls/segmented_control.dart';
 import 'package:later_mobile/design_system/tokens/tokens.dart';
 import 'package:provider/provider.dart';
@@ -81,6 +82,8 @@ class _CreateContentModalState extends State<CreateContentModal>
     with TickerProviderStateMixin {
   final TextEditingController _textController = TextEditingController();
   final FocusNode _focusNode = FocusNode();
+  final TextEditingController _noteTitleController = TextEditingController();
+  final TextEditingController _noteContentController = TextEditingController();
   String? _currentItemId;
   bool _isSaving = false;
   String? _selectedSpaceId; // Local state for space selection (modal-only)
@@ -123,8 +126,8 @@ class _CreateContentModalState extends State<CreateContentModal>
   void initState() {
     super.initState();
 
-    // Initialize selected type from widget parameter
-    _selectedType = widget.initialType;
+    // Initialize selected type from widget parameter, default to note
+    _selectedType = widget.initialType ?? ContentType.note;
 
     _textController.addListener(_onTextChanged);
     _focusNode.addListener(() {
@@ -194,6 +197,8 @@ class _CreateContentModalState extends State<CreateContentModal>
   void dispose() {
     _textController.dispose();
     _focusNode.dispose();
+    _noteTitleController.dispose();
+    _noteContentController.dispose();
     _animationController.dispose();
     _typeIconAnimationController.dispose();
     super.dispose();
@@ -203,6 +208,36 @@ class _CreateContentModalState extends State<CreateContentModal>
     // Simply trigger rebuild for button state updates
     // No auto-detection - user must manually select type if desired
     setState(() {});
+  }
+
+  /// Parse note input to extract title and content
+  /// Returns a record with title and optional content
+  ({String title, String? content}) _parseNoteInput() {
+    final isMobile = context.isMobile;
+
+    if (isMobile) {
+      // Mobile: smart field parsing (first line = title, rest = content)
+      final text = _textController.text;
+      if (text.isEmpty) {
+        return (title: '', content: null);
+      }
+
+      final lines = text.split('\n');
+      final title = lines.first.trim();
+
+      if (lines.length > 1) {
+        final remainingLines = lines.sublist(1);
+        final content = remainingLines.join('\n').trim();
+        return (title: title, content: content.isEmpty ? null : content);
+      }
+
+      return (title: title, content: null);
+    } else {
+      // Desktop: separate fields
+      final title = _noteTitleController.text.trim();
+      final content = _noteContentController.text.trim();
+      return (title: title, content: content.isEmpty ? null : content);
+    }
   }
 
   Future<void> _saveItem() async {
@@ -276,7 +311,14 @@ class _CreateContentModalState extends State<CreateContentModal>
             break;
 
           case ContentType.note:
-            final note = Item(id: id, title: text, spaceId: targetSpaceId);
+            // Parse note input (smart parsing for mobile, separate fields for desktop)
+            final parsed = _parseNoteInput();
+            final note = Item(
+              id: id,
+              title: parsed.title,
+              content: parsed.content,
+              spaceId: targetSpaceId,
+            );
             await contentProvider.createNote(note);
             _currentItemId = id;
             break;
@@ -313,10 +355,19 @@ class _CreateContentModalState extends State<CreateContentModal>
 
   /// Handles explicit save action from save button or keyboard shortcut
   Future<void> _handleExplicitSave() async {
-    final text = _textController.text.trim();
+    // For notes, validate based on the appropriate controller
+    if (_selectedType == ContentType.note) {
+      final isMobile = context.isMobile;
+      final hasContent = isMobile
+          ? _textController.text.trim().isNotEmpty
+          : _noteTitleController.text.trim().isNotEmpty;
 
-    // Validate that text is not empty
-    if (text.isEmpty) return;
+      if (!hasContent) return;
+    } else {
+      // For other types, use the default text controller
+      final text = _textController.text.trim();
+      if (text.isEmpty) return;
+    }
 
     // Prevent multiple simultaneous saves
     if (_isSaving) return;
@@ -836,6 +887,72 @@ class _CreateContentModalState extends State<CreateContentModal>
     );
   }
 
+  /// Build mobile smart field for Notes (first line = title pattern)
+  Widget _buildNoteFieldsMobile() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+      child: TextAreaField(
+        key: const Key('note_smart_field_mobile'),
+        controller: _textController,
+        focusNode: _focusNode,
+        autofocus: true,
+        maxLines: 6,
+        hintText: 'Note title or content...\n(First line becomes title)',
+      ),
+    );
+  }
+
+  /// Build desktop two-field layout for Notes
+  Widget _buildNoteFieldsDesktop() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const SizedBox(height: AppSpacing.sm),
+          // Title field
+          TextInputField(
+            key: const Key('note_title_field_desktop'),
+            controller: _noteTitleController,
+            hintText: 'Note title',
+            autofocus: true,
+            textInputAction: TextInputAction.next,
+            onChanged: (value) {
+              // Trigger rebuild to show/hide content field
+              setState(() {});
+            },
+          ),
+          // Content field (appears when title is not empty)
+          AnimatedSize(
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeInOut,
+            child: _noteTitleController.text.isNotEmpty
+                ? Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const SizedBox(height: AppSpacing.sm),
+                      TextAreaField(
+                        key: const Key('note_content_field_desktop'),
+                        controller: _noteContentController,
+                        hintText: 'Note content',
+                        maxLines: 4,
+                      ),
+                    ],
+                  )
+                : const SizedBox.shrink(),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Build Note-specific fields (responsive)
+  Widget _buildNoteFields() {
+    final isMobile = context.isMobile;
+    return isMobile ? _buildNoteFieldsMobile() : _buildNoteFieldsDesktop();
+  }
+
   /// Build type-specific fields based on selected content type
   Widget? _buildTypeSpecificFields() {
     if (_selectedType == ContentType.list) {
@@ -855,12 +972,34 @@ class _CreateContentModalState extends State<CreateContentModal>
         },
         child: _buildListFields(),
       );
+    } else if (_selectedType == ContentType.note) {
+      return AnimatedSwitcher(
+        duration: const Duration(milliseconds: 250),
+        transitionBuilder: (Widget child, Animation<double> animation) {
+          return FadeTransition(
+            opacity: animation,
+            child: SlideTransition(
+              position: Tween<Offset>(
+                begin: const Offset(0, 0.1),
+                end: Offset.zero,
+              ).animate(animation),
+              child: child,
+            ),
+          );
+        },
+        child: _buildNoteFields(),
+      );
     }
     return null;
   }
 
   Widget _buildInputField() {
     final isMobile = context.isMobile;
+
+    // For notes, we use type-specific fields instead of the default input field
+    if (_selectedType == ContentType.note) {
+      return const SizedBox.shrink();
+    }
 
     return Padding(
       padding: EdgeInsets.symmetric(
@@ -1081,6 +1220,18 @@ class _CreateContentModalState extends State<CreateContentModal>
         break;
     }
 
+    // Determine if button should be enabled based on content type
+    bool hasContent;
+    if (_selectedType == ContentType.note) {
+      // For notes, check the appropriate controller based on screen size
+      hasContent = isMobile
+          ? _textController.text.trim().isNotEmpty
+          : _noteTitleController.text.trim().isNotEmpty;
+    } else {
+      // For other types, check the default text controller
+      hasContent = _textController.text.trim().isNotEmpty;
+    }
+
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -1090,9 +1241,7 @@ class _CreateContentModalState extends State<CreateContentModal>
             key: const Key('save_button'),
             text: buttonText,
             icon: Icons.check,
-            onPressed: _textController.text.trim().isNotEmpty
-                ? _handleExplicitSave
-                : null,
+            onPressed: hasContent ? _handleExplicitSave : null,
             isLoading: _isSaving,
             isExpanded: true,
           ),
