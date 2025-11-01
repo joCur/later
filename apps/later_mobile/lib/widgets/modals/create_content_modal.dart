@@ -1239,7 +1239,7 @@ class _CreateContentModalState extends State<CreateContentModal>
                   color: AppColors.text(context),
                 ),
               ),
-              const SizedBox(width: 2),
+              const SizedBox(width: AppSpacing.xxs),
               Icon(
                 Icons.arrow_drop_down,
                 size: 16,
