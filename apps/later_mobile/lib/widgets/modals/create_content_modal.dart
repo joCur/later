@@ -1106,7 +1106,7 @@ class _CreateContentModalState extends State<CreateContentModal>
       opacity: curvedAnimation,
       child: SlideTransition(
         position: Tween<Offset>(
-          begin: const Offset(0, 0.05), // Reduced from 0.1 for subtler movement
+          begin: const Offset(0, 0.05), // Small offset for subtle entrance animation
           end: Offset.zero,
         ).animate(curvedAnimation),
         child: RepaintBoundary(
