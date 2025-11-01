@@ -36,10 +36,7 @@ void main() {
       mockContentProvider.updateNote(any),
     ).thenAnswer((_) async => Future.value());
     when(
-      mockContentProvider.deleteNote(any, any),
-    ).thenAnswer((_) async => Future.value());
-    when(
-      mockSpacesProvider.decrementSpaceItemCount(any),
+      mockContentProvider.deleteNote(any),
     ).thenAnswer((_) async => Future.value());
   });
 
@@ -358,7 +355,7 @@ void main() {
 
       // Should call deleteNote
       verify(
-        mockContentProvider.deleteNote('note-1', mockSpacesProvider),
+        mockContentProvider.deleteNote('note-1'),
       ).called(1);
     });
 
@@ -377,7 +374,7 @@ void main() {
       await tester.pumpAndSettle();
 
       // Should not call deleteNote
-      verifyNever(mockContentProvider.deleteNote(any, any));
+      verifyNever(mockContentProvider.deleteNote(any));
     });
   });
 
@@ -471,7 +468,7 @@ void main() {
 
     testWidgets('should show error when delete fails', (tester) async {
       when(
-        mockContentProvider.deleteNote(any, any),
+        mockContentProvider.deleteNote(any),
       ).thenThrow(Exception('Delete failed'));
 
       await tester.pumpWidget(createTestWidget(testNote));
