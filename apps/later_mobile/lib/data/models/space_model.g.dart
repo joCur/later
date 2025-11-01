@@ -21,7 +21,6 @@ class SpaceAdapter extends TypeAdapter<Space> {
       name: fields[1] as String,
       icon: fields[2] as String?,
       color: fields[3] as String?,
-      itemCount: fields[4] as int,
       isArchived: fields[5] as bool,
       createdAt: fields[6] as DateTime?,
       updatedAt: fields[7] as DateTime?,
@@ -31,7 +30,7 @@ class SpaceAdapter extends TypeAdapter<Space> {
   @override
   void write(BinaryWriter writer, Space obj) {
     writer
-      ..writeByte(8)
+      ..writeByte(7)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -40,8 +39,6 @@ class SpaceAdapter extends TypeAdapter<Space> {
       ..write(obj.icon)
       ..writeByte(3)
       ..write(obj.color)
-      ..writeByte(4)
-      ..write(obj.itemCount)
       ..writeByte(5)
       ..write(obj.isArchived)
       ..writeByte(6)

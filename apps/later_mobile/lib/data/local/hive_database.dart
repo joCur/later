@@ -3,6 +3,7 @@ import '../models/item_model.dart';
 import '../models/space_model.dart';
 import '../models/todo_list_model.dart';
 import '../models/list_model.dart';
+import 'preferences_service.dart';
 
 /// Wrapper for Hive database operations
 /// Provides a clean interface for box management and initialization
@@ -63,11 +64,53 @@ class HiveDatabase {
       await Hive.openBox<TodoList>(todoListsBoxName);
       await Hive.openBox<ListModel>(listsBoxName);
       await Hive.openBox<Space>(spacesBoxName);
+
+      // Run migrations after boxes are opened
+      await _runMigrations();
     } catch (e) {
       // Log error and rethrow for caller to handle
       // ignore: avoid_print
       print('Error initializing Hive database: $e');
       rethrow;
+    }
+  }
+
+  /// Run database migrations
+  /// Called automatically during initialization
+  static Future<void> _runMigrations() async {
+    try {
+      final prefs = PreferencesService();
+
+      // Migration: Remove stored item counts (v2)
+      // Hive automatically drops unknown fields when reading data with the new adapter
+      // We just need to ensure all spaces have been read once to trigger the cleanup
+      if (!prefs.hasMigratedToCalculatedCounts()) {
+        // ignore: avoid_print
+        print(
+          'Running migration: Migrating to calculated item counts (removing stored counts)',
+        );
+
+        final spacesBox = Hive.box<Space>(spacesBoxName);
+
+        // Force read all spaces to ensure Hive drops the old itemCount field
+        // Hive will automatically drop unknown fields during deserialization
+        for (final key in spacesBox.keys) {
+          // Access each space to trigger deserialization
+          // This causes Hive to drop the itemCount field since it's no longer in the model
+          final _ = spacesBox.get(key);
+        }
+
+        // Mark migration as complete
+        await prefs.setMigratedToCalculatedCounts();
+
+        // ignore: avoid_print
+        print('Migration completed: All spaces migrated to calculated counts');
+      }
+    } catch (e) {
+      // Log migration error but don't fail initialization
+      // Migration errors are non-critical - the app can still function
+      // ignore: avoid_print
+      print('Warning: Migration error (non-critical): $e');
     }
   }
 

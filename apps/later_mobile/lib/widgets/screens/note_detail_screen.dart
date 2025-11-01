@@ -4,7 +4,6 @@ import 'package:provider/provider.dart';
 import 'package:later_mobile/design_system/tokens/tokens.dart';
 import '../../data/models/item_model.dart';
 import '../../providers/content_provider.dart';
-import '../../providers/spaces_provider.dart';
 import 'package:later_mobile/design_system/organisms/modals/bottom_sheet_container.dart';
 import '../../core/utils/responsive_modal.dart';
 import 'package:later_mobile/design_system/atoms/inputs/text_input_field.dart';
@@ -239,12 +238,8 @@ class _NoteDetailScreenState extends State<NoteDetailScreen>
   Future<void> _deleteNote() async {
     try {
       final provider = Provider.of<ContentProvider>(context, listen: false);
-      final spacesProvider = Provider.of<SpacesProvider>(
-        context,
-        listen: false,
-      );
 
-      await provider.deleteNote(_currentNote.id, spacesProvider);
+      await provider.deleteNote(_currentNote.id);
 
       // Navigation already handled in confirmation dialog
       // Success feedback is provided by UI update (note removed from list)

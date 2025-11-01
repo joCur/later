@@ -39,21 +39,18 @@ void main() {
           name: 'Personal',
           icon: '🏠',
           color: '#6366F1',
-          itemCount: 5,
         ),
         Space(
           id: 'space-2',
           name: 'Work',
           icon: '💼',
           color: '#8B5CF6',
-          itemCount: 12,
         ),
         Space(
           id: 'space-3',
           name: 'Projects',
           icon: '🚀',
           color: '#F59E0B',
-          itemCount: 3,
         ),
       ];
 
@@ -402,8 +399,6 @@ void main() {
         await tester.pumpWidget(buildModalWithProvider());
         await tester.pumpAndSettle();
 
-        final originalItemCount = testSpaces[1].itemCount; // Work has 12 items
-
         // Act - Edit space
         await tester.longPress(find.text('Work'));
         await tester.pumpAndSettle();
@@ -417,11 +412,12 @@ void main() {
         await tester.tap(find.text('Save'));
         await tester.pumpAndSettle();
 
-        // Assert - Item count should be preserved
+        // Assert - Space should be edited
         final editedSpace = spacesProvider.spaces.firstWhere(
           (s) => s.name == 'Work Edited',
         );
-        expect(editedSpace.itemCount, equals(originalItemCount));
+        // Item count is now calculated from database, not stored
+        expect(editedSpace.name, equals('Work Edited'));
       });
     });
 

@@ -7,7 +7,6 @@ import 'package:later_mobile/design_system/tokens/tokens.dart';
 import '../../core/utils/responsive_modal.dart';
 import '../../data/models/todo_list_model.dart';
 import '../../providers/content_provider.dart';
-import '../../providers/spaces_provider.dart';
 import 'package:later_mobile/design_system/organisms/cards/todo_item_card.dart';
 import 'package:later_mobile/design_system/organisms/fab/responsive_fab.dart';
 import 'package:later_mobile/design_system/organisms/modals/bottom_sheet_container.dart';
@@ -261,12 +260,8 @@ class _TodoListDetailScreenState extends State<TodoListDetailScreen> {
   Future<void> _deleteTodoList() async {
     try {
       final provider = Provider.of<ContentProvider>(context, listen: false);
-      final spacesProvider = Provider.of<SpacesProvider>(
-        context,
-        listen: false,
-      );
 
-      await provider.deleteTodoList(_currentTodoList.id, spacesProvider);
+      await provider.deleteTodoList(_currentTodoList.id);
 
       // Navigation already handled in confirmation dialog
       // Success feedback is provided by UI update (todo list removed from list)

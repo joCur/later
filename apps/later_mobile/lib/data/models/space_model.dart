@@ -11,7 +11,6 @@ class Space {
     required this.name,
     this.icon,
     this.color,
-    this.itemCount = 0,
     this.isArchived = false,
     DateTime? createdAt,
     DateTime? updatedAt,
@@ -25,7 +24,6 @@ class Space {
       name: json['name'] as String,
       icon: json['icon'] as String?,
       color: json['color'] as String?,
-      itemCount: json['itemCount'] as int? ?? 0,
       isArchived: json['isArchived'] as bool? ?? false,
       createdAt: DateTime.parse(json['createdAt'] as String),
       updatedAt: DateTime.parse(json['updatedAt'] as String),
@@ -48,10 +46,6 @@ class Space {
   @HiveField(3)
   final String? color;
 
-  /// Number of items in this space
-  @HiveField(4)
-  final int itemCount;
-
   /// Whether the space is archived
   @HiveField(5)
   final bool isArchived;
@@ -70,7 +64,6 @@ class Space {
     String? name,
     String? icon,
     String? color,
-    int? itemCount,
     bool? isArchived,
     DateTime? createdAt,
     DateTime? updatedAt,
@@ -80,7 +73,6 @@ class Space {
       name: name ?? this.name,
       icon: icon ?? this.icon,
       color: color ?? this.color,
-      itemCount: itemCount ?? this.itemCount,
       isArchived: isArchived ?? this.isArchived,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
@@ -94,7 +86,6 @@ class Space {
       'name': name,
       'icon': icon,
       'color': color,
-      'itemCount': itemCount,
       'isArchived': isArchived,
       'createdAt': createdAt.toIso8601String(),
       'updatedAt': updatedAt.toIso8601String(),
@@ -103,7 +94,7 @@ class Space {
 
   @override
   String toString() {
-    return 'Space(id: $id, name: $name, itemCount: $itemCount, isArchived: $isArchived)';
+    return 'Space(id: $id, name: $name, isArchived: $isArchived)';
   }
 
   @override

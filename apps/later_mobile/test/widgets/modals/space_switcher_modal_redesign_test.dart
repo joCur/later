@@ -35,11 +35,11 @@ void main() {
 
       // Create test spaces with different counts (1, 5, 20+)
       testSpaces = [
-        Space(id: 'space-1', name: 'Personal', icon: '🏠', itemCount: 5),
-        Space(id: 'space-2', name: 'Work', icon: '💼', itemCount: 12),
-        Space(id: 'space-3', name: 'Projects', icon: '🚀', itemCount: 3),
+        Space(id: 'space-1', name: 'Personal', icon: '🏠'),
+        Space(id: 'space-2', name: 'Work', icon: '💼'),
+        Space(id: 'space-3', name: 'Projects', icon: '🚀'),
         Space(id: 'space-4', name: 'Shopping', icon: '🛒'),
-        Space(id: 'space-5', name: 'Ideas', icon: '💡', itemCount: 8),
+        Space(id: 'space-5', name: 'Ideas', icon: '💡'),
       ];
 
       // Add test spaces to repository
@@ -544,7 +544,6 @@ void main() {
             id: 'space-$index',
             name: 'Space ${index + 1}',
             icon: '📁',
-            itemCount: index,
           ),
         );
         for (final space in manySpaces) {

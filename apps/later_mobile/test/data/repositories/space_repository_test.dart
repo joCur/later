@@ -1,6 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
+import 'package:later_mobile/data/models/item_model.dart';
+import 'package:later_mobile/data/models/list_model.dart';
 import 'package:later_mobile/data/models/space_model.dart';
+import 'package:later_mobile/data/models/todo_list_model.dart';
 import 'package:later_mobile/data/repositories/space_repository.dart';
 
 void main() {
@@ -36,7 +39,6 @@ void main() {
       String name = 'Test Space',
       String? icon,
       String? color,
-      int itemCount = 0,
       bool isArchived = false,
     }) {
       return Space(
@@ -44,7 +46,6 @@ void main() {
         name: name,
         icon: icon,
         color: color,
-        itemCount: itemCount,
         isArchived: isArchived,
       );
     }
@@ -238,7 +239,6 @@ void main() {
           name: 'Work',
           icon: '💼',
           color: '#FF5733',
-          itemCount: 5,
         );
 
         await repository.createSpace(space);
@@ -251,7 +251,6 @@ void main() {
         expect(result!.name, equals('Work'));
         expect(result.icon, equals('💼'));
         expect(result.color, equals('#FF5733'));
-        expect(result.itemCount, equals(5));
       });
     });
 
@@ -381,152 +380,302 @@ void main() {
       });
     });
 
-    group('incrementItemCount', () {
-      test('should increment item count by 1', () async {
-        // Arrange
-        final space = createTestSpace(id: 'space-1', itemCount: 5);
-        await repository.createSpace(space);
+    group('getItemCount', () {
+      late Box<Item> notesBox;
+      late Box<TodoList> todoListsBox;
+      late Box<ListModel> listsBox;
 
-        // Act
-        await repository.incrementItemCount('space-1');
+      setUp(() async {
+        // Register additional adapters if not already registered
+        if (!Hive.isAdapterRegistered(1)) {
+          Hive.registerAdapter(ItemAdapter());
+        }
+        if (!Hive.isAdapterRegistered(20)) {
+          Hive.registerAdapter(TodoListAdapter());
+        }
+        if (!Hive.isAdapterRegistered(22)) {
+          Hive.registerAdapter(ListModelAdapter());
+        }
+        if (!Hive.isAdapterRegistered(21)) {
+          Hive.registerAdapter(TodoItemAdapter());
+        }
+        if (!Hive.isAdapterRegistered(23)) {
+          Hive.registerAdapter(ListItemAdapter());
+        }
+        if (!Hive.isAdapterRegistered(24)) {
+          Hive.registerAdapter(ListStyleAdapter());
+        }
 
-        // Assert
-        final updatedSpace = spacesBox.get('space-1');
-        expect(updatedSpace!.itemCount, equals(6));
+        // Open boxes
+        notesBox = await Hive.openBox<Item>('notes');
+        todoListsBox = await Hive.openBox<TodoList>('todo_lists');
+        listsBox = await Hive.openBox<ListModel>('lists');
       });
 
-      test('should increment from 0', () async {
+      tearDown(() async {
+        // Clear and close all boxes
+        await notesBox.clear();
+        await notesBox.close();
+        await todoListsBox.clear();
+        await todoListsBox.close();
+        await listsBox.clear();
+        await listsBox.close();
+        await Hive.deleteBoxFromDisk('notes');
+        await Hive.deleteBoxFromDisk('todo_lists');
+        await Hive.deleteBoxFromDisk('lists');
+      });
+
+      test('should return 0 for space with no items', () async {
         // Arrange
         final space = createTestSpace(id: 'space-1');
         await repository.createSpace(space);
 
         // Act
-        await repository.incrementItemCount('space-1');
+        final count = await repository.getItemCount('space-1');
 
         // Assert
-        final updatedSpace = spacesBox.get('space-1');
-        expect(updatedSpace!.itemCount, equals(1));
+        expect(count, equals(0));
       });
 
-      test('should increment multiple times', () async {
+      test('should count notes only', () async {
         // Arrange
         final space = createTestSpace(id: 'space-1');
         await repository.createSpace(space);
 
-        // Act
-        await repository.incrementItemCount('space-1');
-        await repository.incrementItemCount('space-1');
-        await repository.incrementItemCount('space-1');
-
-        // Assert
-        final updatedSpace = spacesBox.get('space-1');
-        expect(updatedSpace!.itemCount, equals(3));
-      });
-
-      test('should throw exception when space does not exist', () async {
-        // Act & Assert
-        expect(
-          () => repository.incrementItemCount('non-existent'),
-          throwsException,
+        // Add 3 notes to space-1
+        await notesBox.put(
+          'note-1',
+          Item(
+            id: 'note-1',
+            title: 'Note 1',
+            content: '',
+            spaceId: 'space-1',
+          ),
         );
-      });
-
-      test('should update the updatedAt timestamp', () async {
-        // Arrange
-        final space = createTestSpace(id: 'space-1');
-        await repository.createSpace(space);
-        final originalUpdatedAt = space.updatedAt;
-
-        // Wait a small amount to ensure timestamp difference
-        await Future<void>.delayed(const Duration(milliseconds: 10));
-
-        // Act
-        await repository.incrementItemCount('space-1');
-
-        // Assert
-        final updatedSpace = spacesBox.get('space-1');
-        expect(updatedSpace!.updatedAt.isAfter(originalUpdatedAt), isTrue);
-      });
-    });
-
-    group('decrementItemCount', () {
-      test('should decrement item count by 1', () async {
-        // Arrange
-        final space = createTestSpace(id: 'space-1', itemCount: 5);
-        await repository.createSpace(space);
-
-        // Act
-        await repository.decrementItemCount('space-1');
-
-        // Assert
-        final updatedSpace = spacesBox.get('space-1');
-        expect(updatedSpace!.itemCount, equals(4));
-      });
-
-      test('should not go below 0', () async {
-        // Arrange
-        final space = createTestSpace(id: 'space-1');
-        await repository.createSpace(space);
-
-        // Act
-        await repository.decrementItemCount('space-1');
-
-        // Assert
-        final updatedSpace = spacesBox.get('space-1');
-        expect(updatedSpace!.itemCount, equals(0));
-      });
-
-      test('should decrement from 1 to 0', () async {
-        // Arrange
-        final space = createTestSpace(id: 'space-1', itemCount: 1);
-        await repository.createSpace(space);
-
-        // Act
-        await repository.decrementItemCount('space-1');
-
-        // Assert
-        final updatedSpace = spacesBox.get('space-1');
-        expect(updatedSpace!.itemCount, equals(0));
-      });
-
-      test('should decrement multiple times', () async {
-        // Arrange
-        final space = createTestSpace(id: 'space-1', itemCount: 5);
-        await repository.createSpace(space);
-
-        // Act
-        await repository.decrementItemCount('space-1');
-        await repository.decrementItemCount('space-1');
-        await repository.decrementItemCount('space-1');
-
-        // Assert
-        final updatedSpace = spacesBox.get('space-1');
-        expect(updatedSpace!.itemCount, equals(2));
-      });
-
-      test('should throw exception when space does not exist', () async {
-        // Act & Assert
-        expect(
-          () => repository.decrementItemCount('non-existent'),
-          throwsException,
+        await notesBox.put(
+          'note-2',
+          Item(
+            id: 'note-2',
+            title: 'Note 2',
+            content: '',
+            spaceId: 'space-1',
+          ),
         );
-      });
-
-      test('should update the updatedAt timestamp', () async {
-        // Arrange
-        final space = createTestSpace(id: 'space-1', itemCount: 5);
-        await repository.createSpace(space);
-        final originalUpdatedAt = space.updatedAt;
-
-        // Wait a small amount to ensure timestamp difference
-        await Future<void>.delayed(const Duration(milliseconds: 10));
+        await notesBox.put(
+          'note-3',
+          Item(
+            id: 'note-3',
+            title: 'Note 3',
+            content: '',
+            spaceId: 'space-1',
+          ),
+        );
 
         // Act
-        await repository.decrementItemCount('space-1');
+        final count = await repository.getItemCount('space-1');
 
         // Assert
-        final updatedSpace = spacesBox.get('space-1');
-        expect(updatedSpace!.updatedAt.isAfter(originalUpdatedAt), isTrue);
+        expect(count, equals(3));
+      });
+
+      test('should count todo lists only', () async {
+        // Arrange
+        final space = createTestSpace(id: 'space-1');
+        await repository.createSpace(space);
+
+        // Add 2 todo lists to space-1
+        await todoListsBox.put(
+          'todo-1',
+          TodoList(
+            id: 'todo-1',
+            name: 'Todo 1',
+            spaceId: 'space-1',
+            items: [],
+          ),
+        );
+        await todoListsBox.put(
+          'todo-2',
+          TodoList(
+            id: 'todo-2',
+            name: 'Todo 2',
+            spaceId: 'space-1',
+            items: [],
+          ),
+        );
+
+        // Act
+        final count = await repository.getItemCount('space-1');
+
+        // Assert
+        expect(count, equals(2));
+      });
+
+      test('should count lists only', () async {
+        // Arrange
+        final space = createTestSpace(id: 'space-1');
+        await repository.createSpace(space);
+
+        // Add 2 lists to space-1
+        await listsBox.put(
+          'list-1',
+          ListModel(
+            id: 'list-1',
+            name: 'List 1',
+            spaceId: 'space-1',
+            items: [],
+          ),
+        );
+        await listsBox.put(
+          'list-2',
+          ListModel(
+            id: 'list-2',
+            name: 'List 2',
+            spaceId: 'space-1',
+            items: [],
+          ),
+        );
+
+        // Act
+        final count = await repository.getItemCount('space-1');
+
+        // Assert
+        expect(count, equals(2));
+      });
+
+      test('should sum all item types', () async {
+        // Arrange
+        final space = createTestSpace(id: 'space-1');
+        await repository.createSpace(space);
+
+        // Add 2 notes
+        await notesBox.put(
+          'note-1',
+          Item(
+            id: 'note-1',
+            title: 'Note 1',
+            content: '',
+            spaceId: 'space-1',
+          ),
+        );
+        await notesBox.put(
+          'note-2',
+          Item(
+            id: 'note-2',
+            title: 'Note 2',
+            content: '',
+            spaceId: 'space-1',
+          ),
+        );
+
+        // Add 1 todo list
+        await todoListsBox.put(
+          'todo-1',
+          TodoList(
+            id: 'todo-1',
+            name: 'Todo 1',
+            spaceId: 'space-1',
+            items: [],
+          ),
+        );
+
+        // Add 3 lists
+        await listsBox.put(
+          'list-1',
+          ListModel(
+            id: 'list-1',
+            name: 'List 1',
+            spaceId: 'space-1',
+            items: [],
+          ),
+        );
+        await listsBox.put(
+          'list-2',
+          ListModel(
+            id: 'list-2',
+            name: 'List 2',
+            spaceId: 'space-1',
+            items: [],
+          ),
+        );
+        await listsBox.put(
+          'list-3',
+          ListModel(
+            id: 'list-3',
+            name: 'List 3',
+            spaceId: 'space-1',
+            items: [],
+          ),
+        );
+
+        // Act
+        final count = await repository.getItemCount('space-1');
+
+        // Assert
+        expect(count, equals(6)); // 2 notes + 1 todo + 3 lists
+      });
+
+      test('should filter by spaceId correctly', () async {
+        // Arrange
+        final space1 = createTestSpace(id: 'space-1');
+        final space2 = createTestSpace(id: 'space-2');
+        await repository.createSpace(space1);
+        await repository.createSpace(space2);
+
+        // Add items to space-1
+        await notesBox.put(
+          'note-1',
+          Item(
+            id: 'note-1',
+            title: 'Note in Space 1',
+            content: '',
+            spaceId: 'space-1',
+          ),
+        );
+        await todoListsBox.put(
+          'todo-1',
+          TodoList(
+            id: 'todo-1',
+            name: 'Todo in Space 1',
+            spaceId: 'space-1',
+            items: [],
+          ),
+        );
+
+        // Add items to space-2
+        await notesBox.put(
+          'note-2',
+          Item(
+            id: 'note-2',
+            title: 'Note in Space 2',
+            content: '',
+            spaceId: 'space-2',
+          ),
+        );
+        await listsBox.put(
+          'list-1',
+          ListModel(
+            id: 'list-1',
+            name: 'List in Space 2',
+            spaceId: 'space-2',
+            items: [],
+          ),
+        );
+
+        // Act
+        final count1 = await repository.getItemCount('space-1');
+        final count2 = await repository.getItemCount('space-2');
+
+        // Assert
+        expect(count1, equals(2)); // 1 note + 1 todo
+        expect(count2, equals(2)); // 1 note + 1 list
+      });
+
+      test('should return 0 for non-existent space', () async {
+        // Act
+        final count = await repository.getItemCount('non-existent-space');
+
+        // Assert
+        expect(count, equals(0));
       });
     });
 
@@ -568,23 +717,6 @@ void main() {
         expect(result.name.length, equals(1000));
       });
 
-      test('should handle rapid increment and decrement operations', () async {
-        // Arrange
-        final space = createTestSpace(id: 'space-1', itemCount: 10);
-        await repository.createSpace(space);
-
-        // Act
-        await repository.incrementItemCount('space-1');
-        await repository.incrementItemCount('space-1');
-        await repository.decrementItemCount('space-1');
-        await repository.incrementItemCount('space-1');
-        await repository.decrementItemCount('space-1');
-        await repository.decrementItemCount('space-1');
-
-        // Assert
-        final updatedSpace = spacesBox.get('space-1');
-        expect(updatedSpace!.itemCount, equals(10));
-      });
     });
   });
 }

@@ -116,6 +116,7 @@ import 'package:later_mobile/design_system/design_system.dart';
 - `id`, `name`, `icon`, `color`, `isArchived`
 - Hive typeId: 2
 - Top-level organizational container
+- Note: Item counts are calculated dynamically, not stored (see Item Count Calculation below)
 
 ### Auto-Save Pattern
 
@@ -131,6 +132,29 @@ class MyScreen extends StatefulWidget with AutoSaveMixin {
 ```
 
 Recently applied to note and list detail screens. When adding similar edit screens, use this mixin.
+
+### Item Count Calculation
+
+**Calculated Counts (Not Stored):**
+- Space item counts are **calculated dynamically** from the database, not stored
+- Uses `SpaceItemCountService.calculateItemCount(spaceId)` to query all content boxes
+- Single source of truth: actual items in Hive boxes (`notes`, `todo_lists`, `lists`)
+- Eliminates desynchronization bugs - impossible for counts to be inaccurate
+
+**How to Get Item Counts:**
+- Repository: `SpaceRepository.getItemCount(spaceId)` - returns `Future<int>`
+- Provider: `SpacesProvider.getSpaceItemCount(spaceId)` - returns `Future<int>` with retry logic
+- UI: Use `FutureBuilder` or pre-fetch counts on widget initialization (see `SpaceSwitcherModal` or `AppSidebar` for examples)
+
+**Performance:**
+- Query overhead is minimal (O(n) where n = items in all spaces)
+- UI components pre-fetch and cache counts to prevent flicker
+- Typical performance: <100ms for 10 spaces with 100 items each
+
+**Migration:**
+- Old Space model had stored `itemCount` field (removed in v2)
+- Migration runs automatically on first app launch after upgrade
+- Hive automatically drops unknown fields when deserializing with new adapter
 
 ## Code Quality Standards
 

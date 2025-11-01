@@ -39,6 +39,7 @@ class _SpaceSwitcherModalState extends State<SpaceSwitcherModal> {
   int _selectedIndex = -1; // -1 means no selection, keyboard navigation
   List<Space> _filteredSpaces = [];
   bool _showArchivedSpaces = false; // Toggle state for showing archived spaces
+  final Map<String, int> _cachedCounts = {}; // Cache for item counts
 
   @override
   void initState() {
@@ -46,6 +47,10 @@ class _SpaceSwitcherModalState extends State<SpaceSwitcherModal> {
     _searchController.addListener(_filterSpaces);
     // Don't auto-focus search field to prevent keyboard from covering modal
     // User can tap search field if they want to filter spaces
+    // Pre-fetch item counts for all spaces to prevent flicker
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _preFetchItemCounts();
+    });
   }
 
   @override
@@ -53,7 +58,28 @@ class _SpaceSwitcherModalState extends State<SpaceSwitcherModal> {
     _searchController.dispose();
     _searchFocusNode.dispose();
     _listFocusNode.dispose();
+    _cachedCounts.clear();
     super.dispose();
+  }
+
+  /// Pre-fetch item counts for all spaces to prevent flicker
+  Future<void> _preFetchItemCounts() async {
+    final spacesProvider = context.read<SpacesProvider>();
+    final spaces = spacesProvider.spaces;
+
+    for (final space in spaces) {
+      try {
+        final count = await spacesProvider.getSpaceItemCount(space.id);
+        if (mounted) {
+          setState(() {
+            _cachedCounts[space.id] = count;
+          });
+        }
+      } catch (e) {
+        // Ignore errors during pre-fetch, will fallback to loading state
+        debugPrint('Error pre-fetching count for space ${space.id}: $e');
+      }
+    }
   }
 
   /// Filter spaces based on search query
@@ -196,6 +222,56 @@ class _SpaceSwitcherModalState extends State<SpaceSwitcherModal> {
     );
   }
 
+  /// Build item count widget with async loading
+  Widget _buildItemCount(String spaceId, BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    // Check if we have a cached count
+    if (_cachedCounts.containsKey(spaceId)) {
+      return Container(
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.xs,
+          vertical: AppSpacing.xxs,
+        ),
+        decoration: BoxDecoration(
+          color: AppColors.surfaceVariant(context),
+          borderRadius: BorderRadius.circular(AppSpacing.xs),
+        ),
+        child: Text(
+          '${_cachedCounts[spaceId]}',
+          style: AppTypography.labelMedium.copyWith(
+            color: AppColors.neutral500,
+          ),
+        ),
+      );
+    }
+
+    // If not cached, use FutureBuilder
+    final spacesProvider = Provider.of<SpacesProvider>(context, listen: false);
+    return FutureBuilder<int>(
+      future: spacesProvider.getSpaceItemCount(spaceId),
+      builder: (context, snapshot) {
+        final displayText = snapshot.hasData ? '${snapshot.data}' : '...';
+        return Container(
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.xs,
+            vertical: AppSpacing.xxs,
+          ),
+          decoration: BoxDecoration(
+            color: AppColors.surfaceVariant(context),
+            borderRadius: BorderRadius.circular(AppSpacing.xs),
+          ),
+          child: Text(
+            displayText,
+            style: AppTypography.labelMedium.copyWith(
+              color: isDark ? AppColors.neutral500 : AppColors.neutral500,
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   /// Get gradient for space item based on index
   LinearGradient _getSpaceGradient(int index, BuildContext context) {
     final temporalTheme = Theme.of(context).extension<TemporalFlowTheme>()!;
@@ -233,9 +309,12 @@ class _SpaceSwitcherModalState extends State<SpaceSwitcherModal> {
     final isArchived = space.isArchived;
     final gradient = _getSpaceGradient(index, context);
 
+    // Get item count for accessibility label
+    final itemCount = _cachedCounts[space.id] ?? 0;
+
     // Wrap entire item in Opacity if archived
     final itemContent = Semantics(
-      label: '${space.name}, ${space.itemCount} items',
+      label: '${space.name}, $itemCount items',
       selected: isSelected,
       button: true,
       child: InkWell(
@@ -373,25 +452,8 @@ class _SpaceSwitcherModalState extends State<SpaceSwitcherModal> {
 
                 if (isArchived) const SizedBox(width: AppSpacing.xxs),
 
-                // Item count badge
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppSpacing.xs,
-                    vertical: AppSpacing.xxs,
-                  ),
-                  decoration: BoxDecoration(
-                    color: AppColors.surfaceVariant(context),
-                    borderRadius: BorderRadius.circular(AppSpacing.xs),
-                  ),
-                  child: Text(
-                    '${space.itemCount}',
-                    style: AppTypography.labelMedium.copyWith(
-                      color: isDark
-                          ? AppColors.neutral500
-                          : AppColors.neutral500,
-                    ),
-                  ),
-                ),
+                // Item count badge (async loaded)
+                _buildItemCount(space.id, context),
 
                 // Selected indicator
                 if (isSelected)
@@ -426,6 +488,9 @@ class _SpaceSwitcherModalState extends State<SpaceSwitcherModal> {
     final spacesProvider = Provider.of<SpacesProvider>(context, listen: false);
     final currentSpaceId = spacesProvider.currentSpace?.id ?? '';
     final isCurrentSpace = space.id == currentSpaceId;
+
+    // Get item count for menu (use cached value or default to 0)
+    final itemCount = _cachedCounts[space.id] ?? 0;
 
     // Trigger haptic feedback
     HapticFeedback.mediumImpact();
@@ -473,7 +538,7 @@ class _SpaceSwitcherModalState extends State<SpaceSwitcherModal> {
                         ),
                       ),
                       Text(
-                        '${space.itemCount} items',
+                        '$itemCount items',
                         style: AppTypography.labelMedium.copyWith(
                           color: isDark
                               ? AppColors.neutral500
@@ -513,9 +578,9 @@ class _SpaceSwitcherModalState extends State<SpaceSwitcherModal> {
                     title: const Text('Archive Space'),
                     subtitle: isCurrentSpace
                         ? const Text('Switch to another space first')
-                        : (space.itemCount > 0
+                        : (itemCount > 0
                               ? Text(
-                                  'This space contains ${space.itemCount} items',
+                                  'This space contains $itemCount items',
                                 )
                               : null),
                     onTap: isCurrentSpace
@@ -600,6 +665,9 @@ class _SpaceSwitcherModalState extends State<SpaceSwitcherModal> {
     final spacesProvider = Provider.of<SpacesProvider>(context, listen: false);
     final currentSpaceId = spacesProvider.currentSpace?.id ?? '';
 
+    // Get item count (use cached value or default to 0)
+    final itemCount = _cachedCounts[space.id] ?? 0;
+
     // Prevent archiving current space
     if (space.id == currentSpaceId) {
       messenger.showSnackBar(
@@ -614,13 +682,13 @@ class _SpaceSwitcherModalState extends State<SpaceSwitcherModal> {
     }
 
     // Show confirmation dialog if space has items
-    if (space.itemCount > 0) {
+    if (itemCount > 0) {
       final confirmed = await showDialog<bool>(
         context: context,
         builder: (dialogContext) => AlertDialog(
           title: const Text('Archive Space?'),
           content: Text(
-            'This space contains ${space.itemCount} items. '
+            'This space contains $itemCount items. '
             'Archiving will hide the space but keep all items. '
             'You can restore it later from archived spaces.',
           ),
