@@ -150,6 +150,10 @@ class _ListItemCardState extends State<ListItemCard> {
             visualDensity: VisualDensity.compact,
           ),
         );
+
+      case ListStyle.simple:
+        // No indicator for simple style
+        return const SizedBox.shrink();
     }
   }
 
@@ -191,6 +195,9 @@ class _ListItemCardState extends State<ListItemCard> {
         break;
       case ListStyle.checkboxes:
         buffer.write(widget.listItem.isChecked ? ', checked' : ', not checked');
+        break;
+      case ListStyle.simple:
+        // No additional semantic information for simple style
         break;
     }
 

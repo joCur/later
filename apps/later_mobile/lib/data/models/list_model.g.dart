@@ -120,6 +120,8 @@ class ListStyleAdapter extends TypeAdapter<ListStyle> {
         return ListStyle.numbered;
       case 2:
         return ListStyle.checkboxes;
+      case 3:
+        return ListStyle.simple;
       default:
         return ListStyle.bullets;
     }
@@ -136,6 +138,9 @@ class ListStyleAdapter extends TypeAdapter<ListStyle> {
         break;
       case ListStyle.checkboxes:
         writer.writeByte(2);
+        break;
+      case ListStyle.simple:
+        writer.writeByte(3);
         break;
     }
   }

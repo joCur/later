@@ -7,6 +7,7 @@ import 'package:later_mobile/design_system/atoms/buttons/ghost_button.dart';
 import 'package:later_mobile/design_system/atoms/buttons/gradient_button.dart';
 import 'package:later_mobile/design_system/atoms/buttons/primary_button.dart';
 import 'package:later_mobile/design_system/atoms/inputs/text_area_field.dart';
+import 'package:later_mobile/design_system/molecules/controls/segmented_control.dart';
 import 'package:later_mobile/design_system/tokens/tokens.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
@@ -110,6 +111,7 @@ class _CreateContentModalState extends State<CreateContentModal>
   ];
 
   ContentType? _selectedType; // User-selected type
+  ListStyle _selectedListStyle = ListStyle.bullets; // Default list style
 
   late AnimationController _animationController;
   late Animation<double> _scaleAnimation;
@@ -267,6 +269,7 @@ class _CreateContentModalState extends State<CreateContentModal>
               spaceId: targetSpaceId,
               name: text,
               items: [],
+              style: _selectedListStyle,
             );
             await contentProvider.createList(listModel);
             _currentItemId = id;
@@ -620,6 +623,8 @@ class _CreateContentModalState extends State<CreateContentModal>
   }
 
   Widget _buildModalContent({required bool isMobile}) {
+    final typeSpecificFields = _buildTypeSpecificFields();
+
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -632,6 +637,9 @@ class _CreateContentModalState extends State<CreateContentModal>
 
         // Input field
         _buildInputField(),
+
+        // Type-specific fields (e.g., list style selector)
+        if (typeSpecificFields != null) typeSpecificFields,
 
         // Toolbar
         _buildToolbar(),
@@ -762,6 +770,93 @@ class _CreateContentModalState extends State<CreateContentModal>
         _typeIconAnimationController.forward(from: 0.0);
       },
     );
+  }
+
+  /// Get display label for a list style
+  String _getStyleLabel(ListStyle style) {
+    switch (style) {
+      case ListStyle.bullets:
+        return 'Bullets';
+      case ListStyle.numbered:
+        return 'Numbered';
+      case ListStyle.checkboxes:
+        return 'Checklist';
+      case ListStyle.simple:
+        return 'Simple';
+    }
+  }
+
+  /// Get icon for a list style
+  IconData _getStyleIcon(ListStyle style) {
+    switch (style) {
+      case ListStyle.bullets:
+        return Icons.format_list_bulleted;
+      case ListStyle.numbered:
+        return Icons.format_list_numbered;
+      case ListStyle.checkboxes:
+        return Icons.check_box_outlined;
+      case ListStyle.simple:
+        return Icons.list;
+    }
+  }
+
+  /// Build List-specific fields (style selector)
+  Widget _buildListFields() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const SizedBox(height: AppSpacing.sm),
+          Text(
+            'List Style',
+            style: AppTypography.labelMedium.copyWith(
+              color: AppColors.textSecondary(context),
+            ),
+          ),
+          const SizedBox(height: AppSpacing.xs),
+          // Use the reusable SegmentedControl component
+          SegmentedControl<ListStyle>(
+            options: ListStyle.values.map((style) {
+              return SegmentedControlOption<ListStyle>(
+                value: style,
+                label: _getStyleLabel(style),
+                icon: _getStyleIcon(style),
+              );
+            }).toList(),
+            selectedValue: _selectedListStyle,
+            onSelectionChanged: (value) {
+              setState(() {
+                _selectedListStyle = value;
+              });
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Build type-specific fields based on selected content type
+  Widget? _buildTypeSpecificFields() {
+    if (_selectedType == ContentType.list) {
+      return AnimatedSwitcher(
+        duration: const Duration(milliseconds: 250),
+        transitionBuilder: (Widget child, Animation<double> animation) {
+          return FadeTransition(
+            opacity: animation,
+            child: SlideTransition(
+              position: Tween<Offset>(
+                begin: const Offset(0, 0.1),
+                end: Offset.zero,
+              ).animate(animation),
+              child: child,
+            ),
+          );
+        },
+        child: _buildListFields(),
+      );
+    }
+    return null;
   }
 
   Widget _buildInputField() {

@@ -16,6 +16,10 @@ enum ListStyle {
   /// Checkbox list style for tasks
   @HiveField(2)
   checkboxes,
+
+  /// Simple list style (no prefix)
+  @HiveField(3)
+  simple,
 }
 
 /// Extension for ListStyle enum serialization
