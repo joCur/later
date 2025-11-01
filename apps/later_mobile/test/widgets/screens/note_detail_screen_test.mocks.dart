@@ -4,14 +4,14 @@
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'dart:async' as _i6;
-import 'dart:ui' as _i8;
+import 'dart:ui' as _i7;
 
 import 'package:later_mobile/data/models/item_model.dart' as _i5;
 import 'package:later_mobile/data/models/list_model.dart' as _i4;
 import 'package:later_mobile/data/models/space_model.dart' as _i9;
 import 'package:later_mobile/data/models/todo_list_model.dart' as _i3;
 import 'package:later_mobile/providers/content_provider.dart' as _i2;
-import 'package:later_mobile/providers/spaces_provider.dart' as _i7;
+import 'package:later_mobile/providers/spaces_provider.dart' as _i8;
 import 'package:mockito/mockito.dart' as _i1;
 
 // ignore_for_file: type=lint
@@ -76,17 +76,11 @@ class MockContentProvider extends _i1.Mock implements _i2.ContentProvider {
       ) as _i6.Future<void>);
 
   @override
-  _i6.Future<void> createTodoList(
-    _i3.TodoList? todoList,
-    _i7.SpacesProvider? spacesProvider,
-  ) =>
+  _i6.Future<void> createTodoList(_i3.TodoList? todoList) =>
       (super.noSuchMethod(
         Invocation.method(
           #createTodoList,
-          [
-            todoList,
-            spacesProvider,
-          ],
+          [todoList],
         ),
         returnValue: _i6.Future<void>.value(),
         returnValueForMissingStub: _i6.Future<void>.value(),
@@ -104,17 +98,10 @@ class MockContentProvider extends _i1.Mock implements _i2.ContentProvider {
       ) as _i6.Future<void>);
 
   @override
-  _i6.Future<void> deleteTodoList(
-    String? id,
-    _i7.SpacesProvider? spacesProvider,
-  ) =>
-      (super.noSuchMethod(
+  _i6.Future<void> deleteTodoList(String? id) => (super.noSuchMethod(
         Invocation.method(
           #deleteTodoList,
-          [
-            id,
-            spacesProvider,
-          ],
+          [id],
         ),
         returnValue: _i6.Future<void>.value(),
         returnValueForMissingStub: _i6.Future<void>.value(),
@@ -210,17 +197,10 @@ class MockContentProvider extends _i1.Mock implements _i2.ContentProvider {
       ) as _i6.Future<void>);
 
   @override
-  _i6.Future<void> createList(
-    _i4.ListModel? list,
-    _i7.SpacesProvider? spacesProvider,
-  ) =>
-      (super.noSuchMethod(
+  _i6.Future<void> createList(_i4.ListModel? list) => (super.noSuchMethod(
         Invocation.method(
           #createList,
-          [
-            list,
-            spacesProvider,
-          ],
+          [list],
         ),
         returnValue: _i6.Future<void>.value(),
         returnValueForMissingStub: _i6.Future<void>.value(),
@@ -237,17 +217,10 @@ class MockContentProvider extends _i1.Mock implements _i2.ContentProvider {
       ) as _i6.Future<void>);
 
   @override
-  _i6.Future<void> deleteList(
-    String? id,
-    _i7.SpacesProvider? spacesProvider,
-  ) =>
-      (super.noSuchMethod(
+  _i6.Future<void> deleteList(String? id) => (super.noSuchMethod(
         Invocation.method(
           #deleteList,
-          [
-            id,
-            spacesProvider,
-          ],
+          [id],
         ),
         returnValue: _i6.Future<void>.value(),
         returnValueForMissingStub: _i6.Future<void>.value(),
@@ -343,17 +316,10 @@ class MockContentProvider extends _i1.Mock implements _i2.ContentProvider {
       ) as _i6.Future<void>);
 
   @override
-  _i6.Future<void> createNote(
-    _i5.Item? note,
-    _i7.SpacesProvider? spacesProvider,
-  ) =>
-      (super.noSuchMethod(
+  _i6.Future<void> createNote(_i5.Item? note) => (super.noSuchMethod(
         Invocation.method(
           #createNote,
-          [
-            note,
-            spacesProvider,
-          ],
+          [note],
         ),
         returnValue: _i6.Future<void>.value(),
         returnValueForMissingStub: _i6.Future<void>.value(),
@@ -370,17 +336,10 @@ class MockContentProvider extends _i1.Mock implements _i2.ContentProvider {
       ) as _i6.Future<void>);
 
   @override
-  _i6.Future<void> deleteNote(
-    String? id,
-    _i7.SpacesProvider? spacesProvider,
-  ) =>
-      (super.noSuchMethod(
+  _i6.Future<void> deleteNote(String? id) => (super.noSuchMethod(
         Invocation.method(
           #deleteNote,
-          [
-            id,
-            spacesProvider,
-          ],
+          [id],
         ),
         returnValue: _i6.Future<void>.value(),
         returnValueForMissingStub: _i6.Future<void>.value(),
@@ -433,7 +392,7 @@ class MockContentProvider extends _i1.Mock implements _i2.ContentProvider {
       );
 
   @override
-  void addListener(_i8.VoidCallback? listener) => super.noSuchMethod(
+  void addListener(_i7.VoidCallback? listener) => super.noSuchMethod(
         Invocation.method(
           #addListener,
           [listener],
@@ -442,7 +401,7 @@ class MockContentProvider extends _i1.Mock implements _i2.ContentProvider {
       );
 
   @override
-  void removeListener(_i8.VoidCallback? listener) => super.noSuchMethod(
+  void removeListener(_i7.VoidCallback? listener) => super.noSuchMethod(
         Invocation.method(
           #removeListener,
           [listener],
@@ -472,7 +431,7 @@ class MockContentProvider extends _i1.Mock implements _i2.ContentProvider {
 /// A class which mocks [SpacesProvider].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockSpacesProvider extends _i1.Mock implements _i7.SpacesProvider {
+class MockSpacesProvider extends _i1.Mock implements _i8.SpacesProvider {
   MockSpacesProvider() {
     _i1.throwOnMissingStub(this);
   }
@@ -548,26 +507,13 @@ class MockSpacesProvider extends _i1.Mock implements _i7.SpacesProvider {
       ) as _i6.Future<void>);
 
   @override
-  _i6.Future<void> incrementSpaceItemCount(String? spaceId) =>
-      (super.noSuchMethod(
+  _i6.Future<int> getSpaceItemCount(String? spaceId) => (super.noSuchMethod(
         Invocation.method(
-          #incrementSpaceItemCount,
+          #getSpaceItemCount,
           [spaceId],
         ),
-        returnValue: _i6.Future<void>.value(),
-        returnValueForMissingStub: _i6.Future<void>.value(),
-      ) as _i6.Future<void>);
-
-  @override
-  _i6.Future<void> decrementSpaceItemCount(String? spaceId) =>
-      (super.noSuchMethod(
-        Invocation.method(
-          #decrementSpaceItemCount,
-          [spaceId],
-        ),
-        returnValue: _i6.Future<void>.value(),
-        returnValueForMissingStub: _i6.Future<void>.value(),
-      ) as _i6.Future<void>);
+        returnValue: _i6.Future<int>.value(0),
+      ) as _i6.Future<int>);
 
   @override
   void clearError() => super.noSuchMethod(
@@ -579,7 +525,7 @@ class MockSpacesProvider extends _i1.Mock implements _i7.SpacesProvider {
       );
 
   @override
-  void addListener(_i8.VoidCallback? listener) => super.noSuchMethod(
+  void addListener(_i7.VoidCallback? listener) => super.noSuchMethod(
         Invocation.method(
           #addListener,
           [listener],
@@ -588,7 +534,7 @@ class MockSpacesProvider extends _i1.Mock implements _i7.SpacesProvider {
       );
 
   @override
-  void removeListener(_i8.VoidCallback? listener) => super.noSuchMethod(
+  void removeListener(_i7.VoidCallback? listener) => super.noSuchMethod(
         Invocation.method(
           #removeListener,
           [listener],

@@ -464,7 +464,7 @@ class _SpaceListItemState extends State<_SpaceListItem> {
       ),
       child: Semantics(
         label: widget.isExpanded
-            ? '${widget.space.name}, ${widget.cachedCount ?? "..."} items${widget.keyboardShortcut != null ? ", keyboard shortcut ${widget.keyboardShortcut}" : ""}'
+            ? '${widget.space.name}${widget.cachedCount != null ? ", ${widget.cachedCount} items" : ""}${widget.keyboardShortcut != null ? ", keyboard shortcut ${widget.keyboardShortcut}" : ""}'
             : widget.space.name,
         selected: widget.isSelected,
         button: true,
@@ -476,7 +476,9 @@ class _SpaceListItemState extends State<_SpaceListItem> {
                 ? (widget.keyboardShortcut != null
                       ? 'Press ${widget.keyboardShortcut} to switch'
                       : widget.space.name)
-                : '${widget.space.name} (${widget.cachedCount ?? "..."} items)',
+                : widget.cachedCount != null
+                    ? '${widget.space.name} (${widget.cachedCount} items)'
+                    : widget.space.name,
             child: InkWell(
               onTap: widget.onTap,
               borderRadius: const BorderRadius.all(

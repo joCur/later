@@ -101,22 +101,11 @@ class MockSpaceRepository extends _i1.Mock implements _i3.SpaceRepository {
       ) as _i4.Future<void>);
 
   @override
-  _i4.Future<void> incrementItemCount(String? spaceId) => (super.noSuchMethod(
+  _i4.Future<int> getItemCount(String? spaceId) => (super.noSuchMethod(
         Invocation.method(
-          #incrementItemCount,
+          #getItemCount,
           [spaceId],
         ),
-        returnValue: _i4.Future<void>.value(),
-        returnValueForMissingStub: _i4.Future<void>.value(),
-      ) as _i4.Future<void>);
-
-  @override
-  _i4.Future<void> decrementItemCount(String? spaceId) => (super.noSuchMethod(
-        Invocation.method(
-          #decrementItemCount,
-          [spaceId],
-        ),
-        returnValue: _i4.Future<void>.value(),
-        returnValueForMissingStub: _i4.Future<void>.value(),
-      ) as _i4.Future<void>);
+        returnValue: _i4.Future<int>.value(0),
+      ) as _i4.Future<int>);
 }
