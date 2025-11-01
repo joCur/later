@@ -713,11 +713,11 @@ class _CreateContentModalState extends State<CreateContentModal>
         // Type-specific fields (e.g., list style selector)
         if (typeSpecificFields != null) typeSpecificFields,
 
-        // Toolbar
-        _buildToolbar(),
-
-        // Auto-save indicator
+        // Keyboard shortcuts hint
         _buildAutoSaveIndicator(),
+
+        // Space selector (right before create button)
+        _buildSpaceSelectorRow(),
 
         // Footer with action button
         _buildFooter(isMobile: isMobile),
@@ -1091,7 +1091,10 @@ class _CreateContentModalState extends State<CreateContentModal>
   }
 
   /// Common transition builder for smooth, consistent animations
-  Widget _typeFieldTransitionBuilder(Widget child, Animation<double> animation) {
+  Widget _typeFieldTransitionBuilder(
+    Widget child,
+    Animation<double> animation,
+  ) {
     // Use easeOutCubic for smoother, more natural entrance
     final curvedAnimation = CurvedAnimation(
       parent: animation,
@@ -1182,63 +1185,24 @@ class _CreateContentModalState extends State<CreateContentModal>
     );
   }
 
-  Widget _buildToolbar() {
+  Widget _buildSpaceSelectorRow() {
     final isMobile = context.isMobile;
 
     return Padding(
       padding: EdgeInsets.fromLTRB(
-        isMobile ? AppSpacing.lg : AppSpacing.md, // 24px on mobile
-        AppSpacing.sm,
-        isMobile ? AppSpacing.lg : AppSpacing.md, // 24px on mobile
+        isMobile ? AppSpacing.lg : AppSpacing.md,
         0,
+        isMobile ? AppSpacing.lg : AppSpacing.md,
+        AppSpacing.sm,
       ),
       child: Row(
         children: [
-          // Voice button
-          Semantics(
-            label: 'Voice input',
-            button: true,
-            child: IconButton(
-              key: const Key('voice_button'),
-              icon: Icon(
-                Icons.mic_outlined,
-                color: AppColors.textSecondary(context),
-              ),
-              onPressed: () {
-                // TODO: Implement voice input
-              },
-              iconSize: 20,
-              constraints: const BoxConstraints(
-                minWidth: AppSpacing.minTouchTarget,
-                minHeight: AppSpacing.minTouchTarget,
-              ),
+          Text(
+            'Save to: ',
+            style: AppTypography.labelMedium.copyWith(
+              color: AppColors.textSecondary(context),
             ),
           ),
-
-          // Image button
-          Semantics(
-            label: 'Add image',
-            button: true,
-            child: IconButton(
-              key: const Key('image_button'),
-              icon: Icon(
-                Icons.image_outlined,
-                color: AppColors.textSecondary(context),
-              ),
-              onPressed: () {
-                // TODO: Implement image attachment
-              },
-              iconSize: 20,
-              constraints: const BoxConstraints(
-                minWidth: AppSpacing.minTouchTarget,
-                minHeight: AppSpacing.minTouchTarget,
-              ),
-            ),
-          ),
-
-          const Spacer(),
-
-          // Space selector
           _buildSpaceSelector(),
         ],
       ),
@@ -1260,38 +1224,28 @@ class _CreateContentModalState extends State<CreateContentModal>
 
         return PopupMenuButton<String>(
           key: const Key('space_selector'),
-          child: Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.xs,
-              vertical: AppSpacing.xxs,
-            ),
-            decoration: BoxDecoration(
-              border: Border.all(color: AppColors.border(context)),
-              borderRadius: BorderRadius.circular(AppSpacing.radiusSM),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                if (selectedSpace.icon != null)
-                  Text(
-                    selectedSpace.icon!,
-                    style: const TextStyle(fontSize: 16),
-                  ),
-                const SizedBox(width: AppSpacing.xxs),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (selectedSpace.icon != null)
                 Text(
-                  selectedSpace.name,
-                  style: AppTypography.labelMedium.copyWith(
-                    color: AppColors.text(context),
-                  ),
+                  selectedSpace.icon!,
+                  style: const TextStyle(fontSize: 16),
                 ),
-                const SizedBox(width: AppSpacing.xxs),
-                Icon(
-                  Icons.arrow_drop_down,
-                  size: 16,
-                  color: AppColors.textSecondary(context),
+              if (selectedSpace.icon != null) const SizedBox(width: AppSpacing.xxs),
+              Text(
+                selectedSpace.name,
+                style: AppTypography.labelMedium.copyWith(
+                  color: AppColors.text(context),
                 ),
-              ],
-            ),
+              ),
+              const SizedBox(width: 2),
+              Icon(
+                Icons.arrow_drop_down,
+                size: 16,
+                color: AppColors.textSecondary(context),
+              ),
+            ],
           ),
           itemBuilder: (context) {
             return spacesProvider.spaces.map((space) {
