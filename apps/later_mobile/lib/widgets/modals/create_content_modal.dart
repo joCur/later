@@ -835,6 +835,8 @@ class _CreateContentModalState extends State<CreateContentModal>
         }).toList();
       },
       onSelected: (option) {
+        // Trigger haptic feedback on type selection
+        HapticFeedback.lightImpact();
         setState(() {
           _selectedType = option.type;
         });
@@ -990,23 +992,28 @@ class _CreateContentModalState extends State<CreateContentModal>
             const SizedBox(height: AppSpacing.sm),
             if (!_showDescription)
               // Show expandable link when collapsed
-              GestureDetector(
-                key: const Key('add_description_link'),
-                onTap: () {
-                  setState(() {
-                    _showDescription = true;
-                  });
-                  // Trigger light haptic feedback
-                  HapticFeedback.lightImpact();
-                },
-                child: Container(
-                  height: 48, // Minimum touch target
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    '+ Add description (optional)',
-                    style: AppTypography.labelMedium.copyWith(
-                      color: temporalTheme.taskColor,
-                      decoration: TextDecoration.underline,
+              Semantics(
+                button: true,
+                label: 'Add description, collapsed',
+                hint: 'Tap to add optional description field',
+                child: GestureDetector(
+                  key: const Key('add_description_link'),
+                  onTap: () {
+                    setState(() {
+                      _showDescription = true;
+                    });
+                    // Trigger light haptic feedback
+                    HapticFeedback.lightImpact();
+                  },
+                  child: Container(
+                    height: 48, // Minimum touch target
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      '+ Add description (optional)',
+                      style: AppTypography.labelMedium.copyWith(
+                        color: temporalTheme.taskColor,
+                        decoration: TextDecoration.underline,
+                      ),
                     ),
                   ),
                 ),
@@ -1083,61 +1090,60 @@ class _CreateContentModalState extends State<CreateContentModal>
     );
   }
 
+  /// Common transition builder for smooth, consistent animations
+  Widget _typeFieldTransitionBuilder(Widget child, Animation<double> animation) {
+    // Use easeOutCubic for smoother, more natural entrance
+    final curvedAnimation = CurvedAnimation(
+      parent: animation,
+      curve: Curves.easeOutCubic,
+      reverseCurve: Curves.easeInCubic,
+    );
+
+    return FadeTransition(
+      opacity: curvedAnimation,
+      child: SlideTransition(
+        position: Tween<Offset>(
+          begin: const Offset(0, 0.05), // Reduced from 0.1 for subtler movement
+          end: Offset.zero,
+        ).animate(curvedAnimation),
+        child: RepaintBoundary(
+          child: child, // Optimize repaints during animation
+        ),
+      ),
+    );
+  }
+
   /// Build type-specific fields based on selected content type
   Widget? _buildTypeSpecificFields() {
+    Widget? typeField;
     if (_selectedType == ContentType.list) {
-      return AnimatedSwitcher(
-        duration: const Duration(milliseconds: 250),
-        transitionBuilder: (Widget child, Animation<double> animation) {
-          return FadeTransition(
-            opacity: animation,
-            child: SlideTransition(
-              position: Tween<Offset>(
-                begin: const Offset(0, 0.1),
-                end: Offset.zero,
-              ).animate(animation),
-              child: child,
-            ),
-          );
-        },
-        child: _buildListFields(),
-      );
+      typeField = _buildListFields();
     } else if (_selectedType == ContentType.note) {
-      return AnimatedSwitcher(
-        duration: const Duration(milliseconds: 250),
-        transitionBuilder: (Widget child, Animation<double> animation) {
-          return FadeTransition(
-            opacity: animation,
-            child: SlideTransition(
-              position: Tween<Offset>(
-                begin: const Offset(0, 0.1),
-                end: Offset.zero,
-              ).animate(animation),
-              child: child,
-            ),
-          );
-        },
-        child: _buildNoteFields(),
-      );
+      typeField = _buildNoteFields();
     } else if (_selectedType == ContentType.todoList) {
-      return AnimatedSwitcher(
-        duration: const Duration(milliseconds: 250),
-        transitionBuilder: (Widget child, Animation<double> animation) {
-          return FadeTransition(
-            opacity: animation,
-            child: SlideTransition(
-              position: Tween<Offset>(
-                begin: const Offset(0, 0.1),
-                end: Offset.zero,
-              ).animate(animation),
-              child: child,
-            ),
-          );
-        },
-        child: _buildTodoListFields(),
-      );
+      typeField = _buildTodoListFields();
     }
-    return null;
+
+    if (typeField == null) return null;
+
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 250),
+      transitionBuilder: _typeFieldTransitionBuilder,
+      layoutBuilder: (currentChild, previousChildren) {
+        // Ensure smooth layout transitions without jank
+        return Stack(
+          alignment: Alignment.topCenter,
+          children: <Widget>[
+            ...previousChildren,
+            if (currentChild != null) currentChild,
+          ],
+        );
+      },
+      child: Container(
+        key: ValueKey<ContentType?>(_selectedType), // Unique key for each type
+        child: typeField,
+      ),
+    );
   }
 
   Widget _buildInputField() {
