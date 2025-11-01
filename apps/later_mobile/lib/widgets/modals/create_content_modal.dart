@@ -84,9 +84,11 @@ class _CreateContentModalState extends State<CreateContentModal>
   final FocusNode _focusNode = FocusNode();
   final TextEditingController _noteTitleController = TextEditingController();
   final TextEditingController _noteContentController = TextEditingController();
+  final TextEditingController _descriptionController = TextEditingController();
   String? _currentItemId;
   bool _isSaving = false;
   String? _selectedSpaceId; // Local state for space selection (modal-only)
+  bool _showDescription = false; // State for TodoList description field
 
   // Check if we're creating a new item or editing an existing one
   bool get _isNewItem => _currentItemId == null;
@@ -199,6 +201,7 @@ class _CreateContentModalState extends State<CreateContentModal>
     _focusNode.dispose();
     _noteTitleController.dispose();
     _noteContentController.dispose();
+    _descriptionController.dispose();
     _animationController.dispose();
     _typeIconAnimationController.dispose();
     super.dispose();
@@ -288,10 +291,13 @@ class _CreateContentModalState extends State<CreateContentModal>
 
         switch (contentType) {
           case ContentType.todoList:
+            // Get description from controller, only if not empty
+            final description = _descriptionController.text.trim();
             final todoList = TodoList(
               id: id,
               spaceId: targetSpaceId,
               name: text,
+              description: description.isEmpty ? null : description,
               items: [],
             );
             await contentProvider.createTodoList(todoList);
@@ -367,6 +373,21 @@ class _CreateContentModalState extends State<CreateContentModal>
       // For other types, use the default text controller
       final text = _textController.text.trim();
       if (text.isEmpty) return;
+    }
+
+    // Validate TodoList description length
+    if (_selectedType == ContentType.todoList) {
+      if (_descriptionController.text.length > 500) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Description too long (max 500 characters)'),
+              duration: Duration(seconds: 2),
+            ),
+          );
+        }
+        return;
+      }
     }
 
     // Prevent multiple simultaneous saves
@@ -953,6 +974,115 @@ class _CreateContentModalState extends State<CreateContentModal>
     return isMobile ? _buildNoteFieldsMobile() : _buildNoteFieldsDesktop();
   }
 
+  /// Build TodoList-specific fields (optional description)
+  Widget _buildTodoListFields() {
+    final temporalTheme = Theme.of(context).extension<TemporalFlowTheme>()!;
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+      child: AnimatedSize(
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const SizedBox(height: AppSpacing.sm),
+            if (!_showDescription)
+              // Show expandable link when collapsed
+              GestureDetector(
+                key: const Key('add_description_link'),
+                onTap: () {
+                  setState(() {
+                    _showDescription = true;
+                  });
+                  // Trigger light haptic feedback
+                  HapticFeedback.lightImpact();
+                },
+                child: Container(
+                  height: 48, // Minimum touch target
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    '+ Add description (optional)',
+                    style: AppTypography.labelMedium.copyWith(
+                      color: temporalTheme.taskColor,
+                      decoration: TextDecoration.underline,
+                    ),
+                  ),
+                ),
+              )
+            else
+              // Show description field when expanded
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          'Description (optional)',
+                          style: AppTypography.labelMedium.copyWith(
+                            color: AppColors.textSecondary(context),
+                          ),
+                        ),
+                      ),
+                      // Small close button to collapse
+                      Semantics(
+                        label: 'Remove description field',
+                        button: true,
+                        child: IconButton(
+                          key: const Key('remove_description_button'),
+                          icon: Icon(
+                            Icons.close,
+                            size: 16,
+                            color: AppColors.textSecondary(context),
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              _showDescription = false;
+                              _descriptionController.clear();
+                            });
+                            HapticFeedback.lightImpact();
+                          },
+                          constraints: const BoxConstraints(
+                            minWidth: 32,
+                            minHeight: 32,
+                          ),
+                          padding: EdgeInsets.zero,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: AppSpacing.xs),
+                  TextAreaField(
+                    key: const Key('todolist_description_field'),
+                    controller: _descriptionController,
+                    hintText: 'Add description (optional)',
+                    maxLines: 3,
+                    onChanged: (value) {
+                      // Trigger rebuild for character count
+                      setState(() {});
+                    },
+                  ),
+                  const SizedBox(height: AppSpacing.xxs),
+                  // Character count indicator
+                  Text(
+                    '${_descriptionController.text.length}/500',
+                    style: AppTypography.labelSmall.copyWith(
+                      color: _descriptionController.text.length > 500
+                          ? AppColors.error
+                          : AppColors.textSecondary(context),
+                    ),
+                  ),
+                ],
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
   /// Build type-specific fields based on selected content type
   Widget? _buildTypeSpecificFields() {
     if (_selectedType == ContentType.list) {
@@ -989,6 +1119,23 @@ class _CreateContentModalState extends State<CreateContentModal>
         },
         child: _buildNoteFields(),
       );
+    } else if (_selectedType == ContentType.todoList) {
+      return AnimatedSwitcher(
+        duration: const Duration(milliseconds: 250),
+        transitionBuilder: (Widget child, Animation<double> animation) {
+          return FadeTransition(
+            opacity: animation,
+            child: SlideTransition(
+              position: Tween<Offset>(
+                begin: const Offset(0, 0.1),
+                end: Offset.zero,
+              ).animate(animation),
+              child: child,
+            ),
+          );
+        },
+        child: _buildTodoListFields(),
+      );
     }
     return null;
   }
@@ -1001,17 +1148,30 @@ class _CreateContentModalState extends State<CreateContentModal>
       return const SizedBox.shrink();
     }
 
+    // Get appropriate hint text based on content type
+    String getHintText() {
+      switch (_selectedType) {
+        case ContentType.todoList:
+          return 'Todo list name';
+        case ContentType.list:
+          return 'List name';
+        case ContentType.note:
+          return 'Note title'; // Fallback, but note uses type-specific fields
+        case null:
+          return 'Enter title...';
+      }
+    }
+
     return Padding(
       padding: EdgeInsets.symmetric(
         horizontal: isMobile ? AppSpacing.lg : AppSpacing.md, // 24px on mobile
       ),
-      child: TextAreaField(
+      child: TextInputField(
         key: const Key('capture_input'),
         controller: _textController,
         focusNode: _focusNode,
         autofocus: true,
-        maxLines: 10,
-        hintText: 'What\'s on your mind?',
+        hintText: getHintText(),
       ),
     );
   }
