@@ -483,12 +483,14 @@ class _HomeScreenState extends State<HomeScreen> {
   /// Build the appropriate card widget for each content type
   Widget _buildContentCard(dynamic item, int index) {
     // Build card with onTap callback for navigation
-    // Wrap with ReorderableDragStartListener to enable dragging
+    // Cards internally wrap their drag handles with ReorderableDragStartListener
     Widget card;
 
     if (item is TodoList) {
       card = TodoListCard(
+        key: ValueKey<String>(_getItemId(item)),
         todoList: item,
+        reorderIndex: index,
         // index omitted (null) to disable entrance animation for reorderable items
         onTap: () {
           Navigator.of(context).push(
@@ -500,7 +502,9 @@ class _HomeScreenState extends State<HomeScreen> {
       );
     } else if (item is ListModel) {
       card = ListCard(
+        key: ValueKey<String>(_getItemId(item)),
         list: item,
+        reorderIndex: index,
         // index omitted (null) to disable entrance animation for reorderable items
         onTap: () {
           Navigator.of(context).push(
@@ -512,7 +516,9 @@ class _HomeScreenState extends State<HomeScreen> {
       );
     } else if (item is Item) {
       card = NoteCard(
+        key: ValueKey<String>(_getItemId(item)),
         item: item,
+        reorderIndex: index,
         // index omitted (null) to disable entrance animation for reorderable items
         onTap: () {
           Navigator.of(context).push(
@@ -527,13 +533,7 @@ class _HomeScreenState extends State<HomeScreen> {
       return const SizedBox.shrink();
     }
 
-    // Use ReorderableDragStartListener to make entire card draggable
-    // This wins the gesture arena over the card's internal GestureDetector
-    return ReorderableDragStartListener(
-      key: ValueKey<String>(_getItemId(item)),
-      index: index,
-      child: card,
-    );
+    return card;
   }
 
   /// Get item ID for any content type

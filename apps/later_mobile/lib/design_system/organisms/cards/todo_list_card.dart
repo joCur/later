@@ -4,6 +4,7 @@ import 'package:later_mobile/design_system/tokens/tokens.dart';
 import '../../../data/models/todo_list_model.dart';
 import 'package:later_mobile/design_system/atoms/text/gradient_text.dart';
 import 'package:later_mobile/design_system/atoms/borders/gradient_pill_border.dart';
+import 'package:later_mobile/design_system/atoms/drag_handle/drag_handle.dart';
 import 'package:intl/intl.dart';
 import 'package:later_mobile/core/theme/temporal_flow_theme.dart';
 
@@ -36,6 +37,7 @@ class TodoListCard extends StatefulWidget {
     this.onLongPress,
     this.showMetadata = true,
     this.index,
+    this.reorderIndex,
   });
 
   /// TodoList data to display
@@ -54,6 +56,10 @@ class TodoListCard extends StatefulWidget {
   /// If null, no entrance animation is applied
   final int? index;
 
+  /// Index for ReorderableListView
+  /// If provided, the drag handle will be wrapped with ReorderableDragStartListener
+  final int? reorderIndex;
+
   @override
   State<TodoListCard> createState() => _TodoListCardState();
 }
@@ -61,6 +67,7 @@ class TodoListCard extends StatefulWidget {
 class _TodoListCardState extends State<TodoListCard>
     with TickerProviderStateMixin {
   bool _isPressed = false;
+  bool _isDragging = false;
   late AnimationController _pressAnimationController;
   late Animation<double> _pressScaleAnimation;
 
@@ -206,6 +213,9 @@ class _TodoListCardState extends State<TodoListCard>
   }
 
   void _handleTapDown(TapDownDetails details) {
+    // Don't trigger press animation if dragging
+    if (_isDragging) return;
+
     setState(() => _isPressed = true);
     // Phase 5: Animate scale down on press (100ms)
     _pressAnimationController.forward();
@@ -317,7 +327,6 @@ class _TodoListCardState extends State<TodoListCard>
                     AppSpacing.cardPaddingMobile,
                   ), // 20px
                   child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       // Leading icon (checkbox outline)
                       _buildLeadingIcon(),
@@ -347,6 +356,27 @@ class _TodoListCardState extends State<TodoListCard>
                           ],
                         ),
                       ),
+                      // Spacing before drag handle
+                      const SizedBox(width: AppSpacing.xs), // 8px
+                      // Drag handle (centered vertically by Row's crossAxisAlignment)
+                      // Wrap with ReorderableDragStartListener if reorderIndex is provided
+                      if (widget.reorderIndex != null)
+                        ReorderableDragStartListener(
+                          index: widget.reorderIndex!,
+                          child: DragHandleWidget(
+                            gradient: AppColors.taskGradient,
+                            semanticLabel: 'Reorder ${widget.todoList.name}',
+                            onDragStart: () => setState(() => _isDragging = true),
+                            onDragEnd: () => setState(() => _isDragging = false),
+                          ),
+                        )
+                      else
+                        DragHandleWidget(
+                          gradient: AppColors.taskGradient,
+                          semanticLabel: 'Reorder ${widget.todoList.name}',
+                          onDragStart: () => setState(() => _isDragging = true),
+                          onDragEnd: () => setState(() => _isDragging = false),
+                        ),
                     ],
                   ),
                 ),

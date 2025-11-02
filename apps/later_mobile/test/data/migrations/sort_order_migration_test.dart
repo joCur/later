@@ -92,7 +92,7 @@ void main() {
       final space1 = Space(
         id: 'space-1',
         name: 'Work',
-        createdAt: DateTime(2024, 1, 1),
+        createdAt: DateTime(2024),
       );
       await spacesBox.put(space1.id, space1);
 
@@ -101,25 +101,21 @@ void main() {
         id: 'note-1',
         title: 'Note 1',
         spaceId: 'space-1',
-        createdAt: DateTime(2024, 1, 1, 10, 0),
-        sortOrder: 0, // Should be updated to 0 (earliest)
+        createdAt: DateTime(2024, 1, 1, 10),
       );
       final todoList1 = TodoList(
         id: 'todo-1',
         name: 'Todo 1',
         spaceId: 'space-1',
         items: [],
-        createdAt: DateTime(2024, 1, 1, 11, 0),
-        sortOrder: 0, // Should be updated to 1
+        createdAt: DateTime(2024, 1, 1, 11),
       );
       final list1 = ListModel(
         id: 'list-1',
         name: 'List 1',
         spaceId: 'space-1',
         items: [],
-        style: ListStyle.bullets,
-        createdAt: DateTime(2024, 1, 1, 12, 0),
-        sortOrder: 0, // Should be updated to 2 (latest)
+        createdAt: DateTime(2024, 1, 1, 12),
       );
 
       await notesBox.put(note1.id, note1);
@@ -151,7 +147,7 @@ void main() {
       final space1 = Space(
         id: 'space-1',
         name: 'Work',
-        createdAt: DateTime(2024, 1, 1),
+        createdAt: DateTime(2024),
       );
       await spacesBox.put(space1.id, space1);
 
@@ -160,22 +156,19 @@ void main() {
         id: 'note-1',
         title: 'First Note',
         spaceId: 'space-1',
-        createdAt: DateTime(2024, 1, 1, 10, 0),
-        sortOrder: 0,
+        createdAt: DateTime(2024, 1, 1, 10),
       );
       final note2 = Item(
         id: 'note-2',
         title: 'Second Note',
         spaceId: 'space-1',
-        createdAt: DateTime(2024, 1, 1, 11, 0),
-        sortOrder: 0,
+        createdAt: DateTime(2024, 1, 1, 11),
       );
       final note3 = Item(
         id: 'note-3',
         title: 'Third Note',
         spaceId: 'space-1',
-        createdAt: DateTime(2024, 1, 1, 12, 0),
-        sortOrder: 0,
+        createdAt: DateTime(2024, 1, 1, 12),
       );
 
       await notesBox.put(note1.id, note1);
@@ -203,7 +196,7 @@ void main() {
       final space1 = Space(
         id: 'space-1',
         name: 'Work',
-        createdAt: DateTime(2024, 1, 1),
+        createdAt: DateTime(2024),
       );
       final space2 = Space(
         id: 'space-2',
@@ -218,15 +211,13 @@ void main() {
         id: 'note-1',
         title: 'Work Note 1',
         spaceId: 'space-1',
-        createdAt: DateTime(2024, 1, 1, 10, 0),
-        sortOrder: 0,
+        createdAt: DateTime(2024, 1, 1, 10),
       );
       final note2 = Item(
         id: 'note-2',
         title: 'Work Note 2',
         spaceId: 'space-1',
-        createdAt: DateTime(2024, 1, 1, 11, 0),
-        sortOrder: 0,
+        createdAt: DateTime(2024, 1, 1, 11),
       );
 
       // Create notes in space 2
@@ -234,15 +225,13 @@ void main() {
         id: 'note-3',
         title: 'Personal Note 1',
         spaceId: 'space-2',
-        createdAt: DateTime(2024, 1, 2, 10, 0),
-        sortOrder: 0,
+        createdAt: DateTime(2024, 1, 2, 10),
       );
       final note4 = Item(
         id: 'note-4',
         title: 'Personal Note 2',
         spaceId: 'space-2',
-        createdAt: DateTime(2024, 1, 2, 11, 0),
-        sortOrder: 0,
+        createdAt: DateTime(2024, 1, 2, 11),
       );
 
       await notesBox.put(note1.id, note1);
@@ -280,7 +269,7 @@ void main() {
       final space1 = Space(
         id: 'space-1',
         name: 'Work',
-        createdAt: DateTime(2024, 1, 1),
+        createdAt: DateTime(2024),
       );
       await spacesBox.put(space1.id, space1);
 
@@ -288,7 +277,7 @@ void main() {
         id: 'note-1',
         title: 'Note 1',
         spaceId: 'space-1',
-        createdAt: DateTime(2024, 1, 1, 10, 0),
+        createdAt: DateTime(2024, 1, 1, 10),
         sortOrder: 99, // Non-standard value to prove migration didn't run
       );
       await notesBox.put(note1.id, note1);
@@ -308,7 +297,7 @@ void main() {
       final space1 = Space(
         id: 'space-1',
         name: 'Empty Space',
-        createdAt: DateTime(2024, 1, 1),
+        createdAt: DateTime(2024),
       );
       await spacesBox.put(space1.id, space1);
 
