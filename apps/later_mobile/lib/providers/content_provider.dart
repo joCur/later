@@ -862,25 +862,33 @@ class ContentProvider extends ChangeNotifier {
       // Notify listeners immediately for instant UI update
       notifyListeners();
 
-      // PHASE 2: Persist to database in the background
+      // PHASE 2: Persist to database in parallel for better performance
+      final updateFutures = <Future<void>>[];
       for (final item in updatedItems) {
         if (item is TodoList) {
-          await _executeWithRetry(
-            () => _todoListRepository.update(item),
-            'updateTodoList',
+          updateFutures.add(
+            _executeWithRetry(
+              () => _todoListRepository.update(item),
+              'updateTodoList',
+            ),
           );
         } else if (item is ListModel) {
-          await _executeWithRetry(
-            () => _listRepository.update(item),
-            'updateList',
+          updateFutures.add(
+            _executeWithRetry(
+              () => _listRepository.update(item),
+              'updateList',
+            ),
           );
         } else if (item is Item) {
-          await _executeWithRetry(
-            () => _noteRepository.update(item),
-            'updateNote',
+          updateFutures.add(
+            _executeWithRetry(
+              () => _noteRepository.update(item),
+              'updateNote',
+            ),
           );
         }
       }
+      await Future.wait(updateFutures);
 
       _error = null;
     } catch (e) {
