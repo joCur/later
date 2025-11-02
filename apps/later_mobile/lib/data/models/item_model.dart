@@ -23,6 +23,7 @@ class Item {
     DateTime? createdAt,
     DateTime? updatedAt,
     this.syncStatus,
+    this.sortOrder = 0,
   }) : tags = tags ?? [],
        createdAt = createdAt ?? DateTime.now(),
        updatedAt = updatedAt ?? DateTime.now();
@@ -38,6 +39,7 @@ class Item {
       createdAt: DateTime.parse(json['createdAt'] as String),
       updatedAt: DateTime.parse(json['updatedAt'] as String),
       syncStatus: json['syncStatus'] as String?,
+      sortOrder: (json['sortOrder'] as int?) ?? 0,
     );
   }
 
@@ -74,6 +76,11 @@ class Item {
   @HiveField(10)
   final String? syncStatus;
 
+  /// Sort order within a space (space-scoped, not global)
+  /// Used for user-defined ordering via drag-and-drop
+  @HiveField(11)
+  final int sortOrder;
+
   /// Create a copy of this note with updated fields
   ///
   /// Note: To explicitly clear nullable fields like content or syncStatus,
@@ -87,6 +94,7 @@ class Item {
     DateTime? createdAt,
     DateTime? updatedAt,
     String? syncStatus,
+    int? sortOrder,
   }) {
     return Item(
       id: id ?? this.id,
@@ -97,6 +105,7 @@ class Item {
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       syncStatus: syncStatus ?? this.syncStatus,
+      sortOrder: sortOrder ?? this.sortOrder,
     );
   }
 
@@ -111,6 +120,7 @@ class Item {
       'createdAt': createdAt.toIso8601String(),
       'updatedAt': updatedAt.toIso8601String(),
       'syncStatus': syncStatus,
+      'sortOrder': sortOrder,
     };
   }
 

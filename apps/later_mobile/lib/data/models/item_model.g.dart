@@ -25,13 +25,14 @@ class ItemAdapter extends TypeAdapter<Item> {
       createdAt: fields[8] as DateTime?,
       updatedAt: fields[9] as DateTime?,
       syncStatus: fields[10] as String?,
+      sortOrder: fields[11] as int,
     );
   }
 
   @override
   void write(BinaryWriter writer, Item obj) {
     writer
-      ..writeByte(8)
+      ..writeByte(9)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(2)
@@ -47,7 +48,9 @@ class ItemAdapter extends TypeAdapter<Item> {
       ..writeByte(9)
       ..write(obj.updatedAt)
       ..writeByte(10)
-      ..write(obj.syncStatus);
+      ..write(obj.syncStatus)
+      ..writeByte(11)
+      ..write(obj.sortOrder);
   }
 
   @override
