@@ -4,6 +4,7 @@ import 'package:later_mobile/design_system/tokens/tokens.dart';
 import '../../../data/models/todo_list_model.dart';
 import 'package:later_mobile/design_system/atoms/text/gradient_text.dart';
 import 'package:later_mobile/design_system/atoms/borders/gradient_pill_border.dart';
+import 'package:later_mobile/design_system/atoms/drag_handle/drag_handle.dart';
 import 'package:intl/intl.dart';
 import 'package:later_mobile/core/theme/temporal_flow_theme.dart';
 
@@ -61,6 +62,7 @@ class TodoListCard extends StatefulWidget {
 class _TodoListCardState extends State<TodoListCard>
     with TickerProviderStateMixin {
   bool _isPressed = false;
+  bool _isDragging = false;
   late AnimationController _pressAnimationController;
   late Animation<double> _pressScaleAnimation;
 
@@ -206,6 +208,9 @@ class _TodoListCardState extends State<TodoListCard>
   }
 
   void _handleTapDown(TapDownDetails details) {
+    // Don't trigger press animation if dragging
+    if (_isDragging) return;
+
     setState(() => _isPressed = true);
     // Phase 5: Animate scale down on press (100ms)
     _pressAnimationController.forward();
@@ -346,6 +351,15 @@ class _TodoListCardState extends State<TodoListCard>
                             ],
                           ],
                         ),
+                      ),
+                      // Spacing before drag handle
+                      const SizedBox(width: AppSpacing.xs), // 8px
+                      // Drag handle
+                      DragHandleWidget(
+                        gradient: AppColors.taskGradient,
+                        semanticLabel: 'Reorder ${widget.todoList.name}',
+                        onDragStart: () => setState(() => _isDragging = true),
+                        onDragEnd: () => setState(() => _isDragging = false),
                       ),
                     ],
                   ),
