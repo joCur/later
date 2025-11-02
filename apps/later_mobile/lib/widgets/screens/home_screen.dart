@@ -67,6 +67,9 @@ class _HomeScreenState extends State<HomeScreen> {
   int _currentItemCount = 100; // Initially load 100 items
   bool _isLoadingMore = false;
 
+  // Reorder state
+  bool _isReordering = false;
+
   // FAB pulse state
   bool _enableFabPulse = false;
 
@@ -404,16 +407,45 @@ class _HomeScreenState extends State<HomeScreen> {
     final hasMoreItems = content.length < allContent.length;
     final itemCount = hasMoreItems ? content.length + 1 : content.length;
 
-    return ListView.builder(
+    return ReorderableListView.builder(
       padding: const EdgeInsets.symmetric(
         horizontal: AppSpacing.sm,
         vertical: AppSpacing.xs,
       ),
       itemCount: itemCount,
+      buildDefaultDragHandles: false,
+      onReorder: (oldIndex, newIndex) async {
+        // Don't allow reordering the "Load More" button
+        if (hasMoreItems && (oldIndex == content.length || newIndex > content.length)) {
+          return;
+        }
+
+        // Don't allow reordering if already reordering
+        if (_isReordering) return;
+
+        setState(() {
+          _isReordering = true;
+        });
+
+        try {
+          await contentProvider.reorderContent(
+            _selectedFilter,
+            oldIndex,
+            newIndex,
+          );
+        } finally {
+          if (mounted) {
+            setState(() {
+              _isReordering = false;
+            });
+          }
+        }
+      },
       itemBuilder: (context, index) {
         // Load more button at the end
         if (hasMoreItems && index == content.length) {
           return Padding(
+            key: const ValueKey('load_more_button'),
             padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
             child: Center(
               child: _isLoadingMore
@@ -450,11 +482,14 @@ class _HomeScreenState extends State<HomeScreen> {
 
   /// Build the appropriate card widget for each content type
   Widget _buildContentCard(dynamic item, int index) {
-    // Use type checking to render correct card
+    // Build card with onTap callback for navigation
+    // Wrap with ReorderableDragStartListener to enable dragging
+    Widget card;
+
     if (item is TodoList) {
-      return TodoListCard(
-        key: ValueKey<String>('todo-${item.id}'),
+      card = TodoListCard(
         todoList: item,
+        // index omitted (null) to disable entrance animation for reorderable items
         onTap: () {
           Navigator.of(context).push(
             MaterialPageRoute<void>(
@@ -462,15 +497,11 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           );
         },
-        onLongPress: () {
-          debugPrint('TodoList long-pressed: ${item.id}');
-        },
-        index: index,
       );
     } else if (item is ListModel) {
-      return ListCard(
-        key: ValueKey<String>('list-${item.id}'),
+      card = ListCard(
         list: item,
+        // index omitted (null) to disable entrance animation for reorderable items
         onTap: () {
           Navigator.of(context).push(
             MaterialPageRoute<void>(
@@ -478,15 +509,11 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           );
         },
-        onLongPress: () {
-          debugPrint('List long-pressed: ${item.id}');
-        },
-        index: index,
       );
     } else if (item is Item) {
-      return NoteCard(
-        key: ValueKey<String>('note-${item.id}'),
+      card = NoteCard(
         item: item,
+        // index omitted (null) to disable entrance animation for reorderable items
         onTap: () {
           Navigator.of(context).push(
             MaterialPageRoute<void>(
@@ -494,15 +521,31 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           );
         },
-        onLongPress: () {
-          debugPrint('Note long-pressed: ${item.id}');
-        },
-        index: index,
       );
     } else {
       // Fallback for unknown types
       return const SizedBox.shrink();
     }
+
+    // Use ReorderableDragStartListener to make entire card draggable
+    // This wins the gesture arena over the card's internal GestureDetector
+    return ReorderableDragStartListener(
+      key: ValueKey<String>(_getItemId(item)),
+      index: index,
+      child: card,
+    );
+  }
+
+  /// Get item ID for any content type
+  String _getItemId(dynamic item) {
+    if (item is TodoList) {
+      return 'todo-${item.id}';
+    } else if (item is ListModel) {
+      return 'list-${item.id}';
+    } else if (item is Item) {
+      return 'note-${item.id}';
+    }
+    return 'unknown';
   }
 
   /// Build mobile layout

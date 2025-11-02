@@ -810,19 +810,18 @@ class ContentProvider extends ChangeNotifier {
       content.removeAt(oldIndex);
       content.insert(newIndex, item);
 
-      // Update sortOrder for all items
+      // PHASE 1: Update all local state FIRST (optimistic update)
+      final updatedItems = <dynamic>[];
       for (int i = 0; i < content.length; i++) {
         final currentItem = content[i];
         final newSortOrder = i;
 
-        // Update based on type
+        // Create updated items with new sortOrder
         if (currentItem is TodoList) {
           final updated = currentItem.copyWith(sortOrder: newSortOrder);
-          await _executeWithRetry(
-            () => _todoListRepository.update(updated),
-            'updateTodoList',
-          );
-          // Update local state
+          updatedItems.add(updated);
+
+          // Update local state immediately
           final index = _todoLists.indexWhere((t) => t.id == currentItem.id);
           if (index != -1) {
             _todoLists = [
@@ -833,11 +832,9 @@ class ContentProvider extends ChangeNotifier {
           }
         } else if (currentItem is ListModel) {
           final updated = currentItem.copyWith(sortOrder: newSortOrder);
-          await _executeWithRetry(
-            () => _listRepository.update(updated),
-            'updateList',
-          );
-          // Update local state
+          updatedItems.add(updated);
+
+          // Update local state immediately
           final index = _lists.indexWhere((l) => l.id == currentItem.id);
           if (index != -1) {
             _lists = [
@@ -848,11 +845,9 @@ class ContentProvider extends ChangeNotifier {
           }
         } else if (currentItem is Item) {
           final updated = currentItem.copyWith(sortOrder: newSortOrder);
-          await _executeWithRetry(
-            () => _noteRepository.update(updated),
-            'updateNote',
-          );
-          // Update local state
+          updatedItems.add(updated);
+
+          // Update local state immediately
           final index = _notes.indexWhere((n) => n.id == currentItem.id);
           if (index != -1) {
             _notes = [
@@ -864,8 +859,30 @@ class ContentProvider extends ChangeNotifier {
         }
       }
 
-      _error = null;
+      // Notify listeners immediately for instant UI update
       notifyListeners();
+
+      // PHASE 2: Persist to database in the background
+      for (final item in updatedItems) {
+        if (item is TodoList) {
+          await _executeWithRetry(
+            () => _todoListRepository.update(item),
+            'updateTodoList',
+          );
+        } else if (item is ListModel) {
+          await _executeWithRetry(
+            () => _listRepository.update(item),
+            'updateList',
+          );
+        } else if (item is Item) {
+          await _executeWithRetry(
+            () => _noteRepository.update(item),
+            'updateNote',
+          );
+        }
+      }
+
+      _error = null;
     } catch (e) {
       if (e is AppError) {
         _error = e;

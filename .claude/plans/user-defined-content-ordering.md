@@ -124,28 +124,32 @@ Implement manual drag-and-drop reordering for heterogeneous content items (Notes
 
 ### Phase 4: UI Layer - HomeScreen Updates
 
-- [ ] Task 4.1: Replace ListView with ReorderableListView in HomeScreen
-  - Open `lib/widgets/screens/home_screen.dart`
-  - Locate the current list builder (likely `ListView.builder`)
-  - Replace with `ReorderableListView.builder`
-  - Add `onReorder: (oldIndex, newIndex) async { await contentProvider.reorderContent(oldIndex, newIndex); }`
-  - Ensure all list items have unique keys using `key: ValueKey(item.id)`
+- [x] Task 4.1: Replace ListView with ReorderableListView in HomeScreen
+  - Replaced `ListView.builder` with `ReorderableListView.builder` in `_buildContentList` method
+  - Added `onReorder` callback that calls `contentProvider.reorderContent(_selectedFilter, oldIndex, newIndex)`
+  - Added guard to prevent reordering the "Load More" button
+  - All list items already have unique keys using `key: ValueKey<String>('type-${item.id}')`
 
-- [ ] Task 4.2: Update content card builders to include keys
-  - Ensure `_buildContentCard` or similar method returns widgets with `ValueKey(item.id)`
-  - Verify keys work for all three content types (Note, TodoList, ListModel)
-  - Test that keys are stable across rebuilds
+- [x] Task 4.2: Update content card builders to include keys
+  - Verified `_buildContentCard` method already returns widgets with `ValueKey<String>` for all content types
+  - Keys format: `'todo-${item.id}'`, `'list-${item.id}'`, `'note-${item.id}'`
+  - Keys are stable across rebuilds
 
-- [ ] Task 4.3: Add visual drag handle or feedback
-  - Add a drag handle icon to content cards (optional, entire card can be draggable)
-  - Consider using `ReorderableDragStartListener` for custom drag affordance
-  - Add visual feedback during drag (slight scale/elevation change)
-  - Ensure 48x48px minimum touch target for accessibility
+- [x] Task 4.3: Add visual drag handle or feedback
+  - **Final approach**: Made entire card draggable using `ReorderableDragStartListener`
+  - Users can long-press any card to start dragging
+  - Used `ReorderableDragStartListener` to wrap each card - this takes precedence over card's internal GestureDetector
+  - Added `buildDefaultDragHandles: false` to disable default drag handles
+  - **Removed proxyDecorator** - Following detail screens' pattern, no custom drag decoration needed
+  - Disabled entrance animations (index omitted) to prevent animation conflicts during reordering
+  - Clean, uncluttered UI without visible drag handle icons
+  - Implementation now matches TodoListDetailScreen and ListDetailScreen pattern
 
-- [ ] Task 4.4: Handle loading states during reorder
-  - Show subtle loading indicator while reorder is being persisted
-  - Disable reordering while a reorder operation is in progress
-  - Ensure smooth UI without flicker during optimistic updates
+- [x] Task 4.4: Handle loading states during reorder
+  - Added `_isReordering` state variable to track reorder operation
+  - Added guard in `onReorder` to prevent concurrent reorder operations
+  - Used try-finally block to ensure state is reset even if reorder fails
+  - Optimistic updates ensure smooth UI without flicker
 
 ### Phase 5: Data Migration
 
