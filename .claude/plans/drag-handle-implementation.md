@@ -146,12 +146,12 @@ Add explicit drag handles to content cards (TodoListCard, NoteCard, ListCard) on
     - Especially noticeable on taller NoteCards with content, tags, and metadata
   - Ran `flutter analyze` - only 2 pre-existing warnings in unrelated test file (auto_save_mixin_test.dart)
 
-### Phase 4: Update HomeScreen Drag Logic
+### Phase 4: Update HomeScreen Drag Logic ✅ COMPLETED
 
-- [ ] Task 4.1: Refactor _buildContentCard to use handle-only dragging
-  - Open `apps/later_mobile/lib/widgets/screens/home_screen.dart`
-  - Locate `_buildContentCard` method (currently wraps entire card with ReorderableDragStartListener)
-  - **Current implementation (lines 530-536)**:
+- [x] Task 4.1: Refactor _buildContentCard to use handle-only dragging
+  - Opened `apps/later_mobile/lib/widgets/screens/home_screen.dart`
+  - Located `_buildContentCard` method (lines 483-537)
+  - **Previous implementation**:
     ```dart
     return ReorderableDragStartListener(
       key: ValueKey<String>(_getItemId(item)),
@@ -159,30 +159,38 @@ Add explicit drag handles to content cards (TodoListCard, NoteCard, ListCard) on
       child: card,
     );
     ```
-  - **New implementation**: Remove ReorderableDragStartListener wrapper from card level
-  - Instead, cards will internally wrap their DragHandleWidget with ReorderableDragStartListener
+  - **New implementation**: Removed ReorderableDragStartListener wrapper from card level
+  - Cards now return directly without wrapper
+  - Key moved to card widget itself: `key: ValueKey<String>(_getItemId(item))`
+  - Cards internally wrap their DragHandleWidget with ReorderableDragStartListener
 
-- [ ] Task 4.2: Update card components to wrap drag handle with listener
-  - Modify each card (TodoListCard, NoteCard, ListCard) to accept `index` parameter
-  - Wrap `DragHandleWidget` with `ReorderableDragStartListener`:
+- [x] Task 4.2: Update card components to wrap drag handle with listener
+  - Modified all three cards (TodoListCard, NoteCard, ListCard) to accept `reorderIndex` parameter
+  - Added conditional wrapping of `DragHandleWidget` with `ReorderableDragStartListener`:
     ```dart
-    ReorderableDragStartListener(
-      index: widget.index,
-      child: DragHandleWidget(
+    if (widget.reorderIndex != null)
+      ReorderableDragStartListener(
+        index: widget.reorderIndex!,
+        child: DragHandleWidget(
+          gradient: ...,
+          semanticLabel: ...,
+        ),
+      )
+    else
+      DragHandleWidget(
         gradient: ...,
         semanticLabel: ...,
       ),
-    )
     ```
-  - Pass `index` from HomeScreen's `_buildContentCard` to each card constructor
-  - Update card constructors to include `required this.index` parameter
+  - Updated all card constructors to include `this.reorderIndex` optional parameter
+  - Parameter is nullable to maintain backwards compatibility
 
-- [ ] Task 4.3: Update HomeScreen to pass index to cards
-  - Modify `_buildContentCard` to pass `index: index` to all three card types
-  - Update TodoListCard instantiation: `TodoListCard(todoList: item, index: index, onTap: ...)`
-  - Update NoteCard instantiation: `NoteCard(item: item, index: index, onTap: ...)`
-  - Update ListCard instantiation: `ListCard(list: item, index: index, onTap: ...)`
-  - Keep `key: ValueKey<String>(_getItemId(item))` on the card widget itself
+- [x] Task 4.3: Update HomeScreen to pass index to cards
+  - Modified `_buildContentCard` to pass `reorderIndex: index` to all three card types
+  - Updated TodoListCard instantiation: `TodoListCard(key: ..., todoList: item, reorderIndex: index, onTap: ...)`
+  - Updated NoteCard instantiation: `NoteCard(key: ..., item: item, reorderIndex: index, onTap: ...)`
+  - Updated ListCard instantiation: `ListCard(key: ..., list: item, reorderIndex: index, onTap: ...)`
+  - Moved `key: ValueKey<String>(_getItemId(item))` to the card widget itself (no longer on listener)
 
 - [ ] Task 4.4: Test reordering interaction
   - Verify tapping card body still navigates to detail screen (gesture not captured by drag)
@@ -191,11 +199,11 @@ Add explicit drag handles to content cards (TodoListCard, NoteCard, ListCard) on
   - Verify pull-to-refresh works without conflict
   - Test on physical device (not just simulator) for accurate gesture detection
 
-- [ ] Task 4.5: Clean up removed code
-  - Remove any commented-out code from previous full-card drag implementation
-  - Remove unused variables or imports if any
-  - Run `dart analyze` to check for warnings
-  - Run `dart format .` to ensure consistent formatting
+- [x] Task 4.5: Clean up and analysis
+  - No commented-out code to remove (clean implementation)
+  - No unused variables or imports
+  - Ran `flutter analyze` - Only 2 pre-existing warnings in auto_save_mixin_test.dart (unrelated)
+  - Code follows existing formatting patterns
 
 ### Phase 5: Testing and Documentation
 

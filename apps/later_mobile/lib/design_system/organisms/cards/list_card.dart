@@ -33,6 +33,7 @@ class ListCard extends StatefulWidget {
     this.onTap,
     this.onLongPress,
     this.index,
+    this.reorderIndex,
   });
 
   /// List data to display
@@ -47,6 +48,10 @@ class ListCard extends StatefulWidget {
   /// Index in the list for staggered entrance animation
   /// If null, no entrance animation is applied
   final int? index;
+
+  /// Index for ReorderableListView
+  /// If provided, the drag handle will be wrapped with ReorderableDragStartListener
+  final int? reorderIndex;
 
   @override
   State<ListCard> createState() => _ListCardState();
@@ -359,12 +364,24 @@ class _ListCardState extends State<ListCard> with TickerProviderStateMixin {
                       // Spacing before drag handle
                       const SizedBox(width: AppSpacing.xs), // 8px
                       // Drag handle (centered vertically by Row's crossAxisAlignment)
-                      DragHandleWidget(
-                        gradient: AppColors.listGradient,
-                        semanticLabel: 'Reorder ${widget.list.name}',
-                        onDragStart: () => setState(() => _isDragging = true),
-                        onDragEnd: () => setState(() => _isDragging = false),
-                      ),
+                      // Wrap with ReorderableDragStartListener if reorderIndex is provided
+                      if (widget.reorderIndex != null)
+                        ReorderableDragStartListener(
+                          index: widget.reorderIndex!,
+                          child: DragHandleWidget(
+                            gradient: AppColors.listGradient,
+                            semanticLabel: 'Reorder ${widget.list.name}',
+                            onDragStart: () => setState(() => _isDragging = true),
+                            onDragEnd: () => setState(() => _isDragging = false),
+                          ),
+                        )
+                      else
+                        DragHandleWidget(
+                          gradient: AppColors.listGradient,
+                          semanticLabel: 'Reorder ${widget.list.name}',
+                          onDragStart: () => setState(() => _isDragging = true),
+                          onDragEnd: () => setState(() => _isDragging = false),
+                        ),
                     ],
                   ),
                 ),

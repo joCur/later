@@ -37,6 +37,7 @@ class NoteCard extends StatefulWidget {
     this.onLongPress,
     this.showMetadata = true,
     this.index,
+    this.reorderIndex,
   });
 
   /// Item (Note) data to display
@@ -54,6 +55,10 @@ class NoteCard extends StatefulWidget {
   /// Index in the list for staggered entrance animation
   /// If null, no entrance animation is applied
   final int? index;
+
+  /// Index for ReorderableListView
+  /// If provided, the drag handle will be wrapped with ReorderableDragStartListener
+  final int? reorderIndex;
 
   @override
   State<NoteCard> createState() => _NoteCardState();
@@ -446,12 +451,24 @@ class _NoteCardState extends State<NoteCard> with TickerProviderStateMixin {
                       // Spacing before drag handle
                       const SizedBox(width: AppSpacing.xs), // 8px
                       // Drag handle (centered vertically by Row's crossAxisAlignment)
-                      DragHandleWidget(
-                        gradient: AppColors.noteGradient,
-                        semanticLabel: 'Reorder ${widget.item.title}',
-                        onDragStart: () => setState(() => _isDragging = true),
-                        onDragEnd: () => setState(() => _isDragging = false),
-                      ),
+                      // Wrap with ReorderableDragStartListener if reorderIndex is provided
+                      if (widget.reorderIndex != null)
+                        ReorderableDragStartListener(
+                          index: widget.reorderIndex!,
+                          child: DragHandleWidget(
+                            gradient: AppColors.noteGradient,
+                            semanticLabel: 'Reorder ${widget.item.title}',
+                            onDragStart: () => setState(() => _isDragging = true),
+                            onDragEnd: () => setState(() => _isDragging = false),
+                          ),
+                        )
+                      else
+                        DragHandleWidget(
+                          gradient: AppColors.noteGradient,
+                          semanticLabel: 'Reorder ${widget.item.title}',
+                          onDragStart: () => setState(() => _isDragging = true),
+                          onDragEnd: () => setState(() => _isDragging = false),
+                        ),
                     ],
                   ),
                 ),
