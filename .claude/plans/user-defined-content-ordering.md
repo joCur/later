@@ -96,20 +96,20 @@ Implement manual drag-and-drop reordering for heterogeneous content items (Notes
 
 ### Phase 3: Provider Layer - Reordering Logic
 
-- [ ] Task 3.1: Add `_getSortOrder` helper method to ContentProvider
+- [x] Task 3.1: Add `_getSortOrder` helper method to ContentProvider
   - Open `lib/providers/content_provider.dart`
   - Add private method `int _getSortOrder(dynamic item)`
   - Use type checking: if TodoList return `item.sortOrder`, if ListModel return `item.sortOrder`, if Item return `item.sortOrder`
   - Return 0 as fallback for unknown types
 
-- [ ] Task 3.2: Update `getFilteredContent` to sort by sortOrder
+- [x] Task 3.2: Update `getFilteredContent` to sort by sortOrder
   - Modify `getFilteredContent(ContentFilter filter)` method
   - After building the result list, add sorting logic
   - Use `result.sort((a, b) => _getSortOrder(a).compareTo(_getSortOrder(b)))`
   - Apply to all filter types (all, todoLists, lists, notes)
 
-- [ ] Task 3.3: Add `reorderContent` method to ContentProvider
-  - Add public method `Future<void> reorderContent(int oldIndex, int newIndex) async`
+- [x] Task 3.3: Add `reorderContent` method to ContentProvider
+  - Add public method `Future<void> reorderContent(ContentFilter filter, int oldIndex, int newIndex) async`
   - Get current filtered content list
   - Adjust newIndex if moving down: `if (newIndex > oldIndex) newIndex -= 1;`
   - Remove item at oldIndex, insert at newIndex (in-memory reorder)
@@ -117,7 +117,7 @@ Implement manual drag-and-drop reordering for heterogeneous content items (Notes
   - Use type checking to call appropriate update method (updateTodoList, updateList, updateNote)
   - Handle errors and revert on failure
 
-- [ ] Task 3.4: Add optimistic state update support
+- [x] Task 3.4: Add optimistic state update support
   - After reorder operation, call `notifyListeners()` to update UI immediately
   - Consider adding a local cache of sorted content to avoid re-sorting on every build
   - If reorder fails, revert the local state and show error to user
