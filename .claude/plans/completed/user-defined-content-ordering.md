@@ -153,32 +153,34 @@ Implement manual drag-and-drop reordering for heterogeneous content items (Notes
 
 ### Phase 5: Data Migration
 
-- [ ] Task 5.1: Create migration utility class
-  - Create `lib/data/migrations/sort_order_migration.dart`
-  - Create class `SortOrderMigration` with static method `Future<void> run()`
-  - Use `shared_preferences` to track migration completion with key `'sort_order_migration_v1_completed'`
-  - Check if migration already ran, return early if completed
+- [x] Task 5.1: Create migration utility class
+  - Created `lib/data/migrations/sort_order_migration.dart`
+  - Created class `SortOrderMigration` with static method `Future<void> run()`
+  - Added `hasMigratedSortOrder()` and `setMigratedSortOrder()` methods to `PreferencesService`
+  - Migration checks if already ran and returns early if completed
 
-- [ ] Task 5.2: Implement migration logic
-  - Open all Hive boxes (notes, todo_lists, lists, spaces)
-  - For each space, gather all content items (notes, todoLists, lists)
-  - Sort combined content by `createdAt` ascending (preserve existing order)
-  - Assign sequential sortOrder values (0, 1, 2, 3...) to each item
-  - Update each item in its respective Hive box with new sortOrder
-  - Mark migration as complete in SharedPreferences
+- [x] Task 5.2: Implement migration logic
+  - Opens all Hive boxes (notes, todo_lists, lists, spaces)
+  - For each space, gathers all content items (notes, todoLists, lists)
+  - Sorts combined content by `createdAt` ascending (preserves existing order)
+  - Assigns sequential sortOrder values (0, 1, 2, 3...) to each item
+  - Updates each item in its respective Hive box with new sortOrder
+  - Marks migration as complete in SharedPreferences
 
-- [ ] Task 5.3: Integrate migration into app startup
-  - Open `lib/main.dart`
-  - After `HiveDatabase.initialize()` call, add `await SortOrderMigration.run()`
-  - Ensure migration runs before `runApp()` to avoid data inconsistencies
-  - Wrap migration in try-catch to handle errors gracefully
-  - Log migration success/failure for debugging
+- [x] Task 5.3: Integrate migration into app startup
+  - Integrated into `HiveDatabase._runMigrations()` method (called automatically during initialization)
+  - Migration runs after `HiveDatabase.initialize()` opens boxes
+  - Ensures migration runs before app UI loads
+  - Wrapped in try-catch to handle errors gracefully (non-critical)
+  - Logs migration success/failure for debugging
 
-- [ ] Task 5.4: Test migration with real data
-  - Create test data with existing items (no sortOrder)
-  - Run migration and verify all items get sequential sortOrder values
-  - Verify sortOrder values are scoped per space (Space A: 0,1,2; Space B: 0,1,2)
-  - Verify existing order (by createdAt) is preserved after migration
+- [x] Task 5.4: Test migration with real data
+  - Created comprehensive test suite in `test/data/migrations/sort_order_migration_test.dart`
+  - Tests verify items get sequential sortOrder values
+  - Tests verify sortOrder values are scoped per space (Space A: 0,1,2; Space B: 0,1,2)
+  - Tests verify existing order (by createdAt) is preserved after migration
+  - Tests verify idempotent behavior (migration skipped if already completed)
+  - Tests verify graceful error handling
 
 ### Phase 6: Testing and Polish
 
