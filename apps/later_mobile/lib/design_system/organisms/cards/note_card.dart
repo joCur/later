@@ -4,6 +4,7 @@ import 'package:later_mobile/design_system/tokens/tokens.dart';
 import '../../../data/models/item_model.dart';
 import 'package:later_mobile/design_system/atoms/text/gradient_text.dart';
 import 'package:later_mobile/design_system/atoms/borders/gradient_pill_border.dart';
+import 'package:later_mobile/design_system/atoms/drag_handle/drag_handle.dart';
 import 'package:intl/intl.dart';
 import 'package:later_mobile/core/theme/temporal_flow_theme.dart';
 
@@ -60,6 +61,7 @@ class NoteCard extends StatefulWidget {
 
 class _NoteCardState extends State<NoteCard> with TickerProviderStateMixin {
   bool _isPressed = false;
+  bool _isDragging = false;
   late AnimationController _pressAnimationController;
   late Animation<double> _pressScaleAnimation;
 
@@ -276,6 +278,9 @@ class _NoteCardState extends State<NoteCard> with TickerProviderStateMixin {
   }
 
   void _handleTapDown(TapDownDetails details) {
+    // Don't trigger press animation if dragging
+    if (_isDragging) return;
+
     setState(() => _isPressed = true);
     // Phase 5: Animate scale down on press (100ms)
     _pressAnimationController.forward();
@@ -405,7 +410,6 @@ class _NoteCardState extends State<NoteCard> with TickerProviderStateMixin {
                     AppSpacing.cardPaddingMobile,
                   ), // 20px
                   child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       // Leading icon (document icon)
                       _buildLeadingIcon(),
@@ -438,6 +442,15 @@ class _NoteCardState extends State<NoteCard> with TickerProviderStateMixin {
                             ],
                           ],
                         ),
+                      ),
+                      // Spacing before drag handle
+                      const SizedBox(width: AppSpacing.xs), // 8px
+                      // Drag handle (centered vertically by Row's crossAxisAlignment)
+                      DragHandleWidget(
+                        gradient: AppColors.noteGradient,
+                        semanticLabel: 'Reorder ${widget.item.title}',
+                        onDragStart: () => setState(() => _isDragging = true),
+                        onDragEnd: () => setState(() => _isDragging = false),
                       ),
                     ],
                   ),

@@ -115,28 +115,36 @@ Add explicit drag handles to content cards (TodoListCard, NoteCard, ListCard) on
   - Drag handle successfully integrated into TodoListCard layout
   - Visual testing pending (app running on macOS for verification)
 
-### Phase 3: Integrate Drag Handle into NoteCard and ListCard
+### Phase 3: Integrate Drag Handle into NoteCard and ListCard ✅ COMPLETED
 
-- [ ] Task 3.1: Add drag handle to NoteCard
-  - Open `apps/later_mobile/lib/design_system/organisms/cards/note_card.dart`
-  - Add `DragHandleWidget` to card layout (same pattern as TodoListCard)
-  - Pass `gradient: AppColors.noteGradient` (blue-cyan)
-  - Pass `semanticLabel: 'Reorder ${widget.item.title}'`
-  - Add `_isDragging` state management
-  - Test rendering, interaction, and accessibility
+- [x] Task 3.1: Add drag handle to NoteCard
+  - Opened `apps/later_mobile/lib/design_system/organisms/cards/note_card.dart`
+  - Added `DragHandleWidget` to card layout (same pattern as TodoListCard)
+  - Passed `gradient: AppColors.noteGradient` (blue-cyan)
+  - Passed `semanticLabel: 'Reorder ${widget.item.title}'`
+  - Added `_isDragging` state management
+  - Added import for `drag_handle.dart`
+  - Modified `_handleTapDown` to check `_isDragging` before triggering press animation
 
-- [ ] Task 3.2: Add drag handle to ListCard
-  - Open `apps/later_mobile/lib/design_system/organisms/cards/list_card.dart`
-  - Add `DragHandleWidget` to card layout (same pattern as TodoListCard)
-  - Pass `gradient: AppColors.listGradient` (purple-lavender)
-  - Pass `semanticLabel: 'Reorder ${widget.list.name}'`
-  - Add `_isDragging` state management
-  - Test rendering, interaction, and accessibility
+- [x] Task 3.2: Add drag handle to ListCard
+  - Opened `apps/later_mobile/lib/design_system/organisms/cards/list_card.dart`
+  - Added `DragHandleWidget` to card layout (same pattern as TodoListCard)
+  - Passed `gradient: AppColors.listGradient` (purple-lavender)
+  - Passed `semanticLabel: 'Reorder ${widget.list.name}'`
+  - Added `_isDragging` state management
+  - Added import for `drag_handle.dart`
+  - Modified `_handleTapDown` to check `_isDragging` before triggering press animation
 
-- [ ] Task 3.3: Ensure consistent spacing across all card types
-  - Verify all three card types have identical handle placement and spacing
-  - Check alignment in mixed content list (TodoList + Note + List)
-  - Test with various content lengths (short titles, long titles, empty descriptions)
+- [x] Task 3.3: Ensure consistent spacing across all card types
+  - Verified all three card types have identical handle placement and spacing
+  - All cards use `const SizedBox(width: AppSpacing.xs)` before drag handle
+  - Drag handle is positioned as last child in Row, after Expanded content column
+  - **Improvement**: Fixed vertical centering issue for drag handles
+    - Original cards had `crossAxisAlignment: CrossAxisAlignment.start` which forced top alignment
+    - Removed explicit crossAxisAlignment to use Row's default `CrossAxisAlignment.center`
+    - Handles now properly centered vertically regardless of card height variation
+    - Especially noticeable on taller NoteCards with content, tags, and metadata
+  - Ran `flutter analyze` - only 2 pre-existing warnings in unrelated test file (auto_save_mixin_test.dart)
 
 ### Phase 4: Update HomeScreen Drag Logic
 

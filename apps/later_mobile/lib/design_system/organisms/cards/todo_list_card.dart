@@ -322,7 +322,6 @@ class _TodoListCardState extends State<TodoListCard>
                     AppSpacing.cardPaddingMobile,
                   ), // 20px
                   child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       // Leading icon (checkbox outline)
                       _buildLeadingIcon(),
@@ -354,7 +353,7 @@ class _TodoListCardState extends State<TodoListCard>
                       ),
                       // Spacing before drag handle
                       const SizedBox(width: AppSpacing.xs), // 8px
-                      // Drag handle
+                      // Drag handle (centered vertically by Row's crossAxisAlignment)
                       DragHandleWidget(
                         gradient: AppColors.taskGradient,
                         semanticLabel: 'Reorder ${widget.todoList.name}',
