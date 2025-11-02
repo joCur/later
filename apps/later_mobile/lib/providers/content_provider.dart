@@ -774,6 +774,134 @@ class ContentProvider extends ChangeNotifier {
     }
   }
 
+  /// Reorders heterogeneous content items within the current space.
+  ///
+  /// This method handles reordering of mixed content types (TodoLists, Lists, Notes).
+  /// It updates the sortOrder field for all affected items and persists the changes
+  /// to the database.
+  ///
+  /// Parameters:
+  ///   - [filter]: The current content filter (determines which items are being reordered)
+  ///   - [oldIndex]: The current index of the item
+  ///   - [newIndex]: The target index for the item
+  ///
+  /// Example:
+  /// ```dart
+  /// await provider.reorderContent(ContentFilter.all, 0, 2);
+  /// ```
+  Future<void> reorderContent(
+    ContentFilter filter,
+    int oldIndex,
+    int newIndex,
+  ) async {
+    _error = null;
+
+    try {
+      // Get current filtered content
+      final content = getFilteredContent(filter);
+
+      // Adjust newIndex if moving down (ReorderableListView convention)
+      if (newIndex > oldIndex) {
+        newIndex -= 1;
+      }
+
+      // Perform in-memory reorder
+      final item = content[oldIndex];
+      content.removeAt(oldIndex);
+      content.insert(newIndex, item);
+
+      // PHASE 1: Update all local state FIRST (optimistic update)
+      final updatedItems = <dynamic>[];
+      for (int i = 0; i < content.length; i++) {
+        final currentItem = content[i];
+        final newSortOrder = i;
+
+        // Create updated items with new sortOrder
+        if (currentItem is TodoList) {
+          final updated = currentItem.copyWith(sortOrder: newSortOrder);
+          updatedItems.add(updated);
+
+          // Update local state immediately
+          final index = _todoLists.indexWhere((t) => t.id == currentItem.id);
+          if (index != -1) {
+            _todoLists = [
+              ..._todoLists.sublist(0, index),
+              updated,
+              ..._todoLists.sublist(index + 1),
+            ];
+          }
+        } else if (currentItem is ListModel) {
+          final updated = currentItem.copyWith(sortOrder: newSortOrder);
+          updatedItems.add(updated);
+
+          // Update local state immediately
+          final index = _lists.indexWhere((l) => l.id == currentItem.id);
+          if (index != -1) {
+            _lists = [
+              ..._lists.sublist(0, index),
+              updated,
+              ..._lists.sublist(index + 1),
+            ];
+          }
+        } else if (currentItem is Item) {
+          final updated = currentItem.copyWith(sortOrder: newSortOrder);
+          updatedItems.add(updated);
+
+          // Update local state immediately
+          final index = _notes.indexWhere((n) => n.id == currentItem.id);
+          if (index != -1) {
+            _notes = [
+              ..._notes.sublist(0, index),
+              updated,
+              ..._notes.sublist(index + 1),
+            ];
+          }
+        }
+      }
+
+      // Notify listeners immediately for instant UI update
+      notifyListeners();
+
+      // PHASE 2: Persist to database in parallel for better performance
+      final updateFutures = <Future<void>>[];
+      for (final item in updatedItems) {
+        if (item is TodoList) {
+          updateFutures.add(
+            _executeWithRetry(
+              () => _todoListRepository.update(item),
+              'updateTodoList',
+            ),
+          );
+        } else if (item is ListModel) {
+          updateFutures.add(
+            _executeWithRetry(
+              () => _listRepository.update(item),
+              'updateList',
+            ),
+          );
+        } else if (item is Item) {
+          updateFutures.add(
+            _executeWithRetry(
+              () => _noteRepository.update(item),
+              'updateNote',
+            ),
+          );
+        }
+      }
+      await Future.wait(updateFutures);
+
+      _error = null;
+    } catch (e) {
+      if (e is AppError) {
+        _error = e;
+      } else {
+        _error = AppError.fromException(e);
+      }
+      notifyListeners();
+      rethrow; // Rethrow so UI can handle the error
+    }
+  }
+
   /// Creates a new note.
   ///
   /// Parameters:
@@ -884,12 +1012,13 @@ class ContentProvider extends ChangeNotifier {
   /// Gets filtered content based on the specified filter.
   ///
   /// Returns a list of all content types combined, or filtered to a specific type.
+  /// Content is sorted by sortOrder in ascending order.
   ///
   /// Parameters:
   ///   - [filter]: The content filter to apply
   ///
   /// Returns:
-  ///   A list of content items (TodoList, ListModel, or Item)
+  ///   A list of content items (TodoList, ListModel, or Item) sorted by sortOrder
   ///
   /// Example:
   /// ```dart
@@ -897,16 +1026,21 @@ class ContentProvider extends ChangeNotifier {
   /// final onlyTodos = provider.getFilteredContent(ContentFilter.todoLists);
   /// ```
   List<dynamic> getFilteredContent(ContentFilter filter) {
+    List<dynamic> result;
     switch (filter) {
       case ContentFilter.all:
-        return [..._todoLists, ..._lists, ..._notes];
+        result = [..._todoLists, ..._lists, ..._notes];
       case ContentFilter.todoLists:
-        return _todoLists;
+        result = [..._todoLists];
       case ContentFilter.lists:
-        return _lists;
+        result = [..._lists];
       case ContentFilter.notes:
-        return _notes;
+        result = [..._notes];
     }
+
+    // Sort by sortOrder
+    result.sort((a, b) => _getSortOrder(a).compareTo(_getSortOrder(b)));
+    return result;
   }
 
   /// Gets the total count of all content items in the current space.
@@ -1017,6 +1151,26 @@ class ContentProvider extends ChangeNotifier {
   void clearError() {
     _error = null;
     notifyListeners();
+  }
+
+  /// Gets the sortOrder value from a content item.
+  ///
+  /// This helper method extracts the sortOrder field from different content types
+  /// (TodoList, ListModel, Item). Returns 0 if the item type is unknown.
+  ///
+  /// Parameters:
+  ///   - [item]: The content item (TodoList, ListModel, or Item)
+  ///
+  /// Returns the sortOrder value of the item.
+  int _getSortOrder(dynamic item) {
+    if (item is TodoList) {
+      return item.sortOrder;
+    } else if (item is ListModel) {
+      return item.sortOrder;
+    } else if (item is Item) {
+      return item.sortOrder;
+    }
+    return 0;
   }
 
   /// Executes an operation with retry logic.

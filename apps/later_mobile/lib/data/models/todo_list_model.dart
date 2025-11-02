@@ -148,6 +148,7 @@ class TodoList {
     List<TodoItem>? items,
     DateTime? createdAt,
     DateTime? updatedAt,
+    this.sortOrder = 0,
   }) : items = items ?? [],
        createdAt = createdAt ?? DateTime.now(),
        updatedAt = updatedAt ?? DateTime.now();
@@ -166,6 +167,7 @@ class TodoList {
           [],
       createdAt: DateTime.parse(json['createdAt'] as String),
       updatedAt: DateTime.parse(json['updatedAt'] as String),
+      sortOrder: (json['sortOrder'] as int?) ?? 0,
     );
   }
 
@@ -197,6 +199,11 @@ class TodoList {
   @HiveField(6)
   final DateTime updatedAt;
 
+  /// Sort order within a space (space-scoped, not global)
+  /// Used for user-defined ordering via drag-and-drop
+  @HiveField(7)
+  final int sortOrder;
+
   /// Total number of items in the list
   int get totalItems => items.length;
 
@@ -219,6 +226,7 @@ class TodoList {
     List<TodoItem>? items,
     DateTime? createdAt,
     DateTime? updatedAt,
+    int? sortOrder,
   }) {
     return TodoList(
       id: id ?? this.id,
@@ -228,6 +236,7 @@ class TodoList {
       items: items ?? this.items,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
+      sortOrder: sortOrder ?? this.sortOrder,
     );
   }
 
@@ -241,6 +250,7 @@ class TodoList {
       'items': items.map((item) => item.toJson()).toList(),
       'createdAt': createdAt.toIso8601String(),
       'updatedAt': updatedAt.toIso8601String(),
+      'sortOrder': sortOrder,
     };
   }
 

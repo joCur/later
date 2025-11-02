@@ -95,6 +95,54 @@ void main() {
         expect(todoListBox.get('todo-1'), isNotNull);
       });
 
+      test('create() assigns sortOrder 0 for first todo list in space', () async {
+        // Arrange
+        final todoList = createTestTodoList(id: 'todo-1');
+
+        // Act
+        final result = await repository.create(todoList);
+
+        // Assert
+        expect(result.sortOrder, equals(0));
+      });
+
+      test('create() assigns incremental sortOrder for subsequent todo lists', () async {
+        // Arrange
+        final todoList1 = createTestTodoList(id: 'todo-1');
+        final todoList2 = createTestTodoList(id: 'todo-2');
+        final todoList3 = createTestTodoList(id: 'todo-3');
+
+        // Act
+        final result1 = await repository.create(todoList1);
+        final result2 = await repository.create(todoList2);
+        final result3 = await repository.create(todoList3);
+
+        // Assert
+        expect(result1.sortOrder, equals(0));
+        expect(result2.sortOrder, equals(1));
+        expect(result3.sortOrder, equals(2));
+      });
+
+      test('create() uses space-scoped sortOrder values', () async {
+        // Arrange - Create todo lists in different spaces
+        final todo1Space1 = createTestTodoList(id: 'todo-1');
+        final todo2Space1 = createTestTodoList(id: 'todo-2');
+        final todo1Space2 = createTestTodoList(id: 'todo-3', spaceId: 'space-2');
+        final todo2Space2 = createTestTodoList(id: 'todo-4', spaceId: 'space-2');
+
+        // Act
+        final result1Space1 = await repository.create(todo1Space1);
+        final result2Space1 = await repository.create(todo2Space1);
+        final result1Space2 = await repository.create(todo1Space2);
+        final result2Space2 = await repository.create(todo2Space2);
+
+        // Assert - Each space should have independent sortOrder sequence
+        expect(result1Space1.sortOrder, equals(0));
+        expect(result2Space1.sortOrder, equals(1));
+        expect(result1Space2.sortOrder, equals(0)); // Restarts for new space
+        expect(result2Space2.sortOrder, equals(1));
+      });
+
       test('getById() returns existing TodoList', () async {
         // Arrange
         final todoList = createTestTodoList(

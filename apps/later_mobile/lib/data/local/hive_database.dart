@@ -1,4 +1,5 @@
 import 'package:hive_flutter/hive_flutter.dart';
+import '../migrations/sort_order_migration.dart';
 import '../models/item_model.dart';
 import '../models/space_model.dart';
 import '../models/todo_list_model.dart';
@@ -106,6 +107,12 @@ class HiveDatabase {
         // ignore: avoid_print
         print('Migration completed: All spaces migrated to calculated counts');
       }
+
+      // Migration: Assign sortOrder to existing content (v1)
+      // This migration runs once to assign sequential sortOrder values to all
+      // existing content items (notes, todo lists, lists) based on their createdAt
+      // timestamps, preserving the existing chronological order
+      await SortOrderMigration.run();
     } catch (e) {
       // Log migration error but don't fail initialization
       // Migration errors are non-critical - the app can still function

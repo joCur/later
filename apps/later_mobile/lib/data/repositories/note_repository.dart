@@ -11,13 +11,17 @@ class NoteRepository {
 
   /// Creates a new note in the local storage.
   ///
+  /// Automatically calculates and assigns the next sortOrder value for the note
+  /// within its space. The sortOrder is space-scoped, starting at 0 for the first
+  /// note in a space and incrementing for each subsequent note.
+  ///
   /// Stores the note using its ID as the key in the Hive box.
   ///
   /// Parameters:
   ///   - [note]: The note to be created
   ///
   /// Returns:
-  ///   The created note
+  ///   The created note with assigned sortOrder
   ///
   /// Example:
   /// ```dart
@@ -29,11 +33,23 @@ class NoteRepository {
   ///   tags: ['work', 'meetings'],
   /// );
   /// final created = await repository.create(note);
+  /// // created.sortOrder will be 0 for first note in space, 1 for second, etc.
   /// ```
   Future<Item> create(Item note) async {
     try {
-      await _box.put(note.id, note);
-      return note;
+      // Calculate next sortOrder for this space
+      final notesInSpace = await getBySpace(note.spaceId);
+      final maxSortOrder = notesInSpace.isEmpty
+          ? -1
+          : notesInSpace
+              .map((n) => n.sortOrder)
+              .reduce((a, b) => a > b ? a : b);
+      final nextSortOrder = maxSortOrder + 1;
+
+      // Create note with calculated sortOrder
+      final noteWithSortOrder = note.copyWith(sortOrder: nextSortOrder);
+      await _box.put(noteWithSortOrder.id, noteWithSortOrder);
+      return noteWithSortOrder;
     } catch (e) {
       throw Exception('Failed to create note: $e');
     }

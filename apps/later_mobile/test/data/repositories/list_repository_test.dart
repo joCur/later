@@ -92,6 +92,54 @@ void main() {
         expect(listBox.get('list-1'), isNotNull);
       });
 
+      test('create() assigns sortOrder 0 for first list in space', () async {
+        // Arrange
+        final list = createTestList(id: 'list-1');
+
+        // Act
+        final result = await repository.create(list);
+
+        // Assert
+        expect(result.sortOrder, equals(0));
+      });
+
+      test('create() assigns incremental sortOrder for subsequent lists', () async {
+        // Arrange
+        final list1 = createTestList(id: 'list-1');
+        final list2 = createTestList(id: 'list-2');
+        final list3 = createTestList(id: 'list-3');
+
+        // Act
+        final result1 = await repository.create(list1);
+        final result2 = await repository.create(list2);
+        final result3 = await repository.create(list3);
+
+        // Assert
+        expect(result1.sortOrder, equals(0));
+        expect(result2.sortOrder, equals(1));
+        expect(result3.sortOrder, equals(2));
+      });
+
+      test('create() uses space-scoped sortOrder values', () async {
+        // Arrange - Create lists in different spaces
+        final list1Space1 = createTestList(id: 'list-1');
+        final list2Space1 = createTestList(id: 'list-2');
+        final list1Space2 = createTestList(id: 'list-3', spaceId: 'space-2');
+        final list2Space2 = createTestList(id: 'list-4', spaceId: 'space-2');
+
+        // Act
+        final result1Space1 = await repository.create(list1Space1);
+        final result2Space1 = await repository.create(list2Space1);
+        final result1Space2 = await repository.create(list1Space2);
+        final result2Space2 = await repository.create(list2Space2);
+
+        // Assert - Each space should have independent sortOrder sequence
+        expect(result1Space1.sortOrder, equals(0));
+        expect(result2Space1.sortOrder, equals(1));
+        expect(result1Space2.sortOrder, equals(0)); // Restarts for new space
+        expect(result2Space2.sortOrder, equals(1));
+      });
+
       test('getById() returns existing ListModel', () async {
         // Arrange
         final list = createTestList(

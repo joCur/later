@@ -137,6 +137,7 @@ class ListModel {
     this.style = ListStyle.bullets,
     DateTime? createdAt,
     DateTime? updatedAt,
+    this.sortOrder = 0,
   }) : items = items ?? [],
        createdAt = createdAt ?? DateTime.now(),
        updatedAt = updatedAt ?? DateTime.now();
@@ -156,6 +157,7 @@ class ListModel {
       style: ListStyleExtension.fromJson(json['style'] as String? ?? 'bullets'),
       createdAt: DateTime.parse(json['createdAt'] as String),
       updatedAt: DateTime.parse(json['updatedAt'] as String),
+      sortOrder: (json['sortOrder'] as int?) ?? 0,
     );
   }
 
@@ -191,6 +193,11 @@ class ListModel {
   @HiveField(7)
   final DateTime updatedAt;
 
+  /// Sort order within a space (space-scoped, not global)
+  /// Used for user-defined ordering via drag-and-drop
+  @HiveField(8)
+  final int sortOrder;
+
   /// Total number of items in the list
   int get totalItems => items.length;
 
@@ -217,6 +224,7 @@ class ListModel {
     ListStyle? style,
     DateTime? createdAt,
     DateTime? updatedAt,
+    int? sortOrder,
   }) {
     return ListModel(
       id: id ?? this.id,
@@ -227,6 +235,7 @@ class ListModel {
       style: style ?? this.style,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
+      sortOrder: sortOrder ?? this.sortOrder,
     );
   }
 
@@ -241,6 +250,7 @@ class ListModel {
       'style': style.toJson(),
       'createdAt': createdAt.toIso8601String(),
       'updatedAt': updatedAt.toIso8601String(),
+      'sortOrder': sortOrder,
     };
   }
 

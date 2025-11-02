@@ -24,7 +24,7 @@ class TodoItemAdapter extends TypeAdapter<TodoItem> {
       dueDate: fields[4] as DateTime?,
       priority: fields[5] as TodoPriority?,
       tags: (fields[6] as List?)?.cast<String>(),
-      sortOrder: fields[7] as int,
+      sortOrder: (fields[7] as int?) ?? 0,
     );
   }
 
@@ -79,13 +79,14 @@ class TodoListAdapter extends TypeAdapter<TodoList> {
       items: (fields[4] as List?)?.cast<TodoItem>(),
       createdAt: fields[5] as DateTime?,
       updatedAt: fields[6] as DateTime?,
+      sortOrder: (fields[7] as int?) ?? 0,
     );
   }
 
   @override
   void write(BinaryWriter writer, TodoList obj) {
     writer
-      ..writeByte(7)
+      ..writeByte(8)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -99,7 +100,9 @@ class TodoListAdapter extends TypeAdapter<TodoList> {
       ..writeByte(5)
       ..write(obj.createdAt)
       ..writeByte(6)
-      ..write(obj.updatedAt);
+      ..write(obj.updatedAt)
+      ..writeByte(7)
+      ..write(obj.sortOrder);
   }
 
   @override
