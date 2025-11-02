@@ -112,16 +112,16 @@ class _DragHandleWidgetState extends State<DragHandleWidget> {
       },
       child: SizedBox(
         width:
-            20, // Total visible width (6px dot + 4px spacing + 6px dot + 4px)
+            20, // Total visible width (4px dot + 6px spacing + 4px dot + 6px padding)
         height:
-            24, // Total visible height (4px dot + 4px spacing + 4px dot + 4px spacing + 4px dot + 4px)
+            30, // Total visible height (4px dot + 6px spacing + 4px dot + 6px spacing + 4px dot + 6px padding)
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             _buildDotRow(),
-            const SizedBox(height: 4),
+            const SizedBox(height: 6),
             _buildDotRow(),
-            const SizedBox(height: 4),
+            const SizedBox(height: 6),
             _buildDotRow(),
           ],
         ),
@@ -133,7 +133,7 @@ class _DragHandleWidgetState extends State<DragHandleWidget> {
   Widget _buildDotRow() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
-      children: [_buildDot(), const SizedBox(width: 6), _buildDot()],
+      children: [_buildDot(), const SizedBox(width: 4), _buildDot()],
     );
   }
 

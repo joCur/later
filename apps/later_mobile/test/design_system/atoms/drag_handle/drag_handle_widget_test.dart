@@ -113,7 +113,7 @@ void main() {
       expect(tooltip.message, equals('Reorder Shopping List'));
     });
 
-    testWidgets('Grip dots have correct dimensions (20×24px)', (
+    testWidgets('Grip dots have correct dimensions (20×30px)', (
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(
@@ -132,7 +132,7 @@ void main() {
         find.byType(SizedBox).at(1),
       );
       expect(gripDotsSizedBox.width, equals(20));
-      expect(gripDotsSizedBox.height, equals(24));
+      expect(gripDotsSizedBox.height, equals(30));
     });
 
     testWidgets('Individual dots are 4×4px circles', (
@@ -575,7 +575,7 @@ void main() {
     });
 
     testWidgets(
-      'Grip dots use correct spacing (4px vertical, 6px horizontal)',
+      'Grip dots use correct spacing (6px vertical, 4px horizontal)',
       (WidgetTester tester) async {
         await tester.pumpWidget(
           const MaterialApp(
@@ -592,10 +592,10 @@ void main() {
         final spacingBoxes = find.byWidgetPredicate(
           (widget) =>
               widget is SizedBox &&
-              (widget.height == 4.0 || widget.width == 6.0),
+              (widget.height == 6.0 || widget.width == 4.0),
         );
 
-        // Should have vertical (4px) and horizontal (6px) spacing
+        // Should have vertical (6px) and horizontal (4px) spacing
         expect(spacingBoxes, findsWidgets);
       },
     );
