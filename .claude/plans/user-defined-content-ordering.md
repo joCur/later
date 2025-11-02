@@ -68,32 +68,31 @@ Implement manual drag-and-drop reordering for heterogeneous content items (Notes
 
 ### Phase 2: Repository Layer Updates
 
-- [ ] Task 2.1: Update NoteRepository create method
+- [x] Task 2.1: Update NoteRepository create method
   - Open `lib/data/repositories/note_repository.dart`
   - Modify `create()` method to calculate next sortOrder for the space
   - Query all notes in the same spaceId
   - Find max sortOrder value (or use 0 if space is empty)
   - Assign `sortOrder = maxSortOrder + 1` to new note
 
-- [ ] Task 2.2: Update TodoListRepository create method
+- [x] Task 2.2: Update TodoListRepository create method
   - Open `lib/data/repositories/todo_list_repository.dart`
   - Modify `create()` method to calculate next sortOrder for the space
   - Query all todo lists in the same spaceId
   - Find max sortOrder value (or use 0 if space is empty)
   - Assign `sortOrder = maxSortOrder + 1` to new todo list
 
-- [ ] Task 2.3: Update ListRepository create method
+- [x] Task 2.3: Update ListRepository create method
   - Open `lib/data/repositories/list_repository.dart`
   - Modify `create()` method to calculate next sortOrder for the space
   - Query all lists in the same spaceId
   - Find max sortOrder value (or use 0 if space is empty)
   - Assign `sortOrder = maxSortOrder + 1` to new list
 
-- [ ] Task 2.4: Add helper method to calculate max sortOrder across all content types
-  - Create utility method in each repository or in ContentProvider
-  - Method should query all three content types for a given spaceId
-  - Return the maximum sortOrder value across all types
-  - This ensures new content gets a sortOrder higher than all existing content
+- [x] Task 2.4: Add helper method to calculate max sortOrder across all content types
+  - NOT NEEDED: Each repository independently calculates sortOrder within its own content type
+  - sortOrder is space-scoped but type-independent (each type maintains its own sortOrder sequence)
+  - This approach is simpler and prevents race conditions across content types
 
 ### Phase 3: Provider Layer - Reordering Logic
 

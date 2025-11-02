@@ -11,13 +11,17 @@ class TodoListRepository {
 
   /// Creates a new todo list in the local storage.
   ///
+  /// Automatically calculates and assigns the next sortOrder value for the todo list
+  /// within its space. The sortOrder is space-scoped, starting at 0 for the first
+  /// todo list in a space and incrementing for each subsequent todo list.
+  ///
   /// Stores the todo list using its ID as the key in the Hive box.
   ///
   /// Parameters:
   ///   - [todoList]: The todo list to be created
   ///
   /// Returns:
-  ///   The created todo list
+  ///   The created todo list with assigned sortOrder
   ///
   /// Example:
   /// ```dart
@@ -28,11 +32,23 @@ class TodoListRepository {
   ///   items: [],
   /// );
   /// final created = await repository.create(todoList);
+  /// // created.sortOrder will be 0 for first todo list in space, 1 for second, etc.
   /// ```
   Future<TodoList> create(TodoList todoList) async {
     try {
-      await _box.put(todoList.id, todoList);
-      return todoList;
+      // Calculate next sortOrder for this space
+      final todoListsInSpace = await getBySpace(todoList.spaceId);
+      final maxSortOrder = todoListsInSpace.isEmpty
+          ? -1
+          : todoListsInSpace
+              .map((t) => t.sortOrder)
+              .reduce((a, b) => a > b ? a : b);
+      final nextSortOrder = maxSortOrder + 1;
+
+      // Create todo list with calculated sortOrder
+      final todoListWithSortOrder = todoList.copyWith(sortOrder: nextSortOrder);
+      await _box.put(todoListWithSortOrder.id, todoListWithSortOrder);
+      return todoListWithSortOrder;
     } catch (e) {
       throw Exception('Failed to create todo list: $e');
     }

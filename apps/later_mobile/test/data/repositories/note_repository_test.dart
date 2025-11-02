@@ -72,6 +72,54 @@ void main() {
         expect(noteBox.get('note-1'), isNotNull);
       });
 
+      test('create() assigns sortOrder 0 for first note in space', () async {
+        // Arrange
+        final note = createTestNote(id: 'note-1');
+
+        // Act
+        final result = await repository.create(note);
+
+        // Assert
+        expect(result.sortOrder, equals(0));
+      });
+
+      test('create() assigns incremental sortOrder for subsequent notes', () async {
+        // Arrange
+        final note1 = createTestNote(id: 'note-1');
+        final note2 = createTestNote(id: 'note-2');
+        final note3 = createTestNote(id: 'note-3');
+
+        // Act
+        final result1 = await repository.create(note1);
+        final result2 = await repository.create(note2);
+        final result3 = await repository.create(note3);
+
+        // Assert
+        expect(result1.sortOrder, equals(0));
+        expect(result2.sortOrder, equals(1));
+        expect(result3.sortOrder, equals(2));
+      });
+
+      test('create() uses space-scoped sortOrder values', () async {
+        // Arrange - Create notes in different spaces
+        final note1Space1 = createTestNote(id: 'note-1');
+        final note2Space1 = createTestNote(id: 'note-2');
+        final note1Space2 = createTestNote(id: 'note-3', spaceId: 'space-2');
+        final note2Space2 = createTestNote(id: 'note-4', spaceId: 'space-2');
+
+        // Act
+        final result1Space1 = await repository.create(note1Space1);
+        final result2Space1 = await repository.create(note2Space1);
+        final result1Space2 = await repository.create(note1Space2);
+        final result2Space2 = await repository.create(note2Space2);
+
+        // Assert - Each space should have independent sortOrder sequence
+        expect(result1Space1.sortOrder, equals(0));
+        expect(result2Space1.sortOrder, equals(1));
+        expect(result1Space2.sortOrder, equals(0)); // Restarts for new space
+        expect(result2Space2.sortOrder, equals(1));
+      });
+
       test('getById() returns existing Note', () async {
         // Arrange
         final note = createTestNote(

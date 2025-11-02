@@ -11,13 +11,17 @@ class ListRepository {
 
   /// Creates a new list in the local storage.
   ///
+  /// Automatically calculates and assigns the next sortOrder value for the list
+  /// within its space. The sortOrder is space-scoped, starting at 0 for the first
+  /// list in a space and incrementing for each subsequent list.
+  ///
   /// Stores the list using its ID as the key in the Hive box.
   ///
   /// Parameters:
   ///   - [list]: The list to be created
   ///
   /// Returns:
-  ///   The created list
+  ///   The created list with assigned sortOrder
   ///
   /// Example:
   /// ```dart
@@ -29,11 +33,23 @@ class ListRepository {
   ///   items: [],
   /// );
   /// final created = await repository.create(list);
+  /// // created.sortOrder will be 0 for first list in space, 1 for second, etc.
   /// ```
   Future<ListModel> create(ListModel list) async {
     try {
-      await _box.put(list.id, list);
-      return list;
+      // Calculate next sortOrder for this space
+      final listsInSpace = await getBySpace(list.spaceId);
+      final maxSortOrder = listsInSpace.isEmpty
+          ? -1
+          : listsInSpace
+              .map((l) => l.sortOrder)
+              .reduce((a, b) => a > b ? a : b);
+      final nextSortOrder = maxSortOrder + 1;
+
+      // Create list with calculated sortOrder
+      final listWithSortOrder = list.copyWith(sortOrder: nextSortOrder);
+      await _box.put(listWithSortOrder.id, listWithSortOrder);
+      return listWithSortOrder;
     } catch (e) {
       throw Exception('Failed to create list: $e');
     }
