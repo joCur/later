@@ -179,48 +179,22 @@ class _ListCardState extends State<ListCard> with TickerProviderStateMixin {
     );
   }
 
-  /// Build preview of first 3 items with ellipsis handling
+  /// Build preview showing item count (items are loaded separately)
   ///
-  /// Shows comma-separated list of first 3 item titles
-  /// Adds "..." if more than 3 items exist
-  /// Shows "No items" when list is empty
+  /// Shows a simple text preview indicating the number of items
+  /// Examples: "No items", "5 items"
   Widget _buildItemPreview(BuildContext context) {
-    final preview = _getItemPreview();
+    final count = widget.list.totalItems;
+    final preview = count == 0 ? 'No items yet' : '$count item${count == 1 ? '' : 's'}';
 
     return Text(
       preview,
       style: AppTypography.itemContent.copyWith(
         color: AppColors.textSecondary(context),
       ),
-      maxLines: 2,
+      maxLines: 1,
       overflow: TextOverflow.ellipsis,
     );
-  }
-
-  /// Generate item preview string from first 3 items
-  ///
-  /// Returns:
-  /// - "No items" when list is empty
-  /// - "Item1, Item2, Item3..." when more than 3 items (with ellipsis)
-  /// - "Item1, Item2" when 2 items (no ellipsis)
-  /// - "Item1" when 1 item (no ellipsis)
-  String _getItemPreview() {
-    if (widget.list.items.isEmpty) {
-      return 'No items';
-    }
-
-    final firstThree = widget.list.items
-        .take(3)
-        .map((item) => item.title)
-        .toList();
-    final preview = firstThree.join(', ');
-
-    // Add ellipsis if there are more than 3 items
-    if (widget.list.items.length > 3) {
-      return '$preview...';
-    }
-
-    return preview;
   }
 
   void _handleTapDown(TapDownDetails details) {

@@ -49,6 +49,8 @@ class _ListDetailScreenState extends State<ListDetailScreen>
 
   // Local state
   late ListModel _currentList;
+  List<ListItem> _currentItems = [];
+  bool _isLoadingItems = false;
   bool _enableFabPulse = false;
 
   @override
@@ -63,6 +65,54 @@ class _ListDetailScreenState extends State<ListDetailScreen>
 
     // Listen to text changes for auto-save
     _nameController.addListener(() => onFieldChanged());
+
+    // Load list items for this list
+    _loadListItems();
+  }
+
+  /// Load list items from the provider
+  Future<void> _loadListItems() async {
+    setState(() {
+      _isLoadingItems = true;
+    });
+
+    try {
+      final provider = Provider.of<ContentProvider>(context, listen: false);
+      final items = await provider.loadListItemsForList(widget.list.id);
+
+      if (mounted) {
+        setState(() {
+          _currentItems = items;
+          _isLoadingItems = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isLoadingItems = false;
+        });
+        _showSnackBar('Failed to load items: $e', isError: true);
+      }
+    }
+  }
+
+  /// Refresh the parent list from the provider to get updated counts
+  Future<void> _refreshListData() async {
+    try {
+      final provider = Provider.of<ContentProvider>(context, listen: false);
+      final updated = provider.lists.firstWhere(
+        (l) => l.id == _currentList.id,
+      );
+      if (mounted) {
+        setState(() {
+          _currentList = updated;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        _showSnackBar('Failed to refresh list data: $e', isError: true);
+      }
+    }
   }
 
   @override
@@ -117,15 +167,14 @@ class _ListDetailScreenState extends State<ListDetailScreen>
 
     try {
       final provider = Provider.of<ContentProvider>(context, listen: false);
-      await provider.addListItem(_currentList.id, result);
+      // Set sortOrder to be at the end of current items
+      final itemWithSortOrder = result.copyWith(sortOrder: _currentItems.length);
+      // createListItem takes a ListItem directly
+      await provider.createListItem(itemWithSortOrder);
 
-      // Reload current list
-      final updated = provider.lists.firstWhere((l) => l.id == _currentList.id);
-      if (mounted) {
-        setState(() {
-          _currentList = updated;
-        });
-      }
+      // Reload items and refresh parent list data
+      await _loadListItems();
+      await _refreshListData();
 
       if (mounted) _showSnackBar('Item added');
     } catch (e) {
@@ -140,15 +189,12 @@ class _ListDetailScreenState extends State<ListDetailScreen>
 
     try {
       final provider = Provider.of<ContentProvider>(context, listen: false);
-      await provider.updateListItem(_currentList.id, item.id, result);
+      // updateListItem takes just a ListItem
+      await provider.updateListItem(result);
 
-      // Reload current list
-      final updated = provider.lists.firstWhere((l) => l.id == _currentList.id);
-      if (mounted) {
-        setState(() {
-          _currentList = updated;
-        });
-      }
+      // Reload items and refresh parent list data
+      await _loadListItems();
+      await _refreshListData();
 
       if (mounted) _showSnackBar('Item updated');
     } catch (e) {
@@ -161,15 +207,11 @@ class _ListDetailScreenState extends State<ListDetailScreen>
   Future<void> _performDeleteListItem(ListItem item) async {
     try {
       final provider = Provider.of<ContentProvider>(context, listen: false);
-      await provider.deleteListItem(_currentList.id, item.id);
+      await provider.deleteListItem(item.id, _currentList.id);
 
-      // Reload current list
-      final updated = provider.lists.firstWhere((l) => l.id == _currentList.id);
-      if (mounted) {
-        setState(() {
-          _currentList = updated;
-        });
-      }
+      // Reload items and refresh parent list data
+      await _loadListItems();
+      await _refreshListData();
 
       if (mounted) _showSnackBar('Item deleted');
     } catch (e) {
@@ -181,13 +223,14 @@ class _ListDetailScreenState extends State<ListDetailScreen>
   Future<void> _toggleListItem(ListItem item) async {
     try {
       final provider = Provider.of<ContentProvider>(context, listen: false);
-      await provider.toggleListItem(_currentList.id, item.id);
 
-      // Reload current list
-      final updated = provider.lists.firstWhere((l) => l.id == _currentList.id);
-      setState(() {
-        _currentList = updated;
-      });
+      // Toggle the item by updating it with updateListItem
+      final toggled = item.copyWith(isChecked: !item.isChecked);
+      await provider.updateListItem(toggled);
+
+      // Reload items and refresh parent list data
+      await _loadListItems();
+      await _refreshListData();
     } catch (e) {
       _showSnackBar('Failed to toggle item: $e', isError: true);
     }
@@ -201,29 +244,31 @@ class _ListDetailScreenState extends State<ListDetailScreen>
     }
 
     // Optimistically update local state first for immediate UI feedback
-    final reorderedItems = List<ListItem>.from(_currentList.items);
+    final reorderedItems = List<ListItem>.from(_currentItems);
     final item = reorderedItems.removeAt(oldIndex);
     reorderedItems.insert(newIndex, item);
 
+    // Update sortOrder values
+    for (int i = 0; i < reorderedItems.length; i++) {
+      reorderedItems[i] = reorderedItems[i].copyWith(sortOrder: i);
+    }
+
     setState(() {
-      _currentList = _currentList.copyWith(items: reorderedItems);
+      _currentItems = reorderedItems;
     });
 
     // Then persist to provider in the background
     try {
       final provider = Provider.of<ContentProvider>(context, listen: false);
-      await provider.reorderListItems(_currentList.id, oldIndex, newIndex);
+      // reorderListItems takes (listId, List<ListItem>)
+      await provider.reorderListItems(_currentList.id, reorderedItems);
     } catch (e) {
       // On error, check mounted before any context usage
       if (!mounted) return;
 
-      // Show error to user and revert state
+      // Show error to user and reload items from server
       _showSnackBar('Failed to reorder items: $e', isError: true);
-      final provider = Provider.of<ContentProvider>(context, listen: false);
-      final updated = provider.lists.firstWhere((l) => l.id == _currentList.id);
-      setState(() {
-        _currentList = updated;
-      });
+      await _loadListItems();
     }
   }
 
@@ -311,6 +356,7 @@ class _ListDetailScreenState extends State<ListDetailScreen>
 
           final item = ListItem(
             id: existingItem?.id ?? const Uuid().v4(),
+            listId: _currentList.id,  // Foreign key field
             title: titleController.text.trim(),
             notes: notesController.text.trim().isEmpty
                 ? null
@@ -444,7 +490,7 @@ class _ListDetailScreenState extends State<ListDetailScreen>
       title: 'Delete List',
       message:
           'Are you sure you want to delete "${_currentList.name}"?\n\n'
-          'This will delete all ${_currentList.items.length} items in this list. '
+          'This will delete all ${_currentList.totalItemCount} items in this list. '
           'This action cannot be undone.',
     );
 
@@ -608,33 +654,35 @@ class _ListDetailScreenState extends State<ListDetailScreen>
 
             // List items
             Expanded(
-              child: _currentList.items.isEmpty
-                  ? _buildEmptyState()
-                  : ReorderableListView.builder(
-                      padding: const EdgeInsets.all(AppSpacing.md),
-                      itemCount: _currentList.items.length,
-                      onReorder: _reorderListItems,
-                      itemBuilder: (context, index) {
-                        final item = _currentList.items[index];
-                        final itemKey = ValueKey(item.id);
-                        return DismissibleListItem(
-                          key: itemKey,
-                          itemKey: itemKey,
-                          itemName: item.title,
-                          onDelete: () => _performDeleteListItem(item),
-                          child: ListItemCard(
-                            listItem: item,
-                            listStyle: _currentList.style,
-                            itemIndex: index,
-                            onCheckboxChanged:
-                                _currentList.style == ListStyle.checkboxes
-                                ? (value) => _toggleListItem(item)
-                                : null,
-                            onLongPress: () => _editListItem(item),
-                          ),
-                        );
-                      },
-                    ),
+              child: _isLoadingItems
+                  ? const Center(child: CircularProgressIndicator())
+                  : _currentItems.isEmpty
+                      ? _buildEmptyState()
+                      : ReorderableListView.builder(
+                          padding: const EdgeInsets.all(AppSpacing.md),
+                          itemCount: _currentItems.length,
+                          onReorder: _reorderListItems,
+                          itemBuilder: (context, index) {
+                            final item = _currentItems[index];
+                            final itemKey = ValueKey(item.id);
+                            return DismissibleListItem(
+                              key: itemKey,
+                              itemKey: itemKey,
+                              itemName: item.title,
+                              onDelete: () => _performDeleteListItem(item),
+                              child: ListItemCard(
+                                listItem: item,
+                                listStyle: _currentList.style,
+                                itemIndex: index,
+                                onCheckboxChanged:
+                                    _currentList.style == ListStyle.checkboxes
+                                    ? (value) => _toggleListItem(item)
+                                    : null,
+                                onLongPress: () => _editListItem(item),
+                              ),
+                            );
+                          },
+                        ),
             ),
           ],
         ),

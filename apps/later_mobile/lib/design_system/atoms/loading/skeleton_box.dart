@@ -206,17 +206,17 @@ class _ShimmerPainter extends CustomPainter {
   }
 }
 
-/// A skeleton loading card that mimics the structure of an ItemCard.
+/// A skeleton loading card that mimics the structure of a NoteCard.
 ///
 /// Features:
-/// - Glass morphism background matching ItemCard
+/// - Glass morphism background matching NoteCard
 /// - Three skeleton loaders for title, content, and metadata
-/// - Proper spacing matching ItemCard layout
+/// - Proper spacing matching NoteCard layout
 /// - Theme-adaptive styling
 ///
 /// Used to show loading state for item lists while data is being fetched.
-class ItemCardSkeleton extends StatelessWidget {
-  const ItemCardSkeleton({super.key});
+class NoteCardSkeleton extends StatelessWidget {
+  const NoteCardSkeleton({super.key});
 
   @override
   Widget build(BuildContext context) {

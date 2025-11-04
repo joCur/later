@@ -4,12 +4,12 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:later_mobile/design_system/tokens/tokens.dart';
 import 'package:later_mobile/core/theme/temporal_flow_theme.dart';
 
-/// A skeleton loading card that mimics the structure of an ItemCard.
+/// A skeleton loading card that mimics the structure of a NoteCard.
 ///
 /// Features:
 /// - Glass morphism background
 /// - Shimmer animation effect
-/// - Matches ItemCard dimensions and layout
+/// - Matches NoteCard dimensions and layout
 /// - Theme-adaptive colors
 ///
 /// Used to show loading state for item lists while data is being fetched.

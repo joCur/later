@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 import 'package:later_mobile/design_system/tokens/tokens.dart';
+import '../../core/config/supabase_config.dart';
 import '../../data/models/space_model.dart';
 import '../../providers/spaces_provider.dart';
 import 'package:later_mobile/design_system/atoms/inputs/text_input_field.dart';
@@ -160,6 +161,7 @@ class _CreateSpaceModalState extends State<CreateSpaceModal> {
             ? widget.initialSpace!.id
             : const Uuid().v4(),
         name: name,
+        userId: SupabaseConfig.client.auth.currentUser!.id,
         icon: _selectedIcon,
         color: _selectedColor,
         isArchived: widget.initialSpace?.isArchived ?? false,

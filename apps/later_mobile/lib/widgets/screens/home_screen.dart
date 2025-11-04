@@ -16,6 +16,8 @@ import '../../core/theme/temporal_flow_theme.dart';
 import '../../core/utils/item_type_detector.dart';
 import '../../core/utils/responsive_modal.dart';
 import 'package:later_mobile/data/models/list_model.dart';
+import 'package:later_mobile/data/models/note_model.dart';
+import 'package:later_mobile/data/models/todo_list_model.dart';
 import '../../data/models/space_model.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/content_provider.dart';
@@ -530,10 +532,10 @@ class _HomeScreenState extends State<HomeScreen> {
           );
         },
       );
-    } else if (item is Item) {
+    } else if (item is Note) {
       card = NoteCard(
         key: ValueKey<String>(_getItemId(item)),
-        item: item,
+        note: item,
         reorderIndex: index,
         // index omitted (null) to disable entrance animation for reorderable items
         onTap: () {
@@ -558,7 +560,7 @@ class _HomeScreenState extends State<HomeScreen> {
       return 'todo-${item.id}';
     } else if (item is ListModel) {
       return 'list-${item.id}';
-    } else if (item is Item) {
+    } else if (item is Note) {
       return 'note-${item.id}';
     }
     return 'unknown';

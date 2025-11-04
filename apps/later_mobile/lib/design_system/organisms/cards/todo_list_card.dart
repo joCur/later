@@ -1,15 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:later_mobile/design_system/tokens/tokens.dart';
-import 'package:later_mobile/data/models/list_model.dart';
-import 'package:later_mobile/data/models/list_item_model.dart';
-import 'package:later_mobile/data/models/list_style.dart';
-import 'package:later_mobile/data/models/todo_item_model.dart';
-import 'package:later_mobile/data/models/todo_priority.dart';
-import 'package:later_mobile/design_system/atoms/text/gradient_text.dart';
+import 'package:later_mobile/data/models/todo_list_model.dart';
 import 'package:later_mobile/design_system/atoms/borders/gradient_pill_border.dart';
 import 'package:later_mobile/design_system/atoms/drag_handle/drag_handle.dart';
-import 'package:intl/intl.dart';
 import 'package:later_mobile/core/theme/temporal_flow_theme.dart';
 
 /// TodoList card component for displaying todo lists with progress tracking
@@ -171,50 +165,6 @@ class _TodoListCardState extends State<TodoListCard>
     );
   }
 
-  /// Get earliest due date from items
-  DateTime? _getEarliestDueDate() {
-    final itemsWithDueDates = widget.todoList.items
-        .where((item) => item.dueDate != null)
-        .toList();
-
-    if (itemsWithDueDates.isEmpty) return null;
-
-    itemsWithDueDates.sort((a, b) => a.dueDate!.compareTo(b.dueDate!));
-    return itemsWithDueDates.first.dueDate;
-  }
-
-  /// Build metadata row
-  Widget? _buildMetadata(BuildContext context) {
-    if (!widget.showMetadata) return null;
-
-    final earliestDueDate = _getEarliestDueDate();
-    if (earliestDueDate == null) return null;
-
-    final dateFormat = DateFormat('MMM d, y');
-
-    return Row(
-      children: [
-        // Icon with gradient tint for due dates
-        ShaderMask(
-          shaderCallback: (bounds) =>
-              AppColors.secondaryGradient.createShader(bounds),
-          blendMode: BlendMode.srcIn,
-          child: const Icon(
-            Icons.calendar_today,
-            size: 12,
-            color: Colors.white,
-          ),
-        ),
-        const SizedBox(width: AppSpacing.xxs),
-        // Due date with subtle secondary gradient (amber→pink)
-        GradientText.subtle(
-          dateFormat.format(earliestDueDate),
-          gradient: AppColors.secondaryGradient,
-          style: AppTypography.metadata,
-        ),
-      ],
-    );
-  }
 
   void _handleTapDown(TapDownDetails details) {
     // Don't trigger press animation if dragging
@@ -351,12 +301,6 @@ class _TodoListCardState extends State<TodoListCard>
                             // Progress bar
                             const SizedBox(height: AppSpacing.xs), // 8px
                             _buildProgressBar(),
-
-                            // Metadata (due date if available)
-                            if (_buildMetadata(context) != null) ...[
-                              const SizedBox(height: AppSpacing.xs), // 8px
-                              _buildMetadata(context)!,
-                            ],
                           ],
                         ),
                       ),

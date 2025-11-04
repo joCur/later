@@ -5,11 +5,11 @@ import 'package:later_mobile/design_system/tokens/tokens.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:later_mobile/core/theme/temporal_flow_theme.dart';
 
-/// A skeleton card component that mimics the ItemCard layout
+/// A skeleton card component that mimics the NoteCard layout
 ///
 /// Features (Mobile-First Phase 4):
 /// - Shimmer animation with 1200ms duration
-/// - Matches ItemCard structure (leading element, title, content, metadata)
+/// - Matches NoteCard structure (leading element, title, content, metadata)
 /// - Automatic color adaptation for light/dark mode
 /// - Respects reduce-motion accessibility preferences
 /// - Smooth 60fps animation performance
@@ -30,7 +30,7 @@ import 'package:later_mobile/core/theme/temporal_flow_theme.dart';
 ///     if (isLoading) {
 ///       return SkeletonCard();
 ///     }
-///     return ItemCard(item: items[index]);
+///     return NoteCard(note: notes[index]);
 ///   },
 /// )
 /// ```

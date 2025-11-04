@@ -3,6 +3,10 @@ import 'dart:ui' show ImageFilter;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:later_mobile/data/models/list_model.dart';
+import 'package:later_mobile/data/models/list_style.dart';
+import 'package:later_mobile/data/models/note_model.dart';
+import 'package:later_mobile/data/models/todo_list_model.dart';
 import 'package:later_mobile/design_system/atoms/buttons/ghost_button.dart';
 import 'package:later_mobile/design_system/atoms/buttons/gradient_button.dart';
 import 'package:later_mobile/design_system/atoms/buttons/primary_button.dart';
@@ -13,11 +17,10 @@ import 'package:later_mobile/design_system/tokens/tokens.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../core/config/supabase_config.dart';
 import '../../core/responsive/breakpoints.dart';
 import '../../core/theme/temporal_flow_theme.dart';
 import '../../core/utils/item_type_detector.dart'; // For ContentType enum
-import 'package:later_mobile/data/models/list_model.dart';
-import 'package:later_mobile/data/models/list_style.dart';
 import '../../providers/content_provider.dart';
 import '../../providers/spaces_provider.dart';
 
@@ -295,20 +298,21 @@ class _CreateContentModalState extends State<CreateContentModal>
             final todoList = TodoList(
               id: id,
               spaceId: targetSpaceId,
+              userId: SupabaseConfig.client.auth.currentUser!.id,
               name: text,
               description: description.isEmpty ? null : description,
-              items: [],
             );
             await contentProvider.createTodoList(todoList);
             _currentItemId = id;
             break;
 
           case ContentType.list:
+            // Create ListModel with proper constructor
             final listModel = ListModel(
               id: id,
               spaceId: targetSpaceId,
+              userId: SupabaseConfig.client.auth.currentUser!.id,
               name: text,
-              items: [],
               style: _selectedListStyle,
             );
             await contentProvider.createList(listModel);
@@ -318,11 +322,12 @@ class _CreateContentModalState extends State<CreateContentModal>
           case ContentType.note:
             // Parse note input (smart parsing for mobile, separate fields for desktop)
             final parsed = _parseNoteInput();
-            final note = Item(
+            final note = Note(
               id: id,
               title: parsed.title,
               content: parsed.content,
               spaceId: targetSpaceId,
+              userId: SupabaseConfig.client.auth.currentUser!.id,
             );
             await contentProvider.createNote(note);
             _currentItemId = id;
@@ -333,7 +338,7 @@ class _CreateContentModalState extends State<CreateContentModal>
         // For TodoLists and Lists, we don't support editing in quick capture
         if (contentType == ContentType.note) {
           final existingNotes = contentProvider.notes;
-          final existingNote = existingNotes.cast<Item?>().firstWhere(
+          final existingNote = existingNotes.cast<Note?>().firstWhere(
             (note) => note?.id == _currentItemId,
             orElse: () => null,
           );
@@ -1227,11 +1232,9 @@ class _CreateContentModalState extends State<CreateContentModal>
             mainAxisSize: MainAxisSize.min,
             children: [
               if (selectedSpace.icon != null)
-                Text(
-                  selectedSpace.icon!,
-                  style: const TextStyle(fontSize: 16),
-                ),
-              if (selectedSpace.icon != null) const SizedBox(width: AppSpacing.xxs),
+                Text(selectedSpace.icon!, style: const TextStyle(fontSize: 16)),
+              if (selectedSpace.icon != null)
+                const SizedBox(width: AppSpacing.xxs),
               Text(
                 selectedSpace.name,
                 style: AppTypography.labelMedium.copyWith(

@@ -26,7 +26,7 @@ class NoteDetailScreen extends StatefulWidget {
   const NoteDetailScreen({super.key, required this.note});
 
   /// Note to display and edit
-  final Item note;
+  final Note note;
 
   @override
   State<NoteDetailScreen> createState() => _NoteDetailScreenState();
@@ -39,7 +39,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen>
   late TextEditingController _contentController;
 
   // Local state
-  late Item _currentNote;
+  late Note _currentNote;
 
   // Tag management
   final TextEditingController _tagController = TextEditingController();

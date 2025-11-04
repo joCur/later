@@ -5,9 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:uuid/uuid.dart';
 import 'package:later_mobile/design_system/tokens/tokens.dart';
 import '../../core/utils/responsive_modal.dart';
-import 'package:later_mobile/data/models/list_model.dart';
-import 'package:later_mobile/data/models/list_item_model.dart';
-import 'package:later_mobile/data/models/list_style.dart';
+import 'package:later_mobile/data/models/todo_list_model.dart';
 import 'package:later_mobile/data/models/todo_item_model.dart';
 import 'package:later_mobile/data/models/todo_priority.dart';
 import '../../providers/content_provider.dart';
@@ -44,13 +42,13 @@ class TodoListDetailScreen extends StatefulWidget {
 }
 
 class _TodoListDetailScreenState extends State<TodoListDetailScreen> {
-  // Form key for validation
-
   // Text controllers
   late TextEditingController _nameController;
 
   // Local state
   late TodoList _currentTodoList;
+  List<TodoItem> _currentItems = [];
+  bool _isLoadingItems = false;
   Timer? _debounceTimer;
   Timer? _deletionTimer;
   bool _isSaving = false;
@@ -69,6 +67,55 @@ class _TodoListDetailScreenState extends State<TodoListDetailScreen> {
 
     // Listen to text changes for auto-save
     _nameController.addListener(_onNameChanged);
+
+    // Load todo items for this list
+    _loadTodoItems();
+  }
+
+  /// Load todo items from the provider
+  Future<void> _loadTodoItems() async {
+    setState(() {
+      _isLoadingItems = true;
+    });
+
+    try {
+      final provider = Provider.of<ContentProvider>(context, listen: false);
+      final items = await provider.loadTodoItemsForList(widget.todoList.id);
+
+      if (mounted) {
+        setState(() {
+          _currentItems = items;
+          _isLoadingItems = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isLoadingItems = false;
+        });
+        _showSnackBar('Failed to load items: $e', isError: true);
+      }
+    }
+  }
+
+  /// Refresh the parent todo list from the provider to get updated counts
+  Future<void> _refreshTodoListData() async {
+    try {
+      final provider = Provider.of<ContentProvider>(context, listen: false);
+      final updated = provider.todoLists.firstWhere(
+        (tl) => tl.id == _currentTodoList.id,
+      );
+      if (mounted) {
+        setState(() {
+          _currentTodoList = updated;
+        });
+      }
+    } catch (e) {
+      // Todo list might have been deleted
+      if (mounted) {
+        _showSnackBar('Failed to refresh list data: $e', isError: true);
+      }
+    }
   }
 
   @override
@@ -139,17 +186,14 @@ class _TodoListDetailScreenState extends State<TodoListDetailScreen> {
 
     try {
       final provider = Provider.of<ContentProvider>(context, listen: false);
-      await provider.addTodoItem(_currentTodoList.id, result);
+      // Set sortOrder to be at the end of current items
+      final itemWithSortOrder = result.copyWith(sortOrder: _currentItems.length);
+      // createTodoItem takes a TodoItem directly
+      await provider.createTodoItem(itemWithSortOrder);
 
-      // Reload current todo list
-      final updated = provider.todoLists.firstWhere(
-        (tl) => tl.id == _currentTodoList.id,
-      );
-      if (mounted) {
-        setState(() {
-          _currentTodoList = updated;
-        });
-      }
+      // Reload items and refresh parent list data
+      await _loadTodoItems();
+      await _refreshTodoListData();
 
       if (mounted) _showSnackBar('TodoItem added');
     } catch (e) {
@@ -164,17 +208,12 @@ class _TodoListDetailScreenState extends State<TodoListDetailScreen> {
 
     try {
       final provider = Provider.of<ContentProvider>(context, listen: false);
-      await provider.updateTodoItem(_currentTodoList.id, item.id, result);
+      // updateTodoItem takes just a TodoItem
+      await provider.updateTodoItem(result);
 
-      // Reload current todo list
-      final updated = provider.todoLists.firstWhere(
-        (tl) => tl.id == _currentTodoList.id,
-      );
-      if (mounted) {
-        setState(() {
-          _currentTodoList = updated;
-        });
-      }
+      // Reload items and refresh parent list data
+      await _loadTodoItems();
+      await _refreshTodoListData();
 
       if (mounted) _showSnackBar('TodoItem updated');
     } catch (e) {
@@ -187,17 +226,11 @@ class _TodoListDetailScreenState extends State<TodoListDetailScreen> {
   Future<void> _performDeleteTodoItem(TodoItem item) async {
     try {
       final provider = Provider.of<ContentProvider>(context, listen: false);
-      await provider.deleteTodoItem(_currentTodoList.id, item.id);
+      await provider.deleteTodoItem(item.id, _currentTodoList.id);
 
-      // Reload current todo list
-      final updated = provider.todoLists.firstWhere(
-        (tl) => tl.id == _currentTodoList.id,
-      );
-      if (mounted) {
-        setState(() {
-          _currentTodoList = updated;
-        });
-      }
+      // Reload items and refresh parent list data
+      await _loadTodoItems();
+      await _refreshTodoListData();
 
       if (mounted) _showSnackBar('TodoItem deleted');
     } catch (e) {
@@ -209,15 +242,14 @@ class _TodoListDetailScreenState extends State<TodoListDetailScreen> {
   Future<void> _toggleTodoItem(TodoItem item) async {
     try {
       final provider = Provider.of<ContentProvider>(context, listen: false);
-      await provider.toggleTodoItem(_currentTodoList.id, item.id);
 
-      // Reload current todo list
-      final updated = provider.todoLists.firstWhere(
-        (tl) => tl.id == _currentTodoList.id,
-      );
-      setState(() {
-        _currentTodoList = updated;
-      });
+      // Toggle the item by updating it with updateTodoItem
+      final toggled = item.copyWith(isCompleted: !item.isCompleted);
+      await provider.updateTodoItem(toggled);
+
+      // Reload items and refresh parent list data
+      await _loadTodoItems();
+      await _refreshTodoListData();
     } catch (e) {
       _showSnackBar('Failed to toggle item: $e', isError: true);
     }
@@ -231,31 +263,31 @@ class _TodoListDetailScreenState extends State<TodoListDetailScreen> {
     }
 
     // Optimistically update local state first for immediate UI feedback
-    final reorderedItems = List<TodoItem>.from(_currentTodoList.items);
+    final reorderedItems = List<TodoItem>.from(_currentItems);
     final item = reorderedItems.removeAt(oldIndex);
     reorderedItems.insert(newIndex, item);
 
+    // Update sortOrder values
+    for (int i = 0; i < reorderedItems.length; i++) {
+      reorderedItems[i] = reorderedItems[i].copyWith(sortOrder: i);
+    }
+
     setState(() {
-      _currentTodoList = _currentTodoList.copyWith(items: reorderedItems);
+      _currentItems = reorderedItems;
     });
 
     // Then persist to provider in the background
     try {
       final provider = Provider.of<ContentProvider>(context, listen: false);
-      await provider.reorderTodoItems(_currentTodoList.id, oldIndex, newIndex);
+      // reorderTodoItems takes (todoListId, List<TodoItem>)
+      await provider.reorderTodoItems(_currentTodoList.id, reorderedItems);
     } catch (e) {
       // On error, check mounted before any context usage
       if (!mounted) return;
 
-      // Show error to user and revert state
+      // Show error to user and reload items from server
       _showSnackBar('Failed to reorder items: $e', isError: true);
-      final provider = Provider.of<ContentProvider>(context, listen: false);
-      final updated = provider.todoLists.firstWhere(
-        (tl) => tl.id == _currentTodoList.id,
-      );
-      setState(() {
-        _currentTodoList = updated;
-      });
+      await _loadTodoItems();
     }
   }
 
@@ -300,6 +332,7 @@ class _TodoListDetailScreenState extends State<TodoListDetailScreen> {
 
           final item = TodoItem(
             id: existingItem?.id ?? const Uuid().v4(),
+            todoListId: _currentTodoList.id,  // Foreign key field
             title: titleController.text.trim(),
             description: descriptionController.text.trim().isEmpty
                 ? null
@@ -411,7 +444,7 @@ class _TodoListDetailScreenState extends State<TodoListDetailScreen> {
       title: 'Delete TodoList',
       message:
           'Are you sure you want to delete "${_currentTodoList.name}"?\n\n'
-          'This will delete all ${_currentTodoList.items.length} items in this list. '
+          'This will delete all ${_currentTodoList.totalItemCount} items in this list. '
           'This action cannot be undone.',
     );
 
@@ -544,29 +577,32 @@ class _TodoListDetailScreenState extends State<TodoListDetailScreen> {
 
             // TodoItems list
             Expanded(
-              child: _currentTodoList.items.isEmpty
-                  ? _buildEmptyState()
-                  : ReorderableListView.builder(
-                      padding: const EdgeInsets.all(AppSpacing.md),
-                      itemCount: _currentTodoList.items.length,
-                      onReorder: _reorderTodoItems,
-                      itemBuilder: (context, index) {
-                        final item = _currentTodoList.items[index];
-                        final itemKey = ValueKey(item.id);
-                        return DismissibleListItem(
-                          key: itemKey,
-                          itemKey: itemKey,
-                          itemName: item.title,
-                          onDelete: () => _performDeleteTodoItem(item),
-                          child: TodoItemCard(
-                            todoItem: item,
-                            index: index,
-                            onCheckboxChanged: (value) => _toggleTodoItem(item),
-                            onLongPress: () => _editTodoItem(item),
-                          ),
-                        );
-                      },
-                    ),
+              child: _isLoadingItems
+                  ? const Center(child: CircularProgressIndicator())
+                  : _currentItems.isEmpty
+                      ? _buildEmptyState()
+                      : ReorderableListView.builder(
+                          padding: const EdgeInsets.all(AppSpacing.md),
+                          itemCount: _currentItems.length,
+                          onReorder: _reorderTodoItems,
+                          itemBuilder: (context, index) {
+                            final item = _currentItems[index];
+                            final itemKey = ValueKey(item.id);
+                            return DismissibleListItem(
+                              key: itemKey,
+                              itemKey: itemKey,
+                              itemName: item.title,
+                              onDelete: () => _performDeleteTodoItem(item),
+                              child: TodoItemCard(
+                                todoItem: item,
+                                index: index,
+                                onCheckboxChanged: (value) =>
+                                    _toggleTodoItem(item),
+                                onLongPress: () => _editTodoItem(item),
+                              ),
+                            );
+                          },
+                        ),
             ),
           ],
         ),

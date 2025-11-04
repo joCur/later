@@ -4,9 +4,7 @@ import 'package:provider/provider.dart';
 import 'core/config/supabase_config.dart';
 import 'core/error/error_handler.dart';
 import 'core/theme/app_theme.dart';
-import 'data/local/hive_database.dart';
 import 'data/local/preferences_service.dart';
-import 'data/local/seed_data.dart';
 import 'data/repositories/list_repository.dart';
 import 'data/repositories/note_repository.dart';
 import 'data/repositories/space_repository.dart';
@@ -24,7 +22,7 @@ void main() async {
   // Initialize global error handler
   ErrorHandler.initialize();
 
-  // Initialize preferences service for app settings (before Hive)
+  // Initialize preferences service for app settings
   await PreferencesService.initialize();
 
   // Load environment variables
@@ -35,18 +33,12 @@ void main() async {
     debugPrint('Warning: .env file not found. Authentication will be unavailable.');
   }
 
-  // Initialize Supabase (optional - graceful degradation for offline mode)
+  // Initialize Supabase
   try {
     await SupabaseConfig.initialize();
   } catch (e) {
-    debugPrint('Warning: Supabase initialization failed. Running in offline mode.');
+    debugPrint('Warning: Supabase initialization failed: $e');
   }
-
-  // Initialize Hive database
-  await HiveDatabase.initialize();
-
-  // Initialize seed data for first run
-  await SeedData.initialize();
 
   runApp(const LaterApp());
 }
@@ -70,7 +62,7 @@ class _LaterAppState extends State<LaterApp> {
           create: (_) => ThemeProvider()..loadThemePreference(),
         ),
         ChangeNotifierProvider(
-          create: (_) => SpacesProvider(SpaceRepository())..loadSpaces(),
+          create: (_) => SpacesProvider(SpaceRepository()),
         ),
         ChangeNotifierProvider(
           create: (_) => ContentProvider(
