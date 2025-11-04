@@ -1,43 +1,30 @@
-import 'package:hive/hive.dart';
-import 'package:later_mobile/data/models/list_model.dart';
-import 'package:later_mobile/data/models/list_item_model.dart';
+import '../models/list_item_model.dart';
+import '../models/list_model.dart';
+import 'base_repository.dart';
 
-/// Repository for managing ListModel entities in Hive local storage.
+/// Repository for managing ListModel and ListItem entities in Supabase.
 ///
-/// Provides CRUD operations for Lists and ListItems within them.
-/// Uses Hive box 'lists' for persistence.
-class ListRepository {
-  /// Gets the Hive box for lists
-  Box<ListModel> get _box => Hive.box<ListModel>('lists');
+/// Provides CRUD operations for lists and their items.
+/// Uses Supabase 'lists' and 'list_items' tables with RLS policies.
+/// ListItems are stored separately and fetched on demand for efficiency.
+class ListRepository extends BaseRepository {
 
-  /// Creates a new list in the local storage.
+  /// Creates a new list in Supabase.
   ///
   /// Automatically calculates and assigns the next sortOrder value for the list
-  /// within its space. The sortOrder is space-scoped, starting at 0 for the first
-  /// list in a space and incrementing for each subsequent list.
-  ///
-  /// Stores the list using its ID as the key in the Hive box.
+  /// within its space. Automatically sets the user_id from the authenticated user.
+  /// Initializes count fields to 0.
   ///
   /// Parameters:
   ///   - [list]: The list to be created
   ///
   /// Returns:
-  ///   The created list with assigned sortOrder
+  ///   The created list with assigned sortOrder and initial counts
   ///
-  /// Example:
-  /// ```dart
-  /// final list = ListModel(
-  ///   id: 'list-1',
-  ///   spaceId: 'space-1',
-  ///   name: 'Shopping List',
-  ///   style: ListStyle.checkboxes,
-  ///   items: [],
-  /// );
-  /// final created = await repository.create(list);
-  /// // created.sortOrder will be 0 for first list in space, 1 for second, etc.
-  /// ```
+  /// Throws:
+  ///   Exception if user is not authenticated or database operation fails
   Future<ListModel> create(ListModel list) async {
-    try {
+    return executeQuery(() async {
       // Calculate next sortOrder for this space
       final listsInSpace = await getBySpace(list.spaceId);
       final maxSortOrder = listsInSpace.isEmpty
@@ -47,403 +34,298 @@ class ListRepository {
               .reduce((a, b) => a > b ? a : b);
       final nextSortOrder = maxSortOrder + 1;
 
-      // Create list with calculated sortOrder
-      final listWithSortOrder = list.copyWith(sortOrder: nextSortOrder);
-      await _box.put(listWithSortOrder.id, listWithSortOrder);
-      return listWithSortOrder;
-    } catch (e) {
-      throw Exception('Failed to create list: $e');
-    }
+      // Create list with calculated sortOrder and initial counts
+      final listWithSortOrder = list.copyWith(
+        sortOrder: nextSortOrder,
+        totalItemCount: 0,
+        checkedItemCount: 0,
+      );
+      final data = listWithSortOrder.toJson();
+      data['user_id'] = userId; // Ensure correct user_id
+
+      final response = await supabase
+          .from('lists')
+          .insert(data)
+          .select()
+          .single();
+
+      return ListModel.fromJson(response);
+    });
   }
 
-  /// Retrieves a single list by its ID.
+  /// Retrieves a single list by its ID with aggregate counts.
   ///
-  /// Returns null if the list does not exist.
+  /// Returns null if the list does not exist or user doesn't have access.
+  /// RLS policies ensure users can only access their own lists.
+  /// Note: This does NOT fetch the list items - use getListItemsByListId() for that.
   ///
   /// Parameters:
   ///   - [id]: The ID of the list to retrieve
   ///
   /// Returns:
-  ///   The list with the given ID, or null if not found
-  ///
-  /// Example:
-  /// ```dart
-  /// final list = await repository.getById('list-1');
-  /// if (list != null) {
-  ///   print('Found: ${list.name}');
-  /// }
-  /// ```
+  ///   The list with the given ID (with aggregate counts), or null if not found
   Future<ListModel?> getById(String id) async {
-    try {
-      return _box.get(id);
-    } catch (e) {
-      throw Exception('Failed to get list by id: $e');
-    }
+    return executeQuery(() async {
+      final listResponse = await supabase
+          .from('lists')
+          .select()
+          .eq('id', id)
+          .eq('user_id', userId)
+          .maybeSingle();
+
+      if (listResponse == null) return null;
+
+      // Fetch items to calculate counts
+      final items = await getListItemsByListId(id);
+      final totalCount = items.length;
+      final checkedCount = items.where((item) => item.isChecked).length;
+
+      final list = ListModel.fromJson(listResponse);
+      return list.copyWith(
+        totalItemCount: totalCount,
+        checkedItemCount: checkedCount,
+      );
+    });
   }
 
-  /// Retrieves all lists belonging to a specific space.
+  /// Retrieves all lists belonging to a specific space with aggregate counts.
   ///
-  /// Filters lists by their spaceId property.
+  /// RLS policies ensure users can only access their own lists.
+  /// Orders by sort_order ascending.
+  /// Note: This does NOT fetch the list items - use getListItemsByListId() for that.
   ///
   /// Parameters:
   ///   - [spaceId]: The ID of the space to filter by
   ///
   /// Returns:
   ///   A list of lists belonging to the specified space
-  ///
-  /// Example:
-  /// ```dart
-  /// final workLists = await repository.getBySpace('work-space-1');
-  /// print('Found ${workLists.length} lists');
-  /// ```
   Future<List<ListModel>> getBySpace(String spaceId) async {
-    try {
-      return _box.values.where((list) => list.spaceId == spaceId).toList();
-    } catch (e) {
-      throw Exception('Failed to get lists by space: $e');
-    }
+    return executeQuery(() async {
+      final response = await supabase
+          .from('lists')
+          .select()
+          .eq('space_id', spaceId)
+          .eq('user_id', userId)
+          .order('sort_order', ascending: true);
+
+      final lists = (response as List)
+          .map((json) => ListModel.fromJson(json as Map<String, dynamic>))
+          .toList();
+
+      // Fetch counts for each list
+      final listsWithCounts = await Future.wait(
+        lists.map((list) async {
+          final items = await getListItemsByListId(list.id);
+          final totalCount = items.length;
+          final checkedCount = items.where((item) => item.isChecked).length;
+
+          return list.copyWith(
+            totalItemCount: totalCount,
+            checkedItemCount: checkedCount,
+          );
+        }),
+      );
+
+      return listsWithCounts;
+    });
   }
 
-  /// Updates an existing list in local storage.
+  /// Updates an existing list in Supabase.
   ///
-  /// Automatically updates the updatedAt timestamp to the current time.
-  /// Throws an exception if the list does not exist.
+  /// Automatically updates the updated_at timestamp to the current time.
+  /// RLS policies ensure users can only update their own lists.
+  /// Note: This updates the list metadata only. To update items, use ListItem methods.
   ///
   /// Parameters:
   ///   - [list]: The list to update with new values
   ///
   /// Returns:
-  ///   The updated list with the new updatedAt timestamp
-  ///
-  /// Throws:
-  ///   Exception if the list with the given ID does not exist
-  ///
-  /// Example:
-  /// ```dart
-  /// final updated = list.copyWith(name: 'Updated Name');
-  /// final result = await repository.update(updated);
-  /// ```
+  ///   The updated list with the new updated_at timestamp
   Future<ListModel> update(ListModel list) async {
-    try {
-      // Check if the list exists
-      if (!_box.containsKey(list.id)) {
-        throw Exception('ListModel with id ${list.id} does not exist');
-      }
-
+    return executeQuery(() async {
       // Update the updatedAt timestamp
       final updatedList = list.copyWith(updatedAt: DateTime.now());
+      final data = updatedList.toJson();
 
-      await _box.put(updatedList.id, updatedList);
-      return updatedList;
-    } catch (e) {
-      throw Exception('Failed to update list: $e');
-    }
+      final response = await supabase
+          .from('lists')
+          .update(data)
+          .eq('id', list.id)
+          .eq('user_id', userId)
+          .select()
+          .single();
+
+      return ListModel.fromJson(response);
+    });
   }
 
-  /// Deletes a list from local storage.
+  /// Deletes a list from Supabase.
   ///
-  /// If the list does not exist, this operation completes without error.
+  /// RLS policies ensure users can only delete their own lists.
+  /// Associated list items will be cascade deleted via foreign key constraints.
   ///
   /// Parameters:
   ///   - [id]: The ID of the list to delete
-  ///
-  /// Example:
-  /// ```dart
-  /// await repository.delete('list-1');
-  /// ```
   Future<void> delete(String id) async {
-    try {
-      await _box.delete(id);
-    } catch (e) {
-      throw Exception('Failed to delete list: $e');
-    }
+    return executeQuery(() async {
+      await supabase
+          .from('lists')
+          .delete()
+          .eq('id', id)
+          .eq('user_id', userId);
+    });
   }
 
-  /// Adds a new list item to an existing list.
+  /// Retrieves all list items belonging to a specific list.
   ///
-  /// Parameters:
-  ///   - [listId]: The ID of the list to add the item to
-  ///   - [item]: The list item to add
-  ///
-  /// Returns:
-  ///   The updated list with the new item
-  ///
-  /// Throws:
-  ///   Exception if the list does not exist
-  ///
-  /// Example:
-  /// ```dart
-  /// final item = ListItem(
-  ///   id: 'item-1',
-  ///   title: 'Milk',
-  ///   sortOrder: 0,
-  /// );
-  /// final updated = await repository.addItem('list-1', item);
-  /// ```
-  Future<ListModel> addItem(String listId, ListItem item) async {
-    try {
-      final list = await getById(listId);
-      if (list == null) {
-        throw Exception('ListModel with id $listId does not exist');
-      }
-
-      final updatedItems = [...list.items, item];
-      final updatedList = list.copyWith(
-        items: updatedItems,
-        updatedAt: DateTime.now(),
-      );
-
-      await _box.put(listId, updatedList);
-      return updatedList;
-    } catch (e) {
-      throw Exception('Failed to add item to list: $e');
-    }
-  }
-
-  /// Updates a specific list item within a list.
-  ///
-  /// Parameters:
-  ///   - [listId]: The ID of the list containing the item
-  ///   - [itemId]: The ID of the list item to update
-  ///   - [updatedItem]: The updated list item
-  ///
-  /// Returns:
-  ///   The updated list
-  ///
-  /// Throws:
-  ///   Exception if the list or item does not exist
-  ///
-  /// Example:
-  /// ```dart
-  /// final updated = await repository.updateItem(
-  ///   'list-1',
-  ///   'item-1',
-  ///   item.copyWith(title: 'Updated title'),
-  /// );
-  /// ```
-  Future<ListModel> updateItem(
-    String listId,
-    String itemId,
-    ListItem updatedItem,
-  ) async {
-    try {
-      final list = await getById(listId);
-      if (list == null) {
-        throw Exception('ListModel with id $listId does not exist');
-      }
-
-      final itemIndex = list.items.indexWhere((item) => item.id == itemId);
-      if (itemIndex == -1) {
-        throw Exception(
-          'ListItem with id $itemId does not exist in list $listId',
-        );
-      }
-
-      final updatedItems = [...list.items];
-      updatedItems[itemIndex] = updatedItem;
-
-      final updatedList = list.copyWith(
-        items: updatedItems,
-        updatedAt: DateTime.now(),
-      );
-
-      await _box.put(listId, updatedList);
-      return updatedList;
-    } catch (e) {
-      throw Exception('Failed to update item in list: $e');
-    }
-  }
-
-  /// Deletes a specific list item from a list.
-  ///
-  /// Parameters:
-  ///   - [listId]: The ID of the list containing the item
-  ///   - [itemId]: The ID of the list item to delete
-  ///
-  /// Returns:
-  ///   The updated list without the deleted item
-  ///
-  /// Throws:
-  ///   Exception if the list does not exist
-  ///
-  /// Example:
-  /// ```dart
-  /// final updated = await repository.deleteItem('list-1', 'item-1');
-  /// ```
-  Future<ListModel> deleteItem(String listId, String itemId) async {
-    try {
-      final list = await getById(listId);
-      if (list == null) {
-        throw Exception('ListModel with id $listId does not exist');
-      }
-
-      final updatedItems = list.items
-          .where((item) => item.id != itemId)
-          .toList();
-
-      final updatedList = list.copyWith(
-        items: updatedItems,
-        updatedAt: DateTime.now(),
-      );
-
-      await _box.put(listId, updatedList);
-      return updatedList;
-    } catch (e) {
-      throw Exception('Failed to delete item from list: $e');
-    }
-  }
-
-  /// Toggles the checked status of a specific list item.
-  ///
-  /// This is only relevant for lists with checkbox style.
-  ///
-  /// Parameters:
-  ///   - [listId]: The ID of the list containing the item
-  ///   - [itemId]: The ID of the list item to toggle
-  ///
-  /// Returns:
-  ///   The updated list with the toggled item
-  ///
-  /// Throws:
-  ///   Exception if the list or item does not exist
-  ///
-  /// Example:
-  /// ```dart
-  /// final updated = await repository.toggleItem('list-1', 'item-1');
-  /// ```
-  Future<ListModel> toggleItem(String listId, String itemId) async {
-    try {
-      final list = await getById(listId);
-      if (list == null) {
-        throw Exception('ListModel with id $listId does not exist');
-      }
-
-      final itemIndex = list.items.indexWhere((item) => item.id == itemId);
-      if (itemIndex == -1) {
-        throw Exception(
-          'ListItem with id $itemId does not exist in list $listId',
-        );
-      }
-
-      final updatedItems = [...list.items];
-      updatedItems[itemIndex] = updatedItems[itemIndex].copyWith(
-        isChecked: !updatedItems[itemIndex].isChecked,
-      );
-
-      final updatedList = list.copyWith(
-        items: updatedItems,
-        updatedAt: DateTime.now(),
-      );
-
-      await _box.put(listId, updatedList);
-      return updatedList;
-    } catch (e) {
-      throw Exception('Failed to toggle item in list: $e');
-    }
-  }
-
-  /// Reorders list items within a list.
+  /// RLS policies ensure users can only access items from their own lists.
+  /// Orders by sort_order ascending.
   ///
   /// Parameters:
   ///   - [listId]: The ID of the list
-  ///   - [oldIndex]: The current index of the item
-  ///   - [newIndex]: The target index for the item
   ///
   /// Returns:
-  ///   The updated list with reordered items
-  ///
-  /// Throws:
-  ///   Exception if the list does not exist or indices are invalid
-  ///
-  /// Example:
-  /// ```dart
-  /// final updated = await repository.reorderItems('list-1', 0, 2);
-  /// ```
-  Future<ListModel> reorderItems(
-    String listId,
-    int oldIndex,
-    int newIndex,
-  ) async {
-    try {
-      final list = await getById(listId);
-      if (list == null) {
-        throw Exception('ListModel with id $listId does not exist');
-      }
+  ///   A list of list items belonging to the specified list
+  Future<List<ListItem>> getListItemsByListId(String listId) async {
+    return executeQuery(() async {
+      final response = await supabase
+          .from('list_items')
+          .select()
+          .eq('list_id', listId)
+          .order('sort_order', ascending: true);
 
-      if (oldIndex < 0 ||
-          oldIndex >= list.items.length ||
-          newIndex < 0 ||
-          newIndex >= list.items.length) {
-        throw Exception(
-          'Invalid reorder indices: oldIndex=$oldIndex, newIndex=$newIndex',
-        );
-      }
-
-      final updatedItems = [...list.items];
-      final item = updatedItems.removeAt(oldIndex);
-      updatedItems.insert(newIndex, item);
-
-      // Update sort order for all items
-      final reorderedItems = updatedItems.asMap().entries.map((entry) {
-        return entry.value.copyWith(sortOrder: entry.key);
-      }).toList();
-
-      final updatedList = list.copyWith(
-        items: reorderedItems,
-        updatedAt: DateTime.now(),
-      );
-
-      await _box.put(listId, updatedList);
-      return updatedList;
-    } catch (e) {
-      throw Exception('Failed to reorder items in list: $e');
-    }
+      return (response as List)
+          .map((json) => ListItem.fromJson(json as Map<String, dynamic>))
+          .toList();
+    });
   }
 
-  /// Deletes all lists belonging to a specific space.
+  /// Creates a new list item in Supabase.
+  ///
+  /// Automatically calculates and assigns the next sortOrder value for the item
+  /// within its list. After creating the item, updates the parent list's
+  /// aggregate counts.
   ///
   /// Parameters:
-  ///   - [spaceId]: The ID of the space
+  ///   - [listItem]: The list item to be created
   ///
   /// Returns:
-  ///   The number of lists deleted
-  ///
-  /// Example:
-  /// ```dart
-  /// final count = await repository.deleteAllInSpace('space-1');
-  /// print('Deleted $count lists');
-  /// ```
-  Future<int> deleteAllInSpace(String spaceId) async {
-    try {
-      final lists = await getBySpace(spaceId);
-      for (final list in lists) {
-        await delete(list.id);
-      }
-      return lists.length;
-    } catch (e) {
-      throw Exception('Failed to delete all lists in space: $e');
-    }
+  ///   The created list item with assigned sortOrder
+  Future<ListItem> createListItem(ListItem listItem) async {
+    return executeQuery(() async {
+      // Calculate next sortOrder for this list
+      final itemsInList = await getListItemsByListId(listItem.listId);
+      final maxSortOrder = itemsInList.isEmpty
+          ? -1
+          : itemsInList
+              .map((item) => item.sortOrder)
+              .reduce((a, b) => a > b ? a : b);
+      final nextSortOrder = maxSortOrder + 1;
+
+      // Create item with calculated sortOrder
+      final listItemWithSortOrder = listItem.copyWith(sortOrder: nextSortOrder);
+      final data = listItemWithSortOrder.toJson();
+
+      final response = await supabase
+          .from('list_items')
+          .insert(data)
+          .select()
+          .single();
+
+      // Update parent list counts
+      await _updateListCounts(listItem.listId);
+
+      return ListItem.fromJson(response);
+    });
   }
 
-  /// Counts the number of lists in a specific space.
+  /// Updates an existing list item in Supabase.
+  ///
+  /// If the checked status changes, updates the parent list's counts.
+  /// RLS policies ensure users can only update items from their own lists.
   ///
   /// Parameters:
-  ///   - [spaceId]: The ID of the space
+  ///   - [listItem]: The list item to update with new values
   ///
   /// Returns:
-  ///   The number of lists in the space
+  ///   The updated list item
+  Future<ListItem> updateListItem(ListItem listItem) async {
+    return executeQuery(() async {
+      // Get the old item to check if checked status changed
+      final oldItemResponse = await supabase
+          .from('list_items')
+          .select()
+          .eq('id', listItem.id)
+          .single();
+      final oldItem = ListItem.fromJson(oldItemResponse);
+
+      final data = listItem.toJson();
+
+      final response = await supabase
+          .from('list_items')
+          .update(data)
+          .eq('id', listItem.id)
+          .select()
+          .single();
+
+      // Update parent list counts if checked status changed
+      if (oldItem.isChecked != listItem.isChecked) {
+        await _updateListCounts(listItem.listId);
+      }
+
+      return ListItem.fromJson(response);
+    });
+  }
+
+  /// Deletes a list item from Supabase.
   ///
-  /// Example:
-  /// ```dart
-  /// final count = await repository.countBySpace('space-1');
-  /// print('Space has $count lists');
-  /// ```
-  Future<int> countBySpace(String spaceId) async {
-    try {
-      final lists = await getBySpace(spaceId);
-      return lists.length;
-    } catch (e) {
-      throw Exception('Failed to count lists in space: $e');
-    }
+  /// After deleting the item, updates the parent list's aggregate counts.
+  /// RLS policies ensure users can only delete items from their own lists.
+  ///
+  /// Parameters:
+  ///   - [id]: The ID of the list item to delete
+  ///   - [listId]: The ID of the parent list (for count updates)
+  Future<void> deleteListItem(String id, String listId) async {
+    return executeQuery(() async {
+      await supabase.from('list_items').delete().eq('id', id);
+
+      // Update parent list counts
+      await _updateListCounts(listId);
+    });
+  }
+
+  /// Updates the sort orders for multiple list items in a batch.
+  ///
+  /// Used for drag-and-drop reordering. Updates all items with their new
+  /// sort_order values in a single operation.
+  ///
+  /// Parameters:
+  ///   - [listItems]: List of list items with updated sortOrder values
+  Future<void> updateListItemSortOrders(List<ListItem> listItems) async {
+    return executeQuery(() async {
+      final updates = listItems.map((item) => item.toJson()).toList();
+
+      // Use upsert to update multiple records at once
+      await supabase.from('list_items').upsert(updates);
+    });
+  }
+
+  /// Private helper to update a list's aggregate counts.
+  ///
+  /// Fetches all items for the list and recalculates totalItemCount and checkedItemCount.
+  Future<void> _updateListCounts(String listId) async {
+    final items = await getListItemsByListId(listId);
+    final totalCount = items.length;
+    final checkedCount = items.where((item) => item.isChecked).length;
+
+    await supabase
+        .from('lists')
+        .update({
+          'total_item_count': totalCount,
+          'checked_item_count': checkedCount,
+          'updated_at': DateTime.now().toIso8601String(),
+        })
+        .eq('id', listId)
+        .eq('user_id', userId);
   }
 }

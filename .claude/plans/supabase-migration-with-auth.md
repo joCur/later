@@ -214,93 +214,75 @@ Migrate from Hive local-only storage to Supabase cloud database with proper auth
 
 ### Phase 4: Repository Layer Rewrite
 
-- [ ] Task 4.1: Create base Supabase repository
-  - Create `lib/data/repositories/base_repository.dart` with:
-    - Protected `supabase` getter accessing SupabaseClient singleton
-    - Protected `userId` getter from `supabase.auth.currentUser!.id`
-    - Helper method `handleSupabaseError(error)` to map Supabase exceptions to AppError
-    - Helper method `executeQuery<T>(Future<T> Function() query)` with try-catch and error handling
+- [x] Task 4.1: Create base Supabase repository
+  - ✅ Created `lib/data/repositories/base_repository.dart` with:
+    - ✅ Protected `supabase` getter accessing SupabaseClient singleton
+    - ✅ Protected `userId` getter from `supabase.auth.currentUser!.id`
+    - ✅ Helper method `_handlePostgrestException()` to map Supabase exceptions to user-friendly errors
+    - ✅ Helper method `_handleAuthException()` to map auth exceptions
+    - ✅ Helper method `executeQuery<T>(Future<T> Function() query)` with try-catch and error handling
 
-- [ ] Task 4.2: Rewrite SpaceRepository for Supabase
-  - Update `lib/data/repositories/space_repository.dart` to extend BaseRepository
-  - Replace Hive box operations with Supabase queries:
-    - `getAllSpaces()` → `supabase.from('spaces').select().eq('user_id', userId).order('created_at')`
-    - `getSpaceById(id)` → `supabase.from('spaces').select().eq('id', id).eq('user_id', userId).single()`
-    - `createSpace(space)` → `supabase.from('spaces').insert(space.toJson()..addAll({'user_id': userId}))`
-    - `updateSpace(space)` → `supabase.from('spaces').update(space.toJson()).eq('id', space.id).eq('user_id', userId)`
-    - `deleteSpace(id)` → `supabase.from('spaces').delete().eq('id', id).eq('user_id', userId)`
-    - `getItemCount(spaceId)` → Query counts from notes, todo_lists, and lists tables (similar to SpaceItemCountService logic)
-  - Remove Hive-specific code (box access, keys iteration)
-  - Add error handling for network errors, auth errors, RLS violations
+- [x] Task 4.2: Rewrite SpaceRepository for Supabase
+  - ✅ Updated `lib/data/repositories/space_repository.dart` to extend BaseRepository
+  - ✅ Replaced Hive box operations with Supabase queries:
+    - ✅ `getSpaces()` → `supabase.from('spaces').select().eq('user_id', userId).order('created_at')`
+    - ✅ `getSpaceById(id)` → `supabase.from('spaces').select().eq('id', id).eq('user_id', userId).maybeSingle()`
+    - ✅ `createSpace(space)` → `supabase.from('spaces').insert(data).select().single()`
+    - ✅ `updateSpace(space)` → `supabase.from('spaces').update(data).eq('id', space.id).eq('user_id', userId)`
+    - ✅ `deleteSpace(id)` → `supabase.from('spaces').delete().eq('id', id).eq('user_id', userId)`
+    - ✅ `getItemCount(spaceId)` → Queries counts from notes, todo_lists, and lists tables
+  - ✅ Removed all Hive-specific code (box access, keys iteration)
+  - ✅ Added error handling via BaseRepository.executeQuery()
 
-- [ ] Task 4.3: Rewrite NoteRepository for Supabase
-  - Update `lib/data/repositories/note_repository.dart` to extend BaseRepository
-  - Replace Hive operations with Supabase queries:
-    - `getAllNotes()` → `supabase.from('notes').select().eq('user_id', userId).order('sort_order')`
-    - `getNotesBySpaceId(spaceId)` → Add `.eq('space_id', spaceId)` filter
-    - `getNoteById(id)` → `supabase.from('notes').select().eq('id', id).single()`
-    - `createNote(note)` → Insert with user_id
-    - `updateNote(note)` → Update with user_id check
-    - `deleteNote(id)` → Delete with user_id check
-    - `updateSortOrders(List<Item> notes)` → Batch update via `.upsert()`
-  - Remove Hive-specific code
-  - Handle PostgreSQL array type for tags field
+- [x] Task 4.3: Rewrite NoteRepository for Supabase
+  - ✅ Updated `lib/data/repositories/note_repository.dart` to extend BaseRepository
+  - ✅ Replaced Hive operations with Supabase queries:
+    - ✅ `getBySpace(spaceId)` → `supabase.from('notes').select().eq('space_id', spaceId).eq('user_id', userId).order('sort_order')`
+    - ✅ `getById(id)` → `supabase.from('notes').select().eq('id', id).eq('user_id', userId).maybeSingle()`
+    - ✅ `create(note)` → Insert with user_id and auto-calculated sortOrder
+    - ✅ `update(note)` → Update with user_id check and updated_at timestamp
+    - ✅ `delete(id)` → Delete with user_id check
+    - ✅ `updateSortOrders(List<Note> notes)` → Batch upsert for reordering
+  - ✅ Removed all Hive-specific code
+  - ✅ Added support for PostgreSQL array type for tags field (using `.contains()`)
+  - ✅ Added search functionality with `.or()` and `.ilike()` operators
+  - ✅ Added `getByTag()` method using array containment
 
-- [ ] Task 4.4: Rewrite TodoListRepository for Supabase
-  - Update `lib/data/repositories/todo_list_repository.dart` to extend BaseRepository
-  - Replace Hive operations with Supabase queries:
-    - `getAllTodoLists()` → Query with aggregate counts using PostgreSQL function or LEFT JOIN with GROUP BY:
-      ```sql
-      SELECT
-        tl.*,
-        COUNT(ti.id) as total_item_count,
-        COUNT(ti.id) FILTER (WHERE ti.is_completed = true) as completed_item_count
-      FROM todo_lists tl
-      LEFT JOIN todo_items ti ON ti.todo_list_id = tl.id
-      WHERE tl.user_id = userId
-      GROUP BY tl.id
-      ORDER BY tl.sort_order
-      ```
-    - `getTodoListById(id)` → Single query with aggregate counts (same pattern as above)
-    - `createTodoList(todoList)` → Insert into todo_lists table with initial counts (0, 0)
-    - `updateTodoList(todoList)` → Update todo_lists table (recalculate counts if items changed)
-    - `deleteTodoList(id)` → Delete todo_list (cascade deletes todo_items via FK constraint)
-  - Add new TodoItem-specific methods:
-    - `getTodoItemsByListId(todoListId)` → Query todo_items table: `select().eq('todo_list_id', todoListId).order('sort_order')`
-    - `createTodoItem(todoItem)` → Insert into todo_items table, then update parent list's counts
-    - `updateTodoItem(todoItem)` → Update todo_items table, recalculate parent list counts if completion status changed
-    - `deleteTodoItem(id, todoListId)` → Delete from todo_items table, update parent list's counts
-    - `updateTodoItemSortOrders(List<TodoItem> items)` → Batch upsert for reordering
-  - Remove embedded list logic (items fetched separately)
-  - Note: Consider using PostgreSQL function for efficient count updates
+- [x] Task 4.4: Rewrite TodoListRepository for Supabase
+  - ✅ Updated `lib/data/repositories/todo_list_repository.dart` to extend BaseRepository
+  - ✅ Replaced Hive operations with Supabase queries for TodoLists:
+    - ✅ `getBySpace(spaceId)` → Queries todo_lists and fetches counts by loading items
+    - ✅ `getById(id)` → Single query with counts calculated from items
+    - ✅ `create(todoList)` → Insert into todo_lists table with initial counts (0, 0)
+    - ✅ `update(todoList)` → Update todo_lists table with updated_at timestamp
+    - ✅ `delete(id)` → Delete todo_list (cascade deletes todo_items via FK constraint)
+  - ✅ Added TodoItem-specific methods:
+    - ✅ `getTodoItemsByListId(todoListId)` → Query todo_items table ordered by sort_order
+    - ✅ `createTodoItem(todoItem)` → Insert with auto-calculated sortOrder, updates parent counts
+    - ✅ `updateTodoItem(todoItem)` → Update with count recalculation if completion status changed
+    - ✅ `deleteTodoItem(id, todoListId)` → Delete and update parent list's counts
+    - ✅ `updateTodoItemSortOrders(List<TodoItem> items)` → Batch upsert for reordering
+  - ✅ Removed embedded list logic (items fetched separately via getTodoItemsByListId)
+  - ✅ Added private helper `_updateTodoListCounts()` for efficient count updates
 
-- [ ] Task 4.5: Rewrite ListRepository for Supabase
-  - Update `lib/data/repositories/list_repository.dart` to extend BaseRepository
-  - Replace Hive operations with Supabase queries:
-    - `getAllLists()` → Query with aggregate counts using PostgreSQL function or LEFT JOIN with GROUP BY:
-      ```sql
-      SELECT
-        l.*,
-        COUNT(li.id) as total_item_count,
-        COUNT(li.id) FILTER (WHERE li.is_checked = true) as checked_item_count
-      FROM lists l
-      LEFT JOIN list_items li ON li.list_id = l.id
-      WHERE l.user_id = userId
-      GROUP BY l.id
-      ORDER BY l.sort_order
-      ```
-    - `getListById(id)` → Single query with aggregate counts (same pattern as above)
-    - `createList(list)` → Insert into lists table with initial counts (0, 0)
-    - `updateList(list)` → Update lists table (recalculate counts if items changed)
-    - `deleteList(id)` → Delete list (cascade deletes list_items via FK constraint)
-  - Add new ListItem-specific methods:
-    - `getListItemsByListId(listId)` → Query list_items table: `select().eq('list_id', listId).order('sort_order')`
-    - `createListItem(listItem)` → Insert into list_items table, then update parent list's counts
-    - `updateListItem(listItem)` → Update list_items table, recalculate parent list counts if checked status changed
-    - `deleteListItem(id, listId)` → Delete from list_items table, update parent list's counts
-    - `updateListItemSortOrders(List<ListItem> items)` → Batch upsert for reordering
-  - Remove embedded list logic (items fetched separately)
-  - Note: Consider using PostgreSQL function for efficient count updates
+- [x] Task 4.5: Rewrite ListRepository for Supabase
+  - ✅ Updated `lib/data/repositories/list_repository.dart` to extend BaseRepository
+  - ✅ Replaced Hive operations with Supabase queries for Lists:
+    - ✅ `getBySpace(spaceId)` → Queries lists and fetches counts by loading items
+    - ✅ `getById(id)` → Single query with counts calculated from items
+    - ✅ `create(list)` → Insert into lists table with initial counts (0, 0)
+    - ✅ `update(list)` → Update lists table with updated_at timestamp
+    - ✅ `delete(id)` → Delete list (cascade deletes list_items via FK constraint)
+  - ✅ Added ListItem-specific methods:
+    - ✅ `getListItemsByListId(listId)` → Query list_items table ordered by sort_order
+    - ✅ `createListItem(listItem)` → Insert with auto-calculated sortOrder, updates parent counts
+    - ✅ `updateListItem(listItem)` → Update with count recalculation if checked status changed
+    - ✅ `deleteListItem(id, listId)` → Delete and update parent list's counts
+    - ✅ `updateListItemSortOrders(List<ListItem> items)` → Batch upsert for reordering
+  - ✅ Removed embedded list logic (items fetched separately via getListItemsByListId)
+  - ✅ Added private helper `_updateListCounts()` for efficient count updates
+
+**Phase 4 Complete** - All repository code has been successfully migrated from Hive to Supabase with RLS policies, proper error handling, and efficient count management.
 
 ### Phase 5: Provider Layer Updates
 
