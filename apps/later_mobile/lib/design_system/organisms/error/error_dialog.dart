@@ -49,71 +49,83 @@ class ErrorDialog extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              // Error icon
-              Icon(
-                Icons.error_outline,
-                size: 48,
-                color: Theme.of(context).colorScheme.error,
-              ),
-              const SizedBox(height: 16),
-
-              // Title
-              Text(
-                title ?? 'Something Went Wrong',
-                style: AppTypography.h3.copyWith(
-                  color: Theme.of(context).colorScheme.onSurface,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 12),
-
-              // User message
-              Text(
-                error.getUserMessage(),
-                style: AppTypography.bodyLarge.copyWith(
-                  color: Theme.of(
-                    context,
-                  ).colorScheme.onSurface.withValues(alpha: 0.8),
-                ),
-                textAlign: TextAlign.center,
-              ),
-
-              // Technical details in debug mode
-              if (kDebugMode && error.technicalDetails != null) ...[
-                const SizedBox(height: 16),
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: Theme.of(
-                      context,
-                    ).colorScheme.surfaceContainerHighest,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
+              // Scrollable content
+              Flexible(
+                child: SingleChildScrollView(
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text(
-                        'Debug Info:',
-                        style: AppTypography.labelSmall.copyWith(
-                          color: Theme.of(context).colorScheme.onSurfaceVariant,
-                          fontWeight: FontWeight.bold,
-                        ),
+                      // Error icon
+                      Icon(
+                        Icons.error_outline,
+                        size: 48,
+                        color: Theme.of(context).colorScheme.error,
                       ),
-                      const SizedBox(height: 4),
+                      const SizedBox(height: 16),
+
+                      // Title
                       Text(
-                        error.technicalDetails!,
-                        style: AppTypography.bodySmall.copyWith(
-                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        title ?? 'Something Went Wrong',
+                        style: AppTypography.h3.copyWith(
+                          color: Theme.of(context).colorScheme.onSurface,
                         ),
+                        textAlign: TextAlign.center,
                       ),
+                      const SizedBox(height: 12),
+
+                      // User message
+                      Text(
+                        error.getUserMessage(),
+                        style: AppTypography.bodyLarge.copyWith(
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.onSurface.withValues(alpha: 0.8),
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+
+                      // Technical details in debug mode
+                      if (kDebugMode && error.technicalDetails != null) ...[
+                        const SizedBox(height: 16),
+                        Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.surfaceContainerHighest,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Debug Info:',
+                                style: AppTypography.labelSmall.copyWith(
+                                  color:
+                                      Theme.of(context).colorScheme.onSurfaceVariant,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                error.technicalDetails!,
+                                style: AppTypography.bodySmall.copyWith(
+                                  color:
+                                      Theme.of(context).colorScheme.onSurfaceVariant,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                     ],
                   ),
                 ),
-              ],
+              ),
 
               const SizedBox(height: 24),
 
-              // Action buttons
+              // Action buttons (fixed at bottom)
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [

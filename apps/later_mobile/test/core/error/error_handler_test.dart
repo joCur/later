@@ -2,9 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:later_mobile/core/error/app_error.dart';
 import 'package:later_mobile/core/error/error_handler.dart';
+import 'package:later_mobile/core/theme/temporal_flow_theme.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
+
+  // Helper to create MaterialApp with proper theme for tests
+  Widget testApp(Widget child) {
+    return MaterialApp(
+      theme: ThemeData.light().copyWith(
+        extensions: <ThemeExtension<dynamic>>[TemporalFlowTheme.light()],
+      ),
+      home: Scaffold(body: child),
+    );
+  }
 
   group('ErrorHandler', () {
     setUp(() {
@@ -119,18 +130,16 @@ void main() {
         );
 
         await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(
-              body: Builder(
-                builder: (context) {
-                  return ElevatedButton(
-                    onPressed: () {
-                      ErrorHandler.showErrorDialog(context, error);
-                    },
-                    child: const Text('Show Error'),
-                  );
-                },
-              ),
+          testApp(
+            Builder(
+              builder: (context) {
+                return ElevatedButton(
+                  onPressed: () {
+                    ErrorHandler.showErrorDialog(context, error);
+                  },
+                  child: const Text('Show Error'),
+                );
+              },
             ),
           ),
         );
@@ -140,7 +149,7 @@ void main() {
         await tester.pumpAndSettle();
 
         // Verify dialog is shown
-        expect(find.byType(AlertDialog), findsOneWidget);
+        expect(find.byType(Dialog), findsOneWidget);
       });
 
       testWidgets('dialog contains error message', (tester) async {
@@ -150,18 +159,16 @@ void main() {
         );
 
         await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(
-              body: Builder(
-                builder: (context) {
-                  return ElevatedButton(
-                    onPressed: () {
-                      ErrorHandler.showErrorDialog(context, error);
-                    },
-                    child: const Text('Show Error'),
-                  );
-                },
-              ),
+          testApp(
+            Builder(
+              builder: (context) {
+                return ElevatedButton(
+                  onPressed: () {
+                    ErrorHandler.showErrorDialog(context, error);
+                  },
+                  child: const Text('Show Error'),
+                );
+              },
             ),
           ),
         );
@@ -177,18 +184,16 @@ void main() {
         final error = AppError.storage(message: 'Test error');
 
         await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(
-              body: Builder(
-                builder: (context) {
-                  return ElevatedButton(
-                    onPressed: () {
-                      ErrorHandler.showErrorDialog(context, error);
-                    },
-                    child: const Text('Show Error'),
-                  );
-                },
-              ),
+          testApp(
+            Builder(
+              builder: (context) {
+                return ElevatedButton(
+                  onPressed: () {
+                    ErrorHandler.showErrorDialog(context, error);
+                  },
+                  child: const Text('Show Error'),
+                );
+              },
             ),
           ),
         );
@@ -204,18 +209,16 @@ void main() {
         final error = AppError.storage(message: 'Test error');
 
         await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(
-              body: Builder(
-                builder: (context) {
-                  return ElevatedButton(
-                    onPressed: () {
-                      ErrorHandler.showErrorDialog(context, error);
-                    },
-                    child: const Text('Show Error'),
-                  );
-                },
-              ),
+          testApp(
+            Builder(
+              builder: (context) {
+                return ElevatedButton(
+                  onPressed: () {
+                    ErrorHandler.showErrorDialog(context, error);
+                  },
+                  child: const Text('Show Error'),
+                );
+              },
             ),
           ),
         );
@@ -228,7 +231,7 @@ void main() {
         await tester.pumpAndSettle();
 
         // Dialog should be closed
-        expect(find.byType(AlertDialog), findsNothing);
+        expect(find.byType(Dialog), findsNothing);
       });
 
       testWidgets('dialog calls onRetry callback', (tester) async {
@@ -236,24 +239,22 @@ void main() {
         bool retryCalledVar = false;
 
         await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(
-              body: Builder(
-                builder: (context) {
-                  return ElevatedButton(
-                    onPressed: () {
-                      ErrorHandler.showErrorDialog(
-                        context,
-                        error,
-                        onRetry: () {
-                          retryCalledVar = true;
-                        },
-                      );
-                    },
-                    child: const Text('Show Error'),
-                  );
-                },
-              ),
+          testApp(
+            Builder(
+              builder: (context) {
+                return ElevatedButton(
+                  onPressed: () {
+                    ErrorHandler.showErrorDialog(
+                      context,
+                      error,
+                      onRetry: () {
+                        retryCalledVar = true;
+                      },
+                    );
+                  },
+                  child: const Text('Show Error'),
+                );
+              },
             ),
           ),
         );
@@ -273,18 +274,16 @@ void main() {
         final error = AppError.storage(message: 'Test error');
 
         await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(
-              body: Builder(
-                builder: (context) {
-                  return ElevatedButton(
-                    onPressed: () {
-                      ErrorHandler.showErrorSnackBar(context, error);
-                    },
-                    child: const Text('Show Error'),
-                  );
-                },
-              ),
+          testApp(
+            Builder(
+              builder: (context) {
+                return ElevatedButton(
+                  onPressed: () {
+                    ErrorHandler.showErrorSnackBar(context, error);
+                  },
+                  child: const Text('Show Error'),
+                );
+              },
             ),
           ),
         );
@@ -302,18 +301,16 @@ void main() {
         );
 
         await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(
-              body: Builder(
-                builder: (context) {
-                  return ElevatedButton(
-                    onPressed: () {
-                      ErrorHandler.showErrorSnackBar(context, error);
-                    },
-                    child: const Text('Show Error'),
-                  );
-                },
-              ),
+          testApp(
+            Builder(
+              builder: (context) {
+                return ElevatedButton(
+                  onPressed: () {
+                    ErrorHandler.showErrorSnackBar(context, error);
+                  },
+                  child: const Text('Show Error'),
+                );
+              },
             ),
           ),
         );
@@ -330,18 +327,16 @@ void main() {
         final error = AppError.storage(message: 'Test error');
 
         await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(
-              body: Builder(
-                builder: (context) {
-                  return ElevatedButton(
-                    onPressed: () {
-                      ErrorHandler.showErrorSnackBar(context, error);
-                    },
-                    child: const Text('Show Error'),
-                  );
-                },
-              ),
+          testApp(
+            Builder(
+              builder: (context) {
+                return ElevatedButton(
+                  onPressed: () {
+                    ErrorHandler.showErrorSnackBar(context, error);
+                  },
+                  child: const Text('Show Error'),
+                );
+              },
             ),
           ),
         );
