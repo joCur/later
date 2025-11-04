@@ -2,20 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:later_mobile/core/error/app_error.dart';
 import 'package:later_mobile/core/error/error_handler.dart';
-import 'package:later_mobile/core/theme/temporal_flow_theme.dart';
+
+import '../../test_helpers.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
-
-  // Helper to create MaterialApp with proper theme for tests
-  Widget testApp(Widget child) {
-    return MaterialApp(
-      theme: ThemeData.light().copyWith(
-        extensions: <ThemeExtension<dynamic>>[TemporalFlowTheme.light()],
-      ),
-      home: Scaffold(body: child),
-    );
-  }
 
   group('ErrorHandler', () {
     setUp(() {
