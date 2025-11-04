@@ -24,7 +24,7 @@ class TodoItemAdapter extends TypeAdapter<TodoItem> {
       dueDate: fields[4] as DateTime?,
       priority: fields[5] as TodoPriority?,
       tags: (fields[6] as List?)?.cast<String>(),
-      sortOrder: (fields[7] as int?) ?? 0,
+      sortOrder: fields[7] as int,
     );
   }
 
@@ -79,7 +79,7 @@ class TodoListAdapter extends TypeAdapter<TodoList> {
       items: (fields[4] as List?)?.cast<TodoItem>(),
       createdAt: fields[5] as DateTime?,
       updatedAt: fields[6] as DateTime?,
-      sortOrder: (fields[7] as int?) ?? 0,
+      sortOrder: fields[7] as int,
     );
   }
 

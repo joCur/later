@@ -21,7 +21,7 @@ class ListItemAdapter extends TypeAdapter<ListItem> {
       title: fields[1] as String,
       notes: fields[2] as String?,
       isChecked: fields[3] as bool,
-      sortOrder: (fields[4] as int?) ?? 0,
+      sortOrder: fields[4] as int,
     );
   }
 
@@ -71,7 +71,7 @@ class ListModelAdapter extends TypeAdapter<ListModel> {
       style: fields[5] as ListStyle,
       createdAt: fields[6] as DateTime?,
       updatedAt: fields[7] as DateTime?,
-      sortOrder: (fields[8] as int?) ?? 0,
+      sortOrder: fields[8] as int,
     );
   }
 

@@ -316,6 +316,25 @@ class MockContentProvider extends _i1.Mock implements _i2.ContentProvider {
       ) as _i6.Future<void>);
 
   @override
+  _i6.Future<void> reorderContent(
+    _i2.ContentFilter? filter,
+    int? oldIndex,
+    int? newIndex,
+  ) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #reorderContent,
+          [
+            filter,
+            oldIndex,
+            newIndex,
+          ],
+        ),
+        returnValue: _i6.Future<void>.value(),
+        returnValueForMissingStub: _i6.Future<void>.value(),
+      ) as _i6.Future<void>);
+
+  @override
   _i6.Future<void> createNote(_i5.Item? note) => (super.noSuchMethod(
         Invocation.method(
           #createNote,

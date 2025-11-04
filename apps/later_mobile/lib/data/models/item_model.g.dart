@@ -25,7 +25,7 @@ class ItemAdapter extends TypeAdapter<Item> {
       createdAt: fields[8] as DateTime?,
       updatedAt: fields[9] as DateTime?,
       syncStatus: fields[10] as String?,
-      sortOrder: (fields[11] as int?) ?? 0,
+      sortOrder: fields[11] as int,
     );
   }
 
