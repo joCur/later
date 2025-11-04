@@ -4,6 +4,8 @@ import 'package:later_mobile/core/responsive/breakpoints.dart';
 import 'package:later_mobile/widgets/navigation/app_sidebar.dart';
 import 'package:later_mobile/widgets/navigation/icon_only_bottom_nav.dart';
 
+import "../test_helpers.dart";
+
 /// Responsive Behavior Test Suite: Orientation Tests
 ///
 /// Tests that layouts adapt correctly between portrait and landscape orientations:
@@ -35,8 +37,8 @@ void main() {
       await tester.pumpWidget(
         MediaQuery(
           data: const MediaQueryData(size: portraitSize),
-          child: MaterialApp(
-            home: Builder(
+          child: testApp(
+            Builder(
               builder: (context) {
                 final orientation = MediaQuery.of(context).orientation;
                 final isMobile = Breakpoints.isMobile(context);
@@ -69,8 +71,8 @@ void main() {
       await tester.pumpWidget(
         MediaQuery(
           data: const MediaQueryData(size: landscapeSize),
-          child: MaterialApp(
-            home: Builder(
+          child: testApp(
+            Builder(
               builder: (context) {
                 final orientation = MediaQuery.of(context).orientation;
                 final isMobile = Breakpoints.isMobile(context);
@@ -108,8 +110,8 @@ void main() {
       await tester.pumpWidget(
         MediaQuery(
           data: const MediaQueryData(size: landscapeSize),
-          child: MaterialApp(
-            home: Builder(
+          child: testApp(
+            Builder(
               builder: (context) {
                 // In landscape, width is 812px (tablet), so bottom nav should hide
                 final showBottomNav = Breakpoints.isMobile(context);
@@ -146,8 +148,8 @@ void main() {
       await tester.pumpWidget(
         MediaQuery(
           data: const MediaQueryData(size: portraitSize),
-          child: MaterialApp(
-            home: Scaffold(
+          child: testApp(
+            Scaffold(
               body: LayoutBuilder(
                 builder: (context, constraints) {
                   return Center(
@@ -168,8 +170,8 @@ void main() {
       await tester.pumpWidget(
         MediaQuery(
           data: const MediaQueryData(size: landscapeSize),
-          child: MaterialApp(
-            home: Scaffold(
+          child: testApp(
+            Scaffold(
               body: LayoutBuilder(
                 builder: (context, constraints) {
                   return Center(
@@ -203,8 +205,8 @@ void main() {
       await tester.pumpWidget(
         MediaQuery(
           data: const MediaQueryData(size: portraitSize),
-          child: MaterialApp(
-            home: Builder(
+          child: testApp(
+            Builder(
               builder: (context) {
                 final orientation = MediaQuery.of(context).orientation;
                 final isTablet = Breakpoints.isTablet(context);
@@ -237,8 +239,8 @@ void main() {
       await tester.pumpWidget(
         MediaQuery(
           data: const MediaQueryData(size: landscapeSize),
-          child: MaterialApp(
-            home: Builder(
+          child: testApp(
+            Builder(
               builder: (context) {
                 final orientation = MediaQuery.of(context).orientation;
                 final isDesktop = Breakpoints.isDesktop(context);
@@ -276,8 +278,8 @@ void main() {
       await tester.pumpWidget(
         MediaQuery(
           data: const MediaQueryData(size: landscapeSize),
-          child: MaterialApp(
-            home: Builder(
+          child: testApp(
+            Builder(
               builder: (context) {
                 final showSidebar = Breakpoints.isDesktopOrLarger(context);
                 return Scaffold(
@@ -311,8 +313,8 @@ void main() {
       // Portrait - should be 2 columns (tablet)
       int? portraitColumns;
       await tester.pumpWidget(
-        MaterialApp(
-          home: MediaQuery(
+        testApp(
+          MediaQuery(
             data: const MediaQueryData(size: portraitSize),
             child: Builder(
               builder: (context) {
@@ -333,8 +335,8 @@ void main() {
       // Landscape - should be 3 columns (desktop)
       int? landscapeColumns;
       await tester.pumpWidget(
-        MaterialApp(
-          home: MediaQuery(
+        testApp(
+          MediaQuery(
             data: const MediaQueryData(size: landscapeSize),
             child: Builder(
               builder: (context) {
@@ -365,8 +367,8 @@ void main() {
       await tester.pumpWidget(
         MediaQuery(
           data: const MediaQueryData(size: portraitSize),
-          child: MaterialApp(
-            home: Scaffold(
+          child: testApp(
+            Scaffold(
               body: Builder(
                 builder: (context) {
                   final orientation = MediaQuery.of(context).orientation;
@@ -386,8 +388,8 @@ void main() {
       await tester.pumpWidget(
         MediaQuery(
           data: const MediaQueryData(size: landscapeSize),
-          child: MaterialApp(
-            home: Scaffold(
+          child: testApp(
+            Scaffold(
               body: Builder(
                 builder: (context) {
                   final orientation = MediaQuery.of(context).orientation;
@@ -420,8 +422,8 @@ void main() {
       await tester.pumpWidget(
         MediaQuery(
           data: const MediaQueryData(size: portraitSize),
-          child: MaterialApp(
-            home: Scaffold(
+          child: testApp(
+            Scaffold(
               appBar: AppBar(title: const Text('App')),
               body: ListView.builder(
                 itemCount: 50,
@@ -450,8 +452,8 @@ void main() {
       await tester.pumpWidget(
         MediaQuery(
           data: const MediaQueryData(size: landscapeSize),
-          child: MaterialApp(
-            home: Scaffold(
+          child: testApp(
+            Scaffold(
               appBar: AppBar(title: const Text('App')),
               body: ListView.builder(
                 itemCount: 50,
@@ -486,8 +488,8 @@ void main() {
       await tester.pumpWidget(
         MediaQuery(
           data: const MediaQueryData(size: landscapeSize),
-          child: MaterialApp(
-            home: Scaffold(
+          child: testApp(
+            Scaffold(
               body: Row(
                 children: [
                   // Sidebar in landscape
@@ -531,8 +533,8 @@ void main() {
       await tester.pumpWidget(
         MediaQuery(
           data: const MediaQueryData(size: portraitSize),
-          child: MaterialApp(
-            home: Scaffold(
+          child: testApp(
+            Scaffold(
               body: ListView.builder(
                 itemCount: 100,
                 itemBuilder: (context, index) =>

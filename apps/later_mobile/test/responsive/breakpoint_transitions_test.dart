@@ -5,6 +5,8 @@ import 'package:later_mobile/core/responsive/responsive_layout.dart';
 import 'package:later_mobile/widgets/navigation/app_sidebar.dart';
 import 'package:later_mobile/widgets/navigation/icon_only_bottom_nav.dart';
 
+import '../test_helpers.dart';
+
 /// Responsive Behavior Test Suite: Breakpoint Transitions
 ///
 /// Tests that layouts transition smoothly at exact breakpoints:
@@ -34,8 +36,8 @@ void main() {
       bool? isTablet;
 
       await tester.pumpWidget(
-        MaterialApp(
-          home: MediaQuery(
+        testApp(
+          MediaQuery(
             data: const MediaQueryData(size: Size(767.0, 1024.0)),
             child: Builder(
               builder: (context) {
@@ -57,8 +59,8 @@ void main() {
       bool? isTablet;
 
       await tester.pumpWidget(
-        MaterialApp(
-          home: MediaQuery(
+        testApp(
+          MediaQuery(
             data: const MediaQueryData(size: Size(768.0, 1024.0)),
             child: Builder(
               builder: (context) {
@@ -79,8 +81,8 @@ void main() {
       bool? isTablet;
 
       await tester.pumpWidget(
-        MaterialApp(
-          home: MediaQuery(
+        testApp(
+          MediaQuery(
             data: const MediaQueryData(size: Size(769.0, 1024.0)),
             child: Builder(
               builder: (context) {
@@ -102,8 +104,8 @@ void main() {
       await tester.pumpWidget(
         MediaQuery(
           data: const MediaQueryData(size: Size(767.0, 1024.0)),
-          child: MaterialApp(
-            home: Builder(
+          child: testApp(
+            Builder(
               builder: (context) {
                 final showBottomNav = Breakpoints.isMobile(context);
                 return Scaffold(
@@ -131,8 +133,8 @@ void main() {
       await tester.pumpWidget(
         MediaQuery(
           data: const MediaQueryData(size: Size(768.0, 1024.0)),
-          child: MaterialApp(
-            home: Builder(
+          child: testApp(
+            Builder(
               builder: (context) {
                 final showBottomNav = Breakpoints.isMobile(context);
                 return Scaffold(
@@ -167,8 +169,8 @@ void main() {
 
       // Test at 767px
       await tester.pumpWidget(
-        MaterialApp(
-          home: MediaQuery(
+        testApp(
+          MediaQuery(
             data: const MediaQueryData(size: Size(767.0, 1024.0)),
             child: Builder(
               builder: (context) {
@@ -182,8 +184,8 @@ void main() {
 
       // Test at 768px
       await tester.pumpWidget(
-        MaterialApp(
-          home: MediaQuery(
+        testApp(
+          MediaQuery(
             data: const MediaQueryData(size: Size(768.0, 1024.0)),
             child: Builder(
               builder: (context) {
@@ -204,10 +206,10 @@ void main() {
     ) async {
       // Test at 767px (mobile)
       await tester.pumpWidget(
-        const MediaQuery(
-          data: MediaQueryData(size: Size(767.0, 1024.0)),
-          child: MaterialApp(
-            home: Scaffold(
+        MediaQuery(
+          data: const MediaQueryData(size: Size(767.0, 1024.0)),
+          child: testApp(
+            const Scaffold(
               body: ResponsiveLayout(
                 mobile: Text('Mobile Layout'),
                 tablet: Text('Tablet Layout'),
@@ -222,10 +224,10 @@ void main() {
 
       // Test at 768px (tablet)
       await tester.pumpWidget(
-        const MediaQuery(
-          data: MediaQueryData(size: Size(768.0, 1024.0)),
-          child: MaterialApp(
-            home: Scaffold(
+        MediaQuery(
+          data: const MediaQueryData(size: Size(768.0, 1024.0)),
+          child: testApp(
+            const Scaffold(
               body: ResponsiveLayout(
                 mobile: Text('Mobile Layout'),
                 tablet: Text('Tablet Layout'),
@@ -248,8 +250,8 @@ void main() {
       bool? isDesktop;
 
       await tester.pumpWidget(
-        MaterialApp(
-          home: MediaQuery(
+        testApp(
+          MediaQuery(
             data: const MediaQueryData(size: Size(1023.0, 768.0)),
             child: Builder(
               builder: (context) {
@@ -271,8 +273,8 @@ void main() {
       bool? isDesktop;
 
       await tester.pumpWidget(
-        MaterialApp(
-          home: MediaQuery(
+        testApp(
+          MediaQuery(
             data: const MediaQueryData(size: Size(1024.0, 768.0)),
             child: Builder(
               builder: (context) {
@@ -293,8 +295,8 @@ void main() {
       bool? isDesktop;
 
       await tester.pumpWidget(
-        MaterialApp(
-          home: MediaQuery(
+        testApp(
+          MediaQuery(
             data: const MediaQueryData(size: Size(1025.0, 768.0)),
             child: Builder(
               builder: (context) {
@@ -314,8 +316,8 @@ void main() {
       await tester.pumpWidget(
         MediaQuery(
           data: const MediaQueryData(size: Size(1023.0, 768.0)),
-          child: MaterialApp(
-            home: Builder(
+          child: testApp(
+            Builder(
               builder: (context) {
                 final showSidebar = Breakpoints.isDesktopOrLarger(context);
                 return Scaffold(
@@ -342,8 +344,8 @@ void main() {
       await tester.pumpWidget(
         MediaQuery(
           data: const MediaQueryData(size: Size(1024.0, 768.0)),
-          child: MaterialApp(
-            home: Builder(
+          child: testApp(
+            Builder(
               builder: (context) {
                 final showSidebar = Breakpoints.isDesktopOrLarger(context);
                 return Scaffold(
@@ -377,8 +379,8 @@ void main() {
 
       // Test at 1023px
       await tester.pumpWidget(
-        MaterialApp(
-          home: MediaQuery(
+        testApp(
+          MediaQuery(
             data: const MediaQueryData(size: Size(1023.0, 768.0)),
             child: Builder(
               builder: (context) {
@@ -392,8 +394,8 @@ void main() {
 
       // Test at 1024px
       await tester.pumpWidget(
-        MaterialApp(
-          home: MediaQuery(
+        testApp(
+          MediaQuery(
             data: const MediaQueryData(size: Size(1024.0, 768.0)),
             child: Builder(
               builder: (context) {
@@ -417,8 +419,8 @@ void main() {
 
       // Test at 1023px
       await tester.pumpWidget(
-        MaterialApp(
-          home: MediaQuery(
+        testApp(
+          MediaQuery(
             data: const MediaQueryData(size: Size(1023.0, 768.0)),
             child: Builder(
               builder: (context) {
@@ -432,8 +434,8 @@ void main() {
 
       // Test at 1024px
       await tester.pumpWidget(
-        MaterialApp(
-          home: MediaQuery(
+        testApp(
+          MediaQuery(
             data: const MediaQueryData(size: Size(1024.0, 768.0)),
             child: Builder(
               builder: (context) {
@@ -464,8 +466,8 @@ void main() {
       ScreenSize? screenSize;
 
       await tester.pumpWidget(
-        MaterialApp(
-          home: MediaQuery(
+        testApp(
+          MediaQuery(
             data: const MediaQueryData(size: Size(1439.0, 900.0)),
             child: Builder(
               builder: (context) {
@@ -493,8 +495,8 @@ void main() {
       ScreenSize? screenSize;
 
       await tester.pumpWidget(
-        MaterialApp(
-          home: MediaQuery(
+        testApp(
+          MediaQuery(
             data: const MediaQueryData(size: Size(1440.0, 900.0)),
             child: Builder(
               builder: (context) {
@@ -519,8 +521,8 @@ void main() {
 
       // Test at 1439px
       await tester.pumpWidget(
-        MaterialApp(
-          home: MediaQuery(
+        testApp(
+          MediaQuery(
             data: const MediaQueryData(size: Size(1439.0, 900.0)),
             child: Builder(
               builder: (context) {
@@ -534,8 +536,8 @@ void main() {
 
       // Test at 1440px
       await tester.pumpWidget(
-        MaterialApp(
-          home: MediaQuery(
+        testApp(
+          MediaQuery(
             data: const MediaQueryData(size: Size(1440.0, 900.0)),
             child: Builder(
               builder: (context) {
@@ -559,8 +561,8 @@ void main() {
 
       // Test at 1440px
       await tester.pumpWidget(
-        MaterialApp(
-          home: MediaQuery(
+        testApp(
+          MediaQuery(
             data: const MediaQueryData(size: Size(1440.0, 900.0)),
             child: Builder(
               builder: (context) {
@@ -574,8 +576,8 @@ void main() {
 
       // Test at 1920px
       await tester.pumpWidget(
-        MaterialApp(
-          home: MediaQuery(
+        testApp(
+          MediaQuery(
             data: const MediaQueryData(size: Size(1920.0, 1080.0)),
             child: Builder(
               builder: (context) {
@@ -609,8 +611,8 @@ void main() {
         await tester.pumpWidget(
           MediaQuery(
             data: MediaQueryData(size: Size(width, 1024.0)),
-            child: MaterialApp(
-              home: Scaffold(
+            child: testApp(
+              Scaffold(
                 body: Builder(
                   builder: (context) {
                     final isMobile = Breakpoints.isMobile(context);
@@ -644,8 +646,8 @@ void main() {
         await tester.pumpWidget(
           MediaQuery(
             data: MediaQueryData(size: Size(width, 800.0)),
-            child: MaterialApp(
-              home: Scaffold(
+            child: testApp(
+              Scaffold(
                 body: LayoutBuilder(
                   builder: (context, constraints) {
                     return Center(

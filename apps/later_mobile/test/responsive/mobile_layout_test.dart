@@ -6,6 +6,8 @@ import 'package:later_mobile/design_system/molecules/fab/create_content_fab.dart
 import 'package:later_mobile/widgets/navigation/app_sidebar.dart';
 import 'package:later_mobile/widgets/navigation/icon_only_bottom_nav.dart';
 
+import '../test_helpers.dart';
+
 /// Responsive Behavior Test Suite: Mobile Layout (320px - 767px)
 ///
 /// Tests that mobile layouts render correctly across different screen sizes:
@@ -39,8 +41,8 @@ void main() {
       bool? isDesktop;
 
       await tester.pumpWidget(
-        MaterialApp(
-          home: Builder(
+        testApp(
+          Builder(
             builder: (context) {
               return MediaQuery(
                 data: const MediaQueryData(size: Size(testWidth, testHeight)),
@@ -79,8 +81,8 @@ void main() {
       tester.view.devicePixelRatio = 1.0;
 
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
+        testApp(
+          Scaffold(
             bottomNavigationBar: IconOnlyBottomNav(
               currentIndex: 0,
               onDestinationSelected: (int index) {},
@@ -113,8 +115,8 @@ void main() {
       await tester.pumpWidget(
         MediaQuery(
           data: const MediaQueryData(size: Size(testWidth, testHeight)),
-          child: MaterialApp(
-            home: Builder(
+          child: testApp(
+            Builder(
               builder: (context) {
                 return Scaffold(
                   body: Row(
@@ -144,8 +146,8 @@ void main() {
       await tester.pumpWidget(
         MediaQuery(
           data: const MediaQueryData(size: Size(testWidth, testHeight)),
-          child: MaterialApp(
-            home: Scaffold(
+          child: testApp(
+            Scaffold(
               body: LayoutBuilder(
                 builder: (context, constraints) {
                   return Container(
@@ -172,8 +174,8 @@ void main() {
       await tester.pumpWidget(
         MediaQuery(
           data: const MediaQueryData(size: Size(testWidth, testHeight)),
-          child: MaterialApp(
-            home: Builder(
+          child: testApp(
+            Builder(
               builder: (context) {
                 final columns = Breakpoints.getGridColumns(context);
                 return Scaffold(body: Center(child: Text('Columns: $columns')));
@@ -197,8 +199,8 @@ void main() {
       await tester.pumpWidget(
         MediaQuery(
           data: const MediaQueryData(size: Size(testWidth, testHeight)),
-          child: MaterialApp(
-            home: Scaffold(
+          child: testApp(
+            Scaffold(
               body: const Center(child: Text('Content')),
               floatingActionButton: CreateContentFab(onPressed: () {}),
             ),
@@ -219,10 +221,10 @@ void main() {
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(
-        const MediaQuery(
-          data: MediaQueryData(size: Size(testWidth, testHeight)),
-          child: MaterialApp(
-            home: Scaffold(
+        MediaQuery(
+          data: const MediaQueryData(size: Size(testWidth, testHeight)),
+          child: testApp(
+            const Scaffold(
               body: ResponsiveLayout(
                 mobile: Text('Mobile Layout'),
                 tablet: Text('Tablet Layout'),
@@ -249,8 +251,8 @@ void main() {
       bool? isMobile;
 
       await tester.pumpWidget(
-        MaterialApp(
-          home: MediaQuery(
+        testApp(
+          MediaQuery(
             data: const MediaQueryData(size: Size(testWidth, testHeight)),
             child: Builder(
               builder: (context) {
@@ -271,8 +273,8 @@ void main() {
       await tester.pumpWidget(
         MediaQuery(
           data: const MediaQueryData(size: Size(testWidth, testHeight)),
-          child: MaterialApp(
-            home: Scaffold(
+          child: testApp(
+            Scaffold(
               bottomNavigationBar: IconOnlyBottomNav(
                 currentIndex: 0,
                 onDestinationSelected: (_) {},
@@ -298,8 +300,8 @@ void main() {
       await tester.pumpWidget(
         MediaQuery(
           data: const MediaQueryData(size: Size(testWidth, testHeight)),
-          child: MaterialApp(
-            home: Scaffold(
+          child: testApp(
+            Scaffold(
               bottomNavigationBar: IconOnlyBottomNav(
                 currentIndex: 0,
                 onDestinationSelected: (_) {},
@@ -321,8 +323,8 @@ void main() {
       await tester.pumpWidget(
         MediaQuery(
           data: const MediaQueryData(size: Size(testWidth, testHeight)),
-          child: MaterialApp(
-            home: Scaffold(
+          child: testApp(
+            Scaffold(
               body: LayoutBuilder(
                 builder: (context, constraints) {
                   return Center(
@@ -352,10 +354,10 @@ void main() {
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(
-        const MediaQuery(
-          data: MediaQueryData(size: Size(testWidth, testHeight)),
-          child: MaterialApp(
-            home: Scaffold(
+        MediaQuery(
+          data: const MediaQueryData(size: Size(testWidth, testHeight)),
+          child: testApp(
+            const Scaffold(
               body: Padding(
                 padding: EdgeInsets.all(16.0),
                 child: Text(
@@ -387,8 +389,8 @@ void main() {
       bool? isMobile;
 
       await tester.pumpWidget(
-        MaterialApp(
-          home: MediaQuery(
+        testApp(
+          MediaQuery(
             data: const MediaQueryData(size: Size(testWidth, testHeight)),
             child: Builder(
               builder: (context) {
@@ -409,8 +411,8 @@ void main() {
       await tester.pumpWidget(
         MediaQuery(
           data: const MediaQueryData(size: Size(testWidth, testHeight)),
-          child: MaterialApp(
-            home: Scaffold(
+          child: testApp(
+            Scaffold(
               bottomNavigationBar: IconOnlyBottomNav(
                 currentIndex: 0,
                 onDestinationSelected: (_) {},
@@ -430,8 +432,8 @@ void main() {
       await tester.pumpWidget(
         MediaQuery(
           data: const MediaQueryData(size: Size(testWidth, testHeight)),
-          child: MaterialApp(
-            home: Scaffold(
+          child: testApp(
+            Scaffold(
               bottomNavigationBar: IconOnlyBottomNav(
                 currentIndex: 0,
                 onDestinationSelected: (_) {},
@@ -458,8 +460,8 @@ void main() {
       await tester.pumpWidget(
         MediaQuery(
           data: const MediaQueryData(size: Size(testWidth, testHeight)),
-          child: MaterialApp(
-            home: Builder(
+          child: testApp(
+            Builder(
               builder: (context) {
                 final columns = Breakpoints.getGridColumns(context);
                 return Scaffold(body: Center(child: Text('Columns: $columns')));
@@ -482,8 +484,8 @@ void main() {
       double? maxWidth;
 
       await tester.pumpWidget(
-        MaterialApp(
-          home: MediaQuery(
+        testApp(
+          MediaQuery(
             data: const MediaQueryData(size: Size(testWidth, testHeight)),
             child: Builder(
               builder: (context) {
@@ -510,8 +512,8 @@ void main() {
       await tester.pumpWidget(
         MediaQuery(
           data: const MediaQueryData(size: portraitSize),
-          child: MaterialApp(
-            home: Builder(
+          child: testApp(
+            Builder(
               builder: (context) {
                 final orientation = MediaQuery.of(context).orientation;
                 return Scaffold(
@@ -532,8 +534,8 @@ void main() {
       await tester.pumpWidget(
         MediaQuery(
           data: const MediaQueryData(size: portraitSize),
-          child: MaterialApp(
-            home: Builder(
+          child: testApp(
+            Builder(
               builder: (context) {
                 final orientation = MediaQuery.of(context).orientation;
                 return Scaffold(
@@ -556,8 +558,8 @@ void main() {
       await tester.pumpWidget(
         MediaQuery(
           data: const MediaQueryData(size: portraitSize),
-          child: MaterialApp(
-            home: Scaffold(
+          child: testApp(
+            Scaffold(
               appBar: AppBar(title: const Text('App')),
               body: ListView.builder(
                 itemCount: 10,

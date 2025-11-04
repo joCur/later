@@ -6,6 +6,8 @@ import 'package:later_mobile/core/responsive/responsive_layout.dart';
 import 'package:later_mobile/widgets/navigation/app_sidebar.dart';
 import 'package:later_mobile/widgets/navigation/icon_only_bottom_nav.dart';
 
+import "../test_helpers.dart";
+
 /// Responsive Behavior Test Suite: Desktop Layout (1024px+)
 ///
 /// Tests that desktop layouts render correctly across different screen sizes:
@@ -40,8 +42,8 @@ void main() {
       bool? isDesktop;
 
       await tester.pumpWidget(
-        MaterialApp(
-          home: MediaQuery(
+        testApp(
+          MediaQuery(
             data: const MediaQueryData(size: Size(testWidth, testHeight)),
             child: Builder(
               builder: (context) {
@@ -68,8 +70,8 @@ void main() {
       int? columns;
 
       await tester.pumpWidget(
-        MaterialApp(
-          home: MediaQuery(
+        testApp(
+          MediaQuery(
             data: const MediaQueryData(size: Size(testWidth, testHeight)),
             child: Builder(
               builder: (context) {
@@ -94,8 +96,8 @@ void main() {
       double? maxWidth;
 
       await tester.pumpWidget(
-        MaterialApp(
-          home: MediaQuery(
+        testApp(
+          MediaQuery(
             data: const MediaQueryData(size: Size(testWidth, testHeight)),
             child: Builder(
               builder: (context) {
@@ -118,8 +120,8 @@ void main() {
       await tester.pumpWidget(
         MediaQuery(
           data: const MediaQueryData(size: Size(testWidth, testHeight)),
-          child: MaterialApp(
-            home: Scaffold(
+          child: testApp(
+            Scaffold(
               body: Row(
                 children: [
                   AppSidebar(onToggleExpanded: () {}),
@@ -144,8 +146,8 @@ void main() {
       await tester.pumpWidget(
         MediaQuery(
           data: const MediaQueryData(size: Size(testWidth, testHeight)),
-          child: MaterialApp(
-            home: Scaffold(
+          child: testApp(
+            Scaffold(
               body: Row(
                 children: [
                   AppSidebar(onToggleExpanded: () {}),
@@ -172,8 +174,8 @@ void main() {
       await tester.pumpWidget(
         MediaQuery(
           data: const MediaQueryData(size: Size(testWidth, testHeight)),
-          child: MaterialApp(
-            home: Scaffold(
+          child: testApp(
+            Scaffold(
               body: Row(
                 children: [
                   AppSidebar(isExpanded: false, onToggleExpanded: () {}),
@@ -202,8 +204,8 @@ void main() {
       await tester.pumpWidget(
         MediaQuery(
           data: const MediaQueryData(size: Size(testWidth, testHeight)),
-          child: MaterialApp(
-            home: Builder(
+          child: testApp(
+            Builder(
               builder: (context) {
                 return Scaffold(
                   body: const Center(child: Text('Content')),
@@ -235,8 +237,8 @@ void main() {
       await tester.pumpWidget(
         MediaQuery(
           data: const MediaQueryData(size: Size(testWidth, testHeight)),
-          child: MaterialApp(
-            home: Scaffold(
+          child: testApp(
+            Scaffold(
               body: Row(
                 children: [
                   AppSidebar(onToggleExpanded: () {}),
@@ -272,8 +274,8 @@ void main() {
       await tester.pumpWidget(
         MediaQuery(
           data: const MediaQueryData(size: Size(testWidth, testHeight)),
-          child: MaterialApp(
-            home: Scaffold(
+          child: testApp(
+            Scaffold(
               body: Row(
                 children: [
                   AppSidebar(isExpanded: false, onToggleExpanded: () {}),
@@ -309,8 +311,8 @@ void main() {
       await tester.pumpWidget(
         MediaQuery(
           data: const MediaQueryData(size: Size(testWidth, testHeight)),
-          child: MaterialApp(
-            home: Scaffold(
+          child: testApp(
+            Scaffold(
               body: Builder(
                 builder: (context) {
                   return Center(
@@ -363,8 +365,8 @@ void main() {
       bool? isDesktopLarge;
 
       await tester.pumpWidget(
-        MaterialApp(
-          home: MediaQuery(
+        testApp(
+          MediaQuery(
             data: const MediaQueryData(size: Size(testWidth, testHeight)),
             child: Builder(
               builder: (context) {
@@ -387,8 +389,8 @@ void main() {
       int? columns;
 
       await tester.pumpWidget(
-        MaterialApp(
-          home: MediaQuery(
+        testApp(
+          MediaQuery(
             data: const MediaQueryData(size: Size(testWidth, testHeight)),
             child: Builder(
               builder: (context) {
@@ -413,8 +415,8 @@ void main() {
       double? maxWidth;
 
       await tester.pumpWidget(
-        MaterialApp(
-          home: MediaQuery(
+        testApp(
+          MediaQuery(
             data: const MediaQueryData(size: Size(testWidth, testHeight)),
             child: Builder(
               builder: (context) {
@@ -439,8 +441,8 @@ void main() {
       ScreenSize? screenSize;
 
       await tester.pumpWidget(
-        MaterialApp(
-          home: MediaQuery(
+        testApp(
+          MediaQuery(
             data: const MediaQueryData(size: Size(testWidth, testHeight)),
             child: Builder(
               builder: (context) {
@@ -459,10 +461,10 @@ void main() {
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(
-        const MediaQuery(
-          data: MediaQueryData(size: Size(testWidth, testHeight)),
-          child: MaterialApp(
-            home: Scaffold(
+        MediaQuery(
+          data: const MediaQueryData(size: Size(testWidth, testHeight)),
+          child: testApp(
+            const Scaffold(
               body: ResponsiveLayout(
                 mobile: Text('Mobile'),
                 tablet: Text('Tablet'),
@@ -486,8 +488,8 @@ void main() {
       await tester.pumpWidget(
         MediaQuery(
           data: const MediaQueryData(size: Size(testWidth, testHeight)),
-          child: MaterialApp(
-            home: Scaffold(
+          child: testApp(
+            Scaffold(
               body: Row(
                 children: [
                   AppSidebar(onToggleExpanded: () {}),
@@ -516,8 +518,8 @@ void main() {
       bool? isDesktopLarge;
 
       await tester.pumpWidget(
-        MaterialApp(
-          home: MediaQuery(
+        testApp(
+          MediaQuery(
             data: const MediaQueryData(size: Size(testWidth, testHeight)),
             child: Builder(
               builder: (context) {
@@ -536,8 +538,8 @@ void main() {
       int? columns;
 
       await tester.pumpWidget(
-        MaterialApp(
-          home: MediaQuery(
+        testApp(
+          MediaQuery(
             data: const MediaQueryData(size: Size(testWidth, testHeight)),
             child: Builder(
               builder: (context) {
@@ -558,8 +560,8 @@ void main() {
       await tester.pumpWidget(
         MediaQuery(
           data: const MediaQueryData(size: Size(testWidth, testHeight)),
-          child: MaterialApp(
-            home: Scaffold(
+          child: testApp(
+            Scaffold(
               body: Center(
                 child: ConstrainedBox(
                   constraints: const BoxConstraints(maxWidth: 1200.0),
@@ -594,8 +596,8 @@ void main() {
       await tester.pumpWidget(
         MediaQuery(
           data: const MediaQueryData(size: Size(testWidth, testHeight)),
-          child: MaterialApp(
-            home: Scaffold(
+          child: testApp(
+            Scaffold(
               body: Row(
                 children: [
                   AppSidebar(onToggleExpanded: () {}),
@@ -630,8 +632,8 @@ void main() {
       await tester.pumpWidget(
         MediaQuery(
           data: const MediaQueryData(size: Size(1280.0, 720.0)),
-          child: MaterialApp(
-            home: Scaffold(
+          child: testApp(
+            Scaffold(
               body: Focus(
                 autofocus: true,
                 onKeyEvent: (node, event) {
@@ -666,8 +668,8 @@ void main() {
       await tester.pumpWidget(
         MediaQuery(
           data: const MediaQueryData(size: Size(1280.0, 720.0)),
-          child: MaterialApp(
-            home: Scaffold(
+          child: testApp(
+            Scaffold(
               body: Center(
                 child: ElevatedButton(
                   onPressed: () {},
