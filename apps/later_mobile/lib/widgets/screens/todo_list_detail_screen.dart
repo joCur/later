@@ -555,7 +555,7 @@ class _TodoListDetailScreenState extends State<TodoListDetailScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    '${_currentTodoList.completedItems}/${_currentTodoList.totalItems} completed',
+                    '${_currentTodoList.completedItemCount}/${_currentTodoList.totalItemCount} completed',
                     style: AppTypography.bodyMedium.copyWith(
                       color: Colors.white,
                       fontWeight: FontWeight.w600,

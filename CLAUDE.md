@@ -4,9 +4,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**Later** is a flexible, offline-first task and note organizer built with Flutter. It combines tasks (TodoLists), notes, and custom lists into "Spaces" without forcing users into rigid organizational structures. The app works 100% offline, with planned cloud sync via Supabase (Phase 2).
+**Later** is a flexible task and note organizer built with Flutter. It combines tasks (TodoLists), notes, and custom lists into "Spaces" without forcing users into rigid organizational structures. The app uses Supabase for cloud storage with authentication.
 
-**Current Status**: Phase 1 (Foundation & Local-First Core) is complete. Phase 2 (Supabase backend & sync) is planned but not yet implemented.
+**Current Status**: Supabase migration complete. The app requires authentication and stores all data in the cloud via Supabase.
 
 ## Repository Structure
 
@@ -44,9 +44,11 @@ flutter test                    # Run all tests
 flutter test test/path/to/file_test.dart  # Run single test file
 flutter test --coverage         # Generate coverage report
 
-# Code generation (for Hive adapters)
-dart run build_runner build
-dart run build_runner watch     # Watch mode for development
+# Supabase local development
+supabase start                  # Start local Supabase dev server
+supabase stop                   # Stop local dev server
+supabase status                 # Check running services and credentials
+supabase db reset               # Reset database and apply migrations
 
 # Code analysis and formatting
 flutter analyze                 # Check for issues
@@ -58,23 +60,33 @@ dart fix --apply                # Apply automated fixes
 
 ### Data Architecture
 
-**Local-First with Hive:**
-- **Hive** is used for local NoSQL storage (no SQLite)
-- All data models use Hive type adapters (generated with `build_runner`)
-- Type IDs: Space (2), Item/Note (1), TodoList (20), TodoItem (21), ListModel (22), ListItem (23)
-- Boxes: `notes`, `todo_lists`, `lists`, `spaces`
+**Supabase Cloud Storage:**
+- **Supabase** (PostgreSQL) is used for cloud storage with authentication
+- All data is stored in PostgreSQL tables with Row-Level Security (RLS) policies
+- Tables: `spaces`, `notes`, `todo_lists`, `todo_items`, `lists`, `list_items`
+- Authentication: Email/password via Supabase Auth
+- Local development uses Supabase CLI with Docker-based local PostgreSQL
 
 **Repository Pattern:**
 - All data access goes through repositories (`data/repositories/`)
-- Repositories abstract Hive operations from UI layer
+- Repositories extend `BaseRepository` which provides Supabase client access
+- Repositories handle async operations with proper error handling
 - Key repositories: `NoteRepository`, `TodoListRepository`, `ListRepository`, `SpaceRepository`
+
+**Authentication:**
+- `AuthService` (`data/services/auth_service.dart`) - Handles Supabase Auth operations
+- `AuthProvider` - State management for authentication state
+- `AuthGate` widget - Routes between auth screens and main app based on auth state
+- All repositories automatically filter data by `user_id` from current auth session
 
 **State Management:**
 - **Provider** for state management (not Riverpod, not Bloc)
 - Main providers:
-  - `ContentProvider` - manages all content items (notes, todos, lists)
+  - `AuthProvider` - manages authentication state and auth operations
+  - `ContentProvider` - manages all content items (notes, todos, lists) with caching
   - `SpacesProvider` - manages spaces and active space selection
   - `ThemeProvider` - manages light/dark theme
+- Providers handle loading states, error states, and async operations
 
 ### Design System
 
@@ -97,26 +109,31 @@ import 'package:later_mobile/design_system/design_system.dart';
 
 ### Core Models
 
-**Item** (Note):
-- `id`, `title`, `content`, `tags`, `spaceId`, `isFavorite`, `isArchived`
-- Hive typeId: 1
+**Note** (formerly Item):
+- `id`, `title`, `content`, `tags`, `spaceId`, `userId`, `isFavorite`, `isArchived`
+- Stored in `notes` table
 - Used for freeform notes
+- Uses JSON serialization with snake_case field names
 
 **TodoList**:
-- `id`, `name`, `description`, `spaceId`, `color`, `icon`, `items` (List<TodoItem>)
-- Hive typeId: 20
-- Contains TodoItems with completion tracking, due dates, priorities
+- `id`, `name`, `description`, `spaceId`, `userId`, `color`, `icon`, `totalItemCount`, `completedItemCount`
+- Stored in `todo_lists` table
+- TodoItems are stored separately in `todo_items` table with `todoListId` foreign key
+- Count fields are aggregate values calculated by repository from child items
+- Items fetched separately on-demand (not embedded in TodoList model)
 
 **ListModel**:
-- `id`, `name`, `description`, `spaceId`, `style` (enum: simple, checklist, numbered, bullet)
-- Hive typeId: 22
-- Flexible lists with different visual styles
+- `id`, `name`, `description`, `spaceId`, `userId`, `style` (enum: simple, checklist, numbered, bullet), `totalItemCount`, `checkedItemCount`
+- Stored in `lists` table
+- ListItems are stored separately in `list_items` table with `listId` foreign key
+- Count fields are aggregate values calculated by repository from child items
+- Items fetched separately on-demand (not embedded in ListModel)
 
 **Space**:
-- `id`, `name`, `icon`, `color`, `isArchived`
-- Hive typeId: 2
+- `id`, `name`, `icon`, `color`, `userId`, `isArchived`
+- Stored in `spaces` table
 - Top-level organizational container
-- Note: Item counts are calculated dynamically, not stored (see Item Count Calculation below)
+- Note: Item counts are calculated dynamically by querying related tables
 
 ### Auto-Save Pattern
 
@@ -126,35 +143,34 @@ The app uses `AutoSaveMixin` (in `lib/core/mixins/auto_save_mixin.dart`) for aut
 class MyScreen extends StatefulWidget with AutoSaveMixin {
   @override
   void scheduleSave(VoidCallback callback) {
-    // Debounces saves to reduce Hive writes
+    // Debounces saves to reduce database writes
   }
 }
 ```
 
-Recently applied to note and list detail screens. When adding similar edit screens, use this mixin.
+Recently applied to note and list detail screens. When adding similar edit screens, use this mixin to reduce unnecessary database operations.
 
-### Item Count Calculation
+### Item Count Calculation and Caching
 
-**Calculated Counts (Not Stored):**
-- Space item counts are **calculated dynamically** from the database, not stored
-- Uses `SpaceItemCountService.calculateItemCount(spaceId)` to query all content boxes
-- Single source of truth: actual items in Hive boxes (`notes`, `todo_lists`, `lists`)
-- Eliminates desynchronization bugs - impossible for counts to be inaccurate
+**Nested Item Loading:**
+- TodoList and ListModel have aggregate count fields (`totalItemCount`, `completedItemCount`, etc.)
+- Child items (TodoItem, ListItem) are stored in separate tables with foreign keys
+- Items are fetched on-demand when detail screens open, not loaded with parent lists
+- Enables efficient list views (home screen shows counts only, no expensive item queries)
 
-**How to Get Item Counts:**
-- Repository: `SpaceRepository.getItemCount(spaceId)` - returns `Future<int>`
+**Provider Caching:**
+- `ContentProvider` maintains in-memory caches for nested items:
+  - `Map<String, List<TodoItem>> _todoItemsCache` - keyed by todoListId
+  - `Map<String, List<ListItem>> _listItemsCache` - keyed by listId
+- Cache is populated on first load via `loadTodoItemsForList()` / `loadListItemsForList()`
+- Cache is invalidated when items are created/updated/deleted/reordered
+- Reduces unnecessary database queries for frequently accessed lists
+
+**Space Item Counts:**
+- Space item counts are **calculated dynamically** by querying related tables
+- Uses `SpaceRepository.getItemCount(spaceId)` - returns `Future<int>`
 - Provider: `SpacesProvider.getSpaceItemCount(spaceId)` - returns `Future<int>` with retry logic
-- UI: Use `FutureBuilder` or pre-fetch counts on widget initialization (see `SpaceSwitcherModal` or `AppSidebar` for examples)
-
-**Performance:**
-- Query overhead is minimal (O(n) where n = items in all spaces)
-- UI components pre-fetch and cache counts to prevent flicker
-- Typical performance: <100ms for 10 spaces with 100 items each
-
-**Migration:**
-- Old Space model had stored `itemCount` field (removed in v2)
-- Migration runs automatically on first app launch after upgrade
-- Hive automatically drops unknown fields when deserializing with new adapter
+- UI: Use `FutureBuilder` or pre-fetch counts on widget initialization
 
 ## Code Quality Standards
 
@@ -178,20 +194,22 @@ The project uses strict linting rules (see `analysis_options.yaml`):
 - Test structure mirrors `lib/` directory
 - Unit tests for models, repositories, providers
 - Widget tests for UI components
-- Mock Hive operations in tests (see `test/data/` for examples)
-- Use `mockito` for mocking dependencies
+- Mock Supabase operations in tests using `mockito`
+- Use Supabase local development server for integration tests
+- Note: Test suite is currently undergoing migration from Hive to Supabase
 
 ## Common Development Patterns
 
 ### Adding a New Content Type
 
-1. Create model in `lib/data/models/` with Hive annotations
-2. Add type adapter registration in `HiveDatabase.initialize()`
-3. Create repository in `lib/data/repositories/`
-4. Add to `ContentProvider` if needed
+1. Create database migration in `supabase/migrations/` with table schema
+2. Create model in `lib/data/models/` with JSON serialization (`fromJson`, `toJson`)
+3. Create repository in `lib/data/repositories/` extending `BaseRepository`
+4. Add to `ContentProvider` if needed with proper caching
 5. Create card component in `design_system/molecules/`
 6. Add detail screen in `widgets/screens/`
 7. Update QuickCapture modal for type detection
+8. Add RLS policies to secure data access by user_id
 
 ### Creating Reusable Components
 
@@ -224,19 +242,21 @@ See `WIDGET_PATTERN_ANALYSIS.md` for identified code duplication patterns. Befor
 - Private classes can share file with public class
 - Barrel files (`.dart` exports) at directory level
 
-### Hive Type IDs
+### Database Schema
 
-**Reserved Type IDs:**
-- 1: Item (Note)
-- 2: Space
-- 20: TodoList
-- 21: TodoItem
-- 22: ListModel
-- 23: ListItem
-- 24: ListStyle (enum)
-- 25: TodoPriority (enum)
+**PostgreSQL Tables:**
+- `spaces` - Top-level organizational containers
+- `notes` - Freeform note items
+- `todo_lists` - Todo list containers
+- `todo_items` - Individual todo items (FK: todo_list_id)
+- `lists` - Custom list containers
+- `list_items` - Individual list items (FK: list_id)
 
-When adding new models, use IDs starting from 30+.
+**Row-Level Security (RLS):**
+- All tables have RLS enabled
+- Policies enforce user_id-based access control
+- Users can only access their own data
+- Foreign key relationships maintain referential integrity
 
 ## Design System Guidelines
 
@@ -340,16 +360,29 @@ All components must meet **WCAG 2.1 AA** standards:
 - Debounce text input with `AutoSaveMixin`
 - Avoid rebuilding entire widget trees unnecessarily
 
-## Migration Path (Phase 2 - Not Yet Implemented)
+## Local Development Setup
 
-Phase 2 will add Supabase backend for cloud sync. When implementing:
-- Supabase CLI for local development and migrations
-- Remote repositories will sit alongside local repositories
-- Sync engine with conflict resolution (last-write-wins initially)
-- Row-Level Security (RLS) policies for multi-tenant isolation
-- Migration service to move local data to cloud on first sign-in
+**Prerequisites:**
+- Supabase CLI installed (`brew install supabase/tap/supabase`)
+- Docker running (required by Supabase CLI)
 
-**Do not implement Phase 2 features without explicit instruction.**
+**Starting Local Development:**
+```bash
+cd /path/to/later
+supabase start          # Start local PostgreSQL + Auth services
+cd apps/later_mobile
+flutter run             # Run the app
+```
+
+**Accessing Services:**
+- Supabase Studio (DB management): http://localhost:54323
+- Local API URL: http://127.0.0.1:54321
+- Email confirmation is disabled in local dev for easier testing
+
+**Database Migrations:**
+- Migrations are in `supabase/migrations/`
+- Apply migrations: `supabase db reset`
+- Create new migration: `supabase migration new migration_name`
 
 ## Documentation References
 

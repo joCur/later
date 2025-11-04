@@ -632,7 +632,7 @@ class _ListDetailScreenState extends State<ListDetailScreen>
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      '${_currentList.checkedItems}/${_currentList.totalItems} completed',
+                      '${_currentList.checkedItemCount}/${_currentList.totalItemCount} completed',
                       style: AppTypography.bodyMedium.copyWith(
                         color: Colors.white,
                         fontWeight: FontWeight.w600,

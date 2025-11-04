@@ -168,7 +168,7 @@ class _ListCardState extends State<ListCard> with TickerProviderStateMixin {
   /// Returns "1 item" for single item, "N items" for multiple items
   /// Examples: "1 item", "5 items", "0 items"
   Widget _buildItemCount(BuildContext context) {
-    final count = widget.list.totalItems;
+    final count = widget.list.totalItemCount;
     final text = count == 1 ? '1 item' : '$count items';
 
     return Text(
@@ -182,9 +182,9 @@ class _ListCardState extends State<ListCard> with TickerProviderStateMixin {
   /// Build preview showing item count (items are loaded separately)
   ///
   /// Shows a simple text preview indicating the number of items
-  /// Examples: "No items", "5 items"
+  /// Examples: "No items yet", "5 items"
   Widget _buildItemPreview(BuildContext context) {
-    final count = widget.list.totalItems;
+    final count = widget.list.totalItemCount;
     final preview = count == 0 ? 'No items yet' : '$count item${count == 1 ? '' : 's'}';
 
     return Text(
@@ -254,7 +254,7 @@ class _ListCardState extends State<ListCard> with TickerProviderStateMixin {
     // Build the semantic label
     final semanticLabel =
         'List: ${widget.list.name}, '
-        '${widget.list.totalItems} ${widget.list.totalItems == 1 ? 'item' : 'items'}';
+        '${widget.list.totalItemCount} ${widget.list.totalItemCount == 1 ? 'item' : 'items'}';
 
     // Build the card widget with mobile-first bold design
     // Phase 5: Wrap with AnimatedBuilder for press scale animation

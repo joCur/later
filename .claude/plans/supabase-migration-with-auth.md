@@ -365,7 +365,7 @@ Migrate from Hive local-only storage to Supabase cloud database with proper auth
 
 ### Phase 7: Cleanup and Testing
 
-- [~] Task 7.1: Remove all Hive-related code (PARTIALLY COMPLETE)
+- [x] Task 7.1: Remove all Hive-related code (COMPLETE)
   - ✅ Deleted `lib/data/local/hive_database.dart`
   - ✅ Deleted `lib/data/local/seed_data.dart`
   - ✅ Deleted `lib/data/migrations/` directory (Hive-specific migrations)
@@ -373,17 +373,19 @@ Migrate from Hive local-only storage to Supabase cloud database with proper auth
   - ✅ Removed Hive initialization from `main.dart`
   - ✅ Deleted all `.g.dart` generated files
   - ✅ Ran `flutter clean` to remove build artifacts
-  - [ ] Remove `hive`, `hive_flutter`, `hive_generator` from `pubspec.yaml` (keep `build_runner` for potential future code generation)
-  - [ ] Update CLAUDE.md to remove Hive references and add Supabase documentation
+  - ✅ Removed `hive`, `hive_flutter`, `hive_generator` from `pubspec.yaml` (kept `build_runner` for potential future code generation)
+  - ✅ Updated CLAUDE.md to remove Hive references and add Supabase documentation
 
-- [ ] Task 7.2: Add sign-out functionality to UI
-  - Add "Sign Out" option to app settings or user profile menu
-  - Update `lib/widgets/organisms/app_sidebar.dart` or create settings screen
-  - Call `AuthProvider.signOut()` and navigate to SignInScreen
-  - Clear any cached data in providers after sign out
+- [x] Task 7.2: Add sign-out functionality to UI
+  - ✅ Added "Sign Out" button to `lib/widgets/navigation/app_sidebar.dart` footer
+  - ✅ Button appears in both expanded and collapsed sidebar states
+  - ✅ Calls `AuthProvider.signOut()` on tap
+  - ✅ Uses logout icon and proper theme colors
+  - Note: AuthGate automatically redirects to SignInScreen on auth state change, cached data cleared by providers
 
-- [ ] Task 7.3: Test authentication flows
-  - Manual testing:
+- [ ] Task 7.3: Test authentication flows (READY FOR MANUAL TESTING)
+  - App builds successfully and launches
+  - Next steps - manual testing checklist:
     - Sign up with new email/password → verify account creation in Supabase Studio
     - Sign in with existing credentials → verify HomeScreen loads
     - Sign out → verify redirect to SignInScreen and session cleared
@@ -393,7 +395,7 @@ Migrate from Hive local-only storage to Supabase cloud database with proper auth
     - Create data with User A → sign out → sign in as User B → verify User B cannot see User A's data
   - Note: Social sign-in testing deferred to post-MVP
 
-- [ ] Task 7.4: Test CRUD operations with Supabase
+- [ ] Task 7.4: Test CRUD operations with Supabase (READY FOR MANUAL TESTING)
   - Manual testing for each content type (Notes, TodoLists, Lists):
     - Create new item → verify appears in Supabase Dashboard
     - Update item → verify changes persist
@@ -408,13 +410,13 @@ Migrate from Hive local-only storage to Supabase cloud database with proper auth
     - Move items between Spaces → verify space_id updates
     - Delete Space → verify cascade deletes (needs FK constraint with ON DELETE CASCADE)
 
-- [ ] Task 7.5: Update test suite to work with Supabase (deferred)
+- [ ] Task 7.5: Update test suite to work with Supabase (DEFERRED)
   - Note: Comprehensive test updates are out of scope for MVP
-  - Disable or comment out existing Hive-dependent tests to prevent CI failures
-  - Document test strategy for future implementation:
+  - Test strategy for future implementation:
     - Use Supabase local development mode for integration tests
-    - Mock SupabaseClient for unit tests
+    - Mock SupabaseClient for unit tests using mockito
     - Use Flutter integration tests for E2E auth flows
+  - Disable or comment out existing Hive-dependent tests to prevent CI failures
   - Update `test/` directory README with new testing approach
 
 ### Phase 8: Documentation and Deployment
