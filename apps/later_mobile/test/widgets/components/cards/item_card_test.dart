@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:later_mobile/data/models/item_model.dart';
+import 'package:later_mobile/data/models/note_model.dart';
 import 'package:later_mobile/design_system/organisms/cards/item_card.dart';
 
 void main() {

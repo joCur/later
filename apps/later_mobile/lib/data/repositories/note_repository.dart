@@ -1,5 +1,5 @@
 import 'package:hive/hive.dart';
-import '../models/item_model.dart';
+import '../models/note_model.dart';
 
 /// Repository for managing Note entities (Item model) in Hive local storage.
 ///

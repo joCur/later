@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
-import 'package:later_mobile/data/models/item_model.dart';
+import 'package:later_mobile/data/models/note_model.dart';
 import 'package:later_mobile/data/repositories/note_repository.dart';
 
 void main() {

@@ -7,7 +7,7 @@ import 'package:later_mobile/design_system/atoms/buttons/secondary_button.dart';
 import 'package:later_mobile/design_system/atoms/buttons/ghost_button.dart';
 import 'package:later_mobile/design_system/atoms/inputs/text_input_field.dart';
 import 'package:later_mobile/design_system/organisms/cards/item_card.dart';
-import 'package:later_mobile/data/models/item_model.dart';
+import 'package:later_mobile/data/models/note_model.dart';
 import 'package:later_mobile/design_system/tokens/tokens.dart';
 
 /// Accessibility Test Suite: Focus Indicators & Keyboard Navigation

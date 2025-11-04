@@ -15,7 +15,7 @@ import '../../core/responsive/breakpoints.dart';
 import '../../core/theme/temporal_flow_theme.dart';
 import '../../core/utils/item_type_detector.dart';
 import '../../core/utils/responsive_modal.dart';
-import '../../data/models/item_model.dart';
+import '../../data/models/note_model.dart';
 import '../../data/models/list_model.dart';
 import '../../data/models/space_model.dart';
 import '../../data/models/todo_list_model.dart';

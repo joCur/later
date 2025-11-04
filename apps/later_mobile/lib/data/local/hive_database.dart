@@ -1,9 +1,10 @@
 import 'package:hive_flutter/hive_flutter.dart';
+
 import '../migrations/sort_order_migration.dart';
-import '../models/item_model.dart';
+import '../models/list_model.dart';
+import '../models/note_model.dart';
 import '../models/space_model.dart';
 import '../models/todo_list_model.dart';
-import '../models/list_model.dart';
 import 'preferences_service.dart';
 
 /// Wrapper for Hive database operations
@@ -61,7 +62,7 @@ class HiveDatabase {
       }
 
       // Open boxes
-      await Hive.openBox<Item>(notesBoxName);
+      await Hive.openBox<Note>(notesBoxName);
       await Hive.openBox<TodoList>(todoListsBoxName);
       await Hive.openBox<ListModel>(listsBoxName);
       await Hive.openBox<Space>(spacesBoxName);
@@ -122,7 +123,7 @@ class HiveDatabase {
   }
 
   /// Get the notes box (formerly items box)
-  Box<Item> get notesBox => Hive.box<Item>(notesBoxName);
+  Box<Note> get notesBox => Hive.box<Note>(notesBoxName);
 
   /// Get the todo lists box
   Box<TodoList> get todoListsBox => Hive.box<TodoList>(todoListsBoxName);

@@ -1,5 +1,5 @@
 import 'package:hive/hive.dart';
-import 'package:later_mobile/data/models/item_model.dart';
+import 'package:later_mobile/data/models/note_model.dart';
 import 'package:later_mobile/data/models/list_model.dart';
 import 'package:later_mobile/data/models/todo_list_model.dart';
 
@@ -36,7 +36,7 @@ class SpaceItemCountService {
 
       // Count notes
       if (Hive.isBoxOpen('notes')) {
-        final notesBox = Hive.box<Item>('notes');
+        final notesBox = Hive.box<Note>('notes');
         final notesCount =
             notesBox.values.where((item) => item.spaceId == spaceId).length;
         totalCount += notesCount;

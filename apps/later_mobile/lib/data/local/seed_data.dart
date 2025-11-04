@@ -1,5 +1,5 @@
 import 'package:uuid/uuid.dart';
-import '../models/item_model.dart';
+import '../models/note_model.dart';
 import '../models/space_model.dart';
 import '../repositories/note_repository.dart';
 import '../repositories/space_repository.dart';
@@ -119,7 +119,7 @@ class SeedData {
     );
 
     // Sample Item 2: Getting Started Note
-    final gettingStartedNote = Item(
+    final gettingStartedNote = Note(
       id: _uuid.v4(),
       title: 'Getting Started with Later',
       content:

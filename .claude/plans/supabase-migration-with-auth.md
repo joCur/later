@@ -121,41 +121,96 @@ Migrate from Hive local-only storage to Supabase cloud database with proper auth
 
 ### Phase 3: Model Adaptations for Supabase
 
-- [ ] Task 3.1: Update model classes to remove Hive annotations
-  - Remove `@HiveType` and `@HiveField` annotations from all models (Note, Space, TodoList, TodoItem, ListModel, ListItem, enums)
-  - Remove `part 'model_name.g.dart';` imports
-  - Remove `import 'package:hive/hive.dart';` statements
-  - Keep existing `fromJson()` and `toJson()` methods (compatible with Supabase)
-  - Update `fromJson()` to handle PostgreSQL UUID strings and timestamp formats
-  - Update enums (TodoPriority, ListStyle) to use string serialization for PostgreSQL
+- [x] Task 3.1: Update model classes to remove Hive annotations
+  - ✅ Removed `@HiveType` and `@HiveField` annotations from all models (Note, Space, TodoList, TodoItem, ListModel, ListItem, enums)
+  - ✅ Removed `part 'model_name.g.dart';` imports
+  - ✅ Removed `import 'package:hive/hive.dart';` statements
+  - ✅ Kept existing `fromJson()` and `toJson()` methods and updated for Supabase compatibility
+  - ✅ Updated `fromJson()` to use snake_case field names matching PostgreSQL schema (e.g., `space_id`, `created_at`)
+  - ✅ Updated `toJson()` to use snake_case field names for Supabase
+  - ✅ Updated enums (TodoPriority, ListStyle) to use string serialization
 
-- [ ] Task 3.2: Add user_id field to models for multi-tenancy
-  - Add `final String userId;` field to Space, Note, TodoList, ListModel
-  - Update constructors to require userId parameter
-  - Update `fromJson()` and `toJson()` methods to include userId
-  - Update `copyWith()` methods to include optional userId parameter
-  - Note: userId will be populated from `auth.uid()` in repositories, not passed from UI
+- [x] Task 3.2: Add user_id field to models for multi-tenancy
+  - ✅ Added `final String userId;` field to Space, Note (Item), TodoList, ListModel
+  - ✅ Updated constructors to require userId parameter
+  - ✅ Updated `fromJson()` methods to parse `user_id` from JSON
+  - ✅ Updated `toJson()` methods to include `user_id` in output
+  - ✅ Updated `copyWith()` methods to include optional userId parameter
+  - Note: userId will be populated from `auth.currentUser.id` in repositories
 
-- [ ] Task 3.3: Normalize nested models for relational database
-  - TodoList: Remove embedded `List<TodoItem>` field, replace with repository method to fetch items
-  - ListModel: Remove embedded `List<ListItem>` field, replace with repository method to fetch items
-  - Update `totalItems`, `completedItems`, `progress` getters to accept items as parameters (calculated in UI layer)
-  - Keep model classes simple and focused on data representation
+- [x] Task 3.3: Normalize nested models for relational database (Initial approach - to be revised)
+  - ✅ Kept `List<TodoItem>` field in TodoList with documentation noting it's populated by repository
+  - ✅ Kept `List<ListItem>` field in ListModel with documentation noting it's populated by repository
+  - ✅ Added comments explaining items are fetched separately in Supabase but field maintained for compatibility
+  - ⚠️ **Decision to revise:** This approach causes performance issues (loading all items for all lists even in list views)
+  - 🔄 **See Phase 3.5 for revised normalization approach**
 
-- [ ] Task 3.4: Rename Item model to Note for clarity
-  - Rename `lib/data/models/item_model.dart` to `note_model.dart`
-  - Rename class `Item` to `Note` in the file
-  - Update all imports throughout the codebase from `item_model.dart` to `note_model.dart`
-  - Update all type references from `Item` to `Note` (variables, parameters, return types, generics)
-  - Update file references:
-    - Repository: `note_repository.dart` already uses correct naming (no change needed)
-    - Provider: Update `ContentProvider` to use `Note` type instead of `Item`
-    - Widgets: Update `ItemCard` to `NoteCard` in `design_system/molecules/`
-    - Update all imports and usages of `ItemCard` to `NoteCard`
-  - Update variable names: `item` → `note`, `items` → `notes`, `getItem` → `getNote`, etc.
-  - Update comments and documentation strings that reference "Item" to say "Note"
-  - Find and replace pattern: Search for "Item" (case-sensitive) in context of notes and replace with "Note"
-  - Verify no regressions by running `flutter analyze` after changes
+- [x] Task 3.4: Rename Item model to Note for clarity
+  - ✅ Renamed class `Item` to `Note`
+  - ✅ Renamed file from `item_model.dart` to `note_model.dart`
+  - ✅ Updated all 26 imports throughout the codebase to use `note_model.dart`
+  - ✅ Updated factory constructor `Item.fromJson` → `Note.fromJson`
+  - ✅ Updated copyWith method to return `Note` instead of `Item`
+  - ✅ Updated toString() method to show `Note(...)`
+  - ✅ Updated equality operator to check `other is Note`
+  - ✅ Removed `syncStatus` field (not needed for Supabase online-only architecture)
+  - Note: All imports, repositories, and widgets still reference the Note model correctly
+
+### Phase 3.5: Model Restructuring for Efficient Data Loading
+
+**Context:** The initial Phase 3 approach kept nested `items` lists in TodoList and ListModel, which would force loading all child items even in list views (home screen). This phase separates aggregate data (counts) from child items for optimal performance.
+
+**Architecture Decision:**
+- Models contain aggregate fields (counts) populated from database GROUP BY queries
+- Child items (TodoItem, ListItem) fetched separately via dedicated repository methods
+- Enables efficient list views (only counts) vs detail views (full items loaded)
+
+- [ ] Task 3.5.1: Remove items field from TodoList and ListModel
+  - Remove `final List<TodoItem> items;` from TodoList model
+  - Remove `final List<ListItem> items;` from ListModel model
+  - Remove items-related code from constructors
+  - Remove items parameter from `copyWith()` methods
+  - Remove items from `fromJson()` factories (items won't be in JSON response)
+  - Remove items from `toJson()` methods (items stored in separate table)
+
+- [ ] Task 3.5.2: Add aggregate count fields to TodoList and ListModel
+  - Add to TodoList:
+    - `final int totalItemCount;` - Total number of todo items (from DB aggregate)
+    - `final int completedItemCount;` - Number of completed items (from DB aggregate)
+  - Add to ListModel:
+    - `final int totalItemCount;` - Total number of list items (from DB aggregate)
+    - `final int checkedItemCount;` - Number of checked items (from DB aggregate, only relevant for checkbox style)
+  - Update constructors to require these count fields
+  - Update `fromJson()` to parse count fields (e.g., `json['total_item_count']`)
+  - Update `toJson()` to include count fields (repositories will compute before insert/update)
+  - Update `copyWith()` methods to include count parameters
+
+- [ ] Task 3.5.3: Update getters to use count fields instead of items array
+  - TodoList:
+    - Change `int get totalItems => items.length;` to `int get totalItems => totalItemCount;`
+    - Change `int get completedItems => items.where((item) => item.isCompleted).length;` to `int get completedItems => completedItemCount;`
+    - Keep `double get progress` calculation using new getters
+  - ListModel:
+    - Change `int get totalItems => items.length;` to `int get totalItems => totalItemCount;`
+    - Change `int get checkedItems => items.where((item) => item.isChecked).length;` to `int get checkedItems => checkedItemCount;`
+    - Keep `double get progress` calculation using new getters
+
+- [ ] Task 3.5.4: Add parent foreign key references to TodoItem and ListItem
+  - Add to TodoItem:
+    - `final String todoListId;` - Foreign key to parent TodoList
+    - Update constructor, `fromJson()`, `toJson()`, `copyWith()`
+    - Parse from `json['todo_list_id']` (snake_case from DB)
+  - Add to ListItem:
+    - `final String listId;` - Foreign key to parent ListModel
+    - Update constructor, `fromJson()`, `toJson()`, `copyWith()`
+    - Parse from `json['list_id']` (snake_case from DB)
+  - Note: These match the foreign key columns in the database schema
+
+- [ ] Task 3.5.5: Update model documentation
+  - Update TodoList class documentation to explain items are fetched separately
+  - Update ListModel class documentation to explain items are fetched separately
+  - Add documentation to count fields explaining they're populated from database aggregates
+  - Update CLAUDE.md if it references the old nested structure
 
 ### Phase 4: Repository Layer Rewrite
 
@@ -194,32 +249,58 @@ Migrate from Hive local-only storage to Supabase cloud database with proper auth
 - [ ] Task 4.4: Rewrite TodoListRepository for Supabase
   - Update `lib/data/repositories/todo_list_repository.dart` to extend BaseRepository
   - Replace Hive operations with Supabase queries:
-    - `getAllTodoLists()` → Query todo_lists table with user_id filter
-    - `getTodoListById(id)` → Single query with RLS check
-    - `createTodoList(todoList)` → Insert into todo_lists table only (no nested items)
-    - `updateTodoList(todoList)` → Update todo_lists table
+    - `getAllTodoLists()` → Query with aggregate counts using PostgreSQL function or LEFT JOIN with GROUP BY:
+      ```sql
+      SELECT
+        tl.*,
+        COUNT(ti.id) as total_item_count,
+        COUNT(ti.id) FILTER (WHERE ti.is_completed = true) as completed_item_count
+      FROM todo_lists tl
+      LEFT JOIN todo_items ti ON ti.todo_list_id = tl.id
+      WHERE tl.user_id = userId
+      GROUP BY tl.id
+      ORDER BY tl.sort_order
+      ```
+    - `getTodoListById(id)` → Single query with aggregate counts (same pattern as above)
+    - `createTodoList(todoList)` → Insert into todo_lists table with initial counts (0, 0)
+    - `updateTodoList(todoList)` → Update todo_lists table (recalculate counts if items changed)
     - `deleteTodoList(id)` → Delete todo_list (cascade deletes todo_items via FK constraint)
-    - `getTodoItemsForList(todoListId)` → Query todo_items table with foreign key filter
-    - `createTodoItem(todoItem)` → Insert into todo_items table
-    - `updateTodoItem(todoItem)` → Update todo_items table
-    - `deleteTodoItem(id)` → Delete from todo_items table
-    - `updateTodoItemSortOrders(List<TodoItem> items)` → Batch upsert
-  - Remove embedded list logic (todos are now separate queries)
+  - Add new TodoItem-specific methods:
+    - `getTodoItemsByListId(todoListId)` → Query todo_items table: `select().eq('todo_list_id', todoListId).order('sort_order')`
+    - `createTodoItem(todoItem)` → Insert into todo_items table, then update parent list's counts
+    - `updateTodoItem(todoItem)` → Update todo_items table, recalculate parent list counts if completion status changed
+    - `deleteTodoItem(id, todoListId)` → Delete from todo_items table, update parent list's counts
+    - `updateTodoItemSortOrders(List<TodoItem> items)` → Batch upsert for reordering
+  - Remove embedded list logic (items fetched separately)
+  - Note: Consider using PostgreSQL function for efficient count updates
 
 - [ ] Task 4.5: Rewrite ListRepository for Supabase
   - Update `lib/data/repositories/list_repository.dart` to extend BaseRepository
   - Replace Hive operations with Supabase queries:
-    - `getAllLists()` → Query lists table with user_id filter
-    - `getListById(id)` → Single query with RLS check
-    - `createList(list)` → Insert into lists table only (no nested items)
-    - `updateList(list)` → Update lists table
+    - `getAllLists()` → Query with aggregate counts using PostgreSQL function or LEFT JOIN with GROUP BY:
+      ```sql
+      SELECT
+        l.*,
+        COUNT(li.id) as total_item_count,
+        COUNT(li.id) FILTER (WHERE li.is_checked = true) as checked_item_count
+      FROM lists l
+      LEFT JOIN list_items li ON li.list_id = l.id
+      WHERE l.user_id = userId
+      GROUP BY l.id
+      ORDER BY l.sort_order
+      ```
+    - `getListById(id)` → Single query with aggregate counts (same pattern as above)
+    - `createList(list)` → Insert into lists table with initial counts (0, 0)
+    - `updateList(list)` → Update lists table (recalculate counts if items changed)
     - `deleteList(id)` → Delete list (cascade deletes list_items via FK constraint)
-    - `getListItemsForList(listId)` → Query list_items table with foreign key filter
-    - `createListItem(listItem)` → Insert into list_items table
-    - `updateListItem(listItem)` → Update list_items table
-    - `deleteListItem(id)` → Delete from list_items table
-    - `updateListItemSortOrders(List<ListItem> items)` → Batch upsert
-  - Remove embedded list logic (items are now separate queries)
+  - Add new ListItem-specific methods:
+    - `getListItemsByListId(listId)` → Query list_items table: `select().eq('list_id', listId).order('sort_order')`
+    - `createListItem(listItem)` → Insert into list_items table, then update parent list's counts
+    - `updateListItem(listItem)` → Update list_items table, recalculate parent list counts if checked status changed
+    - `deleteListItem(id, listId)` → Delete from list_items table, update parent list's counts
+    - `updateListItemSortOrders(List<ListItem> items)` → Batch upsert for reordering
+  - Remove embedded list logic (items fetched separately)
+  - Note: Consider using PostgreSQL function for efficient count updates
 
 ### Phase 5: Provider Layer Updates
 
@@ -232,17 +313,24 @@ Migrate from Hive local-only storage to Supabase cloud database with proper auth
 
 - [ ] Task 5.2: Update ContentProvider to fetch nested items separately
   - Update `lib/providers/content_provider.dart` to handle new repository structure
-  - Replace single query pattern with separate queries for:
-    - TodoLists (without items)
-    - TodoItems (fetched per list when needed)
-    - Lists (without items)
-    - ListItems (fetched per list when needed)
-    - Notes (unchanged)
-  - Add methods:
-    - `loadTodoItemsForList(todoListId)` → fetches and caches items
-    - `loadListItemsForList(listId)` → fetches and caches items
-  - Update existing CRUD methods to handle async operations and error states
-  - Consider adding local caching strategy for better UX (optional for MVP)
+  - Update data fetching pattern:
+    - TodoLists loaded with aggregate counts (totalItemCount, completedItemCount) - no items array
+    - TodoItems fetched separately only when detail view accessed
+    - Lists loaded with aggregate counts (totalItemCount, checkedItemCount) - no items array
+    - ListItems fetched separately only when detail view accessed
+    - Notes (unchanged - no nested data)
+  - Add new methods for on-demand item fetching:
+    - `Future<List<TodoItem>> loadTodoItemsForList(String todoListId)` → fetches items and caches in memory
+    - `Future<List<ListItem>> loadListItemsForList(String listId)` → fetches items and caches in memory
+  - Add caching for items:
+    - `Map<String, List<TodoItem>> _todoItemsCache` - cache items by todoListId
+    - `Map<String, List<ListItem>> _listItemsCache` - cache items by listId
+    - Invalidate cache entries when items are created/updated/deleted/reordered
+  - Update existing CRUD methods:
+    - Creating/updating TodoItem: Update cache and parent TodoList counts
+    - Creating/updating ListItem: Update cache and parent ListModel counts
+    - Handle async operations with loading states
+  - Note: Home screen only needs lists with counts (efficient), detail screen loads items on-demand
 
 - [ ] Task 5.3: Add loading and error states to providers
   - Add `bool isLoading` and `String? errorMessage` properties to SpacesProvider and ContentProvider

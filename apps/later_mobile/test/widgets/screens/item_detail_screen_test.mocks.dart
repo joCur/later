@@ -6,7 +6,7 @@
 import 'dart:async' as _i4;
 import 'dart:ui' as _i5;
 
-import 'package:later_mobile/data/models/item_model.dart' as _i3;
+import 'package:later_mobile/data/models/note_model.dart' as _i3;
 import 'package:later_mobile/data/models/space_model.dart' as _i7;
 import 'package:later_mobile/providers/items_provider.dart' as _i2;
 import 'package:later_mobile/providers/spaces_provider.dart' as _i6;

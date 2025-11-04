@@ -1,24 +1,15 @@
-import 'package:hive/hive.dart';
-
-part 'list_model.g.dart';
-
 /// Enum representing the style of list display
-@HiveType(typeId: 24)
 enum ListStyle {
   /// Bulleted list style
-  @HiveField(0)
   bullets,
 
   /// Numbered list style
-  @HiveField(1)
   numbered,
 
   /// Checkbox list style for tasks
-  @HiveField(2)
   checkboxes,
 
   /// Simple list style (no prefix)
-  @HiveField(3)
   simple,
 }
 
@@ -37,7 +28,6 @@ extension ListStyleExtension on ListStyle {
 }
 
 /// ListItem model representing an individual item within a list
-@HiveType(typeId: 23)
 class ListItem {
   ListItem({
     required this.id,
@@ -47,35 +37,30 @@ class ListItem {
     required this.sortOrder,
   });
 
-  /// Create from JSON for serialization
+  /// Create from JSON for Supabase compatibility
   factory ListItem.fromJson(Map<String, dynamic> json) {
     return ListItem(
       id: json['id'] as String,
       title: json['title'] as String,
       notes: json['notes'] as String?,
-      isChecked: json['isChecked'] as bool? ?? false,
-      sortOrder: json['sortOrder'] as int,
+      isChecked: json['is_checked'] as bool? ?? false,
+      sortOrder: json['sort_order'] as int,
     );
   }
 
   /// Unique identifier for the list item
-  @HiveField(0)
   final String id;
 
   /// Title of the list item
-  @HiveField(1)
   final String title;
 
   /// Optional notes providing additional details
-  @HiveField(2)
   final String? notes;
 
   /// Whether the item is checked (only used when style is checkboxes)
-  @HiveField(3)
   final bool isChecked;
 
   /// Sort order for manual reordering of items
-  @HiveField(4)
   final int sortOrder;
 
   /// Create a copy of this list item with updated fields
@@ -98,14 +83,14 @@ class ListItem {
     );
   }
 
-  /// Convert to JSON for serialization
+  /// Convert to JSON for Supabase compatibility
   Map<String, dynamic> toJson() {
     return {
       'id': id,
       'title': title,
       'notes': notes,
-      'isChecked': isChecked,
-      'sortOrder': sortOrder,
+      'is_checked': isChecked,
+      'sort_order': sortOrder,
     };
   }
 
@@ -126,11 +111,11 @@ class ListItem {
 }
 
 /// ListModel representing a collection of list items with a specific style
-@HiveType(typeId: 22)
 class ListModel {
   ListModel({
     required this.id,
     required this.spaceId,
+    required this.userId,
     required this.name,
     this.icon,
     List<ListItem>? items,
@@ -142,11 +127,12 @@ class ListModel {
        createdAt = createdAt ?? DateTime.now(),
        updatedAt = updatedAt ?? DateTime.now();
 
-  /// Create from JSON for serialization
+  /// Create from JSON for Supabase compatibility
   factory ListModel.fromJson(Map<String, dynamic> json) {
     return ListModel(
       id: json['id'] as String,
-      spaceId: json['spaceId'] as String,
+      spaceId: json['space_id'] as String,
+      userId: json['user_id'] as String,
       name: json['name'] as String,
       icon: json['icon'] as String?,
       items:
@@ -155,47 +141,43 @@ class ListModel {
               .toList() ??
           [],
       style: ListStyleExtension.fromJson(json['style'] as String? ?? 'bullets'),
-      createdAt: DateTime.parse(json['createdAt'] as String),
-      updatedAt: DateTime.parse(json['updatedAt'] as String),
-      sortOrder: (json['sortOrder'] as int?) ?? 0,
+      createdAt: DateTime.parse(json['created_at'] as String),
+      updatedAt: DateTime.parse(json['updated_at'] as String),
+      sortOrder: (json['sort_order'] as int?) ?? 0,
     );
   }
 
   /// Unique identifier for the list
-  @HiveField(0)
   final String id;
 
   /// ID of the space this list belongs to
-  @HiveField(1)
   final String spaceId;
 
+  /// ID of the user who owns this list
+  final String userId;
+
   /// Name of the list
-  @HiveField(2)
   final String name;
 
   /// Optional custom icon name or emoji
-  @HiveField(3)
   final String? icon;
 
   /// Collection of list items
-  @HiveField(4)
+  /// Note: In Supabase, items are stored in a separate table and fetched via repository methods
+  /// This field is maintained for backward compatibility and will be populated by the repository
   final List<ListItem> items;
 
   /// Display style of the list
-  @HiveField(5)
   final ListStyle style;
 
   /// When the list was created
-  @HiveField(6)
   final DateTime createdAt;
 
   /// When the list was last updated
-  @HiveField(7)
   final DateTime updatedAt;
 
   /// Sort order within a space (space-scoped, not global)
   /// Used for user-defined ordering via drag-and-drop
-  @HiveField(8)
   final int sortOrder;
 
   /// Total number of items in the list
@@ -217,6 +199,7 @@ class ListModel {
   ListModel copyWith({
     String? id,
     String? spaceId,
+    String? userId,
     String? name,
     String? icon,
     bool clearIcon = false,
@@ -229,6 +212,7 @@ class ListModel {
     return ListModel(
       id: id ?? this.id,
       spaceId: spaceId ?? this.spaceId,
+      userId: userId ?? this.userId,
       name: name ?? this.name,
       icon: clearIcon ? null : (icon ?? this.icon),
       items: items ?? this.items,
@@ -239,18 +223,19 @@ class ListModel {
     );
   }
 
-  /// Convert to JSON for serialization
+  /// Convert to JSON for Supabase compatibility
   Map<String, dynamic> toJson() {
     return {
       'id': id,
-      'spaceId': spaceId,
+      'space_id': spaceId,
+      'user_id': userId,
       'name': name,
       'icon': icon,
       'items': items.map((item) => item.toJson()).toList(),
       'style': style.toJson(),
-      'createdAt': createdAt.toIso8601String(),
-      'updatedAt': updatedAt.toIso8601String(),
-      'sortOrder': sortOrder,
+      'created_at': createdAt.toIso8601String(),
+      'updated_at': updatedAt.toIso8601String(),
+      'sort_order': sortOrder,
     };
   }
 

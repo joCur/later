@@ -3,7 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:later_mobile/design_system/atoms/buttons/primary_button.dart';
 import 'package:later_mobile/design_system/molecules/fab/create_content_fab.dart';
 import 'package:later_mobile/design_system/organisms/cards/item_card.dart';
-import 'package:later_mobile/data/models/item_model.dart';
+import 'package:later_mobile/data/models/note_model.dart';
 
 /// Accessibility Test Suite: Screen Reader Support
 ///

@@ -1,20 +1,11 @@
-import 'package:hive/hive.dart';
-
-part 'todo_list_model.g.dart';
-
 /// Priority levels for todo items
-@HiveType(typeId: 25)
 enum TodoPriority {
-  @HiveField(0)
   low,
-  @HiveField(1)
   medium,
-  @HiveField(2)
   high,
 }
 
 /// TodoItem model representing an individual task within a todo list
-@HiveType(typeId: 21)
 class TodoItem {
   TodoItem({
     required this.id,
@@ -27,15 +18,15 @@ class TodoItem {
     required this.sortOrder,
   }) : tags = tags ?? [];
 
-  /// Create from JSON for serialization
+  /// Create from JSON for Supabase compatibility
   factory TodoItem.fromJson(Map<String, dynamic> json) {
     return TodoItem(
       id: json['id'] as String,
       title: json['title'] as String,
       description: json['description'] as String?,
-      isCompleted: json['isCompleted'] as bool? ?? false,
-      dueDate: json['dueDate'] != null
-          ? DateTime.parse(json['dueDate'] as String)
+      isCompleted: json['is_completed'] as bool? ?? false,
+      dueDate: json['due_date'] != null
+          ? DateTime.parse(json['due_date'] as String)
           : null,
       priority: json['priority'] != null
           ? TodoPriority.values.firstWhere(
@@ -44,40 +35,32 @@ class TodoItem {
             )
           : null,
       tags: (json['tags'] as List<dynamic>?)?.cast<String>() ?? [],
-      sortOrder: json['sortOrder'] as int,
+      sortOrder: json['sort_order'] as int,
     );
   }
 
   /// Unique identifier for the todo item
-  @HiveField(0)
   final String id;
 
   /// Title of the todo item
-  @HiveField(1)
   final String title;
 
   /// Optional description providing more details
-  @HiveField(2)
   final String? description;
 
   /// Whether the todo item is completed
-  @HiveField(3)
   final bool isCompleted;
 
   /// Optional due date for the todo item
-  @HiveField(4)
   final DateTime? dueDate;
 
   /// Optional priority level
-  @HiveField(5)
   final TodoPriority? priority;
 
   /// Tags associated with the todo item
-  @HiveField(6)
   final List<String> tags;
 
   /// Sort order for manual reordering of items
-  @HiveField(7)
   final int sortOrder;
 
   /// Create a copy of this todo item with updated fields
@@ -107,17 +90,17 @@ class TodoItem {
     );
   }
 
-  /// Convert to JSON for serialization
+  /// Convert to JSON for Supabase compatibility
   Map<String, dynamic> toJson() {
     return {
       'id': id,
       'title': title,
       'description': description,
-      'isCompleted': isCompleted,
-      'dueDate': dueDate?.toIso8601String(),
+      'is_completed': isCompleted,
+      'due_date': dueDate?.toIso8601String(),
       'priority': priority?.toString().split('.').last,
       'tags': tags,
-      'sortOrder': sortOrder,
+      'sort_order': sortOrder,
     };
   }
 
@@ -138,11 +121,11 @@ class TodoItem {
 }
 
 /// TodoList model representing a collection of todo items
-@HiveType(typeId: 20)
 class TodoList {
   TodoList({
     required this.id,
     required this.spaceId,
+    required this.userId,
     required this.name,
     this.description,
     List<TodoItem>? items,
@@ -153,11 +136,12 @@ class TodoList {
        createdAt = createdAt ?? DateTime.now(),
        updatedAt = updatedAt ?? DateTime.now();
 
-  /// Create from JSON for serialization
+  /// Create from JSON for Supabase compatibility
   factory TodoList.fromJson(Map<String, dynamic> json) {
     return TodoList(
       id: json['id'] as String,
-      spaceId: json['spaceId'] as String,
+      spaceId: json['space_id'] as String,
+      userId: json['user_id'] as String,
       name: json['name'] as String,
       description: json['description'] as String?,
       items:
@@ -165,43 +149,40 @@ class TodoList {
               ?.map((item) => TodoItem.fromJson(item as Map<String, dynamic>))
               .toList() ??
           [],
-      createdAt: DateTime.parse(json['createdAt'] as String),
-      updatedAt: DateTime.parse(json['updatedAt'] as String),
-      sortOrder: (json['sortOrder'] as int?) ?? 0,
+      createdAt: DateTime.parse(json['created_at'] as String),
+      updatedAt: DateTime.parse(json['updated_at'] as String),
+      sortOrder: (json['sort_order'] as int?) ?? 0,
     );
   }
 
   /// Unique identifier for the todo list
-  @HiveField(0)
   final String id;
 
   /// ID of the space this todo list belongs to
-  @HiveField(1)
   final String spaceId;
 
+  /// ID of the user who owns this todo list
+  final String userId;
+
   /// Name of the todo list
-  @HiveField(2)
   final String name;
 
   /// Optional description of the todo list
-  @HiveField(3)
   final String? description;
 
   /// Collection of todo items in this list
-  @HiveField(4)
+  /// Note: In Supabase, items are stored in a separate table and fetched via repository methods
+  /// This field is maintained for backward compatibility and will be populated by the repository
   final List<TodoItem> items;
 
   /// When the todo list was created
-  @HiveField(5)
   final DateTime createdAt;
 
   /// When the todo list was last updated
-  @HiveField(6)
   final DateTime updatedAt;
 
   /// Sort order within a space (space-scoped, not global)
   /// Used for user-defined ordering via drag-and-drop
-  @HiveField(7)
   final int sortOrder;
 
   /// Total number of items in the list
@@ -221,6 +202,7 @@ class TodoList {
   TodoList copyWith({
     String? id,
     String? spaceId,
+    String? userId,
     String? name,
     String? description,
     List<TodoItem>? items,
@@ -231,6 +213,7 @@ class TodoList {
     return TodoList(
       id: id ?? this.id,
       spaceId: spaceId ?? this.spaceId,
+      userId: userId ?? this.userId,
       name: name ?? this.name,
       description: description ?? this.description,
       items: items ?? this.items,
@@ -240,17 +223,18 @@ class TodoList {
     );
   }
 
-  /// Convert to JSON for serialization
+  /// Convert to JSON for Supabase compatibility
   Map<String, dynamic> toJson() {
     return {
       'id': id,
-      'spaceId': spaceId,
+      'space_id': spaceId,
+      'user_id': userId,
       'name': name,
       'description': description,
       'items': items.map((item) => item.toJson()).toList(),
-      'createdAt': createdAt.toIso8601String(),
-      'updatedAt': updatedAt.toIso8601String(),
-      'sortOrder': sortOrder,
+      'created_at': createdAt.toIso8601String(),
+      'updated_at': updatedAt.toIso8601String(),
+      'sort_order': sortOrder,
     };
   }
 

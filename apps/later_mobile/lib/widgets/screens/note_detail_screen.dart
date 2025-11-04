@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:later_mobile/design_system/tokens/tokens.dart';
-import '../../data/models/item_model.dart';
+import '../../data/models/note_model.dart';
 import '../../providers/content_provider.dart';
 import 'package:later_mobile/design_system/organisms/modals/bottom_sheet_container.dart';
 import '../../core/utils/responsive_modal.dart';

@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 import '../core/error/app_error.dart';
-import '../data/models/item_model.dart';
+import '../data/models/note_model.dart';
 import '../data/models/list_model.dart';
 import '../data/models/todo_list_model.dart';
 import '../data/repositories/list_repository.dart';
