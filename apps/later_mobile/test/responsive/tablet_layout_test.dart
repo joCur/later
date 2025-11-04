@@ -4,7 +4,6 @@ import 'package:later_mobile/core/responsive/breakpoints.dart';
 import 'package:later_mobile/core/responsive/responsive_layout.dart';
 import 'package:later_mobile/widgets/navigation/app_sidebar.dart';
 import 'package:later_mobile/widgets/navigation/icon_only_bottom_nav.dart';
-import 'package:hive/hive.dart';
 
 /// Responsive Behavior Test Suite: Tablet Layout (768px - 1023px)
 ///
@@ -26,15 +25,6 @@ import 'package:hive/hive.dart';
 /// - No overflow or layout issues
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
-
-  setUpAll(() async {
-    // Initialize Hive for testing
-    Hive.init('test/hive_testing_path_responsive_tablet');
-  });
-
-  tearDownAll(() async {
-    await Hive.close();
-  });
 
   group('Tablet Layout Tests - 768px (iPad Mini)', () {
     const testWidth = 768.0;

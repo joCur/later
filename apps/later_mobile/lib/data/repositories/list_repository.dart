@@ -8,7 +8,6 @@ import 'base_repository.dart';
 /// Uses Supabase 'lists' and 'list_items' tables with RLS policies.
 /// ListItems are stored separately and fetched on demand for efficiency.
 class ListRepository extends BaseRepository {
-
   /// Creates a new list in Supabase.
   ///
   /// Automatically calculates and assigns the next sortOrder value for the list
@@ -30,8 +29,8 @@ class ListRepository extends BaseRepository {
       final maxSortOrder = listsInSpace.isEmpty
           ? -1
           : listsInSpace
-              .map((l) => l.sortOrder)
-              .reduce((a, b) => a > b ? a : b);
+                .map((l) => l.sortOrder)
+                .reduce((a, b) => a > b ? a : b);
       final nextSortOrder = maxSortOrder + 1;
 
       // Create list with calculated sortOrder
@@ -50,10 +49,9 @@ class ListRepository extends BaseRepository {
           .single();
 
       // Calculate counts for the newly created list (will be 0)
-      return ListModel.fromJson(response).copyWith(
-        totalItemCount: 0,
-        checkedItemCount: 0,
-      );
+      return ListModel.fromJson(
+        response,
+      ).copyWith(totalItemCount: 0, checkedItemCount: 0);
     });
   }
 
@@ -172,11 +170,7 @@ class ListRepository extends BaseRepository {
   ///   - [id]: The ID of the list to delete
   Future<void> delete(String id) async {
     return executeQuery(() async {
-      await supabase
-          .from('lists')
-          .delete()
-          .eq('id', id)
-          .eq('user_id', userId);
+      await supabase.from('lists').delete().eq('id', id).eq('user_id', userId);
     });
   }
 
@@ -222,8 +216,8 @@ class ListRepository extends BaseRepository {
       final maxSortOrder = itemsInList.isEmpty
           ? -1
           : itemsInList
-              .map((item) => item.sortOrder)
-              .reduce((a, b) => a > b ? a : b);
+                .map((item) => item.sortOrder)
+                .reduce((a, b) => a > b ? a : b);
       final nextSortOrder = maxSortOrder + 1;
 
       // Create item with calculated sortOrder

@@ -74,16 +74,16 @@ class SpaceRepository extends BaseRepository {
     return executeQuery(() async {
       final response = includeArchived
           ? await supabase
-              .from('spaces')
-              .select()
-              .eq('user_id', userId)
-              .order('created_at', ascending: true)
+                .from('spaces')
+                .select()
+                .eq('user_id', userId)
+                .order('created_at', ascending: true)
           : await supabase
-              .from('spaces')
-              .select()
-              .eq('user_id', userId)
-              .eq('is_archived', false)
-              .order('created_at', ascending: true);
+                .from('spaces')
+                .select()
+                .eq('user_id', userId)
+                .eq('is_archived', false)
+                .order('created_at', ascending: true);
 
       return (response as List)
           .map((json) => Space.fromJson(json as Map<String, dynamic>))
@@ -184,11 +184,7 @@ class SpaceRepository extends BaseRepository {
   /// ```
   Future<void> deleteSpace(String id) async {
     return executeQuery(() async {
-      await supabase
-          .from('spaces')
-          .delete()
-          .eq('id', id)
-          .eq('user_id', userId);
+      await supabase.from('spaces').delete().eq('id', id).eq('user_id', userId);
     });
   }
 

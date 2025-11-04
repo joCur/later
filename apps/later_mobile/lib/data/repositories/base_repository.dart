@@ -4,10 +4,15 @@ import '../../core/config/supabase_config.dart';
 /// Base repository providing common functionality for Supabase repositories
 ///
 /// All repositories should extend this class to inherit:
-/// - Supabase client access
+/// - Supabase client access via singleton
 /// - User ID retrieval from authenticated session
 /// - Error handling utilities
 /// - Query execution with consistent error handling
+///
+/// Usage:
+/// ```dart
+/// final repo = SpaceRepository();
+/// ```
 abstract class BaseRepository {
   /// Get the Supabase client singleton
   SupabaseClient get supabase => SupabaseConfig.client;
@@ -15,7 +20,6 @@ abstract class BaseRepository {
   /// Get the current authenticated user's ID
   ///
   /// Throws an exception if no user is authenticated.
-  /// All repositories requiring user context should use this getter.
   ///
   /// Example:
   /// ```dart

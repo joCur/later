@@ -3,7 +3,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:later_mobile/core/responsive/breakpoints.dart';
 import 'package:later_mobile/widgets/navigation/app_sidebar.dart';
 import 'package:later_mobile/widgets/navigation/icon_only_bottom_nav.dart';
-import 'package:hive/hive.dart';
 
 /// Responsive Behavior Test Suite: Orientation Tests
 ///
@@ -26,15 +25,6 @@ import 'package:hive/hive.dart';
 /// - Correct breakpoint detection in both orientations
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
-
-  setUpAll(() async {
-    // Initialize Hive for testing
-    Hive.init('test/hive_testing_path_responsive_orientation');
-  });
-
-  tearDownAll(() async {
-    await Hive.close();
-  });
 
   group('Mobile Portrait to Landscape Tests', () {
     testWidgets('iPhone 12 portrait orientation (375x812)', (

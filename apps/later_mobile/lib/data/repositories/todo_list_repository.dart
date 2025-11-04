@@ -31,8 +31,8 @@ class TodoListRepository extends BaseRepository {
       final maxSortOrder = todoListsInSpace.isEmpty
           ? -1
           : todoListsInSpace
-              .map((t) => t.sortOrder)
-              .reduce((a, b) => a > b ? a : b);
+                .map((t) => t.sortOrder)
+                .reduce((a, b) => a > b ? a : b);
       final nextSortOrder = maxSortOrder + 1;
 
       // Create todo list with calculated sortOrder
@@ -51,10 +51,9 @@ class TodoListRepository extends BaseRepository {
           .single();
 
       // Calculate counts for the newly created todo list (will be 0)
-      return TodoList.fromJson(response).copyWith(
-        totalItemCount: 0,
-        completedItemCount: 0,
-      );
+      return TodoList.fromJson(
+        response,
+      ).copyWith(totalItemCount: 0, completedItemCount: 0);
     });
   }
 
@@ -124,8 +123,7 @@ class TodoListRepository extends BaseRepository {
         todoLists.map((todoList) async {
           final items = await getTodoItemsByListId(todoList.id);
           final totalCount = items.length;
-          final completedCount =
-              items.where((item) => item.isCompleted).length;
+          final completedCount = items.where((item) => item.isCompleted).length;
 
           return todoList.copyWith(
             totalItemCount: totalCount,
@@ -228,8 +226,8 @@ class TodoListRepository extends BaseRepository {
       final maxSortOrder = itemsInList.isEmpty
           ? -1
           : itemsInList
-              .map((item) => item.sortOrder)
-              .reduce((a, b) => a > b ? a : b);
+                .map((item) => item.sortOrder)
+                .reduce((a, b) => a > b ? a : b);
       final nextSortOrder = maxSortOrder + 1;
 
       // Create item with calculated sortOrder

@@ -42,8 +42,8 @@ class NoteRepository extends BaseRepository {
       final maxSortOrder = notesInSpace.isEmpty
           ? -1
           : notesInSpace
-              .map((n) => n.sortOrder)
-              .reduce((a, b) => a > b ? a : b);
+                .map((n) => n.sortOrder)
+                .reduce((a, b) => a > b ? a : b);
       final nextSortOrder = maxSortOrder + 1;
 
       // Create note with calculated sortOrder
@@ -186,11 +186,7 @@ class NoteRepository extends BaseRepository {
   /// ```
   Future<void> delete(String id) async {
     return executeQuery(() async {
-      await supabase
-          .from('notes')
-          .delete()
-          .eq('id', id)
-          .eq('user_id', userId);
+      await supabase.from('notes').delete().eq('id', id).eq('user_id', userId);
     });
   }
 

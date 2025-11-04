@@ -2,10 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:later_mobile/core/responsive/breakpoints.dart';
 import 'package:later_mobile/core/responsive/responsive_layout.dart';
+import 'package:later_mobile/design_system/molecules/fab/create_content_fab.dart';
 import 'package:later_mobile/widgets/navigation/app_sidebar.dart';
 import 'package:later_mobile/widgets/navigation/icon_only_bottom_nav.dart';
-import 'package:later_mobile/design_system/molecules/fab/create_content_fab.dart';
-import 'package:hive/hive.dart';
 
 /// Responsive Behavior Test Suite: Mobile Layout (320px - 767px)
 ///
@@ -27,15 +26,6 @@ import 'package:hive/hive.dart';
 /// - No overflow or clipping issues
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
-
-  setUpAll(() async {
-    // Initialize Hive for testing
-    Hive.init('test/hive_testing_path_responsive');
-  });
-
-  tearDownAll(() async {
-    await Hive.close();
-  });
 
   group('Mobile Layout Tests - 320px (iPhone SE)', () {
     const testWidth = 320.0;

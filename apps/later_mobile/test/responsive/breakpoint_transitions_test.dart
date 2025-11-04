@@ -4,7 +4,6 @@ import 'package:later_mobile/core/responsive/breakpoints.dart';
 import 'package:later_mobile/core/responsive/responsive_layout.dart';
 import 'package:later_mobile/widgets/navigation/app_sidebar.dart';
 import 'package:later_mobile/widgets/navigation/icon_only_bottom_nav.dart';
-import 'package:hive/hive.dart';
 
 /// Responsive Behavior Test Suite: Breakpoint Transitions
 ///
@@ -28,15 +27,6 @@ import 'package:hive/hive.dart';
 /// - No pixel-perfect edge cases cause issues
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
-
-  setUpAll(() async {
-    // Initialize Hive for testing
-    Hive.init('test/hive_testing_path_responsive_breakpoints');
-  });
-
-  tearDownAll(() async {
-    await Hive.close();
-  });
 
   group('Mobile to Tablet Breakpoint (768px)', () {
     testWidgets('767px is detected as mobile', (WidgetTester tester) async {
