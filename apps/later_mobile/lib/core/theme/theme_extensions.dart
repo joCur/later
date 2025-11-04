@@ -1,3 +1,5 @@
+export 'temporal_flow_theme.dart';
+
 import 'package:flutter/material.dart';
 import 'temporal_flow_theme.dart';
 

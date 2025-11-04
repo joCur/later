@@ -19,6 +19,7 @@ import '../../data/models/item_model.dart';
 import '../../data/models/list_model.dart';
 import '../../data/models/space_model.dart';
 import '../../data/models/todo_list_model.dart';
+import '../../providers/auth_provider.dart';
 import '../../providers/content_provider.dart';
 import '../../providers/spaces_provider.dart';
 import '../modals/create_content_modal.dart';
@@ -286,13 +287,30 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
 
         // Menu button
-        IconButton(
-          icon: const Icon(Icons.more_vert),
-          onPressed: () {
-            debugPrint('Menu tapped');
-          },
+        PopupMenuButton<String>(
+          icon: Icon(
+            Icons.more_vert,
+            color: AppColors.textSecondary(context),
+          ),
           tooltip: 'Menu',
-          color: AppColors.textSecondary(context),
+          onSelected: (value) async {
+            if (value == 'signout') {
+              final authProvider = context.read<AuthProvider>();
+              await authProvider.signOut();
+            }
+          },
+          itemBuilder: (context) => [
+            const PopupMenuItem(
+              value: 'signout',
+              child: Row(
+                children: [
+                  Icon(Icons.logout),
+                  SizedBox(width: AppSpacing.sm),
+                  Text('Sign Out'),
+                ],
+              ),
+            ),
+          ],
         ),
       ],
     );
