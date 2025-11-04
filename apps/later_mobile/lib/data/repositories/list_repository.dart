@@ -34,14 +34,14 @@ class ListRepository extends BaseRepository {
               .reduce((a, b) => a > b ? a : b);
       final nextSortOrder = maxSortOrder + 1;
 
-      // Create list with calculated sortOrder and initial counts
-      final listWithSortOrder = list.copyWith(
-        sortOrder: nextSortOrder,
-        totalItemCount: 0,
-        checkedItemCount: 0,
-      );
+      // Create list with calculated sortOrder
+      final listWithSortOrder = list.copyWith(sortOrder: nextSortOrder);
       final data = listWithSortOrder.toJson();
       data['user_id'] = userId; // Ensure correct user_id
+
+      // Remove count fields - these are calculated, not stored
+      data.remove('total_item_count');
+      data.remove('checked_item_count');
 
       final response = await supabase
           .from('lists')
@@ -49,7 +49,11 @@ class ListRepository extends BaseRepository {
           .select()
           .single();
 
-      return ListModel.fromJson(response);
+      // Calculate counts for the newly created list (will be 0)
+      return ListModel.fromJson(response).copyWith(
+        totalItemCount: 0,
+        checkedItemCount: 0,
+      );
     });
   }
 

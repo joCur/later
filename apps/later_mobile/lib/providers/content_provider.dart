@@ -184,6 +184,7 @@ class ContentProvider extends ChangeNotifier {
         _error = AppError.fromException(e);
       }
       notifyListeners();
+      rethrow;
     }
   }
 
@@ -489,6 +490,7 @@ class ContentProvider extends ChangeNotifier {
         _error = AppError.fromException(e);
       }
       notifyListeners();
+      rethrow;
     }
   }
 

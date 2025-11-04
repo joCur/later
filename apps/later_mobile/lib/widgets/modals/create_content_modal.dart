@@ -355,7 +355,6 @@ class _CreateContentModalState extends State<CreateContentModal>
         _isSaving = false;
       });
     } catch (e) {
-      debugPrint('CreateContent: Error saving item - $e');
       setState(() {
         _isSaving = false;
       });
@@ -405,29 +404,19 @@ class _CreateContentModalState extends State<CreateContentModal>
       // Call the existing save logic
       await _saveItem();
 
-      // Show success feedback and close
+      // Trigger haptic feedback and close immediately
       if (mounted) {
-        await _showSuccessFeedback();
+        HapticFeedback.mediumImpact();
 
-        // Close modal after success feedback delay
-        await Future<void>.delayed(const Duration(milliseconds: 500));
+        // Brief delay to allow haptic feedback to register
+        await Future<void>.delayed(const Duration(milliseconds: 100));
         if (mounted) {
           _close();
         }
       }
     } catch (e) {
       // Error already logged in _saveItem, just ensure loading state is cleared
-      debugPrint('CreateContent: Failed to save item - $e');
     }
-  }
-
-  /// Shows success feedback animation with haptics
-  Future<void> _showSuccessFeedback() async {
-    // Trigger haptic feedback
-    HapticFeedback.mediumImpact();
-
-    // Wait for animation duration to allow user to see the loading state complete
-    await Future<void>.delayed(const Duration(milliseconds: 800));
   }
 
   Future<void> _handleKeyEvent(KeyEvent event) async {

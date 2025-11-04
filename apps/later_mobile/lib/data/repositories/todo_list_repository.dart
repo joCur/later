@@ -35,14 +35,14 @@ class TodoListRepository extends BaseRepository {
               .reduce((a, b) => a > b ? a : b);
       final nextSortOrder = maxSortOrder + 1;
 
-      // Create todo list with calculated sortOrder and initial counts
-      final todoListWithSortOrder = todoList.copyWith(
-        sortOrder: nextSortOrder,
-        totalItemCount: 0,
-        completedItemCount: 0,
-      );
+      // Create todo list with calculated sortOrder
+      final todoListWithSortOrder = todoList.copyWith(sortOrder: nextSortOrder);
       final data = todoListWithSortOrder.toJson();
       data['user_id'] = userId; // Ensure correct user_id
+
+      // Remove count fields - these are calculated, not stored
+      data.remove('total_item_count');
+      data.remove('completed_item_count');
 
       final response = await supabase
           .from('todo_lists')
@@ -50,7 +50,11 @@ class TodoListRepository extends BaseRepository {
           .select()
           .single();
 
-      return TodoList.fromJson(response);
+      // Calculate counts for the newly created todo list (will be 0)
+      return TodoList.fromJson(response).copyWith(
+        totalItemCount: 0,
+        completedItemCount: 0,
+      );
     });
   }
 
