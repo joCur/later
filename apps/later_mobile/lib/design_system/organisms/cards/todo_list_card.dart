@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:later_mobile/design_system/tokens/tokens.dart';
-import '../../../data/models/todo_list_model.dart';
+import 'package:later_mobile/data/models/list_model.dart';
+import 'package:later_mobile/data/models/list_item_model.dart';
+import 'package:later_mobile/data/models/list_style.dart';
+import 'package:later_mobile/data/models/todo_item_model.dart';
+import 'package:later_mobile/data/models/todo_priority.dart';
 import 'package:later_mobile/design_system/atoms/text/gradient_text.dart';
 import 'package:later_mobile/design_system/atoms/borders/gradient_pill_border.dart';
 import 'package:later_mobile/design_system/atoms/drag_handle/drag_handle.dart';

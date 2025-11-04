@@ -165,52 +165,52 @@ Migrate from Hive local-only storage to Supabase cloud database with proper auth
 - Child items (TodoItem, ListItem) fetched separately via dedicated repository methods
 - Enables efficient list views (only counts) vs detail views (full items loaded)
 
-- [ ] Task 3.5.1: Remove items field from TodoList and ListModel
-  - Remove `final List<TodoItem> items;` from TodoList model
-  - Remove `final List<ListItem> items;` from ListModel model
-  - Remove items-related code from constructors
-  - Remove items parameter from `copyWith()` methods
-  - Remove items from `fromJson()` factories (items won't be in JSON response)
-  - Remove items from `toJson()` methods (items stored in separate table)
+- [x] Task 3.5.1: Remove items field from TodoList and ListModel
+  - ✅ Removed `final List<TodoItem> items;` from TodoList model
+  - ✅ Removed `final List<ListItem> items;` from ListModel model
+  - ✅ Removed items-related code from constructors
+  - ✅ Removed items parameter from `copyWith()` methods
+  - ✅ Removed items from `fromJson()` factories (items won't be in JSON response)
+  - ✅ Removed items from `toJson()` methods (items stored in separate table)
 
-- [ ] Task 3.5.2: Add aggregate count fields to TodoList and ListModel
-  - Add to TodoList:
+- [x] Task 3.5.2: Add aggregate count fields to TodoList and ListModel
+  - ✅ Added to TodoList:
     - `final int totalItemCount;` - Total number of todo items (from DB aggregate)
     - `final int completedItemCount;` - Number of completed items (from DB aggregate)
-  - Add to ListModel:
+  - ✅ Added to ListModel:
     - `final int totalItemCount;` - Total number of list items (from DB aggregate)
     - `final int checkedItemCount;` - Number of checked items (from DB aggregate, only relevant for checkbox style)
-  - Update constructors to require these count fields
-  - Update `fromJson()` to parse count fields (e.g., `json['total_item_count']`)
-  - Update `toJson()` to include count fields (repositories will compute before insert/update)
-  - Update `copyWith()` methods to include count parameters
+  - ✅ Updated constructors to include these count fields with default values of 0
+  - ✅ Updated `fromJson()` to parse count fields (e.g., `json['total_item_count']`)
+  - ✅ Updated `toJson()` to include count fields (repositories will compute before insert/update)
+  - ✅ Updated `copyWith()` methods to include count parameters
 
-- [ ] Task 3.5.3: Update getters to use count fields instead of items array
-  - TodoList:
-    - Change `int get totalItems => items.length;` to `int get totalItems => totalItemCount;`
-    - Change `int get completedItems => items.where((item) => item.isCompleted).length;` to `int get completedItems => completedItemCount;`
-    - Keep `double get progress` calculation using new getters
-  - ListModel:
-    - Change `int get totalItems => items.length;` to `int get totalItems => totalItemCount;`
-    - Change `int get checkedItems => items.where((item) => item.isChecked).length;` to `int get checkedItems => checkedItemCount;`
-    - Keep `double get progress` calculation using new getters
+- [x] Task 3.5.3: Update getters to use count fields instead of items array
+  - ✅ TodoList:
+    - Changed `int get totalItems => items.length;` to `int get totalItems => totalItemCount;`
+    - Changed `int get completedItems => items.where((item) => item.isCompleted).length;` to `int get completedItems => completedItemCount;`
+    - Kept `double get progress` calculation using new getters
+  - ✅ ListModel:
+    - Changed `int get totalItems => items.length;` to `int get totalItems => totalItemCount;`
+    - Changed `int get checkedItems => items.where((item) => item.isChecked).length;` to `int get checkedItems => checkedItemCount;`
+    - Kept `double get progress` calculation using new getters
 
-- [ ] Task 3.5.4: Add parent foreign key references to TodoItem and ListItem
-  - Add to TodoItem:
+- [x] Task 3.5.4: Add parent foreign key references to TodoItem and ListItem
+  - ✅ Added to TodoItem:
     - `final String todoListId;` - Foreign key to parent TodoList
-    - Update constructor, `fromJson()`, `toJson()`, `copyWith()`
-    - Parse from `json['todo_list_id']` (snake_case from DB)
-  - Add to ListItem:
+    - Updated constructor, `fromJson()`, `toJson()`, `copyWith()`
+    - Parsing from `json['todo_list_id']` (snake_case from DB)
+  - ✅ Added to ListItem:
     - `final String listId;` - Foreign key to parent ListModel
-    - Update constructor, `fromJson()`, `toJson()`, `copyWith()`
-    - Parse from `json['list_id']` (snake_case from DB)
+    - Updated constructor, `fromJson()`, `toJson()`, `copyWith()`
+    - Parsing from `json['list_id']` (snake_case from DB)
   - Note: These match the foreign key columns in the database schema
 
-- [ ] Task 3.5.5: Update model documentation
-  - Update TodoList class documentation to explain items are fetched separately
-  - Update ListModel class documentation to explain items are fetched separately
-  - Add documentation to count fields explaining they're populated from database aggregates
-  - Update CLAUDE.md if it references the old nested structure
+- [x] Task 3.5.5: Update model documentation
+  - ✅ Updated TodoList class documentation to explain items are fetched separately
+  - ✅ Updated ListModel class documentation to explain items are fetched separately
+  - ✅ Added documentation to count fields explaining they're populated from database aggregates
+  - 🔄 Update CLAUDE.md if it references the old nested structure (deferred - will update if issues found)
 
 ### Phase 4: Repository Layer Rewrite
 

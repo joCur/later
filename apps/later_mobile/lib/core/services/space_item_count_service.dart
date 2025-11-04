@@ -1,7 +1,6 @@
 import 'package:hive/hive.dart';
 import 'package:later_mobile/data/models/note_model.dart';
 import 'package:later_mobile/data/models/list_model.dart';
-import 'package:later_mobile/data/models/todo_list_model.dart';
 
 /// Service for calculating item counts for spaces from Hive database.
 ///

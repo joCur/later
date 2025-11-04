@@ -2,8 +2,14 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
 import 'package:later_mobile/data/models/note_model.dart';
 import 'package:later_mobile/data/models/list_model.dart';
+import 'package:later_mobile/data/models/list_item_model.dart';
+import 'package:later_mobile/data/models/list_style.dart';
 import 'package:later_mobile/data/models/space_model.dart';
-import 'package:later_mobile/data/models/todo_list_model.dart';
+import 'package:later_mobile/data/models/list_model.dart';
+import 'package:later_mobile/data/models/list_item_model.dart';
+import 'package:later_mobile/data/models/list_style.dart';
+import 'package:later_mobile/data/models/todo_item_model.dart';
+import 'package:later_mobile/data/models/todo_priority.dart';
 import 'package:later_mobile/data/repositories/space_repository.dart';
 
 void main() {

@@ -1,116 +1,11 @@
-/// Enum representing the style of list display
-enum ListStyle {
-  /// Bulleted list style
-  bullets,
-
-  /// Numbered list style
-  numbered,
-
-  /// Checkbox list style for tasks
-  checkboxes,
-
-  /// Simple list style (no prefix)
-  simple,
-}
-
-/// Extension for ListStyle enum serialization
-extension ListStyleExtension on ListStyle {
-  /// Convert enum to string for JSON serialization
-  String toJson() => toString().split('.').last;
-
-  /// Create enum from string for JSON deserialization
-  static ListStyle fromJson(String value) {
-    return ListStyle.values.firstWhere(
-      (e) => e.toString().split('.').last == value,
-      orElse: () => ListStyle.bullets,
-    );
-  }
-}
-
-/// ListItem model representing an individual item within a list
-class ListItem {
-  ListItem({
-    required this.id,
-    required this.title,
-    this.notes,
-    this.isChecked = false,
-    required this.sortOrder,
-  });
-
-  /// Create from JSON for Supabase compatibility
-  factory ListItem.fromJson(Map<String, dynamic> json) {
-    return ListItem(
-      id: json['id'] as String,
-      title: json['title'] as String,
-      notes: json['notes'] as String?,
-      isChecked: json['is_checked'] as bool? ?? false,
-      sortOrder: json['sort_order'] as int,
-    );
-  }
-
-  /// Unique identifier for the list item
-  final String id;
-
-  /// Title of the list item
-  final String title;
-
-  /// Optional notes providing additional details
-  final String? notes;
-
-  /// Whether the item is checked (only used when style is checkboxes)
-  final bool isChecked;
-
-  /// Sort order for manual reordering of items
-  final int sortOrder;
-
-  /// Create a copy of this list item with updated fields
-  ///
-  /// Note: To explicitly clear nullable fields like notes, use the clearNotes parameter
-  ListItem copyWith({
-    String? id,
-    String? title,
-    String? notes,
-    bool clearNotes = false,
-    bool? isChecked,
-    int? sortOrder,
-  }) {
-    return ListItem(
-      id: id ?? this.id,
-      title: title ?? this.title,
-      notes: clearNotes ? null : (notes ?? this.notes),
-      isChecked: isChecked ?? this.isChecked,
-      sortOrder: sortOrder ?? this.sortOrder,
-    );
-  }
-
-  /// Convert to JSON for Supabase compatibility
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'title': title,
-      'notes': notes,
-      'is_checked': isChecked,
-      'sort_order': sortOrder,
-    };
-  }
-
-  @override
-  String toString() {
-    return 'ListItem(id: $id, title: $title, isChecked: $isChecked, sortOrder: $sortOrder)';
-  }
-
-  @override
-  bool operator ==(Object other) {
-    if (identical(this, other)) return true;
-
-    return other is ListItem && other.id == id;
-  }
-
-  @override
-  int get hashCode => id.hashCode;
-}
+import 'package:later_mobile/data/models/list_style.dart';
 
 /// ListModel representing a collection of list items with a specific style
+///
+/// In Supabase, list items are stored in a separate `list_items` table
+/// and fetched via repository methods when needed. This model contains
+/// aggregate counts (totalItemCount, checkedItemCount) populated from
+/// database GROUP BY queries for efficient list views.
 class ListModel {
   ListModel({
     required this.id,
@@ -118,13 +13,13 @@ class ListModel {
     required this.userId,
     required this.name,
     this.icon,
-    List<ListItem>? items,
     this.style = ListStyle.bullets,
+    this.totalItemCount = 0,
+    this.checkedItemCount = 0,
     DateTime? createdAt,
     DateTime? updatedAt,
     this.sortOrder = 0,
-  }) : items = items ?? [],
-       createdAt = createdAt ?? DateTime.now(),
+  }) : createdAt = createdAt ?? DateTime.now(),
        updatedAt = updatedAt ?? DateTime.now();
 
   /// Create from JSON for Supabase compatibility
@@ -135,12 +30,9 @@ class ListModel {
       userId: json['user_id'] as String,
       name: json['name'] as String,
       icon: json['icon'] as String?,
-      items:
-          (json['items'] as List<dynamic>?)
-              ?.map((item) => ListItem.fromJson(item as Map<String, dynamic>))
-              .toList() ??
-          [],
       style: ListStyleExtension.fromJson(json['style'] as String? ?? 'bullets'),
+      totalItemCount: (json['total_item_count'] as int?) ?? 0,
+      checkedItemCount: (json['checked_item_count'] as int?) ?? 0,
       createdAt: DateTime.parse(json['created_at'] as String),
       updatedAt: DateTime.parse(json['updated_at'] as String),
       sortOrder: (json['sort_order'] as int?) ?? 0,
@@ -162,13 +54,14 @@ class ListModel {
   /// Optional custom icon name or emoji
   final String? icon;
 
-  /// Collection of list items
-  /// Note: In Supabase, items are stored in a separate table and fetched via repository methods
-  /// This field is maintained for backward compatibility and will be populated by the repository
-  final List<ListItem> items;
-
   /// Display style of the list
   final ListStyle style;
+
+  /// Total number of list items (populated from database aggregate)
+  final int totalItemCount;
+
+  /// Number of checked items (populated from database aggregate, only relevant for checkbox style)
+  final int checkedItemCount;
 
   /// When the list was created
   final DateTime createdAt;
@@ -181,10 +74,10 @@ class ListModel {
   final int sortOrder;
 
   /// Total number of items in the list
-  int get totalItems => items.length;
+  int get totalItems => totalItemCount;
 
   /// Number of checked items in the list (only relevant for checkbox style)
-  int get checkedItems => items.where((item) => item.isChecked).length;
+  int get checkedItems => checkedItemCount;
 
   /// Progress as a value between 0.0 and 1.0 (only relevant for checkbox style)
   /// Returns 0.0 if there are no items to avoid division by zero
@@ -203,8 +96,9 @@ class ListModel {
     String? name,
     String? icon,
     bool clearIcon = false,
-    List<ListItem>? items,
     ListStyle? style,
+    int? totalItemCount,
+    int? checkedItemCount,
     DateTime? createdAt,
     DateTime? updatedAt,
     int? sortOrder,
@@ -215,8 +109,9 @@ class ListModel {
       userId: userId ?? this.userId,
       name: name ?? this.name,
       icon: clearIcon ? null : (icon ?? this.icon),
-      items: items ?? this.items,
       style: style ?? this.style,
+      totalItemCount: totalItemCount ?? this.totalItemCount,
+      checkedItemCount: checkedItemCount ?? this.checkedItemCount,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       sortOrder: sortOrder ?? this.sortOrder,
@@ -231,8 +126,9 @@ class ListModel {
       'user_id': userId,
       'name': name,
       'icon': icon,
-      'items': items.map((item) => item.toJson()).toList(),
       'style': style.toJson(),
+      'total_item_count': totalItemCount,
+      'checked_item_count': checkedItemCount,
       'created_at': createdAt.toIso8601String(),
       'updated_at': updatedAt.toIso8601String(),
       'sort_order': sortOrder,
@@ -241,7 +137,7 @@ class ListModel {
 
   @override
   String toString() {
-    return 'ListModel(id: $id, name: $name, spaceId: $spaceId, style: $style, totalItems: $totalItems, checkedItems: $checkedItems)';
+    return 'ListModel(id: $id, name: $name, spaceId: $spaceId, userId: $userId, style: $style)';
   }
 
   @override

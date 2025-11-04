@@ -1,8 +1,14 @@
 import 'package:flutter/foundation.dart';
 import '../core/error/app_error.dart';
 import '../data/models/note_model.dart';
-import '../data/models/list_model.dart';
-import '../data/models/todo_list_model.dart';
+import 'package:later_mobile/data/models/list_model.dart';
+import 'package:later_mobile/data/models/list_item_model.dart';
+import 'package:later_mobile/data/models/list_style.dart';
+import 'package:later_mobile/data/models/list_model.dart';
+import 'package:later_mobile/data/models/list_item_model.dart';
+import 'package:later_mobile/data/models/list_style.dart';
+import 'package:later_mobile/data/models/todo_item_model.dart';
+import 'package:later_mobile/data/models/todo_priority.dart';
 import '../data/repositories/list_repository.dart';
 import '../data/repositories/note_repository.dart';
 import '../data/repositories/todo_list_repository.dart';
@@ -120,9 +126,9 @@ class ContentProvider extends ChangeNotifier {
         ),
       ]);
 
-      _todoLists = results[0] as List<TodoList>;
+      _todoLists = results[0];
       _lists = results[1] as List<ListModel>;
-      _notes = results[2] as List<Item>;
+      _notes = results[2];
 
       _error = null;
     } catch (e) {

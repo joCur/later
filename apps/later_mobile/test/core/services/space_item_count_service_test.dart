@@ -3,7 +3,13 @@ import 'package:hive/hive.dart';
 import 'package:later_mobile/core/services/space_item_count_service.dart';
 import 'package:later_mobile/data/models/note_model.dart';
 import 'package:later_mobile/data/models/list_model.dart';
-import 'package:later_mobile/data/models/todo_list_model.dart';
+import 'package:later_mobile/data/models/list_item_model.dart';
+import 'package:later_mobile/data/models/list_style.dart';
+import 'package:later_mobile/data/models/list_model.dart';
+import 'package:later_mobile/data/models/list_item_model.dart';
+import 'package:later_mobile/data/models/list_style.dart';
+import 'package:later_mobile/data/models/todo_item_model.dart';
+import 'package:later_mobile/data/models/todo_priority.dart';
 
 void main() {
   group('SpaceItemCountService Tests', () {

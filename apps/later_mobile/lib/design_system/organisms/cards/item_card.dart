@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:later_mobile/design_system/tokens/tokens.dart';
-import '../../../data/models/note_model.dart';
-import 'package:later_mobile/design_system/atoms/text/gradient_text.dart';
-import 'package:later_mobile/design_system/atoms/borders/gradient_pill_border.dart';
 import 'package:intl/intl.dart';
 import 'package:later_mobile/core/theme/temporal_flow_theme.dart';
+import 'package:later_mobile/design_system/atoms/borders/gradient_pill_border.dart';
+import 'package:later_mobile/design_system/atoms/text/gradient_text.dart';
+import 'package:later_mobile/design_system/tokens/tokens.dart';
+
+import '../../../data/models/note_model.dart';
 
 /// Item card component for Notes (dual-model architecture)
 /// Mobile-First Bold Redesign
@@ -44,7 +45,7 @@ class ItemCard extends StatefulWidget {
   });
 
   /// Item data to display
-  final Item item;
+  final Note item;
 
   /// Callback when card is tapped
   final VoidCallback? onTap;
@@ -137,12 +138,9 @@ class _ItemCardState extends State<ItemCard> with TickerProviderStateMixin {
 
   /// Build title with proper styling
   Widget _buildTitle(BuildContext context) {
-
     return Text(
       widget.item.title,
-      style: AppTypography.itemTitle.copyWith(
-        color: AppColors.text(context),
-      ),
+      style: AppTypography.itemTitle.copyWith(color: AppColors.text(context)),
       maxLines: AppTypography.itemTitleMaxLines,
       overflow: TextOverflow.ellipsis,
     );
@@ -153,7 +151,6 @@ class _ItemCardState extends State<ItemCard> with TickerProviderStateMixin {
     if (widget.item.content == null || widget.item.content!.isEmpty) {
       return null;
     }
-
 
     return Text(
       widget.item.content!,

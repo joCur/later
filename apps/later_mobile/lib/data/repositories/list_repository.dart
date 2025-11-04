@@ -1,5 +1,6 @@
 import 'package:hive/hive.dart';
-import '../models/list_model.dart';
+import 'package:later_mobile/data/models/list_model.dart';
+import 'package:later_mobile/data/models/list_item_model.dart';
 
 /// Repository for managing ListModel entities in Hive local storage.
 ///

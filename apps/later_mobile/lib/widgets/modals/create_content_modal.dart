@@ -16,9 +16,8 @@ import 'package:uuid/uuid.dart';
 import '../../core/responsive/breakpoints.dart';
 import '../../core/theme/temporal_flow_theme.dart';
 import '../../core/utils/item_type_detector.dart'; // For ContentType enum
-import '../../data/models/note_model.dart';
-import '../../data/models/list_model.dart';
-import '../../data/models/todo_list_model.dart';
+import 'package:later_mobile/data/models/list_model.dart';
+import 'package:later_mobile/data/models/list_style.dart';
 import '../../providers/content_provider.dart';
 import '../../providers/spaces_provider.dart';
 

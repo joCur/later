@@ -1,9 +1,7 @@
 import 'package:hive_flutter/hive_flutter.dart';
 import '../local/preferences_service.dart';
-import '../models/note_model.dart';
-import '../models/list_model.dart';
+import 'package:later_mobile/data/models/list_model.dart';
 import '../models/space_model.dart';
-import '../models/todo_list_model.dart';
 
 /// Migration utility for assigning sortOrder to existing content items
 ///
