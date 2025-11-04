@@ -25,16 +25,11 @@ void main() {
   group('ResponsiveFab', () {
     testWidgets('renders circular FAB without label on mobile', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: MediaQuery(
-            data: const MediaQueryData(size: Size(375, 812)), // Mobile size
-            child: Scaffold(
-              body: ResponsiveFab(
-                icon: Icons.add,
-                label: 'Add Item',
-                onPressed: () {},
-              ),
-            ),
+        createTestApp(
+          child: ResponsiveFab(
+            icon: Icons.add,
+            label: 'Add Item',
+            onPressed: () {},
           ),
         ),
       );
@@ -51,16 +46,12 @@ void main() {
 
     testWidgets('renders extended FAB with label on desktop', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: MediaQuery(
-            data: const MediaQueryData(size: Size(1440, 900)), // Desktop size
-            child: Scaffold(
-              body: ResponsiveFab(
-                icon: Icons.add,
-                label: 'Add Item',
-                onPressed: () {},
-              ),
-            ),
+        createTestApp(
+          size: const Size(1440, 900), // Desktop size
+          child: ResponsiveFab(
+            icon: Icons.add,
+            label: 'Add Item',
+            onPressed: () {},
           ),
         ),
       );
@@ -79,16 +70,11 @@ void main() {
       bool pressed = false;
 
       await tester.pumpWidget(
-        MaterialApp(
-          home: MediaQuery(
-            data: const MediaQueryData(size: Size(375, 812)), // Mobile size
-            child: Scaffold(
-              body: ResponsiveFab(
-                icon: Icons.add,
-                label: 'Add Item',
-                onPressed: () => pressed = true,
-              ),
-            ),
+        createTestApp(
+          child: ResponsiveFab(
+            icon: Icons.add,
+            label: 'Add Item',
+            onPressed: () => pressed = true,
           ),
         ),
       );
@@ -105,16 +91,12 @@ void main() {
       bool pressed = false;
 
       await tester.pumpWidget(
-        MaterialApp(
-          home: MediaQuery(
-            data: const MediaQueryData(size: Size(1440, 900)), // Desktop size
-            child: Scaffold(
-              body: ResponsiveFab(
-                icon: Icons.add,
-                label: 'Add Item',
-                onPressed: () => pressed = true,
-              ),
-            ),
+        createTestApp(
+          size: const Size(1440, 900), // Desktop size
+          child: ResponsiveFab(
+            icon: Icons.add,
+            label: 'Add Item',
+            onPressed: () => pressed = true,
           ),
         ),
       );
@@ -129,16 +111,11 @@ void main() {
 
     testWidgets('supports custom icon', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: MediaQuery(
-            data: const MediaQueryData(size: Size(375, 812)), // Mobile size
-            child: Scaffold(
-              body: ResponsiveFab(
-                icon: Icons.edit,
-                label: 'Edit',
-                onPressed: () {},
-              ),
-            ),
+        createTestApp(
+          child: ResponsiveFab(
+            icon: Icons.edit,
+            label: 'Edit',
+            onPressed: () {},
           ),
         ),
       );
@@ -149,13 +126,8 @@ void main() {
 
     testWidgets('supports null onPressed (disabled state)', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: MediaQuery(
-            data: MediaQueryData(size: Size(375, 812)), // Mobile size
-            child: Scaffold(
-              body: ResponsiveFab(icon: Icons.add, label: 'Add Item'),
-            ),
-          ),
+        createTestApp(
+          child: const ResponsiveFab(icon: Icons.add, label: 'Add Item'),
         ),
       );
 
@@ -165,17 +137,12 @@ void main() {
 
     testWidgets('uses tooltip when provided', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: MediaQuery(
-            data: const MediaQueryData(size: Size(375, 812)), // Mobile size
-            child: Scaffold(
-              body: ResponsiveFab(
-                icon: Icons.add,
-                label: 'Add Item',
-                tooltip: 'Custom Tooltip',
-                onPressed: () {},
-              ),
-            ),
+        createTestApp(
+          child: ResponsiveFab(
+            icon: Icons.add,
+            label: 'Add Item',
+            tooltip: 'Custom Tooltip',
+            onPressed: () {},
           ),
         ),
       );
@@ -188,16 +155,11 @@ void main() {
       tester,
     ) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: MediaQuery(
-            data: const MediaQueryData(size: Size(375, 812)), // Mobile size
-            child: Scaffold(
-              body: ResponsiveFab(
-                icon: Icons.add,
-                label: 'Add Item',
-                onPressed: () {},
-              ),
-            ),
+        createTestApp(
+          child: ResponsiveFab(
+            icon: Icons.add,
+            label: 'Add Item',
+            onPressed: () {},
           ),
         ),
       );
@@ -208,17 +170,12 @@ void main() {
 
     testWidgets('supports custom heroTag', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: MediaQuery(
-            data: const MediaQueryData(size: Size(375, 812)), // Mobile size
-            child: Scaffold(
-              body: ResponsiveFab(
-                icon: Icons.add,
-                label: 'Add Item',
-                heroTag: 'custom-hero',
-                onPressed: () {},
-              ),
-            ),
+        createTestApp(
+          child: ResponsiveFab(
+            icon: Icons.add,
+            label: 'Add Item',
+            heroTag: 'custom-hero',
+            onPressed: () {},
           ),
         ),
       );
@@ -229,17 +186,11 @@ void main() {
 
     testWidgets('renders in light theme', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          theme: ThemeData.light(),
-          home: MediaQuery(
-            data: const MediaQueryData(size: Size(375, 812)), // Mobile size
-            child: Scaffold(
-              body: ResponsiveFab(
-                icon: Icons.add,
-                label: 'Add Item',
-                onPressed: () {},
-              ),
-            ),
+        createTestApp(
+          child: ResponsiveFab(
+            icon: Icons.add,
+            label: 'Add Item',
+            onPressed: () {},
           ),
         ),
       );
@@ -250,17 +201,11 @@ void main() {
 
     testWidgets('renders in dark theme', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          theme: ThemeData.dark(),
-          home: MediaQuery(
-            data: const MediaQueryData(size: Size(375, 812)), // Mobile size
-            child: Scaffold(
-              body: ResponsiveFab(
-                icon: Icons.add,
-                label: 'Add Item',
-                onPressed: () {},
-              ),
-            ),
+        createTestApp(
+          child: ResponsiveFab(
+            icon: Icons.add,
+            label: 'Add Item',
+            onPressed: () {},
           ),
         ),
       );
@@ -272,16 +217,11 @@ void main() {
     testWidgets('adapts from mobile to desktop on resize', (tester) async {
       // Start with mobile size
       await tester.pumpWidget(
-        MaterialApp(
-          home: MediaQuery(
-            data: const MediaQueryData(size: Size(375, 812)), // Mobile size
-            child: Scaffold(
-              body: ResponsiveFab(
-                icon: Icons.add,
-                label: 'Add Item',
-                onPressed: () {},
-              ),
-            ),
+        createTestApp(
+          child: ResponsiveFab(
+            icon: Icons.add,
+            label: 'Add Item',
+            onPressed: () {},
           ),
         ),
       );
@@ -291,16 +231,12 @@ void main() {
 
       // Resize to desktop
       await tester.pumpWidget(
-        MaterialApp(
-          home: MediaQuery(
-            data: const MediaQueryData(size: Size(1440, 900)), // Desktop size
-            child: Scaffold(
-              body: ResponsiveFab(
-                icon: Icons.add,
-                label: 'Add Item',
-                onPressed: () {},
-              ),
-            ),
+        createTestApp(
+          size: const Size(1440, 900), // Desktop size
+          child: ResponsiveFab(
+            icon: Icons.add,
+            label: 'Add Item',
+            onPressed: () {},
           ),
         ),
       );
@@ -382,17 +318,12 @@ void main() {
       bool pressed = false;
 
       await tester.pumpWidget(
-        MaterialApp(
-          home: MediaQuery(
-            data: const MediaQueryData(size: Size(375, 812)), // Mobile size
-            child: Scaffold(
-              body: ResponsiveFab(
-                icon: Icons.add,
-                label: 'Add Item',
-                onPressed: () => pressed = true,
-                enablePulse: true,
-              ),
-            ),
+        createTestApp(
+          child: ResponsiveFab(
+            icon: Icons.add,
+            label: 'Add Item',
+            onPressed: () => pressed = true,
+            enablePulse: true,
           ),
         ),
       );
@@ -409,17 +340,13 @@ void main() {
       bool pressed = false;
 
       await tester.pumpWidget(
-        MaterialApp(
-          home: MediaQuery(
-            data: const MediaQueryData(size: Size(1440, 900)), // Desktop size
-            child: Scaffold(
-              body: ResponsiveFab(
-                icon: Icons.add,
-                label: 'Add Item',
-                onPressed: () => pressed = true,
-                enablePulse: true,
-              ),
-            ),
+        createTestApp(
+          size: const Size(1440, 900), // Desktop size
+          child: ResponsiveFab(
+            icon: Icons.add,
+            label: 'Add Item',
+            onPressed: () => pressed = true,
+            enablePulse: true,
           ),
         ),
       );
