@@ -286,39 +286,50 @@ Migrate from Hive local-only storage to Supabase cloud database with proper auth
 
 ### Phase 5: Provider Layer Updates
 
-- [ ] Task 5.1: Update SpacesProvider to work with async Supabase operations
-  - Update `lib/providers/spaces_provider.dart` to handle async repository calls
-  - Replace synchronous Hive listeners with explicit refresh pattern
-  - Update `loadSpaces()` to be async and handle loading/error states
-  - Update `createSpace()`, `updateSpace()`, `deleteSpace()` to await repository calls and refresh spaces list
-  - Remove `getSpaceItemCount()` if SpaceRepository already returns counts
+- [x] Task 5.1: Update SpacesProvider to work with async Supabase operations
+  - ✅ SpacesProvider already fully migrated with async operations, loading states, and error handling
+  - ✅ Has `loadSpaces()` async method with proper error handling
+  - ✅ All CRUD methods (`createSpace()`, `updateSpace()`, `deleteSpace()`) are async and use retry logic
+  - ✅ `getSpaceItemCount()` method uses SpaceRepository for on-demand count calculation
+  - ✅ Complete loading state management (`isLoading`, `error`, `clearError()`)
 
-- [ ] Task 5.2: Update ContentProvider to fetch nested items separately
-  - Update `lib/providers/content_provider.dart` to handle new repository structure
-  - Update data fetching pattern:
+- [x] Task 5.2: Update ContentProvider to fetch nested items separately
+  - ✅ Updated `lib/providers/content_provider.dart` to handle new repository structure
+  - ✅ Updated data fetching pattern:
     - TodoLists loaded with aggregate counts (totalItemCount, completedItemCount) - no items array
     - TodoItems fetched separately only when detail view accessed
     - Lists loaded with aggregate counts (totalItemCount, checkedItemCount) - no items array
     - ListItems fetched separately only when detail view accessed
     - Notes (unchanged - no nested data)
-  - Add new methods for on-demand item fetching:
+  - ✅ Added new methods for on-demand item fetching:
     - `Future<List<TodoItem>> loadTodoItemsForList(String todoListId)` → fetches items and caches in memory
     - `Future<List<ListItem>> loadListItemsForList(String listId)` → fetches items and caches in memory
-  - Add caching for items:
+  - ✅ Added caching for items:
     - `Map<String, List<TodoItem>> _todoItemsCache` - cache items by todoListId
     - `Map<String, List<ListItem>> _listItemsCache` - cache items by listId
     - Invalidate cache entries when items are created/updated/deleted/reordered
-  - Update existing CRUD methods:
-    - Creating/updating TodoItem: Update cache and parent TodoList counts
-    - Creating/updating ListItem: Update cache and parent ListModel counts
-    - Handle async operations with loading states
+  - ✅ Updated existing CRUD methods:
+    - Renamed `addTodoItem()` → `createTodoItem()` - now takes TodoItem directly (no listId parameter)
+    - Updated `updateTodoItem()` - now takes TodoItem directly (no listId/itemId parameters)
+    - Updated `deleteTodoItem()` - parameters changed to (todoItemId, todoListId) order
+    - Removed `toggleTodoItem()` - toggle should be done via `updateTodoItem()` at UI level
+    - Updated `reorderTodoItems()` - now takes (todoListId, List<TodoItem>) instead of indices
+    - Applied same pattern to ListItem methods (create/update/delete/reorder)
+    - All methods now invalidate cache and refresh parent list counts
+    - Added helper methods `_refreshTodoList()` and `_refreshList()` to fetch latest counts
+  - ✅ Fixed `getTodosWithDueDate()` - now loads items from cache/repository instead of accessing non-existent items field
   - Note: Home screen only needs lists with counts (efficient), detail screen loads items on-demand
 
-- [ ] Task 5.3: Add loading and error states to providers
-  - Add `bool isLoading` and `String? errorMessage` properties to SpacesProvider and ContentProvider
-  - Notify listeners when loading states change
-  - Expose error messages to UI for user feedback
-  - Add `clearError()` methods to dismiss error messages
+- [x] Task 5.3: Add loading and error states to providers
+  - ✅ Both SpacesProvider and ContentProvider already have complete loading/error state management
+  - ✅ Both have `bool isLoading` property with proper state transitions
+  - ✅ Both have `AppError? error` property for error messages
+  - ✅ Both have `clearError()` method to dismiss error messages
+  - ✅ All async methods properly set loading states and notify listeners
+
+**Phase 5 Complete** - All provider code has been successfully migrated to work with async Supabase operations. Providers now use caching for nested items, have complete loading/error state management, and follow the new repository API patterns.
+
+**Note**: The app does not compile at this point because UI screens (Phase 6) haven't been updated to use the new provider API. This is expected and will be resolved in Phase 6.
 
 ### Phase 6: UI Updates for Async Operations
 
