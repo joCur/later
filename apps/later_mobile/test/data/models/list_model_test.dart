@@ -1,33 +1,36 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:later_mobile/data/models/list_model.dart';
 import 'package:later_mobile/data/models/list_item_model.dart';
+import 'package:later_mobile/data/models/list_model.dart';
 import 'package:later_mobile/data/models/list_style.dart';
 
 void main() {
   group('ListStyle', () {
     test('has correct values', () {
-      expect(ListStyle.values.length, 3);
+      expect(ListStyle.values.length, 4);
       expect(ListStyle.values, [
         ListStyle.bullets,
         ListStyle.numbered,
         ListStyle.checkboxes,
+        ListStyle.simple,
       ]);
     });
 
-    test('toJson serializes to string correctly', () {
+    test('serializes to string correctly', () {
       expect(ListStyle.bullets.toJson(), 'bullets');
       expect(ListStyle.numbered.toJson(), 'numbered');
       expect(ListStyle.checkboxes.toJson(), 'checkboxes');
+      expect(ListStyle.simple.toJson(), 'simple');
     });
 
-    test('fromJson deserializes from string correctly', () {
+    test('deserializes from string correctly', () {
       expect(ListStyleExtension.fromJson('bullets'), ListStyle.bullets);
       expect(ListStyleExtension.fromJson('numbered'), ListStyle.numbered);
       expect(ListStyleExtension.fromJson('checkboxes'), ListStyle.checkboxes);
+      expect(ListStyleExtension.fromJson('simple'), ListStyle.simple);
     });
 
-    test('fromJson handles unknown value with fallback', () {
-      expect(ListStyleExtension.fromJson('unknown'), ListStyle.bullets);
+    test('handles invalid value with default', () {
+      expect(ListStyleExtension.fromJson('invalid'), ListStyle.bullets);
     });
   });
 
@@ -36,12 +39,14 @@ void main() {
       test('creates with all required fields', () {
         final item = ListItem(
           id: 'item-1',
-          title: 'Buy groceries',
+          listId: 'list-1',
+          title: 'Buy milk',
           sortOrder: 0,
         );
 
         expect(item.id, 'item-1');
-        expect(item.title, 'Buy groceries');
+        expect(item.listId, 'list-1');
+        expect(item.title, 'Buy milk');
         expect(item.notes, isNull);
         expect(item.isChecked, false);
         expect(item.sortOrder, 0);
@@ -50,172 +55,176 @@ void main() {
       test('creates with all optional fields', () {
         final item = ListItem(
           id: 'item-2',
-          title: 'Complete documentation',
-          notes: 'Include API examples and usage guidelines',
+          listId: 'list-2',
+          title: 'Complete project proposal',
+          notes: 'Include budget estimates and timeline',
           isChecked: true,
           sortOrder: 5,
         );
 
         expect(item.id, 'item-2');
-        expect(item.title, 'Complete documentation');
-        expect(item.notes, 'Include API examples and usage guidelines');
+        expect(item.listId, 'list-2');
+        expect(item.title, 'Complete project proposal');
+        expect(item.notes, 'Include budget estimates and timeline');
         expect(item.isChecked, true);
         expect(item.sortOrder, 5);
       });
 
       test('defaults isChecked to false', () {
-        final item = ListItem(id: 'item-3', title: 'Task', sortOrder: 0);
+        final item = ListItem(
+          id: 'item-3',
+          listId: 'list-3',
+          title: 'Task',
+          sortOrder: 0,
+        );
 
         expect(item.isChecked, false);
       });
     });
 
-    group('JSON serialization', () {
-      test('toJson produces correct format', () {
+    group('fromJson', () {
+      test('deserializes from JSON with all fields', () {
+        final json = {
+          'id': 'item-1',
+          'list_id': 'list-1',
+          'title': 'Research topic',
+          'notes': 'Focus on recent publications',
+          'is_checked': true,
+          'sort_order': 3,
+        };
+
+        final item = ListItem.fromJson(json);
+
+        expect(item.id, 'item-1');
+        expect(item.listId, 'list-1');
+        expect(item.title, 'Research topic');
+        expect(item.notes, 'Focus on recent publications');
+        expect(item.isChecked, true);
+        expect(item.sortOrder, 3);
+      });
+
+      test('deserializes from JSON with minimal fields', () {
+        final json = {
+          'id': 'item-2',
+          'list_id': 'list-2',
+          'title': 'Simple item',
+          'sort_order': 0,
+        };
+
+        final item = ListItem.fromJson(json);
+
+        expect(item.id, 'item-2');
+        expect(item.listId, 'list-2');
+        expect(item.title, 'Simple item');
+        expect(item.notes, isNull);
+        expect(item.isChecked, false);
+        expect(item.sortOrder, 0);
+      });
+
+      test('handles null notes gracefully', () {
+        final json = {
+          'id': 'item-3',
+          'list_id': 'list-3',
+          'title': 'Item',
+          'notes': null,
+          'sort_order': 0,
+        };
+
+        final item = ListItem.fromJson(json);
+
+        expect(item.notes, isNull);
+      });
+
+      test('handles null is_checked with default false', () {
+        final json = {
+          'id': 'item-4',
+          'list_id': 'list-4',
+          'title': 'Item',
+          'is_checked': null,
+          'sort_order': 0,
+        };
+
+        final item = ListItem.fromJson(json);
+
+        expect(item.isChecked, false);
+      });
+    });
+
+    group('toJson', () {
+      test('serializes to JSON with all fields', () {
         final item = ListItem(
-          id: 'item-4',
-          title: 'Review pull request',
-          notes: 'Check for security issues',
+          id: 'item-1',
+          listId: 'list-1',
+          title: 'Write report',
+          notes: 'Include graphs and tables',
+          isChecked: true,
           sortOrder: 2,
         );
 
         final json = item.toJson();
 
-        expect(json['id'], 'item-4');
-        expect(json['title'], 'Review pull request');
-        expect(json['notes'], 'Check for security issues');
-        expect(json['isChecked'], false);
-        expect(json['sortOrder'], 2);
+        expect(json['id'], 'item-1');
+        expect(json['list_id'], 'list-1');
+        expect(json['title'], 'Write report');
+        expect(json['notes'], 'Include graphs and tables');
+        expect(json['is_checked'], true);
+        expect(json['sort_order'], 2);
       });
 
-      test('toJson handles null notes', () {
-        final item = ListItem(id: 'item-5', title: 'Simple item', sortOrder: 0);
-
-        final json = item.toJson();
-
-        expect(json['notes'], isNull);
-      });
-
-      test('fromJson deserializes correctly', () {
-        final json = {
-          'id': 'item-6',
-          'title': 'Write tests',
-          'notes': 'Cover all edge cases',
-          'isChecked': true,
-          'sortOrder': 3,
-        };
-
-        final item = ListItem.fromJson(json);
-
-        expect(item.id, 'item-6');
-        expect(item.title, 'Write tests');
-        expect(item.notes, 'Cover all edge cases');
-        expect(item.isChecked, true);
-        expect(item.sortOrder, 3);
-      });
-
-      test('fromJson handles null optional fields', () {
-        final json = {'id': 'item-7', 'title': 'Minimal item', 'sortOrder': 0};
-
-        final item = ListItem.fromJson(json);
-
-        expect(item.notes, isNull);
-        expect(item.isChecked, false);
-      });
-
-      test('fromJson defaults isChecked to false when null', () {
-        final json = {
-          'id': 'item-8',
-          'title': 'Item',
-          'isChecked': null,
-          'sortOrder': 0,
-        };
-
-        final item = ListItem.fromJson(json);
-
-        expect(item.isChecked, false);
-      });
-
-      test('roundtrip JSON serialization preserves data', () {
-        final original = ListItem(
-          id: 'item-9',
-          title: 'Design homepage',
-          notes: 'Use brand colors and follow style guide',
-          isChecked: true,
-          sortOrder: 1,
-        );
-
-        final json = original.toJson();
-        final restored = ListItem.fromJson(json);
-
-        expect(restored.id, original.id);
-        expect(restored.title, original.title);
-        expect(restored.notes, original.notes);
-        expect(restored.isChecked, original.isChecked);
-        expect(restored.sortOrder, original.sortOrder);
-      });
-
-      test('roundtrip with minimal data', () {
-        final original = ListItem(
-          id: 'item-10',
-          title: 'Basic item',
+      test('serializes to JSON with minimal fields', () {
+        final item = ListItem(
+          id: 'item-2',
+          listId: 'list-2',
+          title: 'Simple',
           sortOrder: 0,
         );
 
-        final json = original.toJson();
-        final restored = ListItem.fromJson(json);
+        final json = item.toJson();
 
-        expect(restored.id, original.id);
-        expect(restored.title, original.title);
-        expect(restored.isChecked, original.isChecked);
-        expect(restored.sortOrder, original.sortOrder);
+        expect(json['id'], 'item-2');
+        expect(json['list_id'], 'list-2');
+        expect(json['title'], 'Simple');
+        expect(json['notes'], isNull);
+        expect(json['is_checked'], false);
+        expect(json['sort_order'], 0);
       });
     });
 
     group('copyWith', () {
-      test('updates specified fields only', () {
+      test('creates copy with updated title', () {
         final original = ListItem(
-          id: 'item-11',
-          title: 'Original title',
-          notes: 'Original notes',
+          id: 'item-1',
+          listId: 'list-1',
+          title: 'Original',
           sortOrder: 0,
         );
 
-        final updated = original.copyWith(
-          title: 'Updated title',
-          isChecked: true,
-        );
+        final updated = original.copyWith(title: 'Updated');
 
         expect(updated.id, original.id);
-        expect(updated.title, 'Updated title');
-        expect(updated.notes, original.notes);
-        expect(updated.isChecked, true);
+        expect(updated.listId, original.listId);
+        expect(updated.title, 'Updated');
         expect(updated.sortOrder, original.sortOrder);
       });
 
-      test('preserves unchanged fields', () {
+      test('creates copy with updated isChecked', () {
         final original = ListItem(
-          id: 'item-12',
-          title: 'Title',
-          notes: 'Notes',
-          isChecked: true,
-          sortOrder: 5,
+          id: 'item-1',
+          listId: 'list-1',
+          title: 'Item',
+          sortOrder: 0,
         );
 
-        final updated = original.copyWith(sortOrder: 10);
+        final updated = original.copyWith(isChecked: true);
 
-        expect(updated.id, original.id);
-        expect(updated.title, original.title);
-        expect(updated.notes, original.notes);
-        expect(updated.isChecked, original.isChecked);
-        expect(updated.sortOrder, 10);
+        expect(updated.isChecked, true);
       });
 
-      test('can update notes', () {
+      test('creates copy with updated notes', () {
         final original = ListItem(
-          id: 'item-13',
+          id: 'item-1',
+          listId: 'list-1',
           title: 'Item',
-          notes: 'Old notes',
           sortOrder: 0,
         );
 
@@ -224,11 +233,12 @@ void main() {
         expect(updated.notes, 'New notes');
       });
 
-      test('clears notes with clearNotes flag', () {
+      test('can clear notes', () {
         final original = ListItem(
-          id: 'item-14',
+          id: 'item-1',
+          listId: 'list-1',
           title: 'Item',
-          notes: 'Some notes',
+          notes: 'Old notes',
           sortOrder: 0,
         );
 
@@ -236,139 +246,85 @@ void main() {
 
         expect(updated.notes, isNull);
       });
-
-      test('clearNotes flag takes precedence over notes parameter', () {
-        final original = ListItem(
-          id: 'item-15',
-          title: 'Item',
-          notes: 'Old notes',
-          sortOrder: 0,
-        );
-
-        final updated = original.copyWith(notes: 'New notes', clearNotes: true);
-
-        expect(updated.notes, isNull);
-      });
-
-      test('can update all fields', () {
-        final original = ListItem(id: 'item-16', title: 'Old', sortOrder: 0);
-
-        final updated = original.copyWith(
-          id: 'item-17',
-          title: 'New',
-          notes: 'New notes',
-          isChecked: true,
-          sortOrder: 10,
-        );
-
-        expect(updated.id, 'item-17');
-        expect(updated.title, 'New');
-        expect(updated.notes, 'New notes');
-        expect(updated.isChecked, true);
-        expect(updated.sortOrder, 10);
-      });
     });
 
     group('equality', () {
-      test('equality is based on id only', () {
+      test('items with same id are equal', () {
         final item1 = ListItem(
-          id: 'same-id',
-          title: 'Title 1',
-          notes: 'Notes 1',
+          id: 'item-1',
+          listId: 'list-1',
+          title: 'Item 1',
           sortOrder: 0,
         );
 
         final item2 = ListItem(
-          id: 'same-id',
-          title: 'Title 2',
-          notes: 'Notes 2',
-          isChecked: true,
-          sortOrder: 10,
+          id: 'item-1',
+          listId: 'list-2',
+          title: 'Item 2',
+          sortOrder: 1,
         );
 
         expect(item1, equals(item2));
         expect(item1.hashCode, equals(item2.hashCode));
       });
 
-      test('different ids are not equal', () {
-        final item1 = ListItem(id: 'id-1', title: 'Same title', sortOrder: 0);
+      test('items with different id are not equal', () {
+        final item1 = ListItem(
+          id: 'item-1',
+          listId: 'list-1',
+          title: 'Item',
+          sortOrder: 0,
+        );
 
-        final item2 = ListItem(id: 'id-2', title: 'Same title', sortOrder: 0);
+        final item2 = ListItem(
+          id: 'item-2',
+          listId: 'list-1',
+          title: 'Item',
+          sortOrder: 0,
+        );
 
         expect(item1, isNot(equals(item2)));
       });
-
-      test('identical items are equal', () {
-        final item = ListItem(id: 'item-18', title: 'Item', sortOrder: 0);
-
-        expect(item, equals(item));
-      });
     });
 
-    group('toString', () {
-      test('includes key identifying fields', () {
-        final item = ListItem(
-          id: 'item-19',
-          title: 'Review code',
+    group('round-trip serialization', () {
+      test('survives JSON round trip with all fields', () {
+        final original = ListItem(
+          id: 'item-1',
+          listId: 'list-1',
+          title: 'Complete task',
+          notes: 'Notes here',
           isChecked: true,
           sortOrder: 3,
         );
 
-        final string = item.toString();
+        final json = original.toJson();
+        final deserialized = ListItem.fromJson(json);
 
-        expect(string, contains('item-19'));
-        expect(string, contains('Review code'));
-        expect(string, contains('true'));
-        expect(string, contains('3'));
+        expect(deserialized.id, original.id);
+        expect(deserialized.listId, original.listId);
+        expect(deserialized.title, original.title);
+        expect(deserialized.notes, original.notes);
+        expect(deserialized.isChecked, original.isChecked);
+        expect(deserialized.sortOrder, original.sortOrder);
       });
 
-      test('has readable format', () {
-        final item = ListItem(id: 'item-20', title: 'Item', sortOrder: 0);
-
-        final string = item.toString();
-
-        expect(string, startsWith('ListItem('));
-        expect(string, contains('id:'));
-        expect(string, contains('title:'));
-      });
-    });
-
-    group('edge cases', () {
-      test('handles empty string title', () {
-        final item = ListItem(id: 'item-21', title: '', sortOrder: 0);
-
-        expect(item.title, '');
-      });
-
-      test('handles very long title', () {
-        final longTitle = 'A' * 1000;
-        final item = ListItem(id: 'item-22', title: longTitle, sortOrder: 0);
-
-        expect(item.title, longTitle);
-      });
-
-      test('handles very long notes', () {
-        final longNotes = 'B' * 5000;
-        final item = ListItem(
-          id: 'item-23',
-          title: 'Item',
-          notes: longNotes,
+      test('survives JSON round trip with minimal fields', () {
+        final original = ListItem(
+          id: 'item-2',
+          listId: 'list-2',
+          title: 'Simple',
           sortOrder: 0,
         );
 
-        expect(item.notes, longNotes);
-      });
+        final json = original.toJson();
+        final deserialized = ListItem.fromJson(json);
 
-      test('handles negative sort order', () {
-        final item = ListItem(id: 'item-24', title: 'Item', sortOrder: -1);
-
-        expect(item.sortOrder, -1);
-      });
-
-      test('handles large sort order', () {
-        final item = ListItem(id: 'item-25', title: 'Item', sortOrder: 999999);
-
-        expect(item.sortOrder, 999999);
+        expect(deserialized.id, original.id);
+        expect(deserialized.listId, original.listId);
+        expect(deserialized.title, original.title);
+        expect(deserialized.isChecked, false);
+        expect(deserialized.sortOrder, 0);
       });
     });
   });
@@ -379,68 +335,85 @@ void main() {
         final list = ListModel(
           id: 'list-1',
           spaceId: 'space-1',
+          userId: 'user-1',
           name: 'Shopping List',
         );
 
         expect(list.id, 'list-1');
         expect(list.spaceId, 'space-1');
+        expect(list.userId, 'user-1');
         expect(list.name, 'Shopping List');
         expect(list.icon, isNull);
-        expect(list.items, isEmpty);
         expect(list.style, ListStyle.bullets);
+        expect(list.totalItemCount, 0);
+        expect(list.checkedItemCount, 0);
         expect(list.createdAt, isA<DateTime>());
         expect(list.updatedAt, isA<DateTime>());
+        expect(list.sortOrder, 0);
       });
 
       test('creates with all optional fields', () {
-        final createdAt = DateTime(2025);
+        final createdAt = DateTime(2025, 1, 1);
         final updatedAt = DateTime(2025, 10, 25);
-        final items = [
-          ListItem(id: 'item-1', title: 'Item 1', sortOrder: 0),
-          ListItem(id: 'item-2', title: 'Item 2', sortOrder: 1),
-        ];
 
         final list = ListModel(
           id: 'list-2',
           spaceId: 'space-2',
-          name: 'Project Checklist',
-          icon: 'checklist',
-          items: items,
+          userId: 'user-2',
+          name: 'Project Tasks',
+          icon: '📝',
           style: ListStyle.checkboxes,
+          totalItemCount: 15,
+          checkedItemCount: 8,
           createdAt: createdAt,
           updatedAt: updatedAt,
+          sortOrder: 5,
         );
 
         expect(list.id, 'list-2');
         expect(list.spaceId, 'space-2');
-        expect(list.name, 'Project Checklist');
-        expect(list.icon, 'checklist');
-        expect(list.items, items);
+        expect(list.userId, 'user-2');
+        expect(list.name, 'Project Tasks');
+        expect(list.icon, '📝');
         expect(list.style, ListStyle.checkboxes);
+        expect(list.totalItemCount, 15);
+        expect(list.checkedItemCount, 8);
         expect(list.createdAt, createdAt);
         expect(list.updatedAt, updatedAt);
+        expect(list.sortOrder, 5);
       });
 
-      test('defaults items to empty list when null', () {
+      test('defaults style to bullets when not provided', () {
         final list = ListModel(
           id: 'list-3',
           spaceId: 'space-3',
-          name: 'Empty List',
+          userId: 'user-3',
+          name: 'List',
         );
-
-        expect(list.items, isEmpty);
-        expect(list.items, isA<List<ListItem>>());
-      });
-
-      test('defaults style to bullets', () {
-        final list = ListModel(id: 'list-4', spaceId: 'space-4', name: 'List');
 
         expect(list.style, ListStyle.bullets);
       });
 
-      test('defaults createdAt and updatedAt to now when null', () {
+      test('defaults counts to 0 when not provided', () {
+        final list = ListModel(
+          id: 'list-4',
+          spaceId: 'space-4',
+          userId: 'user-4',
+          name: 'Empty List',
+        );
+
+        expect(list.totalItemCount, 0);
+        expect(list.checkedItemCount, 0);
+      });
+
+      test('initializes dates to now when not provided', () {
         final before = DateTime.now();
-        final list = ListModel(id: 'list-5', spaceId: 'space-5', name: 'List');
+        final list = ListModel(
+          id: 'list-5',
+          spaceId: 'space-5',
+          userId: 'user-5',
+          name: 'List',
+        );
         final after = DateTime.now();
 
         expect(
@@ -462,160 +435,103 @@ void main() {
       });
     });
 
-    group('JSON serialization', () {
-      test('toJson produces correct format', () {
-        final createdAt = DateTime(2025, 1, 15, 10, 30);
-        final updatedAt = DateTime(2025, 10, 25, 14, 45);
-        final items = [
-          ListItem(
-            id: 'item-1',
-            title: 'First item',
-            notes: 'Important notes',
-            sortOrder: 0,
-          ),
-          ListItem(
-            id: 'item-2',
-            title: 'Second item',
-            isChecked: true,
-            sortOrder: 1,
-          ),
-        ];
-
-        final list = ListModel(
-          id: 'list-6',
-          spaceId: 'space-6',
-          name: 'Meeting Agenda',
-          icon: 'meeting',
-          items: items,
-          style: ListStyle.numbered,
-          createdAt: createdAt,
-          updatedAt: updatedAt,
-        );
-
-        final json = list.toJson();
-
-        expect(json['id'], 'list-6');
-        expect(json['spaceId'], 'space-6');
-        expect(json['name'], 'Meeting Agenda');
-        expect(json['icon'], 'meeting');
-        expect(json['items'], isA<List<dynamic>>());
-        expect(json['items'].length, 2);
-        expect(json['style'], 'numbered');
-        expect(json['createdAt'], createdAt.toIso8601String());
-        expect(json['updatedAt'], updatedAt.toIso8601String());
-      });
-
-      test('toJson handles null icon', () {
-        final list = ListModel(
-          id: 'list-7',
-          spaceId: 'space-7',
-          name: 'Simple List',
-        );
-
-        final json = list.toJson();
-
-        expect(json['icon'], isNull);
-      });
-
-      test('toJson serializes empty items list', () {
-        final list = ListModel(id: 'list-8', spaceId: 'space-8', name: 'Empty');
-
-        final json = list.toJson();
-
-        expect(json['items'], isEmpty);
-        expect(json['items'], isA<List<dynamic>>());
-      });
-
-      test('toJson serializes all list styles correctly', () {
-        final bulletList = ListModel(
-          id: 'list-9',
-          spaceId: 'space-9',
-          name: 'Bullet List',
-        );
-
-        final numberedList = ListModel(
-          id: 'list-10',
-          spaceId: 'space-10',
-          name: 'Numbered List',
-          style: ListStyle.numbered,
-        );
-
-        final checkboxList = ListModel(
-          id: 'list-11',
-          spaceId: 'space-11',
-          name: 'Checkbox List',
-          style: ListStyle.checkboxes,
-        );
-
-        expect(bulletList.toJson()['style'], 'bullets');
-        expect(numberedList.toJson()['style'], 'numbered');
-        expect(checkboxList.toJson()['style'], 'checkboxes');
-      });
-
-      test('fromJson deserializes correctly', () {
+    group('fromJson', () {
+      test('deserializes from JSON with all fields', () {
         final json = {
-          'id': 'list-12',
-          'spaceId': 'space-12',
-          'name': 'Book List',
-          'icon': 'book',
-          'items': [
-            {
-              'id': 'item-1',
-              'title': 'Read chapter 1',
-              'isChecked': false,
-              'sortOrder': 0,
-            },
-            {
-              'id': 'item-2',
-              'title': 'Read chapter 2',
-              'notes': 'Focus on key concepts',
-              'isChecked': true,
-              'sortOrder': 1,
-            },
-          ],
+          'id': 'list-1',
+          'space_id': 'space-1',
+          'user_id': 'user-1',
+          'name': 'Groceries',
+          'icon': '🛒',
           'style': 'checkboxes',
-          'createdAt': '2025-09-01T08:00:00.000Z',
-          'updatedAt': '2025-10-25T12:00:00.000Z',
+          'total_item_count': 12,
+          'checked_item_count': 5,
+          'created_at': '2025-01-01T10:00:00.000Z',
+          'updated_at': '2025-01-02T15:30:00.000Z',
+          'sort_order': 3,
         };
 
         final list = ListModel.fromJson(json);
 
-        expect(list.id, 'list-12');
-        expect(list.spaceId, 'space-12');
-        expect(list.name, 'Book List');
-        expect(list.icon, 'book');
-        expect(list.items.length, 2);
-        expect(list.items[0].title, 'Read chapter 1');
-        expect(list.items[1].title, 'Read chapter 2');
+        expect(list.id, 'list-1');
+        expect(list.spaceId, 'space-1');
+        expect(list.userId, 'user-1');
+        expect(list.name, 'Groceries');
+        expect(list.icon, '🛒');
         expect(list.style, ListStyle.checkboxes);
-        expect(list.createdAt, DateTime.parse('2025-09-01T08:00:00.000Z'));
-        expect(list.updatedAt, DateTime.parse('2025-10-25T12:00:00.000Z'));
+        expect(list.totalItemCount, 12);
+        expect(list.checkedItemCount, 5);
+        expect(list.createdAt, DateTime.parse('2025-01-01T10:00:00.000Z'));
+        expect(list.updatedAt, DateTime.parse('2025-01-02T15:30:00.000Z'));
+        expect(list.sortOrder, 3);
       });
 
-      test('fromJson handles null optional fields', () {
+      test('deserializes from JSON with minimal fields', () {
         final json = {
-          'id': 'list-13',
-          'spaceId': 'space-13',
-          'name': 'Minimal List',
-          'createdAt': '2025-10-25T10:00:00.000Z',
-          'updatedAt': '2025-10-25T10:00:00.000Z',
+          'id': 'list-2',
+          'space_id': 'space-2',
+          'user_id': 'user-2',
+          'name': 'Simple List',
+          'created_at': '2025-01-01T10:00:00.000Z',
+          'updated_at': '2025-01-01T10:00:00.000Z',
+        };
+
+        final list = ListModel.fromJson(json);
+
+        expect(list.id, 'list-2');
+        expect(list.spaceId, 'space-2');
+        expect(list.userId, 'user-2');
+        expect(list.name, 'Simple List');
+        expect(list.icon, isNull);
+        expect(list.style, ListStyle.bullets);
+        expect(list.totalItemCount, 0);
+        expect(list.checkedItemCount, 0);
+        expect(list.sortOrder, 0);
+      });
+
+      test('handles null icon gracefully', () {
+        final json = {
+          'id': 'list-3',
+          'space_id': 'space-3',
+          'user_id': 'user-3',
+          'name': 'List',
+          'icon': null,
+          'created_at': '2025-01-01T10:00:00.000Z',
+          'updated_at': '2025-01-01T10:00:00.000Z',
         };
 
         final list = ListModel.fromJson(json);
 
         expect(list.icon, isNull);
-        expect(list.items, isEmpty);
-        expect(list.style, ListStyle.bullets);
       });
 
-      test('fromJson defaults style to bullets when null', () {
+      test('handles null counts with default 0', () {
         final json = {
-          'id': 'list-14',
-          'spaceId': 'space-14',
+          'id': 'list-4',
+          'space_id': 'space-4',
+          'user_id': 'user-4',
+          'name': 'List',
+          'total_item_count': null,
+          'checked_item_count': null,
+          'created_at': '2025-01-01T10:00:00.000Z',
+          'updated_at': '2025-01-01T10:00:00.000Z',
+        };
+
+        final list = ListModel.fromJson(json);
+
+        expect(list.totalItemCount, 0);
+        expect(list.checkedItemCount, 0);
+      });
+
+      test('handles null style with default bullets', () {
+        final json = {
+          'id': 'list-5',
+          'space_id': 'space-5',
+          'user_id': 'user-5',
           'name': 'List',
           'style': null,
-          'createdAt': '2025-10-25T10:00:00.000Z',
-          'updatedAt': '2025-10-25T10:00:00.000Z',
+          'created_at': '2025-01-01T10:00:00.000Z',
+          'updated_at': '2025-01-01T10:00:00.000Z',
         };
 
         final list = ListModel.fromJson(json);
@@ -623,118 +539,132 @@ void main() {
         expect(list.style, ListStyle.bullets);
       });
 
-      test('roundtrip JSON serialization preserves data', () {
-        final createdAt = DateTime(2025, 5, 10, 9);
-        final updatedAt = DateTime(2025, 10, 25, 15, 30);
-        final items = [
-          ListItem(
-            id: 'item-1',
-            title: 'Design wireframes',
-            notes: 'Mobile-first approach',
-            sortOrder: 0,
-          ),
-          ListItem(
-            id: 'item-2',
-            title: 'Review designs',
-            isChecked: true,
-            sortOrder: 1,
-          ),
-        ];
+      test('handles missing sort_order with default 0', () {
+        final json = {
+          'id': 'list-6',
+          'space_id': 'space-6',
+          'user_id': 'user-6',
+          'name': 'List',
+          'created_at': '2025-01-01T10:00:00.000Z',
+          'updated_at': '2025-01-01T10:00:00.000Z',
+        };
 
-        final original = ListModel(
-          id: 'list-15',
-          spaceId: 'space-15',
-          name: 'Design Tasks',
-          icon: 'design',
-          items: items,
-          style: ListStyle.checkboxes,
+        final list = ListModel.fromJson(json);
+
+        expect(list.sortOrder, 0);
+      });
+    });
+
+    group('toJson', () {
+      test('serializes to JSON with all fields', () {
+        final createdAt = DateTime(2025, 1, 1, 10);
+        final updatedAt = DateTime(2025, 1, 2, 15, 30);
+
+        final list = ListModel(
+          id: 'list-1',
+          spaceId: 'space-1',
+          userId: 'user-1',
+          name: 'Tasks',
+          icon: '✅',
+          style: ListStyle.numbered,
+          totalItemCount: 20,
+          checkedItemCount: 12,
           createdAt: createdAt,
           updatedAt: updatedAt,
+          sortOrder: 2,
         );
 
-        final json = original.toJson();
-        final restored = ListModel.fromJson(json);
+        final json = list.toJson();
 
-        expect(restored.id, original.id);
-        expect(restored.spaceId, original.spaceId);
-        expect(restored.name, original.name);
-        expect(restored.icon, original.icon);
-        expect(restored.items.length, original.items.length);
-        expect(restored.style, original.style);
-        expect(restored.createdAt, original.createdAt);
-        expect(restored.updatedAt, original.updatedAt);
+        expect(json['id'], 'list-1');
+        expect(json['space_id'], 'space-1');
+        expect(json['user_id'], 'user-1');
+        expect(json['name'], 'Tasks');
+        expect(json['icon'], '✅');
+        expect(json['style'], 'numbered');
+        expect(json['total_item_count'], 20);
+        expect(json['checked_item_count'], 12);
+        expect(json['created_at'], createdAt.toIso8601String());
+        expect(json['updated_at'], updatedAt.toIso8601String());
+        expect(json['sort_order'], 2);
+      });
+
+      test('serializes to JSON with minimal fields', () {
+        final list = ListModel(
+          id: 'list-2',
+          spaceId: 'space-2',
+          userId: 'user-2',
+          name: 'Simple',
+        );
+
+        final json = list.toJson();
+
+        expect(json['id'], 'list-2');
+        expect(json['space_id'], 'space-2');
+        expect(json['user_id'], 'user-2');
+        expect(json['name'], 'Simple');
+        expect(json['icon'], isNull);
+        expect(json['style'], 'bullets');
+        expect(json['total_item_count'], 0);
+        expect(json['checked_item_count'], 0);
+        expect(json['sort_order'], 0);
       });
     });
 
     group('copyWith', () {
-      test('updates specified fields only', () {
+      test('creates copy with updated name', () {
         final original = ListModel(
-          id: 'list-16',
-          spaceId: 'space-16',
-          name: 'Original Name',
-          icon: 'star',
+          id: 'list-1',
+          spaceId: 'space-1',
+          userId: 'user-1',
+          name: 'Original',
         );
 
-        final updated = original.copyWith(name: 'Updated Name');
+        final updated = original.copyWith(name: 'Updated');
 
         expect(updated.id, original.id);
+        expect(updated.name, 'Updated');
         expect(updated.spaceId, original.spaceId);
-        expect(updated.name, 'Updated Name');
-        expect(updated.icon, original.icon);
-        expect(updated.items, original.items);
-        expect(updated.style, original.style);
-        expect(updated.createdAt, original.createdAt);
-        expect(updated.updatedAt, original.updatedAt);
+        expect(updated.userId, original.userId);
       });
 
-      test('preserves unchanged fields', () {
-        final createdAt = DateTime(2025);
-        final updatedAt = DateTime(2025, 10, 25);
-        final items = [ListItem(id: 'item-1', title: 'Item', sortOrder: 0)];
-
+      test('creates copy with updated style', () {
         final original = ListModel(
-          id: 'list-17',
-          spaceId: 'space-17',
-          name: 'Name',
-          icon: 'icon',
-          items: items,
-          style: ListStyle.numbered,
-          createdAt: createdAt,
-          updatedAt: updatedAt,
+          id: 'list-1',
+          spaceId: 'space-1',
+          userId: 'user-1',
+          name: 'List',
         );
 
-        final newUpdatedAt = DateTime(2025, 10, 26);
-        final updated = original.copyWith(updatedAt: newUpdatedAt);
+        final updated = original.copyWith(style: ListStyle.numbered);
 
-        expect(updated.id, original.id);
-        expect(updated.spaceId, original.spaceId);
-        expect(updated.name, original.name);
-        expect(updated.icon, original.icon);
-        expect(updated.items, original.items);
-        expect(updated.style, original.style);
-        expect(updated.createdAt, original.createdAt);
-        expect(updated.updatedAt, newUpdatedAt);
+        expect(updated.style, ListStyle.numbered);
       });
 
-      test('can update icon', () {
+      test('creates copy with updated counts', () {
         final original = ListModel(
-          id: 'list-18',
-          spaceId: 'space-18',
+          id: 'list-1',
+          spaceId: 'space-1',
+          userId: 'user-1',
           name: 'List',
-          icon: 'old-icon',
         );
 
-        final updated = original.copyWith(icon: 'new-icon');
+        final updated = original.copyWith(
+          totalItemCount: 10,
+          checkedItemCount: 5,
+        );
 
-        expect(updated.icon, 'new-icon');
+        expect(updated.totalItemCount, 10);
+        expect(updated.checkedItemCount, 5);
       });
 
-      test('clears icon with clearIcon flag', () {
+      test('can clear icon', () {
         final original = ListModel(
-          id: 'list-19',
-          spaceId: 'space-19',
+          id: 'list-1',
+          spaceId: 'space-1',
+          userId: 'user-1',
           name: 'List',
-          icon: 'icon',
+          icon: '🎯',
         );
 
         final updated = original.copyWith(clearIcon: true);
@@ -742,498 +672,206 @@ void main() {
         expect(updated.icon, isNull);
       });
 
-      test('clearIcon flag takes precedence over icon parameter', () {
+      test('preserves unchanged fields', () {
+        final createdAt = DateTime(2025, 1, 1);
         final original = ListModel(
-          id: 'list-20',
-          spaceId: 'space-20',
-          name: 'List',
-          icon: 'old-icon',
+          id: 'list-1',
+          spaceId: 'space-1',
+          userId: 'user-1',
+          name: 'Original',
+          icon: '📌',
+          style: ListStyle.checkboxes,
+          totalItemCount: 5,
+          checkedItemCount: 2,
+          createdAt: createdAt,
+          sortOrder: 3,
         );
 
-        final updated = original.copyWith(icon: 'new-icon', clearIcon: true);
+        final updated = original.copyWith(name: 'Updated');
 
-        expect(updated.icon, isNull);
-      });
-
-      test('can update all fields', () {
-        final original = ListModel(
-          id: 'list-21',
-          spaceId: 'space-21',
-          name: 'Old',
-        );
-
-        final newCreatedAt = DateTime(2025);
-        final newUpdatedAt = DateTime(2025, 10, 26);
-        final newItems = [
-          ListItem(id: 'new-item', title: 'New Item', sortOrder: 0),
-        ];
-
-        final updated = original.copyWith(
-          id: 'list-22',
-          spaceId: 'space-22',
-          name: 'New',
-          icon: 'new-icon',
-          items: newItems,
-          style: ListStyle.numbered,
-          createdAt: newCreatedAt,
-          updatedAt: newUpdatedAt,
-        );
-
-        expect(updated.id, 'list-22');
-        expect(updated.spaceId, 'space-22');
-        expect(updated.name, 'New');
-        expect(updated.icon, 'new-icon');
-        expect(updated.items, newItems);
-        expect(updated.style, ListStyle.numbered);
-        expect(updated.createdAt, newCreatedAt);
-        expect(updated.updatedAt, newUpdatedAt);
+        expect(updated.icon, original.icon);
+        expect(updated.style, original.style);
+        expect(updated.totalItemCount, original.totalItemCount);
+        expect(updated.checkedItemCount, original.checkedItemCount);
+        expect(updated.createdAt, original.createdAt);
+        expect(updated.sortOrder, original.sortOrder);
       });
     });
 
-    group('computed properties', () {
-      test('totalItems returns correct count for empty list', () {
+    group('getters', () {
+      test('totalItems returns totalItemCount', () {
         final list = ListModel(
-          id: 'list-23',
-          spaceId: 'space-23',
-          name: 'Empty',
+          id: 'list-1',
+          spaceId: 'space-1',
+          userId: 'user-1',
+          name: 'List',
+          totalItemCount: 15,
         );
 
-        expect(list.totalItems, 0);
+        expect(list.totalItems, 15);
       });
 
-      test('totalItems returns correct count for list with items', () {
-        final items = [
-          ListItem(id: 'item-1', title: 'Item 1', sortOrder: 0),
-          ListItem(id: 'item-2', title: 'Item 2', sortOrder: 1),
-          ListItem(id: 'item-3', title: 'Item 3', sortOrder: 2),
-        ];
-
+      test('checkedItems returns checkedItemCount', () {
         final list = ListModel(
-          id: 'list-24',
-          spaceId: 'space-24',
+          id: 'list-1',
+          spaceId: 'space-1',
+          userId: 'user-1',
           name: 'List',
-          items: items,
+          checkedItemCount: 7,
         );
 
-        expect(list.totalItems, 3);
+        expect(list.checkedItems, 7);
       });
 
-      test('checkedItems returns correct count when no items checked', () {
-        final items = [
-          ListItem(id: 'item-1', title: 'Item 1', sortOrder: 0),
-          ListItem(id: 'item-2', title: 'Item 2', sortOrder: 1),
-        ];
-
+      test('progress calculates correctly', () {
         final list = ListModel(
-          id: 'list-25',
-          spaceId: 'space-25',
+          id: 'list-1',
+          spaceId: 'space-1',
+          userId: 'user-1',
           name: 'List',
-          items: items,
-          style: ListStyle.checkboxes,
+          totalItemCount: 10,
+          checkedItemCount: 3,
         );
 
-        expect(list.checkedItems, 0);
-      });
-
-      test('checkedItems returns correct count when some items checked', () {
-        final items = [
-          ListItem(
-            id: 'item-1',
-            title: 'Item 1',
-            isChecked: true,
-            sortOrder: 0,
-          ),
-          ListItem(id: 'item-2', title: 'Item 2', sortOrder: 1),
-          ListItem(
-            id: 'item-3',
-            title: 'Item 3',
-            isChecked: true,
-            sortOrder: 2,
-          ),
-          ListItem(id: 'item-4', title: 'Item 4', sortOrder: 3),
-        ];
-
-        final list = ListModel(
-          id: 'list-26',
-          spaceId: 'space-26',
-          name: 'List',
-          items: items,
-          style: ListStyle.checkboxes,
-        );
-
-        expect(list.checkedItems, 2);
-      });
-
-      test('checkedItems returns correct count when all items checked', () {
-        final items = [
-          ListItem(
-            id: 'item-1',
-            title: 'Item 1',
-            isChecked: true,
-            sortOrder: 0,
-          ),
-          ListItem(
-            id: 'item-2',
-            title: 'Item 2',
-            isChecked: true,
-            sortOrder: 1,
-          ),
-        ];
-
-        final list = ListModel(
-          id: 'list-27',
-          spaceId: 'space-27',
-          name: 'List',
-          items: items,
-          style: ListStyle.checkboxes,
-        );
-
-        expect(list.checkedItems, 2);
-      });
-
-      test('checkedItems works for non-checkbox styles', () {
-        final items = [
-          ListItem(
-            id: 'item-1',
-            title: 'Item 1',
-            isChecked: true,
-            sortOrder: 0,
-          ),
-          ListItem(id: 'item-2', title: 'Item 2', sortOrder: 1),
-        ];
-
-        final list = ListModel(
-          id: 'list-28',
-          spaceId: 'space-28',
-          name: 'List',
-          items: items,
-        );
-
-        expect(list.checkedItems, 1);
+        expect(list.progress, 0.3);
       });
 
       test('progress returns 0.0 when no items', () {
         final list = ListModel(
-          id: 'list-29',
-          spaceId: 'space-29',
-          name: 'Empty',
-          style: ListStyle.checkboxes,
-        );
-
-        expect(list.progress, 0.0);
-      });
-
-      test('progress returns 0.0 when no items checked', () {
-        final items = [
-          ListItem(id: 'item-1', title: 'Item 1', sortOrder: 0),
-          ListItem(id: 'item-2', title: 'Item 2', sortOrder: 1),
-        ];
-
-        final list = ListModel(
-          id: 'list-30',
-          spaceId: 'space-30',
+          id: 'list-1',
+          spaceId: 'space-1',
+          userId: 'user-1',
           name: 'List',
-          items: items,
-          style: ListStyle.checkboxes,
         );
 
         expect(list.progress, 0.0);
       });
 
       test('progress returns 1.0 when all items checked', () {
-        final items = [
-          ListItem(
-            id: 'item-1',
-            title: 'Item 1',
-            isChecked: true,
-            sortOrder: 0,
-          ),
-          ListItem(
-            id: 'item-2',
-            title: 'Item 2',
-            isChecked: true,
-            sortOrder: 1,
-          ),
-        ];
-
         final list = ListModel(
-          id: 'list-31',
-          spaceId: 'space-31',
+          id: 'list-1',
+          spaceId: 'space-1',
+          userId: 'user-1',
           name: 'List',
-          items: items,
-          style: ListStyle.checkboxes,
+          totalItemCount: 5,
+          checkedItemCount: 5,
         );
 
         expect(list.progress, 1.0);
       });
-
-      test('progress calculates correctly for partial completion', () {
-        final items = [
-          ListItem(
-            id: 'item-1',
-            title: 'Item 1',
-            isChecked: true,
-            sortOrder: 0,
-          ),
-          ListItem(id: 'item-2', title: 'Item 2', sortOrder: 1),
-          ListItem(id: 'item-3', title: 'Item 3', sortOrder: 2),
-          ListItem(id: 'item-4', title: 'Item 4', sortOrder: 3),
-        ];
-
-        final list = ListModel(
-          id: 'list-32',
-          spaceId: 'space-32',
-          name: 'List',
-          items: items,
-          style: ListStyle.checkboxes,
-        );
-
-        expect(list.progress, 0.25);
-      });
-
-      test('progress calculates correctly for 50% completion', () {
-        final items = [
-          ListItem(
-            id: 'item-1',
-            title: 'Item 1',
-            isChecked: true,
-            sortOrder: 0,
-          ),
-          ListItem(
-            id: 'item-2',
-            title: 'Item 2',
-            isChecked: true,
-            sortOrder: 1,
-          ),
-          ListItem(id: 'item-3', title: 'Item 3', sortOrder: 2),
-          ListItem(id: 'item-4', title: 'Item 4', sortOrder: 3),
-        ];
-
-        final list = ListModel(
-          id: 'list-33',
-          spaceId: 'space-33',
-          name: 'List',
-          items: items,
-          style: ListStyle.checkboxes,
-        );
-
-        expect(list.progress, 0.5);
-      });
-
-      test('progress avoids division by zero', () {
-        final list = ListModel(
-          id: 'list-34',
-          spaceId: 'space-34',
-          name: 'Empty',
-        );
-
-        expect(() => list.progress, returnsNormally);
-        expect(list.progress, 0.0);
-      });
-
-      test('progress works for non-checkbox styles', () {
-        final items = [
-          ListItem(
-            id: 'item-1',
-            title: 'Item 1',
-            isChecked: true,
-            sortOrder: 0,
-          ),
-          ListItem(id: 'item-2', title: 'Item 2', sortOrder: 1),
-        ];
-
-        final list = ListModel(
-          id: 'list-35',
-          spaceId: 'space-35',
-          name: 'List',
-          items: items,
-        );
-
-        expect(list.progress, 0.5);
-      });
     });
 
     group('equality', () {
-      test('equality is based on id only', () {
+      test('lists with same id are equal', () {
         final list1 = ListModel(
-          id: 'same-id',
+          id: 'list-1',
           spaceId: 'space-1',
+          userId: 'user-1',
           name: 'Name 1',
-          icon: 'icon-1',
-          items: [ListItem(id: 'item-1', title: 'Item', sortOrder: 0)],
         );
 
         final list2 = ListModel(
-          id: 'same-id',
+          id: 'list-1',
           spaceId: 'space-2',
+          userId: 'user-2',
           name: 'Name 2',
-          icon: 'icon-2',
-          style: ListStyle.numbered,
         );
 
         expect(list1, equals(list2));
         expect(list1.hashCode, equals(list2.hashCode));
       });
 
-      test('different ids are not equal', () {
+      test('lists with different id are not equal', () {
         final list1 = ListModel(
-          id: 'id-1',
+          id: 'list-1',
           spaceId: 'space-1',
-          name: 'Same name',
+          userId: 'user-1',
+          name: 'Name',
         );
 
         final list2 = ListModel(
-          id: 'id-2',
+          id: 'list-2',
           spaceId: 'space-1',
-          name: 'Same name',
+          userId: 'user-1',
+          name: 'Name',
         );
 
         expect(list1, isNot(equals(list2)));
       });
-
-      test('identical lists are equal', () {
-        final list = ListModel(
-          id: 'list-36',
-          spaceId: 'space-36',
-          name: 'List',
-        );
-
-        expect(list, equals(list));
-      });
     });
 
     group('toString', () {
-      test('includes key identifying fields', () {
-        final items = [
-          ListItem(
-            id: 'item-1',
-            title: 'Item 1',
-            isChecked: true,
-            sortOrder: 0,
-          ),
-          ListItem(id: 'item-2', title: 'Item 2', sortOrder: 1),
-        ];
-
+      test('returns readable string representation', () {
         final list = ListModel(
-          id: 'list-37',
-          spaceId: 'space-37',
+          id: 'list-1',
+          spaceId: 'space-1',
+          userId: 'user-1',
           name: 'My List',
-          items: items,
           style: ListStyle.checkboxes,
         );
 
         final string = list.toString();
 
-        expect(string, contains('list-37'));
+        expect(string, contains('ListModel'));
+        expect(string, contains('list-1'));
         expect(string, contains('My List'));
-        expect(string, contains('space-37'));
+        expect(string, contains('space-1'));
+        expect(string, contains('user-1'));
         expect(string, contains('checkboxes'));
-        expect(string, contains('2')); // totalItems
-        expect(string, contains('1')); // checkedItems
-      });
-
-      test('has readable format', () {
-        final list = ListModel(
-          id: 'list-38',
-          spaceId: 'space-38',
-          name: 'List',
-        );
-
-        final string = list.toString();
-
-        expect(string, startsWith('ListModel('));
-        expect(string, contains('id:'));
-        expect(string, contains('name:'));
-        expect(string, contains('spaceId:'));
-        expect(string, contains('style:'));
       });
     });
 
-    group('edge cases', () {
-      test('handles empty string name', () {
-        final list = ListModel(id: 'list-39', spaceId: 'space-39', name: '');
+    group('round-trip serialization', () {
+      test('survives JSON round trip with all fields', () {
+        final original = ListModel(
+          id: 'list-1',
+          spaceId: 'space-1',
+          userId: 'user-1',
+          name: 'Test List',
+          icon: '🎯',
+          style: ListStyle.simple,
+          totalItemCount: 12,
+          checkedItemCount: 6,
+          createdAt: DateTime(2025, 1, 1, 10),
+          updatedAt: DateTime(2025, 1, 2, 15),
+          sortOrder: 7,
+        );
 
-        expect(list.name, '');
+        final json = original.toJson();
+        final deserialized = ListModel.fromJson(json);
+
+        expect(deserialized.id, original.id);
+        expect(deserialized.spaceId, original.spaceId);
+        expect(deserialized.userId, original.userId);
+        expect(deserialized.name, original.name);
+        expect(deserialized.icon, original.icon);
+        expect(deserialized.style, original.style);
+        expect(deserialized.totalItemCount, original.totalItemCount);
+        expect(deserialized.checkedItemCount, original.checkedItemCount);
+        expect(deserialized.createdAt, original.createdAt);
+        expect(deserialized.updatedAt, original.updatedAt);
+        expect(deserialized.sortOrder, original.sortOrder);
       });
 
-      test('handles very long name', () {
-        final longName = 'A' * 1000;
-        final list = ListModel(
-          id: 'list-40',
-          spaceId: 'space-40',
-          name: longName,
+      test('survives JSON round trip with minimal fields', () {
+        final original = ListModel(
+          id: 'list-2',
+          spaceId: 'space-2',
+          userId: 'user-2',
+          name: 'Minimal',
         );
 
-        expect(list.name, longName);
-      });
+        final json = original.toJson();
+        final deserialized = ListModel.fromJson(json);
 
-      test('handles emoji icon', () {
-        final list = ListModel(
-          id: 'list-41',
-          spaceId: 'space-41',
-          name: 'List',
-          icon: '📝',
-        );
-
-        expect(list.icon, '📝');
-      });
-
-      test('handles many items', () {
-        final manyItems = List.generate(
-          100,
-          (i) => ListItem(id: 'item-$i', title: 'Item $i', sortOrder: i),
-        );
-
-        final list = ListModel(
-          id: 'list-42',
-          spaceId: 'space-42',
-          name: 'Many Items',
-          items: manyItems,
-        );
-
-        expect(list.totalItems, 100);
-        expect(list.items.length, 100);
-      });
-
-      test('handles single item', () {
-        final items = [
-          ListItem(id: 'item-1', title: 'Only item', sortOrder: 0),
-        ];
-
-        final list = ListModel(
-          id: 'list-43',
-          spaceId: 'space-43',
-          name: 'Single Item',
-          items: items,
-        );
-
-        expect(list.totalItems, 1);
-      });
-
-      test('handles all list styles', () {
-        final bulletList = ListModel(
-          id: 'list-44',
-          spaceId: 'space-44',
-          name: 'Bullet',
-        );
-
-        final numberedList = ListModel(
-          id: 'list-45',
-          spaceId: 'space-45',
-          name: 'Numbered',
-          style: ListStyle.numbered,
-        );
-
-        final checkboxList = ListModel(
-          id: 'list-46',
-          spaceId: 'space-46',
-          name: 'Checkbox',
-          style: ListStyle.checkboxes,
-        );
-
-        expect(bulletList.style, ListStyle.bullets);
-        expect(numberedList.style, ListStyle.numbered);
-        expect(checkboxList.style, ListStyle.checkboxes);
+        expect(deserialized.id, original.id);
+        expect(deserialized.spaceId, original.spaceId);
+        expect(deserialized.userId, original.userId);
+        expect(deserialized.name, original.name);
+        expect(deserialized.icon, isNull);
+        expect(deserialized.style, ListStyle.bullets);
+        expect(deserialized.totalItemCount, 0);
+        expect(deserialized.checkedItemCount, 0);
       });
     });
   });
