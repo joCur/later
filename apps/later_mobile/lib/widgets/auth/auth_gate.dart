@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:later_mobile/providers/auth_provider.dart';
 import 'package:later_mobile/widgets/screens/home_screen.dart';
-import 'package:later_mobile/widgets/screens/sign_in_screen.dart';
+import 'package:later_mobile/widgets/screens/auth/sign_in_screen.dart';
 import 'package:provider/provider.dart';
 
 /// Authentication gate that routes users based on authentication status
