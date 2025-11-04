@@ -1,15 +1,36 @@
 import 'package:flutter/material.dart';
 import 'package:later_mobile/core/theme/temporal_flow_theme.dart';
+import 'package:later_mobile/providers/auth_provider.dart';
+import 'package:later_mobile/providers/content_provider.dart';
+import 'package:later_mobile/providers/spaces_provider.dart';
+import 'package:later_mobile/providers/theme_provider.dart';
+import 'package:mockito/annotations.dart';
+import 'package:mockito/mockito.dart';
+import 'package:provider/provider.dart';
+
+import 'test_helpers.mocks.dart';
 
 /// Helper functions for widget testing.
 ///
 /// This file provides common utilities for setting up widget tests
-/// with proper theme configuration.
+/// with proper theme configuration and mock providers.
 
-/// Creates a MaterialApp with proper theme configuration for widget tests.
+@GenerateNiceMocks([
+  MockSpec<AuthProvider>(),
+  MockSpec<SpacesProvider>(),
+  MockSpec<ContentProvider>(),
+  MockSpec<ThemeProvider>(),
+])
+void _generateMocks() {
+  // This function exists only to trigger mock generation
+}
+
+/// Creates a MaterialApp with proper theme configuration and mock providers
+/// for widget tests.
 ///
 /// This helper ensures that all design system components have access to
-/// the required [TemporalFlowTheme] extension.
+/// the required [TemporalFlowTheme] extension and provides mock providers
+/// for AuthProvider, SpacesProvider, and ContentProvider.
 ///
 /// Example usage:
 /// ```dart
@@ -20,18 +41,37 @@ import 'package:later_mobile/core/theme/temporal_flow_theme.dart';
 /// );
 /// ```
 Widget testApp(Widget child) {
-  return MaterialApp(
-    theme: ThemeData.light().copyWith(
-      extensions: <ThemeExtension<dynamic>>[TemporalFlowTheme.light()],
+  final mockAuth = MockAuthProvider();
+  final mockSpaces = MockSpacesProvider();
+  final mockContent = MockContentProvider();
+  final mockTheme = MockThemeProvider();
+
+  // Set up basic mock behavior - stub async methods that return Futures
+  when(mockSpaces.getSpaceItemCount(any))
+      .thenAnswer((_) async => 0);
+
+  return MultiProvider(
+    providers: [
+      ChangeNotifierProvider<AuthProvider>.value(value: mockAuth),
+      ChangeNotifierProvider<SpacesProvider>.value(value: mockSpaces),
+      ChangeNotifierProvider<ContentProvider>.value(value: mockContent),
+      ChangeNotifierProvider<ThemeProvider>.value(value: mockTheme),
+    ],
+    child: MaterialApp(
+      theme: ThemeData.light().copyWith(
+        extensions: <ThemeExtension<dynamic>>[TemporalFlowTheme.light()],
+      ),
+      home: Scaffold(body: child),
     ),
-    home: Scaffold(body: child),
   );
 }
 
-/// Creates a MaterialApp with dark theme configuration for widget tests.
+/// Creates a MaterialApp with dark theme configuration and mock providers
+/// for widget tests.
 ///
 /// This helper ensures that all design system components have access to
-/// the required [TemporalFlowTheme] extension in dark mode.
+/// the required [TemporalFlowTheme] extension in dark mode and provides
+/// mock providers for AuthProvider, SpacesProvider, and ContentProvider.
 ///
 /// Example usage:
 /// ```dart
@@ -42,10 +82,27 @@ Widget testApp(Widget child) {
 /// );
 /// ```
 Widget testAppDark(Widget child) {
-  return MaterialApp(
-    theme: ThemeData.dark().copyWith(
-      extensions: <ThemeExtension<dynamic>>[TemporalFlowTheme.dark()],
+  final mockAuth = MockAuthProvider();
+  final mockSpaces = MockSpacesProvider();
+  final mockContent = MockContentProvider();
+  final mockTheme = MockThemeProvider();
+
+  // Set up basic mock behavior - stub async methods that return Futures
+  when(mockSpaces.getSpaceItemCount(any))
+      .thenAnswer((_) async => 0);
+
+  return MultiProvider(
+    providers: [
+      ChangeNotifierProvider<AuthProvider>.value(value: mockAuth),
+      ChangeNotifierProvider<SpacesProvider>.value(value: mockSpaces),
+      ChangeNotifierProvider<ContentProvider>.value(value: mockContent),
+      ChangeNotifierProvider<ThemeProvider>.value(value: mockTheme),
+    ],
+    child: MaterialApp(
+      theme: ThemeData.dark().copyWith(
+        extensions: <ThemeExtension<dynamic>>[TemporalFlowTheme.dark()],
+      ),
+      home: Scaffold(body: child),
     ),
-    home: Scaffold(body: child),
   );
 }
