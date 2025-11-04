@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:later_mobile/core/navigation/page_transitions.dart';
+import 'package:later_mobile/core/theme/temporal_flow_theme.dart';
 
 void main() {
   group('SharedAxisPageRoute', () {
@@ -11,6 +12,9 @@ void main() {
 
       await tester.pumpWidget(
         MaterialApp(
+          theme: ThemeData.light().copyWith(
+            extensions: <ThemeExtension<dynamic>>[TemporalFlowTheme.light()],
+          ),
           home: const Scaffold(body: Text('Home')),
           onGenerateRoute: (settings) => route,
         ),
@@ -19,6 +23,9 @@ void main() {
       // Navigate to the route
       await tester.pumpWidget(
         MaterialApp(
+          theme: ThemeData.light().copyWith(
+            extensions: <ThemeExtension<dynamic>>[TemporalFlowTheme.light()],
+          ),
           home: Builder(
             builder: (context) {
               return Scaffold(
@@ -45,6 +52,9 @@ void main() {
 
       await tester.pumpWidget(
         MaterialApp(
+          theme: ThemeData.light().copyWith(
+            extensions: <ThemeExtension<dynamic>>[TemporalFlowTheme.light()],
+          ),
           home: MediaQuery(
             data: const MediaQueryData(disableAnimations: true),
             child: Builder(
@@ -78,6 +88,9 @@ void main() {
 
       await tester.pumpWidget(
         MaterialApp(
+          theme: ThemeData.light().copyWith(
+            extensions: <ThemeExtension<dynamic>>[TemporalFlowTheme.light()],
+          ),
           home: Builder(
             builder: (context) {
               return Scaffold(
@@ -112,6 +125,9 @@ void main() {
 
       await tester.pumpWidget(
         MaterialApp(
+          theme: ThemeData.light().copyWith(
+            extensions: <ThemeExtension<dynamic>>[TemporalFlowTheme.light()],
+          ),
           home: Builder(
             builder: (context) {
               return Scaffold(
@@ -138,6 +154,9 @@ void main() {
 
       await tester.pumpWidget(
         MaterialApp(
+          theme: ThemeData.light().copyWith(
+            extensions: <ThemeExtension<dynamic>>[TemporalFlowTheme.light()],
+          ),
           home: MediaQuery(
             data: const MediaQueryData(disableAnimations: true),
             child: Builder(
@@ -172,6 +191,9 @@ void main() {
 
       await tester.pumpWidget(
         MaterialApp(
+          theme: ThemeData.light().copyWith(
+            extensions: <ThemeExtension<dynamic>>[TemporalFlowTheme.light()],
+          ),
           home: Builder(
             builder: (context) {
               return Scaffold(
@@ -215,6 +237,9 @@ void main() {
 
       await tester.pumpWidget(
         MaterialApp(
+          theme: ThemeData.light().copyWith(
+            extensions: <ThemeExtension<dynamic>>[TemporalFlowTheme.light()],
+          ),
           home: Builder(
             builder: (context) {
               return Scaffold(
@@ -243,6 +268,9 @@ void main() {
 
       await tester.pumpWidget(
         MaterialApp(
+          theme: ThemeData.light().copyWith(
+            extensions: <ThemeExtension<dynamic>>[TemporalFlowTheme.light()],
+          ),
           home: Builder(
             builder: (context) {
               return Scaffold(
@@ -271,6 +299,9 @@ void main() {
 
       await tester.pumpWidget(
         MaterialApp(
+          theme: ThemeData.light().copyWith(
+            extensions: <ThemeExtension<dynamic>>[TemporalFlowTheme.light()],
+          ),
           home: Builder(
             builder: (context) {
               return Scaffold(
