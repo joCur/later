@@ -198,6 +198,40 @@ The project uses strict linting rules (see `analysis_options.yaml`):
 - Use Supabase local development server for integration tests
 - Note: Test suite is currently undergoing migration from Hive to Supabase
 
+### Widget Testing with test_helpers.dart
+
+**IMPORTANT**: All widget tests must use the `testApp()` helper from `test/test_helpers.dart` to properly configure theme extensions.
+
+The design system components (buttons, cards, etc.) require `TemporalFlowTheme` extension to be available in the theme. Without it, widgets will throw null check errors when accessing theme properties.
+
+**Usage pattern:**
+```dart
+import 'package:flutter_test/flutter_test.dart';
+import '../../test_helpers.dart'; // Adjust path based on test location
+
+testWidgets('my widget test', (tester) async {
+  await tester.pumpWidget(
+    testApp(
+      MyWidget(),
+    ),
+  );
+
+  // Your test assertions...
+});
+```
+
+**Available helpers:**
+- `testApp(Widget child)` - MaterialApp with light theme + TemporalFlowTheme.light()
+- `testAppDark(Widget child)` - MaterialApp with dark theme + TemporalFlowTheme.dark()
+
+**Why this matters:**
+- Design system components use `Theme.of(context).extension<TemporalFlowTheme>()!`
+- Without the extension, tests fail with "Null check operator used on a null value"
+- The helper wraps your widget in a properly configured MaterialApp + Scaffold
+- Ensures consistent theme setup across all tests
+
+**Do NOT create custom MaterialApp wrappers** in individual test files. Always use the shared helpers to prevent theme-related test failures.
+
 ## Common Development Patterns
 
 ### Adding a New Content Type
