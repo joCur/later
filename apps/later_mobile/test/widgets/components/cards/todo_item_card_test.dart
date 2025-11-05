@@ -10,6 +10,7 @@ void main() {
     // Test data
     final testTodoItem = TodoItem(
       id: 'test-item-1',
+      todoListId: 'test-todo-list-1',
       title: 'Complete project documentation',
       description: 'Write comprehensive docs',
       dueDate: DateTime(2025, 3, 15),
@@ -20,6 +21,7 @@ void main() {
 
     final completedTodoItem = TodoItem(
       id: 'test-item-2',
+      todoListId: 'test-todo-list-1',
       title: 'Review pull request',
       isCompleted: true,
       sortOrder: 1,
@@ -27,6 +29,7 @@ void main() {
 
     final minimalTodoItem = TodoItem(
       id: 'test-item-3',
+      todoListId: 'test-todo-list-1',
       title: 'Simple task',
       sortOrder: 2,
     );
@@ -455,7 +458,7 @@ void main() {
 
     group('Edge Cases', () {
       testWidgets('handles empty title gracefully', (tester) async {
-        final emptyTitleItem = TodoItem(id: 'empty', title: '', sortOrder: 0);
+        final emptyTitleItem = TodoItem(id: 'empty', todoListId: 'test-todo-list-1', title: '', sortOrder: 0);
 
         await tester.pumpWidget(
           makeTestableWidget(TodoItemCard(todoItem: emptyTitleItem)),
@@ -467,6 +470,7 @@ void main() {
       testWidgets('handles very long title with ellipsis', (tester) async {
         final longTitleItem = TodoItem(
           id: 'long',
+          todoListId: 'test-todo-list-1',
           title:
               'This is a very long title that should be truncated with an ellipsis because it exceeds the maximum width available in the card',
           sortOrder: 0,

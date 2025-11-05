@@ -2,24 +2,27 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:later_mobile/data/models/note_model.dart';
 import 'package:later_mobile/design_system/organisms/cards/note_card.dart';
+import '../../../test_helpers.dart';
 
 void main() {
   group('NoteCard', () {
-    // Helper function to create an Item (Note)
-    Item createNote({
+    // Helper function to create a Note
+    Note createNote({
       String id = '1',
       String title = 'Meeting Notes',
       String? content,
       List<String>? tags,
       String spaceId = 'space1',
+      String userId = 'user1',
       DateTime? createdAt,
       DateTime? updatedAt,
     }) {
-      return Item(
+      return Note(
         id: id,
         title: title,
         content: content,
         spaceId: spaceId,
+        userId: userId,
         tags: tags,
         createdAt: createdAt,
         updatedAt: updatedAt,
@@ -27,13 +30,11 @@ void main() {
     }
 
     group('Rendering', () {
-      testWidgets('renders with Item (Note) data', (tester) async {
+      testWidgets('renders with Note data', (tester) async {
         final note = createNote();
 
         await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(body: NoteCard(item: note)),
-          ),
+          testApp(NoteCard(note: note)),
         );
 
         expect(find.byType(NoteCard), findsOneWidget);
@@ -44,9 +45,7 @@ void main() {
         final note = createNote(title: 'Project Ideas');
 
         await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(body: NoteCard(item: note)),
-          ),
+          testApp(NoteCard(note: note)),
         );
 
         expect(find.text('Project Ideas'), findsOneWidget);
@@ -58,9 +57,7 @@ void main() {
         );
 
         await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(body: NoteCard(item: note)),
-          ),
+          testApp(NoteCard(note: note)),
         );
 
         expect(find.textContaining('This is a short note'), findsOneWidget);
@@ -73,9 +70,7 @@ void main() {
         final note = createNote(content: longContent);
 
         await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(body: NoteCard(item: note)),
-          ),
+          testApp(NoteCard(note: note)),
         );
 
         // Should find text that contains the first 100 chars with ellipsis
@@ -90,9 +85,7 @@ void main() {
         final note = createNote();
 
         await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(body: NoteCard(item: note)),
-          ),
+          testApp(NoteCard(note: note)),
         );
 
         expect(find.byIcon(Icons.description_outlined), findsOneWidget);
@@ -104,9 +97,7 @@ void main() {
         final note = createNote();
 
         await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(body: NoteCard(item: note)),
-          ),
+          testApp(NoteCard(note: note)),
         );
 
         // GradientPillBorder should be present
@@ -117,9 +108,7 @@ void main() {
         final note = createNote(tags: ['work', 'important', 'review']);
 
         await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(body: NoteCard(item: note)),
-          ),
+          testApp(NoteCard(note: note)),
         );
 
         // Should show tags
@@ -132,9 +121,7 @@ void main() {
         final note = createNote(tags: ['tag1', 'tag2', 'tag3', 'tag4', 'tag5']);
 
         await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(body: NoteCard(item: note)),
-          ),
+          testApp(NoteCard(note: note)),
         );
 
         // Should show first 3 tags
@@ -150,9 +137,7 @@ void main() {
         final note = createNote(tags: ['tag1', 'tag2', 'tag3', 'tag4']);
 
         await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(body: NoteCard(item: note)),
-          ),
+          testApp(NoteCard(note: note)),
         );
 
         expect(find.text('+1 more'), findsOneWidget);
@@ -163,9 +148,7 @@ void main() {
         final note = createNote(createdAt: createdDate);
 
         await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(body: NoteCard(item: note)),
-          ),
+          testApp(NoteCard(note: note)),
         );
 
         // Should show date in "MMM d, y" format (e.g., "Jan 15, 2024")
@@ -177,9 +160,7 @@ void main() {
         final note = createNote();
 
         await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(body: NoteCard(item: note)),
-          ),
+          testApp(NoteCard(note: note)),
         );
 
         expect(find.byType(NoteCard), findsOneWidget);
@@ -192,9 +173,7 @@ void main() {
         final note = createNote(content: '');
 
         await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(body: NoteCard(item: note)),
-          ),
+          testApp(NoteCard(note: note)),
         );
 
         expect(find.byType(NoteCard), findsOneWidget);
@@ -205,9 +184,7 @@ void main() {
         final note = createNote(tags: []);
 
         await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(body: NoteCard(item: note)),
-          ),
+          testApp(NoteCard(note: note)),
         );
 
         expect(find.byType(NoteCard), findsOneWidget);
@@ -218,9 +195,7 @@ void main() {
         final note = createNote(tags: ['work']);
 
         await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(body: NoteCard(item: note)),
-          ),
+          testApp(NoteCard(note: note)),
         );
 
         expect(find.text('work'), findsOneWidget);
@@ -232,9 +207,7 @@ void main() {
         final note = createNote(tags: ['tag1', 'tag2', 'tag3']);
 
         await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(body: NoteCard(item: note)),
-          ),
+          testApp(NoteCard(note: note)),
         );
 
         expect(find.text('tag1'), findsOneWidget);
@@ -250,9 +223,7 @@ void main() {
         );
 
         await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(body: NoteCard(item: note)),
-          ),
+          testApp(NoteCard(note: note)),
         );
 
         expect(find.byType(NoteCard), findsOneWidget);
@@ -265,14 +236,12 @@ void main() {
         var tapped = false;
 
         await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(
-              body: NoteCard(
-                item: note,
-                onTap: () {
-                  tapped = true;
-                },
-              ),
+          testApp(
+            NoteCard(
+              note: note,
+              onTap: () {
+                tapped = true;
+              },
             ),
           ),
         );
@@ -290,14 +259,12 @@ void main() {
         var longPressed = false;
 
         await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(
-              body: NoteCard(
-                item: note,
-                onLongPress: () {
-                  longPressed = true;
-                },
-              ),
+          testApp(
+            NoteCard(
+              note: note,
+              onLongPress: () {
+                longPressed = true;
+              },
             ),
           ),
         );
@@ -312,9 +279,7 @@ void main() {
         final note = createNote();
 
         await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(body: NoteCard(item: note)),
-          ),
+          testApp(NoteCard(note: note)),
         );
 
         // Should not throw error when tapped without callback
@@ -330,9 +295,7 @@ void main() {
         final note = createNote();
 
         await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(body: NoteCard(item: note)),
-          ),
+          testApp(NoteCard(note: note)),
         );
 
         // Find the container Semantics widget
@@ -357,9 +320,7 @@ void main() {
         );
 
         await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(body: NoteCard(item: note)),
-          ),
+          testApp(NoteCard(note: note)),
         );
 
         // Find the container Semantics widget
@@ -383,9 +344,7 @@ void main() {
         final note = createNote();
 
         await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(body: NoteCard(item: note)),
-          ),
+          testApp(NoteCard(note: note)),
         );
 
         // Card should render with gradient border
@@ -396,9 +355,7 @@ void main() {
         final note = createNote(content: 'Some content', tags: ['tag1']);
 
         await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(body: NoteCard(item: note)),
-          ),
+          testApp(NoteCard(note: note)),
         );
 
         // Should have icon, title, content preview, and tags
@@ -412,9 +369,7 @@ void main() {
         final note = createNote();
 
         await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(body: NoteCard(item: note)),
-          ),
+          testApp(NoteCard(note: note)),
         );
 
         // Find ShaderMask widget
@@ -427,11 +382,7 @@ void main() {
         final note = createNote();
 
         await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(
-              body: NoteCard(item: note, onTap: () {}),
-            ),
-          ),
+          testApp(NoteCard(note: note, onTap: () {})),
         );
 
         // Find the card
@@ -457,9 +408,7 @@ void main() {
         final note = createNote();
 
         await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(body: NoteCard(item: note, index: 0)),
-          ),
+          testApp(NoteCard(note: note, index: 0)),
         );
 
         // Card should render
@@ -476,9 +425,7 @@ void main() {
         final note = createNote();
 
         await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(body: NoteCard(item: note)),
-          ),
+          testApp(NoteCard(note: note)),
         );
 
         // Card should render without animation
@@ -493,14 +440,12 @@ void main() {
         );
 
         await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(
-              body: ListView.builder(
-                itemCount: notes.length,
-                itemBuilder: (context, index) {
-                  return NoteCard(item: notes[index], index: index);
-                },
-              ),
+          testApp(
+            ListView.builder(
+              itemCount: notes.length,
+              itemBuilder: (context, index) {
+                return NoteCard(note: notes[index], index: index);
+              },
             ),
           ),
         );
@@ -526,9 +471,7 @@ void main() {
         final note = createNote(content: content);
 
         await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(body: NoteCard(item: note)),
-          ),
+          testApp(NoteCard(note: note)),
         );
 
         expect(find.byType(NoteCard), findsOneWidget);
@@ -539,9 +482,7 @@ void main() {
         final note = createNote(content: content);
 
         await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(body: NoteCard(item: note)),
-          ),
+          testApp(NoteCard(note: note)),
         );
 
         expect(find.byType(NoteCard), findsOneWidget);
@@ -552,9 +493,7 @@ void main() {
         final note = createNote(content: content);
 
         await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(body: NoteCard(item: note)),
-          ),
+          testApp(NoteCard(note: note)),
         );
 
         expect(find.byType(NoteCard), findsOneWidget);
@@ -569,11 +508,7 @@ void main() {
         );
 
         await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(
-              body: SizedBox(width: 300, child: NoteCard(item: note)),
-            ),
-          ),
+          testApp(SizedBox(width: 300, child: NoteCard(note: note))),
         );
 
         expect(find.byType(NoteCard), findsOneWidget);
@@ -584,9 +519,7 @@ void main() {
         final note = createNote(tags: tags);
 
         await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(body: NoteCard(item: note)),
-          ),
+          testApp(NoteCard(note: note)),
         );
 
         // Should show first 3 tags
@@ -604,11 +537,7 @@ void main() {
         );
 
         await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(
-              body: SizedBox(width: 300, child: NoteCard(item: note)),
-            ),
-          ),
+          testApp(SizedBox(width: 300, child: NoteCard(note: note))),
         );
 
         expect(find.byType(NoteCard), findsOneWidget);
@@ -622,9 +551,7 @@ void main() {
         );
 
         await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(body: NoteCard(item: note)),
-          ),
+          testApp(NoteCard(note: note)),
         );
 
         expect(find.textContaining('Unicode Test'), findsOneWidget);
@@ -634,9 +561,7 @@ void main() {
         final note = createNote();
 
         await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(body: NoteCard(item: note)),
-          ),
+          testApp(NoteCard(note: note)),
         );
 
         expect(find.byType(NoteCard), findsOneWidget);
@@ -648,9 +573,7 @@ void main() {
         final note = createNote();
 
         await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(body: NoteCard(item: note)),
-          ),
+          testApp(NoteCard(note: note)),
         );
 
         // Should show date icon
@@ -661,9 +584,7 @@ void main() {
         final note = createNote();
 
         await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(body: NoteCard(item: note, showMetadata: false)),
-          ),
+          testApp(NoteCard(note: note, showMetadata: false)),
         );
 
         // Should not show date icon

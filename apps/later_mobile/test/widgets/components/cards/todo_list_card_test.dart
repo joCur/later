@@ -1,44 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:later_mobile/data/models/list_model.dart';
-import 'package:later_mobile/data/models/list_item_model.dart';
-import 'package:later_mobile/data/models/list_style.dart';
-import 'package:later_mobile/data/models/todo_item_model.dart';
-import 'package:later_mobile/data/models/todo_priority.dart';
+import 'package:later_mobile/data/models/todo_list_model.dart';
 import 'package:later_mobile/design_system/organisms/cards/todo_list_card.dart';
+import '../../../test_helpers.dart';
 
 void main() {
   group('TodoListCard', () {
-    // Helper function to create a TodoList with items
+    // Helper function to create a TodoList
     TodoList createTodoList({
       String id = '1',
       String name = 'Shopping List',
+      String spaceId = 'space1',
+      String userId = 'user1',
       String? description,
-      List<TodoItem>? items,
+      int totalItemCount = 0,
+      int completedItemCount = 0,
     }) {
       return TodoList(
         id: id,
-        spaceId: 'space1',
+        spaceId: spaceId,
+        userId: userId,
         name: name,
         description: description,
-        items: items,
-      );
-    }
-
-    // Helper function to create a TodoItem
-    TodoItem createTodoItem({
-      required String id,
-      required String title,
-      bool isCompleted = false,
-      DateTime? dueDate,
-      int sortOrder = 0,
-    }) {
-      return TodoItem(
-        id: id,
-        title: title,
-        isCompleted: isCompleted,
-        dueDate: dueDate,
-        sortOrder: sortOrder,
+        totalItemCount: totalItemCount,
+        completedItemCount: completedItemCount,
       );
     }
 
@@ -47,9 +32,7 @@ void main() {
         final todoList = createTodoList();
 
         await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(body: TodoListCard(todoList: todoList)),
-          ),
+          testApp(TodoListCard(todoList: todoList)),
         );
 
         expect(find.byType(TodoListCard), findsOneWidget);
@@ -57,154 +40,141 @@ void main() {
       });
 
       testWidgets('displays name correctly', (tester) async {
-        final todoList = createTodoList(name: 'Project Tasks');
+        final todoList = createTodoList(name: 'Daily Tasks');
 
         await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(body: TodoListCard(todoList: todoList)),
-          ),
+          testApp(TodoListCard(todoList: todoList)),
         );
 
-        expect(find.text('Project Tasks'), findsOneWidget);
+        expect(find.text('Daily Tasks'), findsOneWidget);
       });
 
-      testWidgets('shows progress indicator with correct format', (
+      testWidgets('shows progress text with correct format - multiple items', (
         tester,
       ) async {
         final todoList = createTodoList(
-          items: [
-            createTodoItem(id: '1', title: 'Task 1', isCompleted: true),
-            createTodoItem(id: '2', title: 'Task 2', isCompleted: true),
-            createTodoItem(id: '3', title: 'Task 3', isCompleted: true),
-            createTodoItem(id: '4', title: 'Task 4', isCompleted: true),
-            createTodoItem(id: '5', title: 'Task 5'),
-            createTodoItem(id: '6', title: 'Task 6'),
-            createTodoItem(id: '7', title: 'Task 7'),
-          ],
+          totalItemCount: 7,
+          completedItemCount: 4,
         );
 
         await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(body: TodoListCard(todoList: todoList)),
-          ),
+          testApp(TodoListCard(todoList: todoList)),
         );
 
-        // Should show "4 of 7 completed" or similar
-        expect(find.textContaining('4'), findsAtLeastNWidgets(1));
-        expect(find.textContaining('7'), findsAtLeastNWidgets(1));
+        expect(find.text('4 of 7 completed'), findsOneWidget);
       });
 
-      testWidgets('renders progress bar', (tester) async {
+      testWidgets('shows progress text with singular format - one item total', (
+        tester,
+      ) async {
         final todoList = createTodoList(
-          items: [
-            createTodoItem(id: '1', title: 'Task 1', isCompleted: true),
-            createTodoItem(id: '2', title: 'Task 2'),
-          ],
+          totalItemCount: 1,
+          completedItemCount: 0,
         );
 
         await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(body: TodoListCard(todoList: todoList)),
-          ),
+          testApp(TodoListCard(todoList: todoList)),
+        );
+
+        expect(find.text('0 of 1 completed'), findsOneWidget);
+      });
+
+      testWidgets('shows progress text for empty list', (tester) async {
+        final todoList = createTodoList(
+          totalItemCount: 0,
+          completedItemCount: 0,
+        );
+
+        await tester.pumpWidget(
+          testApp(TodoListCard(todoList: todoList)),
+        );
+
+        expect(find.text('0 of 0 completed'), findsOneWidget);
+      });
+
+      testWidgets('shows progress bar', (tester) async {
+        final todoList = createTodoList(
+          totalItemCount: 10,
+          completedItemCount: 5,
+        );
+
+        await tester.pumpWidget(
+          testApp(TodoListCard(todoList: todoList)),
         );
 
         expect(find.byType(LinearProgressIndicator), findsOneWidget);
       });
 
-      testWidgets('shows checkbox outline icon', (tester) async {
-        final todoList = createTodoList();
-
-        await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(body: TodoListCard(todoList: todoList)),
-          ),
+      testWidgets('progress bar shows 0% when no items completed', (
+        tester,
+      ) async {
+        final todoList = createTodoList(
+          totalItemCount: 5,
+          completedItemCount: 0,
         );
 
-        expect(find.byIcon(Icons.check_box_outline_blank), findsOneWidget);
+        await tester.pumpWidget(
+          testApp(TodoListCard(todoList: todoList)),
+        );
+
+        final progressIndicator =
+            tester.widget<LinearProgressIndicator>(find.byType(LinearProgressIndicator));
+        expect(progressIndicator.value, 0.0);
       });
 
-      testWidgets('displays gradient border', (tester) async {
+      testWidgets('progress bar shows 100% when all items completed', (
+        tester,
+      ) async {
+        final todoList = createTodoList(
+          totalItemCount: 5,
+          completedItemCount: 5,
+        );
+
+        await tester.pumpWidget(
+          testApp(TodoListCard(todoList: todoList)),
+        );
+
+        final progressIndicator =
+            tester.widget<LinearProgressIndicator>(find.byType(LinearProgressIndicator));
+        expect(progressIndicator.value, 1.0);
+      });
+
+      testWidgets('progress bar shows partial completion', (tester) async {
+        final todoList = createTodoList(
+          totalItemCount: 4,
+          completedItemCount: 2,
+        );
+
+        await tester.pumpWidget(
+          testApp(TodoListCard(todoList: todoList)),
+        );
+
+        final progressIndicator =
+            tester.widget<LinearProgressIndicator>(find.byType(LinearProgressIndicator));
+        expect(progressIndicator.value, 0.5);
+      });
+
+      testWidgets('renders red-orange gradient border (taskGradient)', (
+        tester,
+      ) async {
         final todoList = createTodoList();
 
         await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(body: TodoListCard(todoList: todoList)),
-          ),
+          testApp(TodoListCard(todoList: todoList)),
         );
 
         // GradientPillBorder should be present
         expect(find.byType(TodoListCard), findsOneWidget);
       });
 
-      testWidgets('shows due date when items have due dates', (tester) async {
-        final tomorrow = DateTime.now().add(const Duration(days: 1));
-        final todoList = createTodoList(
-          items: [
-            createTodoItem(id: '1', title: 'Task 1', dueDate: tomorrow),
-            createTodoItem(id: '2', title: 'Task 2'),
-          ],
-        );
+      testWidgets('shows checkbox outline icon', (tester) async {
+        final todoList = createTodoList();
 
         await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(body: TodoListCard(todoList: todoList)),
-          ),
+          testApp(TodoListCard(todoList: todoList)),
         );
 
-        // Should show some date information
-        expect(find.byIcon(Icons.calendar_today), findsOneWidget);
-      });
-
-      testWidgets('handles empty list (0 items)', (tester) async {
-        final todoList = createTodoList(items: []);
-
-        await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(body: TodoListCard(todoList: todoList)),
-          ),
-        );
-
-        expect(find.byType(TodoListCard), findsOneWidget);
-        expect(find.text('Shopping List'), findsOneWidget);
-      });
-
-      testWidgets('shows correct progress for all completed items', (
-        tester,
-      ) async {
-        final todoList = createTodoList(
-          items: [
-            createTodoItem(id: '1', title: 'Task 1', isCompleted: true),
-            createTodoItem(id: '2', title: 'Task 2', isCompleted: true),
-          ],
-        );
-
-        await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(body: TodoListCard(todoList: todoList)),
-          ),
-        );
-
-        expect(find.textContaining('2'), findsAtLeastNWidgets(1));
-      });
-
-      testWidgets('shows correct progress for no completed items', (
-        tester,
-      ) async {
-        final todoList = createTodoList(
-          items: [
-            createTodoItem(id: '1', title: 'Task 1'),
-            createTodoItem(id: '2', title: 'Task 2'),
-          ],
-        );
-
-        await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(body: TodoListCard(todoList: todoList)),
-          ),
-        );
-
-        expect(find.textContaining('0'), findsAtLeastNWidgets(1));
-        expect(find.textContaining('2'), findsAtLeastNWidgets(1));
+        expect(find.byIcon(Icons.check_box_outline_blank), findsOneWidget);
       });
     });
 
@@ -214,14 +184,12 @@ void main() {
         var tapped = false;
 
         await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(
-              body: TodoListCard(
-                todoList: todoList,
-                onTap: () {
-                  tapped = true;
-                },
-              ),
+          testApp(
+            TodoListCard(
+              todoList: todoList,
+              onTap: () {
+                tapped = true;
+              },
             ),
           ),
         );
@@ -239,14 +207,12 @@ void main() {
         var longPressed = false;
 
         await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(
-              body: TodoListCard(
-                todoList: todoList,
-                onLongPress: () {
-                  longPressed = true;
-                },
-              ),
+          testApp(
+            TodoListCard(
+              todoList: todoList,
+              onLongPress: () {
+                longPressed = true;
+              },
             ),
           ),
         );
@@ -261,9 +227,7 @@ void main() {
         final todoList = createTodoList();
 
         await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(body: TodoListCard(todoList: todoList)),
-          ),
+          testApp(TodoListCard(todoList: todoList)),
         );
 
         // Should not throw error when tapped without callback
@@ -276,42 +240,13 @@ void main() {
 
     group('Accessibility', () {
       testWidgets('has correct semantic label', (tester) async {
-        final todoList = createTodoList();
-
-        await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(body: TodoListCard(todoList: todoList)),
-          ),
-        );
-
-        // Find the container Semantics widget
-        final semanticsFinder = find.descendant(
-          of: find.byType(TodoListCard),
-          matching: find.byWidgetPredicate(
-            (widget) => widget is Semantics && widget.container == true,
-          ),
-        );
-
-        expect(semanticsFinder, findsOneWidget);
-
-        final semanticsWidget = tester.widget<Semantics>(semanticsFinder);
-        expect(semanticsWidget.properties.label, contains('Shopping List'));
-      });
-
-      testWidgets('semantic label includes progress information', (
-        tester,
-      ) async {
         final todoList = createTodoList(
-          items: [
-            createTodoItem(id: '1', title: 'Task 1', isCompleted: true),
-            createTodoItem(id: '2', title: 'Task 2'),
-          ],
+          totalItemCount: 5,
+          completedItemCount: 3,
         );
 
         await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(body: TodoListCard(todoList: todoList)),
-          ),
+          testApp(TodoListCard(todoList: todoList)),
         );
 
         // Find the container Semantics widget
@@ -325,19 +260,18 @@ void main() {
         expect(semanticsFinder, findsOneWidget);
 
         final semanticsWidget = tester.widget<Semantics>(semanticsFinder);
-        expect(semanticsWidget.properties.label, isNotNull);
-        expect(semanticsWidget.properties.label, contains('1 of 2'));
+        expect(semanticsWidget.properties.label, contains('Todo list'));
+        expect(semanticsWidget.properties.label, contains('Shopping List'));
+        expect(semanticsWidget.properties.label, contains('3 of 5 completed'));
       });
     });
 
     group('Design System Compliance', () {
-      testWidgets('uses task gradient for border', (tester) async {
+      testWidgets('uses task gradient (red-orange) for border', (tester) async {
         final todoList = createTodoList();
 
         await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(body: TodoListCard(todoList: todoList)),
-          ),
+          testApp(TodoListCard(todoList: todoList)),
         );
 
         // Card should render with gradient border
@@ -346,22 +280,30 @@ void main() {
 
       testWidgets('displays with correct layout structure', (tester) async {
         final todoList = createTodoList(
-          items: [
-            createTodoItem(id: '1', title: 'Task 1', isCompleted: true),
-            createTodoItem(id: '2', title: 'Task 2'),
-          ],
+          totalItemCount: 5,
+          completedItemCount: 2,
         );
 
         await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(body: TodoListCard(todoList: todoList)),
-          ),
+          testApp(TodoListCard(todoList: todoList)),
         );
 
-        // Should have icon, title, progress indicator, and progress bar
-        expect(find.byIcon(Icons.check_box_outline_blank), findsOneWidget);
+        // Should have icon, title, progress text, and progress bar
+        expect(find.byType(TodoListCard), findsOneWidget);
         expect(find.text('Shopping List'), findsOneWidget);
+        expect(find.text('2 of 5 completed'), findsOneWidget);
         expect(find.byType(LinearProgressIndicator), findsOneWidget);
+      });
+
+      testWidgets('icon has gradient shader', (tester) async {
+        final todoList = createTodoList();
+
+        await tester.pumpWidget(
+          testApp(TodoListCard(todoList: todoList)),
+        );
+
+        // Find ShaderMask widget
+        expect(find.byType(ShaderMask), findsAtLeastNWidgets(1));
       });
     });
 
@@ -370,11 +312,7 @@ void main() {
         final todoList = createTodoList();
 
         await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(
-              body: TodoListCard(todoList: todoList, onTap: () {}),
-            ),
-          ),
+          testApp(TodoListCard(todoList: todoList, onTap: () {})),
         );
 
         // Find the card
@@ -400,9 +338,7 @@ void main() {
         final todoList = createTodoList();
 
         await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(body: TodoListCard(todoList: todoList, index: 0)),
-          ),
+          testApp(TodoListCard(todoList: todoList, index: 0)),
         );
 
         // Card should render
@@ -419,9 +355,7 @@ void main() {
         final todoList = createTodoList();
 
         await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(body: TodoListCard(todoList: todoList)),
-          ),
+          testApp(TodoListCard(todoList: todoList)),
         );
 
         // Card should render without animation
@@ -432,18 +366,21 @@ void main() {
       testWidgets('applies staggered delay based on index', (tester) async {
         final todoLists = List.generate(
           3,
-          (index) => createTodoList(id: 'list_$index', name: 'List $index'),
+          (index) => createTodoList(
+            id: 'list_$index',
+            name: 'List $index',
+            totalItemCount: index,
+            completedItemCount: 0,
+          ),
         );
 
         await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(
-              body: ListView.builder(
-                itemCount: todoLists.length,
-                itemBuilder: (context, index) {
-                  return TodoListCard(todoList: todoLists[index], index: index);
-                },
-              ),
+          testApp(
+            ListView.builder(
+              itemCount: todoLists.length,
+              itemBuilder: (context, index) {
+                return TodoListCard(todoList: todoLists[index], index: index);
+              },
             ),
           ),
         );
@@ -461,157 +398,76 @@ void main() {
       });
     });
 
-    group('Progress Bar', () {
-      testWidgets('progress bar shows correct value', (tester) async {
-        final todoList = createTodoList(
-          items: [
-            createTodoItem(id: '1', title: 'Task 1', isCompleted: true),
-            createTodoItem(id: '2', title: 'Task 2'),
-            createTodoItem(id: '3', title: 'Task 3'),
-            createTodoItem(id: '4', title: 'Task 4'),
-          ],
-        );
-
-        await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(body: TodoListCard(todoList: todoList)),
-          ),
-        );
-
-        final progressIndicator = tester.widget<LinearProgressIndicator>(
-          find.byType(LinearProgressIndicator),
-        );
-
-        // 1 out of 4 completed = 0.25 progress
-        expect(progressIndicator.value, 0.25);
-      });
-
-      testWidgets('progress bar is 0 for empty list', (tester) async {
-        final todoList = createTodoList(items: []);
-
-        await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(body: TodoListCard(todoList: todoList)),
-          ),
-        );
-
-        final progressIndicator = tester.widget<LinearProgressIndicator>(
-          find.byType(LinearProgressIndicator),
-        );
-
-        expect(progressIndicator.value, 0.0);
-      });
-
-      testWidgets('progress bar is 1.0 for all completed', (tester) async {
-        final todoList = createTodoList(
-          items: [
-            createTodoItem(id: '1', title: 'Task 1', isCompleted: true),
-            createTodoItem(id: '2', title: 'Task 2', isCompleted: true),
-          ],
-        );
-
-        await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(body: TodoListCard(todoList: todoList)),
-          ),
-        );
-
-        final progressIndicator = tester.widget<LinearProgressIndicator>(
-          find.byType(LinearProgressIndicator),
-        );
-
-        expect(progressIndicator.value, 1.0);
-      });
-    });
-
-    group('Due Date Display', () {
-      testWidgets('shows earliest due date from items', (tester) async {
-        final today = DateTime.now();
-        final tomorrow = today.add(const Duration(days: 1));
-        final nextWeek = today.add(const Duration(days: 7));
-
-        final todoList = createTodoList(
-          items: [
-            createTodoItem(id: '1', title: 'Task 1', dueDate: nextWeek),
-            createTodoItem(id: '2', title: 'Task 2', dueDate: tomorrow),
-            createTodoItem(id: '3', title: 'Task 3'),
-          ],
-        );
-
-        await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(body: TodoListCard(todoList: todoList)),
-          ),
-        );
-
-        // Should show the calendar icon for due date
-        expect(find.byIcon(Icons.calendar_today), findsOneWidget);
-      });
-
-      testWidgets('does not show due date when no items have due dates', (
-        tester,
-      ) async {
-        final todoList = createTodoList(
-          items: [
-            createTodoItem(id: '1', title: 'Task 1'),
-            createTodoItem(id: '2', title: 'Task 2'),
-          ],
-        );
-
-        await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(body: TodoListCard(todoList: todoList)),
-          ),
-        );
-
-        // Should not show calendar icon
-        expect(find.byIcon(Icons.calendar_today), findsNothing);
-      });
-    });
-
     group('Edge Cases', () {
-      testWidgets('handles very long names', (tester) async {
+      testWidgets('handles very long name', (tester) async {
         final todoList = createTodoList(
           name:
               'This is a very long todo list name that should be truncated with ellipsis when it exceeds the maximum number of lines allowed',
         );
 
         await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(
-              body: SizedBox(
-                width: 300,
-                child: TodoListCard(todoList: todoList),
-              ),
-            ),
-          ),
+          testApp(SizedBox(width: 300, child: TodoListCard(todoList: todoList))),
         );
 
         expect(find.byType(TodoListCard), findsOneWidget);
       });
 
-      testWidgets('handles many items', (tester) async {
-        final items = List.generate(
-          100,
-          (index) => createTodoItem(
-            id: 'item_$index',
-            title: 'Task $index',
-            isCompleted: index % 2 == 0,
-          ),
+      testWidgets('handles large item counts', (tester) async {
+        final todoList = createTodoList(
+          totalItemCount: 999,
+          completedItemCount: 500,
         );
 
-        final todoList = createTodoList(items: items);
+        await tester.pumpWidget(
+          testApp(TodoListCard(todoList: todoList)),
+        );
+
+        expect(find.text('500 of 999 completed'), findsOneWidget);
+      });
+
+      testWidgets('handles 0% progress correctly', (tester) async {
+        final todoList = createTodoList(
+          totalItemCount: 100,
+          completedItemCount: 0,
+        );
 
         await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(body: TodoListCard(todoList: todoList)),
-          ),
+          testApp(TodoListCard(todoList: todoList)),
+        );
+
+        final progressIndicator =
+            tester.widget<LinearProgressIndicator>(find.byType(LinearProgressIndicator));
+        expect(progressIndicator.value, 0.0);
+      });
+
+      testWidgets('handles unicode in name', (tester) async {
+        final todoList = createTodoList(
+          name: 'Shopping 🛒 List',
+          totalItemCount: 5,
+          completedItemCount: 3,
+        );
+
+        await tester.pumpWidget(
+          testApp(TodoListCard(todoList: todoList)),
+        );
+
+        expect(find.textContaining('Shopping'), findsOneWidget);
+      });
+
+      testWidgets('handles description correctly', (tester) async {
+        final todoList = createTodoList(
+          name: 'My List',
+          description: 'This is a detailed description',
+          totalItemCount: 3,
+          completedItemCount: 1,
+        );
+
+        await tester.pumpWidget(
+          testApp(TodoListCard(todoList: todoList)),
         );
 
         expect(find.byType(TodoListCard), findsOneWidget);
-        // Should show 50 of 100 completed
-        expect(find.textContaining('50'), findsAtLeastNWidgets(1));
-        expect(find.textContaining('100'), findsAtLeastNWidgets(1));
+        expect(find.text('My List'), findsOneWidget);
       });
     });
   });

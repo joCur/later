@@ -10,6 +10,7 @@ void main() {
     // Test data
     final testListItem = ListItem(
       id: 'test-item-1',
+      listId: 'test-list-1',
       title: 'Buy groceries',
       notes: 'Milk, eggs, bread, and cheese',
       sortOrder: 0,
@@ -17,6 +18,7 @@ void main() {
 
     final checkedListItem = ListItem(
       id: 'test-item-2',
+      listId: 'test-list-1',
       title: 'Call dentist',
       isChecked: true,
       sortOrder: 1,
@@ -24,6 +26,7 @@ void main() {
 
     final minimalListItem = ListItem(
       id: 'test-item-3',
+      listId: 'test-list-1',
       title: 'Simple item',
       sortOrder: 2,
     );
@@ -589,7 +592,7 @@ void main() {
 
     group('Edge Cases', () {
       testWidgets('handles empty title gracefully', (tester) async {
-        final emptyTitleItem = ListItem(id: 'empty', title: '', sortOrder: 0);
+        final emptyTitleItem = ListItem(id: 'empty', listId: 'test-list-1', title: '', sortOrder: 0);
 
         await tester.pumpWidget(
           makeTestableWidget(
@@ -607,6 +610,7 @@ void main() {
       testWidgets('handles very long title with ellipsis', (tester) async {
         final longTitleItem = ListItem(
           id: 'long',
+          listId: 'test-list-1',
           title:
               'This is a very long title that should be truncated with an ellipsis because it exceeds the maximum width available in the card',
           sortOrder: 0,
@@ -629,6 +633,7 @@ void main() {
       testWidgets('handles very long notes with ellipsis', (tester) async {
         final longNotesItem = ListItem(
           id: 'long-notes',
+          listId: 'test-list-1',
           title: 'Item with long notes',
           notes:
               'These are very long notes that should be truncated with an ellipsis because they exceed the maximum number of lines available in the card which is set to 2 lines maximum',

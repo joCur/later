@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:later_mobile/data/models/list_model.dart';
-import 'package:later_mobile/data/models/list_item_model.dart';
 import 'package:later_mobile/data/models/list_style.dart';
 import 'package:later_mobile/design_system/organisms/cards/list_card.dart';
+import '../../../test_helpers.dart';
 
 void main() {
   group('ListCard', () {
@@ -11,34 +11,22 @@ void main() {
     ListModel createListModel({
       String id = '1',
       String name = 'Shopping List',
+      String spaceId = 'space1',
+      String userId = 'user1',
       String? icon,
-      List<ListItem>? items,
       ListStyle style = ListStyle.bullets,
+      int totalItemCount = 0,
+      int checkedItemCount = 0,
     }) {
       return ListModel(
         id: id,
-        spaceId: 'space1',
+        spaceId: spaceId,
+        userId: userId,
         name: name,
         icon: icon,
-        items: items,
         style: style,
-      );
-    }
-
-    // Helper function to create a ListItem
-    ListItem createListItem({
-      required String id,
-      required String title,
-      String? notes,
-      bool isChecked = false,
-      int sortOrder = 0,
-    }) {
-      return ListItem(
-        id: id,
-        title: title,
-        notes: notes,
-        isChecked: isChecked,
-        sortOrder: sortOrder,
+        totalItemCount: totalItemCount,
+        checkedItemCount: checkedItemCount,
       );
     }
 
@@ -47,9 +35,7 @@ void main() {
         final listModel = createListModel();
 
         await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(body: ListCard(list: listModel)),
-          ),
+          testApp(ListCard(list: listModel)),
         );
 
         expect(find.byType(ListCard), findsOneWidget);
@@ -60,9 +46,7 @@ void main() {
         final listModel = createListModel(name: 'Grocery List');
 
         await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(body: ListCard(list: listModel)),
-          ),
+          testApp(ListCard(list: listModel)),
         );
 
         expect(find.text('Grocery List'), findsOneWidget);
@@ -71,20 +55,10 @@ void main() {
       testWidgets('shows item count with correct format - multiple items', (
         tester,
       ) async {
-        final listModel = createListModel(
-          items: [
-            createListItem(id: '1', title: 'Milk'),
-            createListItem(id: '2', title: 'Eggs'),
-            createListItem(id: '3', title: 'Bread'),
-            createListItem(id: '4', title: 'Butter'),
-            createListItem(id: '5', title: 'Cheese'),
-          ],
-        );
+        final listModel = createListModel(totalItemCount: 5);
 
         await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(body: ListCard(list: listModel)),
-          ),
+          testApp(ListCard(list: listModel)),
         );
 
         expect(find.text('5 items'), findsOneWidget);
@@ -93,203 +67,84 @@ void main() {
       testWidgets('shows item count with singular format - one item', (
         tester,
       ) async {
-        final listModel = createListModel(
-          items: [createListItem(id: '1', title: 'Milk')],
-        );
+        final listModel = createListModel(totalItemCount: 1);
 
         await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(body: ListCard(list: listModel)),
-          ),
+          testApp(ListCard(list: listModel)),
         );
 
         expect(find.text('1 item'), findsOneWidget);
       });
 
       testWidgets('shows item count for empty list', (tester) async {
-        final listModel = createListModel(items: []);
+        final listModel = createListModel(totalItemCount: 0);
 
         await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(body: ListCard(list: listModel)),
-          ),
+          testApp(ListCard(list: listModel)),
         );
 
         expect(find.text('0 items'), findsOneWidget);
       });
 
-      testWidgets('shows preview of first 3 items', (tester) async {
-        final listModel = createListModel(
-          items: [
-            createListItem(id: '1', title: 'Milk'),
-            createListItem(id: '2', title: 'Eggs'),
-            createListItem(id: '3', title: 'Bread'),
-            createListItem(id: '4', title: 'Butter'),
-            createListItem(id: '5', title: 'Cheese'),
-          ],
-        );
+      testWidgets('shows "No items yet" preview for empty list', (tester) async {
+        final listModel = createListModel(totalItemCount: 0);
 
         await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(body: ListCard(list: listModel)),
-          ),
+          testApp(ListCard(list: listModel)),
         );
 
-        expect(find.text('Milk, Eggs, Bread...'), findsOneWidget);
+        expect(find.text('No items yet'), findsOneWidget);
       });
 
-      testWidgets('shows preview with ellipsis when more than 3 items', (
-        tester,
-      ) async {
-        final listModel = createListModel(
-          items: [
-            createListItem(id: '1', title: 'Item 1'),
-            createListItem(id: '2', title: 'Item 2'),
-            createListItem(id: '3', title: 'Item 3'),
-            createListItem(id: '4', title: 'Item 4'),
-          ],
-        );
+      testWidgets('shows item count preview for non-empty list', (tester) async {
+        final listModel = createListModel(totalItemCount: 5);
 
         await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(body: ListCard(list: listModel)),
-          ),
+          testApp(ListCard(list: listModel)),
         );
 
-        // Should show first 3 items with ellipsis
-        expect(
-          find.textContaining('Item 1, Item 2, Item 3...'),
-          findsOneWidget,
-        );
-      });
-
-      testWidgets('shows preview without ellipsis when 3 or fewer items', (
-        tester,
-      ) async {
-        final listModel = createListModel(
-          items: [
-            createListItem(id: '1', title: 'Milk'),
-            createListItem(id: '2', title: 'Eggs'),
-          ],
-        );
-
-        await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(body: ListCard(list: listModel)),
-          ),
-        );
-
-        expect(find.text('Milk, Eggs'), findsOneWidget);
-      });
-
-      testWidgets('shows empty message when no items', (tester) async {
-        final listModel = createListModel(items: []);
-
-        await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(body: ListCard(list: listModel)),
-          ),
-        );
-
-        expect(find.text('No items'), findsOneWidget);
+        expect(find.text('5 items'), findsAtLeastNWidgets(1));
       });
 
       testWidgets('renders violet gradient border', (tester) async {
         final listModel = createListModel();
 
         await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(body: ListCard(list: listModel)),
-          ),
+          testApp(ListCard(list: listModel)),
         );
 
         // GradientPillBorder should be present
         expect(find.byType(ListCard), findsOneWidget);
       });
 
-      testWidgets('shows custom icon when provided', (tester) async {
-        final listModel = createListModel(icon: '🛒');
+      testWidgets('shows default list icon when icon is null', (tester) async {
+        final listModel = createListModel(icon: null);
 
         await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(body: ListCard(list: listModel)),
-          ),
+          testApp(ListCard(list: listModel)),
         );
 
-        // Should show emoji icon
-        expect(find.text('🛒'), findsOneWidget);
-      });
-
-      testWidgets('shows default icon when icon is null', (tester) async {
-        final listModel = createListModel();
-
-        await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(body: ListCard(list: listModel)),
-          ),
-        );
-
-        // Should show default list icon
         expect(find.byIcon(Icons.list_alt), findsOneWidget);
       });
 
-      testWidgets('shows icon name as icon when provided', (tester) async {
+      testWidgets('shows custom icon when provided', (tester) async {
         final listModel = createListModel(icon: 'shopping_cart');
 
         await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(body: ListCard(list: listModel)),
-          ),
+          testApp(ListCard(list: listModel)),
         );
 
-        // Should show shopping_cart icon
         expect(find.byIcon(Icons.shopping_cart), findsOneWidget);
       });
-    });
 
-    group('List Styles', () {
-      testWidgets('handles bullets style', (tester) async {
-        final listModel = createListModel(
-          items: [createListItem(id: '1', title: 'Item 1')],
-        );
+      testWidgets('shows emoji icon when provided', (tester) async {
+        final listModel = createListModel(icon: '🛒');
 
         await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(body: ListCard(list: listModel)),
-          ),
+          testApp(ListCard(list: listModel)),
         );
 
-        expect(find.byType(ListCard), findsOneWidget);
-      });
-
-      testWidgets('handles numbered style', (tester) async {
-        final listModel = createListModel(
-          style: ListStyle.numbered,
-          items: [createListItem(id: '1', title: 'Item 1')],
-        );
-
-        await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(body: ListCard(list: listModel)),
-          ),
-        );
-
-        expect(find.byType(ListCard), findsOneWidget);
-      });
-
-      testWidgets('handles checkboxes style', (tester) async {
-        final listModel = createListModel(
-          style: ListStyle.checkboxes,
-          items: [createListItem(id: '1', title: 'Item 1', isChecked: true)],
-        );
-
-        await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(body: ListCard(list: listModel)),
-          ),
-        );
-
-        expect(find.byType(ListCard), findsOneWidget);
+        expect(find.text('🛒'), findsOneWidget);
       });
     });
 
@@ -299,14 +154,12 @@ void main() {
         var tapped = false;
 
         await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(
-              body: ListCard(
-                list: listModel,
-                onTap: () {
-                  tapped = true;
-                },
-              ),
+          testApp(
+            ListCard(
+              list: listModel,
+              onTap: () {
+                tapped = true;
+              },
             ),
           ),
         );
@@ -324,14 +177,12 @@ void main() {
         var longPressed = false;
 
         await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(
-              body: ListCard(
-                list: listModel,
-                onLongPress: () {
-                  longPressed = true;
-                },
-              ),
+          testApp(
+            ListCard(
+              list: listModel,
+              onLongPress: () {
+                longPressed = true;
+              },
             ),
           ),
         );
@@ -346,9 +197,7 @@ void main() {
         final listModel = createListModel();
 
         await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(body: ListCard(list: listModel)),
-          ),
+          testApp(ListCard(list: listModel)),
         );
 
         // Should not throw error when tapped without callback
@@ -361,41 +210,10 @@ void main() {
 
     group('Accessibility', () {
       testWidgets('has correct semantic label', (tester) async {
-        final listModel = createListModel(
-          items: [
-            createListItem(id: '1', title: 'Milk'),
-            createListItem(id: '2', title: 'Eggs'),
-          ],
-        );
+        final listModel = createListModel(totalItemCount: 3);
 
         await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(body: ListCard(list: listModel)),
-          ),
-        );
-
-        // Find the container Semantics widget
-        final semanticsFinder = find.descendant(
-          of: find.byType(ListCard),
-          matching: find.byWidgetPredicate(
-            (widget) => widget is Semantics && widget.container == true,
-          ),
-        );
-
-        expect(semanticsFinder, findsOneWidget);
-
-        final semanticsWidget = tester.widget<Semantics>(semanticsFinder);
-        expect(semanticsWidget.properties.label, contains('Shopping List'));
-        expect(semanticsWidget.properties.label, contains('2 items'));
-      });
-
-      testWidgets('semantic label includes list type', (tester) async {
-        final listModel = createListModel(name: 'My List');
-
-        await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(body: ListCard(list: listModel)),
-          ),
+          testApp(ListCard(list: listModel)),
         );
 
         // Find the container Semantics widget
@@ -410,17 +228,44 @@ void main() {
 
         final semanticsWidget = tester.widget<Semantics>(semanticsFinder);
         expect(semanticsWidget.properties.label, contains('List'));
+        expect(semanticsWidget.properties.label, contains('Shopping List'));
+        expect(semanticsWidget.properties.label, contains('3 items'));
+      });
+
+      testWidgets('semantic label shows singular "item" for one item', (
+        tester,
+      ) async {
+        final listModel = createListModel(
+          name: 'To-Do',
+          totalItemCount: 1,
+        );
+
+        await tester.pumpWidget(
+          testApp(ListCard(list: listModel)),
+        );
+
+        // Find the container Semantics widget
+        final semanticsFinder = find.descendant(
+          of: find.byType(ListCard),
+          matching: find.byWidgetPredicate(
+            (widget) => widget is Semantics && widget.container == true,
+          ),
+        );
+
+        expect(semanticsFinder, findsOneWidget);
+
+        final semanticsWidget = tester.widget<Semantics>(semanticsFinder);
+        expect(semanticsWidget.properties.label, contains('To-Do'));
+        expect(semanticsWidget.properties.label, contains('1 item'));
       });
     });
 
     group('Design System Compliance', () {
-      testWidgets('uses violet gradient for border', (tester) async {
+      testWidgets('uses list gradient (violet) for border', (tester) async {
         final listModel = createListModel();
 
         await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(body: ListCard(list: listModel)),
-          ),
+          testApp(ListCard(list: listModel)),
         );
 
         // Card should render with gradient border
@@ -428,23 +273,29 @@ void main() {
       });
 
       testWidgets('displays with correct layout structure', (tester) async {
-        final listModel = createListModel(
-          items: [
-            createListItem(id: '1', title: 'Item 1'),
-            createListItem(id: '2', title: 'Item 2'),
-          ],
-        );
+        final listModel = createListModel(totalItemCount: 3);
 
         await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(body: ListCard(list: listModel)),
-          ),
+          testApp(ListCard(list: listModel)),
         );
 
         // Should have icon, title, item count, and preview
+        expect(find.byType(ListCard), findsOneWidget);
         expect(find.text('Shopping List'), findsOneWidget);
-        expect(find.text('2 items'), findsOneWidget);
-        expect(find.text('Item 1, Item 2'), findsOneWidget);
+        expect(find.text('3 items'), findsAtLeastNWidgets(1));
+      });
+
+      testWidgets('icon has gradient shader for non-emoji icons', (
+        tester,
+      ) async {
+        final listModel = createListModel(icon: 'shopping_cart');
+
+        await tester.pumpWidget(
+          testApp(ListCard(list: listModel)),
+        );
+
+        // Find ShaderMask widget
+        expect(find.byType(ShaderMask), findsAtLeastNWidgets(1));
       });
     });
 
@@ -453,11 +304,7 @@ void main() {
         final listModel = createListModel();
 
         await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(
-              body: ListCard(list: listModel, onTap: () {}),
-            ),
-          ),
+          testApp(ListCard(list: listModel, onTap: () {})),
         );
 
         // Find the card
@@ -483,9 +330,7 @@ void main() {
         final listModel = createListModel();
 
         await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(body: ListCard(list: listModel, index: 0)),
-          ),
+          testApp(ListCard(list: listModel, index: 0)),
         );
 
         // Card should render
@@ -502,9 +347,7 @@ void main() {
         final listModel = createListModel();
 
         await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(body: ListCard(list: listModel)),
-          ),
+          testApp(ListCard(list: listModel)),
         );
 
         // Card should render without animation
@@ -515,18 +358,20 @@ void main() {
       testWidgets('applies staggered delay based on index', (tester) async {
         final lists = List.generate(
           3,
-          (index) => createListModel(id: 'list_$index', name: 'List $index'),
+          (index) => createListModel(
+            id: 'list_$index',
+            name: 'List $index',
+            totalItemCount: index,
+          ),
         );
 
         await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(
-              body: ListView.builder(
-                itemCount: lists.length,
-                itemBuilder: (context, index) {
-                  return ListCard(list: lists[index], index: index);
-                },
-              ),
+          testApp(
+            ListView.builder(
+              itemCount: lists.length,
+              itemBuilder: (context, index) {
+                return ListCard(list: lists[index], index: index);
+              },
             ),
           ),
         );
@@ -544,117 +389,122 @@ void main() {
       });
     });
 
-    group('Icon Parsing', () {
-      testWidgets('parses emoji icon correctly', (tester) async {
-        final listModel = createListModel(icon: '📝');
-
-        await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(body: ListCard(list: listModel)),
-          ),
-        );
-
-        expect(find.text('📝'), findsOneWidget);
-      });
-
-      testWidgets('parses icon name to Icon widget', (tester) async {
-        final listModel = createListModel(icon: 'favorite');
-
-        await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(body: ListCard(list: listModel)),
-          ),
-        );
-
-        expect(find.byIcon(Icons.favorite), findsOneWidget);
-      });
-
-      testWidgets('handles invalid icon name gracefully', (tester) async {
-        final listModel = createListModel(icon: 'invalid_icon_name_xyz');
-
-        await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(body: ListCard(list: listModel)),
-          ),
-        );
-
-        // Should fall back to default icon
-        expect(find.byIcon(Icons.list_alt), findsOneWidget);
-      });
-
-      testWidgets('handles empty icon string', (tester) async {
-        final listModel = createListModel(icon: '');
-
-        await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(body: ListCard(list: listModel)),
-          ),
-        );
-
-        // Should fall back to default icon
-        expect(find.byIcon(Icons.list_alt), findsOneWidget);
-      });
-    });
-
     group('Edge Cases', () {
-      testWidgets('handles very long list names', (tester) async {
+      testWidgets('handles very long name', (tester) async {
         final listModel = createListModel(
           name:
               'This is a very long list name that should be truncated with ellipsis when it exceeds the maximum number of lines allowed',
         );
 
         await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(
-              body: SizedBox(width: 300, child: ListCard(list: listModel)),
-            ),
-          ),
+          testApp(SizedBox(width: 300, child: ListCard(list: listModel))),
         );
 
         expect(find.byType(ListCard), findsOneWidget);
       });
 
-      testWidgets('handles many items', (tester) async {
-        final items = List.generate(
-          100,
-          (index) => createListItem(id: 'item_$index', title: 'Item $index'),
-        );
-
-        final listModel = createListModel(items: items);
+      testWidgets('handles large item count', (tester) async {
+        final listModel = createListModel(totalItemCount: 999);
 
         await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(body: ListCard(list: listModel)),
-          ),
+          testApp(ListCard(list: listModel)),
         );
 
-        expect(find.byType(ListCard), findsOneWidget);
-        expect(find.text('100 items'), findsOneWidget);
-        // Should only show first 3 items in preview
-        expect(find.text('Item 0, Item 1, Item 2...'), findsOneWidget);
+        expect(find.text('999 items'), findsAtLeastNWidgets(1));
       });
 
-      testWidgets('handles items with very long titles', (tester) async {
+      testWidgets('handles empty string icon', (tester) async {
+        final listModel = createListModel(icon: '');
+
+        await tester.pumpWidget(
+          testApp(ListCard(list: listModel)),
+        );
+
+        // Should show default icon
+        expect(find.byIcon(Icons.list_alt), findsOneWidget);
+      });
+
+      testWidgets('handles unknown icon name', (tester) async {
+        final listModel = createListModel(icon: 'unknown_icon_name');
+
+        await tester.pumpWidget(
+          testApp(ListCard(list: listModel)),
+        );
+
+        // Should fall back to default icon (list_alt)
+        expect(find.byIcon(Icons.list_alt), findsOneWidget);
+      });
+
+      testWidgets('handles unicode in list name', (tester) async {
         final listModel = createListModel(
-          items: [
-            createListItem(
-              id: '1',
-              title: 'This is a very long item title that might cause overflow',
-            ),
-            createListItem(id: '2', title: 'Another long title'),
-            createListItem(id: '3', title: 'Yet another long title'),
-          ],
+          name: 'Shopping 🛒 List',
+          totalItemCount: 5,
         );
 
         await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(
-              body: SizedBox(width: 300, child: ListCard(list: listModel)),
-            ),
-          ),
+          testApp(ListCard(list: listModel)),
+        );
+
+        expect(find.textContaining('Shopping'), findsOneWidget);
+      });
+    });
+
+    group('List Styles', () {
+      testWidgets('renders with bullets style', (tester) async {
+        final listModel = createListModel(
+          style: ListStyle.bullets,
+          totalItemCount: 3,
+        );
+
+        await tester.pumpWidget(
+          testApp(ListCard(list: listModel)),
         );
 
         expect(find.byType(ListCard), findsOneWidget);
+        expect(find.text('Shopping List'), findsOneWidget);
+      });
+
+      testWidgets('renders with checkboxes style', (tester) async {
+        final listModel = createListModel(
+          style: ListStyle.checkboxes,
+          totalItemCount: 5,
+          checkedItemCount: 2,
+        );
+
+        await tester.pumpWidget(
+          testApp(ListCard(list: listModel)),
+        );
+
+        expect(find.byType(ListCard), findsOneWidget);
+        expect(find.text('Shopping List'), findsOneWidget);
+      });
+
+      testWidgets('renders with numbered style', (tester) async {
+        final listModel = createListModel(
+          style: ListStyle.numbered,
+          totalItemCount: 10,
+        );
+
+        await tester.pumpWidget(
+          testApp(ListCard(list: listModel)),
+        );
+
+        expect(find.byType(ListCard), findsOneWidget);
+        expect(find.text('Shopping List'), findsOneWidget);
+      });
+
+      testWidgets('renders with simple style', (tester) async {
+        final listModel = createListModel(
+          style: ListStyle.simple,
+          totalItemCount: 4,
+        );
+
+        await tester.pumpWidget(
+          testApp(ListCard(list: listModel)),
+        );
+
+        expect(find.byType(ListCard), findsOneWidget);
+        expect(find.text('Shopping List'), findsOneWidget);
       });
     });
   });
