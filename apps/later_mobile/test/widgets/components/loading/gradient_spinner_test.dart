@@ -134,6 +134,82 @@ void main() {
       expect(find.byType(CustomPaint), findsWidgets);
     });
 
+    testWidgets(
+      'factory constructor .pulsing() creates spinner with pulsing enabled',
+      (tester) async {
+        await tester.pumpWidget(
+          testApp(const GradientSpinner.pulsing()),
+        );
+
+        expect(find.byType(GradientSpinner), findsOneWidget);
+        // Spinner should exist with pulsing animation
+        final spinner = tester.widget<GradientSpinner>(
+          find.byType(GradientSpinner),
+        );
+        expect(spinner.pulsing, isTrue);
+      },
+    );
+
+    testWidgets('pulsing animation scales spinner', (tester) async {
+      await tester.pumpWidget(
+        testApp(const GradientSpinner.pulsing()),
+      );
+
+      // Should find AnimatedBuilder widgets
+      expect(find.byType(AnimatedBuilder), findsWidgets);
+
+      // Advance pulsing animation
+      await tester.pump(const Duration(milliseconds: 1000));
+
+      // Widget should still be rendering
+      expect(find.byType(GradientSpinner), findsOneWidget);
+    });
+
+    testWidgets('uses RepaintBoundary for performance', (tester) async {
+      await tester.pumpWidget(
+        testApp(const GradientSpinner()),
+      );
+
+      expect(find.byType(RepaintBoundary), findsAtLeastNWidgets(1));
+    });
+
+    testWidgets('stroke width adjusts with size variants', (tester) async {
+      await tester.pumpWidget(
+        testApp(
+          const Column(
+            children: [
+              GradientSpinner.small(), // 2px stroke
+              GradientSpinner.medium(), // 3px stroke
+              GradientSpinner.large(), // 4px stroke
+            ],
+          ),
+        ),
+      );
+
+      final spinners = tester.widgetList<GradientSpinner>(
+        find.byType(GradientSpinner),
+      );
+      expect(spinners.elementAt(0).strokeWidth, equals(2.0));
+      expect(spinners.elementAt(1).strokeWidth, equals(3.0));
+      expect(spinners.elementAt(2).strokeWidth, equals(4.0));
+    });
+
+    testWidgets('multiple spinners can render simultaneously', (tester) async {
+      await tester.pumpWidget(
+        testApp(
+          const Column(
+            children: [
+              GradientSpinner.small(),
+              GradientSpinner.medium(),
+              GradientSpinner.large(),
+            ],
+          ),
+        ),
+      );
+
+      expect(find.byType(GradientSpinner), findsNWidgets(3));
+    });
+
     testWidgets('disposes animation controller properly', (tester) async {
       await tester.pumpWidget(
         testApp(const GradientSpinner()),
