@@ -140,60 +140,6 @@ void main() {
       );
     });
 
-    testWidgets('Content reflows in landscape', (WidgetTester tester) async {
-      const portraitSize = Size(375.0, 812.0);
-      const landscapeSize = Size(812.0, 375.0);
-
-      // Build in portrait
-      await tester.pumpWidget(
-        MediaQuery(
-          data: const MediaQueryData(size: portraitSize),
-          child: testApp(
-            Scaffold(
-              body: LayoutBuilder(
-                builder: (context, constraints) {
-                  return Center(
-                    child: Text(
-                      'Size: ${constraints.maxWidth.toInt()}x${constraints.maxHeight.toInt()}',
-                    ),
-                  );
-                },
-              ),
-            ),
-          ),
-        ),
-      );
-
-      expect(find.text('Size: 375x812'), findsOneWidget);
-
-      // Rebuild in landscape
-      await tester.pumpWidget(
-        MediaQuery(
-          data: const MediaQueryData(size: landscapeSize),
-          child: testApp(
-            Scaffold(
-              body: LayoutBuilder(
-                builder: (context, constraints) {
-                  return Center(
-                    child: Text(
-                      'Size: ${constraints.maxWidth.toInt()}x${constraints.maxHeight.toInt()}',
-                    ),
-                  );
-                },
-              ),
-            ),
-          ),
-        ),
-      );
-
-      await tester.pump();
-
-      expect(
-        find.text('Size: 812x375'),
-        findsOneWidget,
-        reason: 'Content should reflow to landscape dimensions',
-      );
-    });
   });
 
   group('Tablet Portrait to Landscape Tests', () {

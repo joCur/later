@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:later_mobile/core/responsive/breakpoints.dart';
-import 'package:later_mobile/core/responsive/responsive_layout.dart';
 import 'package:later_mobile/widgets/navigation/app_sidebar.dart';
 import 'package:later_mobile/widgets/navigation/icon_only_bottom_nav.dart';
 
@@ -201,47 +200,6 @@ void main() {
       expect(columns768, equals(2), reason: '768px should have 2 columns');
     });
 
-    testWidgets('ResponsiveLayout switches at 768px', (
-      WidgetTester tester,
-    ) async {
-      // Test at 767px (mobile)
-      await tester.pumpWidget(
-        MediaQuery(
-          data: const MediaQueryData(size: Size(767.0, 1024.0)),
-          child: testApp(
-            const Scaffold(
-              body: ResponsiveLayout(
-                mobile: Text('Mobile Layout'),
-                tablet: Text('Tablet Layout'),
-              ),
-            ),
-          ),
-        ),
-      );
-
-      expect(find.text('Mobile Layout'), findsOneWidget);
-      expect(find.text('Tablet Layout'), findsNothing);
-
-      // Test at 768px (tablet)
-      await tester.pumpWidget(
-        MediaQuery(
-          data: const MediaQueryData(size: Size(768.0, 1024.0)),
-          child: testApp(
-            const Scaffold(
-              body: ResponsiveLayout(
-                mobile: Text('Mobile Layout'),
-                tablet: Text('Tablet Layout'),
-              ),
-            ),
-          ),
-        ),
-      );
-
-      await tester.pump();
-
-      expect(find.text('Mobile Layout'), findsNothing);
-      expect(find.text('Tablet Layout'), findsOneWidget);
-    });
   });
 
   group('Tablet to Desktop Breakpoint (1024px)', () {

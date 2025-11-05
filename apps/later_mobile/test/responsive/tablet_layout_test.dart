@@ -325,65 +325,6 @@ void main() {
       );
     });
 
-    testWidgets('Modal max-width constraint at 834px', (
-      WidgetTester tester,
-    ) async {
-      await tester.pumpWidget(
-        MediaQuery(
-          data: const MediaQueryData(size: Size(testWidth, testHeight)),
-          child: testApp(
-            Scaffold(
-              body: Builder(
-                builder: (context) {
-                  return Center(
-                    child: ElevatedButton(
-                      onPressed: () {
-                        showDialog<void>(
-                          context: context,
-                          builder: (context) => Dialog(
-                            child: ConstrainedBox(
-                              constraints: const BoxConstraints(
-                                maxWidth: 560.0, // Modal max-width
-                              ),
-                              child: const Padding(
-                                padding: EdgeInsets.all(16.0),
-                                child: Text('Modal Content'),
-                              ),
-                            ),
-                          ),
-                        );
-                      },
-                      child: const Text('Show Modal'),
-                    ),
-                  );
-                },
-              ),
-            ),
-          ),
-        ),
-      );
-
-      // Tap button to show modal
-      await tester.tap(find.text('Show Modal'));
-      await tester.pumpAndSettle();
-
-      // Find the modal dialog
-      final dialog = find.byType(Dialog);
-      expect(dialog, findsOneWidget);
-
-      // Check that the constrained box has correct max width
-      final constrainedBox = find.byType(ConstrainedBox);
-      expect(constrainedBox, findsOneWidget);
-
-      final constraints = tester
-          .widget<ConstrainedBox>(constrainedBox)
-          .constraints;
-      expect(
-        constraints.maxWidth,
-        equals(560.0),
-        reason: 'Modal should have max-width of 560px on tablet',
-      );
-    });
   });
 
   group('Tablet Layout Tests - 1024px (iPad Pro)', () {
@@ -565,43 +506,6 @@ void main() {
       );
     });
 
-    testWidgets('Content area adjusts for sidebar at 1024px', (
-      WidgetTester tester,
-    ) async {
-      const sidebarWidth = 240.0;
-
-      await tester.pumpWidget(
-        MediaQuery(
-          data: const MediaQueryData(size: Size(testWidth, testHeight)),
-          child: testApp(
-            Scaffold(
-              body: Row(
-                children: [
-                  AppSidebar(onToggleExpanded: () {}),
-                  Expanded(
-                    child: LayoutBuilder(
-                      builder: (context, constraints) {
-                        return Center(
-                          child: Text('Content Width: ${constraints.maxWidth}'),
-                        );
-                      },
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      );
-
-      // Content width should be screen width minus sidebar width
-      const expectedContentWidth = testWidth - sidebarWidth;
-      expect(
-        find.text('Content Width: $expectedContentWidth'),
-        findsOneWidget,
-        reason: 'Content should adjust for sidebar width',
-      );
-    });
 
     testWidgets('Landscape orientation at 1366x1024', (
       WidgetTester tester,

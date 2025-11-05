@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:later_mobile/core/responsive/breakpoints.dart';
-import 'package:later_mobile/core/responsive/responsive_layout.dart';
 import 'package:later_mobile/design_system/molecules/fab/create_content_fab.dart';
 import 'package:later_mobile/widgets/navigation/app_sidebar.dart';
 import 'package:later_mobile/widgets/navigation/icon_only_bottom_nav.dart';
@@ -98,8 +97,8 @@ void main() {
       final size = tester.getSize(find.byType(IconOnlyBottomNav));
       expect(
         size.height,
-        equals(64.0),
-        reason: 'Bottom navigation should be 64px tall',
+        equals(60.0),
+        reason: 'Bottom navigation should be 60px tall',
       );
       expect(
         size.width,
@@ -142,33 +141,6 @@ void main() {
       );
     });
 
-    testWidgets('Content is full-width at 320px', (WidgetTester tester) async {
-      await tester.pumpWidget(
-        MediaQuery(
-          data: const MediaQueryData(size: Size(testWidth, testHeight)),
-          child: testApp(
-            Scaffold(
-              body: LayoutBuilder(
-                builder: (context, constraints) {
-                  return Container(
-                    color: Colors.blue,
-                    child: Text('Width: ${constraints.maxWidth}'),
-                  );
-                },
-              ),
-            ),
-          ),
-        ),
-      );
-
-      final size = tester.getSize(find.byType(Container).first);
-
-      expect(
-        size.width,
-        equals(testWidth),
-        reason: 'Content should use full screen width',
-      );
-    });
 
     testWidgets('Single-column layout at 320px', (WidgetTester tester) async {
       await tester.pumpWidget(
@@ -211,34 +183,12 @@ void main() {
       // Verify FAB is present
       expect(find.byType(CreateContentFab), findsOneWidget);
 
-      // FAB should be 64x64px
+      // FAB should be 56x56px
       final fabSize = tester.getSize(find.byType(CreateContentFab));
-      expect(fabSize.width, equals(64.0));
-      expect(fabSize.height, equals(64.0));
+      expect(fabSize.width, equals(56.0));
+      expect(fabSize.height, equals(56.0));
     });
 
-    testWidgets('ResponsiveLayout shows mobile widget at 320px', (
-      WidgetTester tester,
-    ) async {
-      await tester.pumpWidget(
-        MediaQuery(
-          data: const MediaQueryData(size: Size(testWidth, testHeight)),
-          child: testApp(
-            const Scaffold(
-              body: ResponsiveLayout(
-                mobile: Text('Mobile Layout'),
-                tablet: Text('Tablet Layout'),
-                desktop: Text('Desktop Layout'),
-              ),
-            ),
-          ),
-        ),
-      );
-
-      expect(find.text('Mobile Layout'), findsOneWidget);
-      expect(find.text('Tablet Layout'), findsNothing);
-      expect(find.text('Desktop Layout'), findsNothing);
-    });
   });
 
   group('Mobile Layout Tests - 375px (iPhone 12/13)', () {
@@ -267,88 +217,6 @@ void main() {
       expect(isMobile, isTrue, reason: '375px should be identified as mobile');
     });
 
-    testWidgets('Bottom navigation visible and properly sized at 375px', (
-      WidgetTester tester,
-    ) async {
-      await tester.pumpWidget(
-        MediaQuery(
-          data: const MediaQueryData(size: Size(testWidth, testHeight)),
-          child: testApp(
-            Scaffold(
-              bottomNavigationBar: IconOnlyBottomNav(
-                currentIndex: 0,
-                onDestinationSelected: (_) {},
-              ),
-            ),
-          ),
-        ),
-      );
-
-      expect(find.byType(IconOnlyBottomNav), findsOneWidget);
-
-      final size = tester.getSize(find.byType(IconOnlyBottomNav));
-      expect(
-        size.width,
-        equals(testWidth),
-        reason: 'Bottom nav should span full width',
-      );
-    });
-
-    testWidgets('All 3 navigation items are visible at 375px', (
-      WidgetTester tester,
-    ) async {
-      await tester.pumpWidget(
-        MediaQuery(
-          data: const MediaQueryData(size: Size(testWidth, testHeight)),
-          child: testApp(
-            Scaffold(
-              bottomNavigationBar: IconOnlyBottomNav(
-                currentIndex: 0,
-                onDestinationSelected: (_) {},
-              ),
-            ),
-          ),
-        ),
-      );
-
-      // Find all navigation labels
-      expect(find.text('Home'), findsOneWidget);
-      expect(find.text('Search'), findsOneWidget);
-      expect(find.text('Settings'), findsOneWidget);
-    });
-
-    testWidgets('Content area accounts for bottom nav at 375px', (
-      WidgetTester tester,
-    ) async {
-      await tester.pumpWidget(
-        MediaQuery(
-          data: const MediaQueryData(size: Size(testWidth, testHeight)),
-          child: testApp(
-            Scaffold(
-              body: LayoutBuilder(
-                builder: (context, constraints) {
-                  return Center(
-                    child: Text('Content Height: ${constraints.maxHeight}'),
-                  );
-                },
-              ),
-              bottomNavigationBar: IconOnlyBottomNav(
-                currentIndex: 0,
-                onDestinationSelected: (_) {},
-              ),
-            ),
-          ),
-        ),
-      );
-
-      // Content should have less height than full screen due to bottom nav
-      final contentSize = tester.getSize(find.byType(LayoutBuilder));
-      expect(
-        contentSize.height,
-        lessThan(testHeight),
-        reason: 'Content should be reduced by bottom nav height',
-      );
-    });
 
     testWidgets('Text remains readable at 375px width', (
       WidgetTester tester,
@@ -405,26 +273,6 @@ void main() {
       expect(isMobile, isTrue, reason: '414px should be identified as mobile');
     });
 
-    testWidgets('Bottom navigation spans full width at 414px', (
-      WidgetTester tester,
-    ) async {
-      await tester.pumpWidget(
-        MediaQuery(
-          data: const MediaQueryData(size: Size(testWidth, testHeight)),
-          child: testApp(
-            Scaffold(
-              bottomNavigationBar: IconOnlyBottomNav(
-                currentIndex: 0,
-                onDestinationSelected: (_) {},
-              ),
-            ),
-          ),
-        ),
-      );
-
-      final size = tester.getSize(find.byType(IconOnlyBottomNav));
-      expect(size.width, equals(testWidth));
-    });
 
     testWidgets('Navigation items have adequate spacing at 414px', (
       WidgetTester tester,

@@ -345,7 +345,9 @@ class _AppSidebarState extends State<AppSidebar> {
                               children: [
                                 Icon(Icons.settings_outlined),
                                 SizedBox(width: AppSpacing.xs),
-                                Text('Settings'),
+                                Flexible(
+                                  child: Text('Settings'),
+                                ),
                               ],
                             ),
                           ),
@@ -380,10 +382,12 @@ class _AppSidebarState extends State<AppSidebar> {
                               color: AppColors.textSecondary(context),
                             ),
                             const SizedBox(width: AppSpacing.xs),
-                            Text(
-                              'Sign Out',
-                              style: TextStyle(
-                                color: AppColors.textSecondary(context),
+                            Flexible(
+                              child: Text(
+                                'Sign Out',
+                                style: TextStyle(
+                                  color: AppColors.textSecondary(context),
+                                ),
                               ),
                             ),
                           ],

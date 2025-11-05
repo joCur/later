@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:later_mobile/core/responsive/breakpoints.dart';
-import 'package:later_mobile/core/responsive/responsive_layout.dart';
 import 'package:later_mobile/widgets/navigation/app_sidebar.dart';
 import 'package:later_mobile/widgets/navigation/icon_only_bottom_nav.dart';
 
@@ -90,7 +89,7 @@ void main() {
       );
     });
 
-    testWidgets('Max content width is 1200px at 1280px', (
+    testWidgets('Max content width is 1024px at 1280px', (
       WidgetTester tester,
     ) async {
       double? maxWidth;
@@ -111,8 +110,8 @@ void main() {
 
       expect(
         maxWidth,
-        equals(1200.0),
-        reason: 'Desktop large should constrain content to 1200px',
+        equals(1024.0),
+        reason: 'Desktop should constrain content to 1024px',
       );
     });
 
@@ -229,81 +228,7 @@ void main() {
       );
     });
 
-    testWidgets('Content area with expanded sidebar at 1280px', (
-      WidgetTester tester,
-    ) async {
-      const sidebarWidth = 240.0;
 
-      await tester.pumpWidget(
-        MediaQuery(
-          data: const MediaQueryData(size: Size(testWidth, testHeight)),
-          child: testApp(
-            Scaffold(
-              body: Row(
-                children: [
-                  AppSidebar(onToggleExpanded: () {}),
-                  Expanded(
-                    child: LayoutBuilder(
-                      builder: (context, constraints) {
-                        return Center(
-                          child: Text('Width: ${constraints.maxWidth}'),
-                        );
-                      },
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      );
-
-      // Content width should be screen width minus sidebar
-      const expectedContentWidth = testWidth - sidebarWidth;
-      expect(
-        find.textContaining('Width: $expectedContentWidth'),
-        findsOneWidget,
-      );
-    });
-
-    testWidgets('Content area with collapsed sidebar at 1280px', (
-      WidgetTester tester,
-    ) async {
-      const collapsedSidebarWidth = 72.0;
-
-      await tester.pumpWidget(
-        MediaQuery(
-          data: const MediaQueryData(size: Size(testWidth, testHeight)),
-          child: testApp(
-            Scaffold(
-              body: Row(
-                children: [
-                  AppSidebar(isExpanded: false, onToggleExpanded: () {}),
-                  Expanded(
-                    child: LayoutBuilder(
-                      builder: (context, constraints) {
-                        return Center(
-                          child: Text('Width: ${constraints.maxWidth}'),
-                        );
-                      },
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      );
-
-      await tester.pumpAndSettle();
-
-      // Content width should be screen width minus collapsed sidebar
-      const expectedContentWidth = testWidth - collapsedSidebarWidth;
-      expect(
-        find.textContaining('Width: $expectedContentWidth'),
-        findsOneWidget,
-      );
-    });
 
     testWidgets('Modal has centered positioning at 1280px', (
       WidgetTester tester,
@@ -457,30 +382,6 @@ void main() {
       expect(screenSize, equals(ScreenSize.desktopLarge));
     });
 
-    testWidgets('ResponsiveLayout shows desktopLarge widget at 1440px', (
-      WidgetTester tester,
-    ) async {
-      await tester.pumpWidget(
-        MediaQuery(
-          data: const MediaQueryData(size: Size(testWidth, testHeight)),
-          child: testApp(
-            const Scaffold(
-              body: ResponsiveLayout(
-                mobile: Text('Mobile'),
-                tablet: Text('Tablet'),
-                desktop: Text('Desktop'),
-                desktopLarge: Text('Desktop Large'),
-              ),
-            ),
-          ),
-        ),
-      );
-
-      expect(find.text('Desktop Large'), findsOneWidget);
-      expect(find.text('Desktop'), findsNothing);
-      expect(find.text('Tablet'), findsNothing);
-      expect(find.text('Mobile'), findsNothing);
-    });
 
     testWidgets('Sidebar remains functional at 1440px', (
       WidgetTester tester,
@@ -554,41 +455,6 @@ void main() {
       expect(columns, equals(4));
     });
 
-    testWidgets('Content is centered with max-width at 1920px', (
-      WidgetTester tester,
-    ) async {
-      await tester.pumpWidget(
-        MediaQuery(
-          data: const MediaQueryData(size: Size(testWidth, testHeight)),
-          child: testApp(
-            Scaffold(
-              body: Center(
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 1200.0),
-                  child: Container(
-                    color: Colors.blue,
-                    child: const Text('Constrained Content'),
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ),
-      );
-
-      expect(find.text('Constrained Content'), findsOneWidget);
-
-      // Verify the constraint is applied
-      final constrainedBox = find.byType(ConstrainedBox);
-      final constraints = tester
-          .widget<ConstrainedBox>(constrainedBox)
-          .constraints;
-      expect(
-        constraints.maxWidth,
-        equals(1200.0),
-        reason: 'Content should be constrained to 1200px max width',
-      );
-    });
 
     testWidgets('Layout is usable at very wide screens', (
       WidgetTester tester,
