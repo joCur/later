@@ -3,14 +3,14 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:later_mobile/design_system/atoms/buttons/ghost_button.dart';
 import 'package:later_mobile/design_system/tokens/tokens.dart';
 
+import '../../../test_helpers.dart';
+
 void main() {
   group('GhostButton', () {
     testWidgets('renders with text', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: GhostButton(text: 'Test Button', onPressed: () {}),
-          ),
+        testApp(
+          GhostButton(text: 'Test Button', onPressed: () {}),
         ),
       );
 
@@ -22,14 +22,12 @@ void main() {
       var pressed = false;
 
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: GhostButton(
-              text: 'Test Button',
-              onPressed: () {
-                pressed = true;
-              },
-            ),
+        testApp(
+          GhostButton(
+            text: 'Test Button',
+            onPressed: () {
+              pressed = true;
+            },
           ),
         ),
       );
@@ -44,10 +42,8 @@ void main() {
       tester,
     ) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: GhostButton(text: 'Disabled Button', onPressed: null),
-          ),
+        testApp(
+          const GhostButton(text: 'Disabled Button', onPressed: null),
         ),
       );
 
@@ -59,13 +55,11 @@ void main() {
       tester,
     ) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: GhostButton(
-              text: 'Loading',
-              isLoading: true,
-              onPressed: () {},
-            ),
+        testApp(
+          GhostButton(
+            text: 'Loading',
+            isLoading: true,
+            onPressed: () {},
           ),
         ),
       );
@@ -76,13 +70,11 @@ void main() {
 
     testWidgets('renders with icon when provided', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: GhostButton(
-              text: 'With Icon',
-              icon: Icons.delete,
-              onPressed: () {},
-            ),
+        testApp(
+          GhostButton(
+            text: 'With Icon',
+            icon: Icons.delete,
+            onPressed: () {},
           ),
         ),
       );
@@ -93,10 +85,8 @@ void main() {
 
     testWidgets('has proper semantic label', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: GhostButton(text: 'Accessible Button', onPressed: () {}),
-          ),
+        testApp(
+          GhostButton(text: 'Accessible Button', onPressed: () {}),
         ),
       );
 
@@ -109,15 +99,13 @@ void main() {
       var pressed = false;
 
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: GhostButton(
-              text: 'Loading',
-              isLoading: true,
-              onPressed: () {
-                pressed = true;
-              },
-            ),
+        testApp(
+          GhostButton(
+            text: 'Loading',
+            isLoading: true,
+            onPressed: () {
+              pressed = true;
+            },
           ),
         ),
       );
@@ -131,10 +119,8 @@ void main() {
     group('Temporal Flow Design Requirements', () {
       testWidgets('has 10px border radius', (tester) async {
         await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(
-              body: GhostButton(text: 'Test', onPressed: () {}),
-            ),
+          testApp(
+            GhostButton(text: 'Test', onPressed: () {}),
           ),
         );
 
@@ -153,10 +139,8 @@ void main() {
 
       testWidgets('animates to 0.92 scale on press', (tester) async {
         await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(
-              body: GhostButton(text: 'Test', onPressed: () {}),
-            ),
+          testApp(
+            GhostButton(text: 'Test', onPressed: () {}),
           ),
         );
 
@@ -185,10 +169,8 @@ void main() {
 
       testWidgets('disabled state has 40% opacity', (tester) async {
         await tester.pumpWidget(
-          const MaterialApp(
-            home: Scaffold(
-              body: GhostButton(text: 'Disabled', onPressed: null),
-            ),
+          testApp(
+            const GhostButton(text: 'Disabled', onPressed: null),
           ),
         );
 
@@ -203,13 +185,11 @@ void main() {
 
       testWidgets('icon and text have 8px gap', (tester) async {
         await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(
-              body: GhostButton(
-                text: 'With Icon',
-                icon: Icons.delete,
-                onPressed: () {},
-              ),
+          testApp(
+            GhostButton(
+              text: 'With Icon',
+              icon: Icons.delete,
+              onPressed: () {},
             ),
           ),
         );

@@ -3,14 +3,14 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:later_mobile/design_system/tokens/tokens.dart';
 import 'package:later_mobile/design_system/atoms/buttons/primary_button.dart';
 
+import '../../../test_helpers.dart';
+
 void main() {
   group('PrimaryButton', () {
     testWidgets('renders with text', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: PrimaryButton(text: 'Test Button', onPressed: () {}),
-          ),
+        testApp(
+          PrimaryButton(text: 'Test Button', onPressed: () {}),
         ),
       );
 
@@ -22,14 +22,12 @@ void main() {
       var pressed = false;
 
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: PrimaryButton(
-              text: 'Test Button',
-              onPressed: () {
-                pressed = true;
-              },
-            ),
+        testApp(
+          PrimaryButton(
+            text: 'Test Button',
+            onPressed: () {
+              pressed = true;
+            },
           ),
         ),
       );
@@ -44,10 +42,8 @@ void main() {
       tester,
     ) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: PrimaryButton(text: 'Disabled Button', onPressed: null),
-          ),
+        testApp(
+          const PrimaryButton(text: 'Disabled Button', onPressed: null),
         ),
       );
 
@@ -57,13 +53,11 @@ void main() {
 
     testWidgets('renders small size correctly', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: PrimaryButton(
-              text: 'Small',
-              size: ButtonSize.small,
-              onPressed: () {},
-            ),
+        testApp(
+          PrimaryButton(
+            text: 'Small',
+            size: ButtonSize.small,
+            onPressed: () {},
           ),
         ),
       );
@@ -76,10 +70,8 @@ void main() {
 
     testWidgets('renders medium size correctly', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: PrimaryButton(text: 'Medium', onPressed: () {}),
-          ),
+        testApp(
+          PrimaryButton(text: 'Medium', onPressed: () {}),
         ),
       );
 
@@ -88,13 +80,11 @@ void main() {
 
     testWidgets('renders large size correctly', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: PrimaryButton(
-              text: 'Large',
-              size: ButtonSize.large,
-              onPressed: () {},
-            ),
+        testApp(
+          PrimaryButton(
+            text: 'Large',
+            size: ButtonSize.large,
+            onPressed: () {},
           ),
         ),
       );
@@ -106,13 +96,11 @@ void main() {
       tester,
     ) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: PrimaryButton(
-              text: 'Loading',
-              isLoading: true,
-              onPressed: () {},
-            ),
+        testApp(
+          PrimaryButton(
+            text: 'Loading',
+            isLoading: true,
+            onPressed: () {},
           ),
         ),
       );
@@ -125,15 +113,13 @@ void main() {
       var pressed = false;
 
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: PrimaryButton(
-              text: 'Loading',
-              isLoading: true,
-              onPressed: () {
-                pressed = true;
-              },
-            ),
+        testApp(
+          PrimaryButton(
+            text: 'Loading',
+            isLoading: true,
+            onPressed: () {
+              pressed = true;
+            },
           ),
         ),
       );
@@ -146,13 +132,11 @@ void main() {
 
     testWidgets('renders with icon when provided', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: PrimaryButton(
-              text: 'With Icon',
-              icon: Icons.add,
-              onPressed: () {},
-            ),
+        testApp(
+          PrimaryButton(
+            text: 'With Icon',
+            icon: Icons.add,
+            onPressed: () {},
           ),
         ),
       );
@@ -163,10 +147,8 @@ void main() {
 
     testWidgets('has proper semantic label', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: PrimaryButton(text: 'Accessible Button', onPressed: () {}),
-          ),
+        testApp(
+          PrimaryButton(text: 'Accessible Button', onPressed: () {}),
         ),
       );
 
@@ -177,10 +159,8 @@ void main() {
 
     testWidgets('is not enabled when disabled', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: PrimaryButton(text: 'Disabled', onPressed: null),
-          ),
+        testApp(
+          const PrimaryButton(text: 'Disabled', onPressed: null),
         ),
       );
 
@@ -193,36 +173,35 @@ void main() {
       tester,
     ) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: SizedBox(
-              width: 300,
-              child: PrimaryButton(
-                text: 'Expanded',
-                isExpanded: true,
-                onPressed: () {},
-              ),
+        testApp(
+          SizedBox(
+            width: 300,
+            child: PrimaryButton(
+              text: 'Expanded',
+              isExpanded: true,
+              onPressed: () {},
             ),
           ),
         ),
       );
 
+      // Find the SizedBox with width: double.infinity inside PrimaryButton
       final sizedBox = tester.widget<SizedBox>(
-        find.ancestor(
-          of: find.byType(PrimaryButton),
-          matching: find.byType(SizedBox),
-        ),
+        find
+            .descendant(
+              of: find.byType(PrimaryButton),
+              matching: find.byType(SizedBox),
+            )
+            .last,
       );
-      expect(sizedBox.width, 300);
+      expect(sizedBox.width, double.infinity);
     });
 
     group('Temporal Flow Design Requirements', () {
       testWidgets('has 10px border radius', (tester) async {
         await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(
-              body: PrimaryButton(text: 'Test', onPressed: () {}),
-            ),
+          testApp(
+            PrimaryButton(text: 'Test', onPressed: () {}),
           ),
         );
 
@@ -241,11 +220,8 @@ void main() {
 
       testWidgets('uses gradient background in light mode', (tester) async {
         await tester.pumpWidget(
-          MaterialApp(
-            theme: ThemeData.light(),
-            home: Scaffold(
-              body: PrimaryButton(text: 'Test', onPressed: () {}),
-            ),
+          testApp(
+            PrimaryButton(text: 'Test', onPressed: () {}),
           ),
         );
 
@@ -264,11 +240,8 @@ void main() {
 
       testWidgets('uses gradient background in dark mode', (tester) async {
         await tester.pumpWidget(
-          MaterialApp(
-            theme: ThemeData.dark(),
-            home: Scaffold(
-              body: PrimaryButton(text: 'Test', onPressed: () {}),
-            ),
+          testAppDark(
+            PrimaryButton(text: 'Test', onPressed: () {}),
           ),
         );
 
@@ -287,10 +260,8 @@ void main() {
 
       testWidgets('animates to 0.92 scale on press', (tester) async {
         await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(
-              body: PrimaryButton(text: 'Test', onPressed: () {}),
-            ),
+          testApp(
+            PrimaryButton(text: 'Test', onPressed: () {}),
           ),
         );
 
@@ -319,10 +290,8 @@ void main() {
 
       testWidgets('has soft shadow when enabled', (tester) async {
         await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(
-              body: PrimaryButton(text: 'Test', onPressed: () {}),
-            ),
+          testApp(
+            PrimaryButton(text: 'Test', onPressed: () {}),
           ),
         );
 
@@ -345,10 +314,8 @@ void main() {
 
       testWidgets('disabled state has 40% opacity', (tester) async {
         await tester.pumpWidget(
-          const MaterialApp(
-            home: Scaffold(
-              body: PrimaryButton(text: 'Disabled', onPressed: null),
-            ),
+          testApp(
+            const PrimaryButton(text: 'Disabled', onPressed: null),
           ),
         );
 
@@ -363,13 +330,11 @@ void main() {
 
       testWidgets('icon and text have 8px gap', (tester) async {
         await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(
-              body: PrimaryButton(
-                text: 'With Icon',
-                icon: Icons.add,
-                onPressed: () {},
-              ),
+          testApp(
+            PrimaryButton(
+              text: 'With Icon',
+              icon: Icons.add,
+              onPressed: () {},
             ),
           ),
         );
@@ -394,18 +359,17 @@ void main() {
       testWidgets('button sizes are correct', (tester) async {
         // Small: 36px
         await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(
-              body: PrimaryButton(
-                text: 'Small',
-                size: ButtonSize.small,
-                onPressed: () {},
-              ),
+          testApp(
+            PrimaryButton(
+              text: 'Small',
+              size: ButtonSize.small,
+              onPressed: () {},
             ),
           ),
         );
 
-        var container = tester.widget<Container>(
+        // Container uses height constraint, verify it's 36px
+        var containerBox = tester.getSize(
           find
               .descendant(
                 of: find.byType(PrimaryButton),
@@ -413,23 +377,17 @@ void main() {
               )
               .first,
         );
-        expect(
-          container.constraints?.minHeight ??
-              container.constraints?.maxHeight ??
-              0,
-          36.0,
-        );
+        expect(containerBox.height, 36.0);
 
         // Medium: 44px
         await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(
-              body: PrimaryButton(text: 'Medium', onPressed: () {}),
-            ),
+          testApp(
+            PrimaryButton(text: 'Medium', onPressed: () {}),
           ),
         );
 
-        container = tester.widget<Container>(
+        // Container uses height constraint, verify it's 44px
+        containerBox = tester.getSize(
           find
               .descendant(
                 of: find.byType(PrimaryButton),
@@ -437,27 +395,21 @@ void main() {
               )
               .first,
         );
-        expect(
-          container.constraints?.minHeight ??
-              container.constraints?.maxHeight ??
-              0,
-          44.0,
-        );
+        expect(containerBox.height, 44.0);
 
         // Large: 52px
         await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(
-              body: PrimaryButton(
-                text: 'Large',
-                size: ButtonSize.large,
-                onPressed: () {},
-              ),
+          testApp(
+            PrimaryButton(
+              text: 'Large',
+              size: ButtonSize.large,
+              onPressed: () {},
             ),
           ),
         );
 
-        container = tester.widget<Container>(
+        // Container uses height constraint, verify it's 52px
+        containerBox = tester.getSize(
           find
               .descendant(
                 of: find.byType(PrimaryButton),
@@ -465,12 +417,7 @@ void main() {
               )
               .first,
         );
-        expect(
-          container.constraints?.minHeight ??
-              container.constraints?.maxHeight ??
-              0,
-          52.0,
-        );
+        expect(containerBox.height, 52.0);
       });
     });
   });

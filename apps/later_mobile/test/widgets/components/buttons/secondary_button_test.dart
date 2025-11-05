@@ -3,14 +3,14 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:later_mobile/design_system/atoms/buttons/secondary_button.dart';
 import 'package:later_mobile/design_system/tokens/tokens.dart';
 
+import '../../../test_helpers.dart';
+
 void main() {
   group('SecondaryButton', () {
     testWidgets('renders with text', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: SecondaryButton(text: 'Test Button', onPressed: () {}),
-          ),
+        testApp(
+          SecondaryButton(text: 'Test Button', onPressed: () {}),
         ),
       );
 
@@ -22,14 +22,12 @@ void main() {
       var pressed = false;
 
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: SecondaryButton(
-              text: 'Test Button',
-              onPressed: () {
-                pressed = true;
-              },
-            ),
+        testApp(
+          SecondaryButton(
+            text: 'Test Button',
+            onPressed: () {
+              pressed = true;
+            },
           ),
         ),
       );
@@ -44,10 +42,8 @@ void main() {
       tester,
     ) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: SecondaryButton(text: 'Disabled Button', onPressed: null),
-          ),
+        testApp(
+          const SecondaryButton(text: 'Disabled Button', onPressed: null),
         ),
       );
 
@@ -61,13 +57,11 @@ void main() {
       tester,
     ) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: SecondaryButton(
-              text: 'Loading',
-              isLoading: true,
-              onPressed: () {},
-            ),
+        testApp(
+          SecondaryButton(
+            text: 'Loading',
+            isLoading: true,
+            onPressed: () {},
           ),
         ),
       );
@@ -78,13 +72,11 @@ void main() {
 
     testWidgets('renders with icon when provided', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: SecondaryButton(
-              text: 'With Icon',
-              icon: Icons.settings,
-              onPressed: () {},
-            ),
+        testApp(
+          SecondaryButton(
+            text: 'With Icon',
+            icon: Icons.settings,
+            onPressed: () {},
           ),
         ),
       );
@@ -95,10 +87,8 @@ void main() {
 
     testWidgets('has proper semantic label', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: SecondaryButton(text: 'Accessible Button', onPressed: () {}),
-          ),
+        testApp(
+          SecondaryButton(text: 'Accessible Button', onPressed: () {}),
         ),
       );
 
@@ -110,10 +100,8 @@ void main() {
     group('Temporal Flow Design Requirements', () {
       testWidgets('has 10px border radius', (tester) async {
         await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(
-              body: SecondaryButton(text: 'Test', onPressed: () {}),
-            ),
+          testApp(
+            SecondaryButton(text: 'Test', onPressed: () {}),
           ),
         );
 
@@ -132,10 +120,8 @@ void main() {
 
       testWidgets('has gradient border', (tester) async {
         await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(
-              body: SecondaryButton(text: 'Test', onPressed: () {}),
-            ),
+          testApp(
+            SecondaryButton(text: 'Test', onPressed: () {}),
           ),
         );
 
@@ -156,10 +142,8 @@ void main() {
 
       testWidgets('animates to 0.92 scale on press', (tester) async {
         await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(
-              body: SecondaryButton(text: 'Test', onPressed: () {}),
-            ),
+          testApp(
+            SecondaryButton(text: 'Test', onPressed: () {}),
           ),
         );
 
@@ -188,10 +172,8 @@ void main() {
 
       testWidgets('disabled state has 40% opacity', (tester) async {
         await tester.pumpWidget(
-          const MaterialApp(
-            home: Scaffold(
-              body: SecondaryButton(text: 'Disabled', onPressed: null),
-            ),
+          testApp(
+            const SecondaryButton(text: 'Disabled', onPressed: null),
           ),
         );
 
@@ -206,13 +188,11 @@ void main() {
 
       testWidgets('icon and text have 8px gap', (tester) async {
         await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(
-              body: SecondaryButton(
-                text: 'With Icon',
-                icon: Icons.settings,
-                onPressed: () {},
-              ),
+          testApp(
+            SecondaryButton(
+              text: 'With Icon',
+              icon: Icons.settings,
+              onPressed: () {},
             ),
           ),
         );

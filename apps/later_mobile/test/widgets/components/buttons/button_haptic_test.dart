@@ -1,9 +1,10 @@
-import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:later_mobile/design_system/atoms/buttons/primary_button.dart';
 import 'package:later_mobile/design_system/atoms/buttons/secondary_button.dart';
 import 'package:later_mobile/design_system/atoms/buttons/ghost_button.dart';
+
+import '../../../test_helpers.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -37,14 +38,12 @@ void main() {
         bool wasPressed = false;
 
         await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(
-              body: PrimaryButton(
-                text: 'Test Button',
-                onPressed: () {
-                  wasPressed = true;
-                },
-              ),
+          testApp(
+            PrimaryButton(
+              text: 'Test Button',
+              onPressed: () {
+                wasPressed = true;
+              },
             ),
           ),
         );
@@ -68,10 +67,8 @@ void main() {
         WidgetTester tester,
       ) async {
         await tester.pumpWidget(
-          const MaterialApp(
-            home: Scaffold(
-              body: PrimaryButton(text: 'Disabled Button', onPressed: null),
-            ),
+          testApp(
+            const PrimaryButton(text: 'Disabled Button', onPressed: null),
           ),
         );
 
@@ -93,14 +90,12 @@ void main() {
         bool wasPressed = false;
 
         await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(
-              body: SecondaryButton(
-                text: 'Secondary',
-                onPressed: () {
-                  wasPressed = true;
-                },
-              ),
+          testApp(
+            SecondaryButton(
+              text: 'Secondary',
+              onPressed: () {
+                wasPressed = true;
+              },
             ),
           ),
         );
@@ -119,14 +114,12 @@ void main() {
         bool wasPressed = false;
 
         await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(
-              body: GhostButton(
-                text: 'Ghost',
-                onPressed: () {
-                  wasPressed = true;
-                },
-              ),
+          testApp(
+            GhostButton(
+              text: 'Ghost',
+              onPressed: () {
+                wasPressed = true;
+              },
             ),
           ),
         );
