@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hive_flutter/hive_flutter.dart';
 import 'package:later_mobile/core/theme/temporal_flow_theme.dart';
 import 'package:later_mobile/core/utils/responsive_modal.dart';
 import 'package:later_mobile/data/models/space_model.dart';
@@ -9,58 +8,52 @@ import 'package:later_mobile/data/repositories/space_repository.dart';
 import 'package:later_mobile/providers/spaces_provider.dart';
 import 'package:later_mobile/widgets/modals/space_switcher_modal.dart';
 import 'package:later_mobile/design_system/tokens/tokens.dart';
+import 'package:mockito/annotations.dart';
+import 'package:mockito/mockito.dart';
 import 'package:provider/provider.dart';
 
+import 'space_switcher_modal_test.mocks.dart';
+
+@GenerateMocks([SpaceRepository])
 void main() {
   group('SpaceSwitcherModal Widget Tests', () {
-    late SpaceRepository repository;
+    late MockSpaceRepository mockRepository;
     late SpacesProvider spacesProvider;
     late List<Space> testSpaces;
 
-    setUpAll(() async {
-      // Initialize Hive for testing
-      Hive.init('test/hive_testing_path');
-      Hive.registerAdapter(SpaceAdapter());
-    });
+    // Test user ID for all test spaces
+    const testUserId = 'test-user-id';
 
     setUp(() async {
-      // Open or clear the box
-      if (!Hive.isBoxOpen('spaces')) {
-        await Hive.openBox<Space>('spaces');
-      } else {
-        await Hive.box<Space>('spaces').clear();
-      }
+      mockRepository = MockSpaceRepository();
+      spacesProvider = SpacesProvider(mockRepository);
 
-      // Create repository and provider
-      repository = SpaceRepository();
-      spacesProvider = SpacesProvider(repository);
-
-      // Create test spaces (itemCount is now calculated, not stored)
+      // Create test spaces
       testSpaces = [
-        Space(id: 'space-1', name: 'Personal', icon: '🏠'),
-        Space(id: 'space-2', name: 'Work', icon: '💼'),
-        Space(id: 'space-3', name: 'Projects', icon: '🚀'),
-        Space(id: 'space-4', name: 'Shopping', icon: '🛒'),
-        Space(id: 'space-5', name: 'Ideas', icon: '💡'),
+        Space(id: 'space-1', name: 'Personal', userId: testUserId, icon: '🏠'),
+        Space(id: 'space-2', name: 'Work', userId: testUserId, icon: '💼'),
+        Space(id: 'space-3', name: 'Projects', userId: testUserId, icon: '🚀'),
+        Space(id: 'space-4', name: 'Shopping', userId: testUserId, icon: '🛒'),
+        Space(id: 'space-5', name: 'Ideas', userId: testUserId, icon: '💡'),
       ];
 
-      // Add test spaces to repository
-      for (final space in testSpaces) {
-        await repository.createSpace(space);
-      }
+      // Mock repository to return test spaces
+      when(mockRepository.getSpaces()).thenAnswer((_) async => testSpaces);
+      when(mockRepository.getItemCount(any)).thenAnswer((_) async => 12);
+
+      // Mock create/update operations
+      when(mockRepository.createSpace(any)).thenAnswer((inv) async {
+        final space = inv.positionalArguments[0] as Space;
+        return space;
+      });
+      when(mockRepository.updateSpace(any)).thenAnswer((inv) async {
+        final space = inv.positionalArguments[0] as Space;
+        return space;
+      });
+      when(mockRepository.deleteSpace(any)).thenAnswer((_) async {});
 
       // Load spaces into provider
       await spacesProvider.loadSpaces();
-    });
-
-    tearDown(() async {
-      if (Hive.isBoxOpen('spaces')) {
-        await Hive.box<Space>('spaces').clear();
-      }
-    });
-
-    tearDownAll(() async {
-      await Hive.close();
     });
 
     /// Helper to build modal with provider
@@ -68,9 +61,11 @@ void main() {
       Size size = const Size(400, 800), // Mobile by default
       ThemeData? theme,
     }) {
-      final testTheme = (theme ?? ThemeData.light()).copyWith(
+      final baseTheme = theme ?? ThemeData.light();
+      final isDark = baseTheme.brightness == Brightness.dark;
+      final testTheme = baseTheme.copyWith(
         extensions: <ThemeExtension<dynamic>>[
-          TemporalFlowTheme.light(),
+          isDark ? TemporalFlowTheme.dark() : TemporalFlowTheme.light(),
         ],
       );
 
@@ -120,10 +115,8 @@ void main() {
       await tester.pumpWidget(buildModalWithProvider());
       await tester.pumpAndSettle();
 
-      // Assert - Check that item counts are visible (may appear multiple times due to number indicators)
-      expect(find.text('12'), findsWidgets); // Work - unique
-      expect(find.text('0'), findsWidgets); // Shopping - unique
-      expect(find.text('8'), findsWidgets); // Ideas - unique
+      // Assert - Check that item counts are visible (all spaces have 12 items from mock)
+      expect(find.text('12'), findsWidgets);
     });
 
     testWidgets('highlights currently selected space', (
@@ -667,9 +660,9 @@ void main() {
         await tester.pumpWidget(buildModalWithProvider());
         await tester.pumpAndSettle();
 
-        // Assert - Counts should be displayed (will be 0 since no items created)
+        // Assert - Counts should be displayed (all spaces have 12 items from mock)
         // We can verify that the count badges are present
-        expect(find.text('0'), findsWidgets);
+        expect(find.text('12'), findsWidgets);
       });
 
       testWidgets('caches counts to prevent flicker on rebuild', (
@@ -680,7 +673,7 @@ void main() {
         await tester.pumpAndSettle();
 
         // Get initial count displays
-        final initialCountFinder = find.text('0');
+        final initialCountFinder = find.text('12');
         expect(initialCountFinder, findsWidgets);
 
         // Act - Trigger a rebuild by typing in search
@@ -688,7 +681,7 @@ void main() {
         await tester.pump(); // Just pump once, don't settle
 
         // Assert - Counts should still be visible (from cache)
-        expect(find.text('0'), findsWidgets);
+        expect(find.text('12'), findsWidgets);
       });
     });
   });

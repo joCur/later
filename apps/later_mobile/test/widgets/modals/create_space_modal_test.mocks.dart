@@ -3,13 +3,13 @@
 // Do not manually edit this file.
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
-import 'dart:async' as _i4;
+import 'dart:async' as _i3;
+import 'dart:ui' as _i4;
 
-import 'package:later_mobile/data/models/space_model.dart' as _i3;
-import 'package:later_mobile/data/repositories/space_repository.dart' as _i5;
+import 'package:later_mobile/data/models/space_model.dart' as _i6;
+import 'package:later_mobile/providers/auth_provider.dart' as _i2;
+import 'package:later_mobile/providers/spaces_provider.dart' as _i5;
 import 'package:mockito/mockito.dart' as _i1;
-import 'package:mockito/src/dummies.dart' as _i6;
-import 'package:supabase_flutter/supabase_flutter.dart' as _i2;
 
 // ignore_for_file: type=lint
 // ignore_for_file: avoid_redundant_argument_values
@@ -26,123 +26,218 @@ import 'package:supabase_flutter/supabase_flutter.dart' as _i2;
 // ignore_for_file: subtype_of_sealed_class
 // ignore_for_file: invalid_use_of_internal_member
 
-class _FakeSupabaseClient_0 extends _i1.SmartFake
-    implements _i2.SupabaseClient {
-  _FakeSupabaseClient_0(Object parent, Invocation parentInvocation)
-    : super(parent, parentInvocation);
-}
-
-class _FakeSpace_1 extends _i1.SmartFake implements _i3.Space {
-  _FakeSpace_1(Object parent, Invocation parentInvocation)
-    : super(parent, parentInvocation);
-}
-
-class _FakeFuture_2<T1> extends _i1.SmartFake implements _i4.Future<T1> {
-  _FakeFuture_2(Object parent, Invocation parentInvocation)
-    : super(parent, parentInvocation);
-}
-
-/// A class which mocks [SpaceRepository].
+/// A class which mocks [AuthProvider].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockSpaceRepository extends _i1.Mock implements _i5.SpaceRepository {
-  MockSpaceRepository() {
+class MockAuthProvider extends _i1.Mock implements _i2.AuthProvider {
+  MockAuthProvider() {
     _i1.throwOnMissingStub(this);
   }
 
   @override
-  _i2.SupabaseClient get supabase =>
+  _i2.AuthStatus get authStatus =>
       (super.noSuchMethod(
-            Invocation.getter(#supabase),
-            returnValue: _FakeSupabaseClient_0(
-              this,
-              Invocation.getter(#supabase),
-            ),
+            Invocation.getter(#authStatus),
+            returnValue: _i2.AuthStatus.authenticated,
           )
-          as _i2.SupabaseClient);
+          as _i2.AuthStatus);
 
   @override
-  String get userId =>
-      (super.noSuchMethod(
-            Invocation.getter(#userId),
-            returnValue: _i6.dummyValue<String>(
-              this,
-              Invocation.getter(#userId),
-            ),
-          )
-          as String);
+  bool get isLoading =>
+      (super.noSuchMethod(Invocation.getter(#isLoading), returnValue: false)
+          as bool);
 
   @override
-  _i4.Future<_i3.Space> createSpace(_i3.Space? space) =>
+  bool get isAuthenticated =>
       (super.noSuchMethod(
-            Invocation.method(#createSpace, [space]),
-            returnValue: _i4.Future<_i3.Space>.value(
-              _FakeSpace_1(this, Invocation.method(#createSpace, [space])),
-            ),
+            Invocation.getter(#isAuthenticated),
+            returnValue: false,
           )
-          as _i4.Future<_i3.Space>);
+          as bool);
 
   @override
-  _i4.Future<List<_i3.Space>> getSpaces({bool? includeArchived = false}) =>
+  bool get hasListeners =>
+      (super.noSuchMethod(Invocation.getter(#hasListeners), returnValue: false)
+          as bool);
+
+  @override
+  _i3.Future<void> signUp({
+    required String? email,
+    required String? password,
+  }) =>
       (super.noSuchMethod(
-            Invocation.method(#getSpaces, [], {
+            Invocation.method(#signUp, [], {
+              #email: email,
+              #password: password,
+            }),
+            returnValue: _i3.Future<void>.value(),
+            returnValueForMissingStub: _i3.Future<void>.value(),
+          )
+          as _i3.Future<void>);
+
+  @override
+  _i3.Future<void> signIn({
+    required String? email,
+    required String? password,
+  }) =>
+      (super.noSuchMethod(
+            Invocation.method(#signIn, [], {
+              #email: email,
+              #password: password,
+            }),
+            returnValue: _i3.Future<void>.value(),
+            returnValueForMissingStub: _i3.Future<void>.value(),
+          )
+          as _i3.Future<void>);
+
+  @override
+  _i3.Future<void> signOut() =>
+      (super.noSuchMethod(
+            Invocation.method(#signOut, []),
+            returnValue: _i3.Future<void>.value(),
+            returnValueForMissingStub: _i3.Future<void>.value(),
+          )
+          as _i3.Future<void>);
+
+  @override
+  void clearError() => super.noSuchMethod(
+    Invocation.method(#clearError, []),
+    returnValueForMissingStub: null,
+  );
+
+  @override
+  void dispose() => super.noSuchMethod(
+    Invocation.method(#dispose, []),
+    returnValueForMissingStub: null,
+  );
+
+  @override
+  void addListener(_i4.VoidCallback? listener) => super.noSuchMethod(
+    Invocation.method(#addListener, [listener]),
+    returnValueForMissingStub: null,
+  );
+
+  @override
+  void removeListener(_i4.VoidCallback? listener) => super.noSuchMethod(
+    Invocation.method(#removeListener, [listener]),
+    returnValueForMissingStub: null,
+  );
+
+  @override
+  void notifyListeners() => super.noSuchMethod(
+    Invocation.method(#notifyListeners, []),
+    returnValueForMissingStub: null,
+  );
+}
+
+/// A class which mocks [SpacesProvider].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockSpacesProvider extends _i1.Mock implements _i5.SpacesProvider {
+  MockSpacesProvider() {
+    _i1.throwOnMissingStub(this);
+  }
+
+  @override
+  List<_i6.Space> get spaces =>
+      (super.noSuchMethod(
+            Invocation.getter(#spaces),
+            returnValue: <_i6.Space>[],
+          )
+          as List<_i6.Space>);
+
+  @override
+  bool get isLoading =>
+      (super.noSuchMethod(Invocation.getter(#isLoading), returnValue: false)
+          as bool);
+
+  @override
+  bool get hasListeners =>
+      (super.noSuchMethod(Invocation.getter(#hasListeners), returnValue: false)
+          as bool);
+
+  @override
+  _i3.Future<void> loadSpaces({bool? includeArchived = false}) =>
+      (super.noSuchMethod(
+            Invocation.method(#loadSpaces, [], {
               #includeArchived: includeArchived,
             }),
-            returnValue: _i4.Future<List<_i3.Space>>.value(<_i3.Space>[]),
+            returnValue: _i3.Future<void>.value(),
+            returnValueForMissingStub: _i3.Future<void>.value(),
           )
-          as _i4.Future<List<_i3.Space>>);
+          as _i3.Future<void>);
 
   @override
-  _i4.Future<_i3.Space?> getSpaceById(String? id) =>
+  _i3.Future<void> addSpace(_i6.Space? space) =>
       (super.noSuchMethod(
-            Invocation.method(#getSpaceById, [id]),
-            returnValue: _i4.Future<_i3.Space?>.value(),
+            Invocation.method(#addSpace, [space]),
+            returnValue: _i3.Future<void>.value(),
+            returnValueForMissingStub: _i3.Future<void>.value(),
           )
-          as _i4.Future<_i3.Space?>);
+          as _i3.Future<void>);
 
   @override
-  _i4.Future<_i3.Space> updateSpace(_i3.Space? space) =>
+  _i3.Future<void> updateSpace(_i6.Space? space) =>
       (super.noSuchMethod(
             Invocation.method(#updateSpace, [space]),
-            returnValue: _i4.Future<_i3.Space>.value(
-              _FakeSpace_1(this, Invocation.method(#updateSpace, [space])),
-            ),
+            returnValue: _i3.Future<void>.value(),
+            returnValueForMissingStub: _i3.Future<void>.value(),
           )
-          as _i4.Future<_i3.Space>);
+          as _i3.Future<void>);
 
   @override
-  _i4.Future<void> deleteSpace(String? id) =>
+  _i3.Future<void> deleteSpace(String? id) =>
       (super.noSuchMethod(
             Invocation.method(#deleteSpace, [id]),
-            returnValue: _i4.Future<void>.value(),
-            returnValueForMissingStub: _i4.Future<void>.value(),
+            returnValue: _i3.Future<void>.value(),
+            returnValueForMissingStub: _i3.Future<void>.value(),
           )
-          as _i4.Future<void>);
+          as _i3.Future<void>);
 
   @override
-  _i4.Future<int> getItemCount(String? spaceId) =>
+  _i3.Future<void> switchSpace(String? spaceId) =>
       (super.noSuchMethod(
-            Invocation.method(#getItemCount, [spaceId]),
-            returnValue: _i4.Future<int>.value(0),
+            Invocation.method(#switchSpace, [spaceId]),
+            returnValue: _i3.Future<void>.value(),
+            returnValueForMissingStub: _i3.Future<void>.value(),
           )
-          as _i4.Future<int>);
+          as _i3.Future<void>);
 
   @override
-  _i4.Future<T> executeQuery<T>(_i4.Future<T> Function()? query) =>
+  _i3.Future<int> getSpaceItemCount(String? spaceId) =>
       (super.noSuchMethod(
-            Invocation.method(#executeQuery, [query]),
-            returnValue:
-                _i6.ifNotNull(
-                  _i6.dummyValueOrNull<T>(
-                    this,
-                    Invocation.method(#executeQuery, [query]),
-                  ),
-                  (T v) => _i4.Future<T>.value(v),
-                ) ??
-                _FakeFuture_2<T>(
-                  this,
-                  Invocation.method(#executeQuery, [query]),
-                ),
+            Invocation.method(#getSpaceItemCount, [spaceId]),
+            returnValue: _i3.Future<int>.value(0),
           )
-          as _i4.Future<T>);
+          as _i3.Future<int>);
+
+  @override
+  void clearError() => super.noSuchMethod(
+    Invocation.method(#clearError, []),
+    returnValueForMissingStub: null,
+  );
+
+  @override
+  void addListener(_i4.VoidCallback? listener) => super.noSuchMethod(
+    Invocation.method(#addListener, [listener]),
+    returnValueForMissingStub: null,
+  );
+
+  @override
+  void removeListener(_i4.VoidCallback? listener) => super.noSuchMethod(
+    Invocation.method(#removeListener, [listener]),
+    returnValueForMissingStub: null,
+  );
+
+  @override
+  void dispose() => super.noSuchMethod(
+    Invocation.method(#dispose, []),
+    returnValueForMissingStub: null,
+  );
+
+  @override
+  void notifyListeners() => super.noSuchMethod(
+    Invocation.method(#notifyListeners, []),
+    returnValueForMissingStub: null,
+  );
 }

@@ -1,64 +1,58 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hive_flutter/hive_flutter.dart';
+import 'package:later_mobile/core/theme/temporal_flow_theme.dart';
 import 'package:later_mobile/data/models/space_model.dart';
 import 'package:later_mobile/data/repositories/space_repository.dart';
 import 'package:later_mobile/providers/spaces_provider.dart';
 import 'package:later_mobile/widgets/modals/space_switcher_modal.dart';
 import 'package:later_mobile/design_system/tokens/tokens.dart';
+import 'package:mockito/annotations.dart';
+import 'package:mockito/mockito.dart';
 import 'package:provider/provider.dart';
 
+import 'space_switcher_modal_redesign_test.mocks.dart';
+
+@GenerateMocks([SpaceRepository])
 void main() {
   group('SpaceSwitcherModal Redesign Tests (Task 3.3)', () {
-    late SpaceRepository repository;
+    late MockSpaceRepository mockRepository;
     late SpacesProvider spacesProvider;
     late List<Space> testSpaces;
 
-    setUpAll(() async {
-      // Initialize Hive for testing
-      Hive.init('test/hive_testing_path_redesign');
-      Hive.registerAdapter(SpaceAdapter());
-    });
+    // Test user ID for all test spaces
+    const testUserId = 'test-user-id';
 
     setUp(() async {
-      // Open or clear the box
-      if (!Hive.isBoxOpen('spaces')) {
-        await Hive.openBox<Space>('spaces');
-      } else {
-        await Hive.box<Space>('spaces').clear();
-      }
-
-      // Create repository and provider
-      repository = SpaceRepository();
-      spacesProvider = SpacesProvider(repository);
+      mockRepository = MockSpaceRepository();
+      spacesProvider = SpacesProvider(mockRepository);
 
       // Create test spaces with different counts (1, 5, 20+)
       testSpaces = [
-        Space(id: 'space-1', name: 'Personal', icon: '🏠'),
-        Space(id: 'space-2', name: 'Work', icon: '💼'),
-        Space(id: 'space-3', name: 'Projects', icon: '🚀'),
-        Space(id: 'space-4', name: 'Shopping', icon: '🛒'),
-        Space(id: 'space-5', name: 'Ideas', icon: '💡'),
+        Space(id: 'space-1', name: 'Personal', userId: testUserId, icon: '🏠'),
+        Space(id: 'space-2', name: 'Work', userId: testUserId, icon: '💼'),
+        Space(id: 'space-3', name: 'Projects', userId: testUserId, icon: '🚀'),
+        Space(id: 'space-4', name: 'Shopping', userId: testUserId, icon: '🛒'),
+        Space(id: 'space-5', name: 'Ideas', userId: testUserId, icon: '💡'),
       ];
 
-      // Add test spaces to repository
-      for (final space in testSpaces) {
-        await repository.createSpace(space);
-      }
+      // Mock repository to return test spaces
+      when(mockRepository.getSpaces()).thenAnswer((_) async => testSpaces);
+      when(mockRepository.getItemCount(any)).thenAnswer((_) async => 12);
+
+      // Mock create/update operations
+      when(mockRepository.createSpace(any)).thenAnswer((inv) async {
+        final space = inv.positionalArguments[0] as Space;
+        return space;
+      });
+      when(mockRepository.updateSpace(any)).thenAnswer((inv) async {
+        final space = inv.positionalArguments[0] as Space;
+        return space;
+      });
+      when(mockRepository.deleteSpace(any)).thenAnswer((_) async {});
 
       // Load spaces into provider
       await spacesProvider.loadSpaces();
-    });
-
-    tearDown(() async {
-      if (Hive.isBoxOpen('spaces')) {
-        await Hive.box<Space>('spaces').clear();
-      }
-    });
-
-    tearDownAll(() async {
-      await Hive.close();
     });
 
     /// Helper to build modal with provider
@@ -66,10 +60,18 @@ void main() {
       Size size = const Size(400, 800), // Mobile by default
       ThemeData? theme,
     }) {
+      final baseTheme = theme ?? ThemeData.light();
+      final isDark = baseTheme.brightness == Brightness.dark;
+      final testTheme = baseTheme.copyWith(
+        extensions: <ThemeExtension<dynamic>>[
+          isDark ? TemporalFlowTheme.dark() : TemporalFlowTheme.light(),
+        ],
+      );
+
       return MediaQuery(
         data: MediaQueryData(size: size),
         child: MaterialApp(
-          theme: theme ?? ThemeData.light(),
+          theme: testTheme,
           home: ChangeNotifierProvider<SpacesProvider>.value(
             value: spacesProvider,
             child: const Scaffold(body: SpaceSwitcherModal()),
@@ -495,9 +497,10 @@ void main() {
     group('Responsive Testing with Different Space Counts', () {
       testWidgets('modal works with 1 space', (WidgetTester tester) async {
         // Arrange - Clear and add only 1 space
-        await Hive.box<Space>('spaces').clear();
-        final singleSpace = Space(id: 'space-1', name: 'Only Space', icon: '⭐');
-        await repository.createSpace(singleSpace);
+        testSpaces.clear();
+        final singleSpace = Space(id: 'space-1', name: 'Only Space', userId: testUserId, icon: '⭐');
+        testSpaces.add(singleSpace);
+        when(mockRepository.getSpaces()).thenAnswer((_) async => testSpaces);
         await spacesProvider.loadSpaces();
 
         // Act
@@ -537,18 +540,18 @@ void main() {
 
       testWidgets('modal works with 20+ spaces', (WidgetTester tester) async {
         // Arrange - Add 20 more spaces
-        await Hive.box<Space>('spaces').clear();
+        testSpaces.clear();
         final manySpaces = List.generate(
           25,
           (index) => Space(
             id: 'space-$index',
             name: 'Space ${index + 1}',
+            userId: testUserId,
             icon: '📁',
           ),
         );
-        for (final space in manySpaces) {
-          await repository.createSpace(space);
-        }
+        testSpaces.addAll(manySpaces);
+        when(mockRepository.getSpaces()).thenAnswer((_) async => testSpaces);
         await spacesProvider.loadSpaces();
 
         // Act

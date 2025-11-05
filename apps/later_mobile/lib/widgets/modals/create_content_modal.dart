@@ -17,10 +17,10 @@ import 'package:later_mobile/design_system/tokens/tokens.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 
-import '../../core/config/supabase_config.dart';
 import '../../core/responsive/breakpoints.dart';
 import '../../core/theme/temporal_flow_theme.dart';
 import '../../core/utils/item_type_detector.dart'; // For ContentType enum
+import '../../providers/auth_provider.dart';
 import '../../providers/content_provider.dart';
 import '../../providers/spaces_provider.dart';
 
@@ -254,13 +254,11 @@ class _CreateContentModalState extends State<CreateContentModal>
     final currentSpace = spacesProvider.currentSpace;
 
     if (currentSpace == null) {
-      debugPrint('CreateContent: Cannot save - no current space');
       return;
     }
 
     // Safety check: Ensure selected space ID is valid
     if (_selectedSpaceId == null) {
-      debugPrint('CreateContent: Cannot save - _selectedSpaceId is null');
       return;
     }
 
@@ -270,21 +268,14 @@ class _CreateContentModalState extends State<CreateContentModal>
     );
     final targetSpaceId = spaceExists ? _selectedSpaceId! : currentSpace.id;
 
-    debugPrint(
-      'CreateContent: Creating item - _selectedSpaceId: $_selectedSpaceId, '
-      'currentSpace: ${currentSpace.id}, targetSpaceId: $targetSpaceId, '
-      'spaceExists: $spaceExists',
-    );
-
-    // Log fallback if space was deleted
-    if (!spaceExists) {
-      debugPrint(
-        'Warning: Selected space no longer exists, falling back to current space',
-      );
-    }
-
     // Determine content type (user-selected, defaults to note if not specified)
     final contentType = _selectedType ?? ContentType.note;
+
+    // Safety check: Ensure user is authenticated
+    final userId = context.read<AuthProvider>().currentUser?.id;
+    if (userId == null) {
+      return; // Exit early - user should be redirected to auth screen by AuthGate
+    }
 
     try {
       if (_currentItemId == null) {
@@ -298,7 +289,7 @@ class _CreateContentModalState extends State<CreateContentModal>
             final todoList = TodoList(
               id: id,
               spaceId: targetSpaceId,
-              userId: SupabaseConfig.client.auth.currentUser!.id,
+              userId: userId,
               name: text,
               description: description.isEmpty ? null : description,
             );
@@ -311,7 +302,7 @@ class _CreateContentModalState extends State<CreateContentModal>
             final listModel = ListModel(
               id: id,
               spaceId: targetSpaceId,
-              userId: SupabaseConfig.client.auth.currentUser!.id,
+              userId: userId,
               name: text,
               style: _selectedListStyle,
             );
@@ -327,7 +318,7 @@ class _CreateContentModalState extends State<CreateContentModal>
               title: parsed.title,
               content: parsed.content,
               spaceId: targetSpaceId,
-              userId: SupabaseConfig.client.auth.currentUser!.id,
+              userId: userId,
             );
             await contentProvider.createNote(note);
             _currentItemId = id;

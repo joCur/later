@@ -1,76 +1,72 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hive_flutter/hive_flutter.dart';
 import 'package:later_mobile/data/models/space_model.dart';
 import 'package:later_mobile/data/repositories/space_repository.dart';
 import 'package:later_mobile/providers/spaces_provider.dart';
 import 'package:later_mobile/widgets/modals/space_switcher_modal.dart';
+import 'package:mockito/annotations.dart';
+import 'package:mockito/mockito.dart';
 import 'package:provider/provider.dart';
 
+import 'space_switcher_modal_edit_test.mocks.dart';
+
+@GenerateMocks([SpaceRepository])
 void main() {
   group('SpaceSwitcherModal Edit Space Tests', () {
-    late SpaceRepository repository;
+    late MockSpaceRepository mockRepository;
     late SpacesProvider spacesProvider;
     late List<Space> testSpaces;
 
-    setUpAll(() async {
-      // Initialize Hive for testing
-      Hive.init('test/hive_testing_path_edit');
-      Hive.registerAdapter(SpaceAdapter());
-    });
+    // Test user ID for all test spaces
+    const testUserId = 'test-user-id';
 
     setUp(() async {
-      // Open or clear the box
-      if (!Hive.isBoxOpen('spaces')) {
-        await Hive.openBox<Space>('spaces');
-      } else {
-        await Hive.box<Space>('spaces').clear();
-      }
-
-      // Create repository and provider
-      repository = SpaceRepository();
-      spacesProvider = SpacesProvider(repository);
+      mockRepository = MockSpaceRepository();
+      spacesProvider = SpacesProvider(mockRepository);
 
       // Create test spaces
       testSpaces = [
         Space(
           id: 'space-1',
           name: 'Personal',
+          userId: testUserId,
           icon: '🏠',
           color: '#6366F1',
         ),
         Space(
           id: 'space-2',
           name: 'Work',
+          userId: testUserId,
           icon: '💼',
           color: '#8B5CF6',
         ),
         Space(
           id: 'space-3',
           name: 'Projects',
+          userId: testUserId,
           icon: '🚀',
           color: '#F59E0B',
         ),
       ];
 
-      // Add test spaces to repository
-      for (final space in testSpaces) {
-        await repository.createSpace(space);
-      }
+      // Mock repository to return test spaces
+      when(mockRepository.getSpaces()).thenAnswer((_) async => testSpaces);
+      when(mockRepository.getItemCount(any)).thenAnswer((_) async => 12);
+
+      // Mock create/update operations
+      when(mockRepository.createSpace(any)).thenAnswer((inv) async {
+        final space = inv.positionalArguments[0] as Space;
+        return space;
+      });
+      when(mockRepository.updateSpace(any)).thenAnswer((inv) async {
+        final space = inv.positionalArguments[0] as Space;
+        return space;
+      });
+      when(mockRepository.deleteSpace(any)).thenAnswer((_) async {});
 
       // Load spaces into provider
       await spacesProvider.loadSpaces();
-    });
-
-    tearDown(() async {
-      if (Hive.isBoxOpen('spaces')) {
-        await Hive.box<Space>('spaces').clear();
-      }
-    });
-
-    tearDownAll(() async {
-      await Hive.close();
     });
 
     /// Helper to build modal with provider
@@ -529,7 +525,7 @@ void main() {
 
         // Each ListTile should have adequate touch target size
         for (final item in menuItems.evaluate()) {
-          final renderBox = item.renderObject as RenderBox;
+          final renderBox = item.renderObject! as RenderBox;
           expect(renderBox.size.height, greaterThanOrEqualTo(44.0));
         }
       });
@@ -596,7 +592,14 @@ void main() {
       ) async {
         // Arrange - Archive a space first
         final archivedSpace = testSpaces[2].copyWith(isArchived: true);
-        await repository.updateSpace(archivedSpace);
+        when(mockRepository.updateSpace(archivedSpace))
+            .thenAnswer((_) async => archivedSpace);
+        await spacesProvider.updateSpace(archivedSpace);
+
+        // Mock to return only non-archived spaces
+        when(mockRepository.getSpaces()).thenAnswer(
+          (_) async => testSpaces.where((s) => !s.isArchived).toList(),
+        );
         await spacesProvider.loadSpaces();
 
         await tester.pumpWidget(buildModalWithProvider());
