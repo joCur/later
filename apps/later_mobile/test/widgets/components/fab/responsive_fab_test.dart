@@ -268,6 +268,7 @@ void main() {
     ) async {
       await tester.pumpWidget(
         createTestApp(
+          disableAnimations: true,
           child: ResponsiveFab(
             icon: Icons.add,
             label: 'Add Item',
@@ -294,6 +295,7 @@ void main() {
       await tester.pumpWidget(
         createTestApp(
           size: const Size(1440, 900), // Desktop size
+          disableAnimations: true,
           child: ResponsiveFab(
             icon: Icons.add,
             label: 'Add Item',
@@ -308,10 +310,6 @@ void main() {
         find.byType(ResponsiveFab),
       );
       expect(responsiveFab.enablePulse, isTrue);
-
-      // Pump frames to allow animation to start
-      await tester.pump();
-      await tester.pump(const Duration(milliseconds: 500));
     });
 
     testWidgets('stops pulsing on user interaction on mobile', (tester) async {
@@ -319,6 +317,7 @@ void main() {
 
       await tester.pumpWidget(
         createTestApp(
+          disableAnimations: true,
           child: ResponsiveFab(
             icon: Icons.add,
             label: 'Add Item',
@@ -342,6 +341,7 @@ void main() {
       await tester.pumpWidget(
         createTestApp(
           size: const Size(1440, 900), // Desktop size
+          disableAnimations: true,
           child: ResponsiveFab(
             icon: Icons.add,
             label: 'Add Item',
