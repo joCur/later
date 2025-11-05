@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:later_mobile/design_system/tokens/tokens.dart';
 import 'package:later_mobile/design_system/atoms/inputs/text_input_field.dart';
+import 'package:later_mobile/design_system/tokens/tokens.dart';
+
+import '../../../test_helpers.dart';
 
 void main() {
   group('TextInputField', () {
     testWidgets('renders with label', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(body: TextInputField(label: 'Test Label')),
+        testApp(
+          const TextInputField(label: 'Test Label'),
         ),
       );
 
@@ -18,9 +20,10 @@ void main() {
 
     testWidgets('renders with hint text', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: TextInputField(label: 'Label', hintText: 'Enter text here'),
+        testApp(
+          const TextInputField(
+            label: 'Label',
+            hintText: 'Enter text here',
           ),
         ),
       );
@@ -32,10 +35,8 @@ void main() {
       final controller = TextEditingController();
 
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: TextInputField(label: 'Label', controller: controller),
-          ),
+        testApp(
+          TextInputField(label: 'Label', controller: controller),
         ),
       );
 
@@ -49,14 +50,12 @@ void main() {
       String? changedText;
 
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: TextInputField(
-              label: 'Label',
-              onChanged: (value) {
-                changedText = value;
-              },
-            ),
+        testApp(
+          TextInputField(
+            label: 'Label',
+            onChanged: (value) {
+              changedText = value;
+            },
           ),
         ),
       );
@@ -67,12 +66,10 @@ void main() {
 
     testWidgets('displays error message when provided', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: TextInputField(
-              label: 'Label',
-              errorText: 'This field is required',
-            ),
+        testApp(
+          const TextInputField(
+            label: 'Label',
+            errorText: 'This field is required',
           ),
         ),
       );
@@ -82,8 +79,8 @@ void main() {
 
     testWidgets('renders in disabled state', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(body: TextInputField(label: 'Label', enabled: false)),
+        testApp(
+          const TextInputField(label: 'Label', enabled: false),
         ),
       );
 
@@ -93,10 +90,8 @@ void main() {
 
     testWidgets('shows prefix icon when provided', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: TextInputField(label: 'Label', prefixIcon: Icons.search),
-          ),
+        testApp(
+          const TextInputField(label: 'Label', prefixIcon: Icons.search),
         ),
       );
 
@@ -105,10 +100,8 @@ void main() {
 
     testWidgets('shows suffix icon when provided', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: TextInputField(label: 'Label', suffixIcon: Icons.clear),
-          ),
+        testApp(
+          const TextInputField(label: 'Label', suffixIcon: Icons.clear),
         ),
       );
 
@@ -117,10 +110,8 @@ void main() {
 
     testWidgets('obscures text when obscureText is true', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: TextInputField(label: 'Password', obscureText: true),
-          ),
+        testApp(
+          const TextInputField(label: 'Password', obscureText: true),
         ),
       );
 
@@ -130,12 +121,10 @@ void main() {
 
     testWidgets('applies keyboard type', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: TextInputField(
-              label: 'Email',
-              keyboardType: TextInputType.emailAddress,
-            ),
+        testApp(
+          const TextInputField(
+            label: 'Email',
+            keyboardType: TextInputType.emailAddress,
           ),
         ),
       );
@@ -146,12 +135,10 @@ void main() {
 
     testWidgets('applies text input action', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: TextInputField(
-              label: 'Label',
-              textInputAction: TextInputAction.search,
-            ),
+        testApp(
+          const TextInputField(
+            label: 'Label',
+            textInputAction: TextInputAction.search,
           ),
         ),
       );
@@ -164,14 +151,12 @@ void main() {
       String? submittedText;
 
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: TextInputField(
-              label: 'Label',
-              onSubmitted: (value) {
-                submittedText = value;
-              },
-            ),
+        testApp(
+          TextInputField(
+            label: 'Label',
+            onSubmitted: (value) {
+              submittedText = value;
+            },
           ),
         ),
       );
@@ -183,8 +168,8 @@ void main() {
 
     testWidgets('auto-focuses when autofocus is true', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(body: TextInputField(label: 'Label', autofocus: true)),
+        testApp(
+          const TextInputField(label: 'Label', autofocus: true),
         ),
       );
 
@@ -192,28 +177,27 @@ void main() {
       expect(textField.autofocus, isTrue);
     });
 
-    testWidgets('displays character counter when maxLength provided', (
-      tester,
-    ) async {
-      final controller = TextEditingController(text: 'Test');
+    testWidgets(
+      'displays character counter when maxLength provided',
+      (tester) async {
+        final controller = TextEditingController(text: 'Test');
 
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: TextInputField(
+        await tester.pumpWidget(
+          testApp(
+            TextInputField(
               label: 'Label',
               controller: controller,
               maxLength: 10,
             ),
           ),
-        ),
-      );
+        );
 
-      // Should display custom counter (TextField maxLength is null to hide default)
-      expect(find.text('4 / 10'), findsOneWidget);
+        // Should display custom counter
+        expect(find.text('4 / 10'), findsOneWidget);
 
-      controller.dispose();
-    });
+        controller.dispose();
+      },
+    );
 
     // ============================================================
     // TEMPORAL FLOW DESIGN SYSTEM TESTS
@@ -222,8 +206,8 @@ void main() {
     group('Temporal Flow Design', () {
       testWidgets('has glass background with 3% opacity', (tester) async {
         await tester.pumpWidget(
-          const MaterialApp(
-            home: Scaffold(body: TextInputField(label: 'Label')),
+          testApp(
+            const TextInputField(label: 'Label'),
           ),
         );
 
@@ -253,8 +237,8 @@ void main() {
         tester,
       ) async {
         await tester.pumpWidget(
-          const MaterialApp(
-            home: Scaffold(body: TextInputField(label: 'Label')),
+          testApp(
+            const TextInputField(label: 'Label'),
           ),
         );
 
@@ -278,7 +262,7 @@ void main() {
         expect(decoration.gradient, isNotNull);
         expect(decoration.gradient, isA<LinearGradient>());
 
-        final gradient = decoration.gradient as LinearGradient;
+        final gradient = decoration.gradient! as LinearGradient;
         // Should have gradient colors with 30% opacity
         expect(gradient.colors.length, 2);
         // Check that colors have reduced alpha (30%)
@@ -294,9 +278,8 @@ void main() {
         tester,
       ) async {
         await tester.pumpWidget(
-          MaterialApp(
-            theme: ThemeData.dark(),
-            home: const Scaffold(body: TextInputField(label: 'Label')),
+          testAppDark(
+            const TextInputField(label: 'Label'),
           ),
         );
 
@@ -320,7 +303,7 @@ void main() {
         expect(decoration.gradient, isNotNull);
         expect(decoration.gradient, isA<LinearGradient>());
 
-        final gradient = decoration.gradient as LinearGradient;
+        final gradient = decoration.gradient! as LinearGradient;
         // Should have gradient colors with 30% opacity
         expect(gradient.colors.length, 2);
         // Check that colors have reduced alpha (30%)
@@ -336,8 +319,8 @@ void main() {
         'shows focus shadow with gradient tint (8px blur, 20% opacity)',
         (tester) async {
           await tester.pumpWidget(
-            const MaterialApp(
-              home: Scaffold(body: TextInputField(label: 'Label')),
+            testApp(
+              const TextInputField(label: 'Label'),
             ),
           );
 
@@ -373,8 +356,8 @@ void main() {
 
       testWidgets('has standard border when not focused', (tester) async {
         await tester.pumpWidget(
-          const MaterialApp(
-            home: Scaffold(body: TextInputField(label: 'Label')),
+          testApp(
+            const TextInputField(label: 'Label'),
           ),
         );
 
@@ -399,10 +382,8 @@ void main() {
         tester,
       ) async {
         await tester.pumpWidget(
-          const MaterialApp(
-            home: Scaffold(
-              body: TextInputField(label: 'Label', errorText: 'Error message'),
-            ),
+          testApp(
+            const TextInputField(label: 'Label', errorText: 'Error message'),
           ),
         );
 
@@ -422,7 +403,7 @@ void main() {
         expect(decoration.gradient, isNotNull);
         expect(decoration.gradient, isA<LinearGradient>());
 
-        final gradient = decoration.gradient as LinearGradient;
+        final gradient = decoration.gradient! as LinearGradient;
         // Error gradient: red-500 to orange-400 in light mode
         expect(gradient.colors, contains(const Color(0xFFEF4444)));
         expect(gradient.colors, contains(const Color(0xFFFB923C)));
@@ -430,11 +411,8 @@ void main() {
 
       testWidgets('shows error gradient border in dark mode', (tester) async {
         await tester.pumpWidget(
-          MaterialApp(
-            theme: ThemeData.dark(),
-            home: const Scaffold(
-              body: TextInputField(label: 'Label', errorText: 'Error message'),
-            ),
+          testAppDark(
+            const TextInputField(label: 'Label', errorText: 'Error message'),
           ),
         );
 
@@ -452,7 +430,7 @@ void main() {
 
         // Check for dark mode error gradient border
         expect(decoration.gradient, isNotNull);
-        final gradient = decoration.gradient as LinearGradient;
+        final gradient = decoration.gradient! as LinearGradient;
         // Error gradient: red-400 to yellow-400 in dark mode
         expect(gradient.colors, contains(const Color(0xFFF87171)));
         expect(gradient.colors, contains(const Color(0xFFFBBF24)));
@@ -462,13 +440,11 @@ void main() {
         final controller = TextEditingController(text: 'Test');
 
         await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(
-              body: TextInputField(
-                label: 'Label',
-                controller: controller,
-                maxLength: 10,
-              ),
+          testApp(
+            TextInputField(
+              label: 'Label',
+              controller: controller,
+              maxLength: 10,
             ),
           ),
         );
@@ -485,13 +461,11 @@ void main() {
         final controller = TextEditingController(text: 'Twelve12');
 
         await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(
-              body: TextInputField(
-                label: 'Label',
-                controller: controller,
-                maxLength: 10,
-              ),
+          testApp(
+            TextInputField(
+              label: 'Label',
+              controller: controller,
+              maxLength: 10,
             ),
           ),
         );
@@ -518,13 +492,11 @@ void main() {
         final controller = TextEditingController(text: 'TwelveOne');
 
         await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(
-              body: TextInputField(
-                label: 'Label',
-                controller: controller,
-                maxLength: 10,
-              ),
+          testApp(
+            TextInputField(
+              label: 'Label',
+              controller: controller,
+              maxLength: 10,
             ),
           ),
         );
@@ -546,10 +518,8 @@ void main() {
         final controller = TextEditingController(text: 'Test text');
 
         await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(
-              body: TextInputField(label: 'Label', controller: controller),
-            ),
+          testApp(
+            TextInputField(label: 'Label', controller: controller),
           ),
         );
 
@@ -563,12 +533,10 @@ void main() {
         tester,
       ) async {
         await tester.pumpWidget(
-          const MaterialApp(
-            home: Scaffold(
-              body: TextInputField(
-                label: 'Label',
-                hintText: 'Placeholder text',
-              ),
+          testApp(
+            const TextInputField(
+              label: 'Label',
+              hintText: 'Placeholder text',
             ),
           ),
         );
@@ -588,8 +556,8 @@ void main() {
 
       testWidgets('uses correct border radius (10px)', (tester) async {
         await tester.pumpWidget(
-          const MaterialApp(
-            home: Scaffold(body: TextInputField(label: 'Label')),
+          testApp(
+            const TextInputField(label: 'Label'),
           ),
         );
 
@@ -604,7 +572,7 @@ void main() {
         );
 
         final decoration = animatedContainer.decoration as BoxDecoration;
-        final borderRadius = decoration.borderRadius as BorderRadius;
+        final borderRadius = decoration.borderRadius! as BorderRadius;
 
         // Plan specifies 10px border radius
         expect(borderRadius.topLeft.x, 10.0);
@@ -617,20 +585,17 @@ void main() {
         final controller = TextEditingController();
 
         await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(
-              body: TextInputField(
-                label: 'Label',
-                controller: controller,
-                maxLength: 100,
-              ),
+          testApp(
+            TextInputField(
+              label: 'Label',
+              controller: controller,
+              maxLength: 100,
             ),
           ),
         );
 
         // Enter long text
-        const longText =
-            'This is a very long text that should work correctly '
+        const longText = 'This is a very long text that should work correctly '
             'with the new design system and display properly.';
         await tester.enterText(find.byType(TextField), longText);
 
@@ -644,8 +609,8 @@ void main() {
         tester,
       ) async {
         await tester.pumpWidget(
-          const MaterialApp(
-            home: Scaffold(body: TextInputField(label: 'Label')),
+          testApp(
+            const TextInputField(label: 'Label'),
           ),
         );
 
@@ -698,8 +663,8 @@ void main() {
 
       testWidgets('has smooth focus/blur transitions (200ms)', (tester) async {
         await tester.pumpWidget(
-          const MaterialApp(
-            home: Scaffold(body: TextInputField(label: 'Label')),
+          testApp(
+            const TextInputField(label: 'Label'),
           ),
         );
 
@@ -720,8 +685,8 @@ void main() {
 
       testWidgets('gradient border uses 30% opacity on focus', (tester) async {
         await tester.pumpWidget(
-          const MaterialApp(
-            home: Scaffold(body: TextInputField(label: 'Label')),
+          testApp(
+            const TextInputField(label: 'Label'),
           ),
         );
 
@@ -742,7 +707,7 @@ void main() {
         final decoration = animatedContainer.decoration as BoxDecoration;
         expect(decoration.gradient, isNotNull);
 
-        final gradient = decoration.gradient as LinearGradient;
+        final gradient = decoration.gradient! as LinearGradient;
         // Gradient should use colors with 30% opacity
         for (final color in gradient.colors) {
           expect(
@@ -756,8 +721,8 @@ void main() {
         tester,
       ) async {
         await tester.pumpWidget(
-          const MaterialApp(
-            home: Scaffold(body: TextInputField(label: 'Label')),
+          testApp(
+            const TextInputField(label: 'Label'),
           ),
         );
 
@@ -781,14 +746,14 @@ void main() {
         tester,
       ) async {
         await tester.pumpWidget(
-          const MaterialApp(
-            home: Scaffold(body: TextInputField(label: 'Label')),
+          testApp(
+            const TextInputField(label: 'Label'),
           ),
         );
 
         final textField = tester.widget<TextField>(find.byType(TextField));
         final decoration = textField.decoration!;
-        final padding = decoration.contentPadding as EdgeInsets;
+        final padding = decoration.contentPadding! as EdgeInsets;
 
         // Single-line input: 12px horizontal, 12px vertical
         expect(padding.left, 12.0); // AppSpacing.inputPaddingHorizontal

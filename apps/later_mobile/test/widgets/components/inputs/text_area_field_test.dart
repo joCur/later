@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:later_mobile/design_system/tokens/tokens.dart';
 import 'package:later_mobile/design_system/atoms/inputs/text_area_field.dart';
+import 'package:later_mobile/design_system/tokens/tokens.dart';
+
+import '../../../test_helpers.dart';
 
 void main() {
   group('TextAreaField', () {
     testWidgets('renders with label', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(body: TextAreaField(label: 'Test Label')),
+        testApp(
+          const TextAreaField(label: 'Test Label'),
         ),
       );
 
@@ -18,12 +20,10 @@ void main() {
 
     testWidgets('renders with hint text', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: TextAreaField(
-              label: 'Label',
-              hintText: 'Enter multiple lines here',
-            ),
+        testApp(
+          const TextAreaField(
+            label: 'Label',
+            hintText: 'Enter multiple lines here',
           ),
         ),
       );
@@ -35,10 +35,8 @@ void main() {
       final controller = TextEditingController();
 
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: TextAreaField(label: 'Label', controller: controller),
-          ),
+        testApp(
+          TextAreaField(label: 'Label', controller: controller),
         ),
       );
 
@@ -50,12 +48,10 @@ void main() {
 
     testWidgets('displays error message when provided', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: TextAreaField(
-              label: 'Label',
-              errorText: 'This field is required',
-            ),
+        testApp(
+          const TextAreaField(
+            label: 'Label',
+            errorText: 'This field is required',
           ),
         ),
       );
@@ -65,8 +61,8 @@ void main() {
 
     testWidgets('renders in disabled state', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(body: TextAreaField(label: 'Label', enabled: false)),
+        testApp(
+          const TextAreaField(label: 'Label', enabled: false),
         ),
       );
 
@@ -76,8 +72,8 @@ void main() {
 
     testWidgets('sets minimum lines', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(body: TextAreaField(label: 'Label')),
+        testApp(
+          const TextAreaField(label: 'Label'),
         ),
       );
 
@@ -87,8 +83,8 @@ void main() {
 
     testWidgets('sets maximum lines', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(body: TextAreaField(label: 'Label', maxLines: 10)),
+        testApp(
+          const TextAreaField(label: 'Label', maxLines: 10),
         ),
       );
 
@@ -100,14 +96,12 @@ void main() {
       String? changedText;
 
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: TextAreaField(
-              label: 'Label',
-              onChanged: (value) {
-                changedText = value;
-              },
-            ),
+        testApp(
+          TextAreaField(
+            label: 'Label',
+            onChanged: (value) {
+              changedText = value;
+            },
           ),
         ),
       );
@@ -123,8 +117,8 @@ void main() {
     group('Temporal Flow Design', () {
       testWidgets('has glass background with 3% opacity', (tester) async {
         await tester.pumpWidget(
-          const MaterialApp(
-            home: Scaffold(body: TextAreaField(label: 'Label')),
+          testApp(
+            const TextAreaField(label: 'Label'),
           ),
         );
 
@@ -151,8 +145,8 @@ void main() {
 
       testWidgets('shows gradient border on focus', (tester) async {
         await tester.pumpWidget(
-          const MaterialApp(
-            home: Scaffold(body: TextAreaField(label: 'Label')),
+          testApp(
+            const TextAreaField(label: 'Label'),
           ),
         );
 
@@ -175,7 +169,7 @@ void main() {
         expect(decoration.gradient, isNotNull);
         expect(decoration.gradient, isA<LinearGradient>());
 
-        final gradient = decoration.gradient as LinearGradient;
+        final gradient = decoration.gradient! as LinearGradient;
         // Should have gradient colors with 30% opacity
         expect(gradient.colors.length, 2);
         // Check that colors have reduced alpha (30%)
@@ -189,8 +183,8 @@ void main() {
 
       testWidgets('shows focus shadow with gradient tint', (tester) async {
         await tester.pumpWidget(
-          const MaterialApp(
-            home: Scaffold(body: TextAreaField(label: 'Label')),
+          testApp(
+            const TextAreaField(label: 'Label'),
           ),
         );
 
@@ -226,10 +220,8 @@ void main() {
         tester,
       ) async {
         await tester.pumpWidget(
-          const MaterialApp(
-            home: Scaffold(
-              body: TextAreaField(label: 'Label', errorText: 'Error message'),
-            ),
+          testApp(
+            const TextAreaField(label: 'Label', errorText: 'Error message'),
           ),
         );
 
@@ -248,7 +240,7 @@ void main() {
         expect(decoration.gradient, isNotNull);
         expect(decoration.gradient, isA<LinearGradient>());
 
-        final gradient = decoration.gradient as LinearGradient;
+        final gradient = decoration.gradient! as LinearGradient;
         // Error gradient: red-500 to orange-400 in light mode
         expect(gradient.colors, contains(const Color(0xFFEF4444)));
         expect(gradient.colors, contains(const Color(0xFFFB923C)));
@@ -258,13 +250,11 @@ void main() {
         final controller = TextEditingController(text: 'Test content\nLine 2');
 
         await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(
-              body: TextAreaField(
-                label: 'Label',
-                controller: controller,
-                maxLength: 100,
-              ),
+          testApp(
+            TextAreaField(
+              label: 'Label',
+              controller: controller,
+              maxLength: 100,
             ),
           ),
         );
@@ -282,13 +272,11 @@ void main() {
         final controller = TextEditingController(text: 'X' * 81);
 
         await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(
-              body: TextAreaField(
-                label: 'Label',
-                controller: controller,
-                maxLength: 100,
-              ),
+          testApp(
+            TextAreaField(
+              label: 'Label',
+              controller: controller,
+              maxLength: 100,
             ),
           ),
         );
@@ -312,12 +300,10 @@ void main() {
         tester,
       ) async {
         await tester.pumpWidget(
-          const MaterialApp(
-            home: Scaffold(
-              body: TextAreaField(
-                label: 'Label',
-                hintText: 'Enter description here',
-              ),
+          testApp(
+            const TextAreaField(
+              label: 'Label',
+              hintText: 'Enter description here',
             ),
           ),
         );
@@ -337,8 +323,8 @@ void main() {
 
       testWidgets('uses correct border radius (10px)', (tester) async {
         await tester.pumpWidget(
-          const MaterialApp(
-            home: Scaffold(body: TextAreaField(label: 'Label')),
+          testApp(
+            const TextAreaField(label: 'Label'),
           ),
         );
 
@@ -352,7 +338,7 @@ void main() {
         );
 
         final decoration = animatedContainer.decoration as BoxDecoration;
-        final borderRadius = decoration.borderRadius as BorderRadius;
+        final borderRadius = decoration.borderRadius! as BorderRadius;
 
         // Plan specifies 10px border radius
         expect(borderRadius.topLeft.x, 10.0);
@@ -365,10 +351,8 @@ void main() {
         final controller = TextEditingController();
 
         await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(
-              body: TextAreaField(label: 'Label', controller: controller),
-            ),
+          testApp(
+            TextAreaField(label: 'Label', controller: controller),
           ),
         );
 
@@ -385,33 +369,35 @@ void main() {
         tester,
       ) async {
         await tester.pumpWidget(
-          const MaterialApp(
-            home: Scaffold(body: TextAreaField(label: 'Label')),
+          testApp(
+            const TextAreaField(label: 'Label'),
           ),
         );
 
         // Initial state: no focus, no gradient
         var animatedContainer = tester.widget<AnimatedContainer>(
-          find.ancestor(
-            of: find.byType(TextField),
-            matching: find.byType(AnimatedContainer),
-          ),
+          find
+              .ancestor(
+                of: find.byType(TextField),
+                matching: find.byType(AnimatedContainer),
+              )
+              .first,
         );
         var decoration = animatedContainer.decoration as BoxDecoration;
         expect(decoration.gradient, isNull);
 
         // Tap to focus
         await tester.tap(find.byType(TextField));
-        // Tap to focus the field
-        await tester.tap(find.byType(TextField));
         await tester.pumpAndSettle();
 
         // Focused state: should have gradient border
         animatedContainer = tester.widget<AnimatedContainer>(
-          find.ancestor(
-            of: find.byType(TextField),
-            matching: find.byType(AnimatedContainer),
-          ),
+          find
+              .ancestor(
+                of: find.byType(TextField),
+                matching: find.byType(AnimatedContainer),
+              )
+              .first,
         );
         decoration = animatedContainer.decoration as BoxDecoration;
         expect(decoration.gradient, isNotNull);
@@ -419,16 +405,16 @@ void main() {
 
         // Unfocus
         await tester.testTextInput.receiveAction(TextInputAction.done);
-        // Tap to focus the field
-        await tester.tap(find.byType(TextField));
         await tester.pumpAndSettle();
 
         // Unfocused state: gradient should be removed
         animatedContainer = tester.widget<AnimatedContainer>(
-          find.ancestor(
-            of: find.byType(TextField),
-            matching: find.byType(AnimatedContainer),
-          ),
+          find
+              .ancestor(
+                of: find.byType(TextField),
+                matching: find.byType(AnimatedContainer),
+              )
+              .first,
         );
         decoration = animatedContainer.decoration as BoxDecoration;
         expect(decoration.gradient, isNull);
@@ -437,10 +423,8 @@ void main() {
 
       testWidgets('supports custom min and max lines', (tester) async {
         await tester.pumpWidget(
-          const MaterialApp(
-            home: Scaffold(
-              body: TextAreaField(label: 'Label', minLines: 5, maxLines: 15),
-            ),
+          testApp(
+            const TextAreaField(label: 'Label', minLines: 5, maxLines: 15),
           ),
         );
 
@@ -451,8 +435,8 @@ void main() {
 
       testWidgets('has smooth focus/blur transitions (200ms)', (tester) async {
         await tester.pumpWidget(
-          const MaterialApp(
-            home: Scaffold(body: TextAreaField(label: 'Label')),
+          testApp(
+            const TextAreaField(label: 'Label'),
           ),
         );
 
@@ -465,8 +449,6 @@ void main() {
 
         // Complete animation (200ms total)
         await tester.pump(const Duration(milliseconds: 100));
-        // Tap to focus the field
-        await tester.tap(find.byType(TextField));
         await tester.pumpAndSettle();
 
         // Verify AnimatedContainer is being used for transitions
@@ -475,8 +457,8 @@ void main() {
 
       testWidgets('gradient border uses 30% opacity on focus', (tester) async {
         await tester.pumpWidget(
-          const MaterialApp(
-            home: Scaffold(body: TextAreaField(label: 'Label')),
+          testApp(
+            const TextAreaField(label: 'Label'),
           ),
         );
 
@@ -496,7 +478,7 @@ void main() {
         final decoration = animatedContainer.decoration as BoxDecoration;
         expect(decoration.gradient, isNotNull);
 
-        final gradient = decoration.gradient as LinearGradient;
+        final gradient = decoration.gradient! as LinearGradient;
         // Gradient should use colors with 30% opacity
         for (final color in gradient.colors) {
           expect(
@@ -510,8 +492,8 @@ void main() {
         tester,
       ) async {
         await tester.pumpWidget(
-          const MaterialApp(
-            home: Scaffold(body: TextAreaField(label: 'Label')),
+          testApp(
+            const TextAreaField(label: 'Label'),
           ),
         );
 
@@ -535,14 +517,14 @@ void main() {
         tester,
       ) async {
         await tester.pumpWidget(
-          const MaterialApp(
-            home: Scaffold(body: TextAreaField(label: 'Label')),
+          testApp(
+            const TextAreaField(label: 'Label'),
           ),
         );
 
         final textField = tester.widget<TextField>(find.byType(TextField));
         final decoration = textField.decoration!;
-        final padding = decoration.contentPadding as EdgeInsets;
+        final padding = decoration.contentPadding! as EdgeInsets;
 
         // Multi-line input: 12px horizontal, 16px vertical
         expect(padding.left, 12.0); // AppSpacing.inputPaddingHorizontal
