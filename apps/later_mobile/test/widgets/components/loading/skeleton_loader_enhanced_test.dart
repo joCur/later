@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:later_mobile/design_system/atoms/loading/skeleton_box.dart';
+import '../../../test_helpers.dart';
 
 void main() {
   group('SkeletonLoader - Generic Component', () {
     testWidgets('renders with default dimensions', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(home: Scaffold(body: SkeletonLoader())),
+        testApp(const SkeletonLoader()),
       );
 
       expect(find.byType(SkeletonLoader), findsOneWidget);
@@ -220,45 +221,45 @@ void main() {
     });
   });
 
-  group('SkeletonLoader - ItemCard Variant', () {
-    testWidgets('ItemCardSkeleton renders', (tester) async {
+  group('SkeletonLoader - NoteCard Variant', () {
+    testWidgets('NoteCardSkeleton renders', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(home: Scaffold(body: ItemCardSkeleton())),
+        testApp(const NoteCardSkeleton()),
       );
 
-      expect(find.byType(ItemCardSkeleton), findsOneWidget);
+      expect(find.byType(NoteCardSkeleton), findsOneWidget);
     });
 
-    testWidgets('ItemCardSkeleton has glass morphism background', (
+    testWidgets('NoteCardSkeleton has glass morphism background', (
       tester,
     ) async {
       await tester.pumpWidget(
-        const MaterialApp(home: Scaffold(body: ItemCardSkeleton())),
+        testApp(const NoteCardSkeleton()),
       );
 
-      expect(find.byType(ItemCardSkeleton), findsOneWidget);
+      expect(find.byType(NoteCardSkeleton), findsOneWidget);
       // Should have BackdropFilter for glass effect
       expect(find.byType(BackdropFilter), findsWidgets);
     });
 
-    testWidgets('ItemCardSkeleton contains multiple skeleton loaders', (
+    testWidgets('NoteCardSkeleton contains multiple skeleton loaders', (
       tester,
     ) async {
       await tester.pumpWidget(
-        const MaterialApp(home: Scaffold(body: ItemCardSkeleton())),
+        testApp(const NoteCardSkeleton()),
       );
 
       // Should have title, content, and metadata skeletons
       expect(find.byType(SkeletonLoader), findsAtLeastNWidgets(3));
     });
 
-    testWidgets('ItemCardSkeleton matches ItemCard layout', (tester) async {
+    testWidgets('NoteCardSkeleton matches NoteCard layout', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(home: Scaffold(body: ItemCardSkeleton())),
+        testApp(const NoteCardSkeleton()),
       );
 
-      expect(find.byType(ItemCardSkeleton), findsOneWidget);
-      // Should use same padding and spacing as ItemCard
+      expect(find.byType(NoteCardSkeleton), findsOneWidget);
+      // Should use same padding and spacing as NoteCard
     });
   });
 }
