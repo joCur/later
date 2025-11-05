@@ -77,7 +77,7 @@ void main() {
       });
 
       testWidgets('shows item count for empty list', (tester) async {
-        final listModel = createListModel(totalItemCount: 0);
+        final listModel = createListModel();
 
         await tester.pumpWidget(
           testApp(ListCard(list: listModel)),
@@ -87,7 +87,7 @@ void main() {
       });
 
       testWidgets('shows "No items yet" preview for empty list', (tester) async {
-        final listModel = createListModel(totalItemCount: 0);
+        final listModel = createListModel();
 
         await tester.pumpWidget(
           testApp(ListCard(list: listModel)),
@@ -118,7 +118,7 @@ void main() {
       });
 
       testWidgets('shows default list icon when icon is null', (tester) async {
-        final listModel = createListModel(icon: null);
+        final listModel = createListModel();
 
         await tester.pumpWidget(
           testApp(ListCard(list: listModel)),
@@ -452,7 +452,6 @@ void main() {
     group('List Styles', () {
       testWidgets('renders with bullets style', (tester) async {
         final listModel = createListModel(
-          style: ListStyle.bullets,
           totalItemCount: 3,
         );
 

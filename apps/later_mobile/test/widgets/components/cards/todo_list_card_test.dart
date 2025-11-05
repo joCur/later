@@ -69,7 +69,6 @@ void main() {
       ) async {
         final todoList = createTodoList(
           totalItemCount: 1,
-          completedItemCount: 0,
         );
 
         await tester.pumpWidget(
@@ -80,10 +79,7 @@ void main() {
       });
 
       testWidgets('shows progress text for empty list', (tester) async {
-        final todoList = createTodoList(
-          totalItemCount: 0,
-          completedItemCount: 0,
-        );
+        final todoList = createTodoList();
 
         await tester.pumpWidget(
           testApp(TodoListCard(todoList: todoList)),
@@ -110,7 +106,6 @@ void main() {
       ) async {
         final todoList = createTodoList(
           totalItemCount: 5,
-          completedItemCount: 0,
         );
 
         await tester.pumpWidget(
@@ -370,7 +365,6 @@ void main() {
             id: 'list_$index',
             name: 'List $index',
             totalItemCount: index,
-            completedItemCount: 0,
           ),
         );
 
@@ -428,7 +422,6 @@ void main() {
       testWidgets('handles 0% progress correctly', (tester) async {
         final todoList = createTodoList(
           totalItemCount: 100,
-          completedItemCount: 0,
         );
 
         await tester.pumpWidget(
