@@ -703,7 +703,6 @@ void main() {
         title: 'Task 1',
         todoListId: 'todo-1',
         sortOrder: 0,
-        isCompleted: false,
       );
       await provider.createTodoItem(item);
 
@@ -856,7 +855,6 @@ void main() {
         title: 'Item 1',
         listId: 'list-1',
         sortOrder: 0,
-        isChecked: false,
       );
       await provider.createListItem(item);
 

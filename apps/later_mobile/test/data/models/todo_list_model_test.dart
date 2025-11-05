@@ -444,7 +444,7 @@ void main() {
       });
 
       test('creates with all optional fields', () {
-        final createdAt = DateTime(2025, 1, 1);
+        final createdAt = DateTime(2025);
         final updatedAt = DateTime(2025, 10, 25);
 
         final list = TodoList(
@@ -699,7 +699,7 @@ void main() {
       });
 
       test('preserves unchanged fields', () {
-        final createdAt = DateTime(2025, 1, 1);
+        final createdAt = DateTime(2025);
         final original = TodoList(
           id: 'list-1',
           spaceId: 'space-1',

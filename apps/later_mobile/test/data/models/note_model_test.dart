@@ -373,7 +373,7 @@ void main() {
       });
 
       test('preserves unchanged fields', () {
-        final createdAt = DateTime(2025, 1, 1);
+        final createdAt = DateTime(2025);
         final original = Note(
           id: 'note-1',
           title: 'Title',
