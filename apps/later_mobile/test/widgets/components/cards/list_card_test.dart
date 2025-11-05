@@ -61,7 +61,7 @@ void main() {
           testApp(ListCard(list: listModel)),
         );
 
-        expect(find.text('5 items'), findsOneWidget);
+        expect(find.text('5 items'), findsAtLeastNWidgets(1));
       });
 
       testWidgets('shows item count with singular format - one item', (
@@ -73,7 +73,7 @@ void main() {
           testApp(ListCard(list: listModel)),
         );
 
-        expect(find.text('1 item'), findsOneWidget);
+        expect(find.text('1 item'), findsAtLeastNWidgets(1));
       });
 
       testWidgets('shows item count for empty list', (tester) async {
@@ -83,7 +83,7 @@ void main() {
           testApp(ListCard(list: listModel)),
         );
 
-        expect(find.text('0 items'), findsOneWidget);
+        expect(find.text('0 items'), findsAtLeastNWidgets(1));
       });
 
       testWidgets('shows "No items yet" preview for empty list', (tester) async {

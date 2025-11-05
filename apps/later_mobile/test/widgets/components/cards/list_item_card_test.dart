@@ -169,12 +169,12 @@ void main() {
             ListItemCard(
               listItem: testListItem,
               listStyle: ListStyle.numbered,
-              itemIndex: 1,
+              itemIndex: 0,
             ),
           ),
         );
 
-        // Should show number badge with "1."
+        // Should show number badge with "1." (itemIndex 0 displays as "1.")
         expect(find.text('1.'), findsOneWidget);
       });
 
@@ -186,17 +186,17 @@ void main() {
                 ListItemCard(
                   listItem: testListItem,
                   listStyle: ListStyle.numbered,
-                  itemIndex: 1,
+                  itemIndex: 0,
                 ),
                 ListItemCard(
                   listItem: checkedListItem,
                   listStyle: ListStyle.numbered,
-                  itemIndex: 2,
+                  itemIndex: 1,
                 ),
                 ListItemCard(
                   listItem: minimalListItem,
                   listStyle: ListStyle.numbered,
-                  itemIndex: 3,
+                  itemIndex: 2,
                 ),
               ],
             ),
@@ -513,7 +513,7 @@ void main() {
             ListItemCard(
               listItem: testListItem,
               listStyle: ListStyle.numbered,
-              itemIndex: 1,
+              itemIndex: 0,
             ),
           ),
         );
@@ -686,8 +686,8 @@ void main() {
           ),
         );
 
-        // itemIndex 0 should show as "0."
-        expect(find.text('0.'), findsOneWidget);
+        // itemIndex 0 should show as "1." (0+1)
+        expect(find.text('1.'), findsOneWidget);
       });
     });
 
