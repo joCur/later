@@ -422,10 +422,11 @@ class _IconParser {
   /// Common emoji ranges: 0x1F300-0x1F9FF, 0x2600-0x26FF, 0x2700-0x27BF
   static bool isEmoji(String text) {
     if (text.isEmpty) return false;
-    final codeUnit = text.codeUnitAt(0);
-    return (codeUnit >= 0x1F300 && codeUnit <= 0x1F9FF) ||
-        (codeUnit >= 0x2600 && codeUnit <= 0x26FF) ||
-        (codeUnit >= 0x2700 && codeUnit <= 0x27BF);
+    // Use runes to get the actual Unicode code point (handles surrogate pairs)
+    final codePoint = text.runes.first;
+    return (codePoint >= 0x1F300 && codePoint <= 0x1F9FF) ||
+        (codePoint >= 0x2600 && codePoint <= 0x26FF) ||
+        (codePoint >= 0x2700 && codePoint <= 0x27BF);
   }
 
   /// Parse icon name string to IconData

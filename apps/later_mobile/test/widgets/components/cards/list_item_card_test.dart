@@ -4,6 +4,7 @@ import 'package:later_mobile/design_system/organisms/cards/list_item_card.dart';
 import 'package:later_mobile/data/models/list_item_model.dart';
 import 'package:later_mobile/data/models/list_style.dart';
 import 'package:later_mobile/design_system/tokens/tokens.dart';
+import '../../../test_helpers.dart';
 
 void main() {
   group('ListItemCard', () {
@@ -31,15 +32,10 @@ void main() {
       sortOrder: 2,
     );
 
-    // Helper to wrap widget in MaterialApp for testing
-    Widget makeTestableWidget(Widget child) {
-      return MaterialApp(home: Scaffold(body: child));
-    }
-
     group('Rendering', () {
       testWidgets('renders with ListItem data', (tester) async {
         await tester.pumpWidget(
-          makeTestableWidget(
+          testApp(
             ListItemCard(
               listItem: testListItem,
               listStyle: ListStyle.bullets,
@@ -53,7 +49,7 @@ void main() {
 
       testWidgets('displays title correctly', (tester) async {
         await tester.pumpWidget(
-          makeTestableWidget(
+          testApp(
             ListItemCard(
               listItem: testListItem,
               listStyle: ListStyle.bullets,
@@ -67,7 +63,7 @@ void main() {
 
       testWidgets('shows notes if present', (tester) async {
         await tester.pumpWidget(
-          makeTestableWidget(
+          testApp(
             ListItemCard(
               listItem: testListItem,
               listStyle: ListStyle.bullets,
@@ -81,7 +77,7 @@ void main() {
 
       testWidgets('does not show notes if not present', (tester) async {
         await tester.pumpWidget(
-          makeTestableWidget(
+          testApp(
             ListItemCard(
               listItem: minimalListItem,
               listStyle: ListStyle.bullets,
@@ -102,7 +98,7 @@ void main() {
 
       testWidgets('shows reorder handle icon', (tester) async {
         await tester.pumpWidget(
-          makeTestableWidget(
+          testApp(
             ListItemCard(
               listItem: testListItem,
               listStyle: ListStyle.bullets,
@@ -116,7 +112,7 @@ void main() {
 
       testWidgets('renders with compact height', (tester) async {
         await tester.pumpWidget(
-          makeTestableWidget(
+          testApp(
             ListItemCard(
               listItem: minimalListItem,
               listStyle: ListStyle.bullets,
@@ -134,7 +130,7 @@ void main() {
     group('List Style - Bullets', () {
       testWidgets('shows bullet point for bullets style', (tester) async {
         await tester.pumpWidget(
-          makeTestableWidget(
+          testApp(
             ListItemCard(
               listItem: testListItem,
               listStyle: ListStyle.bullets,
@@ -149,7 +145,7 @@ void main() {
 
       testWidgets('does not show checkbox for bullets style', (tester) async {
         await tester.pumpWidget(
-          makeTestableWidget(
+          testApp(
             ListItemCard(
               listItem: testListItem,
               listStyle: ListStyle.bullets,
@@ -165,7 +161,7 @@ void main() {
     group('List Style - Numbered', () {
       testWidgets('shows number for numbered style', (tester) async {
         await tester.pumpWidget(
-          makeTestableWidget(
+          testApp(
             ListItemCard(
               listItem: testListItem,
               listStyle: ListStyle.numbered,
@@ -180,7 +176,7 @@ void main() {
 
       testWidgets('shows correct number based on itemIndex', (tester) async {
         await tester.pumpWidget(
-          makeTestableWidget(
+          testApp(
             Column(
               children: [
                 ListItemCard(
@@ -210,7 +206,7 @@ void main() {
 
       testWidgets('does not show checkbox for numbered style', (tester) async {
         await tester.pumpWidget(
-          makeTestableWidget(
+          testApp(
             ListItemCard(
               listItem: testListItem,
               listStyle: ListStyle.numbered,
@@ -226,7 +222,7 @@ void main() {
     group('List Style - Checkboxes', () {
       testWidgets('shows checkbox for checkboxes style', (tester) async {
         await tester.pumpWidget(
-          makeTestableWidget(
+          testApp(
             ListItemCard(
               listItem: testListItem,
               listStyle: ListStyle.checkboxes,
@@ -242,7 +238,7 @@ void main() {
         tester,
       ) async {
         await tester.pumpWidget(
-          makeTestableWidget(
+          testApp(
             ListItemCard(
               listItem: testListItem,
               listStyle: ListStyle.checkboxes,
@@ -257,7 +253,7 @@ void main() {
 
       testWidgets('checkbox shows correct state when checked', (tester) async {
         await tester.pumpWidget(
-          makeTestableWidget(
+          testApp(
             ListItemCard(
               listItem: checkedListItem,
               listStyle: ListStyle.checkboxes,
@@ -272,7 +268,7 @@ void main() {
 
       testWidgets('shows strikethrough when checked', (tester) async {
         await tester.pumpWidget(
-          makeTestableWidget(
+          testApp(
             ListItemCard(
               listItem: checkedListItem,
               listStyle: ListStyle.checkboxes,
@@ -289,7 +285,7 @@ void main() {
         tester,
       ) async {
         await tester.pumpWidget(
-          makeTestableWidget(
+          testApp(
             ListItemCard(
               listItem: testListItem,
               listStyle: ListStyle.checkboxes,
@@ -307,7 +303,7 @@ void main() {
       testWidgets('onTap callback fires when card is tapped', (tester) async {
         bool tapped = false;
         await tester.pumpWidget(
-          makeTestableWidget(
+          testApp(
             ListItemCard(
               listItem: testListItem,
               listStyle: ListStyle.bullets,
@@ -328,7 +324,7 @@ void main() {
         (tester) async {
           bool? newValue;
           await tester.pumpWidget(
-            makeTestableWidget(
+            testApp(
               ListItemCard(
                 listItem: testListItem,
                 listStyle: ListStyle.checkboxes,
@@ -350,7 +346,7 @@ void main() {
         (tester) async {
           bool? newValue;
           await tester.pumpWidget(
-            makeTestableWidget(
+            testApp(
               ListItemCard(
                 listItem: checkedListItem,
                 listStyle: ListStyle.checkboxes,
@@ -372,7 +368,7 @@ void main() {
         (tester) async {
           bool? checkboxValue;
           await tester.pumpWidget(
-            makeTestableWidget(
+            testApp(
               ListItemCard(
                 listItem: testListItem,
                 listStyle: ListStyle.checkboxes,
@@ -394,7 +390,7 @@ void main() {
       testWidgets('long press callback fires', (tester) async {
         bool longPressed = false;
         await tester.pumpWidget(
-          makeTestableWidget(
+          testApp(
             ListItemCard(
               listItem: testListItem,
               listStyle: ListStyle.bullets,
@@ -414,7 +410,7 @@ void main() {
         tester,
       ) async {
         await tester.pumpWidget(
-          makeTestableWidget(
+          testApp(
             ListItemCard(
               listItem: testListItem,
               listStyle: ListStyle.bullets,
@@ -431,7 +427,7 @@ void main() {
         tester,
       ) async {
         await tester.pumpWidget(
-          makeTestableWidget(
+          testApp(
             ListItemCard(
               listItem: testListItem,
               listStyle: ListStyle.numbered,
@@ -450,7 +446,7 @@ void main() {
         tester,
       ) async {
         await tester.pumpWidget(
-          makeTestableWidget(
+          testApp(
             ListItemCard(
               listItem: testListItem,
               listStyle: ListStyle.checkboxes,
@@ -471,7 +467,7 @@ void main() {
         tester,
       ) async {
         await tester.pumpWidget(
-          makeTestableWidget(
+          testApp(
             ListItemCard(
               listItem: checkedListItem,
               listStyle: ListStyle.checkboxes,
@@ -490,7 +486,7 @@ void main() {
         tester,
       ) async {
         await tester.pumpWidget(
-          makeTestableWidget(
+          testApp(
             ListItemCard(
               listItem: testListItem,
               listStyle: ListStyle.bullets,
@@ -509,7 +505,7 @@ void main() {
         tester,
       ) async {
         await tester.pumpWidget(
-          makeTestableWidget(
+          testApp(
             ListItemCard(
               listItem: testListItem,
               listStyle: ListStyle.numbered,
@@ -528,7 +524,7 @@ void main() {
         tester,
       ) async {
         await tester.pumpWidget(
-          makeTestableWidget(
+          testApp(
             ListItemCard(
               listItem: testListItem,
               listStyle: ListStyle.checkboxes,
@@ -545,7 +541,7 @@ void main() {
     group('Visual States', () {
       testWidgets('applies reduced opacity when checked', (tester) async {
         await tester.pumpWidget(
-          makeTestableWidget(
+          testApp(
             ListItemCard(
               listItem: checkedListItem,
               listStyle: ListStyle.checkboxes,
@@ -567,7 +563,7 @@ void main() {
 
       testWidgets('full opacity when not checked', (tester) async {
         await tester.pumpWidget(
-          makeTestableWidget(
+          testApp(
             ListItemCard(
               listItem: testListItem,
               listStyle: ListStyle.checkboxes,
@@ -595,7 +591,7 @@ void main() {
         final emptyTitleItem = ListItem(id: 'empty', listId: 'test-list-1', title: '', sortOrder: 0);
 
         await tester.pumpWidget(
-          makeTestableWidget(
+          testApp(
             ListItemCard(
               listItem: emptyTitleItem,
               listStyle: ListStyle.bullets,
@@ -617,7 +613,7 @@ void main() {
         );
 
         await tester.pumpWidget(
-          makeTestableWidget(
+          testApp(
             ListItemCard(
               listItem: longTitleItem,
               listStyle: ListStyle.bullets,
@@ -641,7 +637,7 @@ void main() {
         );
 
         await tester.pumpWidget(
-          makeTestableWidget(
+          testApp(
             ListItemCard(
               listItem: longNotesItem,
               listStyle: ListStyle.bullets,
@@ -659,7 +655,7 @@ void main() {
 
       testWidgets('handles null callbacks gracefully', (tester) async {
         await tester.pumpWidget(
-          makeTestableWidget(
+          testApp(
             ListItemCard(
               listItem: testListItem,
               listStyle: ListStyle.bullets,
@@ -677,7 +673,7 @@ void main() {
 
       testWidgets('handles itemIndex 0 correctly', (tester) async {
         await tester.pumpWidget(
-          makeTestableWidget(
+          testApp(
             ListItemCard(
               listItem: testListItem,
               listStyle: ListStyle.numbered,
@@ -694,7 +690,7 @@ void main() {
     group('Layout', () {
       testWidgets('indicator is on the left', (tester) async {
         await tester.pumpWidget(
-          makeTestableWidget(
+          testApp(
             ListItemCard(
               listItem: testListItem,
               listStyle: ListStyle.bullets,
@@ -713,7 +709,7 @@ void main() {
         tester,
       ) async {
         await tester.pumpWidget(
-          makeTestableWidget(
+          testApp(
             ListItemCard(
               listItem: testListItem,
               listStyle: ListStyle.checkboxes,
@@ -730,7 +726,7 @@ void main() {
 
       testWidgets('reorder handle is on the right', (tester) async {
         await tester.pumpWidget(
-          makeTestableWidget(
+          testApp(
             ListItemCard(
               listItem: testListItem,
               listStyle: ListStyle.bullets,
@@ -749,7 +745,7 @@ void main() {
 
       testWidgets('notes are below title', (tester) async {
         await tester.pumpWidget(
-          makeTestableWidget(
+          testApp(
             ListItemCard(
               listItem: testListItem,
               listStyle: ListStyle.bullets,
@@ -769,7 +765,7 @@ void main() {
     group('Performance', () {
       testWidgets('uses RepaintBoundary for optimization', (tester) async {
         await tester.pumpWidget(
-          makeTestableWidget(
+          testApp(
             ListItemCard(
               listItem: testListItem,
               listStyle: ListStyle.bullets,

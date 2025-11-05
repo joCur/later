@@ -226,6 +226,8 @@ class _NoteCardState extends State<NoteCard> with TickerProviderStateMixin {
               : AppColors.noteGradientStart,
           fontSize: 11, // Slightly smaller for tags
         ),
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
       ),
     );
   }
@@ -264,6 +266,7 @@ class _NoteCardState extends State<NoteCard> with TickerProviderStateMixin {
     final dateFormat = DateFormat('MMM d, y');
 
     return Row(
+      mainAxisSize: MainAxisSize.min,
       children: [
         // Icon with gradient tint for created dates
         ShaderMask(
@@ -273,10 +276,13 @@ class _NoteCardState extends State<NoteCard> with TickerProviderStateMixin {
           child: const Icon(Icons.access_time, size: 12, color: Colors.white),
         ),
         const SizedBox(width: AppSpacing.xxs),
-        // Created date with subtle primary gradient
-        GradientText.subtle(
-          dateFormat.format(widget.note.createdAt),
-          style: AppTypography.metadata,
+        // Created date with subtle primary gradient - use Flexible to prevent overflow
+        Flexible(
+          child: GradientText.subtle(
+            dateFormat.format(widget.note.createdAt),
+            style: AppTypography.metadata,
+            overflow: TextOverflow.ellipsis,
+          ),
         ),
       ],
     );
