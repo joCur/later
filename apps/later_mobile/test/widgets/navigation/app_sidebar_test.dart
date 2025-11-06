@@ -3,18 +3,21 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:later_mobile/core/theme/temporal_flow_theme.dart';
+import 'package:later_mobile/data/local/preferences_service.dart';
 import 'package:later_mobile/data/models/space_model.dart';
 import 'package:later_mobile/data/repositories/space_repository.dart';
 import 'package:later_mobile/providers/auth_provider.dart';
 import 'package:later_mobile/providers/spaces_provider.dart';
+import 'package:later_mobile/providers/theme_provider.dart';
 import 'package:later_mobile/widgets/navigation/app_sidebar.dart';
 import 'package:mockito/annotations.dart';
-import 'package:mockito/mockito.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'app_sidebar_test.mocks.dart';
 
 @GenerateNiceMocks([MockSpec<AuthProvider>()])
+// ignore: unused_element
 void _generateMocks() {
   // This function exists only to trigger mock generation
 }
@@ -96,7 +99,11 @@ void main() {
     late SpacesProvider spacesProvider;
     late MockAuthProvider mockAuthProvider;
 
-    setUp(() {
+    setUp(() async {
+      // Initialize SharedPreferences with mock values for testing
+      SharedPreferences.setMockInitialValues({});
+      await PreferencesService.initialize();
+
       mockRepository = MockSpaceRepository();
       spacesProvider = SpacesProvider(mockRepository);
       mockAuthProvider = MockAuthProvider();
@@ -106,6 +113,8 @@ void main() {
       bool isExpanded = true,
       VoidCallback? onToggleExpanded,
     }) {
+      final themeProvider = ThemeProvider();
+
       return MaterialApp(
         theme: ThemeData.light().copyWith(
           extensions: [TemporalFlowTheme.light()],
@@ -117,6 +126,7 @@ void main() {
           providers: [
             ChangeNotifierProvider<SpacesProvider>.value(value: spacesProvider),
             ChangeNotifierProvider<AuthProvider>.value(value: mockAuthProvider),
+            ChangeNotifierProvider<ThemeProvider>.value(value: themeProvider),
           ],
           child: Scaffold(
             body: AppSidebar(
@@ -258,6 +268,7 @@ void main() {
 
     testWidgets('animates width when expanding/collapsing', (tester) async {
       bool isExpanded = true;
+      final themeProvider = ThemeProvider();
 
       await tester.pumpWidget(
         StatefulBuilder(
@@ -270,6 +281,7 @@ void main() {
                 providers: [
                   ChangeNotifierProvider<SpacesProvider>.value(value: spacesProvider),
                   ChangeNotifierProvider<AuthProvider>.value(value: mockAuthProvider),
+                  ChangeNotifierProvider<ThemeProvider>.value(value: themeProvider),
                 ],
                 child: Scaffold(
                   body: AppSidebar(
@@ -468,6 +480,8 @@ void main() {
     });
 
     testWidgets('works with dark theme', (tester) async {
+      final themeProvider = ThemeProvider();
+
       await tester.pumpWidget(
         MaterialApp(
           theme: ThemeData.dark().copyWith(
@@ -477,6 +491,7 @@ void main() {
             providers: [
               ChangeNotifierProvider<SpacesProvider>.value(value: spacesProvider),
               ChangeNotifierProvider<AuthProvider>.value(value: mockAuthProvider),
+              ChangeNotifierProvider<ThemeProvider>.value(value: themeProvider),
             ],
             child: const Scaffold(body: AppSidebar()),
           ),
@@ -487,6 +502,8 @@ void main() {
     });
 
     testWidgets('works with light theme', (tester) async {
+      final themeProvider = ThemeProvider();
+
       await tester.pumpWidget(
         MaterialApp(
           theme: ThemeData.light().copyWith(
@@ -496,6 +513,7 @@ void main() {
             providers: [
               ChangeNotifierProvider<SpacesProvider>.value(value: spacesProvider),
               ChangeNotifierProvider<AuthProvider>.value(value: mockAuthProvider),
+              ChangeNotifierProvider<ThemeProvider>.value(value: themeProvider),
             ],
             child: const Scaffold(body: AppSidebar()),
           ),
@@ -630,6 +648,7 @@ void main() {
       tester,
     ) async {
       bool isExpanded = true;
+      final themeProvider = ThemeProvider();
 
       await tester.pumpWidget(
         StatefulBuilder(
@@ -642,6 +661,7 @@ void main() {
                 providers: [
                   ChangeNotifierProvider<SpacesProvider>.value(value: spacesProvider),
                   ChangeNotifierProvider<AuthProvider>.value(value: mockAuthProvider),
+                  ChangeNotifierProvider<ThemeProvider>.value(value: themeProvider),
                 ],
                 child: Scaffold(
                   body: AppSidebar(
