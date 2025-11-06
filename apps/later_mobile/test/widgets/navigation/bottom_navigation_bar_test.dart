@@ -1,20 +1,39 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:later_mobile/core/theme/temporal_flow_theme.dart';
 import 'package:later_mobile/widgets/navigation/bottom_navigation_bar.dart';
 import 'package:later_mobile/design_system/tokens/tokens.dart';
 
 void main() {
+  Widget createTestWidget({
+    required int currentIndex,
+    required void Function(int) onDestinationSelected,
+    ThemeData? theme,
+  }) {
+    return MaterialApp(
+      theme: (theme ?? ThemeData.light()).copyWith(
+        extensions: <ThemeExtension<dynamic>>[
+          theme?.brightness == Brightness.dark
+              ? TemporalFlowTheme.dark()
+              : TemporalFlowTheme.light(),
+        ],
+      ),
+      home: Scaffold(
+        bottomNavigationBar: AppBottomNavigationBar(
+          currentIndex: currentIndex,
+          onDestinationSelected: onDestinationSelected,
+        ),
+      ),
+    );
+  }
+
   group('AppBottomNavigationBar', () {
     testWidgets('renders with all three destinations', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            bottomNavigationBar: AppBottomNavigationBar(
-              currentIndex: 0,
-              onDestinationSelected: (_) {},
-            ),
-          ),
+        createTestWidget(
+          currentIndex: 0,
+          onDestinationSelected: (_) {},
         ),
       );
 
@@ -28,13 +47,9 @@ void main() {
       tester,
     ) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            bottomNavigationBar: AppBottomNavigationBar(
-              currentIndex: 0,
-              onDestinationSelected: (_) {},
-            ),
-          ),
+        createTestWidget(
+          currentIndex: 0,
+          onDestinationSelected: (_) {},
         ),
       );
 
@@ -52,14 +67,9 @@ void main() {
       tester,
     ) async {
       await tester.pumpWidget(
-        MaterialApp(
-          theme: ThemeData.light(),
-          home: Scaffold(
-            bottomNavigationBar: AppBottomNavigationBar(
-              currentIndex: 0,
-              onDestinationSelected: (_) {},
-            ),
-          ),
+        createTestWidget(
+          currentIndex: 0,
+          onDestinationSelected: (_) {},
         ),
       );
 
@@ -81,14 +91,10 @@ void main() {
       tester,
     ) async {
       await tester.pumpWidget(
-        MaterialApp(
+        createTestWidget(
+          currentIndex: 0,
+          onDestinationSelected: (_) {},
           theme: ThemeData.dark(),
-          home: Scaffold(
-            bottomNavigationBar: AppBottomNavigationBar(
-              currentIndex: 0,
-              onDestinationSelected: (_) {},
-            ),
-          ),
         ),
       );
 
@@ -110,14 +116,9 @@ void main() {
       'displays gradient active indicator with correct colors in light mode',
       (tester) async {
         await tester.pumpWidget(
-          MaterialApp(
-            theme: ThemeData.light(),
-            home: Scaffold(
-              bottomNavigationBar: AppBottomNavigationBar(
-                currentIndex: 0,
-                onDestinationSelected: (_) {},
-              ),
-            ),
+          createTestWidget(
+            currentIndex: 0,
+            onDestinationSelected: (_) {},
           ),
         );
 
@@ -141,14 +142,10 @@ void main() {
       'displays gradient active indicator with correct colors in dark mode',
       (tester) async {
         await tester.pumpWidget(
-          MaterialApp(
+          createTestWidget(
+            currentIndex: 0,
+            onDestinationSelected: (_) {},
             theme: ThemeData.dark(),
-            home: Scaffold(
-              bottomNavigationBar: AppBottomNavigationBar(
-                currentIndex: 0,
-                onDestinationSelected: (_) {},
-              ),
-            ),
           ),
         );
 
@@ -170,13 +167,9 @@ void main() {
 
     testWidgets('indicator has pill shape with 40px height', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            bottomNavigationBar: AppBottomNavigationBar(
-              currentIndex: 0,
-              onDestinationSelected: (_) {},
-            ),
-          ),
+        createTestWidget(
+          currentIndex: 0,
+          onDestinationSelected: (_) {},
         ),
       );
 
@@ -198,13 +191,9 @@ void main() {
 
     testWidgets('uses outlined icons with 2px stroke', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            bottomNavigationBar: AppBottomNavigationBar(
-              currentIndex: 1, // Select Search so Home shows outline icon
-              onDestinationSelected: (_) {},
-            ),
-          ),
+        createTestWidget(
+          currentIndex: 1, // Select Search so Home shows outline icon
+          onDestinationSelected: (_) {},
         ),
       );
 
@@ -215,13 +204,9 @@ void main() {
 
     testWidgets('displays correct icons for each destination', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            bottomNavigationBar: AppBottomNavigationBar(
-              currentIndex: 0,
-              onDestinationSelected: (_) {},
-            ),
-          ),
+        createTestWidget(
+          currentIndex: 0,
+          onDestinationSelected: (_) {},
         ),
       );
 
@@ -233,13 +218,9 @@ void main() {
 
     testWidgets('shows selected icon for active destination', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            bottomNavigationBar: AppBottomNavigationBar(
-              currentIndex: 0,
-              onDestinationSelected: (_) {},
-            ),
-          ),
+        createTestWidget(
+          currentIndex: 0,
+          onDestinationSelected: (_) {},
         ),
       );
 
@@ -254,15 +235,11 @@ void main() {
       int? selectedIndex;
 
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            bottomNavigationBar: AppBottomNavigationBar(
-              currentIndex: 0,
-              onDestinationSelected: (index) {
-                selectedIndex = index;
-              },
-            ),
-          ),
+        createTestWidget(
+          currentIndex: 0,
+          onDestinationSelected: (index) {
+            selectedIndex = index;
+          },
         ),
       );
 
@@ -279,17 +256,13 @@ void main() {
       await tester.pumpWidget(
         StatefulBuilder(
           builder: (context, setState) {
-            return MaterialApp(
-              home: Scaffold(
-                bottomNavigationBar: AppBottomNavigationBar(
-                  currentIndex: currentIndex,
-                  onDestinationSelected: (index) {
-                    setState(() {
-                      currentIndex = index;
-                    });
-                  },
-                ),
-              ),
+            return createTestWidget(
+              currentIndex: currentIndex,
+              onDestinationSelected: (index) {
+                setState(() {
+                  currentIndex = index;
+                });
+              },
             );
           },
         ),
@@ -309,13 +282,9 @@ void main() {
 
     testWidgets('has proper semantic labels for accessibility', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            bottomNavigationBar: AppBottomNavigationBar(
-              currentIndex: 0,
-              onDestinationSelected: (_) {},
-            ),
-          ),
+        createTestWidget(
+          currentIndex: 0,
+          onDestinationSelected: (_) {},
         ),
       );
 
@@ -330,13 +299,9 @@ void main() {
 
     testWidgets('displays tooltips on destinations', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            bottomNavigationBar: AppBottomNavigationBar(
-              currentIndex: 0,
-              onDestinationSelected: (_) {},
-            ),
-          ),
+        createTestWidget(
+          currentIndex: 0,
+          onDestinationSelected: (_) {},
         ),
       );
 
@@ -351,13 +316,9 @@ void main() {
 
     testWidgets('maintains 64px total height', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            bottomNavigationBar: AppBottomNavigationBar(
-              currentIndex: 0,
-              onDestinationSelected: (_) {},
-            ),
-          ),
+        createTestWidget(
+          currentIndex: 0,
+          onDestinationSelected: (_) {},
         ),
       );
 
@@ -376,17 +337,13 @@ void main() {
       await tester.pumpWidget(
         StatefulBuilder(
           builder: (context, setState) {
-            return MaterialApp(
-              home: Scaffold(
-                bottomNavigationBar: AppBottomNavigationBar(
-                  currentIndex: currentIndex,
-                  onDestinationSelected: (index) {
-                    setState(() {
-                      currentIndex = index;
-                    });
-                  },
-                ),
-              ),
+            return createTestWidget(
+              currentIndex: currentIndex,
+              onDestinationSelected: (index) {
+                setState(() {
+                  currentIndex = index;
+                });
+              },
             );
           },
         ),
@@ -409,6 +366,11 @@ void main() {
     testWidgets('respects SafeArea for notch devices', (tester) async {
       await tester.pumpWidget(
         MaterialApp(
+          theme: ThemeData.light().copyWith(
+            extensions: <ThemeExtension<dynamic>>[
+              TemporalFlowTheme.light(),
+            ],
+          ),
           home: MediaQuery(
             data: const MediaQueryData(
               padding: EdgeInsets.only(bottom: 34.0), // iPhone notch
@@ -435,14 +397,10 @@ void main() {
 
     testWidgets('works with dark theme', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
+        createTestWidget(
+          currentIndex: 0,
+          onDestinationSelected: (_) {},
           theme: ThemeData.dark(),
-          home: Scaffold(
-            bottomNavigationBar: AppBottomNavigationBar(
-              currentIndex: 0,
-              onDestinationSelected: (_) {},
-            ),
-          ),
         ),
       );
 
@@ -453,14 +411,9 @@ void main() {
 
     testWidgets('works with light theme', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          theme: ThemeData.light(),
-          home: Scaffold(
-            bottomNavigationBar: AppBottomNavigationBar(
-              currentIndex: 0,
-              onDestinationSelected: (_) {},
-            ),
-          ),
+        createTestWidget(
+          currentIndex: 0,
+          onDestinationSelected: (_) {},
         ),
       );
 
@@ -492,15 +445,11 @@ void main() {
       final tappedIndices = <int>[];
 
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            bottomNavigationBar: AppBottomNavigationBar(
-              currentIndex: 0,
-              onDestinationSelected: (index) {
-                tappedIndices.add(index);
-              },
-            ),
-          ),
+        createTestWidget(
+          currentIndex: 0,
+          onDestinationSelected: (index) {
+            tappedIndices.add(index);
+          },
         ),
       );
 
