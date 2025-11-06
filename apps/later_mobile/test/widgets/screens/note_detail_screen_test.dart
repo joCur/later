@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:later_mobile/core/theme/temporal_flow_theme.dart';
 import 'package:later_mobile/data/models/note_model.dart';
 import 'package:later_mobile/providers/content_provider.dart';
 import 'package:later_mobile/providers/spaces_provider.dart';
@@ -14,19 +15,20 @@ import 'note_detail_screen_test.mocks.dart';
 void main() {
   late MockContentProvider mockContentProvider;
   late MockSpacesProvider mockSpacesProvider;
-  late Item testNote;
+  late Note testNote;
 
   setUp(() {
     mockContentProvider = MockContentProvider();
     mockSpacesProvider = MockSpacesProvider();
 
     // Create test note
-    testNote = Item(
+    testNote = Note(
       id: 'note-1',
       title: 'Test Note',
       content: 'This is the test content',
       spaceId: 'space-1',
-      tags: ['tag1', 'tag2'],
+      userId: 'user-1',
+      tags: <String>['tag1', 'tag2'],
       createdAt: DateTime(2024),
       updatedAt: DateTime(2024),
     );
@@ -40,7 +42,7 @@ void main() {
     ).thenAnswer((_) async => Future.value());
   });
 
-  Widget createTestWidget(Item note, {Size? screenSize}) {
+  Widget createTestWidget(Note note, {Size? screenSize}) {
     Widget widget = MultiProvider(
       providers: [
         ChangeNotifierProvider<ContentProvider>.value(
@@ -48,7 +50,12 @@ void main() {
         ),
         ChangeNotifierProvider<SpacesProvider>.value(value: mockSpacesProvider),
       ],
-      child: MaterialApp(home: NoteDetailScreen(note: note)),
+      child: MaterialApp(
+        theme: ThemeData.light().copyWith(
+          extensions: <ThemeExtension<dynamic>>[TemporalFlowTheme.light()],
+        ),
+        home: NoteDetailScreen(note: note),
+      ),
     );
 
     // Wrap with MediaQuery if custom screen size is provided
@@ -63,7 +70,7 @@ void main() {
   }
 
   /// Helper to set mobile viewport size (< 768px)
-  Widget createMobileTestWidget(Item note) {
+  Widget createMobileTestWidget(Note note) {
     return createTestWidget(
       note,
       screenSize: const Size(375, 812),
@@ -71,7 +78,7 @@ void main() {
   }
 
   /// Helper to set desktop viewport size (>= 1024px)
-  Widget createDesktopTestWidget(Item note) {
+  Widget createDesktopTestWidget(Note note) {
     return createTestWidget(note, screenSize: const Size(1200, 800));
   }
 
@@ -382,11 +389,12 @@ void main() {
     testWidgets('should show empty state for note without content', (
       tester,
     ) async {
-      final emptyNote = Item(
+      final emptyNote = Note(
         id: 'note-2',
         title: 'Empty Note',
         spaceId: 'space-1',
-        tags: [],
+        userId: 'user-1',
+        tags: <String>[],
       );
 
       await tester.pumpWidget(createTestWidget(emptyNote));
@@ -401,11 +409,12 @@ void main() {
     });
 
     testWidgets('should show hint text in empty content field', (tester) async {
-      final emptyNote = Item(
+      final emptyNote = Note(
         id: 'note-2',
         title: 'Empty Note',
         spaceId: 'space-1',
-        tags: [],
+        userId: 'user-1',
+        tags: <String>[],
       );
 
       await tester.pumpWidget(createTestWidget(emptyNote));
