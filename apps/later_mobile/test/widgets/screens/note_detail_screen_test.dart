@@ -2,24 +2,48 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:later_mobile/core/theme/temporal_flow_theme.dart';
 import 'package:later_mobile/data/models/note_model.dart';
+import 'package:later_mobile/data/models/space_model.dart';
 import 'package:later_mobile/providers/content_provider.dart';
 import 'package:later_mobile/providers/spaces_provider.dart';
 import 'package:later_mobile/widgets/screens/note_detail_screen.dart';
-import 'package:mockito/annotations.dart';
-import 'package:mockito/mockito.dart';
 import 'package:provider/provider.dart';
 
-import 'note_detail_screen_test.mocks.dart';
+import '../../fakes/fake_repositories.dart';
 
-@GenerateMocks([ContentProvider, SpacesProvider])
 void main() {
-  late MockContentProvider mockContentProvider;
-  late MockSpacesProvider mockSpacesProvider;
+  late FakeNoteRepository fakeNoteRepository;
+  late FakeTodoListRepository fakeTodoListRepository;
+  late FakeListRepository fakeListRepository;
+  late FakeSpaceRepository fakeSpaceRepository;
+  late ContentProvider contentProvider;
+  late SpacesProvider spacesProvider;
   late Note testNote;
 
   setUp(() {
-    mockContentProvider = MockContentProvider();
-    mockSpacesProvider = MockSpacesProvider();
+    fakeNoteRepository = FakeNoteRepository();
+    fakeTodoListRepository = FakeTodoListRepository();
+    fakeListRepository = FakeListRepository();
+    fakeSpaceRepository = FakeSpaceRepository();
+
+    contentProvider = ContentProvider(
+      todoListRepository: fakeTodoListRepository,
+      listRepository: fakeListRepository,
+      noteRepository: fakeNoteRepository,
+    );
+
+    spacesProvider = SpacesProvider(fakeSpaceRepository);
+
+    // Set up default space
+    fakeSpaceRepository.setSpaces([
+      Space(
+        id: 'space-1',
+        name: 'Test Space',
+        icon: '🏠',
+        userId: 'user-1',
+        createdAt: DateTime(2024),
+        updatedAt: DateTime(2024),
+      ),
+    ]);
 
     // Create test note
     testNote = Note(
@@ -33,22 +57,17 @@ void main() {
       updatedAt: DateTime(2024),
     );
 
-    // Setup default mock behavior
-    when(
-      mockContentProvider.updateNote(any),
-    ).thenAnswer((_) async => Future.value());
-    when(
-      mockContentProvider.deleteNote(any),
-    ).thenAnswer((_) async => Future.value());
+    // Add test note to repository
+    fakeNoteRepository.setNotes([testNote]);
   });
 
   Widget createTestWidget(Note note, {Size? screenSize}) {
     Widget widget = MultiProvider(
       providers: [
         ChangeNotifierProvider<ContentProvider>.value(
-          value: mockContentProvider,
+          value: contentProvider,
         ),
-        ChangeNotifierProvider<SpacesProvider>.value(value: mockSpacesProvider),
+        ChangeNotifierProvider<SpacesProvider>.value(value: spacesProvider),
       ],
       child: MaterialApp(
         theme: ThemeData.light().copyWith(

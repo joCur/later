@@ -10,188 +10,11 @@ import 'package:later_mobile/data/models/list_item_model.dart';
 import 'package:later_mobile/data/models/list_style.dart';
 import 'package:later_mobile/providers/content_provider.dart';
 import 'package:later_mobile/providers/spaces_provider.dart';
-import 'package:later_mobile/data/repositories/list_repository.dart';
-import 'package:later_mobile/data/repositories/todo_list_repository.dart';
-import 'package:later_mobile/data/repositories/note_repository.dart';
-import 'package:later_mobile/data/repositories/space_repository.dart';
 import 'package:later_mobile/data/models/space_model.dart';
+import 'package:later_mobile/core/theme/temporal_flow_theme.dart';
 import 'package:provider/provider.dart';
 
-/// Fake ListRepository for testing
-/// Matches the new Supabase repository API with separate items storage
-class FakeListRepository implements ListRepository {
-  List<ListModel> _lists = [];
-  final Map<String, List<ListItem>> _itemsByListId = {};
-  bool _shouldThrowError = false;
-
-  void setLists(List<ListModel> lists) {
-    _lists = lists;
-  }
-
-  void setItemsForList(String listId, List<ListItem> items) {
-    _itemsByListId[listId] = items;
-    // Update counts on the list
-    final listIndex = _lists.indexWhere((l) => l.id == listId);
-    if (listIndex != -1) {
-      final checkedCount = items.where((item) => item.isChecked).length;
-      _lists[listIndex] = _lists[listIndex].copyWith(
-        totalItemCount: items.length,
-        checkedItemCount: checkedCount,
-      );
-    }
-  }
-
-  void setShouldThrowError(bool value) {
-    _shouldThrowError = value;
-  }
-
-  void _updateListCounts(String listId) {
-    final items = _itemsByListId[listId] ?? [];
-    final listIndex = _lists.indexWhere((l) => l.id == listId);
-    if (listIndex != -1) {
-      final checkedCount = items.where((item) => item.isChecked).length;
-      _lists[listIndex] = _lists[listIndex].copyWith(
-        totalItemCount: items.length,
-        checkedItemCount: checkedCount,
-      );
-    }
-  }
-
-  @override
-  Future<ListModel> create(ListModel list) async {
-    if (_shouldThrowError) throw Exception('Create failed');
-    _lists.add(list);
-    _itemsByListId[list.id] = [];
-    return list;
-  }
-
-  @override
-  Future<ListModel?> getById(String id) async {
-    if (_shouldThrowError) throw Exception('GetById failed');
-    try {
-      return _lists.firstWhere((list) => list.id == id);
-    } catch (e) {
-      return null;
-    }
-  }
-
-  @override
-  Future<List<ListModel>> getBySpace(String spaceId) async {
-    if (_shouldThrowError) throw Exception('GetBySpace failed');
-    return _lists.where((list) => list.spaceId == spaceId).toList();
-  }
-
-  @override
-  Future<ListModel> update(ListModel list) async {
-    if (_shouldThrowError) throw Exception('Update failed');
-    final index = _lists.indexWhere((l) => l.id == list.id);
-    if (index == -1) throw Exception('List not found');
-    _lists[index] = list.copyWith(updatedAt: DateTime.now());
-    return _lists[index];
-  }
-
-  @override
-  Future<void> delete(String id) async {
-    if (_shouldThrowError) throw Exception('Delete failed');
-    _lists.removeWhere((list) => list.id == id);
-    _itemsByListId.remove(id);
-  }
-
-  @override
-  Future<List<ListItem>> getListItemsByListId(String listId) async {
-    if (_shouldThrowError) throw Exception('GetListItemsByListId failed');
-    return _itemsByListId[listId] ?? [];
-  }
-
-  @override
-  Future<ListItem> createListItem(ListItem listItem) async {
-    if (_shouldThrowError) throw Exception('CreateListItem failed');
-    final items = _itemsByListId[listItem.listId] ?? [];
-    items.add(listItem);
-    _itemsByListId[listItem.listId] = items;
-    _updateListCounts(listItem.listId);
-    return listItem;
-  }
-
-  @override
-  Future<ListItem> updateListItem(ListItem listItem) async {
-    if (_shouldThrowError) throw Exception('UpdateListItem failed');
-    final items = _itemsByListId[listItem.listId] ?? [];
-    final index = items.indexWhere((item) => item.id == listItem.id);
-    if (index == -1) throw Exception('Item not found');
-    items[index] = listItem;
-    _itemsByListId[listItem.listId] = items;
-    _updateListCounts(listItem.listId);
-    return listItem;
-  }
-
-  @override
-  Future<void> deleteListItem(String id, String listId) async {
-    if (_shouldThrowError) throw Exception('DeleteListItem failed');
-    final items = _itemsByListId[listId] ?? [];
-    items.removeWhere((item) => item.id == id);
-    _itemsByListId[listId] = items;
-    _updateListCounts(listId);
-  }
-
-  @override
-  Future<void> updateListItemSortOrders(List<ListItem> listItems) async {
-    if (_shouldThrowError) throw Exception('UpdateListItemSortOrders failed');
-    if (listItems.isEmpty) return;
-    final listId = listItems.first.listId;
-    _itemsByListId[listId] = listItems;
-    _updateListCounts(listId);
-  }
-
-  @override
-  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
-}
-
-/// Fake TodoListRepository for testing
-class FakeTodoListRepository implements TodoListRepository {
-  @override
-  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
-}
-
-/// Fake NoteRepository for testing
-class FakeNoteRepository implements NoteRepository {
-  @override
-  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
-}
-
-/// Fake SpaceRepository for testing
-class FakeSpaceRepository implements SpaceRepository {
-  List<Space> _spaces = [];
-
-  void setSpaces(List<Space> spaces) {
-    _spaces = spaces;
-  }
-
-  @override
-  Future<List<Space>> getSpaces({bool includeArchived = false}) async {
-    return _spaces;
-  }
-
-  @override
-  Future<Space?> getSpaceById(String id) async {
-    try {
-      return _spaces.firstWhere((s) => s.id == id);
-    } catch (e) {
-      return null;
-    }
-  }
-
-  @override
-  Future<Space> updateSpace(Space space) async {
-    final index = _spaces.indexWhere((s) => s.id == space.id);
-    if (index == -1) throw Exception('Space not found');
-    _spaces[index] = space;
-    return space;
-  }
-
-  @override
-  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
-}
+import '../../fakes/fake_repositories.dart';
 
 void main() {
   late FakeListRepository fakeListRepository;
@@ -234,7 +57,12 @@ void main() {
         ChangeNotifierProvider<ContentProvider>.value(value: contentProvider),
         ChangeNotifierProvider<SpacesProvider>.value(value: spacesProvider),
       ],
-      child: MaterialApp(home: ListDetailScreen(list: list)),
+      child: MaterialApp(
+        theme: ThemeData.light().copyWith(
+          extensions: <ThemeExtension<dynamic>>[TemporalFlowTheme.light()],
+        ),
+        home: ListDetailScreen(list: list),
+      ),
     );
 
     // Wrap with MediaQuery if custom screen size is provided
@@ -485,7 +313,7 @@ void main() {
       await tester.pump(const Duration(milliseconds: 600));
 
       // Verify update was called
-      final updatedList = fakeListRepository._lists.first;
+      final updatedList = fakeListRepository.lists.first;
       expect(updatedList.name, 'Updated Name');
     });
 
@@ -522,7 +350,7 @@ void main() {
 
       // Check for loading indicator (may or may not be present due to timing)
       // This test is timing-dependent, so we'll just verify the update happened
-      final updatedList = fakeListRepository._lists.first;
+      final updatedList = fakeListRepository.lists.first;
       expect(updatedList.name, 'Updated Name');
     });
 
@@ -1020,7 +848,7 @@ void main() {
       await tester.pump(const Duration(milliseconds: 600));
 
       // Verify save was called
-      final updatedList = fakeListRepository._lists.first;
+      final updatedList = fakeListRepository.lists.first;
       expect(updatedList.name, 'Updated');
     });
   });
