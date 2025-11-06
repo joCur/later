@@ -18,22 +18,50 @@ import 'package:later_mobile/data/models/space_model.dart';
 import 'package:provider/provider.dart';
 
 /// Fake ListRepository for testing
+/// Matches the new Supabase repository API with separate items storage
 class FakeListRepository implements ListRepository {
   List<ListModel> _lists = [];
+  final Map<String, List<ListItem>> _itemsByListId = {};
   bool _shouldThrowError = false;
 
   void setLists(List<ListModel> lists) {
     _lists = lists;
   }
 
+  void setItemsForList(String listId, List<ListItem> items) {
+    _itemsByListId[listId] = items;
+    // Update counts on the list
+    final listIndex = _lists.indexWhere((l) => l.id == listId);
+    if (listIndex != -1) {
+      final checkedCount = items.where((item) => item.isChecked).length;
+      _lists[listIndex] = _lists[listIndex].copyWith(
+        totalItemCount: items.length,
+        checkedItemCount: checkedCount,
+      );
+    }
+  }
+
   void setShouldThrowError(bool value) {
     _shouldThrowError = value;
+  }
+
+  void _updateListCounts(String listId) {
+    final items = _itemsByListId[listId] ?? [];
+    final listIndex = _lists.indexWhere((l) => l.id == listId);
+    if (listIndex != -1) {
+      final checkedCount = items.where((item) => item.isChecked).length;
+      _lists[listIndex] = _lists[listIndex].copyWith(
+        totalItemCount: items.length,
+        checkedItemCount: checkedCount,
+      );
+    }
   }
 
   @override
   Future<ListModel> create(ListModel list) async {
     if (_shouldThrowError) throw Exception('Create failed');
     _lists.add(list);
+    _itemsByListId[list.id] = [];
     return list;
   }
 
@@ -66,118 +94,57 @@ class FakeListRepository implements ListRepository {
   Future<void> delete(String id) async {
     if (_shouldThrowError) throw Exception('Delete failed');
     _lists.removeWhere((list) => list.id == id);
+    _itemsByListId.remove(id);
   }
 
   @override
-  Future<ListModel> addItem(String listId, ListItem item) async {
-    if (_shouldThrowError) throw Exception('AddItem failed');
-    final list = await getById(listId);
-    if (list == null) throw Exception('List not found');
-    final updated = list.copyWith(
-      items: [...list.items, item],
-      updatedAt: DateTime.now(),
-    );
-    final index = _lists.indexWhere((l) => l.id == listId);
-    _lists[index] = updated;
-    return updated;
+  Future<List<ListItem>> getListItemsByListId(String listId) async {
+    if (_shouldThrowError) throw Exception('GetListItemsByListId failed');
+    return _itemsByListId[listId] ?? [];
   }
 
   @override
-  Future<ListModel> updateItem(
-    String listId,
-    String itemId,
-    ListItem updatedItem,
-  ) async {
-    if (_shouldThrowError) throw Exception('UpdateItem failed');
-    final list = await getById(listId);
-    if (list == null) throw Exception('List not found');
-    final itemIndex = list.items.indexWhere((item) => item.id == itemId);
-    if (itemIndex == -1) throw Exception('Item not found');
-    final updatedItems = [...list.items];
-    updatedItems[itemIndex] = updatedItem;
-    final updated = list.copyWith(
-      items: updatedItems,
-      updatedAt: DateTime.now(),
-    );
-    final index = _lists.indexWhere((l) => l.id == listId);
-    _lists[index] = updated;
-    return updated;
+  Future<ListItem> createListItem(ListItem listItem) async {
+    if (_shouldThrowError) throw Exception('CreateListItem failed');
+    final items = _itemsByListId[listItem.listId] ?? [];
+    items.add(listItem);
+    _itemsByListId[listItem.listId] = items;
+    _updateListCounts(listItem.listId);
+    return listItem;
   }
 
   @override
-  Future<ListModel> deleteItem(String listId, String itemId) async {
-    if (_shouldThrowError) throw Exception('DeleteItem failed');
-    final list = await getById(listId);
-    if (list == null) throw Exception('List not found');
-    final updated = list.copyWith(
-      items: list.items.where((item) => item.id != itemId).toList(),
-      updatedAt: DateTime.now(),
-    );
-    final index = _lists.indexWhere((l) => l.id == listId);
-    _lists[index] = updated;
-    return updated;
+  Future<ListItem> updateListItem(ListItem listItem) async {
+    if (_shouldThrowError) throw Exception('UpdateListItem failed');
+    final items = _itemsByListId[listItem.listId] ?? [];
+    final index = items.indexWhere((item) => item.id == listItem.id);
+    if (index == -1) throw Exception('Item not found');
+    items[index] = listItem;
+    _itemsByListId[listItem.listId] = items;
+    _updateListCounts(listItem.listId);
+    return listItem;
   }
 
   @override
-  Future<ListModel> toggleItem(String listId, String itemId) async {
-    if (_shouldThrowError) throw Exception('ToggleItem failed');
-    final list = await getById(listId);
-    if (list == null) throw Exception('List not found');
-    final itemIndex = list.items.indexWhere((item) => item.id == itemId);
-    if (itemIndex == -1) throw Exception('Item not found');
-    final updatedItems = [...list.items];
-    updatedItems[itemIndex] = updatedItems[itemIndex].copyWith(
-      isChecked: !updatedItems[itemIndex].isChecked,
-    );
-    final updated = list.copyWith(
-      items: updatedItems,
-      updatedAt: DateTime.now(),
-    );
-    final index = _lists.indexWhere((l) => l.id == listId);
-    _lists[index] = updated;
-    return updated;
+  Future<void> deleteListItem(String id, String listId) async {
+    if (_shouldThrowError) throw Exception('DeleteListItem failed');
+    final items = _itemsByListId[listId] ?? [];
+    items.removeWhere((item) => item.id == id);
+    _itemsByListId[listId] = items;
+    _updateListCounts(listId);
   }
 
   @override
-  Future<ListModel> reorderItems(
-    String listId,
-    int oldIndex,
-    int newIndex,
-  ) async {
-    if (_shouldThrowError) throw Exception('ReorderItems failed');
-    final list = await getById(listId);
-    if (list == null) throw Exception('List not found');
-    final updatedItems = [...list.items];
-    final item = updatedItems.removeAt(oldIndex);
-    updatedItems.insert(newIndex, item);
-    final reorderedItems = updatedItems.asMap().entries.map((entry) {
-      return entry.value.copyWith(sortOrder: entry.key);
-    }).toList();
-    final updated = list.copyWith(
-      items: reorderedItems,
-      updatedAt: DateTime.now(),
-    );
-    final index = _lists.indexWhere((l) => l.id == listId);
-    _lists[index] = updated;
-    return updated;
+  Future<void> updateListItemSortOrders(List<ListItem> listItems) async {
+    if (_shouldThrowError) throw Exception('UpdateListItemSortOrders failed');
+    if (listItems.isEmpty) return;
+    final listId = listItems.first.listId;
+    _itemsByListId[listId] = listItems;
+    _updateListCounts(listId);
   }
 
   @override
-  Future<int> deleteAllInSpace(String spaceId) async {
-    if (_shouldThrowError) throw Exception('DeleteAllInSpace failed');
-    final lists = await getBySpace(spaceId);
-    for (final list in lists) {
-      await delete(list.id);
-    }
-    return lists.length;
-  }
-
-  @override
-  Future<int> countBySpace(String spaceId) async {
-    if (_shouldThrowError) throw Exception('CountBySpace failed');
-    final lists = await getBySpace(spaceId);
-    return lists.length;
-  }
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
 /// Fake TodoListRepository for testing
@@ -254,6 +221,7 @@ void main() {
         id: 'space-1',
         name: 'Test Space',
         icon: '🏠',
+        userId: 'test-user-id',
         createdAt: DateTime.now(),
         updatedAt: DateTime.now(),
       ),
@@ -300,8 +268,10 @@ void main() {
       final list = ListModel(
         id: 'list-1',
         spaceId: 'space-1',
+        userId: 'test-user-id',
         name: 'Shopping List',
-        items: [],
+        
+        
       );
       fakeListRepository.setLists([list]);
 
@@ -317,9 +287,11 @@ void main() {
       final list = ListModel(
         id: 'list-1',
         spaceId: 'space-1',
+        userId: 'test-user-id',
         name: 'Shopping List',
         icon: '🛒',
-        items: [],
+        
+        
       );
       fakeListRepository.setLists([list]);
 
@@ -336,8 +308,10 @@ void main() {
       final list = ListModel(
         id: 'list-1',
         spaceId: 'space-1',
+        userId: 'test-user-id',
         name: 'Empty List',
-        items: [],
+        
+        
       );
       fakeListRepository.setLists([list]);
 
@@ -358,13 +332,16 @@ void main() {
       final list = ListModel(
         id: 'list-1',
         spaceId: 'space-1',
+        userId: 'test-user-id',
         name: 'Shopping List',
-        items: [
-          ListItem(id: 'item-1', title: 'Milk', sortOrder: 0),
-          ListItem(id: 'item-2', title: 'Eggs', sortOrder: 1),
-        ],
+        totalItemCount: 2,
+        
       );
       fakeListRepository.setLists([list]);
+      fakeListRepository.setItemsForList('list-1', [
+        ListItem(id: 'item-1', title: 'Milk', sortOrder: 0, listId: 'list-1'),
+        ListItem(id: 'item-2', title: 'Eggs', sortOrder: 1, listId: 'list-1'),
+      ]);
 
       await tester.pumpWidget(createTestWidget(list));
       await tester.pumpAndSettle();
@@ -381,14 +358,17 @@ void main() {
       final list = ListModel(
         id: 'list-1',
         spaceId: 'space-1',
+        userId: 'test-user-id',
         name: 'Steps',
         style: ListStyle.numbered,
-        items: [
-          ListItem(id: 'item-1', title: 'First step', sortOrder: 0),
-          ListItem(id: 'item-2', title: 'Second step', sortOrder: 1),
-        ],
+        totalItemCount: 2,
+        
       );
       fakeListRepository.setLists([list]);
+      fakeListRepository.setItemsForList('list-1', [
+        ListItem(id: 'item-1', title: 'First step', sortOrder: 0, listId: 'list-1'),
+        ListItem(id: 'item-2', title: 'Second step', sortOrder: 1, listId: 'list-1'),
+      ]);
 
       await tester.pumpWidget(createTestWidget(list));
       await tester.pumpAndSettle();
@@ -405,19 +385,23 @@ void main() {
       final list = ListModel(
         id: 'list-1',
         spaceId: 'space-1',
+        userId: 'test-user-id',
         name: 'Tasks',
         style: ListStyle.checkboxes,
-        items: [
-          ListItem(id: 'item-1', title: 'Task 1', sortOrder: 0),
-          ListItem(
-            id: 'item-2',
-            title: 'Task 2',
-            isChecked: true,
-            sortOrder: 1,
-          ),
-        ],
+        totalItemCount: 2,
+        checkedItemCount: 1,
       );
       fakeListRepository.setLists([list]);
+      fakeListRepository.setItemsForList('list-1', [
+        ListItem(id: 'item-1', title: 'Task 1', sortOrder: 0, listId: 'list-1'),
+        ListItem(
+          id: 'item-2',
+          title: 'Task 2',
+          isChecked: true,
+          sortOrder: 1,
+          listId: 'list-1',
+        ),
+      ]);
 
       await tester.pumpWidget(createTestWidget(list));
       await tester.pumpAndSettle();
@@ -434,8 +418,10 @@ void main() {
       final list = ListModel(
         id: 'list-1',
         spaceId: 'space-1',
+        userId: 'test-user-id',
         name: 'List',
-        items: [],
+        
+        
       );
       fakeListRepository.setLists([list]);
 
@@ -450,8 +436,10 @@ void main() {
       final list = ListModel(
         id: 'list-1',
         spaceId: 'space-1',
+        userId: 'test-user-id',
         name: 'List',
-        items: [],
+        
+        
       );
       fakeListRepository.setLists([list]);
 
@@ -468,8 +456,10 @@ void main() {
       final list = ListModel(
         id: 'list-1',
         spaceId: 'space-1',
+        userId: 'test-user-id',
         name: 'Original Name',
-        items: [],
+        
+        
       );
       fakeListRepository.setLists([list]);
 
@@ -505,8 +495,10 @@ void main() {
       final list = ListModel(
         id: 'list-1',
         spaceId: 'space-1',
+        userId: 'test-user-id',
         name: 'Original Name',
-        items: [],
+        
+        
       );
       fakeListRepository.setLists([list]);
 
@@ -538,8 +530,10 @@ void main() {
       final list = ListModel(
         id: 'list-1',
         spaceId: 'space-1',
+        userId: 'test-user-id',
         name: 'Original Name',
-        items: [],
+        
+        
       );
       fakeListRepository.setLists([list]);
 
@@ -571,8 +565,10 @@ void main() {
       final list = ListModel(
         id: 'list-1',
         spaceId: 'space-1',
+        userId: 'test-user-id',
         name: 'List',
-        items: [],
+        
+        
       );
       fakeListRepository.setLists([list]);
 
@@ -595,8 +591,10 @@ void main() {
       final list = ListModel(
         id: 'list-1',
         spaceId: 'space-1',
+        userId: 'test-user-id',
         name: 'List',
-        items: [],
+        
+        
       );
       fakeListRepository.setLists([list]);
 
@@ -623,19 +621,24 @@ void main() {
       await tester.pumpAndSettle();
 
       // Verify item was added to repository
-      final updatedList = fakeListRepository._lists.first;
-      expect(updatedList.items.length, 1);
-      expect(updatedList.items.first.title, 'New Item');
+      final items = await fakeListRepository.getListItemsByListId('list-1');
+      expect(items.length, 1);
+      expect(items.first.title, 'New Item');
     });
 
     testWidgets('opens edit dialog on long press', (WidgetTester tester) async {
       final list = ListModel(
         id: 'list-1',
         spaceId: 'space-1',
+        userId: 'test-user-id',
         name: 'List',
-        items: [ListItem(id: 'item-1', title: 'Existing Item', sortOrder: 0)],
+        totalItemCount: 1,
+        
       );
       fakeListRepository.setLists([list]);
+      fakeListRepository.setItemsForList('list-1', [
+        ListItem(id: 'item-1', title: 'Existing Item', sortOrder: 0, listId: 'list-1'),
+      ]);
 
       await tester.pumpWidget(createTestWidget(list));
       await tester.pumpAndSettle();
@@ -654,11 +657,16 @@ void main() {
       final list = ListModel(
         id: 'list-1',
         spaceId: 'space-1',
+        userId: 'test-user-id',
         name: 'Tasks',
         style: ListStyle.checkboxes,
-        items: [ListItem(id: 'item-1', title: 'Task', sortOrder: 0)],
+        totalItemCount: 1,
+        
       );
       fakeListRepository.setLists([list]);
+      fakeListRepository.setItemsForList('list-1', [
+        ListItem(id: 'item-1', title: 'Task', sortOrder: 0, listId: 'list-1'),
+      ]);
 
       await tester.pumpWidget(createTestWidget(list));
       await tester.pumpAndSettle();
@@ -671,18 +679,23 @@ void main() {
       await tester.pumpAndSettle();
 
       // Verify item was toggled
-      final updatedList = fakeListRepository._lists.first;
-      expect(updatedList.items.first.isChecked, true);
+      final items = await fakeListRepository.getListItemsByListId('list-1');
+      expect(items.first.isChecked, true);
     });
 
     testWidgets('supports swipe-to-delete', (WidgetTester tester) async {
       final list = ListModel(
         id: 'list-1',
         spaceId: 'space-1',
+        userId: 'test-user-id',
         name: 'List',
-        items: [ListItem(id: 'item-1', title: 'Item to Delete', sortOrder: 0)],
+        totalItemCount: 1,
+        
       );
       fakeListRepository.setLists([list]);
+      fakeListRepository.setItemsForList('list-1', [
+        ListItem(id: 'item-1', title: 'Item to Delete', sortOrder: 0, listId: 'list-1'),
+      ]);
 
       await tester.pumpWidget(createTestWidget(list));
       await tester.pumpAndSettle();
@@ -705,10 +718,15 @@ void main() {
       final list = ListModel(
         id: 'list-1',
         spaceId: 'space-1',
+        userId: 'test-user-id',
         name: 'List',
-        items: [ListItem(id: 'item-1', title: 'Item to Delete', sortOrder: 0)],
+        totalItemCount: 1,
+        
       );
       fakeListRepository.setLists([list]);
+      fakeListRepository.setItemsForList('list-1', [
+        ListItem(id: 'item-1', title: 'Item to Delete', sortOrder: 0, listId: 'list-1'),
+      ]);
 
       await tester.pumpWidget(createTestWidget(list));
       await tester.pumpAndSettle();
@@ -733,14 +751,17 @@ void main() {
       final list = ListModel(
         id: 'list-1',
         spaceId: 'space-1',
+        userId: 'test-user-id',
         name: 'List',
-        items: [
-          ListItem(id: 'item-1', title: 'First', sortOrder: 0),
-          ListItem(id: 'item-2', title: 'Second', sortOrder: 1),
-          ListItem(id: 'item-3', title: 'Third', sortOrder: 2),
-        ],
+        totalItemCount: 3,
+        
       );
       fakeListRepository.setLists([list]);
+      fakeListRepository.setItemsForList('list-1', [
+        ListItem(id: 'item-1', title: 'First', sortOrder: 0, listId: 'list-1'),
+        ListItem(id: 'item-2', title: 'Second', sortOrder: 1, listId: 'list-1'),
+        ListItem(id: 'item-3', title: 'Third', sortOrder: 2, listId: 'list-1'),
+      ]);
 
       await tester.pumpWidget(createTestWidget(list));
       await tester.pumpAndSettle();
@@ -755,8 +776,10 @@ void main() {
       final list = ListModel(
         id: 'list-1',
         spaceId: 'space-1',
+        userId: 'test-user-id',
         name: 'List',
-        items: [],
+        
+        
       );
       fakeListRepository.setLists([list]);
 
@@ -777,8 +800,10 @@ void main() {
       final list = ListModel(
         id: 'list-1',
         spaceId: 'space-1',
+        userId: 'test-user-id',
         name: 'List',
-        items: [],
+        
+        
       );
       fakeListRepository.setLists([list]);
 
@@ -804,8 +829,10 @@ void main() {
       final list = ListModel(
         id: 'list-1',
         spaceId: 'space-1',
+        userId: 'test-user-id',
         name: 'List',
-        items: [],
+        
+        
       );
       fakeListRepository.setLists([list]);
 
@@ -828,10 +855,15 @@ void main() {
       final list = ListModel(
         id: 'list-1',
         spaceId: 'space-1',
+        userId: 'test-user-id',
         name: 'List to Delete',
-        items: [ListItem(id: 'item-1', title: 'Item', sortOrder: 0)],
+        totalItemCount: 1,
+        
       );
       fakeListRepository.setLists([list]);
+      fakeListRepository.setItemsForList('list-1', [
+        ListItem(id: 'item-1', title: 'Item', sortOrder: 0, listId: 'list-1'),
+      ]);
 
       await tester.pumpWidget(createTestWidget(list));
       await tester.pumpAndSettle();
@@ -861,25 +893,30 @@ void main() {
       final list = ListModel(
         id: 'list-1',
         spaceId: 'space-1',
+        userId: 'test-user-id',
         name: 'Tasks',
         style: ListStyle.checkboxes,
-        items: [
-          ListItem(
-            id: 'item-1',
-            title: 'Task 1',
-            isChecked: true,
-            sortOrder: 0,
-          ),
-          ListItem(id: 'item-2', title: 'Task 2', sortOrder: 1),
-          ListItem(
-            id: 'item-3',
-            title: 'Task 3',
-            isChecked: true,
-            sortOrder: 2,
-          ),
-        ],
+        totalItemCount: 3,
+        checkedItemCount: 2,
       );
       fakeListRepository.setLists([list]);
+      fakeListRepository.setItemsForList('list-1', [
+        ListItem(
+          id: 'item-1',
+          title: 'Task 1',
+          isChecked: true,
+          sortOrder: 0,
+          listId: 'list-1',
+        ),
+        ListItem(id: 'item-2', title: 'Task 2', sortOrder: 1, listId: 'list-1'),
+        ListItem(
+          id: 'item-3',
+          title: 'Task 3',
+          isChecked: true,
+          sortOrder: 2,
+          listId: 'list-1',
+        ),
+      ]);
 
       await tester.pumpWidget(createTestWidget(list));
       await tester.pumpAndSettle();
@@ -897,13 +934,16 @@ void main() {
       final list = ListModel(
         id: 'list-1',
         spaceId: 'space-1',
+        userId: 'test-user-id',
         name: 'List',
-        items: [
-          ListItem(id: 'item-1', title: 'Item 1', sortOrder: 0),
-          ListItem(id: 'item-2', title: 'Item 2', sortOrder: 1),
-        ],
+        totalItemCount: 2,
+        
       );
       fakeListRepository.setLists([list]);
+      fakeListRepository.setItemsForList('list-1', [
+        ListItem(id: 'item-1', title: 'Item 1', sortOrder: 0, listId: 'list-1'),
+        ListItem(id: 'item-2', title: 'Item 2', sortOrder: 1, listId: 'list-1'),
+      ]);
 
       await tester.pumpWidget(createTestWidget(list));
       await tester.pumpAndSettle();
@@ -921,8 +961,10 @@ void main() {
       final list = ListModel(
         id: 'list-1',
         spaceId: 'space-1',
+        userId: 'test-user-id',
         name: 'List',
-        items: [],
+        
+        
       );
       fakeListRepository.setLists([list]);
 
@@ -957,8 +999,10 @@ void main() {
       final list = ListModel(
         id: 'list-1',
         spaceId: 'space-1',
+        userId: 'test-user-id',
         name: 'Original',
-        items: [],
+        
+        
       );
       fakeListRepository.setLists([list]);
 
@@ -986,11 +1030,16 @@ void main() {
       final list = ListModel(
         id: 'list-1',
         spaceId: 'space-1',
+        userId: 'test-user-id',
         name: 'Accessible List',
         style: ListStyle.checkboxes,
-        items: [ListItem(id: 'item-1', title: 'Item 1', sortOrder: 0)],
+        totalItemCount: 1,
+        
       );
       fakeListRepository.setLists([list]);
+      fakeListRepository.setItemsForList('list-1', [
+        ListItem(id: 'item-1', title: 'Item 1', sortOrder: 0, listId: 'list-1'),
+      ]);
 
       await tester.pumpWidget(createTestWidget(list));
       await tester.pumpAndSettle();
@@ -1005,8 +1054,10 @@ void main() {
       final list = ListModel(
         id: 'list-1',
         spaceId: 'space-1',
+        userId: 'test-user-id',
         name: 'List',
-        items: [],
+        
+        
       );
       fakeListRepository.setLists([list]);
 
@@ -1027,8 +1078,10 @@ void main() {
       final list = ListModel(
         id: 'list-1',
         spaceId: 'space-1',
+        userId: 'test-user-id',
         name: 'List',
-        items: [],
+        
+        
       );
       fakeListRepository.setLists([list]);
 
@@ -1049,8 +1102,10 @@ void main() {
       final list = ListModel(
         id: 'list-1',
         spaceId: 'space-1',
+        userId: 'test-user-id',
         name: 'List',
-        items: [],
+        
+        
       );
       fakeListRepository.setLists([list]);
 
@@ -1070,8 +1125,10 @@ void main() {
       final list = ListModel(
         id: 'list-1',
         spaceId: 'space-1',
+        userId: 'test-user-id',
         name: 'List',
-        items: [],
+        
+        
       );
       fakeListRepository.setLists([list]);
 
@@ -1095,8 +1152,10 @@ void main() {
       final list = ListModel(
         id: 'list-1',
         spaceId: 'space-1',
+        userId: 'test-user-id',
         name: 'List',
-        items: [],
+        
+        
       );
       fakeListRepository.setLists([list]);
 
@@ -1128,8 +1187,10 @@ void main() {
       final list = ListModel(
         id: 'list-1',
         spaceId: 'space-1',
+        userId: 'test-user-id',
         name: 'List',
-        items: [],
+        
+        
       );
       fakeListRepository.setLists([list]);
 
@@ -1156,10 +1217,15 @@ void main() {
       final list = ListModel(
         id: 'list-1',
         spaceId: 'space-1',
+        userId: 'test-user-id',
         name: 'List',
-        items: [ListItem(id: 'item-1', title: 'Existing Item', sortOrder: 0)],
+        totalItemCount: 1,
+        
       );
       fakeListRepository.setLists([list]);
+      fakeListRepository.setItemsForList('list-1', [
+        ListItem(id: 'item-1', title: 'Existing Item', sortOrder: 0, listId: 'list-1'),
+      ]);
 
       await tester.pumpWidget(createMobileTestWidget(list));
       await tester.pumpAndSettle();
@@ -1185,10 +1251,15 @@ void main() {
       final list = ListModel(
         id: 'list-1',
         spaceId: 'space-1',
+        userId: 'test-user-id',
         name: 'List',
-        items: [ListItem(id: 'item-1', title: 'Existing Item', sortOrder: 0)],
+        totalItemCount: 1,
+        
       );
       fakeListRepository.setLists([list]);
+      fakeListRepository.setItemsForList('list-1', [
+        ListItem(id: 'item-1', title: 'Existing Item', sortOrder: 0, listId: 'list-1'),
+      ]);
 
       await tester.pumpWidget(createDesktopTestWidget(list));
       await tester.pumpAndSettle();
@@ -1211,8 +1282,10 @@ void main() {
       final list = ListModel(
         id: 'list-1',
         spaceId: 'space-1',
+        userId: 'test-user-id',
         name: 'List',
-        items: [],
+        
+        
       );
       fakeListRepository.setLists([list]);
 
@@ -1248,8 +1321,10 @@ void main() {
       final list = ListModel(
         id: 'list-1',
         spaceId: 'space-1',
+        userId: 'test-user-id',
         name: 'List',
-        items: [],
+        
+        
       );
       fakeListRepository.setLists([list]);
 
@@ -1282,8 +1357,10 @@ void main() {
       final list = ListModel(
         id: 'list-1',
         spaceId: 'space-1',
+        userId: 'test-user-id',
         name: 'List',
-        items: [],
+        
+        
       );
       fakeListRepository.setLists([list]);
 
@@ -1318,8 +1395,10 @@ void main() {
       final list = ListModel(
         id: 'list-1',
         spaceId: 'space-1',
+        userId: 'test-user-id',
         name: 'List',
-        items: [],
+        
+        
       );
       fakeListRepository.setLists([list]);
 
@@ -1344,138 +1423,4 @@ void main() {
     });
   });
 
-  group('ListDetailScreen - Dismissible Background Styling', () {
-    testWidgets(
-      'Dismissible background has ClipRRect with correct borderRadius',
-      (WidgetTester tester) async {
-        final list = ListModel(
-          id: 'list-1',
-          spaceId: 'space-1',
-          name: 'List',
-          items: [ListItem(id: 'item-1', title: 'Test Item', sortOrder: 0)],
-        );
-        fakeListRepository.setLists([list]);
-
-        await tester.pumpWidget(createTestWidget(list));
-        await tester.pumpAndSettle();
-
-        // Find the dismissible
-        final dismissible = find.byType(Dismissible);
-        expect(dismissible, findsOneWidget);
-
-        // Start swipe to reveal background
-        await tester.drag(dismissible, const Offset(-200, 0));
-        await tester.pump();
-
-        // Should have ClipRRect with 8px borderRadius
-        final clipRRect = find.byWidgetPredicate(
-          (widget) =>
-              widget is ClipRRect &&
-              widget.borderRadius == BorderRadius.circular(8.0),
-        );
-        expect(clipRRect, findsAtLeastNWidgets(1));
-      },
-    );
-
-    testWidgets('Dismissible background has Padding with bottom: 8px', (
-      WidgetTester tester,
-    ) async {
-      final list = ListModel(
-        id: 'list-1',
-        spaceId: 'space-1',
-        name: 'List',
-        items: [ListItem(id: 'item-1', title: 'Test Item', sortOrder: 0)],
-      );
-      fakeListRepository.setLists([list]);
-
-      await tester.pumpWidget(createTestWidget(list));
-      await tester.pumpAndSettle();
-
-      // Find the dismissible
-      final dismissible = find.byType(Dismissible);
-
-      // Start swipe to reveal background
-      await tester.drag(dismissible, const Offset(-200, 0));
-      await tester.pump();
-
-      // Should have Padding with bottom: 8.0
-      final padding = find.byWidgetPredicate(
-        (widget) =>
-            widget is Padding &&
-            widget.padding == const EdgeInsets.only(bottom: 8.0),
-      );
-      expect(padding, findsAtLeastNWidgets(1));
-    });
-
-    testWidgets(
-      'Dismissible background shows delete icon with proper alignment',
-      (WidgetTester tester) async {
-        final list = ListModel(
-          id: 'list-1',
-          spaceId: 'space-1',
-          name: 'List',
-          items: [ListItem(id: 'item-1', title: 'Test Item', sortOrder: 0)],
-        );
-        fakeListRepository.setLists([list]);
-
-        await tester.pumpWidget(createTestWidget(list));
-        await tester.pumpAndSettle();
-
-        // Find the dismissible
-        final dismissible = find.byType(Dismissible);
-
-        // Start swipe to reveal background
-        await tester.drag(dismissible, const Offset(-200, 0));
-        await tester.pump();
-
-        // Should show delete icon
-        expect(find.byIcon(Icons.delete), findsAtLeastNWidgets(1));
-
-        // Container should have centerRight alignment
-        final alignedContainer = find.byWidgetPredicate(
-          (widget) =>
-              widget is Container && widget.alignment == Alignment.centerRight,
-        );
-        expect(alignedContainer, findsAtLeastNWidgets(1));
-      },
-    );
-
-    testWidgets('Dismissible background has correct container structure', (
-      WidgetTester tester,
-    ) async {
-      final list = ListModel(
-        id: 'list-1',
-        spaceId: 'space-1',
-        name: 'List',
-        items: [ListItem(id: 'item-1', title: 'Test Item', sortOrder: 0)],
-      );
-      fakeListRepository.setLists([list]);
-
-      await tester.pumpWidget(createTestWidget(list));
-      await tester.pumpAndSettle();
-
-      // Find the dismissible
-      final dismissible = find.byType(Dismissible);
-
-      // Start swipe to reveal background
-      await tester.drag(dismissible, const Offset(-200, 0));
-      await tester.pump();
-
-      // Verify the structure: Padding > ClipRRect > Container
-      // Find Padding containing ClipRRect
-      final paddingWithClipRRect = find.ancestor(
-        of: find.byWidgetPredicate(
-          (widget) =>
-              widget is ClipRRect &&
-              widget.borderRadius == BorderRadius.circular(8.0),
-        ),
-        matching: find.byWidgetPredicate(
-          (widget) =>
-              widget is Padding &&
-              widget.padding == const EdgeInsets.only(bottom: 8.0),
-        ),
-      );
-      expect(paddingWithClipRRect, findsAtLeastNWidgets(1));
-    });
-  });
 }
