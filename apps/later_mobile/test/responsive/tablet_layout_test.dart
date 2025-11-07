@@ -5,7 +5,7 @@ import 'package:later_mobile/core/responsive/responsive_layout.dart';
 import 'package:later_mobile/widgets/navigation/app_sidebar.dart';
 import 'package:later_mobile/widgets/navigation/icon_only_bottom_nav.dart';
 
-import "../test_helpers.dart";
+import '../test_helpers.dart';
 
 /// Responsive Behavior Test Suite: Tablet Layout (768px - 1023px)
 ///

@@ -4,7 +4,7 @@ import 'package:later_mobile/core/responsive/breakpoints.dart';
 import 'package:later_mobile/widgets/navigation/app_sidebar.dart';
 import 'package:later_mobile/widgets/navigation/icon_only_bottom_nav.dart';
 
-import "../test_helpers.dart";
+import '../test_helpers.dart';
 
 /// Responsive Behavior Test Suite: Orientation Tests
 ///
