@@ -89,6 +89,15 @@ void main() {
     return createTestWidget(list, screenSize: const Size(1200, 800));
   }
 
+  /// Helper to wait for async operations to complete
+  /// Use this instead of pumpAndSettle() when screen loads async data
+  Future<void> pumpAndWaitForAsync(WidgetTester tester, {int pumps = 3}) async {
+    // Multiple pump cycles to handle async operations and animations
+    for (int i = 0; i < pumps; i++) {
+      await tester.pump(const Duration(milliseconds: 100));
+    }
+  }
+
   group('ListDetailScreen - Rendering', () {
     testWidgets('renders with list name in AppBar', (
       WidgetTester tester,
@@ -98,13 +107,13 @@ void main() {
         spaceId: 'space-1',
         userId: 'test-user-id',
         name: 'Shopping List',
-        
-        
       );
       fakeListRepository.setLists([list]);
+      fakeListRepository.setItemsForList('list-1', []); // Initialize empty items
+      fakeListRepository.setItemsForList('list-1', []); // No items
 
       await tester.pumpWidget(createTestWidget(list));
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Check for list name in AppBar
       expect(find.text('Shopping List'), findsOneWidget);
@@ -122,9 +131,10 @@ void main() {
         
       );
       fakeListRepository.setLists([list]);
+      fakeListRepository.setItemsForList('list-1', []); // Initialize empty items
 
       await tester.pumpWidget(createTestWidget(list));
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Check for custom icon
       expect(find.text('🛒'), findsOneWidget);
@@ -142,9 +152,10 @@ void main() {
         
       );
       fakeListRepository.setLists([list]);
+      fakeListRepository.setItemsForList('list-1', []); // Initialize empty items
 
       await tester.pumpWidget(createTestWidget(list));
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Check for empty state
       expect(find.text('No items yet'), findsOneWidget);
@@ -166,13 +177,14 @@ void main() {
         
       );
       fakeListRepository.setLists([list]);
+      fakeListRepository.setItemsForList('list-1', []); // Initialize empty items
       fakeListRepository.setItemsForList('list-1', [
         ListItem(id: 'item-1', title: 'Milk', sortOrder: 0, listId: 'list-1'),
         ListItem(id: 'item-2', title: 'Eggs', sortOrder: 1, listId: 'list-1'),
       ]);
 
       await tester.pumpWidget(createTestWidget(list));
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Check for list items
       expect(find.text('Milk'), findsOneWidget);
@@ -193,13 +205,14 @@ void main() {
         
       );
       fakeListRepository.setLists([list]);
+      fakeListRepository.setItemsForList('list-1', []); // Initialize empty items
       fakeListRepository.setItemsForList('list-1', [
         ListItem(id: 'item-1', title: 'First step', sortOrder: 0, listId: 'list-1'),
         ListItem(id: 'item-2', title: 'Second step', sortOrder: 1, listId: 'list-1'),
       ]);
 
       await tester.pumpWidget(createTestWidget(list));
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Check for numbered items
       expect(find.text('First step'), findsOneWidget);
@@ -220,6 +233,7 @@ void main() {
         checkedItemCount: 1,
       );
       fakeListRepository.setLists([list]);
+      fakeListRepository.setItemsForList('list-1', []); // Initialize empty items
       fakeListRepository.setItemsForList('list-1', [
         ListItem(id: 'item-1', title: 'Task 1', sortOrder: 0, listId: 'list-1'),
         ListItem(
@@ -232,7 +246,7 @@ void main() {
       ]);
 
       await tester.pumpWidget(createTestWidget(list));
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Check for checkbox items
       expect(find.text('Task 1'), findsOneWidget);
@@ -252,9 +266,10 @@ void main() {
         
       );
       fakeListRepository.setLists([list]);
+      fakeListRepository.setItemsForList('list-1', []); // Initialize empty items
 
       await tester.pumpWidget(createTestWidget(list));
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Check for ResponsiveFab
       expect(find.byType(ResponsiveFab), findsOneWidget);
@@ -270,9 +285,10 @@ void main() {
         
       );
       fakeListRepository.setLists([list]);
+      fakeListRepository.setItemsForList('list-1', []); // Initialize empty items
 
       await tester.pumpWidget(createTestWidget(list));
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Check for menu button
       expect(find.byType(PopupMenuButton<String>), findsOneWidget);
@@ -290,24 +306,25 @@ void main() {
         
       );
       fakeListRepository.setLists([list]);
+      fakeListRepository.setItemsForList('list-1', []); // Initialize empty items
 
       await tester.pumpWidget(createTestWidget(list));
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Tap on the name to edit
       await tester.tap(find.text('Original Name'));
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Should show TextField
       expect(find.byType(TextField), findsOneWidget);
 
       // Enter new name
       await tester.enterText(find.byType(TextField), 'Updated Name');
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Submit by pressing enter or unfocusing
       await tester.testTextInput.receiveAction(TextInputAction.done);
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Wait for debounce
       await tester.pump(const Duration(milliseconds: 600));
@@ -329,21 +346,22 @@ void main() {
         
       );
       fakeListRepository.setLists([list]);
+      fakeListRepository.setItemsForList('list-1', []); // Initialize empty items
 
       await tester.pumpWidget(createTestWidget(list));
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Tap on the name to edit
       await tester.tap(find.text('Original Name'));
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Enter new name
       await tester.enterText(find.byType(TextField), 'Updated Name');
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Submit
       await tester.testTextInput.receiveAction(TextInputAction.done);
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Wait for debounce
       await tester.pump(const Duration(milliseconds: 100));
@@ -364,21 +382,22 @@ void main() {
         
       );
       fakeListRepository.setLists([list]);
+      fakeListRepository.setItemsForList('list-1', []); // Initialize empty items
 
       await tester.pumpWidget(createTestWidget(list));
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Tap on the name to edit
       await tester.tap(find.text('Original Name'));
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Try to set empty name
       await tester.enterText(find.byType(TextField), '   ');
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Submit
       await tester.testTextInput.receiveAction(TextInputAction.done);
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Wait for debounce
       await tester.pump(const Duration(milliseconds: 600));
@@ -399,13 +418,14 @@ void main() {
         
       );
       fakeListRepository.setLists([list]);
+      fakeListRepository.setItemsForList('list-1', []); // Initialize empty items
 
       await tester.pumpWidget(createTestWidget(list));
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Tap FAB to add item
       await tester.tap(find.byType(ResponsiveFab));
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Should show modal with BottomSheetContainer
       expect(find.byType(BottomSheetContainer), findsOneWidget);
@@ -425,16 +445,17 @@ void main() {
         
       );
       fakeListRepository.setLists([list]);
+      fakeListRepository.setItemsForList('list-1', []); // Initialize empty items
 
       await tester.pumpWidget(createTestWidget(list));
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Verify empty state initially
       expect(find.text('No items yet'), findsOneWidget);
 
       // Tap FAB
       await tester.tap(find.byType(ResponsiveFab));
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // We have dialog open, enter text in the title field
       // Find the first TextField inside the dialog (by checking for label)
@@ -442,11 +463,11 @@ void main() {
         find.widgetWithText(TextField, 'Title *'),
         'New Item',
       );
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Tap Add button in dialog
       await tester.tap(find.widgetWithText(ElevatedButton, 'Add'));
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Verify item was added to repository
       final items = await fakeListRepository.getListItemsByListId('list-1');
@@ -464,16 +485,17 @@ void main() {
         
       );
       fakeListRepository.setLists([list]);
+      fakeListRepository.setItemsForList('list-1', []); // Initialize empty items
       fakeListRepository.setItemsForList('list-1', [
         ListItem(id: 'item-1', title: 'Existing Item', sortOrder: 0, listId: 'list-1'),
       ]);
 
       await tester.pumpWidget(createTestWidget(list));
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Long press on item
       await tester.longPress(find.text('Existing Item'));
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Should show edit dialog
       expect(find.text('Edit Item'), findsOneWidget);
@@ -492,19 +514,20 @@ void main() {
         
       );
       fakeListRepository.setLists([list]);
+      fakeListRepository.setItemsForList('list-1', []); // Initialize empty items
       fakeListRepository.setItemsForList('list-1', [
         ListItem(id: 'item-1', title: 'Task', sortOrder: 0, listId: 'list-1'),
       ]);
 
       await tester.pumpWidget(createTestWidget(list));
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Find and tap checkbox
       final checkbox = find.byType(Checkbox);
       expect(checkbox, findsOneWidget);
 
       await tester.tap(checkbox);
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Verify item was toggled
       final items = await fakeListRepository.getListItemsByListId('list-1');
@@ -521,12 +544,13 @@ void main() {
         
       );
       fakeListRepository.setLists([list]);
+      fakeListRepository.setItemsForList('list-1', []); // Initialize empty items
       fakeListRepository.setItemsForList('list-1', [
         ListItem(id: 'item-1', title: 'Item to Delete', sortOrder: 0, listId: 'list-1'),
       ]);
 
       await tester.pumpWidget(createTestWidget(list));
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Find Dismissible
       final dismissible = find.byType(Dismissible);
@@ -534,7 +558,7 @@ void main() {
 
       // Swipe to delete
       await tester.drag(dismissible, const Offset(-500, 0));
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Should show delete confirmation
       expect(find.text('Delete Item'), findsOneWidget);
@@ -552,20 +576,21 @@ void main() {
         
       );
       fakeListRepository.setLists([list]);
+      fakeListRepository.setItemsForList('list-1', []); // Initialize empty items
       fakeListRepository.setItemsForList('list-1', [
         ListItem(id: 'item-1', title: 'Item to Delete', sortOrder: 0, listId: 'list-1'),
       ]);
 
       await tester.pumpWidget(createTestWidget(list));
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Swipe to delete
       await tester.drag(find.byType(Dismissible), const Offset(-500, 0));
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Confirm deletion
       await tester.tap(find.text('Delete'));
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Verify item was deleted
       expect(find.text('Item to Delete'), findsNothing);
@@ -585,6 +610,7 @@ void main() {
         
       );
       fakeListRepository.setLists([list]);
+      fakeListRepository.setItemsForList('list-1', []); // Initialize empty items
       fakeListRepository.setItemsForList('list-1', [
         ListItem(id: 'item-1', title: 'First', sortOrder: 0, listId: 'list-1'),
         ListItem(id: 'item-2', title: 'Second', sortOrder: 1, listId: 'list-1'),
@@ -592,7 +618,7 @@ void main() {
       ]);
 
       await tester.pumpWidget(createTestWidget(list));
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Check for ReorderableListView
       expect(find.byType(ReorderableListView), findsOneWidget);
@@ -610,13 +636,14 @@ void main() {
         
       );
       fakeListRepository.setLists([list]);
+      fakeListRepository.setItemsForList('list-1', []); // Initialize empty items
 
       await tester.pumpWidget(createTestWidget(list));
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Tap menu button
       await tester.tap(find.byType(PopupMenuButton<String>));
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Check for menu options
       expect(find.text('Change Style'), findsOneWidget);
@@ -634,17 +661,18 @@ void main() {
         
       );
       fakeListRepository.setLists([list]);
+      fakeListRepository.setItemsForList('list-1', []); // Initialize empty items
 
       await tester.pumpWidget(createTestWidget(list));
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Tap menu button
       await tester.tap(find.byType(PopupMenuButton<String>));
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Tap Change Style
       await tester.tap(find.text('Change Style'));
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Should show style dialog
       expect(find.text('Select Style'), findsOneWidget);
@@ -663,17 +691,18 @@ void main() {
         
       );
       fakeListRepository.setLists([list]);
+      fakeListRepository.setItemsForList('list-1', []); // Initialize empty items
 
       await tester.pumpWidget(createTestWidget(list));
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Tap menu button
       await tester.tap(find.byType(PopupMenuButton<String>));
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Tap Change Icon
       await tester.tap(find.text('Change Icon'));
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Should show icon dialog
       expect(find.text('Select Icon'), findsOneWidget);
@@ -689,20 +718,21 @@ void main() {
         
       );
       fakeListRepository.setLists([list]);
+      fakeListRepository.setItemsForList('list-1', []); // Initialize empty items
       fakeListRepository.setItemsForList('list-1', [
         ListItem(id: 'item-1', title: 'Item', sortOrder: 0, listId: 'list-1'),
       ]);
 
       await tester.pumpWidget(createTestWidget(list));
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Tap menu button
       await tester.tap(find.byType(PopupMenuButton<String>));
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Tap Delete List
       await tester.tap(find.text('Delete List'));
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Should show confirmation
       expect(
@@ -728,6 +758,7 @@ void main() {
         checkedItemCount: 2,
       );
       fakeListRepository.setLists([list]);
+      fakeListRepository.setItemsForList('list-1', []); // Initialize empty items
       fakeListRepository.setItemsForList('list-1', [
         ListItem(
           id: 'item-1',
@@ -747,7 +778,7 @@ void main() {
       ]);
 
       await tester.pumpWidget(createTestWidget(list));
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Check for progress text
       expect(find.text('2/3 completed'), findsOneWidget);
@@ -768,13 +799,14 @@ void main() {
         
       );
       fakeListRepository.setLists([list]);
+      fakeListRepository.setItemsForList('list-1', []); // Initialize empty items
       fakeListRepository.setItemsForList('list-1', [
         ListItem(id: 'item-1', title: 'Item 1', sortOrder: 0, listId: 'list-1'),
         ListItem(id: 'item-2', title: 'Item 2', sortOrder: 1, listId: 'list-1'),
       ]);
 
       await tester.pumpWidget(createTestWidget(list));
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Should not show progress
       expect(find.text('completed'), findsNothing);
@@ -795,25 +827,26 @@ void main() {
         
       );
       fakeListRepository.setLists([list]);
+      fakeListRepository.setItemsForList('list-1', []); // Initialize empty items
 
       await tester.pumpWidget(createTestWidget(list));
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Enable error after initial load
       fakeListRepository.setShouldThrowError(true);
 
       // Try to add an item (which should fail)
       await tester.tap(find.byType(ResponsiveFab));
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Enter title
       final textFields = find.byType(TextField);
       await tester.enterText(textFields.first, 'Test Item');
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Tap Add button
       await tester.tap(find.widgetWithText(ElevatedButton, 'Add'));
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Should show error - check for any error text in snackbar
       expect(find.textContaining('Failed to add item'), findsOneWidget);
@@ -833,16 +866,17 @@ void main() {
         
       );
       fakeListRepository.setLists([list]);
+      fakeListRepository.setItemsForList('list-1', []); // Initialize empty items
 
       await tester.pumpWidget(createTestWidget(list));
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Edit name
       await tester.tap(find.text('Original'));
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       await tester.enterText(find.byType(TextField), 'Updated');
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Wait for debounce (500ms)
       await tester.pump(const Duration(milliseconds: 600));
@@ -865,12 +899,13 @@ void main() {
         
       );
       fakeListRepository.setLists([list]);
+      fakeListRepository.setItemsForList('list-1', []); // Initialize empty items
       fakeListRepository.setItemsForList('list-1', [
         ListItem(id: 'item-1', title: 'Item 1', sortOrder: 0, listId: 'list-1'),
       ]);
 
       await tester.pumpWidget(createTestWidget(list));
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Check for semantic labels
       expect(find.bySemanticsLabel(RegExp('.*Item 1.*')), findsOneWidget);
@@ -888,9 +923,10 @@ void main() {
         
       );
       fakeListRepository.setLists([list]);
+      fakeListRepository.setItemsForList('list-1', []); // Initialize empty items
 
       await tester.pumpWidget(createMobileTestWidget(list));
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Should have ResponsiveFab
       expect(find.byType(ResponsiveFab), findsOneWidget);
@@ -912,9 +948,10 @@ void main() {
         
       );
       fakeListRepository.setLists([list]);
+      fakeListRepository.setItemsForList('list-1', []); // Initialize empty items
 
       await tester.pumpWidget(createDesktopTestWidget(list));
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Should have ResponsiveFab
       expect(find.byType(ResponsiveFab), findsOneWidget);
@@ -936,13 +973,14 @@ void main() {
         
       );
       fakeListRepository.setLists([list]);
+      fakeListRepository.setItemsForList('list-1', []); // Initialize empty items
 
       await tester.pumpWidget(createMobileTestWidget(list));
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Tap FAB
       await tester.tap(find.byType(ResponsiveFab));
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Modal should open
       expect(find.byType(BottomSheetContainer), findsOneWidget);
@@ -959,13 +997,14 @@ void main() {
         
       );
       fakeListRepository.setLists([list]);
+      fakeListRepository.setItemsForList('list-1', []); // Initialize empty items
 
       await tester.pumpWidget(createDesktopTestWidget(list));
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Tap FAB
       await tester.tap(find.byType(ResponsiveFab));
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Modal should open
       expect(find.byType(BottomSheetContainer), findsOneWidget);
@@ -986,13 +1025,14 @@ void main() {
         
       );
       fakeListRepository.setLists([list]);
+      fakeListRepository.setItemsForList('list-1', []); // Initialize empty items
 
       await tester.pumpWidget(createMobileTestWidget(list));
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Open add item modal
       await tester.tap(find.byType(ResponsiveFab));
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Should show BottomSheetContainer with title
       expect(find.byType(BottomSheetContainer), findsOneWidget);
@@ -1021,13 +1061,14 @@ void main() {
         
       );
       fakeListRepository.setLists([list]);
+      fakeListRepository.setItemsForList('list-1', []); // Initialize empty items
 
       await tester.pumpWidget(createDesktopTestWidget(list));
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Open add item modal
       await tester.tap(find.byType(ResponsiveFab));
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Should show Dialog containing BottomSheetContainer
       expect(find.byType(Dialog), findsOneWidget);
@@ -1051,16 +1092,17 @@ void main() {
         
       );
       fakeListRepository.setLists([list]);
+      fakeListRepository.setItemsForList('list-1', []); // Initialize empty items
       fakeListRepository.setItemsForList('list-1', [
         ListItem(id: 'item-1', title: 'Existing Item', sortOrder: 0, listId: 'list-1'),
       ]);
 
       await tester.pumpWidget(createMobileTestWidget(list));
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Long press to edit
       await tester.longPress(find.text('Existing Item'));
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Should show BottomSheetContainer with "Edit Item" title
       expect(find.byType(BottomSheetContainer), findsOneWidget);
@@ -1085,16 +1127,17 @@ void main() {
         
       );
       fakeListRepository.setLists([list]);
+      fakeListRepository.setItemsForList('list-1', []); // Initialize empty items
       fakeListRepository.setItemsForList('list-1', [
         ListItem(id: 'item-1', title: 'Existing Item', sortOrder: 0, listId: 'list-1'),
       ]);
 
       await tester.pumpWidget(createDesktopTestWidget(list));
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Long press to edit
       await tester.longPress(find.text('Existing Item'));
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Should show Dialog containing BottomSheetContainer
       expect(find.byType(Dialog), findsOneWidget);
@@ -1116,16 +1159,17 @@ void main() {
         
       );
       fakeListRepository.setLists([list]);
+      fakeListRepository.setItemsForList('list-1', []); // Initialize empty items
 
       await tester.pumpWidget(createMobileTestWidget(list));
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Open menu and select "Change Style"
       await tester.tap(find.byType(PopupMenuButton<String>));
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       await tester.tap(find.text('Change Style'));
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Should show BottomSheetContainer
       expect(find.byType(BottomSheetContainer), findsOneWidget);
@@ -1155,16 +1199,17 @@ void main() {
         
       );
       fakeListRepository.setLists([list]);
+      fakeListRepository.setItemsForList('list-1', []); // Initialize empty items
 
       await tester.pumpWidget(createDesktopTestWidget(list));
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Open menu and select "Change Style"
       await tester.tap(find.byType(PopupMenuButton<String>));
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       await tester.tap(find.text('Change Style'));
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Should show Dialog containing BottomSheetContainer
       expect(find.byType(Dialog), findsOneWidget);
@@ -1191,16 +1236,17 @@ void main() {
         
       );
       fakeListRepository.setLists([list]);
+      fakeListRepository.setItemsForList('list-1', []); // Initialize empty items
 
       await tester.pumpWidget(createMobileTestWidget(list));
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Open menu and select "Change Icon"
       await tester.tap(find.byType(PopupMenuButton<String>));
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       await tester.tap(find.text('Change Icon'));
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Should show BottomSheetContainer
       expect(find.byType(BottomSheetContainer), findsOneWidget);
@@ -1229,16 +1275,17 @@ void main() {
         
       );
       fakeListRepository.setLists([list]);
+      fakeListRepository.setItemsForList('list-1', []); // Initialize empty items
 
       await tester.pumpWidget(createDesktopTestWidget(list));
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Open menu and select "Change Icon"
       await tester.tap(find.byType(PopupMenuButton<String>));
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       await tester.tap(find.text('Change Icon'));
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Should show Dialog containing BottomSheetContainer
       expect(find.byType(Dialog), findsOneWidget);

@@ -101,24 +101,33 @@ void main() {
     return createTestWidget(note, screenSize: const Size(1200, 800));
   }
 
+  /// Helper to wait for async operations to complete
+  /// Use this instead of pumpAndSettle() when screen loads async data
+  Future<void> pumpAndWaitForAsync(WidgetTester tester, {int pumps = 3}) async {
+    // Multiple pump cycles to handle async operations and animations
+    for (int i = 0; i < pumps; i++) {
+      await tester.pump(const Duration(milliseconds: 100));
+    }
+  }
+
   group('NoteDetailScreen - UI Elements', () {
     testWidgets('should display note title in AppBar', (tester) async {
       await tester.pumpWidget(createTestWidget(testNote));
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       expect(find.text('Test Note'), findsOneWidget);
     });
 
     testWidgets('should display note content in TextField', (tester) async {
       await tester.pumpWidget(createTestWidget(testNote));
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       expect(find.text('This is the test content'), findsOneWidget);
     });
 
     testWidgets('should display existing tags as chips', (tester) async {
       await tester.pumpWidget(createTestWidget(testNote));
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       expect(find.text('tag1'), findsOneWidget);
       expect(find.text('tag2'), findsOneWidget);
@@ -126,7 +135,7 @@ void main() {
 
     testWidgets('should have multiline TextField for content', (tester) async {
       await tester.pumpWidget(createTestWidget(testNote));
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       final textField = tester.widget<TextField>(
         find.byKey(const Key('note_content_field')),
@@ -138,14 +147,14 @@ void main() {
 
     testWidgets('should display menu button in AppBar', (tester) async {
       await tester.pumpWidget(createTestWidget(testNote));
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       expect(find.byType(PopupMenuButton<String>), findsOneWidget);
     });
 
     testWidgets('should use note gradient for title', (tester) async {
       await tester.pumpWidget(createTestWidget(testNote));
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Verify ShaderMask is present (used by GradientText)
       expect(find.byType(ShaderMask), findsAtLeastNWidgets(1));
@@ -155,11 +164,11 @@ void main() {
   group('NoteDetailScreen - Title Editing', () {
     testWidgets('should allow tapping title to edit', (tester) async {
       await tester.pumpWidget(createTestWidget(testNote));
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Tap the title to start editing
       await tester.tap(find.text('Test Note'));
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Should show TextField for editing
       final editableFields = tester.widgetList<TextField>(
@@ -170,11 +179,11 @@ void main() {
 
     testWidgets('should save title on submit', (tester) async {
       await tester.pumpWidget(createTestWidget(testNote));
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Tap title to start editing
       await tester.tap(find.text('Test Note'));
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Find the title TextField (first one in AppBar)
       final titleFields = tester.widgetList<TextField>(find.byType(TextField));
@@ -183,7 +192,7 @@ void main() {
       // Change title
       await tester.enterText(find.byWidget(titleField), 'Updated Title');
       await tester.testTextInput.receiveAction(TextInputAction.done);
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Wait for debounce
       await tester.pump(const Duration(milliseconds: 2500));
@@ -202,7 +211,7 @@ void main() {
   group('NoteDetailScreen - Content Editing', () {
     testWidgets('should allow editing content', (tester) async {
       await tester.pumpWidget(createTestWidget(testNote));
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Find content field by key
       final contentField = find.byKey(const Key('note_content_field'));
@@ -210,21 +219,21 @@ void main() {
 
       // Edit content
       await tester.enterText(contentField, 'New content');
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       expect(find.text('New content'), findsOneWidget);
     });
 
     testWidgets('should auto-save content after 2 seconds', (tester) async {
       await tester.pumpWidget(createTestWidget(testNote));
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Edit content
       await tester.enterText(
         find.byKey(const Key('note_content_field')),
         'New content',
       );
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Wait for auto-save debounce (2000ms)
       await tester.pump(const Duration(milliseconds: 2500));
@@ -242,19 +251,19 @@ void main() {
   group('NoteDetailScreen - Tag Management', () {
     testWidgets('should display add tag button', (tester) async {
       await tester.pumpWidget(createTestWidget(testNote));
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       expect(find.byIcon(Icons.add), findsWidgets);
     });
 
     testWidgets('should show modal to add tag', (tester) async {
       await tester.pumpWidget(createTestWidget(testNote));
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Find and tap add tag button
       final addButton = find.widgetWithIcon(IconButton, Icons.add).first;
       await tester.tap(addButton);
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Should show modal (responsive based on screen size)
       expect(find.text('Add Tag'), findsOneWidget);
@@ -263,17 +272,17 @@ void main() {
 
     testWidgets('should add new tag', (tester) async {
       await tester.pumpWidget(createTestWidget(testNote));
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Tap add tag button
       final addButton = find.widgetWithIcon(IconButton, Icons.add).first;
       await tester.tap(addButton);
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Enter tag name
       await tester.enterText(find.byType(TextField).last, 'newtag');
       await tester.tap(find.text('Add'));
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Wait for auto-save
       await tester.pump(const Duration(milliseconds: 2500));
@@ -285,7 +294,7 @@ void main() {
 
     testWidgets('should remove tag when X is tapped', (tester) async {
       await tester.pumpWidget(createTestWidget(testNote));
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Find delete icon on first tag chip
       final deleteIcons = find.byIcon(Icons.close);
@@ -293,7 +302,7 @@ void main() {
 
       // Tap first delete icon
       await tester.tap(deleteIcons.first);
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Wait for auto-save
       await tester.pump(const Duration(milliseconds: 2500));
@@ -305,16 +314,16 @@ void main() {
 
     testWidgets('should not add duplicate tags', (tester) async {
       await tester.pumpWidget(createTestWidget(testNote));
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Try to add existing tag
       final addButton = find.widgetWithIcon(IconButton, Icons.add).first;
       await tester.tap(addButton);
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       await tester.enterText(find.byType(TextField).last, 'tag1');
       await tester.tap(find.text('Add'));
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Should show error
       expect(find.textContaining('already exists'), findsOneWidget);
@@ -322,19 +331,19 @@ void main() {
 
     testWidgets('should validate tag max length', (tester) async {
       await tester.pumpWidget(createTestWidget(testNote));
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Try to add very long tag
       final addButton = find.widgetWithIcon(IconButton, Icons.add).first;
       await tester.tap(addButton);
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       await tester.enterText(
         find.byType(TextField).last,
         'a' * 51, // More than 50 chars
       );
       await tester.tap(find.text('Add'));
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Should show error
       expect(find.textContaining('too long'), findsOneWidget);
@@ -344,26 +353,26 @@ void main() {
   group('NoteDetailScreen - Menu Actions', () {
     testWidgets('should show delete option in menu', (tester) async {
       await tester.pumpWidget(createTestWidget(testNote));
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Open menu
       await tester.tap(find.byType(PopupMenuButton<String>));
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       expect(find.text('Delete Note'), findsOneWidget);
     });
 
     testWidgets('should show delete confirmation dialog', (tester) async {
       await tester.pumpWidget(createTestWidget(testNote));
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Open menu
       await tester.tap(find.byType(PopupMenuButton<String>));
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Tap delete
       await tester.tap(find.text('Delete Note'));
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Should show confirmation
       expect(find.byType(AlertDialog), findsOneWidget);
@@ -372,17 +381,17 @@ void main() {
 
     testWidgets('should delete note on confirmation', (tester) async {
       await tester.pumpWidget(createTestWidget(testNote));
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Open menu and tap delete
       await tester.tap(find.byType(PopupMenuButton<String>));
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
       await tester.tap(find.text('Delete Note'));
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Confirm deletion
       await tester.tap(find.text('Delete'));
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Verify note was deleted from repository
       final deletedNote = await fakeNoteRepository.getById('note-1');
@@ -391,17 +400,17 @@ void main() {
 
     testWidgets('should cancel deletion', (tester) async {
       await tester.pumpWidget(createTestWidget(testNote));
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Open menu and tap delete
       await tester.tap(find.byType(PopupMenuButton<String>));
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
       await tester.tap(find.text('Delete Note'));
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Cancel
       await tester.tap(find.text('Cancel'));
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Verify note was NOT deleted from repository
       final note = await fakeNoteRepository.getById('note-1');
@@ -422,7 +431,7 @@ void main() {
       );
 
       await tester.pumpWidget(createTestWidget(emptyNote));
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Content field should be empty but functional
       final contentField = find.byKey(const Key('note_content_field'));
@@ -442,7 +451,7 @@ void main() {
       );
 
       await tester.pumpWidget(createTestWidget(emptyNote));
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       final contentField = tester.widget<TextField>(
         find.byKey(const Key('note_content_field')),
@@ -455,18 +464,18 @@ void main() {
   group('NoteDetailScreen - Save on Exit', () {
     testWidgets('should save changes when navigating back', (tester) async {
       await tester.pumpWidget(createTestWidget(testNote));
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Make changes
       await tester.enterText(
         find.byKey(const Key('note_content_field')),
         'Modified content',
       );
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Wait for debounce and trigger save
       await tester.pump(const Duration(milliseconds: 2500));
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Verify content was saved
       final updatedNote = await fakeNoteRepository.getById('note-1');
@@ -480,14 +489,14 @@ void main() {
       fakeNoteRepository.setShouldThrowError(true);
 
       await tester.pumpWidget(createTestWidget(testNote));
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Edit content
       await tester.enterText(
         find.byKey(const Key('note_content_field')),
         'New content',
       );
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Wait for auto-save
       await tester.pump(const Duration(milliseconds: 2500));
@@ -503,15 +512,15 @@ void main() {
       fakeNoteRepository.setShouldThrowError(true);
 
       await tester.pumpWidget(createTestWidget(testNote));
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Try to delete
       await tester.tap(find.byType(PopupMenuButton<String>));
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
       await tester.tap(find.text('Delete Note'));
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
       await tester.tap(find.text('Delete'));
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Should show error
       expect(find.byType(SnackBar), findsOneWidget);
@@ -522,7 +531,7 @@ void main() {
   group('NoteDetailScreen - Styling and Design', () {
     testWidgets('should use AppColors.noteGradient for title', (tester) async {
       await tester.pumpWidget(createTestWidget(testNote));
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Verify gradient is applied (ShaderMask present)
       expect(find.byType(ShaderMask), findsWidgets);
@@ -530,7 +539,7 @@ void main() {
 
     testWidgets('should use AppTypography styles', (tester) async {
       await tester.pumpWidget(createTestWidget(testNote));
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Find text widgets and verify they have styles
       final textWidgets = tester.widgetList<Text>(find.byType(Text));
@@ -539,7 +548,7 @@ void main() {
 
     testWidgets('should use AppSpacing for layout', (tester) async {
       await tester.pumpWidget(createTestWidget(testNote));
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Verify SizedBox widgets exist for spacing
       expect(find.byType(SizedBox), findsWidgets);
@@ -549,7 +558,7 @@ void main() {
   group('NoteDetailScreen - Accessibility', () {
     testWidgets('should have semantic labels', (tester) async {
       await tester.pumpWidget(createTestWidget(testNote));
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Verify semantic labels exist
       final semantics = tester.getSemantics(find.byType(Scaffold));
@@ -558,7 +567,7 @@ void main() {
 
     testWidgets('should support screen readers', (tester) async {
       await tester.pumpWidget(createTestWidget(testNote));
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Text fields should be accessible
       final contentField = find.byKey(const Key('note_content_field'));
@@ -572,12 +581,12 @@ void main() {
       tester,
     ) async {
       await tester.pumpWidget(createMobileTestWidget(testNote));
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Tap add tag button
       final addButton = find.widgetWithIcon(IconButton, Icons.add).first;
       await tester.tap(addButton);
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // On mobile, should show BottomSheetContainer (no AlertDialog)
       expect(find.byType(AlertDialog), findsNothing);
@@ -589,12 +598,12 @@ void main() {
       tester,
     ) async {
       await tester.pumpWidget(createDesktopTestWidget(testNote));
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Tap add tag button
       final addButton = find.widgetWithIcon(IconButton, Icons.add).first;
       await tester.tap(addButton);
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // On desktop, should show Dialog
       expect(find.byType(Dialog), findsOneWidget);
@@ -605,17 +614,17 @@ void main() {
       tester,
     ) async {
       await tester.pumpWidget(createMobileTestWidget(testNote));
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Open add tag modal
       final addButton = find.widgetWithIcon(IconButton, Icons.add).first;
       await tester.tap(addButton);
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Enter tag name and submit
       await tester.enterText(find.byType(TextField).last, 'newtag');
       await tester.tap(find.text('Add'));
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Wait for auto-save
       await tester.pump(const Duration(milliseconds: 2500));
@@ -629,17 +638,17 @@ void main() {
       tester,
     ) async {
       await tester.pumpWidget(createDesktopTestWidget(testNote));
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Open add tag modal
       final addButton = find.widgetWithIcon(IconButton, Icons.add).first;
       await tester.tap(addButton);
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Enter tag name and submit
       await tester.enterText(find.byType(TextField).last, 'newtag');
       await tester.tap(find.text('Add'));
-      await tester.pumpAndSettle();
+      await pumpAndWaitForAsync(tester);
 
       // Wait for auto-save
       await tester.pump(const Duration(milliseconds: 2500));
