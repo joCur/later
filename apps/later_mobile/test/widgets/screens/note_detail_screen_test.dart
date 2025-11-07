@@ -188,8 +188,10 @@ void main() {
       // Wait for debounce
       await tester.pump(const Duration(milliseconds: 2500));
 
-      // Verify updateNote was called
-      verify(mockContentProvider.updateNote(any)).called(greaterThan(0));
+      // With fake repositories, the note is automatically updated in the provider
+      // We can verify by checking the repository state if needed
+      final updatedNote = await fakeNoteRepository.getById('note-1');
+      expect(updatedNote?.title, 'Updated Title');
     });
 
     // Note: Empty title validation is implemented in the component
@@ -227,8 +229,9 @@ void main() {
       // Wait for auto-save debounce (2000ms)
       await tester.pump(const Duration(milliseconds: 2500));
 
-      // Verify updateNote was called
-      verify(mockContentProvider.updateNote(any)).called(greaterThan(0));
+      // Verify content was saved
+      final updatedNote = await fakeNoteRepository.getById('note-1');
+      expect(updatedNote?.content, 'New content');
     });
 
     // Note: Saving indicator test is flaky due to async timing.
@@ -275,8 +278,9 @@ void main() {
       // Wait for auto-save
       await tester.pump(const Duration(milliseconds: 2500));
 
-      // Should call updateNote
-      verify(mockContentProvider.updateNote(any)).called(greaterThan(0));
+      // Verify tag was added
+      final updatedNote = await fakeNoteRepository.getById('note-1');
+      expect(updatedNote?.tags, contains('newtag'));
     });
 
     testWidgets('should remove tag when X is tapped', (tester) async {
@@ -294,8 +298,9 @@ void main() {
       // Wait for auto-save
       await tester.pump(const Duration(milliseconds: 2500));
 
-      // Should update note
-      verify(mockContentProvider.updateNote(any)).called(greaterThan(0));
+      // Verify tag was removed
+      final updatedNote = await fakeNoteRepository.getById('note-1');
+      expect(updatedNote?.tags.length, lessThan(testNote.tags.length));
     });
 
     testWidgets('should not add duplicate tags', (tester) async {
@@ -379,10 +384,9 @@ void main() {
       await tester.tap(find.text('Delete'));
       await tester.pumpAndSettle();
 
-      // Should call deleteNote
-      verify(
-        mockContentProvider.deleteNote('note-1'),
-      ).called(1);
+      // Verify note was deleted from repository
+      final deletedNote = await fakeNoteRepository.getById('note-1');
+      expect(deletedNote, isNull);
     });
 
     testWidgets('should cancel deletion', (tester) async {
@@ -399,8 +403,9 @@ void main() {
       await tester.tap(find.text('Cancel'));
       await tester.pumpAndSettle();
 
-      // Should not call deleteNote
-      verifyNever(mockContentProvider.deleteNote(any));
+      // Verify note was NOT deleted from repository
+      final note = await fakeNoteRepository.getById('note-1');
+      expect(note, isNotNull);
     });
   });
 
@@ -463,17 +468,16 @@ void main() {
       await tester.pump(const Duration(milliseconds: 2500));
       await tester.pumpAndSettle();
 
-      // Should have saved
-      verify(mockContentProvider.updateNote(any)).called(greaterThan(0));
+      // Verify content was saved
+      final updatedNote = await fakeNoteRepository.getById('note-1');
+      expect(updatedNote?.content, 'Modified content');
     });
   });
 
   group('NoteDetailScreen - Error Handling', () {
     testWidgets('should show error message when save fails', (tester) async {
-      // Setup provider to throw error
-      when(
-        mockContentProvider.updateNote(any),
-      ).thenThrow(Exception('Save failed'));
+      // Setup repository to throw error
+      fakeNoteRepository.setShouldThrowError(true);
 
       await tester.pumpWidget(createTestWidget(testNote));
       await tester.pumpAndSettle();
@@ -495,9 +499,8 @@ void main() {
     });
 
     testWidgets('should show error when delete fails', (tester) async {
-      when(
-        mockContentProvider.deleteNote(any),
-      ).thenThrow(Exception('Delete failed'));
+      // Setup repository to throw error
+      fakeNoteRepository.setShouldThrowError(true);
 
       await tester.pumpWidget(createTestWidget(testNote));
       await tester.pumpAndSettle();
@@ -614,8 +617,12 @@ void main() {
       await tester.tap(find.text('Add'));
       await tester.pumpAndSettle();
 
-      // Should call updateNote
-      verify(mockContentProvider.updateNote(any)).called(greaterThan(0));
+      // Wait for auto-save
+      await tester.pump(const Duration(milliseconds: 2500));
+
+      // Verify tag was added
+      final updatedNote = await fakeNoteRepository.getById('note-1');
+      expect(updatedNote?.tags, contains('newtag'));
     });
 
     testWidgets('should add tag successfully from desktop dialog', (
@@ -634,8 +641,12 @@ void main() {
       await tester.tap(find.text('Add'));
       await tester.pumpAndSettle();
 
-      // Should call updateNote
-      verify(mockContentProvider.updateNote(any)).called(greaterThan(0));
+      // Wait for auto-save
+      await tester.pump(const Duration(milliseconds: 2500));
+
+      // Verify tag was added
+      final updatedNote = await fakeNoteRepository.getById('note-1');
+      expect(updatedNote?.tags, contains('newtag'));
     });
   });
 }
