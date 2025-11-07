@@ -196,7 +196,7 @@ The project uses strict linting rules (see `analysis_options.yaml`):
 - Widget tests for UI components
 - Mock Supabase operations in tests using `mockito`
 - Use Supabase local development server for integration tests
-- Note: Test suite is currently undergoing migration from Hive to Supabase
+- Note: Test suite requires updates to work with Supabase (see plan for future test migration strategy)
 
 ### Widget Testing with test_helpers.dart
 
