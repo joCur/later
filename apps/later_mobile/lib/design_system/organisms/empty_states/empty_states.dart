@@ -7,3 +7,4 @@ export 'empty_state.dart';
 export 'welcome_state.dart';
 export 'empty_space_state.dart';
 export 'empty_search_state.dart';
+export 'no_spaces_state.dart';
