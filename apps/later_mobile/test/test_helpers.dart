@@ -9,7 +9,6 @@ import 'package:provider/provider.dart';
 
 import 'test_helpers.mocks.dart';
 
-
 /// Creates a MaterialApp with proper theme configuration and mock providers
 /// for widget tests.
 ///
@@ -32,8 +31,7 @@ Widget testApp(Widget child) {
   final mockTheme = MockThemeProvider();
 
   // Set up basic mock behavior - stub async methods that return Futures
-  when(mockSpaces.getSpaceItemCount(any))
-      .thenAnswer((_) async => 0);
+  when(mockSpaces.getSpaceItemCount(any)).thenAnswer((_) async => 0);
 
   return MultiProvider(
     providers: [
@@ -73,8 +71,7 @@ Widget testAppDark(Widget child) {
   final mockTheme = MockThemeProvider();
 
   // Set up basic mock behavior - stub async methods that return Futures
-  when(mockSpaces.getSpaceItemCount(any))
-      .thenAnswer((_) async => 0);
+  when(mockSpaces.getSpaceItemCount(any)).thenAnswer((_) async => 0);
 
   return MultiProvider(
     providers: [
