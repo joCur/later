@@ -515,7 +515,14 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   /// Build simple FAB for creating content
-  Widget _buildFAB(BuildContext context) {
+  /// Returns null when there are no spaces (user should create a space first)
+  Widget? _buildFAB(BuildContext context, SpacesProvider spacesProvider) {
+    // Don't show FAB if there are no spaces
+    // The NoSpacesState has its own action button to create the first space
+    if (spacesProvider.spaces.isEmpty) {
+      return null;
+    }
+
     return ResponsiveFab(
       icon: Icons.add,
       label: 'Create',
@@ -665,7 +672,7 @@ class _HomeScreenState extends State<HomeScreen> {
           setState(() => _selectedNavIndex = index);
         },
       ),
-      floatingActionButton: _buildFAB(context),
+      floatingActionButton: _buildFAB(context, spacesProvider),
     );
   }
 
@@ -753,7 +760,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
-      floatingActionButton: _buildFAB(context),
+      floatingActionButton: _buildFAB(context, spacesProvider),
     );
   }
 
