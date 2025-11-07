@@ -145,8 +145,8 @@ void main() {
     test('should load spaces successfully', () async {
       // Arrange
       final testSpaces = [
-        Space(id: '1', name: 'Work', icon: '💼', color: '#FF5733'),
-        Space(id: '2', name: 'Personal', icon: '🏠', color: '#33FF57'),
+        Space(id: '1', userId: 'test-user', name: 'Work', icon: '💼', color: '#FF5733'),
+        Space(id: '2', userId: 'test-user', name: 'Personal', icon: '🏠', color: '#33FF57'),
       ];
       mockRepository.mockSpaces = testSpaces;
 
@@ -164,8 +164,8 @@ void main() {
     test('should set first space as current space when loading', () async {
       // Arrange
       final testSpaces = [
-        Space(id: '1', name: 'Work'),
-        Space(id: '2', name: 'Personal'),
+        Space(id: '1', userId: 'test-user', name: 'Work'),
+        Space(id: '2', userId: 'test-user', name: 'Personal'),
       ];
       mockRepository.mockSpaces = testSpaces;
 
@@ -180,9 +180,9 @@ void main() {
     test('should exclude archived spaces by default', () async {
       // Arrange
       final testSpaces = [
-        Space(id: '1', name: 'Work'),
-        Space(id: '2', name: 'Old Project', isArchived: true),
-        Space(id: '3', name: 'Personal'),
+        Space(id: '1', userId: 'test-user', name: 'Work'),
+        Space(id: '2', userId: 'test-user', name: 'Old Project', isArchived: true),
+        Space(id: '3', userId: 'test-user', name: 'Personal'),
       ];
       mockRepository.mockSpaces = testSpaces;
 
@@ -197,9 +197,9 @@ void main() {
     test('should include archived spaces when requested', () async {
       // Arrange
       final testSpaces = [
-        Space(id: '1', name: 'Work'),
-        Space(id: '2', name: 'Old Project', isArchived: true),
-        Space(id: '3', name: 'Personal'),
+        Space(id: '1', userId: 'test-user', name: 'Work'),
+        Space(id: '2', userId: 'test-user', name: 'Old Project', isArchived: true),
+        Space(id: '3', userId: 'test-user', name: 'Personal'),
       ];
       mockRepository.mockSpaces = testSpaces;
 
@@ -245,7 +245,7 @@ void main() {
 
     test('should notify listeners on successful load', () async {
       // Arrange
-      mockRepository.mockSpaces = [Space(id: '1', name: 'Work')];
+      mockRepository.mockSpaces = [Space(id: '1', userId: 'test-user', name: 'Work')];
       int notifyCount = 0;
       provider.addListener(() {
         notifyCount++;
@@ -261,8 +261,8 @@ void main() {
     test('should not set current space if already set', () async {
       // Arrange
       final testSpaces = [
-        Space(id: '1', name: 'Work'),
-        Space(id: '2', name: 'Personal'),
+        Space(id: '1', userId: 'test-user', name: 'Work'),
+        Space(id: '2', userId: 'test-user', name: 'Personal'),
       ];
       mockRepository.mockSpaces = testSpaces;
       await provider.loadSpaces();
@@ -278,9 +278,9 @@ void main() {
     test('should restore persisted space selection on load', () async {
       // Arrange
       final testSpaces = [
-        Space(id: '1', name: 'Work'),
-        Space(id: '2', name: 'Personal'),
-        Space(id: '3', name: 'Projects'),
+        Space(id: '1', userId: 'test-user', name: 'Work'),
+        Space(id: '2', userId: 'test-user', name: 'Personal'),
+        Space(id: '3', userId: 'test-user', name: 'Projects'),
       ];
       mockRepository.mockSpaces = testSpaces;
 
@@ -301,8 +301,8 @@ void main() {
       () async {
         // Arrange
         final testSpaces = [
-          Space(id: '1', name: 'Work'),
-          Space(id: '2', name: 'Personal'),
+          Space(id: '1', userId: 'test-user', name: 'Work'),
+          Space(id: '2', userId: 'test-user', name: 'Personal'),
         ];
         mockRepository.mockSpaces = testSpaces;
 
@@ -322,8 +322,8 @@ void main() {
     test('should clear persisted space ID when it does not exist', () async {
       // Arrange
       final testSpaces = [
-        Space(id: '1', name: 'Work'),
-        Space(id: '2', name: 'Personal'),
+        Space(id: '1', userId: 'test-user', name: 'Work'),
+        Space(id: '2', userId: 'test-user', name: 'Personal'),
       ];
       mockRepository.mockSpaces = testSpaces;
 
@@ -344,9 +344,9 @@ void main() {
       () async {
         // Arrange
         final testSpaces = [
-          Space(id: '1', name: 'Work'),
-          Space(id: '2', name: 'Personal'),
-          Space(id: '3', name: 'Projects'),
+          Space(id: '1', userId: 'test-user', name: 'Work'),
+          Space(id: '2', userId: 'test-user', name: 'Personal'),
+          Space(id: '3', userId: 'test-user', name: 'Projects'),
         ];
         mockRepository.mockSpaces = testSpaces;
 
@@ -365,8 +365,8 @@ void main() {
     test('should handle null persisted space ID gracefully', () async {
       // Arrange
       final testSpaces = [
-        Space(id: '1', name: 'Work'),
-        Space(id: '2', name: 'Personal'),
+        Space(id: '1', userId: 'test-user', name: 'Work'),
+        Space(id: '2', userId: 'test-user', name: 'Personal'),
       ];
       mockRepository.mockSpaces = testSpaces;
 
@@ -388,6 +388,7 @@ void main() {
       // Arrange
       final newSpace = Space(
         id: '1',
+        userId: 'test-user',
         name: 'Work',
         icon: '💼',
         color: '#FF5733',
@@ -404,7 +405,7 @@ void main() {
 
     test('should set new space as current space', () async {
       // Arrange
-      final newSpace = Space(id: '1', name: 'Work');
+      final newSpace = Space(id: '1', userId: 'test-user', name: 'Work');
 
       // Act
       await provider.addSpace(newSpace);
@@ -416,7 +417,7 @@ void main() {
 
     test('should persist new space as current selection', () async {
       // Arrange
-      final newSpace = Space(id: '1', name: 'Work');
+      final newSpace = Space(id: '1', userId: 'test-user', name: 'Work');
 
       // Act
       await provider.addSpace(newSpace);
@@ -430,7 +431,7 @@ void main() {
     test('should handle error when adding space fails', () async {
       // Arrange
       mockRepository.shouldThrowError = true;
-      final newSpace = Space(id: '1', name: 'Work');
+      final newSpace = Space(id: '1', userId: 'test-user', name: 'Work');
 
       // Act
       await provider.addSpace(newSpace);
@@ -444,7 +445,7 @@ void main() {
     test('should not persist space when adding fails', () async {
       // Arrange
       mockRepository.shouldThrowError = true;
-      final newSpace = Space(id: '1', name: 'Work');
+      final newSpace = Space(id: '1', userId: 'test-user', name: 'Work');
 
       // Act
       await provider.addSpace(newSpace);
@@ -457,7 +458,7 @@ void main() {
 
     test('should notify listeners when adding space', () async {
       // Arrange
-      final newSpace = Space(id: '1', name: 'Work');
+      final newSpace = Space(id: '1', userId: 'test-user', name: 'Work');
       int notifyCount = 0;
       provider.addListener(() {
         notifyCount++;
@@ -474,7 +475,7 @@ void main() {
   group('SpacesProvider - updateSpace', () {
     test('should update space successfully', () async {
       // Arrange
-      final originalSpace = Space(id: '1', name: 'Work');
+      final originalSpace = Space(id: '1', userId: 'test-user', name: 'Work');
       mockRepository.mockSpaces = [originalSpace];
       await provider.loadSpaces();
 
@@ -493,7 +494,7 @@ void main() {
       'should update current space if it is the one being updated',
       () async {
         // Arrange
-        final space = Space(id: '1', name: 'Work');
+        final space = Space(id: '1', userId: 'test-user', name: 'Work');
         mockRepository.mockSpaces = [space];
         await provider.loadSpaces();
 
@@ -509,7 +510,7 @@ void main() {
 
     test('should handle error when updating space fails', () async {
       // Arrange
-      final space = Space(id: '1', name: 'Work');
+      final space = Space(id: '1', userId: 'test-user', name: 'Work');
       mockRepository.mockSpaces = [space];
       await provider.loadSpaces();
 
@@ -525,7 +526,7 @@ void main() {
 
     test('should handle updating non-existent space', () async {
       // Arrange
-      final space = Space(id: '999', name: 'Non-existent');
+      final space = Space(id: '999', userId: 'test-user', name: 'Non-existent');
 
       // Act
       await provider.updateSpace(space);
@@ -537,7 +538,7 @@ void main() {
 
     test('should keep persisted space ID when archiving current space', () async {
       // Arrange
-      final space = Space(id: '1', name: 'Work');
+      final space = Space(id: '1', userId: 'test-user', name: 'Work');
       mockRepository.mockSpaces = [space];
       await provider.loadSpaces();
 
@@ -560,8 +561,8 @@ void main() {
       'should keep persisted space ID when archiving non-current space',
       () async {
         // Arrange
-        final space1 = Space(id: '1', name: 'Work');
-        final space2 = Space(id: '2', name: 'Personal');
+        final space1 = Space(id: '1', userId: 'test-user', name: 'Work');
+        final space2 = Space(id: '2', userId: 'test-user', name: 'Personal');
         mockRepository.mockSpaces = [space1, space2];
         await provider.loadSpaces();
 
@@ -584,8 +585,8 @@ void main() {
   group('SpacesProvider - deleteSpace', () {
     test('should delete space successfully', () async {
       // Arrange
-      final space1 = Space(id: '1', name: 'Work');
-      final space2 = Space(id: '2', name: 'Personal');
+      final space1 = Space(id: '1', userId: 'test-user', name: 'Work');
+      final space2 = Space(id: '2', userId: 'test-user', name: 'Personal');
       mockRepository.mockSpaces = [space1, space2];
       await provider.loadSpaces();
       await provider.switchSpace(
@@ -604,7 +605,7 @@ void main() {
 
     test('should prevent deleting current space', () async {
       // Arrange
-      final space = Space(id: '1', name: 'Work');
+      final space = Space(id: '1', userId: 'test-user', name: 'Work');
       mockRepository.mockSpaces = [space];
       await provider.loadSpaces();
 
@@ -623,8 +624,8 @@ void main() {
 
     test('should handle error when deleting space fails', () async {
       // Arrange
-      final space1 = Space(id: '1', name: 'Work');
-      final space2 = Space(id: '2', name: 'Personal');
+      final space1 = Space(id: '1', userId: 'test-user', name: 'Work');
+      final space2 = Space(id: '2', userId: 'test-user', name: 'Personal');
       mockRepository.mockSpaces = [space1, space2];
       await provider.loadSpaces();
 
@@ -640,8 +641,8 @@ void main() {
 
     test('should notify listeners when deleting space', () async {
       // Arrange
-      final space1 = Space(id: '1', name: 'Work');
-      final space2 = Space(id: '2', name: 'Personal');
+      final space1 = Space(id: '1', userId: 'test-user', name: 'Work');
+      final space2 = Space(id: '2', userId: 'test-user', name: 'Personal');
       mockRepository.mockSpaces = [space1, space2];
       await provider.loadSpaces();
       await provider.switchSpace('2');
@@ -662,9 +663,9 @@ void main() {
       'should clear persisted space ID when deleting a persisted space',
       () async {
         // Arrange
-        final space1 = Space(id: '1', name: 'Work');
-        final space2 = Space(id: '2', name: 'Personal');
-        final space3 = Space(id: '3', name: 'Hobby');
+        final space1 = Space(id: '1', userId: 'test-user', name: 'Work');
+        final space2 = Space(id: '2', userId: 'test-user', name: 'Personal');
+        final space3 = Space(id: '3', userId: 'test-user', name: 'Hobby');
         mockRepository.mockSpaces = [space1, space2, space3];
         await provider.loadSpaces();
 
@@ -690,9 +691,9 @@ void main() {
       'should not clear persisted space ID when deleting a non-persisted space',
       () async {
         // Arrange
-        final space1 = Space(id: '1', name: 'Work');
-        final space2 = Space(id: '2', name: 'Personal');
-        final space3 = Space(id: '3', name: 'Hobby');
+        final space1 = Space(id: '1', userId: 'test-user', name: 'Work');
+        final space2 = Space(id: '2', userId: 'test-user', name: 'Personal');
+        final space3 = Space(id: '3', userId: 'test-user', name: 'Hobby');
         mockRepository.mockSpaces = [space1, space2, space3];
         await provider.loadSpaces();
 
@@ -714,8 +715,8 @@ void main() {
   group('SpacesProvider - switchSpace', () {
     test('should switch to different space', () async {
       // Arrange
-      final space1 = Space(id: '1', name: 'Work');
-      final space2 = Space(id: '2', name: 'Personal');
+      final space1 = Space(id: '1', userId: 'test-user', name: 'Work');
+      final space2 = Space(id: '2', userId: 'test-user', name: 'Personal');
       mockRepository.mockSpaces = [space1, space2];
       await provider.loadSpaces();
 
@@ -729,8 +730,8 @@ void main() {
 
     test('should persist space selection when switching space', () async {
       // Arrange
-      final space1 = Space(id: '1', name: 'Work');
-      final space2 = Space(id: '2', name: 'Personal');
+      final space1 = Space(id: '1', userId: 'test-user', name: 'Work');
+      final space2 = Space(id: '2', userId: 'test-user', name: 'Personal');
       mockRepository.mockSpaces = [space1, space2];
       await provider.loadSpaces();
 
@@ -745,7 +746,7 @@ void main() {
 
     test('should handle switching to non-existent space', () async {
       // Arrange
-      final space = Space(id: '1', name: 'Work');
+      final space = Space(id: '1', userId: 'test-user', name: 'Work');
       mockRepository.mockSpaces = [space];
       await provider.loadSpaces();
 
@@ -760,8 +761,8 @@ void main() {
 
     test('should notify listeners when switching space', () async {
       // Arrange
-      final space1 = Space(id: '1', name: 'Work');
-      final space2 = Space(id: '2', name: 'Personal');
+      final space1 = Space(id: '1', userId: 'test-user', name: 'Work');
+      final space2 = Space(id: '2', userId: 'test-user', name: 'Personal');
       mockRepository.mockSpaces = [space1, space2];
       await provider.loadSpaces();
 
@@ -779,7 +780,7 @@ void main() {
 
     test('should not persist space selection when switch fails', () async {
       // Arrange
-      final space = Space(id: '1', name: 'Work');
+      final space = Space(id: '1', userId: 'test-user', name: 'Work');
       mockRepository.mockSpaces = [space];
       await provider.loadSpaces();
 

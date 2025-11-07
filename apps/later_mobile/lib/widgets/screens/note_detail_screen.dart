@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:later_mobile/design_system/tokens/tokens.dart';
-import '../../data/models/item_model.dart';
+import '../../data/models/note_model.dart';
 import '../../providers/content_provider.dart';
 import 'package:later_mobile/design_system/organisms/modals/bottom_sheet_container.dart';
 import '../../core/utils/responsive_modal.dart';
@@ -26,7 +26,7 @@ class NoteDetailScreen extends StatefulWidget {
   const NoteDetailScreen({super.key, required this.note});
 
   /// Note to display and edit
-  final Item note;
+  final Note note;
 
   @override
   State<NoteDetailScreen> createState() => _NoteDetailScreenState();
@@ -39,7 +39,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen>
   late TextEditingController _contentController;
 
   // Local state
-  late Item _currentNote;
+  late Note _currentNote;
 
   // Tag management
   final TextEditingController _tagController = TextEditingController();

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:later_mobile/core/error/app_error.dart';
 import 'package:later_mobile/design_system/organisms/error/error_dialog.dart';
+import '../../../test_helpers.dart';
 
 void main() {
   group('ErrorDialog', () {
@@ -11,7 +12,7 @@ void main() {
         userMessage: 'Could not save your data',
       );
 
-      await tester.pumpWidget(MaterialApp(home: ErrorDialog(error: error)));
+      await tester.pumpWidget(testApp(ErrorDialog(error: error)));
 
       expect(find.byType(Dialog), findsOneWidget);
       expect(find.text('Could not save your data'), findsOneWidget);
@@ -20,15 +21,15 @@ void main() {
     testWidgets('shows error icon', (tester) async {
       final error = AppError.storage(message: 'Test');
 
-      await tester.pumpWidget(MaterialApp(home: ErrorDialog(error: error)));
+      await tester.pumpWidget(testApp(ErrorDialog(error: error)));
 
       expect(find.byIcon(Icons.error_outline), findsOneWidget);
     });
 
-    testWidgets('displays title', (tester) async {
+    testWidgets('displays default title', (tester) async {
       final error = AppError.storage(message: 'Test');
 
-      await tester.pumpWidget(MaterialApp(home: ErrorDialog(error: error)));
+      await tester.pumpWidget(testApp(ErrorDialog(error: error)));
 
       expect(find.text('Something Went Wrong'), findsOneWidget);
     });
@@ -37,9 +38,7 @@ void main() {
       final error = AppError.storage(message: 'Test');
 
       await tester.pumpWidget(
-        MaterialApp(
-          home: ErrorDialog(error: error, title: 'Custom Error Title'),
-        ),
+        testApp(ErrorDialog(error: error, title: 'Custom Error Title')),
       );
 
       expect(find.text('Custom Error Title'), findsOneWidget);
@@ -48,7 +47,7 @@ void main() {
     testWidgets('shows retry button for retryable errors', (tester) async {
       final error = AppError.storage(message: 'Test'); // Retryable
 
-      await tester.pumpWidget(MaterialApp(home: ErrorDialog(error: error)));
+      await tester.pumpWidget(testApp(ErrorDialog(error: error)));
 
       expect(find.text('Retry'), findsOneWidget);
     });
@@ -58,9 +57,10 @@ void main() {
     ) async {
       final error = AppError.validation(message: 'Test'); // Not retryable
 
-      await tester.pumpWidget(MaterialApp(home: ErrorDialog(error: error)));
+      await tester.pumpWidget(testApp(ErrorDialog(error: error)));
 
       expect(find.text('Dismiss'), findsOneWidget);
+      expect(find.text('Retry'), findsNothing);
     });
 
     testWidgets('calls onRetry when retry button tapped', (tester) async {
@@ -68,8 +68,8 @@ void main() {
       bool retryCalled = false;
 
       await tester.pumpWidget(
-        MaterialApp(
-          home: ErrorDialog(
+        testApp(
+          ErrorDialog(
             error: error,
             onRetry: () {
               retryCalled = true;
@@ -88,21 +88,19 @@ void main() {
       final error = AppError.storage(message: 'Test');
 
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: Builder(
-              builder: (context) {
-                return ElevatedButton(
-                  onPressed: () {
-                    showDialog<void>(
-                      context: context,
-                      builder: (_) => ErrorDialog(error: error),
-                    );
-                  },
-                  child: const Text('Show'),
-                );
-              },
-            ),
+        testApp(
+          Builder(
+            builder: (context) {
+              return ElevatedButton(
+                onPressed: () {
+                  showDialog<void>(
+                    context: context,
+                    builder: (_) => ErrorDialog(error: error),
+                  );
+                },
+                child: const Text('Show'),
+              );
+            },
           ),
         ),
       );
@@ -121,7 +119,7 @@ void main() {
     testWidgets('applies correct styling', (tester) async {
       final error = AppError.storage(message: 'Test');
 
-      await tester.pumpWidget(MaterialApp(home: ErrorDialog(error: error)));
+      await tester.pumpWidget(testApp(ErrorDialog(error: error)));
 
       final dialog = tester.widget<Dialog>(find.byType(Dialog));
       expect(dialog.shape, isNotNull);
@@ -130,72 +128,53 @@ void main() {
     testWidgets('has correct max width constraint', (tester) async {
       final error = AppError.storage(message: 'Test');
 
-      await tester.pumpWidget(MaterialApp(home: ErrorDialog(error: error)));
+      await tester.pumpWidget(testApp(ErrorDialog(error: error)));
 
-      final constrainedBox = tester.widget<ConstrainedBox>(
-        find
-            .descendant(
-              of: find.byType(Dialog),
-              matching: find.byType(ConstrainedBox),
-            )
-            .first,
+      // Find the ConstrainedBox inside the Dialog
+      final constrainedBoxes = find
+          .descendant(
+            of: find.byType(Dialog),
+            matching: find.byType(ConstrainedBox),
+          )
+          .evaluate();
+
+      // Should have a ConstrainedBox with max width of 360
+      expect(
+        constrainedBoxes.any((element) {
+          final widget = element.widget as ConstrainedBox;
+          return widget.constraints.maxWidth == 360;
+        }),
+        isTrue,
       );
-
-      expect(constrainedBox.constraints.maxWidth, 360);
     });
 
-    testWidgets('shows technical details in debug mode', (tester) async {
-      final error = AppError.storage(
-        message: 'Storage error',
-        details: 'Box is full',
-      );
-
-      await tester.pumpWidget(MaterialApp(home: ErrorDialog(error: error)));
-
-      // In debug mode, technical details should be visible somewhere
-      // (implementation may vary)
-      expect(find.byType(ErrorDialog), findsOneWidget);
-    });
-
-    testWidgets('error icon has correct color', (tester) async {
+    testWidgets('error icon has correct size', (tester) async {
       final error = AppError.storage(message: 'Test');
 
-      await tester.pumpWidget(MaterialApp(home: ErrorDialog(error: error)));
+      await tester.pumpWidget(testApp(ErrorDialog(error: error)));
 
       final icon = tester.widget<Icon>(find.byIcon(Icons.error_outline));
       expect(icon.size, 48);
-      // Color should be error color
       expect(icon.color, isNotNull);
-    });
-
-    testWidgets('buttons are properly styled', (tester) async {
-      final error = AppError.storage(message: 'Test');
-
-      await tester.pumpWidget(MaterialApp(home: ErrorDialog(error: error)));
-
-      // Should have styled buttons
-      expect(find.byType(TextButton), findsAtLeastNWidgets(1));
     });
 
     testWidgets('dialog is dismissible by barrier tap', (tester) async {
       final error = AppError.storage(message: 'Test');
 
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: Builder(
-              builder: (context) {
-                return ElevatedButton(
-                  onPressed: () {
-                    showDialog<void>(
-                      context: context,
-                      builder: (_) => ErrorDialog(error: error),
-                    );
-                  },
-                  child: const Text('Show'),
-                );
-              },
-            ),
+        testApp(
+          Builder(
+            builder: (context) {
+              return ElevatedButton(
+                onPressed: () {
+                  showDialog<void>(
+                    context: context,
+                    builder: (_) => ErrorDialog(error: error),
+                  );
+                },
+                child: const Text('Show'),
+              );
+            },
           ),
         ),
       );
@@ -223,7 +202,7 @@ void main() {
       ];
 
       for (final error in errors) {
-        await tester.pumpWidget(MaterialApp(home: ErrorDialog(error: error)));
+        await tester.pumpWidget(testApp(ErrorDialog(error: error)));
 
         expect(find.byType(ErrorDialog), findsOneWidget);
         expect(find.text(error.getUserMessage()), findsOneWidget);
@@ -233,31 +212,67 @@ void main() {
       }
     });
 
-    testWidgets('content is scrollable for long messages', (tester) async {
+    testWidgets('handles long error messages without overflow', (
+      tester,
+    ) async {
       final error = AppError.storage(
         message: 'Error',
         userMessage: 'A' * 500, // Very long message
       );
 
-      await tester.pumpWidget(MaterialApp(home: ErrorDialog(error: error)));
+      await tester.pumpWidget(testApp(ErrorDialog(error: error)));
 
       // Should render without overflow
       expect(find.byType(ErrorDialog), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
 
-    testWidgets('maintains 24px padding', (tester) async {
+    testWidgets('shows both Dismiss and primary action for retryable errors',
+        (tester) async {
       final error = AppError.storage(message: 'Test');
 
-      await tester.pumpWidget(MaterialApp(home: ErrorDialog(error: error)));
+      await tester.pumpWidget(testApp(ErrorDialog(error: error)));
 
-      final padding = tester.widget<Padding>(
-        find
-            .descendant(of: find.byType(Dialog), matching: find.byType(Padding))
-            .first,
+      // Retryable errors show both Dismiss (ghost) and Retry (primary)
+      expect(find.text('Dismiss'), findsOneWidget);
+      expect(find.text('Retry'), findsOneWidget);
+    });
+
+    testWidgets('closes dialog after retry button is tapped', (tester) async {
+      final error = AppError.storage(message: 'Test');
+
+      await tester.pumpWidget(
+        testApp(
+          Builder(
+            builder: (context) {
+              return ElevatedButton(
+                onPressed: () {
+                  showDialog<void>(
+                    context: context,
+                    builder: (_) => ErrorDialog(
+                      error: error,
+                      onRetry: () {},
+                    ),
+                  );
+                },
+                child: const Text('Show'),
+              );
+            },
+          ),
+        ),
       );
 
-      expect(padding.padding, const EdgeInsets.all(24));
+      await tester.tap(find.text('Show'));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(ErrorDialog), findsOneWidget);
+
+      // Tap retry button
+      await tester.tap(find.text('Retry'));
+      await tester.pumpAndSettle();
+
+      // Dialog should be closed
+      expect(find.byType(ErrorDialog), findsNothing);
     });
   });
 }

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:later_mobile/design_system/tokens/tokens.dart';
-import '../../../data/models/item_model.dart';
+import '../../../data/models/note_model.dart';
 import 'package:later_mobile/design_system/atoms/text/gradient_text.dart';
 import 'package:later_mobile/design_system/atoms/borders/gradient_pill_border.dart';
 import 'package:later_mobile/design_system/atoms/drag_handle/drag_handle.dart';
@@ -32,7 +32,7 @@ import 'package:later_mobile/core/theme/temporal_flow_theme.dart';
 class NoteCard extends StatefulWidget {
   const NoteCard({
     super.key,
-    required this.item,
+    required this.note,
     this.onTap,
     this.onLongPress,
     this.showMetadata = true,
@@ -40,8 +40,8 @@ class NoteCard extends StatefulWidget {
     this.reorderIndex,
   });
 
-  /// Item (Note) data to display
-  final Item item;
+  /// Note data to display
+  final Note note;
 
   /// Callback when card is tapped
   final VoidCallback? onTap;
@@ -131,7 +131,7 @@ class _NoteCardState extends State<NoteCard> with TickerProviderStateMixin {
   Widget _buildTitle(BuildContext context) {
 
     return Text(
-      widget.item.title,
+      widget.note.title,
       style: AppTypography.itemTitle.copyWith(
         color: AppColors.text(context),
       ),
@@ -161,11 +161,11 @@ class _NoteCardState extends State<NoteCard> with TickerProviderStateMixin {
 
   /// Build content preview (first 100 chars, 2 lines max)
   Widget? _buildContentPreview(BuildContext context) {
-    if (widget.item.content == null || widget.item.content!.isEmpty) {
+    if (widget.note.content == null || widget.note.content!.isEmpty) {
       return null;
     }
 
-    final truncatedContent = _truncateContent(widget.item.content!);
+    final truncatedContent = _truncateContent(widget.note.content!);
 
     return Text(
       truncatedContent,
@@ -179,13 +179,13 @@ class _NoteCardState extends State<NoteCard> with TickerProviderStateMixin {
 
   /// Build tags row (show first 3, "+X more" if more)
   Widget? _buildTags(BuildContext context) {
-    if (widget.item.tags.isEmpty) {
+    if (widget.note.tags.isEmpty) {
       return null;
     }
 
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final visibleTags = widget.item.tags.take(3).toList();
-    final remainingCount = widget.item.tags.length - visibleTags.length;
+    final visibleTags = widget.note.tags.take(3).toList();
+    final remainingCount = widget.note.tags.length - visibleTags.length;
 
     return Wrap(
       spacing: AppSpacing.xxs, // 4px between chips
@@ -226,6 +226,8 @@ class _NoteCardState extends State<NoteCard> with TickerProviderStateMixin {
               : AppColors.noteGradientStart,
           fontSize: 11, // Slightly smaller for tags
         ),
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
       ),
     );
   }
@@ -264,6 +266,7 @@ class _NoteCardState extends State<NoteCard> with TickerProviderStateMixin {
     final dateFormat = DateFormat('MMM d, y');
 
     return Row(
+      mainAxisSize: MainAxisSize.min,
       children: [
         // Icon with gradient tint for created dates
         ShaderMask(
@@ -273,10 +276,13 @@ class _NoteCardState extends State<NoteCard> with TickerProviderStateMixin {
           child: const Icon(Icons.access_time, size: 12, color: Colors.white),
         ),
         const SizedBox(width: AppSpacing.xxs),
-        // Created date with subtle primary gradient
-        GradientText.subtle(
-          dateFormat.format(widget.item.createdAt),
-          style: AppTypography.metadata,
+        // Created date with subtle primary gradient - use Flexible to prevent overflow
+        Flexible(
+          child: GradientText.subtle(
+            dateFormat.format(widget.note.createdAt),
+            style: AppTypography.metadata,
+            overflow: TextOverflow.ellipsis,
+          ),
         ),
       ],
     );
@@ -317,18 +323,18 @@ class _NoteCardState extends State<NoteCard> with TickerProviderStateMixin {
 
   /// Build semantic label for accessibility
   String _buildSemanticLabel() {
-    final buffer = StringBuffer('Note: ${widget.item.title}');
+    final buffer = StringBuffer('Note: ${widget.note.title}');
 
     // Add tag count if tags exist
-    if (widget.item.tags.isNotEmpty) {
+    if (widget.note.tags.isNotEmpty) {
       buffer.write(
-        ', ${widget.item.tags.length} ${widget.item.tags.length == 1 ? 'tag' : 'tags'}',
+        ', ${widget.note.tags.length} ${widget.note.tags.length == 1 ? 'tag' : 'tags'}',
       );
     }
 
     // Add content preview if exists
-    if (widget.item.content != null && widget.item.content!.isNotEmpty) {
-      final preview = _truncateContent(widget.item.content!);
+    if (widget.note.content != null && widget.note.content!.isNotEmpty) {
+      final preview = _truncateContent(widget.note.content!);
       buffer.write(', $preview');
     }
 
@@ -457,7 +463,7 @@ class _NoteCardState extends State<NoteCard> with TickerProviderStateMixin {
                           index: widget.reorderIndex!,
                           child: DragHandleWidget(
                             gradient: AppColors.noteGradient,
-                            semanticLabel: 'Reorder ${widget.item.title}',
+                            semanticLabel: 'Reorder ${widget.note.title}',
                             onDragStart: () => setState(() => _isDragging = true),
                             onDragEnd: () => setState(() => _isDragging = false),
                           ),
@@ -465,7 +471,7 @@ class _NoteCardState extends State<NoteCard> with TickerProviderStateMixin {
                       else
                         DragHandleWidget(
                           gradient: AppColors.noteGradient,
-                          semanticLabel: 'Reorder ${widget.item.title}',
+                          semanticLabel: 'Reorder ${widget.note.title}',
                           onDragStart: () => setState(() => _isDragging = true),
                           onDragEnd: () => setState(() => _isDragging = false),
                         ),

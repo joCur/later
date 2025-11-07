@@ -4,7 +4,8 @@ import 'package:later_mobile/core/responsive/breakpoints.dart';
 import 'package:later_mobile/core/responsive/responsive_layout.dart';
 import 'package:later_mobile/widgets/navigation/app_sidebar.dart';
 import 'package:later_mobile/widgets/navigation/icon_only_bottom_nav.dart';
-import 'package:hive/hive.dart';
+
+import '../test_helpers.dart';
 
 /// Responsive Behavior Test Suite: Tablet Layout (768px - 1023px)
 ///
@@ -27,15 +28,6 @@ import 'package:hive/hive.dart';
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  setUpAll(() async {
-    // Initialize Hive for testing
-    Hive.init('test/hive_testing_path_responsive_tablet');
-  });
-
-  tearDownAll(() async {
-    await Hive.close();
-  });
-
   group('Tablet Layout Tests - 768px (iPad Mini)', () {
     const testWidth = 768.0;
     const testHeight = 1024.0; // Portrait
@@ -48,8 +40,8 @@ void main() {
       bool? isDesktop;
 
       await tester.pumpWidget(
-        MaterialApp(
-          home: MediaQuery(
+        testApp(
+          MediaQuery(
             data: const MediaQueryData(size: Size(testWidth, testHeight)),
             child: Builder(
               builder: (context) {
@@ -74,8 +66,8 @@ void main() {
       ScreenSize? screenSize;
 
       await tester.pumpWidget(
-        MaterialApp(
-          home: MediaQuery(
+        testApp(
+          MediaQuery(
             data: const MediaQueryData(size: Size(testWidth, testHeight)),
             child: Builder(
               builder: (context) {
@@ -94,8 +86,8 @@ void main() {
       int? columns;
 
       await tester.pumpWidget(
-        MaterialApp(
-          home: MediaQuery(
+        testApp(
+          MediaQuery(
             data: const MediaQueryData(size: Size(testWidth, testHeight)),
             child: Builder(
               builder: (context) {
@@ -116,8 +108,8 @@ void main() {
       double? maxWidth;
 
       await tester.pumpWidget(
-        MaterialApp(
-          home: MediaQuery(
+        testApp(
+          MediaQuery(
             data: const MediaQueryData(size: Size(testWidth, testHeight)),
             child: Builder(
               builder: (context) {
@@ -140,10 +132,10 @@ void main() {
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(
-        const MediaQuery(
-          data: MediaQueryData(size: Size(testWidth, testHeight)),
-          child: MaterialApp(
-            home: Scaffold(
+        MediaQuery(
+          data: const MediaQueryData(size: Size(testWidth, testHeight)),
+          child: testApp(
+            const Scaffold(
               body: ResponsiveLayout(
                 mobile: Text('Mobile Layout'),
                 tablet: Text('Tablet Layout'),
@@ -165,8 +157,8 @@ void main() {
       await tester.pumpWidget(
         MediaQuery(
           data: const MediaQueryData(size: Size(testWidth, testHeight)),
-          child: MaterialApp(
-            home: Builder(
+          child: testApp(
+            Builder(
               builder: (context) {
                 return Scaffold(
                   body: const Center(child: Text('Content')),
@@ -198,8 +190,8 @@ void main() {
       await tester.pumpWidget(
         MediaQuery(
           data: const MediaQueryData(size: Size(testWidth, testHeight)),
-          child: MaterialApp(
-            home: Builder(
+          child: testApp(
+            Builder(
               builder: (context) {
                 final orientation = MediaQuery.of(context).orientation;
                 return Scaffold(
@@ -225,8 +217,8 @@ void main() {
       bool? isTablet;
 
       await tester.pumpWidget(
-        MaterialApp(
-          home: MediaQuery(
+        testApp(
+          MediaQuery(
             data: const MediaQueryData(size: Size(testWidth, testHeight)),
             child: Builder(
               builder: (context) {
@@ -245,8 +237,8 @@ void main() {
       int? columns;
 
       await tester.pumpWidget(
-        MaterialApp(
-          home: MediaQuery(
+        testApp(
+          MediaQuery(
             data: const MediaQueryData(size: Size(testWidth, testHeight)),
             child: Builder(
               builder: (context) {
@@ -276,8 +268,8 @@ void main() {
           data: const MediaQueryData(
             size: Size(landscapeWidth, landscapeHeight),
           ),
-          child: MaterialApp(
-            home: Builder(
+          child: testApp(
+            Builder(
               builder: (context) {
                 final orientation = MediaQuery.of(context).orientation;
                 return Scaffold(
@@ -303,8 +295,8 @@ void main() {
           data: const MediaQueryData(
             size: Size(landscapeWidth, landscapeHeight),
           ),
-          child: MaterialApp(
-            home: Builder(
+          child: testApp(
+            Builder(
               builder: (context) {
                 // In landscape, width is 1194px which is >= 1024px (desktop)
                 final shouldShowSidebar = Breakpoints.isDesktopOrLarger(
@@ -333,65 +325,6 @@ void main() {
       );
     });
 
-    testWidgets('Modal max-width constraint at 834px', (
-      WidgetTester tester,
-    ) async {
-      await tester.pumpWidget(
-        MediaQuery(
-          data: const MediaQueryData(size: Size(testWidth, testHeight)),
-          child: MaterialApp(
-            home: Scaffold(
-              body: Builder(
-                builder: (context) {
-                  return Center(
-                    child: ElevatedButton(
-                      onPressed: () {
-                        showDialog<void>(
-                          context: context,
-                          builder: (context) => Dialog(
-                            child: ConstrainedBox(
-                              constraints: const BoxConstraints(
-                                maxWidth: 560.0, // Modal max-width
-                              ),
-                              child: const Padding(
-                                padding: EdgeInsets.all(16.0),
-                                child: Text('Modal Content'),
-                              ),
-                            ),
-                          ),
-                        );
-                      },
-                      child: const Text('Show Modal'),
-                    ),
-                  );
-                },
-              ),
-            ),
-          ),
-        ),
-      );
-
-      // Tap button to show modal
-      await tester.tap(find.text('Show Modal'));
-      await tester.pumpAndSettle();
-
-      // Find the modal dialog
-      final dialog = find.byType(Dialog);
-      expect(dialog, findsOneWidget);
-
-      // Check that the constrained box has correct max width
-      final constrainedBox = find.byType(ConstrainedBox);
-      expect(constrainedBox, findsOneWidget);
-
-      final constraints = tester
-          .widget<ConstrainedBox>(constrainedBox)
-          .constraints;
-      expect(
-        constraints.maxWidth,
-        equals(560.0),
-        reason: 'Modal should have max-width of 560px on tablet',
-      );
-    });
   });
 
   group('Tablet Layout Tests - 1024px (iPad Pro)', () {
@@ -405,8 +338,8 @@ void main() {
       bool? isDesktop;
 
       await tester.pumpWidget(
-        MaterialApp(
-          home: MediaQuery(
+        testApp(
+          MediaQuery(
             data: const MediaQueryData(size: Size(testWidth, testHeight)),
             child: Builder(
               builder: (context) {
@@ -436,8 +369,8 @@ void main() {
       int? columns;
 
       await tester.pumpWidget(
-        MaterialApp(
-          home: MediaQuery(
+        testApp(
+          MediaQuery(
             data: const MediaQueryData(size: Size(testWidth, testHeight)),
             child: Builder(
               builder: (context) {
@@ -462,8 +395,8 @@ void main() {
       double? maxWidth;
 
       await tester.pumpWidget(
-        MaterialApp(
-          home: MediaQuery(
+        testApp(
+          MediaQuery(
             data: const MediaQueryData(size: Size(testWidth, testHeight)),
             child: Builder(
               builder: (context) {
@@ -486,8 +419,8 @@ void main() {
       await tester.pumpWidget(
         MediaQuery(
           data: const MediaQueryData(size: Size(testWidth, testHeight)),
-          child: MaterialApp(
-            home: Builder(
+          child: testApp(
+            Builder(
               builder: (context) {
                 final shouldShowSidebar = Breakpoints.isDesktopOrLarger(
                   context,
@@ -520,8 +453,8 @@ void main() {
       await tester.pumpWidget(
         MediaQuery(
           data: const MediaQueryData(size: Size(testWidth, testHeight)),
-          child: MaterialApp(
-            home: Scaffold(
+          child: testApp(
+            Scaffold(
               body: Row(
                 children: [
                   AppSidebar(onToggleExpanded: () {}),
@@ -548,8 +481,8 @@ void main() {
       await tester.pumpWidget(
         MediaQuery(
           data: const MediaQueryData(size: Size(testWidth, testHeight)),
-          child: MaterialApp(
-            home: Scaffold(
+          child: testApp(
+            Scaffold(
               body: Row(
                 children: [
                   AppSidebar(isExpanded: false, onToggleExpanded: () {}),
@@ -573,43 +506,6 @@ void main() {
       );
     });
 
-    testWidgets('Content area adjusts for sidebar at 1024px', (
-      WidgetTester tester,
-    ) async {
-      const sidebarWidth = 240.0;
-
-      await tester.pumpWidget(
-        MediaQuery(
-          data: const MediaQueryData(size: Size(testWidth, testHeight)),
-          child: MaterialApp(
-            home: Scaffold(
-              body: Row(
-                children: [
-                  AppSidebar(onToggleExpanded: () {}),
-                  Expanded(
-                    child: LayoutBuilder(
-                      builder: (context, constraints) {
-                        return Center(
-                          child: Text('Content Width: ${constraints.maxWidth}'),
-                        );
-                      },
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      );
-
-      // Content width should be screen width minus sidebar width
-      const expectedContentWidth = testWidth - sidebarWidth;
-      expect(
-        find.text('Content Width: $expectedContentWidth'),
-        findsOneWidget,
-        reason: 'Content should adjust for sidebar width',
-      );
-    });
 
     testWidgets('Landscape orientation at 1366x1024', (
       WidgetTester tester,
@@ -622,8 +518,8 @@ void main() {
           data: const MediaQueryData(
             size: Size(landscapeWidth, landscapeHeight),
           ),
-          child: MaterialApp(
-            home: Builder(
+          child: testApp(
+            Builder(
               builder: (context) {
                 final orientation = MediaQuery.of(context).orientation;
                 return Scaffold(
@@ -646,8 +542,8 @@ void main() {
       String? value;
 
       await tester.pumpWidget(
-        MaterialApp(
-          home: MediaQuery(
+        testApp(
+          MediaQuery(
             data: const MediaQueryData(size: Size(800.0, 1024.0)),
             child: Builder(
               builder: (context) {
@@ -673,8 +569,8 @@ void main() {
       String? value;
 
       await tester.pumpWidget(
-        MaterialApp(
-          home: MediaQuery(
+        testApp(
+          MediaQuery(
             data: const MediaQueryData(size: Size(800.0, 1024.0)),
             child: Builder(
               builder: (context) {

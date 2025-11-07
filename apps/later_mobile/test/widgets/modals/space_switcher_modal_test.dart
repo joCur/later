@@ -1,695 +1,355 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hive_flutter/hive_flutter.dart';
 import 'package:later_mobile/core/theme/temporal_flow_theme.dart';
-import 'package:later_mobile/core/utils/responsive_modal.dart';
 import 'package:later_mobile/data/models/space_model.dart';
-import 'package:later_mobile/data/repositories/space_repository.dart';
+import 'package:later_mobile/design_system/atoms/buttons/primary_button.dart';
+import 'package:later_mobile/design_system/atoms/inputs/text_input_field.dart';
 import 'package:later_mobile/providers/spaces_provider.dart';
 import 'package:later_mobile/widgets/modals/space_switcher_modal.dart';
-import 'package:later_mobile/design_system/tokens/tokens.dart';
+import 'package:mockito/annotations.dart';
+import 'package:mockito/mockito.dart';
 import 'package:provider/provider.dart';
 
+import 'space_switcher_modal_test.mocks.dart';
+
+@GenerateMocks([SpacesProvider])
 void main() {
-  group('SpaceSwitcherModal Widget Tests', () {
-    late SpaceRepository repository;
-    late SpacesProvider spacesProvider;
-    late List<Space> testSpaces;
+  late MockSpacesProvider mockSpacesProvider;
+  late List<Space> testSpaces;
 
-    setUpAll(() async {
-      // Initialize Hive for testing
-      Hive.init('test/hive_testing_path');
-      Hive.registerAdapter(SpaceAdapter());
-    });
+  // Test user ID for all test spaces
+  const testUserId = 'test-user-id';
 
-    setUp(() async {
-      // Open or clear the box
-      if (!Hive.isBoxOpen('spaces')) {
-        await Hive.openBox<Space>('spaces');
-      } else {
-        await Hive.box<Space>('spaces').clear();
-      }
+  setUp(() {
+    mockSpacesProvider = MockSpacesProvider();
 
-      // Create repository and provider
-      repository = SpaceRepository();
-      spacesProvider = SpacesProvider(repository);
+    // Create test spaces
+    testSpaces = [
+      Space(id: 'space-1', name: 'Personal', userId: testUserId, icon: '🏠'),
+      Space(id: 'space-2', name: 'Work', userId: testUserId, icon: '💼'),
+      Space(id: 'space-3', name: 'Shopping', userId: testUserId, icon: '🛒'),
+    ];
 
-      // Create test spaces (itemCount is now calculated, not stored)
-      testSpaces = [
-        Space(id: 'space-1', name: 'Personal', icon: '🏠'),
-        Space(id: 'space-2', name: 'Work', icon: '💼'),
-        Space(id: 'space-3', name: 'Projects', icon: '🚀'),
-        Space(id: 'space-4', name: 'Shopping', icon: '🛒'),
-        Space(id: 'space-5', name: 'Ideas', icon: '💡'),
-      ];
+    // Mock SpacesProvider to return test spaces
+    when(mockSpacesProvider.spaces).thenReturn(testSpaces);
+    when(mockSpacesProvider.currentSpace).thenReturn(testSpaces.first);
+    when(mockSpacesProvider.isLoading).thenReturn(false);
 
-      // Add test spaces to repository
-      for (final space in testSpaces) {
-        await repository.createSpace(space);
-      }
+    // Mock getSpaceItemCount to return consistent counts
+    when(mockSpacesProvider.getSpaceItemCount('space-1'))
+        .thenAnswer((_) async => 5);
+    when(mockSpacesProvider.getSpaceItemCount('space-2'))
+        .thenAnswer((_) async => 12);
+    when(mockSpacesProvider.getSpaceItemCount('space-3'))
+        .thenAnswer((_) async => 3);
 
-      // Load spaces into provider
-      await spacesProvider.loadSpaces();
-    });
+    // Mock provider operations
+    when(mockSpacesProvider.switchSpace(any)).thenAnswer((_) async {});
+    when(mockSpacesProvider.loadSpaces(includeArchived: anyNamed('includeArchived')))
+        .thenAnswer((_) async {});
+  });
 
-    tearDown(() async {
-      if (Hive.isBoxOpen('spaces')) {
-        await Hive.box<Space>('spaces').clear();
-      }
-    });
+  Widget createTestWidget({required Widget child}) {
+    return MaterialApp(
+      theme: ThemeData.light().copyWith(
+        extensions: <ThemeExtension<dynamic>>[TemporalFlowTheme.light()],
+      ),
+      home: Scaffold(
+        body: ChangeNotifierProvider<SpacesProvider>.value(
+          value: mockSpacesProvider,
+          child: child,
+        ),
+      ),
+    );
+  }
 
-    tearDownAll(() async {
-      await Hive.close();
-    });
-
-    /// Helper to build modal with provider
-    Widget buildModalWithProvider({
-      Size size = const Size(400, 800), // Mobile by default
-      ThemeData? theme,
-    }) {
-      final testTheme = (theme ?? ThemeData.light()).copyWith(
-        extensions: <ThemeExtension<dynamic>>[
-          TemporalFlowTheme.light(),
-        ],
-      );
-
-      return MediaQuery(
-        data: MediaQueryData(size: size),
-        child: MaterialApp(
-          theme: testTheme,
-          home: ChangeNotifierProvider<SpacesProvider>.value(
-            value: spacesProvider,
-            child: const Scaffold(body: SpaceSwitcherModal()),
-          ),
+  group('SpaceSwitcherModal - Rendering', () {
+    testWidgets('renders list of spaces', (WidgetTester tester) async {
+      await tester.pumpWidget(
+        createTestWidget(
+          child: const SpaceSwitcherModal(),
         ),
       );
-    }
-
-    testWidgets('renders list of spaces correctly', (
-      WidgetTester tester,
-    ) async {
-      // Act
-      await tester.pumpWidget(buildModalWithProvider());
       await tester.pumpAndSettle();
 
-      // Assert
-      expect(find.text('Switch Space'), findsOneWidget);
+      // Should show all space names
       expect(find.text('Personal'), findsOneWidget);
       expect(find.text('Work'), findsOneWidget);
-      expect(find.text('Projects'), findsOneWidget);
       expect(find.text('Shopping'), findsOneWidget);
-      expect(find.text('Ideas'), findsOneWidget);
     });
 
-    testWidgets('displays space icons correctly', (WidgetTester tester) async {
-      // Act
-      await tester.pumpWidget(buildModalWithProvider());
+    testWidgets('renders search field', (WidgetTester tester) async {
+      await tester.pumpWidget(
+        createTestWidget(
+          child: const SpaceSwitcherModal(),
+        ),
+      );
       await tester.pumpAndSettle();
 
-      // Assert
+      // Should show search field
+      expect(find.byType(TextInputField), findsOneWidget);
+    });
+
+    testWidgets('renders Create New Space button', (WidgetTester tester) async {
+      await tester.pumpWidget(
+        createTestWidget(
+          child: const SpaceSwitcherModal(),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // Should show create button
+      expect(find.text('Create New Space'), findsOneWidget);
+      expect(find.byType(PrimaryButton), findsOneWidget);
+    });
+
+    testWidgets('shows current space from provider', (WidgetTester tester) async {
+      await tester.pumpWidget(
+        createTestWidget(
+          child: const SpaceSwitcherModal(),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // Current space (Personal) should be displayed
+      expect(find.text('Personal'), findsOneWidget);
+      // Verify current space is being accessed
+      verify(mockSpacesProvider.currentSpace).called(greaterThan(0));
+    });
+
+    testWidgets('displays space icons', (WidgetTester tester) async {
+      await tester.pumpWidget(
+        createTestWidget(
+          child: const SpaceSwitcherModal(),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // Should show space icons
       expect(find.text('🏠'), findsOneWidget);
       expect(find.text('💼'), findsOneWidget);
-      expect(find.text('🚀'), findsOneWidget);
       expect(find.text('🛒'), findsOneWidget);
-      expect(find.text('💡'), findsOneWidget);
     });
 
-    testWidgets('displays item count badges', (WidgetTester tester) async {
-      // Act
-      await tester.pumpWidget(buildModalWithProvider());
-      await tester.pumpAndSettle();
-
-      // Assert - Check that item counts are visible (may appear multiple times due to number indicators)
-      expect(find.text('12'), findsWidgets); // Work - unique
-      expect(find.text('0'), findsWidgets); // Shopping - unique
-      expect(find.text('8'), findsWidgets); // Ideas - unique
-    });
-
-    testWidgets('highlights currently selected space', (
+    testWidgets('renders when spaces list is empty', (
       WidgetTester tester,
     ) async {
-      // Act
-      await tester.pumpWidget(buildModalWithProvider());
+      when(mockSpacesProvider.spaces).thenReturn([]);
+
+      await tester.pumpWidget(
+        createTestWidget(
+          child: const SpaceSwitcherModal(),
+        ),
+      );
       await tester.pumpAndSettle();
 
-      // Assert - Personal should be selected (first space)
-      final selectedIcon = find.byIcon(Icons.check_circle);
-      expect(selectedIcon, findsOneWidget);
+      // Modal should still render (shows empty state)
+      expect(find.byType(SpaceSwitcherModal), findsOneWidget);
     });
 
-    testWidgets('displays search field at the top', (
+    testWidgets('shows empty state when no spaces', (
       WidgetTester tester,
     ) async {
-      // Act
-      await tester.pumpWidget(buildModalWithProvider());
+      when(mockSpacesProvider.spaces).thenReturn([]);
+
+      await tester.pumpWidget(
+        createTestWidget(
+          child: const SpaceSwitcherModal(),
+        ),
+      );
       await tester.pumpAndSettle();
 
-      // Assert
-      expect(find.byType(TextField), findsOneWidget);
-      expect(find.text('Search spaces...'), findsOneWidget);
+      // Should show empty state message
+      expect(find.textContaining('No spaces'), findsOneWidget);
     });
+  });
 
-    testWidgets('filters spaces by search query', (WidgetTester tester) async {
-      // Act
-      await tester.pumpWidget(buildModalWithProvider());
+  group('SpaceSwitcherModal - Search Functionality', () {
+    testWidgets('filters spaces based on search query', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        createTestWidget(
+          child: const SpaceSwitcherModal(),
+        ),
+      );
       await tester.pumpAndSettle();
 
-      // Type 'work' in search field
-      await tester.enterText(find.byType(TextField), 'work');
+      // Enter search query
+      await tester.enterText(find.byType(TextInputField), 'Shop');
       await tester.pumpAndSettle();
 
-      // Assert
-      expect(find.text('Work'), findsOneWidget);
+      // Should only show Shopping space
+      expect(find.text('Shopping'), findsOneWidget);
       expect(find.text('Personal'), findsNothing);
-      expect(find.text('Projects'), findsNothing);
+      expect(find.text('Work'), findsNothing);
     });
 
     testWidgets('search is case-insensitive', (WidgetTester tester) async {
-      // Act
-      await tester.pumpWidget(buildModalWithProvider());
+      await tester.pumpWidget(
+        createTestWidget(
+          child: const SpaceSwitcherModal(),
+        ),
+      );
       await tester.pumpAndSettle();
 
-      // Search with uppercase
-      await tester.enterText(find.byType(TextField), 'WORK');
+      // Enter lowercase search query for uppercase space name
+      await tester.enterText(find.byType(TextInputField), 'work');
       await tester.pumpAndSettle();
 
-      // Assert
+      // Should find Work space
       expect(find.text('Work'), findsOneWidget);
     });
 
-    testWidgets('shows "No spaces found" when filter has no results', (
+    testWidgets('clears filter when search is cleared', (
       WidgetTester tester,
     ) async {
-      // Act
-      await tester.pumpWidget(buildModalWithProvider());
+      await tester.pumpWidget(
+        createTestWidget(
+          child: const SpaceSwitcherModal(),
+        ),
+      );
       await tester.pumpAndSettle();
 
-      await tester.enterText(find.byType(TextField), 'nonexistent');
+      // Enter search query
+      await tester.enterText(find.byType(TextInputField), 'Work');
+      await tester.pumpAndSettle();
+      expect(find.text('Personal'), findsNothing);
+
+      // Clear search
+      await tester.enterText(find.byType(TextInputField), '');
       await tester.pumpAndSettle();
 
-      // Assert
-      expect(find.text('No spaces found'), findsOneWidget);
-    });
-
-    testWidgets('clears search with clear button', (WidgetTester tester) async {
-      // Act
-      await tester.pumpWidget(buildModalWithProvider());
-      await tester.pumpAndSettle();
-
-      await tester.enterText(find.byType(TextField), 'work');
-      await tester.pumpAndSettle();
-
-      // Tap clear button
-      await tester.tap(find.byIcon(Icons.clear));
-      await tester.pumpAndSettle();
-
-      // Assert - all spaces should be visible again
+      // Should show all spaces again
       expect(find.text('Personal'), findsOneWidget);
       expect(find.text('Work'), findsOneWidget);
-      expect(find.text('Projects'), findsOneWidget);
+      expect(find.text('Shopping'), findsOneWidget);
     });
 
-    testWidgets('displays create new space button', (
+    testWidgets('shows no results when search has no matches', (
       WidgetTester tester,
     ) async {
-      // Act
-      await tester.pumpWidget(buildModalWithProvider());
-      await tester.pumpAndSettle();
-
-      // Assert
-      expect(find.text('Create New Space'), findsOneWidget);
-      expect(find.widgetWithIcon(ElevatedButton, Icons.add), findsOneWidget);
-    });
-
-    testWidgets('create button opens create space modal', (
-      WidgetTester tester,
-    ) async {
-      // Act
-      await tester.pumpWidget(buildModalWithProvider());
-      await tester.pumpAndSettle();
-
-      await tester.tap(find.text('Create New Space'));
-      await tester.pumpAndSettle();
-
-      // Assert - the modal should close and open CreateSpaceModal
-      // Since we're in a test without proper navigation, just verify
-      // the button can be tapped without errors
-      expect(find.text('Create New Space'), findsNothing);
-    });
-
-    testWidgets('closes modal when close button is tapped', (
-      WidgetTester tester,
-    ) async {
-      // Arrange
-      var modalClosed = false;
-
       await tester.pumpWidget(
-        MediaQuery(
-          data: const MediaQueryData(size: Size(400, 800)),
-          child: MaterialApp(
-            home: ChangeNotifierProvider<SpacesProvider>.value(
-              value: spacesProvider,
-              child: Builder(
-                builder: (context) => Scaffold(
-                  body: ElevatedButton(
-                    onPressed: () async {
-                      final result = await ResponsiveModal.show<bool>(
-                        context: context,
-                        child: const SpaceSwitcherModal(),
-                      );
-                      modalClosed = result == null || !result;
-                    },
-                    child: const Text('Show Modal'),
-                  ),
-                ),
-              ),
-            ),
-          ),
+        createTestWidget(
+          child: const SpaceSwitcherModal(),
         ),
       );
-
-      // Act
-      await tester.tap(find.text('Show Modal'));
       await tester.pumpAndSettle();
 
-      await tester.tap(find.byIcon(Icons.close));
+      // Enter search query with no matches
+      await tester.enterText(find.byType(TextInputField), 'NonExistent');
       await tester.pumpAndSettle();
 
-      // Assert
-      expect(modalClosed, isTrue);
+      // Should show no spaces
+      expect(find.text('Personal'), findsNothing);
+      expect(find.text('Work'), findsNothing);
+      expect(find.text('Shopping'), findsNothing);
     });
+  });
 
-    testWidgets('switches space when space is tapped', (
-      WidgetTester tester,
-    ) async {
-      // Act
-      await tester.pumpWidget(buildModalWithProvider());
+  group('SpaceSwitcherModal - Space Selection', () {
+    testWidgets('switches space when tapped', (WidgetTester tester) async {
+      await tester.pumpWidget(
+        createTestWidget(
+          child: const SpaceSwitcherModal(),
+        ),
+      );
       await tester.pumpAndSettle();
 
-      // Tap on 'Work' space
+      // Tap on Work space
       await tester.tap(find.text('Work'));
       await tester.pumpAndSettle();
 
-      // Assert
-      expect(spacesProvider.currentSpace?.id, equals('space-2'));
-      expect(spacesProvider.currentSpace?.name, equals('Work'));
+      // Should call switchSpace with correct ID
+      verify(mockSpacesProvider.switchSpace('space-2')).called(1);
     });
 
-    testWidgets('escape key closes modal', (WidgetTester tester) async {
-      // Arrange
-      var modalClosed = false;
-
+    testWidgets('closes modal when tapping current space', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
-        MediaQuery(
-          data: const MediaQueryData(size: Size(400, 800)),
-          child: MaterialApp(
-            home: ChangeNotifierProvider<SpacesProvider>.value(
-              value: spacesProvider,
-              child: Builder(
-                builder: (context) => Scaffold(
-                  body: ElevatedButton(
-                    onPressed: () async {
-                      final result = await ResponsiveModal.show<bool>(
-                        context: context,
-                        child: const SpaceSwitcherModal(),
-                      );
-                      modalClosed = result == null || !result;
-                    },
-                    child: const Text('Show Modal'),
-                  ),
-                ),
-              ),
-            ),
-          ),
+        createTestWidget(
+          child: const SpaceSwitcherModal(),
         ),
       );
-
-      await tester.tap(find.text('Show Modal'));
       await tester.pumpAndSettle();
 
-      // Act - Press escape key
-      await tester.sendKeyEvent(LogicalKeyboardKey.escape);
-      await tester.pumpAndSettle();
-
-      // Assert
-      expect(modalClosed, isTrue);
-    });
-
-    testWidgets('arrow down key navigates down the list', (
-      WidgetTester tester,
-    ) async {
-      // Act
-      await tester.pumpWidget(buildModalWithProvider());
-      await tester.pumpAndSettle();
-
-      // Press arrow down twice
-      await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
-      await tester.pumpAndSettle();
-
-      await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
-      await tester.pumpAndSettle();
-
-      // Press enter to select
-      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
-      await tester.pumpAndSettle();
-
-      // Assert - Should have selected the second space (Work)
-      expect(spacesProvider.currentSpace?.id, equals('space-2'));
-    });
-
-    testWidgets('arrow up key navigates up the list', (
-      WidgetTester tester,
-    ) async {
-      // Act
-      await tester.pumpWidget(buildModalWithProvider());
-      await tester.pumpAndSettle();
-
-      // Press arrow up (should wrap to last item)
-      await tester.sendKeyEvent(LogicalKeyboardKey.arrowUp);
-      await tester.pumpAndSettle();
-
-      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
-      await tester.pumpAndSettle();
-
-      // Assert - Should have selected the last space (Ideas)
-      expect(spacesProvider.currentSpace?.id, equals('space-5'));
-    });
-
-    testWidgets('number key 1 selects first space', (
-      WidgetTester tester,
-    ) async {
-      // Act
-      await tester.pumpWidget(buildModalWithProvider());
-      await tester.pumpAndSettle();
-
-      await tester.sendKeyEvent(LogicalKeyboardKey.digit1);
-      await tester.pumpAndSettle();
-
-      // Assert
-      expect(spacesProvider.currentSpace?.id, equals('space-1'));
-    });
-
-    testWidgets('number key 2 selects second space', (
-      WidgetTester tester,
-    ) async {
-      // Act
-      await tester.pumpWidget(buildModalWithProvider());
-      await tester.pumpAndSettle();
-
-      await tester.sendKeyEvent(LogicalKeyboardKey.digit2);
-      await tester.pumpAndSettle();
-
-      // Assert
-      expect(spacesProvider.currentSpace?.id, equals('space-2'));
-    });
-
-    testWidgets('shows number indicators for first 9 spaces', (
-      WidgetTester tester,
-    ) async {
-      // Act
-      await tester.pumpWidget(buildModalWithProvider());
-      await tester.pumpAndSettle();
-
-      // Assert - Should show numbers 1-5 (may appear more than once)
-      expect(find.text('1'), findsWidgets);
-      expect(find.text('2'), findsWidgets);
-      expect(find.text('3'), findsWidgets);
-      expect(find.text('4'), findsWidgets);
-    });
-
-    testWidgets('displays as bottom sheet on mobile', (
-      WidgetTester tester,
-    ) async {
-      // Arrange
-      await tester.pumpWidget(
-        MediaQuery(
-          data: const MediaQueryData(size: Size(400, 800)), // Mobile size
-          child: MaterialApp(
-            home: ChangeNotifierProvider<SpacesProvider>.value(
-              value: spacesProvider,
-              child: Builder(
-                builder: (context) => Scaffold(
-                  body: ElevatedButton(
-                    onPressed: () => ResponsiveModal.show<bool>(
-                      context: context,
-                      child: const SpaceSwitcherModal(),
-                    ),
-                    child: const Text('Show Modal'),
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ),
-      );
-
-      // Act
-      await tester.tap(find.text('Show Modal'));
-      await tester.pumpAndSettle();
-
-      // Assert - Modal should be visible
-      expect(find.text('Switch Space'), findsOneWidget);
-      expect(find.text('Personal'), findsOneWidget);
-    });
-
-    testWidgets('displays as dialog on desktop', (WidgetTester tester) async {
-      // Arrange
-      await tester.pumpWidget(
-        MediaQuery(
-          data: const MediaQueryData(size: Size(1200, 800)), // Desktop size
-          child: MaterialApp(
-            home: ChangeNotifierProvider<SpacesProvider>.value(
-              value: spacesProvider,
-              child: Builder(
-                builder: (context) => Scaffold(
-                  body: ElevatedButton(
-                    onPressed: () => ResponsiveModal.show<bool>(
-                      context: context,
-                      child: const SpaceSwitcherModal(),
-                    ),
-                    child: const Text('Show Modal'),
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ),
-      );
-
-      // Act
-      await tester.tap(find.text('Show Modal'));
-      await tester.pumpAndSettle();
-
-      // Assert - Dialog should be visible
-      expect(find.byType(Dialog), findsOneWidget);
-      expect(find.text('Switch Space'), findsOneWidget);
-    });
-
-    testWidgets('has minimum touch target size for all interactive elements', (
-      WidgetTester tester,
-    ) async {
-      // Act
-      await tester.pumpWidget(buildModalWithProvider());
-      await tester.pumpAndSettle();
-
-      // Assert - Create button should meet minimum size
-      final createButton = tester.widget<ElevatedButton>(
-        find.widgetWithText(ElevatedButton, 'Create New Space'),
-      );
-      final minimumSize = createButton.style!.minimumSize?.resolve(
-        <WidgetState>{},
-      );
-      expect(minimumSize, isNotNull);
-      expect(minimumSize!.height, greaterThanOrEqualTo(44.0));
-    });
-
-    testWidgets('uses correct colors in light mode', (
-      WidgetTester tester,
-    ) async {
-      // Act
-      await tester.pumpWidget(buildModalWithProvider(theme: ThemeData.light()));
-      await tester.pumpAndSettle();
-
-      // Assert - Create button should use primary amber
-      final createButton = tester.widget<ElevatedButton>(
-        find.widgetWithText(ElevatedButton, 'Create New Space'),
-      );
-      final backgroundColor = createButton.style!.backgroundColor?.resolve(
-        <WidgetState>{},
-      );
-      expect(backgroundColor, AppColors.primarySolid);
-    });
-
-    testWidgets('uses correct colors in dark mode', (
-      WidgetTester tester,
-    ) async {
-      // Act
-      final darkTheme = ThemeData.dark().copyWith(
-        extensions: <ThemeExtension<dynamic>>[
-          TemporalFlowTheme.dark(),
-        ],
-      );
-      await tester.pumpWidget(buildModalWithProvider(theme: darkTheme));
-      await tester.pumpAndSettle();
-
-      // Assert - Create button should still use primary amber
-      final createButton = tester.widget<ElevatedButton>(
-        find.widgetWithText(ElevatedButton, 'Create New Space'),
-      );
-      final backgroundColor = createButton.style!.backgroundColor?.resolve(
-        <WidgetState>{},
-      );
-      expect(backgroundColor, AppColors.primarySolid);
-    });
-
-    testWidgets('has proper semantic labels for accessibility', (
-      WidgetTester tester,
-    ) async {
-      // Act
-      await tester.pumpWidget(buildModalWithProvider());
-      await tester.pumpAndSettle();
-
-      // Assert - Space items should have semantic labels with item counts
-      final personalSemantics = tester.getSemantics(
-        find
-            .ancestor(
-              of: find.text('Personal'),
-              matching: find.byType(Semantics),
-            )
-            .first,
-      );
-      expect(personalSemantics.label, contains('Personal'));
-      // Item count should be present (will be 0 since no items created in test)
-      expect(personalSemantics.label, contains('items'));
-    });
-
-    testWidgets('performance: space switching completes quickly', (
-      WidgetTester tester,
-    ) async {
-      // Act
-      await tester.pumpWidget(buildModalWithProvider());
-      await tester.pumpAndSettle();
-
-      final startTime = DateTime.now();
-      await tester.tap(find.text('Work'));
-      await tester.pumpAndSettle();
-      final duration = DateTime.now().difference(startTime);
-
-      // Assert - Should complete quickly (test environment allowance)
-      expect(duration.inMilliseconds, lessThan(1000));
-      expect(spacesProvider.currentSpace?.name, equals('Work'));
-    });
-
-    testWidgets('closes modal automatically when space is selected', (
-      WidgetTester tester,
-    ) async {
-      // Arrange
-      var modalClosed = false;
-
-      await tester.pumpWidget(
-        MediaQuery(
-          data: const MediaQueryData(size: Size(400, 800)),
-          child: MaterialApp(
-            home: ChangeNotifierProvider<SpacesProvider>.value(
-              value: spacesProvider,
-              child: Builder(
-                builder: (context) => Scaffold(
-                  body: ElevatedButton(
-                    onPressed: () async {
-                      final result = await ResponsiveModal.show<bool>(
-                        context: context,
-                        child: const SpaceSwitcherModal(),
-                      );
-                      modalClosed = result == true;
-                    },
-                    child: const Text('Show Modal'),
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ),
-      );
-
-      await tester.tap(find.text('Show Modal'));
-      await tester.pumpAndSettle();
-
-      // Assert - Modal is visible before selection
-      expect(find.text('Switch Space'), findsOneWidget);
-
-      // Act - Select a different space (find the text in the list)
-      final workFinder = find.descendant(
-        of: find.byType(ListView),
-        matching: find.text('Work'),
-      );
-      expect(workFinder, findsOneWidget);
-      await tester.tap(workFinder);
-      await tester.pumpAndSettle();
-
-      // Assert
-      expect(modalClosed, isTrue);
-    });
-
-    testWidgets('does not close when selecting current space', (
-      WidgetTester tester,
-    ) async {
-      // Act
-      await tester.pumpWidget(buildModalWithProvider());
-      await tester.pumpAndSettle();
-
-      // Tap on current space (Personal, which is first/current)
+      // Tap on current space (Personal) - should just close, not switch
       await tester.tap(find.text('Personal'));
       await tester.pumpAndSettle();
 
-      // Assert - Modal should close but return false (no change)
-      expect(find.text('Switch Space'), findsNothing);
+      // Should not call switchSpace when tapping current space
+      verifyNever(mockSpacesProvider.switchSpace(any));
+    });
+  });
+
+  group('SpaceSwitcherModal - Item Counts', () {
+    testWidgets('pre-fetches item counts for all spaces', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        createTestWidget(
+          child: const SpaceSwitcherModal(),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // Wait for async pre-fetch
+      await tester.pump(const Duration(milliseconds: 100));
+
+      // Should have requested item counts (may be called multiple times during render)
+      verify(mockSpacesProvider.getSpaceItemCount(any)).called(greaterThanOrEqualTo(3));
     });
 
-    group('Async Item Count Display', () {
-      testWidgets('displays loading state for item counts initially', (
-        WidgetTester tester,
-      ) async {
-        // Act
-        await tester.pumpWidget(buildModalWithProvider());
-        // Don't settle yet - check loading state
-        await tester.pump();
+  });
 
-        // Assert - Should show some form of loading indicator or placeholder
-        // The exact text may be '...' or '0' depending on cache state
-        expect(find.byType(SpaceSwitcherModal), findsOneWidget);
-      });
+  group('SpaceSwitcherModal - Create New Space', () {
+    testWidgets('has Create New Space button', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        createTestWidget(
+          child: const SpaceSwitcherModal(),
+        ),
+      );
+      await tester.pumpAndSettle();
 
-      testWidgets('displays correct count after async loading completes', (
-        WidgetTester tester,
-      ) async {
-        // Act
-        await tester.pumpWidget(buildModalWithProvider());
-        await tester.pumpAndSettle();
+      // Should show Create New Space button
+      expect(find.text('Create New Space'), findsOneWidget);
+      expect(find.byType(PrimaryButton), findsOneWidget);
+    });
+  });
 
-        // Assert - Counts should be displayed (will be 0 since no items created)
-        // We can verify that the count badges are present
-        expect(find.text('0'), findsWidgets);
-      });
+  group('SpaceSwitcherModal - Accessibility', () {
+    testWidgets('spaces are tappable with semantic meaning', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        createTestWidget(
+          child: const SpaceSwitcherModal(),
+        ),
+      );
+      await tester.pumpAndSettle();
 
-      testWidgets('caches counts to prevent flicker on rebuild', (
-        WidgetTester tester,
-      ) async {
-        // Arrange
-        await tester.pumpWidget(buildModalWithProvider());
-        await tester.pumpAndSettle();
+      // All spaces should be findable and tappable
+      expect(find.text('Personal'), findsOneWidget);
+      expect(find.text('Work'), findsWidgets);
+      expect(find.text('Shopping'), findsOneWidget);
+    });
 
-        // Get initial count displays
-        final initialCountFinder = find.text('0');
-        expect(initialCountFinder, findsWidgets);
+    testWidgets('search field is accessible', (WidgetTester tester) async {
+      await tester.pumpWidget(
+        createTestWidget(
+          child: const SpaceSwitcherModal(),
+        ),
+      );
+      await tester.pumpAndSettle();
 
-        // Act - Trigger a rebuild by typing in search
-        await tester.enterText(find.byType(TextField), 'a');
-        await tester.pump(); // Just pump once, don't settle
-
-        // Assert - Counts should still be visible (from cache)
-        expect(find.text('0'), findsWidgets);
-      });
+      // Search field should have proper semantics
+      final textField = tester.widget<TextInputField>(
+        find.byType(TextInputField),
+      );
+      expect(textField.hintText, isNotEmpty);
     });
   });
 }

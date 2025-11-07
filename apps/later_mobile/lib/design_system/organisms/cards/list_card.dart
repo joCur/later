@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:later_mobile/design_system/tokens/tokens.dart';
-import '../../../data/models/list_model.dart';
+import 'package:later_mobile/data/models/list_model.dart';
 import 'package:later_mobile/design_system/atoms/borders/gradient_pill_border.dart';
 import 'package:later_mobile/design_system/atoms/drag_handle/drag_handle.dart';
 import 'package:later_mobile/core/theme/temporal_flow_theme.dart';
@@ -168,7 +168,7 @@ class _ListCardState extends State<ListCard> with TickerProviderStateMixin {
   /// Returns "1 item" for single item, "N items" for multiple items
   /// Examples: "1 item", "5 items", "0 items"
   Widget _buildItemCount(BuildContext context) {
-    final count = widget.list.totalItems;
+    final count = widget.list.totalItemCount;
     final text = count == 1 ? '1 item' : '$count items';
 
     return Text(
@@ -179,48 +179,22 @@ class _ListCardState extends State<ListCard> with TickerProviderStateMixin {
     );
   }
 
-  /// Build preview of first 3 items with ellipsis handling
+  /// Build preview showing item count (items are loaded separately)
   ///
-  /// Shows comma-separated list of first 3 item titles
-  /// Adds "..." if more than 3 items exist
-  /// Shows "No items" when list is empty
+  /// Shows a simple text preview indicating the number of items
+  /// Examples: "No items yet", "5 items"
   Widget _buildItemPreview(BuildContext context) {
-    final preview = _getItemPreview();
+    final count = widget.list.totalItemCount;
+    final preview = count == 0 ? 'No items yet' : '$count item${count == 1 ? '' : 's'}';
 
     return Text(
       preview,
       style: AppTypography.itemContent.copyWith(
         color: AppColors.textSecondary(context),
       ),
-      maxLines: 2,
+      maxLines: 1,
       overflow: TextOverflow.ellipsis,
     );
-  }
-
-  /// Generate item preview string from first 3 items
-  ///
-  /// Returns:
-  /// - "No items" when list is empty
-  /// - "Item1, Item2, Item3..." when more than 3 items (with ellipsis)
-  /// - "Item1, Item2" when 2 items (no ellipsis)
-  /// - "Item1" when 1 item (no ellipsis)
-  String _getItemPreview() {
-    if (widget.list.items.isEmpty) {
-      return 'No items';
-    }
-
-    final firstThree = widget.list.items
-        .take(3)
-        .map((item) => item.title)
-        .toList();
-    final preview = firstThree.join(', ');
-
-    // Add ellipsis if there are more than 3 items
-    if (widget.list.items.length > 3) {
-      return '$preview...';
-    }
-
-    return preview;
   }
 
   void _handleTapDown(TapDownDetails details) {
@@ -280,7 +254,7 @@ class _ListCardState extends State<ListCard> with TickerProviderStateMixin {
     // Build the semantic label
     final semanticLabel =
         'List: ${widget.list.name}, '
-        '${widget.list.totalItems} ${widget.list.totalItems == 1 ? 'item' : 'items'}';
+        '${widget.list.totalItemCount} ${widget.list.totalItemCount == 1 ? 'item' : 'items'}';
 
     // Build the card widget with mobile-first bold design
     // Phase 5: Wrap with AnimatedBuilder for press scale animation
@@ -448,10 +422,11 @@ class _IconParser {
   /// Common emoji ranges: 0x1F300-0x1F9FF, 0x2600-0x26FF, 0x2700-0x27BF
   static bool isEmoji(String text) {
     if (text.isEmpty) return false;
-    final codeUnit = text.codeUnitAt(0);
-    return (codeUnit >= 0x1F300 && codeUnit <= 0x1F9FF) ||
-        (codeUnit >= 0x2600 && codeUnit <= 0x26FF) ||
-        (codeUnit >= 0x2700 && codeUnit <= 0x27BF);
+    // Use runes to get the actual Unicode code point (handles surrogate pairs)
+    final codePoint = text.runes.first;
+    return (codePoint >= 0x1F300 && codePoint <= 0x1F9FF) ||
+        (codePoint >= 0x2600 && codePoint <= 0x26FF) ||
+        (codePoint >= 0x2700 && codePoint <= 0x27BF);
   }
 
   /// Parse icon name string to IconData

@@ -1,21 +1,17 @@
-import 'package:hive/hive.dart';
-import '../models/item_model.dart';
+import '../models/note_model.dart';
+import 'base_repository.dart';
 
-/// Repository for managing Note entities (Item model) in Hive local storage.
+/// Repository for managing Note entities in Supabase.
 ///
 /// Provides CRUD operations for notes, which are standalone content items
-/// for documentation and free-form text. Uses Hive box 'notes' for persistence.
-class NoteRepository {
-  /// Gets the Hive box for notes
-  Box<Item> get _box => Hive.box<Item>('notes');
-
-  /// Creates a new note in the local storage.
+/// for documentation and free-form text. Uses Supabase 'notes' table with RLS policies.
+class NoteRepository extends BaseRepository {
+  /// Creates a new note in Supabase.
   ///
   /// Automatically calculates and assigns the next sortOrder value for the note
   /// within its space. The sortOrder is space-scoped, starting at 0 for the first
   /// note in a space and incrementing for each subsequent note.
-  ///
-  /// Stores the note using its ID as the key in the Hive box.
+  /// Automatically sets the user_id from the authenticated user.
   ///
   /// Parameters:
   ///   - [note]: The note to be created
@@ -23,47 +19,61 @@ class NoteRepository {
   /// Returns:
   ///   The created note with assigned sortOrder
   ///
+  /// Throws:
+  ///   Exception if user is not authenticated or database operation fails
+  ///
   /// Example:
   /// ```dart
-  /// final note = Item(
+  /// final note = Note(
   ///   id: 'note-1',
   ///   title: 'Meeting Notes',
   ///   content: 'Discussion points from today\'s meeting...',
   ///   spaceId: 'space-1',
+  ///   userId: 'user-123',
   ///   tags: ['work', 'meetings'],
   /// );
   /// final created = await repository.create(note);
   /// // created.sortOrder will be 0 for first note in space, 1 for second, etc.
   /// ```
-  Future<Item> create(Item note) async {
-    try {
+  Future<Note> create(Note note) async {
+    return executeQuery(() async {
       // Calculate next sortOrder for this space
       final notesInSpace = await getBySpace(note.spaceId);
       final maxSortOrder = notesInSpace.isEmpty
           ? -1
           : notesInSpace
-              .map((n) => n.sortOrder)
-              .reduce((a, b) => a > b ? a : b);
+                .map((n) => n.sortOrder)
+                .reduce((a, b) => a > b ? a : b);
       final nextSortOrder = maxSortOrder + 1;
 
       // Create note with calculated sortOrder
       final noteWithSortOrder = note.copyWith(sortOrder: nextSortOrder);
-      await _box.put(noteWithSortOrder.id, noteWithSortOrder);
-      return noteWithSortOrder;
-    } catch (e) {
-      throw Exception('Failed to create note: $e');
-    }
+      final data = noteWithSortOrder.toJson();
+      data['user_id'] = userId; // Ensure correct user_id
+
+      final response = await supabase
+          .from('notes')
+          .insert(data)
+          .select()
+          .single();
+
+      return Note.fromJson(response);
+    });
   }
 
   /// Retrieves a single note by its ID.
   ///
-  /// Returns null if the note does not exist.
+  /// Returns null if the note does not exist or user doesn't have access.
+  /// RLS policies ensure users can only access their own notes.
   ///
   /// Parameters:
   ///   - [id]: The ID of the note to retrieve
   ///
   /// Returns:
   ///   The note with the given ID, or null if not found
+  ///
+  /// Throws:
+  ///   Exception if user is not authenticated or database operation fails
   ///
   /// Example:
   /// ```dart
@@ -72,17 +82,24 @@ class NoteRepository {
   ///   print('Found: ${note.title}');
   /// }
   /// ```
-  Future<Item?> getById(String id) async {
-    try {
-      return _box.get(id);
-    } catch (e) {
-      throw Exception('Failed to get note by id: $e');
-    }
+  Future<Note?> getById(String id) async {
+    return executeQuery(() async {
+      final response = await supabase
+          .from('notes')
+          .select()
+          .eq('id', id)
+          .eq('user_id', userId)
+          .maybeSingle();
+
+      if (response == null) return null;
+      return Note.fromJson(response);
+    });
   }
 
   /// Retrieves all notes belonging to a specific space.
   ///
-  /// Filters notes by their spaceId property.
+  /// Filters notes by their space_id and orders by sort_order.
+  /// RLS policies ensure users can only access their own notes.
   ///
   /// Parameters:
   ///   - [spaceId]: The ID of the space to filter by
@@ -90,32 +107,42 @@ class NoteRepository {
   /// Returns:
   ///   A list of notes belonging to the specified space
   ///
+  /// Throws:
+  ///   Exception if user is not authenticated or database operation fails
+  ///
   /// Example:
   /// ```dart
   /// final workNotes = await repository.getBySpace('work-space-1');
   /// print('Found ${workNotes.length} notes');
   /// ```
-  Future<List<Item>> getBySpace(String spaceId) async {
-    try {
-      return _box.values.where((note) => note.spaceId == spaceId).toList();
-    } catch (e) {
-      throw Exception('Failed to get notes by space: $e');
-    }
+  Future<List<Note>> getBySpace(String spaceId) async {
+    return executeQuery(() async {
+      final response = await supabase
+          .from('notes')
+          .select()
+          .eq('space_id', spaceId)
+          .eq('user_id', userId)
+          .order('sort_order', ascending: true);
+
+      return (response as List)
+          .map((json) => Note.fromJson(json as Map<String, dynamic>))
+          .toList();
+    });
   }
 
-  /// Updates an existing note in local storage.
+  /// Updates an existing note in Supabase.
   ///
-  /// Automatically updates the updatedAt timestamp to the current time.
-  /// Throws an exception if the note does not exist.
+  /// Automatically updates the updated_at timestamp to the current time.
+  /// RLS policies ensure users can only update their own notes.
   ///
   /// Parameters:
   ///   - [note]: The note to update with new values
   ///
   /// Returns:
-  ///   The updated note with the new updatedAt timestamp
+  ///   The updated note with the new updated_at timestamp
   ///
   /// Throws:
-  ///   Exception if the note with the given ID does not exist
+  ///   Exception if note doesn't exist, user doesn't have access, or operation fails
   ///
   /// Example:
   /// ```dart
@@ -125,43 +152,47 @@ class NoteRepository {
   /// );
   /// final result = await repository.update(updated);
   /// ```
-  Future<Item> update(Item note) async {
-    try {
-      // Check if the note exists
-      if (!_box.containsKey(note.id)) {
-        throw Exception('Note with id ${note.id} does not exist');
-      }
-
+  Future<Note> update(Note note) async {
+    return executeQuery(() async {
       // Update the updatedAt timestamp
       final updatedNote = note.copyWith(updatedAt: DateTime.now());
+      final data = updatedNote.toJson();
 
-      await _box.put(updatedNote.id, updatedNote);
-      return updatedNote;
-    } catch (e) {
-      throw Exception('Failed to update note: $e');
-    }
+      final response = await supabase
+          .from('notes')
+          .update(data)
+          .eq('id', note.id)
+          .eq('user_id', userId)
+          .select()
+          .single();
+
+      return Note.fromJson(response);
+    });
   }
 
-  /// Deletes a note from local storage.
+  /// Deletes a note from Supabase.
   ///
-  /// If the note does not exist, this operation completes without error.
+  /// RLS policies ensure users can only delete their own notes.
   ///
   /// Parameters:
   ///   - [id]: The ID of the note to delete
+  ///
+  /// Throws:
+  ///   Exception if user doesn't have access or operation fails
   ///
   /// Example:
   /// ```dart
   /// await repository.delete('note-1');
   /// ```
   Future<void> delete(String id) async {
-    try {
-      await _box.delete(id);
-    } catch (e) {
-      throw Exception('Failed to delete note: $e');
-    }
+    return executeQuery(() async {
+      await supabase.from('notes').delete().eq('id', id).eq('user_id', userId);
+    });
   }
 
   /// Deletes all notes belonging to a specific space.
+  ///
+  /// RLS policies ensure users can only delete their own notes.
   ///
   /// Parameters:
   ///   - [spaceId]: The ID of the space
@@ -169,24 +200,29 @@ class NoteRepository {
   /// Returns:
   ///   The number of notes deleted
   ///
+  /// Throws:
+  ///   Exception if user doesn't have access or operation fails
+  ///
   /// Example:
   /// ```dart
   /// final count = await repository.deleteAllInSpace('space-1');
   /// print('Deleted $count notes');
   /// ```
   Future<int> deleteAllInSpace(String spaceId) async {
-    try {
+    return executeQuery(() async {
       final notes = await getBySpace(spaceId);
-      for (final note in notes) {
-        await delete(note.id);
-      }
+      await supabase
+          .from('notes')
+          .delete()
+          .eq('space_id', spaceId)
+          .eq('user_id', userId);
       return notes.length;
-    } catch (e) {
-      throw Exception('Failed to delete all notes in space: $e');
-    }
+    });
   }
 
   /// Counts the number of notes in a specific space.
+  ///
+  /// RLS policies ensure users can only count their own notes.
   ///
   /// Parameters:
   ///   - [spaceId]: The ID of the space
@@ -194,21 +230,30 @@ class NoteRepository {
   /// Returns:
   ///   The number of notes in the space
   ///
+  /// Throws:
+  ///   Exception if user is not authenticated or database operation fails
+  ///
   /// Example:
   /// ```dart
   /// final count = await repository.countBySpace('space-1');
   /// print('Space has $count notes');
   /// ```
   Future<int> countBySpace(String spaceId) async {
-    try {
-      final notes = await getBySpace(spaceId);
-      return notes.length;
-    } catch (e) {
-      throw Exception('Failed to count notes in space: $e');
-    }
+    return executeQuery(() async {
+      final response = await supabase
+          .from('notes')
+          .select()
+          .eq('space_id', spaceId)
+          .eq('user_id', userId);
+
+      return (response as List).length;
+    });
   }
 
   /// Retrieves all notes with a specific tag.
+  ///
+  /// Uses PostgreSQL array operations to filter by tag.
+  /// RLS policies ensure users can only access their own notes.
   ///
   /// Parameters:
   ///   - [tag]: The tag to filter by
@@ -216,21 +261,32 @@ class NoteRepository {
   /// Returns:
   ///   A list of notes that have the specified tag
   ///
+  /// Throws:
+  ///   Exception if user is not authenticated or database operation fails
+  ///
   /// Example:
   /// ```dart
   /// final workNotes = await repository.getByTag('work');
   /// ```
-  Future<List<Item>> getByTag(String tag) async {
-    try {
-      return _box.values.where((note) => note.tags.contains(tag)).toList();
-    } catch (e) {
-      throw Exception('Failed to get notes by tag: $e');
-    }
+  Future<List<Note>> getByTag(String tag) async {
+    return executeQuery(() async {
+      final response = await supabase
+          .from('notes')
+          .select()
+          .contains('tags', [tag])
+          .eq('user_id', userId)
+          .order('sort_order', ascending: true);
+
+      return (response as List)
+          .map((json) => Note.fromJson(json as Map<String, dynamic>))
+          .toList();
+    });
   }
 
   /// Searches notes by title or content.
   ///
-  /// Performs a case-insensitive search across both title and content fields.
+  /// Performs a case-insensitive search using PostgreSQL's ILIKE operator.
+  /// RLS policies ensure users can only search their own notes.
   ///
   /// Parameters:
   ///   - [query]: The search query string
@@ -238,21 +294,60 @@ class NoteRepository {
   /// Returns:
   ///   A list of notes that match the search query
   ///
+  /// Throws:
+  ///   Exception if user is not authenticated or database operation fails
+  ///
   /// Example:
   /// ```dart
   /// final results = await repository.search('meeting');
   /// ```
-  Future<List<Item>> search(String query) async {
-    try {
-      final lowerQuery = query.toLowerCase();
-      return _box.values.where((note) {
-        final titleMatch = note.title.toLowerCase().contains(lowerQuery);
-        final contentMatch =
-            note.content?.toLowerCase().contains(lowerQuery) ?? false;
-        return titleMatch || contentMatch;
+  Future<List<Note>> search(String query) async {
+    return executeQuery(() async {
+      // Using .or() with .ilike() for case-insensitive search
+      final response = await supabase
+          .from('notes')
+          .select()
+          .eq('user_id', userId)
+          .or('title.ilike.%$query%,content.ilike.%$query%')
+          .order('sort_order', ascending: true);
+
+      return (response as List)
+          .map((json) => Note.fromJson(json as Map<String, dynamic>))
+          .toList();
+    });
+  }
+
+  /// Updates the sort orders for multiple notes in a batch.
+  ///
+  /// Used for drag-and-drop reordering. Updates all notes with their new
+  /// sort_order values in a single operation.
+  /// RLS policies ensure users can only update their own notes.
+  ///
+  /// Parameters:
+  ///   - [notes]: List of notes with updated sortOrder values
+  ///
+  /// Throws:
+  ///   Exception if user doesn't have access or operation fails
+  ///
+  /// Example:
+  /// ```dart
+  /// final reorderedNotes = notes
+  ///   .asMap()
+  ///   .entries
+  ///   .map((entry) => entry.value.copyWith(sortOrder: entry.key))
+  ///   .toList();
+  /// await repository.updateSortOrders(reorderedNotes);
+  /// ```
+  Future<void> updateSortOrders(List<Note> notes) async {
+    return executeQuery(() async {
+      final updates = notes.map((note) {
+        final data = note.toJson();
+        data['user_id'] = userId; // Ensure correct user_id
+        return data;
       }).toList();
-    } catch (e) {
-      throw Exception('Failed to search notes: $e');
-    }
+
+      // Use upsert to update multiple records at once
+      await supabase.from('notes').upsert(updates);
+    });
   }
 }

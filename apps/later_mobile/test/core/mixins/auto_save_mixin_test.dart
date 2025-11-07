@@ -25,7 +25,7 @@ class TestWidgetState extends State<TestWidget> with AutoSaveMixin {
     }
 
     // Simulate async save operation
-    await Future.delayed(const Duration(milliseconds: 50));
+    await Future<void>.delayed(const Duration(milliseconds: 50));
   }
 
   @override
@@ -53,7 +53,7 @@ class TestWidgetCustomDelayState extends State<TestWidgetCustomDelay>
   Future<void> saveChanges() async {
     saveCallCount++;
     // Simulate async save operation
-    await Future.delayed(const Duration(milliseconds: 50));
+    await Future<void>.delayed(const Duration(milliseconds: 50));
   }
 
   @override

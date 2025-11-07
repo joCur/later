@@ -1,19 +1,38 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:later_mobile/core/theme/temporal_flow_theme.dart';
 import 'package:later_mobile/widgets/navigation/icon_only_bottom_nav.dart';
 import 'package:later_mobile/design_system/tokens/tokens.dart';
 
 void main() {
+  Widget createTestWidget({
+    required int currentIndex,
+    required void Function(int) onDestinationSelected,
+    ThemeData? theme,
+  }) {
+    return MaterialApp(
+      theme: (theme ?? ThemeData.light()).copyWith(
+        extensions: <ThemeExtension<dynamic>>[
+          theme?.brightness == Brightness.dark
+              ? TemporalFlowTheme.dark()
+              : TemporalFlowTheme.light(),
+        ],
+      ),
+      home: Scaffold(
+        bottomNavigationBar: IconOnlyBottomNav(
+          currentIndex: currentIndex,
+          onDestinationSelected: onDestinationSelected,
+        ),
+      ),
+    );
+  }
+
   group('IconOnlyBottomNav', () {
     testWidgets('renders with correct height', (WidgetTester tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            bottomNavigationBar: IconOnlyBottomNav(
-              currentIndex: 0,
-              onDestinationSelected: (_) {},
-            ),
-          ),
+        createTestWidget(
+          currentIndex: 0,
+          onDestinationSelected: (_) {},
         ),
       );
 
@@ -30,13 +49,9 @@ void main() {
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            bottomNavigationBar: IconOnlyBottomNav(
-              currentIndex: 0,
-              onDestinationSelected: (_) {},
-            ),
-          ),
+        createTestWidget(
+          currentIndex: 0,
+          onDestinationSelected: (_) {},
         ),
       );
 
@@ -50,13 +65,9 @@ void main() {
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            bottomNavigationBar: IconOnlyBottomNav(
-              currentIndex: 0,
-              onDestinationSelected: (_) {},
-            ),
-          ),
+        createTestWidget(
+          currentIndex: 0,
+          onDestinationSelected: (_) {},
         ),
       );
 
@@ -84,6 +95,11 @@ void main() {
 
       await tester.pumpWidget(
         MaterialApp(
+          theme: ThemeData.light().copyWith(
+            extensions: <ThemeExtension<dynamic>>[
+              TemporalFlowTheme.light(),
+            ],
+          ),
           home: StatefulBuilder(
             builder: (context, setState) {
               return Scaffold(
@@ -116,13 +132,9 @@ void main() {
 
     testWidgets('active tab shows filled icon', (WidgetTester tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            bottomNavigationBar: IconOnlyBottomNav(
-              currentIndex: 0,
-              onDestinationSelected: (_) {},
-            ),
-          ),
+        createTestWidget(
+          currentIndex: 0,
+          onDestinationSelected: (_) {},
         ),
       );
 
@@ -137,14 +149,10 @@ void main() {
 
     testWidgets('inactive tabs show gray icons', (WidgetTester tester) async {
       await tester.pumpWidget(
-        MaterialApp(
+        createTestWidget(
+          currentIndex: 0,
+          onDestinationSelected: (_) {},
           theme: ThemeData.light(),
-          home: Scaffold(
-            bottomNavigationBar: IconOnlyBottomNav(
-              currentIndex: 0,
-              onDestinationSelected: (_) {},
-            ),
-          ),
         ),
       );
 
@@ -161,13 +169,9 @@ void main() {
 
     testWidgets('active tab shows white icon', (WidgetTester tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            bottomNavigationBar: IconOnlyBottomNav(
-              currentIndex: 0,
-              onDestinationSelected: (_) {},
-            ),
-          ),
+        createTestWidget(
+          currentIndex: 0,
+          onDestinationSelected: (_) {},
         ),
       );
 
@@ -182,14 +186,10 @@ void main() {
 
     testWidgets('respects dark mode', (WidgetTester tester) async {
       await tester.pumpWidget(
-        MaterialApp(
+        createTestWidget(
+          currentIndex: 1, // Search is active
+          onDestinationSelected: (_) {},
           theme: ThemeData.dark(),
-          home: Scaffold(
-            bottomNavigationBar: IconOnlyBottomNav(
-              currentIndex: 1, // Search is active
-              onDestinationSelected: (_) {},
-            ),
-          ),
         ),
       );
 
@@ -206,13 +206,9 @@ void main() {
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            bottomNavigationBar: IconOnlyBottomNav(
-              currentIndex: 0,
-              onDestinationSelected: (_) {},
-            ),
-          ),
+        createTestWidget(
+          currentIndex: 0,
+          onDestinationSelected: (_) {},
         ),
       );
 
@@ -234,6 +230,11 @@ void main() {
 
       await tester.pumpWidget(
         MaterialApp(
+          theme: ThemeData.light().copyWith(
+            extensions: <ThemeExtension<dynamic>>[
+              TemporalFlowTheme.light(),
+            ],
+          ),
           home: StatefulBuilder(
             builder: (context, setState) {
               return Scaffold(
@@ -272,13 +273,9 @@ void main() {
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            bottomNavigationBar: IconOnlyBottomNav(
-              currentIndex: 0,
-              onDestinationSelected: (_) {},
-            ),
-          ),
+        createTestWidget(
+          currentIndex: 0,
+          onDestinationSelected: (_) {},
         ),
       );
 
@@ -300,13 +297,9 @@ void main() {
 
     testWidgets('shows tooltips on long press', (WidgetTester tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            bottomNavigationBar: IconOnlyBottomNav(
-              currentIndex: 0,
-              onDestinationSelected: (_) {},
-            ),
-          ),
+        createTestWidget(
+          currentIndex: 0,
+          onDestinationSelected: (_) {},
         ),
       );
 
@@ -322,13 +315,9 @@ void main() {
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            bottomNavigationBar: IconOnlyBottomNav(
-              currentIndex: 0,
-              onDestinationSelected: (_) {},
-            ),
-          ),
+        createTestWidget(
+          currentIndex: 0,
+          onDestinationSelected: (_) {},
         ),
       );
 

@@ -3,11 +3,24 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:later_mobile/core/theme/temporal_flow_theme.dart';
+import 'package:later_mobile/data/local/preferences_service.dart';
 import 'package:later_mobile/data/models/space_model.dart';
 import 'package:later_mobile/data/repositories/space_repository.dart';
+import 'package:later_mobile/providers/auth_provider.dart';
 import 'package:later_mobile/providers/spaces_provider.dart';
+import 'package:later_mobile/providers/theme_provider.dart';
 import 'package:later_mobile/widgets/navigation/app_sidebar.dart';
+import 'package:mockito/annotations.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import 'app_sidebar_test.mocks.dart';
+
+@GenerateNiceMocks([MockSpec<AuthProvider>()])
+// ignore: unused_element
+void _generateMocks() {
+  // This function exists only to trigger mock generation
+}
 
 /// Mock implementation of SpaceRepository for testing
 class MockSpaceRepository extends SpaceRepository {
@@ -84,16 +97,24 @@ void main() {
   group('AppSidebar', () {
     late MockSpaceRepository mockRepository;
     late SpacesProvider spacesProvider;
+    late MockAuthProvider mockAuthProvider;
 
-    setUp(() {
+    setUp(() async {
+      // Initialize SharedPreferences with mock values for testing
+      SharedPreferences.setMockInitialValues({});
+      await PreferencesService.initialize();
+
       mockRepository = MockSpaceRepository();
       spacesProvider = SpacesProvider(mockRepository);
+      mockAuthProvider = MockAuthProvider();
     });
 
     Widget createTestWidget({
       bool isExpanded = true,
       VoidCallback? onToggleExpanded,
     }) {
+      final themeProvider = ThemeProvider();
+
       return MaterialApp(
         theme: ThemeData.light().copyWith(
           extensions: [TemporalFlowTheme.light()],
@@ -101,8 +122,12 @@ void main() {
         darkTheme: ThemeData.dark().copyWith(
           extensions: [TemporalFlowTheme.dark()],
         ),
-        home: ChangeNotifierProvider<SpacesProvider>.value(
-          value: spacesProvider,
+        home: MultiProvider(
+          providers: [
+            ChangeNotifierProvider<SpacesProvider>.value(value: spacesProvider),
+            ChangeNotifierProvider<AuthProvider>.value(value: mockAuthProvider),
+            ChangeNotifierProvider<ThemeProvider>.value(value: themeProvider),
+          ],
           child: Scaffold(
             body: AppSidebar(
               isExpanded: isExpanded,
@@ -141,8 +166,8 @@ void main() {
 
     testWidgets('displays space list with item counts', (tester) async {
       final spaces = [
-        Space(id: 'space-1', name: 'Work', icon: '💼'),
-        Space(id: 'space-2', name: 'Personal', icon: '🏠'),
+        Space(id: 'space-1', name: 'Work', icon: '💼', userId: 'test-user'),
+        Space(id: 'space-2', name: 'Personal', icon: '🏠', userId: 'test-user'),
       ];
 
       mockRepository.mockSpaces = spaces;
@@ -172,8 +197,8 @@ void main() {
 
     testWidgets('highlights selected space', (tester) async {
       final spaces = [
-        Space(id: 'space-1', name: 'Work'),
-        Space(id: 'space-2', name: 'Personal'),
+        Space(id: 'space-1', name: 'Work', userId: 'test-user'),
+        Space(id: 'space-2', name: 'Personal', userId: 'test-user'),
       ];
 
       mockRepository.mockSpaces = spaces;
@@ -189,8 +214,8 @@ void main() {
 
     testWidgets('switches space on tap', (tester) async {
       final spaces = [
-        Space(id: 'space-1', name: 'Work'),
-        Space(id: 'space-2', name: 'Personal'),
+        Space(id: 'space-1', name: 'Work', userId: 'test-user'),
+        Space(id: 'space-2', name: 'Personal', userId: 'test-user'),
       ];
 
       mockRepository.mockSpaces = spaces;
@@ -243,13 +268,21 @@ void main() {
 
     testWidgets('animates width when expanding/collapsing', (tester) async {
       bool isExpanded = true;
+      final themeProvider = ThemeProvider();
 
       await tester.pumpWidget(
         StatefulBuilder(
           builder: (context, setState) {
             return MaterialApp(
-              home: ChangeNotifierProvider<SpacesProvider>.value(
-                value: spacesProvider,
+              theme: ThemeData.light().copyWith(
+                extensions: [TemporalFlowTheme.light()],
+              ),
+              home: MultiProvider(
+                providers: [
+                  ChangeNotifierProvider<SpacesProvider>.value(value: spacesProvider),
+                  ChangeNotifierProvider<AuthProvider>.value(value: mockAuthProvider),
+                  ChangeNotifierProvider<ThemeProvider>.value(value: themeProvider),
+                ],
                 child: Scaffold(
                   body: AppSidebar(
                     isExpanded: isExpanded,
@@ -288,8 +321,8 @@ void main() {
 
     testWidgets('keyboard shortcut 1 switches to first space', (tester) async {
       final spaces = [
-        Space(id: 'space-1', name: 'Work'),
-        Space(id: 'space-2', name: 'Personal'),
+        Space(id: 'space-1', name: 'Work', userId: 'test-user'),
+        Space(id: 'space-2', name: 'Personal', userId: 'test-user'),
       ];
 
       mockRepository.mockSpaces = spaces;
@@ -310,8 +343,8 @@ void main() {
 
     testWidgets('keyboard shortcut 2 switches to second space', (tester) async {
       final spaces = [
-        Space(id: 'space-1', name: 'Work'),
-        Space(id: 'space-2', name: 'Personal'),
+        Space(id: 'space-1', name: 'Work', userId: 'test-user'),
+        Space(id: 'space-2', name: 'Personal', userId: 'test-user'),
       ];
 
       mockRepository.mockSpaces = spaces;
@@ -331,7 +364,7 @@ void main() {
     testWidgets('keyboard shortcuts work for spaces 1-9', (tester) async {
       final spaces = List<Space>.generate(
         9,
-        (i) => Space(id: 'space-${i + 1}', name: 'Space ${i + 1}'),
+        (i) => Space(id: 'space-${i + 1}', name: 'Space ${i + 1}', userId: 'test-user'),
       );
 
       mockRepository.mockSpaces = spaces;
@@ -371,7 +404,7 @@ void main() {
 
     testWidgets('has proper semantic labels for accessibility', (tester) async {
       final spaces = [
-        Space(id: 'space-1', name: 'Work', icon: '💼'),
+        Space(id: 'space-1', name: 'Work', icon: '💼', userId: 'test-user'),
       ];
 
       mockRepository.mockSpaces = spaces;
@@ -393,7 +426,7 @@ void main() {
     });
 
     testWidgets('displays tooltips on hover', (tester) async {
-      final spaces = [Space(id: 'space-1', name: 'Work')];
+      final spaces = [Space(id: 'space-1', name: 'Work', userId: 'test-user')];
 
       mockRepository.mockSpaces = spaces;
 
@@ -410,8 +443,8 @@ void main() {
       tester,
     ) async {
       final spaces = [
-        Space(id: 'space-1', name: 'Work', icon: '💼'),
-        Space(id: 'space-2', name: 'Personal'),
+        Space(id: 'space-1', name: 'Work', icon: '💼', userId: 'test-user'),
+        Space(id: 'space-2', name: 'Personal', userId: 'test-user'),
       ];
 
       mockRepository.mockSpaces = spaces;
@@ -428,7 +461,7 @@ void main() {
     });
 
     testWidgets('maintains minimum touch target size', (tester) async {
-      final spaces = [Space(id: 'space-1', name: 'Work')];
+      final spaces = [Space(id: 'space-1', name: 'Work', userId: 'test-user')];
 
       mockRepository.mockSpaces = spaces;
 
@@ -447,11 +480,19 @@ void main() {
     });
 
     testWidgets('works with dark theme', (tester) async {
+      final themeProvider = ThemeProvider();
+
       await tester.pumpWidget(
         MaterialApp(
-          theme: ThemeData.dark(),
-          home: ChangeNotifierProvider<SpacesProvider>.value(
-            value: spacesProvider,
+          theme: ThemeData.dark().copyWith(
+            extensions: [TemporalFlowTheme.dark()],
+          ),
+          home: MultiProvider(
+            providers: [
+              ChangeNotifierProvider<SpacesProvider>.value(value: spacesProvider),
+              ChangeNotifierProvider<AuthProvider>.value(value: mockAuthProvider),
+              ChangeNotifierProvider<ThemeProvider>.value(value: themeProvider),
+            ],
             child: const Scaffold(body: AppSidebar()),
           ),
         ),
@@ -461,11 +502,19 @@ void main() {
     });
 
     testWidgets('works with light theme', (tester) async {
+      final themeProvider = ThemeProvider();
+
       await tester.pumpWidget(
         MaterialApp(
-          theme: ThemeData.light(),
-          home: ChangeNotifierProvider<SpacesProvider>.value(
-            value: spacesProvider,
+          theme: ThemeData.light().copyWith(
+            extensions: [TemporalFlowTheme.light()],
+          ),
+          home: MultiProvider(
+            providers: [
+              ChangeNotifierProvider<SpacesProvider>.value(value: spacesProvider),
+              ChangeNotifierProvider<AuthProvider>.value(value: mockAuthProvider),
+              ChangeNotifierProvider<ThemeProvider>.value(value: themeProvider),
+            ],
             child: const Scaffold(body: AppSidebar()),
           ),
         ),
@@ -504,7 +553,7 @@ void main() {
 
     testWidgets('space item has gradient hover state', (tester) async {
       final spaces = [
-        Space(id: 'space-1', name: 'Work', icon: '💼'),
+        Space(id: 'space-1', name: 'Work', icon: '💼', userId: 'test-user'),
       ];
 
       mockRepository.mockSpaces = spaces;
@@ -542,8 +591,8 @@ void main() {
       tester,
     ) async {
       final spaces = [
-        Space(id: 'space-1', name: 'Work', icon: '💼'),
-        Space(id: 'space-2', name: 'Personal', icon: '🏠'),
+        Space(id: 'space-1', name: 'Work', icon: '💼', userId: 'test-user'),
+        Space(id: 'space-2', name: 'Personal', icon: '🏠', userId: 'test-user'),
       ];
 
       mockRepository.mockSpaces = spaces;
@@ -571,6 +620,7 @@ void main() {
           name: 'Work',
           icon: '💼',
           color: 'red',
+          userId: 'test-user',
         ),
       ];
 
@@ -598,13 +648,21 @@ void main() {
       tester,
     ) async {
       bool isExpanded = true;
+      final themeProvider = ThemeProvider();
 
       await tester.pumpWidget(
         StatefulBuilder(
           builder: (context, setState) {
             return MaterialApp(
-              home: ChangeNotifierProvider<SpacesProvider>.value(
-                value: spacesProvider,
+              theme: ThemeData.light().copyWith(
+                extensions: [TemporalFlowTheme.light()],
+              ),
+              home: MultiProvider(
+                providers: [
+                  ChangeNotifierProvider<SpacesProvider>.value(value: spacesProvider),
+                  ChangeNotifierProvider<AuthProvider>.value(value: mockAuthProvider),
+                  ChangeNotifierProvider<ThemeProvider>.value(value: themeProvider),
+                ],
                 child: Scaffold(
                   body: AppSidebar(
                     isExpanded: isExpanded,
@@ -642,7 +700,7 @@ void main() {
       tester,
     ) async {
       final spaces = [
-        Space(id: 'space-1', name: 'Work', icon: '💼'),
+        Space(id: 'space-1', name: 'Work', icon: '💼', userId: 'test-user'),
       ];
 
       mockRepository.mockSpaces = spaces;
@@ -699,7 +757,7 @@ void main() {
     ) async {
       final spaces = List<Space>.generate(
         5,
-        (i) => Space(id: 'space-${i + 1}', name: 'Space ${i + 1}'),
+        (i) => Space(id: 'space-${i + 1}', name: 'Space ${i + 1}', userId: 'test-user'),
       );
 
       mockRepository.mockSpaces = spaces;

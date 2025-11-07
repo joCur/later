@@ -45,6 +45,7 @@ class TextInputField extends StatefulWidget {
     this.onSuffixIconPressed,
     this.focusNode,
     this.textCapitalization = TextCapitalization.none,
+    this.textColor,
   });
 
   /// Field label (optional - omit for cases like search fields)
@@ -106,6 +107,9 @@ class TextInputField extends StatefulWidget {
 
   /// Text capitalization behavior
   final TextCapitalization textCapitalization;
+
+  /// Optional custom text color (overrides default theme color)
+  final Color? textColor;
 
   @override
   State<TextInputField> createState() => _TextInputFieldState();
@@ -317,7 +321,7 @@ class _TextInputFieldState extends State<TextInputField> {
                 maxLines: widget.maxLines,
                 style: AppTypography.input.copyWith(
                   color: widget.enabled
-                      ? (AppColors.text(context))
+                      ? (widget.textColor ?? AppColors.text(context))
                       : (AppColors.textDisabled(context)),
                 ),
                 decoration: InputDecoration(

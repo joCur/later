@@ -3,6 +3,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:later_mobile/design_system/atoms/chips/filter_chip.dart';
 import 'package:later_mobile/design_system/tokens/tokens.dart';
 
+import '../../../test_helpers.dart';
+
 /// Widget Test Suite: TemporalFilterChip Component
 ///
 /// Tests the TemporalFilterChip atom component from the design system.
@@ -30,13 +32,11 @@ void main() {
   group('TemporalFilterChip Component Tests', () {
     testWidgets('Initial render shows label', (WidgetTester tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: TemporalFilterChip(
-              label: 'Test Filter',
-              isSelected: false,
-              onSelected: () {},
-            ),
+        testApp(
+          TemporalFilterChip(
+            label: 'Test Filter',
+            isSelected: false,
+            onSelected: () {},
           ),
         ),
       );
@@ -48,13 +48,11 @@ void main() {
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: TemporalFilterChip(
-              label: 'Selected',
-              isSelected: true,
-              onSelected: () {},
-            ),
+        testApp(
+          TemporalFilterChip(
+            label: 'Selected',
+            isSelected: true,
+            onSelected: () {},
           ),
         ),
       );
@@ -79,13 +77,11 @@ void main() {
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: TemporalFilterChip(
-              label: 'Selected',
-              isSelected: true,
-              onSelected: () {},
-            ),
+        testAppDark(
+          TemporalFilterChip(
+            label: 'Selected',
+            isSelected: true,
+            onSelected: () {},
           ),
         ),
       );
@@ -102,13 +98,11 @@ void main() {
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: TemporalFilterChip(
-              label: 'Unselected',
-              isSelected: false,
-              onSelected: () {},
-            ),
+        testApp(
+          TemporalFilterChip(
+            label: 'Unselected',
+            isSelected: false,
+            onSelected: () {},
           ),
         ),
       );
@@ -128,13 +122,11 @@ void main() {
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: TemporalFilterChip(
-              label: 'Unselected',
-              isSelected: false,
-              onSelected: () {},
-            ),
+        testAppDark(
+          TemporalFilterChip(
+            label: 'Unselected',
+            isSelected: false,
+            onSelected: () {},
           ),
         ),
       );
@@ -152,16 +144,14 @@ void main() {
       var callbackInvoked = false;
 
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: Center(
-              child: TemporalFilterChip(
-                label: 'Tap Me',
-                isSelected: false,
-                onSelected: () {
-                  callbackInvoked = true;
-                },
-              ),
+        testApp(
+          Center(
+            child: TemporalFilterChip(
+              label: 'Tap Me',
+              isSelected: false,
+              onSelected: () {
+                callbackInvoked = true;
+              },
             ),
           ),
         ),
@@ -176,13 +166,11 @@ void main() {
 
     testWidgets('Animation triggers on tap', (WidgetTester tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: TemporalFilterChip(
-              label: 'Animate',
-              isSelected: false,
-              onSelected: () {},
-            ),
+        testApp(
+          TemporalFilterChip(
+            label: 'Animate',
+            isSelected: false,
+            onSelected: () {},
           ),
         ),
       );
@@ -216,14 +204,12 @@ void main() {
 
     testWidgets('Icon displays when provided', (WidgetTester tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: TemporalFilterChip(
-              label: 'With Icon',
-              isSelected: false,
-              onSelected: () {},
-              icon: Icons.filter_list,
-            ),
+        testApp(
+          TemporalFilterChip(
+            label: 'With Icon',
+            isSelected: false,
+            onSelected: () {},
+            icon: Icons.filter_list,
           ),
         ),
       );
@@ -238,13 +224,11 @@ void main() {
 
     testWidgets('No icon when not provided', (WidgetTester tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: TemporalFilterChip(
-              label: 'No Icon',
-              isSelected: false,
-              onSelected: () {},
-            ),
+        testApp(
+          TemporalFilterChip(
+            label: 'No Icon',
+            isSelected: false,
+            onSelected: () {},
           ),
         ),
       );
@@ -258,13 +242,11 @@ void main() {
     ) async {
       // Test selected state
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: TemporalFilterChip(
-              label: 'Selected',
-              isSelected: true,
-              onSelected: () {},
-            ),
+        testApp(
+          TemporalFilterChip(
+            label: 'Selected',
+            isSelected: true,
+            onSelected: () {},
           ),
         ),
       );
@@ -274,13 +256,11 @@ void main() {
 
       // Test unselected state
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: TemporalFilterChip(
-              label: 'Unselected',
-              isSelected: false,
-              onSelected: () {},
-            ),
+        testApp(
+          TemporalFilterChip(
+            label: 'Unselected',
+            isSelected: false,
+            onSelected: () {},
           ),
         ),
       );
@@ -294,13 +274,11 @@ void main() {
     ) async {
       // Test selected state
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: TemporalFilterChip(
-              label: 'Selected',
-              isSelected: true,
-              onSelected: () {},
-            ),
+        testAppDark(
+          TemporalFilterChip(
+            label: 'Selected',
+            isSelected: true,
+            onSelected: () {},
           ),
         ),
       );
@@ -310,13 +288,11 @@ void main() {
 
       // Test unselected state
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: TemporalFilterChip(
-              label: 'Unselected',
-              isSelected: false,
-              onSelected: () {},
-            ),
+        testAppDark(
+          TemporalFilterChip(
+            label: 'Unselected',
+            isSelected: false,
+            onSelected: () {},
           ),
         ),
       );
@@ -330,14 +306,12 @@ void main() {
     ) async {
       // Test selected state
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: TemporalFilterChip(
-              label: 'Selected',
-              isSelected: true,
-              onSelected: () {},
-              icon: Icons.star,
-            ),
+        testApp(
+          TemporalFilterChip(
+            label: 'Selected',
+            isSelected: true,
+            onSelected: () {},
+            icon: Icons.star,
           ),
         ),
       );
@@ -347,14 +321,12 @@ void main() {
 
       // Test unselected state
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: TemporalFilterChip(
-              label: 'Unselected',
-              isSelected: false,
-              onSelected: () {},
-              icon: Icons.star,
-            ),
+        testApp(
+          TemporalFilterChip(
+            label: 'Unselected',
+            isSelected: false,
+            onSelected: () {},
+            icon: Icons.star,
           ),
         ),
       );
@@ -368,14 +340,12 @@ void main() {
     ) async {
       // Test selected state
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: TemporalFilterChip(
-              label: 'Selected',
-              isSelected: true,
-              onSelected: () {},
-              icon: Icons.star,
-            ),
+        testAppDark(
+          TemporalFilterChip(
+            label: 'Selected',
+            isSelected: true,
+            onSelected: () {},
+            icon: Icons.star,
           ),
         ),
       );
@@ -385,14 +355,12 @@ void main() {
 
       // Test unselected state
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: TemporalFilterChip(
-              label: 'Unselected',
-              isSelected: false,
-              onSelected: () {},
-              icon: Icons.star,
-            ),
+        testAppDark(
+          TemporalFilterChip(
+            label: 'Unselected',
+            isSelected: false,
+            onSelected: () {},
+            icon: Icons.star,
           ),
         ),
       );
@@ -403,13 +371,11 @@ void main() {
 
     testWidgets('Chip has correct height', (WidgetTester tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: TemporalFilterChip(
-              label: 'Height Test',
-              isSelected: false,
-              onSelected: () {},
-            ),
+        testApp(
+          TemporalFilterChip(
+            label: 'Height Test',
+            isSelected: false,
+            onSelected: () {},
           ),
         ),
       );
@@ -435,13 +401,11 @@ void main() {
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: TemporalFilterChip(
-              label: 'Typography Test',
-              isSelected: false,
-              onSelected: () {},
-            ),
+        testApp(
+          TemporalFilterChip(
+            label: 'Typography Test',
+            isSelected: false,
+            onSelected: () {},
           ),
         ),
       );
@@ -453,28 +417,26 @@ void main() {
 
     testWidgets('Multiple chips can coexist', (WidgetTester tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: Row(
-              children: [
-                TemporalFilterChip(
-                  label: 'First',
-                  isSelected: true,
-                  onSelected: () {},
-                ),
-                TemporalFilterChip(
-                  label: 'Second',
-                  isSelected: false,
-                  onSelected: () {},
-                ),
-                TemporalFilterChip(
-                  label: 'Third',
-                  isSelected: false,
-                  onSelected: () {},
-                  icon: Icons.filter,
-                ),
-              ],
-            ),
+        testApp(
+          Row(
+            children: [
+              TemporalFilterChip(
+                label: 'First',
+                isSelected: true,
+                onSelected: () {},
+              ),
+              TemporalFilterChip(
+                label: 'Second',
+                isSelected: false,
+                onSelected: () {},
+              ),
+              TemporalFilterChip(
+                label: 'Third',
+                isSelected: false,
+                onSelected: () {},
+                icon: Icons.filter,
+              ),
+            ],
           ),
         ),
       );
@@ -491,24 +453,22 @@ void main() {
       bool isSelected = false;
 
       await tester.pumpWidget(
-        StatefulBuilder(
-          builder: (context, setState) {
-            return MaterialApp(
-              home: Scaffold(
-                body: Center(
-                  child: TemporalFilterChip(
-                    label: 'Toggle',
-                    isSelected: isSelected,
-                    onSelected: () {
-                      setState(() {
-                        isSelected = !isSelected;
-                      });
-                    },
-                  ),
+        testApp(
+          StatefulBuilder(
+            builder: (context, setState) {
+              return Center(
+                child: TemporalFilterChip(
+                  label: 'Toggle',
+                  isSelected: isSelected,
+                  onSelected: () {
+                    setState(() {
+                      isSelected = !isSelected;
+                    });
+                  },
                 ),
-              ),
-            );
-          },
+              );
+            },
+          ),
         ),
       );
 

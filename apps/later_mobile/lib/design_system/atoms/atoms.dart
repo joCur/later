@@ -2,6 +2,7 @@
 /// All atomic components (smallest building blocks)
 library;
 
+export 'animated_mesh_background.dart';
 export 'buttons/buttons.dart';
 export 'chips/chips.dart';
 export 'drag_handle/drag_handle.dart';

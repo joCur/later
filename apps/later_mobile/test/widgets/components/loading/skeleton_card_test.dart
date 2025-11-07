@@ -5,6 +5,7 @@ import 'package:later_mobile/design_system/atoms/loading/skeleton_line.dart';
 import 'package:later_mobile/design_system/molecules/loading/skeleton_card.dart';
 import 'package:later_mobile/design_system/tokens/tokens.dart';
 import 'package:shimmer/shimmer.dart';
+import '../../../test_helpers.dart';
 
 void main() {
   group('SkeletonLine', () {
@@ -132,7 +133,7 @@ void main() {
   group('SkeletonCard', () {
     testWidgets('renders skeleton card structure', (WidgetTester tester) async {
       await tester.pumpWidget(
-        const MaterialApp(home: Scaffold(body: SkeletonCard())),
+        testApp(const SkeletonCard()),
       );
 
       // Should render a shimmer widget
@@ -148,7 +149,7 @@ void main() {
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(
-        const MaterialApp(home: Scaffold(body: SkeletonCard())),
+        testApp(const SkeletonCard()),
       );
 
       await tester.pump();
@@ -180,7 +181,7 @@ void main() {
 
     testWidgets('displays shimmer animation', (WidgetTester tester) async {
       await tester.pumpWidget(
-        const MaterialApp(home: Scaffold(body: SkeletonCard())),
+        testApp(const SkeletonCard()),
       );
 
       // Find shimmer widget
@@ -197,10 +198,7 @@ void main() {
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(
-        MaterialApp(
-          theme: ThemeData.light(),
-          home: const Scaffold(body: SkeletonCard()),
-        ),
+        testApp(const SkeletonCard()),
       );
 
       await tester.pump();
@@ -222,10 +220,7 @@ void main() {
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(
-        MaterialApp(
-          theme: ThemeData.dark(),
-          home: const Scaffold(body: SkeletonCard()),
-        ),
+        testAppDark(const SkeletonCard()),
       );
 
       await tester.pump();
@@ -247,7 +242,7 @@ void main() {
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(
-        const MaterialApp(home: Scaffold(body: SkeletonCard())),
+        testApp(const SkeletonCard()),
       );
 
       await tester.pump();
@@ -264,7 +259,7 @@ void main() {
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(
-        const MaterialApp(home: Scaffold(body: SkeletonCard())),
+        testApp(const SkeletonCard()),
       );
 
       await tester.pump();
@@ -286,7 +281,7 @@ void main() {
           FakeAccessibilityFeatures.allOn(reduceMotion: true);
 
       await tester.pumpWidget(
-        const MaterialApp(home: Scaffold(body: SkeletonCard())),
+        testApp(const SkeletonCard()),
       );
 
       await tester.pump();
@@ -304,18 +299,16 @@ void main() {
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: SingleChildScrollView(
-              child: Column(
-                children: [
-                  SkeletonCard(),
-                  SizedBox(height: 8),
-                  SkeletonCard(),
-                  SizedBox(height: 8),
-                  SkeletonCard(),
-                ],
-              ),
+        testApp(
+          const SingleChildScrollView(
+            child: Column(
+              children: [
+                SkeletonCard(),
+                SizedBox(height: 8),
+                SkeletonCard(),
+                SizedBox(height: 8),
+                SkeletonCard(),
+              ],
             ),
           ),
         ),
@@ -332,7 +325,7 @@ void main() {
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(
-        const MaterialApp(home: Scaffold(body: SkeletonCard())),
+        testApp(const SkeletonCard()),
       );
 
       await tester.pump();
@@ -350,7 +343,7 @@ void main() {
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(
-        const MaterialApp(home: Scaffold(body: SkeletonCard())),
+        testApp(const SkeletonCard()),
       );
 
       await tester.pump();
@@ -375,17 +368,17 @@ void main() {
     ) async {
       // Test default variant
       await tester.pumpWidget(
-        const MaterialApp(home: Scaffold(body: SkeletonCard())),
+        testApp(const SkeletonCard()),
       );
 
       expect(find.byType(SkeletonCard), findsOneWidget);
     });
 
-    testWidgets('maintains 12px border radius consistently', (
+    testWidgets('maintains 20px border radius consistently', (
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(
-        const MaterialApp(home: Scaffold(body: SkeletonCard())),
+        testApp(const SkeletonCard()),
       );
 
       await tester.pump();
@@ -402,7 +395,7 @@ void main() {
         if (decoration?.borderRadius != null) {
           final BorderRadius? borderRadius =
               decoration!.borderRadius as BorderRadius?;
-          if (borderRadius != null && borderRadius.topLeft.x == 12.0) {
+          if (borderRadius != null && borderRadius.topLeft.x == 20.0) {
             foundCorrectBorderRadius = true;
             break;
           }
@@ -418,7 +411,7 @@ void main() {
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(
-        const MaterialApp(home: Scaffold(body: SkeletonCard())),
+        testApp(const SkeletonCard()),
       );
 
       await tester.pumpAndSettle();
@@ -440,7 +433,7 @@ void main() {
           FakeAccessibilityFeatures.allOn(highContrast: true);
 
       await tester.pumpWidget(
-        const MaterialApp(home: Scaffold(body: SkeletonCard())),
+        testApp(const SkeletonCard()),
       );
 
       await tester.pumpAndSettle();
@@ -457,14 +450,12 @@ void main() {
       int buildCount = 0;
 
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: Builder(
-              builder: (context) {
-                buildCount++;
-                return const SkeletonCard();
-              },
-            ),
+        testApp(
+          Builder(
+            builder: (context) {
+              buildCount++;
+              return const SkeletonCard();
+            },
           ),
         ),
       );

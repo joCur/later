@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 import 'package:later_mobile/design_system/tokens/tokens.dart';
 import '../../data/models/space_model.dart';
+import '../../providers/auth_provider.dart';
 import '../../providers/spaces_provider.dart';
 import 'package:later_mobile/design_system/atoms/inputs/text_input_field.dart';
 import 'package:later_mobile/design_system/organisms/modals/bottom_sheet_container.dart';
@@ -153,6 +154,12 @@ class _CreateSpaceModalState extends State<CreateSpaceModal> {
     final messenger = ScaffoldMessenger.of(context);
     final spacesProvider = context.read<SpacesProvider>();
 
+    // Safety check: Ensure user is authenticated
+    final userId = context.read<AuthProvider>().currentUser?.id;
+    if (userId == null) {
+      return; // Exit early - user should be redirected to auth screen by AuthGate
+    }
+
     try {
       final name = _nameController.text.trim();
       final space = Space(
@@ -160,6 +167,7 @@ class _CreateSpaceModalState extends State<CreateSpaceModal> {
             ? widget.initialSpace!.id
             : const Uuid().v4(),
         name: name,
+        userId: userId,
         icon: _selectedIcon,
         color: _selectedColor,
         isArchived: widget.initialSpace?.isArchived ?? false,

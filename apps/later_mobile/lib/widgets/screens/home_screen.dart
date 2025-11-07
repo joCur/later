@@ -15,10 +15,11 @@ import '../../core/responsive/breakpoints.dart';
 import '../../core/theme/temporal_flow_theme.dart';
 import '../../core/utils/item_type_detector.dart';
 import '../../core/utils/responsive_modal.dart';
-import '../../data/models/item_model.dart';
-import '../../data/models/list_model.dart';
+import 'package:later_mobile/data/models/list_model.dart';
+import 'package:later_mobile/data/models/note_model.dart';
+import 'package:later_mobile/data/models/todo_list_model.dart';
 import '../../data/models/space_model.dart';
-import '../../data/models/todo_list_model.dart';
+import '../../providers/auth_provider.dart';
 import '../../providers/content_provider.dart';
 import '../../providers/spaces_provider.dart';
 import '../modals/create_content_modal.dart';
@@ -286,13 +287,30 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
 
         // Menu button
-        IconButton(
-          icon: const Icon(Icons.more_vert),
-          onPressed: () {
-            debugPrint('Menu tapped');
-          },
+        PopupMenuButton<String>(
+          icon: Icon(
+            Icons.more_vert,
+            color: AppColors.textSecondary(context),
+          ),
           tooltip: 'Menu',
-          color: AppColors.textSecondary(context),
+          onSelected: (value) async {
+            if (value == 'signout') {
+              final authProvider = context.read<AuthProvider>();
+              await authProvider.signOut();
+            }
+          },
+          itemBuilder: (context) => [
+            const PopupMenuItem(
+              value: 'signout',
+              child: Row(
+                children: [
+                  Icon(Icons.logout),
+                  SizedBox(width: AppSpacing.sm),
+                  Text('Sign Out'),
+                ],
+              ),
+            ),
+          ],
         ),
       ],
     );
@@ -514,10 +532,10 @@ class _HomeScreenState extends State<HomeScreen> {
           );
         },
       );
-    } else if (item is Item) {
+    } else if (item is Note) {
       card = NoteCard(
         key: ValueKey<String>(_getItemId(item)),
-        item: item,
+        note: item,
         reorderIndex: index,
         // index omitted (null) to disable entrance animation for reorderable items
         onTap: () {
@@ -542,7 +560,7 @@ class _HomeScreenState extends State<HomeScreen> {
       return 'todo-${item.id}';
     } else if (item is ListModel) {
       return 'list-${item.id}';
-    } else if (item is Item) {
+    } else if (item is Note) {
       return 'note-${item.id}';
     }
     return 'unknown';

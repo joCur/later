@@ -3,12 +3,16 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:later_mobile/design_system/molecules/app_bars/editable_app_bar_title.dart';
 import 'package:later_mobile/design_system/tokens/tokens.dart';
 import 'package:later_mobile/design_system/atoms/text/gradient_text.dart';
+import 'package:later_mobile/core/theme/temporal_flow_theme.dart';
 
 void main() {
   group('EditableAppBarTitle', () {
     testWidgets('displays GradientText initially', (tester) async {
       await tester.pumpWidget(
         MaterialApp(
+          theme: ThemeData.light().copyWith(
+            extensions: <ThemeExtension<dynamic>>[TemporalFlowTheme.light()],
+          ),
           home: Scaffold(
             appBar: AppBar(
               title: EditableAppBarTitle(text: 'Test Title', onChanged: (_) {}),
@@ -26,6 +30,9 @@ void main() {
     testWidgets('shows edit icon next to gradient text', (tester) async {
       await tester.pumpWidget(
         MaterialApp(
+          theme: ThemeData.light().copyWith(
+            extensions: <ThemeExtension<dynamic>>[TemporalFlowTheme.light()],
+          ),
           home: Scaffold(
             appBar: AppBar(
               title: EditableAppBarTitle(text: 'Test Title', onChanged: (_) {}),
@@ -41,6 +48,9 @@ void main() {
     testWidgets('enters edit mode when tapped', (tester) async {
       await tester.pumpWidget(
         MaterialApp(
+          theme: ThemeData.light().copyWith(
+            extensions: <ThemeExtension<dynamic>>[TemporalFlowTheme.light()],
+          ),
           home: Scaffold(
             appBar: AppBar(
               title: EditableAppBarTitle(text: 'Test Title', onChanged: (_) {}),
@@ -65,6 +75,9 @@ void main() {
     testWidgets('TextField has correct initial text', (tester) async {
       await tester.pumpWidget(
         MaterialApp(
+          theme: ThemeData.light().copyWith(
+            extensions: <ThemeExtension<dynamic>>[TemporalFlowTheme.light()],
+          ),
           home: Scaffold(
             appBar: AppBar(
               title: EditableAppBarTitle(
@@ -92,6 +105,9 @@ void main() {
 
       await tester.pumpWidget(
         MaterialApp(
+          theme: ThemeData.light().copyWith(
+            extensions: <ThemeExtension<dynamic>>[TemporalFlowTheme.light()],
+          ),
           home: Scaffold(
             appBar: AppBar(
               title: EditableAppBarTitle(
@@ -124,6 +140,9 @@ void main() {
     testWidgets('exits edit mode after submission', (tester) async {
       await tester.pumpWidget(
         MaterialApp(
+          theme: ThemeData.light().copyWith(
+            extensions: <ThemeExtension<dynamic>>[TemporalFlowTheme.light()],
+          ),
           home: Scaffold(
             appBar: AppBar(
               title: EditableAppBarTitle(text: 'Test', onChanged: (_) {}),
@@ -151,6 +170,9 @@ void main() {
 
       await tester.pumpWidget(
         MaterialApp(
+          theme: ThemeData.light().copyWith(
+            extensions: <ThemeExtension<dynamic>>[TemporalFlowTheme.light()],
+          ),
           home: Scaffold(
             appBar: AppBar(
               title: EditableAppBarTitle(
@@ -187,6 +209,9 @@ void main() {
     ) async {
       await tester.pumpWidget(
         MaterialApp(
+          theme: ThemeData.light().copyWith(
+            extensions: <ThemeExtension<dynamic>>[TemporalFlowTheme.light()],
+          ),
           home: Scaffold(
             appBar: AppBar(
               title: EditableAppBarTitle(text: 'Original', onChanged: (_) {}),
@@ -215,6 +240,9 @@ void main() {
     testWidgets('uses custom gradient when provided', (tester) async {
       await tester.pumpWidget(
         MaterialApp(
+          theme: ThemeData.light().copyWith(
+            extensions: <ThemeExtension<dynamic>>[TemporalFlowTheme.light()],
+          ),
           home: Scaffold(
             appBar: AppBar(
               title: EditableAppBarTitle(
@@ -239,6 +267,9 @@ void main() {
 
       await tester.pumpWidget(
         MaterialApp(
+          theme: ThemeData.light().copyWith(
+            extensions: <ThemeExtension<dynamic>>[TemporalFlowTheme.light()],
+          ),
           home: Scaffold(
             appBar: AppBar(
               title: EditableAppBarTitle(
@@ -261,6 +292,9 @@ void main() {
     testWidgets('displays custom hint text in TextField', (tester) async {
       await tester.pumpWidget(
         MaterialApp(
+          theme: ThemeData.light().copyWith(
+            extensions: <ThemeExtension<dynamic>>[TemporalFlowTheme.light()],
+          ),
           home: Scaffold(
             appBar: AppBar(
               title: EditableAppBarTitle(
@@ -285,6 +319,9 @@ void main() {
     testWidgets('TextField has no border decoration', (tester) async {
       await tester.pumpWidget(
         MaterialApp(
+          theme: ThemeData.light().copyWith(
+            extensions: <ThemeExtension<dynamic>>[TemporalFlowTheme.light()],
+          ),
           home: Scaffold(
             appBar: AppBar(
               title: EditableAppBarTitle(text: 'Test', onChanged: (_) {}),
@@ -309,6 +346,9 @@ void main() {
 
       await tester.pumpWidget(
         MaterialApp(
+          theme: ThemeData.light().copyWith(
+            extensions: <ThemeExtension<dynamic>>[TemporalFlowTheme.light()],
+          ),
           home: Scaffold(
             appBar: AppBar(
               title: EditableAppBarTitle(
@@ -339,6 +379,9 @@ void main() {
 
       await tester.pumpWidget(
         MaterialApp(
+          theme: ThemeData.light().copyWith(
+            extensions: <ThemeExtension<dynamic>>[TemporalFlowTheme.light()],
+          ),
           home: Scaffold(
             appBar: AppBar(
               title: EditableAppBarTitle(
@@ -371,6 +414,9 @@ void main() {
     testWidgets('uses AppTypography.h3 by default', (tester) async {
       await tester.pumpWidget(
         MaterialApp(
+          theme: ThemeData.light().copyWith(
+            extensions: <ThemeExtension<dynamic>>[TemporalFlowTheme.light()],
+          ),
           home: Scaffold(
             appBar: AppBar(
               title: EditableAppBarTitle(text: 'Test', onChanged: (_) {}),
@@ -389,6 +435,9 @@ void main() {
     testWidgets('GradientText uses ellipsis overflow', (tester) async {
       await tester.pumpWidget(
         MaterialApp(
+          theme: ThemeData.light().copyWith(
+            extensions: <ThemeExtension<dynamic>>[TemporalFlowTheme.light()],
+          ),
           home: Scaffold(
             appBar: AppBar(
               title: EditableAppBarTitle(
@@ -411,6 +460,9 @@ void main() {
       // Test with task gradient
       await tester.pumpWidget(
         MaterialApp(
+          theme: ThemeData.light().copyWith(
+            extensions: <ThemeExtension<dynamic>>[TemporalFlowTheme.light()],
+          ),
           home: Scaffold(
             appBar: AppBar(
               title: EditableAppBarTitle(
@@ -429,6 +481,9 @@ void main() {
       // Rebuild with list gradient
       await tester.pumpWidget(
         MaterialApp(
+          theme: ThemeData.light().copyWith(
+            extensions: <ThemeExtension<dynamic>>[TemporalFlowTheme.light()],
+          ),
           home: Scaffold(
             appBar: AppBar(
               title: EditableAppBarTitle(
@@ -457,6 +512,9 @@ void main() {
         StatefulBuilder(
           builder: (context, setState) {
             return MaterialApp(
+              theme: ThemeData.light().copyWith(
+                extensions: <ThemeExtension<dynamic>>[TemporalFlowTheme.light()],
+              ),
               home: Scaffold(
                 appBar: AppBar(
                   title: EditableAppBarTitle(

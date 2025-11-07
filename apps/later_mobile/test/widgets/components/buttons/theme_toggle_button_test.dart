@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:later_mobile/core/theme/app_theme.dart';
+import 'package:later_mobile/core/theme/temporal_flow_theme.dart';
 import 'package:later_mobile/data/local/preferences_service.dart';
 import 'package:later_mobile/providers/theme_provider.dart';
 import 'package:later_mobile/design_system/atoms/buttons/theme_toggle_button.dart';
@@ -19,8 +20,12 @@ void main() {
     return ChangeNotifierProvider<ThemeProvider>.value(
       value: themeProvider,
       child: MaterialApp(
-        theme: AppTheme.lightTheme,
-        darkTheme: AppTheme.darkTheme,
+        theme: AppTheme.lightTheme.copyWith(
+          extensions: <ThemeExtension<dynamic>>[TemporalFlowTheme.light()],
+        ),
+        darkTheme: AppTheme.darkTheme.copyWith(
+          extensions: <ThemeExtension<dynamic>>[TemporalFlowTheme.dark()],
+        ),
         themeMode: themeProvider.themeMode,
         home: const Scaffold(body: ThemeToggleButton()),
       ),

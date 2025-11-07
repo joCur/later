@@ -3,6 +3,10 @@ import 'dart:ui' show ImageFilter;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:later_mobile/data/models/list_model.dart';
+import 'package:later_mobile/data/models/list_style.dart';
+import 'package:later_mobile/data/models/note_model.dart';
+import 'package:later_mobile/data/models/todo_list_model.dart';
 import 'package:later_mobile/design_system/atoms/buttons/ghost_button.dart';
 import 'package:later_mobile/design_system/atoms/buttons/gradient_button.dart';
 import 'package:later_mobile/design_system/atoms/buttons/primary_button.dart';
@@ -16,9 +20,7 @@ import 'package:uuid/uuid.dart';
 import '../../core/responsive/breakpoints.dart';
 import '../../core/theme/temporal_flow_theme.dart';
 import '../../core/utils/item_type_detector.dart'; // For ContentType enum
-import '../../data/models/item_model.dart';
-import '../../data/models/list_model.dart';
-import '../../data/models/todo_list_model.dart';
+import '../../providers/auth_provider.dart';
 import '../../providers/content_provider.dart';
 import '../../providers/spaces_provider.dart';
 
@@ -252,13 +254,11 @@ class _CreateContentModalState extends State<CreateContentModal>
     final currentSpace = spacesProvider.currentSpace;
 
     if (currentSpace == null) {
-      debugPrint('CreateContent: Cannot save - no current space');
       return;
     }
 
     // Safety check: Ensure selected space ID is valid
     if (_selectedSpaceId == null) {
-      debugPrint('CreateContent: Cannot save - _selectedSpaceId is null');
       return;
     }
 
@@ -268,21 +268,14 @@ class _CreateContentModalState extends State<CreateContentModal>
     );
     final targetSpaceId = spaceExists ? _selectedSpaceId! : currentSpace.id;
 
-    debugPrint(
-      'CreateContent: Creating item - _selectedSpaceId: $_selectedSpaceId, '
-      'currentSpace: ${currentSpace.id}, targetSpaceId: $targetSpaceId, '
-      'spaceExists: $spaceExists',
-    );
-
-    // Log fallback if space was deleted
-    if (!spaceExists) {
-      debugPrint(
-        'Warning: Selected space no longer exists, falling back to current space',
-      );
-    }
-
     // Determine content type (user-selected, defaults to note if not specified)
     final contentType = _selectedType ?? ContentType.note;
+
+    // Safety check: Ensure user is authenticated
+    final userId = context.read<AuthProvider>().currentUser?.id;
+    if (userId == null) {
+      return; // Exit early - user should be redirected to auth screen by AuthGate
+    }
 
     try {
       if (_currentItemId == null) {
@@ -296,20 +289,21 @@ class _CreateContentModalState extends State<CreateContentModal>
             final todoList = TodoList(
               id: id,
               spaceId: targetSpaceId,
+              userId: userId,
               name: text,
               description: description.isEmpty ? null : description,
-              items: [],
             );
             await contentProvider.createTodoList(todoList);
             _currentItemId = id;
             break;
 
           case ContentType.list:
+            // Create ListModel with proper constructor
             final listModel = ListModel(
               id: id,
               spaceId: targetSpaceId,
+              userId: userId,
               name: text,
-              items: [],
               style: _selectedListStyle,
             );
             await contentProvider.createList(listModel);
@@ -319,11 +313,12 @@ class _CreateContentModalState extends State<CreateContentModal>
           case ContentType.note:
             // Parse note input (smart parsing for mobile, separate fields for desktop)
             final parsed = _parseNoteInput();
-            final note = Item(
+            final note = Note(
               id: id,
               title: parsed.title,
               content: parsed.content,
               spaceId: targetSpaceId,
+              userId: userId,
             );
             await contentProvider.createNote(note);
             _currentItemId = id;
@@ -334,7 +329,7 @@ class _CreateContentModalState extends State<CreateContentModal>
         // For TodoLists and Lists, we don't support editing in quick capture
         if (contentType == ContentType.note) {
           final existingNotes = contentProvider.notes;
-          final existingNote = existingNotes.cast<Item?>().firstWhere(
+          final existingNote = existingNotes.cast<Note?>().firstWhere(
             (note) => note?.id == _currentItemId,
             orElse: () => null,
           );
@@ -351,7 +346,6 @@ class _CreateContentModalState extends State<CreateContentModal>
         _isSaving = false;
       });
     } catch (e) {
-      debugPrint('CreateContent: Error saving item - $e');
       setState(() {
         _isSaving = false;
       });
@@ -401,29 +395,19 @@ class _CreateContentModalState extends State<CreateContentModal>
       // Call the existing save logic
       await _saveItem();
 
-      // Show success feedback and close
+      // Trigger haptic feedback and close immediately
       if (mounted) {
-        await _showSuccessFeedback();
+        HapticFeedback.mediumImpact();
 
-        // Close modal after success feedback delay
-        await Future<void>.delayed(const Duration(milliseconds: 500));
+        // Brief delay to allow haptic feedback to register
+        await Future<void>.delayed(const Duration(milliseconds: 100));
         if (mounted) {
           _close();
         }
       }
     } catch (e) {
       // Error already logged in _saveItem, just ensure loading state is cleared
-      debugPrint('CreateContent: Failed to save item - $e');
     }
-  }
-
-  /// Shows success feedback animation with haptics
-  Future<void> _showSuccessFeedback() async {
-    // Trigger haptic feedback
-    HapticFeedback.mediumImpact();
-
-    // Wait for animation duration to allow user to see the loading state complete
-    await Future<void>.delayed(const Duration(milliseconds: 800));
   }
 
   Future<void> _handleKeyEvent(KeyEvent event) async {
@@ -1228,11 +1212,9 @@ class _CreateContentModalState extends State<CreateContentModal>
             mainAxisSize: MainAxisSize.min,
             children: [
               if (selectedSpace.icon != null)
-                Text(
-                  selectedSpace.icon!,
-                  style: const TextStyle(fontSize: 16),
-                ),
-              if (selectedSpace.icon != null) const SizedBox(width: AppSpacing.xxs),
+                Text(selectedSpace.icon!, style: const TextStyle(fontSize: 16)),
+              if (selectedSpace.icon != null)
+                const SizedBox(width: AppSpacing.xxs),
               Text(
                 selectedSpace.name,
                 style: AppTypography.labelMedium.copyWith(

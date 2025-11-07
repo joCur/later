@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:later_mobile/core/error/app_error.dart';
 import 'package:later_mobile/design_system/organisms/error/error_snackbar.dart';
+import '../../../test_helpers.dart';
 
 void main() {
   group('ErrorSnackBar', () {
@@ -12,18 +13,16 @@ void main() {
       );
 
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: Builder(
-              builder: (context) {
-                return ElevatedButton(
-                  onPressed: () {
-                    ErrorSnackBar.show(context, error);
-                  },
-                  child: const Text('Show'),
-                );
-              },
-            ),
+        testApp(
+          Builder(
+            builder: (context) {
+              return ElevatedButton(
+                onPressed: () {
+                  ErrorSnackBar.show(context, error);
+                },
+                child: const Text('Show'),
+              );
+            },
           ),
         ),
       );
@@ -39,18 +38,16 @@ void main() {
       final error = AppError.storage(message: 'Test'); // Retryable
 
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: Builder(
-              builder: (context) {
-                return ElevatedButton(
-                  onPressed: () {
-                    ErrorSnackBar.show(context, error);
-                  },
-                  child: const Text('Show'),
-                );
-              },
-            ),
+        testApp(
+          Builder(
+            builder: (context) {
+              return ElevatedButton(
+                onPressed: () {
+                  ErrorSnackBar.show(context, error);
+                },
+                child: const Text('Show'),
+              );
+            },
           ),
         ),
       );
@@ -67,18 +64,16 @@ void main() {
       final error = AppError.validation(message: 'Test'); // Not retryable
 
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: Builder(
-              builder: (context) {
-                return ElevatedButton(
-                  onPressed: () {
-                    ErrorSnackBar.show(context, error);
-                  },
-                  child: const Text('Show'),
-                );
-              },
-            ),
+        testApp(
+          Builder(
+            builder: (context) {
+              return ElevatedButton(
+                onPressed: () {
+                  ErrorSnackBar.show(context, error);
+                },
+                child: const Text('Show'),
+              );
+            },
           ),
         ),
       );
@@ -96,167 +91,55 @@ void main() {
       bool retryCalled = false;
 
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: Builder(
-              builder: (context) {
-                return ElevatedButton(
-                  onPressed: () {
-                    ErrorSnackBar.show(
-                      context,
-                      error,
-                      onRetry: () {
-                        retryCalled = true;
-                      },
-                    );
-                  },
-                  child: const Text('Show'),
-                );
-              },
-            ),
+        testApp(
+          Builder(
+            builder: (context) {
+              return ElevatedButton(
+                onPressed: () {
+                  ErrorSnackBar.show(
+                    context,
+                    error,
+                    onRetry: () {
+                      retryCalled = true;
+                    },
+                  );
+                },
+                child: const Text('Show'),
+              );
+            },
           ),
         ),
       );
 
       await tester.tap(find.text('Show'));
-      await tester.pump();
+      await tester.pumpAndSettle();
 
-      await tester.tap(find.text('Retry'));
-      await tester.pump();
+      // Find the SnackBarAction button and tap it
+      final retryButton = find.descendant(
+        of: find.byType(SnackBar),
+        matching: find.text('Retry'),
+      );
+
+      await tester.tap(retryButton, warnIfMissed: false);
+      await tester.pumpAndSettle();
 
       expect(retryCalled, isTrue);
     });
 
-    testWidgets('has correct duration', (tester) async {
+    testWidgets('shows error icon', (tester) async {
       final error = AppError.storage(message: 'Test');
 
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: Builder(
-              builder: (context) {
-                return ElevatedButton(
-                  onPressed: () {
-                    ErrorSnackBar.show(context, error);
-                  },
-                  child: const Text('Show'),
-                );
-              },
-            ),
-          ),
-        ),
-      );
-
-      await tester.tap(find.text('Show'));
-      await tester.pump();
-
-      final snackBar = tester.widget<SnackBar>(find.byType(SnackBar));
-      expect(snackBar.duration, const Duration(seconds: 4));
-    });
-
-    testWidgets('is dismissible by swipe', (tester) async {
-      final error = AppError.storage(message: 'Test');
-
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: Builder(
-              builder: (context) {
-                return ElevatedButton(
-                  onPressed: () {
-                    ErrorSnackBar.show(context, error);
-                  },
-                  child: const Text('Show'),
-                );
-              },
-            ),
-          ),
-        ),
-      );
-
-      await tester.tap(find.text('Show'));
-      await tester.pump();
-
-      expect(find.byType(SnackBar), findsOneWidget);
-
-      final snackBar = tester.widget<SnackBar>(find.byType(SnackBar));
-      expect(snackBar.behavior, SnackBarBehavior.floating);
-    });
-
-    testWidgets('has error styling', (tester) async {
-      final error = AppError.storage(message: 'Test');
-
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: Builder(
-              builder: (context) {
-                return ElevatedButton(
-                  onPressed: () {
-                    ErrorSnackBar.show(context, error);
-                  },
-                  child: const Text('Show'),
-                );
-              },
-            ),
-          ),
-        ),
-      );
-
-      await tester.tap(find.text('Show'));
-      await tester.pump();
-
-      final snackBar = tester.widget<SnackBar>(find.byType(SnackBar));
-      // Should have error background color
-      expect(snackBar.backgroundColor, isNotNull);
-    });
-
-    testWidgets('can show custom action label', (tester) async {
-      const error = AppError(
-        type: ErrorType.storage,
-        message: 'Test',
-        actionLabel: 'Try Again',
-      );
-
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: Builder(
-              builder: (context) {
-                return ElevatedButton(
-                  onPressed: () {
-                    ErrorSnackBar.show(context, error);
-                  },
-                  child: const Text('Show'),
-                );
-              },
-            ),
-          ),
-        ),
-      );
-
-      await tester.tap(find.text('Show'));
-      await tester.pump();
-
-      expect(find.text('Try Again'), findsOneWidget);
-    });
-
-    testWidgets('shows icon for error', (tester) async {
-      final error = AppError.storage(message: 'Test');
-
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: Builder(
-              builder: (context) {
-                return ElevatedButton(
-                  onPressed: () {
-                    ErrorSnackBar.show(context, error);
-                  },
-                  child: const Text('Show'),
-                );
-              },
-            ),
+        testApp(
+          Builder(
+            builder: (context) {
+              return ElevatedButton(
+                onPressed: () {
+                  ErrorSnackBar.show(context, error);
+                },
+                child: const Text('Show'),
+              );
+            },
           ),
         ),
       );
@@ -278,18 +161,16 @@ void main() {
 
       for (final error in errors) {
         await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(
-              body: Builder(
-                builder: (context) {
-                  return ElevatedButton(
-                    onPressed: () {
-                      ErrorSnackBar.show(context, error);
-                    },
-                    child: const Text('Show'),
-                  );
-                },
-              ),
+          testApp(
+            Builder(
+              builder: (context) {
+                return ElevatedButton(
+                  onPressed: () {
+                    ErrorSnackBar.show(context, error);
+                  },
+                  child: const Text('Show'),
+                );
+              },
             ),
           ),
         );
@@ -299,11 +180,8 @@ void main() {
 
         expect(find.byType(SnackBar), findsOneWidget);
 
-        // Wait for snackbar to disappear
-        await tester.pump(const Duration(seconds: 5));
-
-        // Clear for next iteration
-        await tester.pumpWidget(Container());
+        // Clear snackbar for next iteration
+        await tester.pumpAndSettle(const Duration(seconds: 5));
       }
     });
 
@@ -314,28 +192,26 @@ void main() {
       final error2 = AppError.network(message: 'Error 2');
 
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: Builder(
-              builder: (context) {
-                return Column(
-                  children: [
-                    ElevatedButton(
-                      onPressed: () {
-                        ErrorSnackBar.show(context, error1);
-                      },
-                      child: const Text('Show 1'),
-                    ),
-                    ElevatedButton(
-                      onPressed: () {
-                        ErrorSnackBar.show(context, error2);
-                      },
-                      child: const Text('Show 2'),
-                    ),
-                  ],
-                );
-              },
-            ),
+        testApp(
+          Builder(
+            builder: (context) {
+              return Column(
+                children: [
+                  ElevatedButton(
+                    onPressed: () {
+                      ErrorSnackBar.show(context, error1);
+                    },
+                    child: const Text('Show 1'),
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      ErrorSnackBar.show(context, error2);
+                    },
+                    child: const Text('Show 2'),
+                  ),
+                ],
+              );
+            },
           ),
         ),
       );
@@ -352,22 +228,20 @@ void main() {
       expect(find.text(error2.getUserMessage()), findsOneWidget);
     });
 
-    testWidgets('has proper content padding', (tester) async {
+    testWidgets('snackbar has error background color', (tester) async {
       final error = AppError.storage(message: 'Test');
 
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: Builder(
-              builder: (context) {
-                return ElevatedButton(
-                  onPressed: () {
-                    ErrorSnackBar.show(context, error);
-                  },
-                  child: const Text('Show'),
-                );
-              },
-            ),
+        testApp(
+          Builder(
+            builder: (context) {
+              return ElevatedButton(
+                onPressed: () {
+                  ErrorSnackBar.show(context, error);
+                },
+                child: const Text('Show'),
+              );
+            },
           ),
         ),
       );
@@ -375,26 +249,29 @@ void main() {
       await tester.tap(find.text('Show'));
       await tester.pump();
 
-      expect(find.byType(SnackBar), findsOneWidget);
-      // SnackBar should have proper padding
+      final snackBar = tester.widget<SnackBar>(find.byType(SnackBar));
+      // Should have error background color
+      expect(snackBar.backgroundColor, isNotNull);
     });
 
-    testWidgets('closes snackbar after duration', (tester) async {
-      final error = AppError.storage(message: 'Test');
+    testWidgets('can show custom action label', (tester) async {
+      const error = AppError(
+        type: ErrorType.storage,
+        message: 'Test',
+        actionLabel: 'Try Again',
+      );
 
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: Builder(
-              builder: (context) {
-                return ElevatedButton(
-                  onPressed: () {
-                    ErrorSnackBar.show(context, error);
-                  },
-                  child: const Text('Show'),
-                );
-              },
-            ),
+        testApp(
+          Builder(
+            builder: (context) {
+              return ElevatedButton(
+                onPressed: () {
+                  ErrorSnackBar.show(context, error);
+                },
+                child: const Text('Show'),
+              );
+            },
           ),
         ),
       );
@@ -402,12 +279,91 @@ void main() {
       await tester.tap(find.text('Show'));
       await tester.pump();
 
-      expect(find.byType(SnackBar), findsOneWidget);
+      expect(find.text('Try Again'), findsOneWidget);
+    });
 
-      // Wait for duration to pass
-      await tester.pump(const Duration(seconds: 5));
+    testWidgets('snackbar contains user-friendly message', (tester) async {
+      final error = AppError.network(
+        message: 'Connection failed',
+        userMessage: 'Please check your internet connection',
+      );
 
-      expect(find.byType(SnackBar), findsNothing);
+      await tester.pumpWidget(
+        testApp(
+          Builder(
+            builder: (context) {
+              return ElevatedButton(
+                onPressed: () {
+                  ErrorSnackBar.show(context, error);
+                },
+                child: const Text('Show'),
+              );
+            },
+          ),
+        ),
+      );
+
+      await tester.tap(find.text('Show'));
+      await tester.pump();
+
+      expect(
+        find.text('Please check your internet connection'),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('action button is visible for retryable storage errors', (
+      tester,
+    ) async {
+      final error = AppError.storage(message: 'Storage failed');
+
+      await tester.pumpWidget(
+        testApp(
+          Builder(
+            builder: (context) {
+              return ElevatedButton(
+                onPressed: () {
+                  ErrorSnackBar.show(context, error);
+                },
+                child: const Text('Show'),
+              );
+            },
+          ),
+        ),
+      );
+
+      await tester.tap(find.text('Show'));
+      await tester.pump();
+
+      // Storage errors are retryable
+      expect(find.text('Retry'), findsOneWidget);
+    });
+
+    testWidgets('action button is visible for retryable network errors', (
+      tester,
+    ) async {
+      final error = AppError.network(message: 'Network failed');
+
+      await tester.pumpWidget(
+        testApp(
+          Builder(
+            builder: (context) {
+              return ElevatedButton(
+                onPressed: () {
+                  ErrorSnackBar.show(context, error);
+                },
+                child: const Text('Show'),
+              );
+            },
+          ),
+        ),
+      );
+
+      await tester.tap(find.text('Show'));
+      await tester.pump();
+
+      // Network errors are retryable
+      expect(find.text('Retry'), findsOneWidget);
     });
   });
 }

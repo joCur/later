@@ -6,6 +6,7 @@ import 'package:later_mobile/design_system/tokens/tokens.dart';
 import '../../core/theme/temporal_flow_theme.dart';
 import '../../data/models/space_model.dart';
 import '../../providers/spaces_provider.dart';
+import '../../providers/auth_provider.dart';
 import 'package:later_mobile/design_system/atoms/buttons/theme_toggle_button.dart';
 
 /// Desktop sidebar navigation component
@@ -289,6 +290,8 @@ class _AppSidebarState extends State<AppSidebar> {
   }
 
   Widget _buildFooter(bool isDarkMode, TemporalFlowTheme temporalTheme) {
+    final authProvider = context.watch<AuthProvider>();
+
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -309,23 +312,60 @@ class _AppSidebarState extends State<AppSidebar> {
         ),
         Container(
           padding: const EdgeInsets.all(AppSpacing.xs),
-          child: Row(
-            mainAxisAlignment: widget.isExpanded
-                ? MainAxisAlignment.start
-                : MainAxisAlignment.center,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
-              // Theme toggle button
-              const ThemeToggleButton(),
+              Row(
+                mainAxisAlignment: widget.isExpanded
+                    ? MainAxisAlignment.start
+                    : MainAxisAlignment.center,
+                children: [
+                  // Theme toggle button
+                  const ThemeToggleButton(),
 
-              if (widget.isExpanded) ...[
-                const SizedBox(width: AppSpacing.xs),
-                // Settings button
-                Expanded(
+                  if (widget.isExpanded) ...[
+                    const SizedBox(width: AppSpacing.xs),
+                    // Settings button
+                    Expanded(
+                      child: Tooltip(
+                        message: 'Settings',
+                        child: InkWell(
+                          onTap: () {
+                            // Navigate to settings
+                          },
+                          borderRadius: const BorderRadius.all(
+                            Radius.circular(AppSpacing.radiusSM),
+                          ),
+                          child: Container(
+                            height: AppSpacing.minTouchTarget,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: AppSpacing.sm,
+                            ),
+                            child: const Row(
+                              children: [
+                                Icon(Icons.settings_outlined),
+                                SizedBox(width: AppSpacing.xs),
+                                Flexible(
+                                  child: Text('Settings'),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+              // Sign Out button
+              if (widget.isExpanded)
+                Padding(
+                  padding: const EdgeInsets.only(top: AppSpacing.xs),
                   child: Tooltip(
-                    message: 'Settings',
+                    message: 'Sign Out',
                     child: InkWell(
-                      onTap: () {
-                        // Navigate to settings
+                      onTap: () async {
+                        await authProvider.signOut();
                       },
                       borderRadius: const BorderRadius.all(
                         Radius.circular(AppSpacing.radiusSM),
@@ -335,26 +375,32 @@ class _AppSidebarState extends State<AppSidebar> {
                         padding: const EdgeInsets.symmetric(
                           horizontal: AppSpacing.sm,
                         ),
-                        child: const Row(
+                        child: Row(
                           children: [
-                            Icon(Icons.settings_outlined),
-                            SizedBox(width: AppSpacing.xs),
-                            Text('Settings'),
+                            Icon(
+                              Icons.logout,
+                              color: AppColors.textSecondary(context),
+                            ),
+                            const SizedBox(width: AppSpacing.xs),
+                            Flexible(
+                              child: Text(
+                                'Sign Out',
+                                style: TextStyle(
+                                  color: AppColors.textSecondary(context),
+                                ),
+                              ),
+                            ),
                           ],
                         ),
                       ),
                     ),
                   ),
                 ),
-              ] else ...[
-                // In collapsed state, show settings icon below
-                const SizedBox.shrink(),
-              ],
             ],
           ),
         ),
-        // Show settings button below in collapsed mode
-        if (!widget.isExpanded)
+        // Show buttons below in collapsed mode
+        if (!widget.isExpanded) ...[
           Container(
             padding: const EdgeInsets.all(AppSpacing.xs),
             child: Tooltip(
@@ -376,6 +422,31 @@ class _AppSidebarState extends State<AppSidebar> {
               ),
             ),
           ),
+          Container(
+            padding: const EdgeInsets.all(AppSpacing.xs),
+            child: Tooltip(
+              message: 'Sign Out',
+              child: InkWell(
+                onTap: () async {
+                  await authProvider.signOut();
+                },
+                borderRadius: const BorderRadius.all(
+                  Radius.circular(AppSpacing.radiusSM),
+                ),
+                child: Container(
+                  height: AppSpacing.minTouchTarget,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.xs,
+                  ),
+                  child: Icon(
+                    Icons.logout,
+                    color: AppColors.textSecondary(context),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
       ],
     );
   }

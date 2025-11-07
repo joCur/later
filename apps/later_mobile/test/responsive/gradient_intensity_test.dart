@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:later_mobile/design_system/tokens/tokens.dart';
 import 'package:later_mobile/design_system/molecules/fab/create_content_fab.dart';
-import 'package:later_mobile/core/theme/app_theme.dart';
-import 'package:hive/hive.dart';
+import 'package:later_mobile/design_system/tokens/tokens.dart';
+
+import '../test_helpers.dart';
 
 /// Responsive Behavior Test Suite: Gradient Intensity Tests
 ///
@@ -26,15 +26,6 @@ import 'package:hive/hive.dart';
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  setUpAll(() async {
-    // Initialize Hive for testing
-    Hive.init('test/hive_testing_path_responsive_gradients');
-  });
-
-  tearDownAll(() async {
-    await Hive.close();
-  });
-
   group('Gradient Rendering Tests - Mobile', () {
     testWidgets('Primary gradient renders at 320px', (
       WidgetTester tester,
@@ -42,9 +33,8 @@ void main() {
       await tester.pumpWidget(
         MediaQuery(
           data: const MediaQueryData(size: Size(320.0, 568.0)),
-          child: MaterialApp(
-            theme: AppTheme.lightTheme,
-            home: Scaffold(
+          child: testApp(
+            Scaffold(
               body: Container(
                 decoration: const BoxDecoration(
                   gradient: AppColors.primaryGradient,
@@ -71,9 +61,8 @@ void main() {
       await tester.pumpWidget(
         MediaQuery(
           data: const MediaQueryData(size: Size(375.0, 812.0)),
-          child: MaterialApp(
-            theme: AppTheme.lightTheme,
-            home: Scaffold(
+          child: testApp(
+            Scaffold(
               body: Container(
                 decoration: const BoxDecoration(
                   gradient: AppColors.primaryGradient,
@@ -94,9 +83,8 @@ void main() {
       await tester.pumpWidget(
         MediaQuery(
           data: const MediaQueryData(size: Size(414.0, 896.0)),
-          child: MaterialApp(
-            theme: AppTheme.lightTheme,
-            home: Scaffold(
+          child: testApp(
+            Scaffold(
               body: Container(
                 decoration: const BoxDecoration(
                   gradient: AppColors.primaryGradient,
@@ -117,11 +105,8 @@ void main() {
       await tester.pumpWidget(
         MediaQuery(
           data: const MediaQueryData(size: Size(375.0, 812.0)),
-          child: MaterialApp(
-            theme: AppTheme.lightTheme,
-            home: Scaffold(
-              floatingActionButton: CreateContentFab(onPressed: () {}),
-            ),
+          child: testApp(
+            Scaffold(floatingActionButton: CreateContentFab(onPressed: () {})),
           ),
         ),
       );
@@ -142,9 +127,8 @@ void main() {
       await tester.pumpWidget(
         MediaQuery(
           data: const MediaQueryData(size: Size(768.0, 1024.0)),
-          child: MaterialApp(
-            theme: AppTheme.lightTheme,
-            home: Scaffold(
+          child: testApp(
+            Scaffold(
               body: Container(
                 decoration: const BoxDecoration(
                   gradient: AppColors.primaryGradient,
@@ -169,9 +153,8 @@ void main() {
       await tester.pumpWidget(
         MediaQuery(
           data: const MediaQueryData(size: Size(834.0, 1194.0)),
-          child: MaterialApp(
-            theme: AppTheme.lightTheme,
-            home: Scaffold(
+          child: testApp(
+            Scaffold(
               body: Container(
                 decoration: const BoxDecoration(
                   gradient: AppColors.primaryGradient,
@@ -191,9 +174,8 @@ void main() {
       await tester.pumpWidget(
         MediaQuery(
           data: const MediaQueryData(size: Size(1024.0, 1366.0)),
-          child: MaterialApp(
-            theme: AppTheme.lightTheme,
-            home: Scaffold(
+          child: testApp(
+            Scaffold(
               body: Container(
                 decoration: const BoxDecoration(
                   gradient: AppColors.primaryGradient,
@@ -215,9 +197,8 @@ void main() {
       await tester.pumpWidget(
         MediaQuery(
           data: const MediaQueryData(size: Size(1280.0, 720.0)),
-          child: MaterialApp(
-            theme: AppTheme.lightTheme,
-            home: Scaffold(
+          child: testApp(
+            Scaffold(
               body: Container(
                 decoration: const BoxDecoration(
                   gradient: AppColors.primaryGradient,
@@ -241,9 +222,8 @@ void main() {
       await tester.pumpWidget(
         MediaQuery(
           data: const MediaQueryData(size: Size(1440.0, 900.0)),
-          child: MaterialApp(
-            theme: AppTheme.lightTheme,
-            home: Scaffold(
+          child: testApp(
+            Scaffold(
               body: Container(
                 decoration: const BoxDecoration(
                   gradient: AppColors.primaryGradient,
@@ -263,9 +243,8 @@ void main() {
       await tester.pumpWidget(
         MediaQuery(
           data: const MediaQueryData(size: Size(1920.0, 1080.0)),
-          child: MaterialApp(
-            theme: AppTheme.lightTheme,
-            home: Scaffold(
+          child: testApp(
+            Scaffold(
               body: Container(
                 decoration: const BoxDecoration(
                   gradient: AppColors.primaryGradient,
@@ -285,9 +264,8 @@ void main() {
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(
-        MaterialApp(
-          theme: AppTheme.lightTheme,
-          home: Scaffold(
+        testApp(
+          Scaffold(
             body: Container(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
@@ -315,9 +293,8 @@ void main() {
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(
-        MaterialApp(
-          theme: AppTheme.lightTheme,
-          home: Scaffold(
+        testApp(
+          Scaffold(
             body: Container(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
@@ -341,9 +318,8 @@ void main() {
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(
-        MaterialApp(
-          theme: AppTheme.lightTheme,
-          home: Scaffold(
+        testApp(
+          Scaffold(
             body: Container(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
@@ -367,9 +343,8 @@ void main() {
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(
-        MaterialApp(
-          theme: AppTheme.lightTheme,
-          home: Scaffold(
+        testApp(
+          Scaffold(
             body: Container(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
@@ -393,9 +368,8 @@ void main() {
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(
-        MaterialApp(
-          theme: AppTheme.lightTheme,
-          home: Scaffold(
+        testApp(
+          Scaffold(
             body: Stack(
               children: [
                 // 2% background gradient
@@ -460,9 +434,8 @@ void main() {
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(
-        MaterialApp(
-          theme: ThemeData.light(),
-          home: Scaffold(
+        testApp(
+          Scaffold(
             body: Container(
               decoration: const BoxDecoration(
                 gradient: AppColors.primaryGradient,
@@ -479,9 +452,8 @@ void main() {
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(
-        MaterialApp(
-          theme: ThemeData.dark(),
-          home: Scaffold(
+        testAppDark(
+          Scaffold(
             body: Container(
               decoration: const BoxDecoration(
                 gradient: AppColors.primaryGradientDark,
@@ -498,9 +470,8 @@ void main() {
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(
-        MaterialApp(
-          theme: AppTheme.lightTheme,
-          home: Scaffold(
+        testApp(
+          Scaffold(
             body: Container(
               decoration: const BoxDecoration(
                 gradient: AppColors.secondaryGradient,
@@ -515,9 +486,8 @@ void main() {
 
     testWidgets('Task gradient renders correctly', (WidgetTester tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          theme: AppTheme.lightTheme,
-          home: Scaffold(
+        testApp(
+          Scaffold(
             body: Container(
               decoration: const BoxDecoration(gradient: AppColors.taskGradient),
             ),
@@ -530,9 +500,8 @@ void main() {
 
     testWidgets('Note gradient renders correctly', (WidgetTester tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          theme: AppTheme.lightTheme,
-          home: Scaffold(
+        testApp(
+          Scaffold(
             body: Container(
               decoration: const BoxDecoration(gradient: AppColors.noteGradient),
             ),
@@ -545,9 +514,8 @@ void main() {
 
     testWidgets('List gradient renders correctly', (WidgetTester tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          theme: AppTheme.lightTheme,
-          home: Scaffold(
+        testApp(
+          Scaffold(
             body: Container(
               decoration: const BoxDecoration(gradient: AppColors.listGradient),
             ),
@@ -564,9 +532,8 @@ void main() {
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(
-        MaterialApp(
-          theme: AppTheme.lightTheme,
-          home: Scaffold(
+        testApp(
+          Scaffold(
             body: ListView.builder(
               itemCount: 20,
               itemBuilder: (context, index) {
@@ -599,9 +566,8 @@ void main() {
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(
-        MaterialApp(
-          theme: AppTheme.lightTheme,
-          home: Scaffold(
+        testApp(
+          Scaffold(
             body: Stack(
               children: [
                 // Base gradient

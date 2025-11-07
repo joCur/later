@@ -3,20 +3,20 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:later_mobile/design_system/molecules/lists/dismissible_list_item.dart';
 import 'package:later_mobile/design_system/tokens/colors.dart';
 
+import '../../../test_helpers.dart';
+
 void main() {
   group('DismissibleListItem', () {
     testWidgets('should render child widget correctly', (tester) async {
       // Arrange
       const testText = 'Test Item';
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: DismissibleListItem(
-              itemKey: const ValueKey('test-item'),
-              itemName: 'Test Item',
-              onDelete: () {},
-              child: const Text(testText),
-            ),
+        testApp(
+          DismissibleListItem(
+            itemKey: const ValueKey('test-item'),
+            itemName: 'Test Item',
+            onDelete: () {},
+            child: const Text(testText),
           ),
         ),
       );
@@ -30,17 +30,15 @@ void main() {
     ) async {
       // Arrange
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: DismissibleListItem(
-              itemKey: const ValueKey('test-item'),
-              itemName: 'Test Item',
-              onDelete: () {},
-              child: Container(
-                height: 80,
-                color: Colors.white,
-                child: const Text('Swipeable Item'),
-              ),
+        testApp(
+          DismissibleListItem(
+            itemKey: const ValueKey('test-item'),
+            itemName: 'Test Item',
+            onDelete: () {},
+            child: Container(
+              height: 80,
+              color: Colors.white,
+              child: const Text('Swipeable Item'),
             ),
           ),
         ),
@@ -74,17 +72,15 @@ void main() {
       var deleteCallCount = 0;
 
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: DismissibleListItem(
-              itemKey: const ValueKey('test-item'),
-              itemName: itemName,
-              onDelete: () => deleteCallCount++,
-              child: Container(
-                height: 80,
-                color: Colors.white,
-                child: const Text('Swipeable Item'),
-              ),
+        testApp(
+          DismissibleListItem(
+            itemKey: const ValueKey('test-item'),
+            itemName: itemName,
+            onDelete: () => deleteCallCount++,
+            child: Container(
+              height: 80,
+              color: Colors.white,
+              child: const Text('Swipeable Item'),
             ),
           ),
         ),
@@ -109,17 +105,15 @@ void main() {
       var deleteCallCount = 0;
 
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: DismissibleListItem(
-              itemKey: const ValueKey('test-item'),
-              itemName: 'Test Item',
-              onDelete: () => deleteCallCount++,
-              child: Container(
-                height: 80,
-                color: Colors.white,
-                child: const Text('Swipeable Item'),
-              ),
+        testApp(
+          DismissibleListItem(
+            itemKey: const ValueKey('test-item'),
+            itemName: 'Test Item',
+            onDelete: () => deleteCallCount++,
+            child: Container(
+              height: 80,
+              color: Colors.white,
+              child: const Text('Swipeable Item'),
             ),
           ),
         ),
@@ -145,17 +139,15 @@ void main() {
       var deleteCallCount = 0;
 
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: DismissibleListItem(
-              itemKey: const ValueKey('test-item'),
-              itemName: 'Test Item',
-              onDelete: () => deleteCallCount++,
-              child: Container(
-                height: 80,
-                color: Colors.white,
-                child: const Text('Swipeable Item'),
-              ),
+        testApp(
+          DismissibleListItem(
+            itemKey: const ValueKey('test-item'),
+            itemName: 'Test Item',
+            onDelete: () => deleteCallCount++,
+            child: Container(
+              height: 80,
+              color: Colors.white,
+              child: const Text('Swipeable Item'),
             ),
           ),
         ),
@@ -183,18 +175,16 @@ void main() {
       var deleteCallCount = 0;
 
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: DismissibleListItem(
-              itemKey: const ValueKey('test-item'),
-              itemName: 'Test Item',
-              confirmDelete: false,
-              onDelete: () => deleteCallCount++,
-              child: Container(
-                height: 80,
-                color: Colors.white,
-                child: const Text('Swipeable Item'),
-              ),
+        testApp(
+          DismissibleListItem(
+            itemKey: const ValueKey('test-item'),
+            itemName: 'Test Item',
+            confirmDelete: false,
+            onDelete: () => deleteCallCount++,
+            child: Container(
+              height: 80,
+              color: Colors.white,
+              child: const Text('Swipeable Item'),
             ),
           ),
         ),
@@ -222,18 +212,16 @@ void main() {
       var deleteCallCount = 0;
 
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: DismissibleListItem(
-              itemKey: const ValueKey('test-item'),
-              itemName: 'Test Item',
-              confirmDelete: false,
-              onDelete: () => deleteCallCount++,
-              child: Container(
-                height: 80,
-                color: Colors.white,
-                child: const Text('Swipeable Item'),
-              ),
+        testApp(
+          DismissibleListItem(
+            itemKey: const ValueKey('test-item'),
+            itemName: 'Test Item',
+            confirmDelete: false,
+            onDelete: () => deleteCallCount++,
+            child: Container(
+              height: 80,
+              color: Colors.white,
+              child: const Text('Swipeable Item'),
             ),
           ),
         ),
@@ -253,17 +241,15 @@ void main() {
     ) async {
       // Arrange
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: DismissibleListItem(
-              itemKey: const ValueKey('test-item'),
-              itemName: 'Test Item',
-              onDelete: () {},
-              child: Container(
-                height: 80,
-                color: Colors.white,
-                child: const Text('Swipeable Item'),
-              ),
+        testApp(
+          DismissibleListItem(
+            itemKey: const ValueKey('test-item'),
+            itemName: 'Test Item',
+            onDelete: () {},
+            child: Container(
+              height: 80,
+              color: Colors.white,
+              child: const Text('Swipeable Item'),
             ),
           ),
         ),
@@ -294,14 +280,12 @@ void main() {
       const testKey = ValueKey('unique-item-key');
 
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: DismissibleListItem(
-              itemKey: testKey,
-              itemName: 'Test Item',
-              onDelete: () {},
-              child: const Text('Swipeable Item'),
-            ),
+        testApp(
+          DismissibleListItem(
+            itemKey: testKey,
+            itemName: 'Test Item',
+            onDelete: () {},
+            child: const Text('Swipeable Item'),
           ),
         ),
       );
@@ -316,17 +300,15 @@ void main() {
     ) async {
       // Arrange
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: DismissibleListItem(
-              itemKey: const ValueKey('test-item'),
-              itemName: 'Test Item',
-              onDelete: () {},
-              child: Container(
-                height: 80,
-                color: Colors.white,
-                child: const Text('Swipeable Item'),
-              ),
+        testApp(
+          DismissibleListItem(
+            itemKey: const ValueKey('test-item'),
+            itemName: 'Test Item',
+            onDelete: () {},
+            child: Container(
+              height: 80,
+              color: Colors.white,
+              child: const Text('Swipeable Item'),
             ),
           ),
         ),
