@@ -50,6 +50,7 @@ class _CreateSpaceModalState extends State<CreateSpaceModal> {
   String? _selectedIcon;
   String? _selectedColor;
   String? _errorMessage;
+  String? _submitErrorMessage; // Error message for submission failures
   bool _isSubmitting = false;
 
   // Curated emoji icons for spaces
@@ -113,6 +114,16 @@ class _CreateSpaceModalState extends State<CreateSpaceModal> {
     _selectedColor = widget.initialSpace?.color ?? _colorOptions[0];
 
     _nameController.addListener(_validateForm);
+    _nameController.addListener(_clearSubmitError);
+  }
+
+  /// Clear submit error when user starts editing
+  void _clearSubmitError() {
+    if (_submitErrorMessage != null) {
+      setState(() {
+        _submitErrorMessage = null;
+      });
+    }
   }
 
   @override
@@ -148,16 +159,23 @@ class _CreateSpaceModalState extends State<CreateSpaceModal> {
 
     setState(() {
       _isSubmitting = true;
+      _submitErrorMessage = null; // Clear previous errors
     });
 
     final navigator = Navigator.of(context);
-    final messenger = ScaffoldMessenger.of(context);
     final spacesProvider = context.read<SpacesProvider>();
 
     // Safety check: Ensure user is authenticated
     final userId = context.read<AuthProvider>().currentUser?.id;
     if (userId == null) {
-      return; // Exit early - user should be redirected to auth screen by AuthGate
+      if (mounted) {
+        setState(() {
+          _isSubmitting = false;
+          _submitErrorMessage =
+              'You are not signed in. Please sign in and try again.';
+        });
+      }
+      return;
     }
 
     try {
@@ -188,17 +206,14 @@ class _CreateSpaceModalState extends State<CreateSpaceModal> {
       if (mounted) {
         setState(() {
           _isSubmitting = false;
+
+          // Show user-friendly error message inside the modal UI
+          _submitErrorMessage = e.toString().contains('connection')
+              ? 'Network error. Please check your connection and try again.'
+              : widget.mode == SpaceModalMode.edit
+                  ? 'Failed to update space. Please try again.'
+                  : 'Failed to create space. Please try again.';
         });
-        messenger.showSnackBar(
-          SnackBar(
-            content: Text(
-              widget.mode == SpaceModalMode.edit
-                  ? 'Failed to update space'
-                  : 'Failed to create space',
-            ),
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
       }
     }
   }
@@ -240,6 +255,7 @@ class _CreateSpaceModalState extends State<CreateSpaceModal> {
               onTap: () {
                 setState(() {
                   _selectedIcon = icon;
+                  _submitErrorMessage = null; // Clear error on interaction
                 });
               },
               child: Container(
@@ -311,6 +327,7 @@ class _CreateSpaceModalState extends State<CreateSpaceModal> {
               onTap: () {
                 setState(() {
                   _selectedColor = colorHex;
+                  _submitErrorMessage = null; // Clear error on interaction
                 });
               },
               child: Container(
@@ -345,6 +362,39 @@ class _CreateSpaceModalState extends State<CreateSpaceModal> {
     );
   }
 
+  /// Build error banner if there's a submit error
+  Widget? _buildErrorBanner() {
+    if (_submitErrorMessage == null) return null;
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: AppSpacing.md),
+      padding: const EdgeInsets.all(AppSpacing.sm),
+      decoration: BoxDecoration(
+        color: AppColors.errorBg,
+        borderRadius: BorderRadius.circular(AppSpacing.radiusSM),
+        border: Border.all(color: AppColors.error),
+      ),
+      child: Row(
+        children: [
+          const Icon(
+            Icons.error_outline,
+            color: AppColors.error,
+            size: 20,
+          ),
+          const SizedBox(width: AppSpacing.xs),
+          Expanded(
+            child: Text(
+              _submitErrorMessage!,
+              style: AppTypography.bodySmall.copyWith(
+                color: AppColors.errorDark,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   /// Build form content
   Widget _buildFormContent(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -363,6 +413,12 @@ class _CreateSpaceModalState extends State<CreateSpaceModal> {
 
         // Color picker
         _buildColorPicker(isDark),
+
+        // Error banner (if any)
+        if (_submitErrorMessage != null) ...[
+          const SizedBox(height: AppSpacing.lg),
+          _buildErrorBanner()!,
+        ],
       ],
     );
   }

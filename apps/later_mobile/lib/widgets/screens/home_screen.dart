@@ -6,6 +6,7 @@ import 'package:later_mobile/design_system/organisms/cards/list_card.dart';
 import 'package:later_mobile/design_system/organisms/cards/note_card.dart';
 import 'package:later_mobile/design_system/organisms/cards/todo_list_card.dart';
 import 'package:later_mobile/design_system/organisms/empty_states/empty_space_state.dart';
+import 'package:later_mobile/design_system/organisms/empty_states/no_spaces_state.dart';
 import 'package:later_mobile/design_system/organisms/empty_states/welcome_state.dart';
 import 'package:later_mobile/design_system/organisms/fab/responsive_fab.dart';
 import 'package:later_mobile/design_system/tokens/tokens.dart';
@@ -23,6 +24,8 @@ import '../../providers/auth_provider.dart';
 import '../../providers/content_provider.dart';
 import '../../providers/spaces_provider.dart';
 import '../modals/create_content_modal.dart';
+import '../modals/create_space_modal.dart'
+    show CreateSpaceModal, SpaceModalMode;
 import '../modals/space_switcher_modal.dart';
 import '../navigation/app_sidebar.dart';
 import '../navigation/icon_only_bottom_nav.dart';
@@ -154,6 +157,28 @@ class _HomeScreenState extends State<HomeScreen> {
         initialType: initialType,
       ),
     );
+  }
+
+  /// Show create space modal
+  Future<void> _showCreateSpaceModal() async {
+    final result = await ResponsiveModal.show<bool>(
+      context: context,
+      child: const CreateSpaceModal(mode: SpaceModalMode.create),
+    );
+
+    // If a space was created, load content for the newly selected space
+    // Note: SpacesProvider.addSpace() automatically sets the new space as current
+    // and updates the spaces list, so we don't need to call loadSpaces()
+    if (result == true && mounted) {
+      final spacesProvider = context.read<SpacesProvider>();
+      final contentProvider = context.read<ContentProvider>();
+
+      // Load content for the new current space
+      // (which was automatically set by addSpace)
+      if (spacesProvider.currentSpace != null) {
+        await contentProvider.loadSpaceContent(spacesProvider.currentSpace!.id);
+      }
+    }
   }
 
   /// Handle keyboard shortcuts
@@ -288,10 +313,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
         // Menu button
         PopupMenuButton<String>(
-          icon: Icon(
-            Icons.more_vert,
-            color: AppColors.textSecondary(context),
-          ),
+          icon: Icon(Icons.more_vert, color: AppColors.textSecondary(context)),
           tooltip: 'Menu',
           onSelected: (value) async {
             if (value == 'signout') {
@@ -384,6 +406,11 @@ class _HomeScreenState extends State<HomeScreen> {
     SpacesProvider spacesProvider,
     ContentProvider contentProvider,
   ) {
+    // Check for no spaces first (new user without any spaces)
+    if (spacesProvider.spaces.isEmpty) {
+      return NoSpacesState(onActionPressed: _showCreateSpaceModal);
+    }
+
     // Check if completely empty (no content at all)
     if (content.isEmpty && contentProvider.getTotalCount() == 0) {
       // Check if this is a new user (welcome state)
@@ -434,7 +461,8 @@ class _HomeScreenState extends State<HomeScreen> {
       buildDefaultDragHandles: false,
       onReorder: (oldIndex, newIndex) async {
         // Don't allow reordering the "Load More" button
-        if (hasMoreItems && (oldIndex == content.length || newIndex > content.length)) {
+        if (hasMoreItems &&
+            (oldIndex == content.length || newIndex > content.length)) {
           return;
         }
 

@@ -43,11 +43,7 @@ class SupabaseConfig {
     // Auto-detect debug mode based on URL
     final isLocal = _isLocalEnvironment(url);
 
-    await Supabase.initialize(
-      url: url,
-      anonKey: anonKey,
-      debug: isLocal,
-    );
+    await Supabase.initialize(url: url, anonKey: anonKey, debug: isLocal);
   }
 
   /// Check if URL points to local development environment

@@ -171,6 +171,7 @@ class SpacesProvider extends ChangeNotifier {
         _error = AppError.fromException(e);
       }
       notifyListeners();
+      rethrow;
     }
   }
 
