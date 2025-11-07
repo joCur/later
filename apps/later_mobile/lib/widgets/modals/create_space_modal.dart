@@ -178,42 +178,37 @@ class _CreateSpaceModalState extends State<CreateSpaceModal> {
       return;
     }
 
-    try {
-      final name = _nameController.text.trim();
-      final space = Space(
-        id: widget.mode == SpaceModalMode.edit
-            ? widget.initialSpace!.id
-            : const Uuid().v4(),
-        name: name,
-        userId: userId,
-        icon: _selectedIcon,
-        color: _selectedColor,
-        isArchived: widget.initialSpace?.isArchived ?? false,
-        createdAt: widget.initialSpace?.createdAt,
-        updatedAt: DateTime.now(),
-      );
+    final name = _nameController.text.trim();
+    final space = Space(
+      id: widget.mode == SpaceModalMode.edit
+          ? widget.initialSpace!.id
+          : const Uuid().v4(),
+      name: name,
+      userId: userId,
+      icon: _selectedIcon,
+      color: _selectedColor,
+      isArchived: widget.initialSpace?.isArchived ?? false,
+      createdAt: widget.initialSpace?.createdAt,
+      updatedAt: DateTime.now(),
+    );
 
-      if (widget.mode == SpaceModalMode.edit) {
-        await spacesProvider.updateSpace(space);
-      } else {
-        await spacesProvider.addSpace(space);
-      }
+    if (widget.mode == SpaceModalMode.edit) {
+      await spacesProvider.updateSpace(space);
+    } else {
+      await spacesProvider.addSpace(space);
+    }
 
-      if (mounted) {
-        navigator.pop(true);
-      }
-    } catch (e) {
-      if (mounted) {
+    // Check if operation succeeded by checking provider's error state
+    if (mounted) {
+      if (spacesProvider.error != null) {
+        // Operation failed - show error from provider
         setState(() {
           _isSubmitting = false;
-
-          // Show user-friendly error message inside the modal UI
-          _submitErrorMessage = e.toString().contains('connection')
-              ? 'Network error. Please check your connection and try again.'
-              : widget.mode == SpaceModalMode.edit
-                  ? 'Failed to update space. Please try again.'
-                  : 'Failed to create space. Please try again.';
+          _submitErrorMessage = spacesProvider.error!.message;
         });
+      } else {
+        // Operation succeeded - close modal
+        navigator.pop(true);
       }
     }
   }
