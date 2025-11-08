@@ -136,11 +136,11 @@ Three-layer error handling system:
   - Maintained fallback to `_getFallbackMessage()` when localizations is null
   - Updated ErrorCode extension to generate correct camelCase localization keys
 
-### Phase 3: Domain Error Mappers
+### Phase 3: Domain Error Mappers ✅ COMPLETED
 
 **Goal:** Create mapper classes that convert third-party exceptions to AppError with proper error codes.
 
-- [ ] Task 3.1: Create SupabaseErrorMapper for PostgrestException
+- [x] Task 3.1: Create SupabaseErrorMapper for PostgrestException
   - Create `lib/core/error/mappers/supabase_error_mapper.dart`
   - Create static class `SupabaseErrorMapper`
   - Implement `static AppError fromPostgrestException(PostgrestException exception)` method
@@ -154,7 +154,7 @@ Three-layer error handling system:
   - Include `technicalDetails` with original exception message
   - Add debug logging for unmapped error codes
 
-- [ ] Task 3.2: Add AuthException mapper to SupabaseErrorMapper
+- [x] Task 3.2: Add AuthException mapper to SupabaseErrorMapper
   - Add `static AppError fromAuthException(AuthException exception)` method
   - Map Supabase auth codes to ErrorCode:
     - `'invalid_credentials'`, `'invalid_grant'`, `'user_not_found'` → `ErrorCode.authInvalidCredentials`
@@ -168,18 +168,33 @@ Three-layer error handling system:
   - Include `technicalDetails` with original exception message
   - Add debug logging for unmapped auth error codes
 
-- [ ] Task 3.3: Create ValidationErrorMapper
+- [x] Task 3.3: Create ValidationErrorMapper
   - Create `lib/core/error/mappers/validation_error_mapper.dart`
   - Create static class `ValidationErrorMapper`
   - Implement methods for common validation scenarios:
     - `static AppError requiredField(String fieldName)` → `ErrorCode.validationRequired` with context
     - `static AppError invalidFormat(String fieldName)` → `ErrorCode.validationInvalidFormat` with context
     - `static AppError outOfRange(String fieldName, String min, String max)` → `ErrorCode.validationOutOfRange` with context
+    - `static AppError duplicate(String fieldName)` → `ErrorCode.validationDuplicate` with context
 
-- [ ] Task 3.4: Export mappers in error module
-  - Create or update `lib/core/error/error.dart` barrel file
-  - Export `error_codes.dart`, `app_error.dart`, and all mappers
-  - Ensure clean import path: `import 'package:later_mobile/core/error/error.dart';`
+- [x] Task 3.4: Export mappers in error module
+  - Created `lib/core/error/error.dart` barrel file
+  - Exported `error_codes.dart`, `app_error.dart`, `error_handler.dart`, `error_logger.dart`, and all mappers
+  - Provides clean import path: `import 'package:later_mobile/core/error/error.dart';`
+
+**Phase 3 Implementation Notes:**
+- Created `SupabaseErrorMapper` with comprehensive PostgrestException and AuthException mapping
+- **Uses proper error codes from Supabase API** (not keyword matching!):
+  - PostgrestException has `code` property with PostgreSQL error codes (23505, 42501, etc.)
+  - AuthException has `code` property with Supabase auth error codes (`user_not_found`, `weak_password`, etc.)
+  - Only falls back to message parsing when `code` is null (rare edge case)
+  - References official Supabase error codes: https://github.com/supabase/auth/blob/master/internal/api/errorcodes.go
+- Added password minimum length extraction from error messages (supports various formats)
+- Created `ValidationErrorMapper` with helper methods for common validation scenarios
+- All mappers include context data for proper message interpolation
+- Wrote comprehensive test suite: 25 Supabase tests + 24 validation tests = 49 total tests
+- All mapper tests passing ✅
+- Fixed one test file (error_snackbar_test.dart) to use new ErrorCode parameter
 
 ### Phase 4: Repository Integration
 

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:later_mobile/core/error/app_error.dart';
+import 'package:later_mobile/core/error/error_codes.dart';
 import 'package:later_mobile/design_system/organisms/error/error_snackbar.dart';
 import '../../../test_helpers.dart';
 
@@ -256,6 +257,7 @@ void main() {
 
     testWidgets('can show custom action label', (tester) async {
       const error = AppError(
+        code: ErrorCode.databaseGeneric,
         type: ErrorType.storage,
         message: 'Test',
         actionLabel: 'Try Again',
