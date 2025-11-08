@@ -201,10 +201,12 @@ class _CreateSpaceModalState extends State<CreateSpaceModal> {
     // Check if operation succeeded by checking provider's error state
     if (mounted) {
       if (spacesProvider.error != null) {
-        // Operation failed - show error from provider
+        // Operation failed - show user-friendly error message
         setState(() {
           _isSubmitting = false;
-          _submitErrorMessage = spacesProvider.error!.message;
+          _submitErrorMessage =
+              spacesProvider.error!.userMessage ??
+              'Could not create the space. Please try again.';
         });
       } else {
         // Operation succeeded - close modal
@@ -371,11 +373,7 @@ class _CreateSpaceModalState extends State<CreateSpaceModal> {
       ),
       child: Row(
         children: [
-          const Icon(
-            Icons.error_outline,
-            color: AppColors.error,
-            size: 20,
-          ),
+          const Icon(Icons.error_outline, color: AppColors.error, size: 20),
           const SizedBox(width: AppSpacing.xs),
           Expanded(
             child: Text(
