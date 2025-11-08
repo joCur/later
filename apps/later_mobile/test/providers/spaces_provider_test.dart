@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:later_mobile/core/error/app_error.dart';
 import 'package:later_mobile/data/local/preferences_service.dart';
 import 'package:later_mobile/data/models/space_model.dart';
 import 'package:later_mobile/data/repositories/space_repository.dart';
@@ -145,8 +146,20 @@ void main() {
     test('should load spaces successfully', () async {
       // Arrange
       final testSpaces = [
-        Space(id: '1', userId: 'test-user', name: 'Work', icon: '💼', color: '#FF5733'),
-        Space(id: '2', userId: 'test-user', name: 'Personal', icon: '🏠', color: '#33FF57'),
+        Space(
+          id: '1',
+          userId: 'test-user',
+          name: 'Work',
+          icon: '💼',
+          color: '#FF5733',
+        ),
+        Space(
+          id: '2',
+          userId: 'test-user',
+          name: 'Personal',
+          icon: '🏠',
+          color: '#33FF57',
+        ),
       ];
       mockRepository.mockSpaces = testSpaces;
 
@@ -181,7 +194,12 @@ void main() {
       // Arrange
       final testSpaces = [
         Space(id: '1', userId: 'test-user', name: 'Work'),
-        Space(id: '2', userId: 'test-user', name: 'Old Project', isArchived: true),
+        Space(
+          id: '2',
+          userId: 'test-user',
+          name: 'Old Project',
+          isArchived: true,
+        ),
         Space(id: '3', userId: 'test-user', name: 'Personal'),
       ];
       mockRepository.mockSpaces = testSpaces;
@@ -198,7 +216,12 @@ void main() {
       // Arrange
       final testSpaces = [
         Space(id: '1', userId: 'test-user', name: 'Work'),
-        Space(id: '2', userId: 'test-user', name: 'Old Project', isArchived: true),
+        Space(
+          id: '2',
+          userId: 'test-user',
+          name: 'Old Project',
+          isArchived: true,
+        ),
         Space(id: '3', userId: 'test-user', name: 'Personal'),
       ];
       mockRepository.mockSpaces = testSpaces;
@@ -245,7 +268,9 @@ void main() {
 
     test('should notify listeners on successful load', () async {
       // Arrange
-      mockRepository.mockSpaces = [Space(id: '1', userId: 'test-user', name: 'Work')];
+      mockRepository.mockSpaces = [
+        Space(id: '1', userId: 'test-user', name: 'Work'),
+      ];
       int notifyCount = 0;
       provider.addListener(() {
         notifyCount++;
@@ -469,6 +494,27 @@ void main() {
 
       // Assert
       expect(notifyCount, greaterThan(0));
+    });
+
+    test('should wrap unknown errors with context-specific message', () async {
+      // Arrange
+      mockRepository.shouldThrowError = true;
+      mockRepository.errorMessage = 'Unknown database error';
+      final newSpace = Space(id: '1', userId: 'test-user', name: 'Work');
+
+      // Act
+      await provider.addSpace(newSpace);
+
+      // Assert
+      expect(provider.error, isNotNull);
+      expect(provider.error!.type, ErrorType.unknown);
+      expect(provider.error!.message, contains('Failed to create space'));
+      expect(
+        provider.error!.userMessage,
+        'Could not create the space. Please check your connection and try again.',
+      );
+      expect(provider.spaces, isEmpty);
+      expect(provider.currentSpace, isNull);
     });
   });
 

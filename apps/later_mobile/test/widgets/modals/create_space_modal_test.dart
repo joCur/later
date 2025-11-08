@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:later_mobile/core/error/app_error.dart';
 import 'package:later_mobile/core/theme/temporal_flow_theme.dart';
 import 'package:later_mobile/core/utils/responsive_modal.dart';
 import 'package:later_mobile/data/models/space_model.dart';
@@ -42,6 +43,8 @@ void main() {
     // Mock SpacesProvider methods
     when(mockSpacesProvider.addSpace(any)).thenAnswer((_) async {});
     when(mockSpacesProvider.updateSpace(any)).thenAnswer((_) async {});
+    // Mock error getter to return null by default (success case)
+    when(mockSpacesProvider.error).thenReturn(null);
   });
 
   Widget createTestWidget({required Widget child, bool isDark = false}) {
@@ -56,9 +59,7 @@ void main() {
       home: Scaffold(
         body: MultiProvider(
           providers: [
-            ChangeNotifierProvider<AuthProvider>.value(
-              value: mockAuthProvider,
-            ),
+            ChangeNotifierProvider<AuthProvider>.value(value: mockAuthProvider),
             ChangeNotifierProvider<SpacesProvider>.value(
               value: mockSpacesProvider,
             ),
@@ -525,13 +526,17 @@ void main() {
       verify(mockSpacesProvider.addSpace(any)).called(1);
     });
 
-
     testWidgets('should show error snackbar on creation failure', (
       WidgetTester tester,
     ) async {
-      when(
-        mockSpacesProvider.addSpace(any),
-      ).thenThrow(Exception('Failed to create space'));
+      // Set up error state in provider with user-friendly message
+      final testError = AppError.unknown(
+        message: 'Failed to create space',
+        userMessage:
+            'Could not create the space. Please check your connection and try again.',
+      );
+      when(mockSpacesProvider.addSpace(any)).thenAnswer((_) async {});
+      when(mockSpacesProvider.error).thenReturn(testError);
 
       await tester.pumpWidget(
         createTestWidget(
@@ -550,8 +555,8 @@ void main() {
       await tester.pump(); // Start animation
       await tester.pump(const Duration(seconds: 1)); // Finish animation
 
-      // Should show error snackbar
-      expect(find.textContaining('Failed to create space'), findsOneWidget);
+      // Should show user-friendly error banner
+      expect(find.textContaining('Could not create the space'), findsOneWidget);
     });
   });
 
@@ -628,7 +633,6 @@ void main() {
       ).called(1);
     });
 
-
     testWidgets('should show error snackbar on update failure', (
       WidgetTester tester,
     ) async {
@@ -639,9 +643,14 @@ void main() {
         icon: '💼',
         color: '#6366F1',
       );
-      when(
-        mockSpacesProvider.updateSpace(any),
-      ).thenThrow(Exception('Failed to update space'));
+      // Set up error state in provider with user-friendly message
+      final testError = AppError.unknown(
+        message: 'Failed to update space',
+        userMessage:
+            'Could not create the space. Please check your connection and try again.',
+      );
+      when(mockSpacesProvider.updateSpace(any)).thenAnswer((_) async {});
+      when(mockSpacesProvider.error).thenReturn(testError);
 
       await tester.pumpWidget(
         createTestWidget(
@@ -663,8 +672,8 @@ void main() {
       await tester.pump(); // Start animation
       await tester.pump(const Duration(seconds: 1)); // Finish animation
 
-      // Should show error snackbar
-      expect(find.textContaining('Failed to update space'), findsOneWidget);
+      // Should show user-friendly error banner
+      expect(find.textContaining('Could not create the space'), findsOneWidget);
     });
   });
 

@@ -165,10 +165,26 @@ class SpacesProvider extends ChangeNotifier {
       _error = null;
       notifyListeners();
     } catch (e) {
+      // Wrap the error with context-specific message
       if (e is AppError) {
-        _error = e;
+        // If it's an unknown error, wrap it with a better message
+        if (e.type == ErrorType.unknown) {
+          _error = AppError.unknown(
+            message: 'Failed to create space: ${e.message}',
+            details: e.technicalDetails,
+            userMessage:
+                'Could not create the space. Please check your connection and try again.',
+          );
+        } else {
+          _error = e;
+        }
       } else {
-        _error = AppError.fromException(e);
+        _error = AppError.unknown(
+          message: 'Failed to create space: ${e.toString()}',
+          details: e.toString(),
+          userMessage:
+              'Could not create the space. Please check your connection and try again.',
+        );
       }
       notifyListeners();
     }
