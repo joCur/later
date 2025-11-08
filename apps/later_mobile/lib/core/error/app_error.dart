@@ -1,3 +1,4 @@
+import '../../l10n/app_localizations.dart';
 import 'error_codes.dart';
 
 /// Error types for categorizing different kinds of errors in the app.
@@ -230,23 +231,110 @@ class AppError implements Exception {
 
   /// Gets the localized user-friendly message for this error.
   ///
-  /// This method will be implemented in Phase 2 when localization is set up.
-  /// For now, it returns a fallback English message based on the error code.
+  /// Uses the AppLocalizations to retrieve the localized error message based
+  /// on the error code. Falls back to English messages if localizations is null.
   ///
   /// Parameters:
-  ///   - localizations: AppLocalizations instance (will be used in Phase 2)
+  ///   - localizations: AppLocalizations instance from the current context
   ///
   /// Returns a user-friendly error message with interpolated context values.
-  String getUserMessageLocalized([dynamic localizations]) {
-    // Phase 2 TODO: Use localizations.getString(code.localizationKey)
-    // and interpolate context values
-
+  String getUserMessageLocalized([AppLocalizations? localizations]) {
+    // Use custom userMessage if provided
     if (userMessage != null) {
       return userMessage!;
     }
 
-    // Fallback English messages until Phase 2 localization is complete
-    return _getFallbackMessage();
+    // If no localizations available, use fallback
+    if (localizations == null) {
+      return _getFallbackMessage();
+    }
+
+    // Get localized message based on error code
+    return _getLocalizedMessage(localizations);
+  }
+
+  /// Gets the localized error message using AppLocalizations.
+  String _getLocalizedMessage(AppLocalizations localizations) {
+    switch (code) {
+      // Database errors
+      case ErrorCode.databaseUniqueConstraint:
+        return localizations.errorDatabaseUniqueConstraint;
+      case ErrorCode.databaseForeignKeyViolation:
+        return localizations.errorDatabaseForeignKeyViolation;
+      case ErrorCode.databaseNotNullViolation:
+        return localizations.errorDatabaseNotNullViolation;
+      case ErrorCode.databasePermissionDenied:
+        return localizations.errorDatabasePermissionDenied;
+      case ErrorCode.databaseTimeout:
+        return localizations.errorDatabaseTimeout;
+      case ErrorCode.databaseGeneric:
+        return localizations.errorDatabaseGeneric;
+
+      // Auth errors
+      case ErrorCode.authInvalidCredentials:
+        return localizations.errorAuthInvalidCredentials;
+      case ErrorCode.authUserAlreadyExists:
+        return localizations.errorAuthUserAlreadyExists;
+      case ErrorCode.authWeakPassword:
+        final minLength = context?['minLength']?.toString() ?? '8';
+        return localizations.errorAuthWeakPassword(minLength);
+      case ErrorCode.authInvalidEmail:
+        return localizations.errorAuthInvalidEmail;
+      case ErrorCode.authEmailNotConfirmed:
+        return localizations.errorAuthEmailNotConfirmed;
+      case ErrorCode.authSessionExpired:
+        return localizations.errorAuthSessionExpired;
+      case ErrorCode.authNetworkError:
+        return localizations.errorAuthNetworkError;
+      case ErrorCode.authRateLimitExceeded:
+        return localizations.errorAuthRateLimitExceeded;
+      case ErrorCode.authGeneric:
+        return localizations.errorAuthGeneric;
+
+      // Network errors
+      case ErrorCode.networkTimeout:
+        return localizations.errorNetworkTimeout;
+      case ErrorCode.networkNoConnection:
+        return localizations.errorNetworkNoConnection;
+      case ErrorCode.networkServerError:
+        return localizations.errorNetworkServerError;
+      case ErrorCode.networkBadRequest:
+        return localizations.errorNetworkBadRequest;
+      case ErrorCode.networkNotFound:
+        return localizations.errorNetworkNotFound;
+      case ErrorCode.networkGeneric:
+        return localizations.errorNetworkGeneric;
+
+      // Validation errors
+      case ErrorCode.validationRequired:
+        final fieldName = context?['fieldName']?.toString() ?? 'Field';
+        return localizations.errorValidationRequired(fieldName);
+      case ErrorCode.validationInvalidFormat:
+        final fieldName = context?['fieldName']?.toString() ?? 'Field';
+        return localizations.errorValidationInvalidFormat(fieldName);
+      case ErrorCode.validationOutOfRange:
+        final fieldName = context?['fieldName']?.toString() ?? 'Value';
+        final min = context?['min']?.toString() ?? '0';
+        final max = context?['max']?.toString() ?? '100';
+        return localizations.errorValidationOutOfRange(fieldName, min, max);
+      case ErrorCode.validationDuplicate:
+        final fieldName = context?['fieldName']?.toString() ?? 'Value';
+        return localizations.errorValidationDuplicate(fieldName);
+
+      // Business logic errors
+      case ErrorCode.spaceNotFound:
+        return localizations.errorSpaceNotFound;
+      case ErrorCode.noteNotFound:
+        return localizations.errorNoteNotFound;
+      case ErrorCode.insufficientPermissions:
+        return localizations.errorInsufficientPermissions;
+      case ErrorCode.operationNotAllowed:
+        return localizations.errorOperationNotAllowed;
+
+      // Unknown error
+      case ErrorCode.unknownError:
+        return localizations.errorUnknownError;
+    }
   }
 
   /// Gets a fallback English error message based on the error code.

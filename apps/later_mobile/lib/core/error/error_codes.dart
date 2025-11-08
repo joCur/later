@@ -127,11 +127,17 @@ enum ErrorSeverity {
 extension ErrorCodeMetadata on ErrorCode {
   /// Returns the localization key for this error code.
   ///
-  /// The key follows the format 'error.{errorCodeName}' which maps to
-  /// entries in the ARB localization files.
+  /// The key follows the format 'error{ErrorCodeName}' which maps to
+  /// entries in the ARB localization files (camelCase).
   ///
-  /// Example: ErrorCode.databaseTimeout → 'error.databaseTimeout'
-  String get localizationKey => 'error.$name';
+  /// Example: ErrorCode.databaseTimeout → 'errorDatabaseTimeout'
+  String get localizationKey {
+    // Convert from camelCase enum name to camelCase with 'error' prefix
+    // databaseTimeout → errorDatabaseTimeout
+    final name = this.name;
+    final capitalizedName = name[0].toUpperCase() + name.substring(1);
+    return 'error$capitalizedName';
+  }
 
   /// Returns true if this error type should allow retry operations.
   ///
