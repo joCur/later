@@ -56,7 +56,7 @@ class ErrorLogger {
     final timestamp = DateTime.now().toIso8601String();
     final buffer = StringBuffer();
 
-    buffer.writeln('[$timestamp] ERROR: ${error.type.name}');
+    buffer.writeln('[$timestamp] ERROR: ${error.code.name}');
     buffer.writeln('Message: ${error.message}');
 
     if (context != null) {
@@ -112,7 +112,7 @@ class ErrorLogger {
   /// Formats an AppError into a readable string.
   static String formatError(AppError error) {
     final buffer = StringBuffer();
-    buffer.write('${error.type.name}: ${error.message}');
+    buffer.write('${error.code.name}: ${error.message}');
 
     if (error.technicalDetails != null) {
       buffer.write(' (${error.technicalDetails})');

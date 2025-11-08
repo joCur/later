@@ -1,15 +1,18 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:later_mobile/core/error/app_error.dart';
+import 'package:later_mobile/core/error/error_codes.dart';
 
 void main() {
   group('AppError', () {
     group('constructor', () {
       test('creates error with message', () {
         const error = AppError(
+          code: ErrorCode.databaseGeneric,
           type: ErrorType.storage,
           message: 'Storage error occurred',
         );
 
+        expect(error.code, ErrorCode.databaseGeneric);
         expect(error.type, ErrorType.storage);
         expect(error.message, 'Storage error occurred');
         expect(error.technicalDetails, isNull);
@@ -19,6 +22,7 @@ void main() {
 
       test('creates error with all fields', () {
         const error = AppError(
+          code: ErrorCode.networkTimeout,
           type: ErrorType.network,
           message: 'Network error occurred',
           technicalDetails: 'Connection timeout after 30s',
@@ -26,6 +30,7 @@ void main() {
           actionLabel: 'Retry',
         );
 
+        expect(error.code, ErrorCode.networkTimeout);
         expect(error.type, ErrorType.network);
         expect(error.message, 'Network error occurred');
         expect(error.technicalDetails, 'Connection timeout after 30s');
@@ -122,9 +127,20 @@ void main() {
         expect(error.isRetryable, isTrue);
       });
 
-      test('storage errors are retryable', () {
-        final error = AppError.storage(message: 'Save failed');
+      test('database timeout errors are retryable', () {
+        const error = AppError(
+          code: ErrorCode.databaseTimeout,
+          message: 'Save failed',
+        );
         expect(error.isRetryable, isTrue);
+      });
+
+      test('database errors are not retryable', () {
+        const error = AppError(
+          code: ErrorCode.databaseGeneric,
+          message: 'Save failed',
+        );
+        expect(error.isRetryable, isFalse);
       });
 
       test('validation errors are not retryable', () {
@@ -146,6 +162,7 @@ void main() {
     group('getUserMessage', () {
       test('returns custom user message if provided', () {
         const error = AppError(
+          code: ErrorCode.databaseGeneric,
           type: ErrorType.storage,
           message: 'Technical message',
           userMessage: 'Custom user message',
@@ -174,6 +191,7 @@ void main() {
     group('getActionLabel', () {
       test('returns custom action label if provided', () {
         const error = AppError(
+          code: ErrorCode.databaseGeneric,
           type: ErrorType.storage,
           message: 'Error',
           actionLabel: 'Custom Action',
@@ -196,17 +214,19 @@ void main() {
     group('toString', () {
       test('includes type and message', () {
         const error = AppError(
+          code: ErrorCode.databaseGeneric,
           type: ErrorType.storage,
           message: 'Storage error',
         );
 
         final str = error.toString();
-        expect(str, contains('storage'));
+        expect(str, contains('databaseGeneric'));
         expect(str, contains('Storage error'));
       });
 
       test('includes technical details if present', () {
         const error = AppError(
+          code: ErrorCode.networkTimeout,
           type: ErrorType.network,
           message: 'Network error',
           technicalDetails: 'Timeout occurred',
@@ -219,16 +239,22 @@ void main() {
 
     group('copyWith', () {
       test('copies with updated message', () {
-        const original = AppError(type: ErrorType.storage, message: 'Original');
+        const original = AppError(
+          code: ErrorCode.databaseGeneric,
+          type: ErrorType.storage,
+          message: 'Original',
+        );
 
         final copy = original.copyWith(message: 'Updated');
 
+        expect(copy.code, original.code);
         expect(copy.type, original.type);
         expect(copy.message, 'Updated');
       });
 
       test('copies with updated userMessage', () {
         const original = AppError(
+          code: ErrorCode.databaseGeneric,
           type: ErrorType.storage,
           message: 'Error',
           userMessage: 'Original user message',
@@ -236,6 +262,7 @@ void main() {
 
         final copy = original.copyWith(userMessage: 'Updated user message');
 
+        expect(copy.code, original.code);
         expect(copy.type, original.type);
         expect(copy.message, original.message);
         expect(copy.userMessage, 'Updated user message');
@@ -243,6 +270,7 @@ void main() {
 
       test('preserves original values if not specified', () {
         const original = AppError(
+          code: ErrorCode.networkTimeout,
           type: ErrorType.network,
           message: 'Error',
           technicalDetails: 'Details',
@@ -252,6 +280,7 @@ void main() {
 
         final copy = original.copyWith();
 
+        expect(copy.code, original.code);
         expect(copy.type, original.type);
         expect(copy.message, original.message);
         expect(copy.technicalDetails, original.technicalDetails);

@@ -1,4 +1,7 @@
+import 'error_codes.dart';
+
 /// Error types for categorizing different kinds of errors in the app.
+/// @deprecated Use ErrorCode instead for more granular error categorization.
 enum ErrorType {
   /// Storage-related errors (Hive, file system, etc.)
   storage,
@@ -26,9 +29,10 @@ enum ErrorType {
 /// try {
 ///   await saveData();
 /// } catch (e) {
-///   final error = AppError.storage(
+///   final error = AppError(
+///     code: ErrorCode.databaseGeneric,
 ///     message: 'Failed to save data',
-///     details: e.toString(),
+///     technicalDetails: e.toString(),
 ///   );
 ///   ErrorHandler.handleError(error);
 /// }
@@ -36,20 +40,25 @@ enum ErrorType {
 class AppError implements Exception {
   /// Creates an AppError with the specified properties.
   const AppError({
-    required this.type,
+    required this.code,
     required this.message,
     this.technicalDetails,
+    this.context,
     this.userMessage,
     this.actionLabel,
-  });
+    @Deprecated('Use ErrorCode instead') ErrorType? type,
+  }) : type = type ?? ErrorType.unknown;
 
   /// Factory constructor for storage-related errors.
+  /// @deprecated Use AppError with ErrorCode.databaseGeneric instead.
+  @Deprecated('Use AppError with ErrorCode instead')
   factory AppError.storage({
     required String message,
     String? details,
     String? userMessage,
   }) {
     return AppError(
+      code: ErrorCode.databaseGeneric,
       type: ErrorType.storage,
       message: message,
       technicalDetails: details,
@@ -60,12 +69,15 @@ class AppError implements Exception {
   }
 
   /// Factory constructor for network-related errors.
+  /// @deprecated Use AppError with ErrorCode.networkGeneric instead.
+  @Deprecated('Use AppError with ErrorCode instead')
   factory AppError.network({
     required String message,
     String? details,
     String? userMessage,
   }) {
     return AppError(
+      code: ErrorCode.networkGeneric,
       type: ErrorType.network,
       message: message,
       technicalDetails: details,
@@ -76,12 +88,15 @@ class AppError implements Exception {
   }
 
   /// Factory constructor for validation errors.
+  /// @deprecated Use AppError with ErrorCode.validationRequired or other validation codes instead.
+  @Deprecated('Use AppError with ErrorCode instead')
   factory AppError.validation({
     required String message,
     String? details,
     String? userMessage,
   }) {
     return AppError(
+      code: ErrorCode.validationRequired,
       type: ErrorType.validation,
       message: message,
       technicalDetails: details,
@@ -91,12 +106,15 @@ class AppError implements Exception {
   }
 
   /// Factory constructor for data corruption errors.
+  /// @deprecated Use AppError with ErrorCode.databaseGeneric instead.
+  @Deprecated('Use AppError with ErrorCode instead')
   factory AppError.corruption({
     required String message,
     String? details,
     String? userMessage,
   }) {
     return AppError(
+      code: ErrorCode.databaseGeneric,
       type: ErrorType.corruption,
       message: message,
       technicalDetails: details,
@@ -107,12 +125,15 @@ class AppError implements Exception {
   }
 
   /// Factory constructor for unknown errors.
+  /// @deprecated Use AppError with ErrorCode.unknownError instead.
+  @Deprecated('Use AppError with ErrorCode instead')
   factory AppError.unknown({
     required String message,
     String? details,
     String? userMessage,
   }) {
     return AppError(
+      code: ErrorCode.unknownError,
       type: ErrorType.unknown,
       message: message,
       technicalDetails: details,
@@ -124,6 +145,8 @@ class AppError implements Exception {
   /// Factory constructor to create an AppError from an Exception.
   ///
   /// This attempts to categorize the exception based on its message content.
+  /// @deprecated Use domain-specific error mappers (SupabaseErrorMapper, ValidationErrorMapper) instead.
+  @Deprecated('Use domain-specific error mappers instead')
   factory AppError.fromException(Object exception) {
     final message = exception.toString();
 
@@ -148,7 +171,11 @@ class AppError implements Exception {
     }
   }
 
+  /// The error code identifying the specific error type.
+  final ErrorCode code;
+
   /// The type of error.
+  /// @deprecated Use [code] instead for more granular error categorization.
   final ErrorType type;
 
   /// Technical error message for logging and debugging.
@@ -157,6 +184,9 @@ class AppError implements Exception {
   /// Additional technical details about the error.
   final String? technicalDetails;
 
+  /// Context data for message interpolation (e.g., field names, limits).
+  final Map<String, dynamic>? context;
+
   /// User-friendly error message to display in the UI.
   final String? userMessage;
 
@@ -164,22 +194,21 @@ class AppError implements Exception {
   final String? actionLabel;
 
   /// Returns true if this error type is retryable.
-  bool get isRetryable {
-    switch (type) {
-      case ErrorType.storage:
-      case ErrorType.network:
-        return true;
-      case ErrorType.validation:
-      case ErrorType.corruption:
-      case ErrorType.unknown:
-        return false;
-    }
-  }
+  ///
+  /// Delegates to [code.isRetryable] for the new error code system.
+  bool get isRetryable => code.isRetryable;
+
+  /// Returns the severity level of this error.
+  ///
+  /// Delegates to [code.severity] for the new error code system.
+  ErrorSeverity get severity => code.severity;
 
   /// Gets the user-friendly message for this error.
   ///
   /// Returns the custom [userMessage] if provided, otherwise returns
   /// a default message based on the error type.
+  ///
+  /// @deprecated Use getUserMessageLocalized() with AppLocalizations once Phase 2 is complete.
   String getUserMessage() {
     if (userMessage != null) {
       return userMessage!;
@@ -199,6 +228,114 @@ class AppError implements Exception {
     }
   }
 
+  /// Gets the localized user-friendly message for this error.
+  ///
+  /// This method will be implemented in Phase 2 when localization is set up.
+  /// For now, it returns a fallback English message based on the error code.
+  ///
+  /// Parameters:
+  ///   - localizations: AppLocalizations instance (will be used in Phase 2)
+  ///
+  /// Returns a user-friendly error message with interpolated context values.
+  String getUserMessageLocalized([dynamic localizations]) {
+    // Phase 2 TODO: Use localizations.getString(code.localizationKey)
+    // and interpolate context values
+
+    if (userMessage != null) {
+      return userMessage!;
+    }
+
+    // Fallback English messages until Phase 2 localization is complete
+    return _getFallbackMessage();
+  }
+
+  /// Gets a fallback English error message based on the error code.
+  String _getFallbackMessage() {
+    // Interpolate context values if present
+    String interpolate(String message) {
+      if (context == null) return message;
+      var result = message;
+      context!.forEach((key, value) {
+        result = result.replaceAll('{$key}', value.toString());
+      });
+      return result;
+    }
+
+    switch (code) {
+      // Database errors
+      case ErrorCode.databaseUniqueConstraint:
+        return 'A record with this value already exists.';
+      case ErrorCode.databaseForeignKeyViolation:
+        return 'Cannot complete this operation due to related data.';
+      case ErrorCode.databaseNotNullViolation:
+        return 'Required data is missing.';
+      case ErrorCode.databasePermissionDenied:
+        return 'You do not have permission to perform this operation.';
+      case ErrorCode.databaseTimeout:
+        return 'The operation timed out. Please try again.';
+      case ErrorCode.databaseGeneric:
+        return 'A database error occurred. Please try again.';
+
+      // Auth errors
+      case ErrorCode.authInvalidCredentials:
+        return 'Invalid email or password. Please try again.';
+      case ErrorCode.authUserAlreadyExists:
+        return 'An account with this email already exists.';
+      case ErrorCode.authWeakPassword:
+        return interpolate('Password must be at least {minLength} characters long.');
+      case ErrorCode.authInvalidEmail:
+        return 'Please enter a valid email address.';
+      case ErrorCode.authEmailNotConfirmed:
+        return 'Please confirm your email address before signing in.';
+      case ErrorCode.authSessionExpired:
+        return 'Your session has expired. Please sign in again.';
+      case ErrorCode.authNetworkError:
+        return 'Network error during authentication. Please check your connection.';
+      case ErrorCode.authRateLimitExceeded:
+        return 'Too many attempts. Please try again later.';
+      case ErrorCode.authGeneric:
+        return 'Authentication failed. Please try again.';
+
+      // Network errors
+      case ErrorCode.networkTimeout:
+        return 'Connection timed out. Please check your internet connection.';
+      case ErrorCode.networkNoConnection:
+        return 'No internet connection. Please check your network settings.';
+      case ErrorCode.networkServerError:
+        return 'Server error. Please try again later.';
+      case ErrorCode.networkBadRequest:
+        return 'Invalid request. Please try again.';
+      case ErrorCode.networkNotFound:
+        return 'The requested resource was not found.';
+      case ErrorCode.networkGeneric:
+        return 'Network error. Please check your connection and try again.';
+
+      // Validation errors
+      case ErrorCode.validationRequired:
+        return interpolate('{fieldName} is required.');
+      case ErrorCode.validationInvalidFormat:
+        return interpolate('{fieldName} has an invalid format.');
+      case ErrorCode.validationOutOfRange:
+        return interpolate('{fieldName} must be between {min} and {max}.');
+      case ErrorCode.validationDuplicate:
+        return interpolate('{fieldName} already exists.');
+
+      // Business logic errors
+      case ErrorCode.spaceNotFound:
+        return 'Space not found.';
+      case ErrorCode.noteNotFound:
+        return 'Note not found.';
+      case ErrorCode.insufficientPermissions:
+        return 'You do not have permission to perform this action.';
+      case ErrorCode.operationNotAllowed:
+        return 'This operation is not allowed.';
+
+      // Unknown error
+      case ErrorCode.unknownError:
+        return 'An unexpected error occurred. Please try again.';
+    }
+  }
+
   /// Gets the action label for this error.
   ///
   /// Returns the custom [actionLabel] if provided, otherwise returns
@@ -213,16 +350,20 @@ class AppError implements Exception {
 
   /// Creates a copy of this error with updated fields.
   AppError copyWith({
+    ErrorCode? code,
     ErrorType? type,
     String? message,
     String? technicalDetails,
+    Map<String, dynamic>? context,
     String? userMessage,
     String? actionLabel,
   }) {
     return AppError(
+      code: code ?? this.code,
       type: type ?? this.type,
       message: message ?? this.message,
       technicalDetails: technicalDetails ?? this.technicalDetails,
+      context: context ?? this.context,
       userMessage: userMessage ?? this.userMessage,
       actionLabel: actionLabel ?? this.actionLabel,
     );
@@ -230,9 +371,12 @@ class AppError implements Exception {
 
   @override
   String toString() {
-    final buffer = StringBuffer('AppError(${type.name}): $message');
+    final buffer = StringBuffer('AppError(${code.name}): $message');
     if (technicalDetails != null) {
       buffer.write(' - Details: $technicalDetails');
+    }
+    if (context != null && context!.isNotEmpty) {
+      buffer.write(' - Context: $context');
     }
     return buffer.toString();
   }

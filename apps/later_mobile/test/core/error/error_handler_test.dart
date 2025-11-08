@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:later_mobile/core/error/app_error.dart';
+import 'package:later_mobile/core/error/error_codes.dart';
 import 'package:later_mobile/core/error/error_handler.dart';
 
 import '../../test_helpers.dart';
@@ -172,7 +173,10 @@ void main() {
       });
 
       testWidgets('dialog has action button', (tester) async {
-        final error = AppError.storage(message: 'Test error');
+        const error = AppError(
+          code: ErrorCode.networkTimeout,
+          message: 'Test error',
+        );
 
         await tester.pumpWidget(
           testApp(
@@ -197,7 +201,10 @@ void main() {
       });
 
       testWidgets('dialog can be dismissed', (tester) async {
-        final error = AppError.storage(message: 'Test error');
+        const error = AppError(
+          code: ErrorCode.networkTimeout,
+          message: 'Test error',
+        );
 
         await tester.pumpWidget(
           testApp(
@@ -226,7 +233,10 @@ void main() {
       });
 
       testWidgets('dialog calls onRetry callback', (tester) async {
-        final error = AppError.storage(message: 'Test error');
+        const error = AppError(
+          code: ErrorCode.networkTimeout,
+          message: 'Test error',
+        );
         bool retryCalledVar = false;
 
         await tester.pumpWidget(
@@ -315,7 +325,10 @@ void main() {
       testWidgets('snackbar has action button for retryable errors', (
         tester,
       ) async {
-        final error = AppError.storage(message: 'Test error');
+        const error = AppError(
+          code: ErrorCode.networkTimeout,
+          message: 'Test error',
+        );
 
         await tester.pumpWidget(
           testApp(

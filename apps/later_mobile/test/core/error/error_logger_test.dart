@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:later_mobile/core/error/app_error.dart';
+import 'package:later_mobile/core/error/error_codes.dart';
 import 'package:later_mobile/core/error/error_logger.dart';
 
 void main() {
@@ -150,6 +151,7 @@ void main() {
     group('formatError', () {
       test('formats error with all details', () {
         const error = AppError(
+          code: ErrorCode.databaseGeneric,
           type: ErrorType.storage,
           message: 'Storage failed',
           technicalDetails: 'Box is full',
@@ -158,20 +160,21 @@ void main() {
 
         final formatted = ErrorLogger.formatError(error);
 
-        expect(formatted, contains('storage'));
+        expect(formatted, contains('databaseGeneric'));
         expect(formatted, contains('Storage failed'));
         expect(formatted, contains('Box is full'));
       });
 
       test('formats error without technical details', () {
         const error = AppError(
+          code: ErrorCode.networkGeneric,
           type: ErrorType.network,
           message: 'Connection failed',
         );
 
         final formatted = ErrorLogger.formatError(error);
 
-        expect(formatted, contains('network'));
+        expect(formatted, contains('networkGeneric'));
         expect(formatted, contains('Connection failed'));
       });
     });
