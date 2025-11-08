@@ -53,6 +53,10 @@ class _CreateSpaceModalState extends State<CreateSpaceModal> {
   String? _submitErrorMessage; // Error message for submission failures
   bool _isSubmitting = false;
 
+  // Default error message for space operations
+  static const String _defaultSpaceErrorMessage =
+      'Could not create the space. Please try again.';
+
   // Curated emoji icons for spaces
   static const List<String> _iconOptions = [
     '💼', // Work
@@ -205,8 +209,7 @@ class _CreateSpaceModalState extends State<CreateSpaceModal> {
         setState(() {
           _isSubmitting = false;
           _submitErrorMessage =
-              spacesProvider.error!.userMessage ??
-              'Could not create the space. Please try again.';
+              spacesProvider.error!.userMessage ?? _defaultSpaceErrorMessage;
         });
       } else {
         // Operation succeeded - close modal

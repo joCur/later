@@ -40,14 +40,13 @@ class NoSpacesState extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AnimatedEmptyState(
-      icon: Icons.folder_outlined,
+      icon: Icons.folder_rounded,
       title: 'Welcome to Later',
       message:
           'Spaces organize your tasks, notes, and lists by context. Let\'s create your first one!',
       actionLabel: 'Create Your First Space',
       onActionPressed: onActionPressed,
-      secondaryActionLabel:
-          onSecondaryPressed != null ? 'Learn more' : null,
+      secondaryActionLabel: onSecondaryPressed != null ? 'Learn more' : null,
       onSecondaryPressed: onSecondaryPressed,
       enableFabPulse: enableFabPulse,
     );
