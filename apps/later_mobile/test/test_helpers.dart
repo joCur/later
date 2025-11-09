@@ -18,6 +18,7 @@ import 'test_helpers.mocks.dart';
   MockSpec<ContentProvider>(),
   MockSpec<ThemeProvider>(),
 ])
+// ignore: unused_element
 void _generateMocks() {
   // This function exists only to trigger mock generation
 }
@@ -63,10 +64,7 @@ Widget testApp(Widget child) {
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
-      supportedLocales: const [
-        Locale('en'),
-        Locale('de'),
-      ],
+      supportedLocales: const [Locale('en'), Locale('de')],
       home: Scaffold(body: child),
     ),
   );
@@ -113,10 +111,7 @@ Widget testAppDark(Widget child) {
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
-      supportedLocales: const [
-        Locale('en'),
-        Locale('de'),
-      ],
+      supportedLocales: const [Locale('en'), Locale('de')],
       home: Scaffold(body: child),
     ),
   );
