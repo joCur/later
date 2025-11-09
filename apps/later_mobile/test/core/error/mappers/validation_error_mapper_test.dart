@@ -23,7 +23,7 @@ void main() {
         final error = ValidationErrorMapper.requiredField('Password');
 
         // Test fallback message (without localization)
-        final message = error.getUserMessageLocalized(null);
+        final message = error.getUserMessageLocalized();
         expect(message, 'Password is required.');
       });
 
@@ -60,7 +60,7 @@ void main() {
         final error = ValidationErrorMapper.invalidFormat('Email address');
 
         // Test fallback message (without localization)
-        final message = error.getUserMessageLocalized(null);
+        final message = error.getUserMessageLocalized();
         expect(message, 'Email address has an invalid format.');
       });
 
@@ -95,7 +95,7 @@ void main() {
         final error = ValidationErrorMapper.outOfRange('Age', '18', '65');
 
         // Test fallback message (without localization)
-        final message = error.getUserMessageLocalized(null);
+        final message = error.getUserMessageLocalized();
         expect(message, 'Age must be between 18 and 65.');
       });
 
@@ -138,7 +138,7 @@ void main() {
         final error = ValidationErrorMapper.duplicate('Username');
 
         // Test fallback message (without localization)
-        final message = error.getUserMessageLocalized(null);
+        final message = error.getUserMessageLocalized();
         expect(message, 'Username already exists.');
       });
 

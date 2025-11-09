@@ -1,25 +1,6 @@
 import '../../l10n/app_localizations.dart';
 import 'error_codes.dart';
 
-/// Error types for categorizing different kinds of errors in the app.
-/// @deprecated Use ErrorCode instead for more granular error categorization.
-enum ErrorType {
-  /// Storage-related errors (Hive, file system, etc.)
-  storage,
-
-  /// Network-related errors (connection, timeout, etc.)
-  network,
-
-  /// Validation errors (invalid input, missing data, etc.)
-  validation,
-
-  /// Data corruption errors (invalid format, parsing errors, etc.)
-  corruption,
-
-  /// Unknown or uncategorized errors
-  unknown,
-}
-
 /// Custom error class for handling application errors with user-friendly messages.
 ///
 /// This class provides a structured way to handle errors throughout the app,
@@ -47,138 +28,10 @@ class AppError implements Exception {
     this.context,
     this.userMessage,
     this.actionLabel,
-    @Deprecated('Use ErrorCode instead') ErrorType? type,
-  }) : type = type ?? ErrorType.unknown;
-
-  /// Factory constructor for storage-related errors.
-  /// @deprecated Use AppError with ErrorCode.databaseTimeout or specific database error codes instead.
-  @Deprecated('Use AppError with ErrorCode instead')
-  factory AppError.storage({
-    required String message,
-    String? details,
-    String? userMessage,
-  }) {
-    // Use databaseTimeout as it's retryable (storage errors in old system were retryable)
-    return AppError(
-      code: ErrorCode.databaseTimeout,
-      type: ErrorType.storage,
-      message: message,
-      technicalDetails: details,
-      userMessage:
-          userMessage ??
-          'Unable to save or load data. Please try again or free up storage space.',
-    );
-  }
-
-  /// Factory constructor for network-related errors.
-  /// @deprecated Use AppError with ErrorCode.networkGeneric instead.
-  @Deprecated('Use AppError with ErrorCode instead')
-  factory AppError.network({
-    required String message,
-    String? details,
-    String? userMessage,
-  }) {
-    return AppError(
-      code: ErrorCode.networkGeneric,
-      type: ErrorType.network,
-      message: message,
-      technicalDetails: details,
-      userMessage:
-          userMessage ??
-          'Connection failed. Please check your internet connection and try again.',
-    );
-  }
-
-  /// Factory constructor for validation errors.
-  /// @deprecated Use AppError with ErrorCode.validationRequired or other validation codes instead.
-  @Deprecated('Use AppError with ErrorCode instead')
-  factory AppError.validation({
-    required String message,
-    String? details,
-    String? userMessage,
-  }) {
-    return AppError(
-      code: ErrorCode.validationRequired,
-      type: ErrorType.validation,
-      message: message,
-      technicalDetails: details,
-      userMessage:
-          userMessage ?? 'Invalid input. Please check your data and try again.',
-    );
-  }
-
-  /// Factory constructor for data corruption errors.
-  /// @deprecated Use AppError with ErrorCode.databaseGeneric instead.
-  @Deprecated('Use AppError with ErrorCode instead')
-  factory AppError.corruption({
-    required String message,
-    String? details,
-    String? userMessage,
-  }) {
-    return AppError(
-      code: ErrorCode.databaseGeneric,
-      type: ErrorType.corruption,
-      message: message,
-      technicalDetails: details,
-      userMessage:
-          userMessage ??
-          'Data is corrupted. You may need to reset and restore from backup.',
-    );
-  }
-
-  /// Factory constructor for unknown errors.
-  /// @deprecated Use AppError with ErrorCode.unknownError instead.
-  @Deprecated('Use AppError with ErrorCode instead')
-  factory AppError.unknown({
-    required String message,
-    String? details,
-    String? userMessage,
-  }) {
-    return AppError(
-      code: ErrorCode.unknownError,
-      type: ErrorType.unknown,
-      message: message,
-      technicalDetails: details,
-      userMessage:
-          userMessage ?? 'An unexpected error occurred. Please try again.',
-    );
-  }
-
-  /// Factory constructor to create an AppError from an Exception.
-  ///
-  /// This attempts to categorize the exception based on its message content.
-  /// @deprecated Use domain-specific error mappers (SupabaseErrorMapper, ValidationErrorMapper) instead.
-  @Deprecated('Use domain-specific error mappers instead')
-  factory AppError.fromException(Object exception) {
-    final message = exception.toString();
-
-    // Try to categorize based on exception content
-    if (message.contains('Hive') ||
-        message.contains('storage') ||
-        message.contains('Box') ||
-        message.contains('file')) {
-      return AppError.storage(message: message, details: exception.toString());
-    } else if (message.contains('network') ||
-        message.contains('connection') ||
-        message.contains('timeout') ||
-        message.contains('socket')) {
-      return AppError.network(message: message, details: exception.toString());
-    } else if (exception is ArgumentError || message.contains('validation')) {
-      return AppError.validation(
-        message: message,
-        details: exception.toString(),
-      );
-    } else {
-      return AppError.unknown(message: message, details: exception.toString());
-    }
-  }
+  });
 
   /// The error code identifying the specific error type.
   final ErrorCode code;
-
-  /// The type of error.
-  /// @deprecated Use [code] instead for more granular error categorization.
-  final ErrorType type;
 
   /// Technical error message for logging and debugging.
   final String message;
@@ -204,31 +57,6 @@ class AppError implements Exception {
   ///
   /// Delegates to [code.severity] for the new error code system.
   ErrorSeverity get severity => code.severity;
-
-  /// Gets the user-friendly message for this error.
-  ///
-  /// Returns the custom [userMessage] if provided, otherwise returns
-  /// a default message based on the error type.
-  ///
-  /// @deprecated Use getUserMessageLocalized() with AppLocalizations once Phase 2 is complete.
-  String getUserMessage() {
-    if (userMessage != null) {
-      return userMessage!;
-    }
-
-    switch (type) {
-      case ErrorType.storage:
-        return 'Unable to save or load data. Please try again or free up storage space.';
-      case ErrorType.network:
-        return 'Connection failed. Please check your internet connection and try again.';
-      case ErrorType.validation:
-        return 'Invalid input. Please check your data and try again.';
-      case ErrorType.corruption:
-        return 'Data is corrupted. You may need to reset and restore from backup.';
-      case ErrorType.unknown:
-        return 'An unexpected error occurred. Please try again.';
-    }
-  }
 
   /// Gets the localized user-friendly message for this error.
   ///
@@ -440,7 +268,6 @@ class AppError implements Exception {
   /// Creates a copy of this error with updated fields.
   AppError copyWith({
     ErrorCode? code,
-    ErrorType? type,
     String? message,
     String? technicalDetails,
     Map<String, dynamic>? context,
@@ -449,7 +276,6 @@ class AppError implements Exception {
   }) {
     return AppError(
       code: code ?? this.code,
-      type: type ?? this.type,
       message: message ?? this.message,
       technicalDetails: technicalDetails ?? this.technicalDetails,
       context: context ?? this.context,

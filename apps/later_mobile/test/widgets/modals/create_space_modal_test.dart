@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:later_mobile/core/error/app_error.dart';
+import 'package:later_mobile/core/error/error_codes.dart';
 import 'package:later_mobile/core/theme/temporal_flow_theme.dart';
 import 'package:later_mobile/core/utils/responsive_modal.dart';
 import 'package:later_mobile/data/models/space_model.dart';
@@ -530,7 +531,8 @@ void main() {
       WidgetTester tester,
     ) async {
       // Set up error state in provider with user-friendly message
-      final testError = AppError.unknown(
+      const testError = AppError(
+        code: ErrorCode.unknownError,
         message: 'Failed to create space',
         userMessage:
             'Could not create the space. Please check your connection and try again.',
@@ -644,7 +646,8 @@ void main() {
         color: '#6366F1',
       );
       // Set up error state in provider with user-friendly message
-      final testError = AppError.unknown(
+      const testError = AppError(
+        code: ErrorCode.unknownError,
         message: 'Failed to update space',
         userMessage:
             'Could not create the space. Please check your connection and try again.',

@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../app_error.dart';
 import '../error_codes.dart';
@@ -43,8 +44,7 @@ class SupabaseErrorMapper {
 
     // Log unmapped error codes for debugging
     if (code != null && !_isKnownPostgrestCode(code)) {
-      // TODO: Add debug logging when logger is available
-      // ErrorLogger.debug('Unmapped Postgrest error code: $code - $message');
+      debugPrint('⚠️ Unmapped Postgrest error code: $code - $message');
     }
 
     final errorCode = _mapPostgrestCode(code);
@@ -102,8 +102,7 @@ class SupabaseErrorMapper {
 
     // Log unmapped error codes for debugging
     if (code != null && !_isKnownAuthCode(code)) {
-      // TODO: Add debug logging when logger is available
-      // ErrorLogger.debug('Unmapped auth error code: $code - $message (status: $statusCode)');
+      debugPrint('⚠️ Unmapped auth error code: $code - $message (status: $statusCode)');
     }
 
     final errorCode = _mapAuthCode(code, message);

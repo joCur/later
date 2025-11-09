@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'app_error.dart';
+import 'error_codes.dart';
 import 'error_logger.dart';
 import 'package:later_mobile/design_system/organisms/error/custom_error_widget.dart';
 import 'package:later_mobile/design_system/organisms/error/error_dialog.dart';
@@ -136,24 +137,34 @@ class ErrorHandler {
     }
 
     if (error is ArgumentError) {
-      return AppError.validation(
+      return AppError(
+        code: ErrorCode.validationRequired,
         message: error.toString(),
-        details: error.message?.toString(),
+        technicalDetails: error.message?.toString(),
       );
     }
 
     if (error is Exception) {
-      return AppError.fromException(error);
-    }
-
-    if (error is Error) {
-      return AppError.unknown(
+      // Generic exception - wrap in unknownError
+      return AppError(
+        code: ErrorCode.unknownError,
         message: error.toString(),
-        details: error.stackTrace?.toString(),
+        technicalDetails: error.toString(),
       );
     }
 
-    return AppError.unknown(message: error.toString());
+    if (error is Error) {
+      return AppError(
+        code: ErrorCode.unknownError,
+        message: error.toString(),
+        technicalDetails: error.stackTrace?.toString(),
+      );
+    }
+
+    return AppError(
+      code: ErrorCode.unknownError,
+      message: error.toString(),
+    );
   }
 
   /// Gets the last error that was handled.
