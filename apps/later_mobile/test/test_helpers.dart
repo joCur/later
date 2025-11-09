@@ -6,10 +6,21 @@ import 'package:later_mobile/providers/auth_provider.dart';
 import 'package:later_mobile/providers/content_provider.dart';
 import 'package:later_mobile/providers/spaces_provider.dart';
 import 'package:later_mobile/providers/theme_provider.dart';
+import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:provider/provider.dart';
 
 import 'test_helpers.mocks.dart';
+
+@GenerateNiceMocks([
+  MockSpec<AuthProvider>(),
+  MockSpec<SpacesProvider>(),
+  MockSpec<ContentProvider>(),
+  MockSpec<ThemeProvider>(),
+])
+void _generateMocks() {
+  // This function exists only to trigger mock generation
+}
 
 /// Creates a MaterialApp with proper theme configuration and mock providers
 /// for widget tests.
