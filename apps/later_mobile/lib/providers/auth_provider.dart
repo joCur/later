@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/widgets.dart';
+import 'package:later_mobile/core/error/error.dart';
 import 'package:later_mobile/data/services/auth_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -154,12 +155,26 @@ class AuthProvider with ChangeNotifier {
     try {
       await operation();
       _errorMessage = null;
-    } on AuthException catch (e) {
+    } on AppError catch (e) {
+      // AuthService already mapped to AppError with proper error codes
+      // Use technical message for now (Phase 6 will add localization to UI)
       _errorMessage = e.message;
+      ErrorLogger.logError(e, context: 'AuthProvider._executeAuthOperation');
       _authStatus = _currentUser != null
           ? AuthStatus.authenticated
           : AuthStatus.unauthenticated;
-    } catch (e) {
+    } catch (e, stackTrace) {
+      // Unexpected error (AuthService should catch all Supabase errors)
+      final error = AppError(
+        code: ErrorCode.unknownError,
+        message: 'Unexpected auth error: ${e.toString()}',
+        technicalDetails: e.toString(),
+      );
+      ErrorLogger.logError(
+        error,
+        stackTrace: stackTrace,
+        context: 'AuthProvider._executeAuthOperation',
+      );
       _errorMessage = 'An unexpected error occurred. Please try again.';
       _authStatus = _currentUser != null
           ? AuthStatus.authenticated

@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:later_mobile/core/error/app_error.dart';
+import 'package:later_mobile/core/error/error.dart';
 import 'package:later_mobile/data/local/preferences_service.dart';
 import 'package:later_mobile/data/models/space_model.dart';
 import 'package:later_mobile/data/repositories/space_repository.dart';
@@ -507,12 +507,8 @@ void main() {
 
       // Assert
       expect(provider.error, isNotNull);
-      expect(provider.error!.type, ErrorType.unknown);
-      expect(provider.error!.message, contains('Failed to create space'));
-      expect(
-        provider.error!.userMessage,
-        'Could not create the space. Please check your connection and try again.',
-      );
+      expect(provider.error!.code, ErrorCode.unknownError);
+      expect(provider.error!.message, contains('Unexpected error in addSpace'));
       expect(provider.spaces, isEmpty);
       expect(provider.currentSpace, isNull);
     });

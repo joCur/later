@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
-import '../core/error/app_error.dart';
+
+import '../core/error/error.dart';
 import '../data/local/preferences_service.dart';
 import '../data/models/space_model.dart';
 import '../data/repositories/space_repository.dart';
@@ -112,11 +113,7 @@ class SpacesProvider extends ChangeNotifier {
 
       _error = null;
     } catch (e) {
-      if (e is AppError) {
-        _error = e;
-      } else {
-        _error = AppError.fromException(e);
-      }
+      // _error already set by _executeWithRetry
       _spaces = [];
     } finally {
       _isLoading = false;
@@ -165,27 +162,7 @@ class SpacesProvider extends ChangeNotifier {
       _error = null;
       notifyListeners();
     } catch (e) {
-      // Wrap the error with context-specific message
-      if (e is AppError) {
-        // If it's an unknown error, wrap it with a better message
-        if (e.type == ErrorType.unknown) {
-          _error = AppError.unknown(
-            message: 'Failed to create space: ${e.message}',
-            details: e.technicalDetails,
-            userMessage:
-                'Could not create the space. Please check your connection and try again.',
-          );
-        } else {
-          _error = e;
-        }
-      } else {
-        _error = AppError.unknown(
-          message: 'Failed to create space: ${e.toString()}',
-          details: e.toString(),
-          userMessage:
-              'Could not create the space. Please check your connection and try again.',
-        );
-      }
+      // _error already set by _executeWithRetry
       notifyListeners();
     }
   }
@@ -238,11 +215,7 @@ class SpacesProvider extends ChangeNotifier {
       _error = null;
       notifyListeners();
     } catch (e) {
-      if (e is AppError) {
-        _error = e;
-      } else {
-        _error = AppError.fromException(e);
-      }
+      // _error already set by _executeWithRetry
       notifyListeners();
     }
   }
@@ -269,10 +242,10 @@ class SpacesProvider extends ChangeNotifier {
 
     // Prevent deleting current space
     if (_currentSpace?.id == id) {
-      _error = AppError.validation(
+      _error = const AppError(
+        code: ErrorCode.validationRequired,
         message: 'Cannot delete the current space',
-        userMessage:
-            'Cannot delete the current space. Please switch to another space first.',
+        context: {'fieldName': 'Current space'},
       );
       notifyListeners();
       return;
@@ -296,11 +269,7 @@ class SpacesProvider extends ChangeNotifier {
       _error = null;
       notifyListeners();
     } catch (e) {
-      if (e is AppError) {
-        _error = e;
-      } else {
-        _error = AppError.fromException(e);
-      }
+      // _error already set by _executeWithRetry
       notifyListeners();
     }
   }
@@ -339,12 +308,18 @@ class SpacesProvider extends ChangeNotifier {
 
       _error = null;
       notifyListeners();
-    } catch (e) {
-      if (e is AppError) {
-        _error = e;
-      } else {
-        _error = AppError.fromException(e);
-      }
+    } catch (e, stackTrace) {
+      // switchSpace doesn't use _executeWithRetry, so handle error here
+      _error = AppError(
+        code: ErrorCode.unknownError,
+        message: 'Unexpected error switching space: ${e.toString()}',
+        technicalDetails: e.toString(),
+      );
+      ErrorLogger.logError(
+        _error!,
+        stackTrace: stackTrace,
+        context: 'SpacesProvider.switchSpace',
+      );
       notifyListeners();
     }
   }
@@ -413,9 +388,14 @@ class SpacesProvider extends ChangeNotifier {
     while (attempts < _maxRetries) {
       try {
         return await operation();
-      } catch (e) {
+      } on AppError catch (e) {
+        // Repository already mapped to AppError
         attempts++;
-        lastError = AppError.fromException(e);
+        lastError = e;
+
+        // Set provider error state
+        _error = e;
+        ErrorLogger.logError(e, context: 'SpacesProvider.$operationName');
 
         // Only retry if the error is retryable and we have attempts left
         if (lastError.isRetryable && attempts < _maxRetries) {
@@ -427,11 +407,33 @@ class SpacesProvider extends ChangeNotifier {
 
         // Non-retryable error or max retries reached
         throw lastError;
+      } catch (e, stackTrace) {
+        // Unexpected error, wrap in AppError
+        attempts++;
+        lastError = AppError(
+          code: ErrorCode.unknownError,
+          message: 'Unexpected error in $operationName: ${e.toString()}',
+          technicalDetails: e.toString(),
+        );
+
+        // Set provider error state
+        _error = lastError;
+        ErrorLogger.logError(
+          lastError,
+          stackTrace: stackTrace,
+          context: 'SpacesProvider.$operationName',
+        );
+
+        // Don't retry unexpected errors
+        throw lastError;
       }
     }
 
     // This should never be reached, but throw the last error just in case
     throw lastError ??
-        AppError.unknown(message: 'Unknown error in $operationName');
+        AppError(
+          code: ErrorCode.unknownError,
+          message: 'Unknown error in $operationName',
+        );
   }
 }
