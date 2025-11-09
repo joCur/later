@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:later_mobile/core/error/app_error.dart';
+import 'package:later_mobile/core/error/error_codes.dart';
 import 'package:later_mobile/core/error/error_handler.dart';
 
 import '../../test_helpers.dart';
@@ -27,7 +28,10 @@ void main() {
 
     group('handleError', () {
       test('handles AppError', () {
-        final error = AppError.storage(message: 'Test error');
+        const error = AppError(
+          code: ErrorCode.databaseTimeout,
+          message: 'Test error',
+        );
 
         expect(() {
           ErrorHandler.handleError(error);
@@ -57,7 +61,10 @@ void main() {
       });
 
       test('stores last error', () {
-        final error = AppError.storage(message: 'Test error');
+        const error = AppError(
+          code: ErrorCode.databaseTimeout,
+          message: 'Test error',
+        );
         ErrorHandler.handleError(error);
 
         final lastError = ErrorHandler.getLastError();
@@ -66,7 +73,10 @@ void main() {
       });
 
       test('handles error with stack trace', () {
-        final error = AppError.storage(message: 'Test error');
+        const error = AppError(
+          code: ErrorCode.databaseTimeout,
+          message: 'Test error',
+        );
 
         expect(() {
           try {
@@ -78,7 +88,10 @@ void main() {
       });
 
       test('handles error with context', () {
-        final error = AppError.storage(message: 'Test error');
+        const error = AppError(
+          code: ErrorCode.databaseTimeout,
+          message: 'Test error',
+        );
 
         expect(() {
           ErrorHandler.handleError(error, context: 'ItemsProvider.loadItems');
@@ -115,7 +128,8 @@ void main() {
 
     group('showErrorDialog', () {
       testWidgets('shows error dialog', (tester) async {
-        final error = AppError.storage(
+        const error = AppError(
+          code: ErrorCode.databaseTimeout,
           message: 'Test error',
           userMessage: 'User friendly message',
         );
@@ -144,7 +158,8 @@ void main() {
       });
 
       testWidgets('dialog contains error message', (tester) async {
-        final error = AppError.storage(
+        const error = AppError(
+          code: ErrorCode.databaseTimeout,
           message: 'Technical error',
           userMessage: 'User friendly message',
         );
@@ -172,7 +187,10 @@ void main() {
       });
 
       testWidgets('dialog has action button', (tester) async {
-        final error = AppError.storage(message: 'Test error');
+        const error = AppError(
+          code: ErrorCode.networkTimeout,
+          message: 'Test error',
+        );
 
         await tester.pumpWidget(
           testApp(
@@ -197,7 +215,10 @@ void main() {
       });
 
       testWidgets('dialog can be dismissed', (tester) async {
-        final error = AppError.storage(message: 'Test error');
+        const error = AppError(
+          code: ErrorCode.networkTimeout,
+          message: 'Test error',
+        );
 
         await tester.pumpWidget(
           testApp(
@@ -226,7 +247,10 @@ void main() {
       });
 
       testWidgets('dialog calls onRetry callback', (tester) async {
-        final error = AppError.storage(message: 'Test error');
+        const error = AppError(
+          code: ErrorCode.networkTimeout,
+          message: 'Test error',
+        );
         bool retryCalledVar = false;
 
         await tester.pumpWidget(
@@ -262,7 +286,10 @@ void main() {
 
     group('showErrorSnackBar', () {
       testWidgets('shows error snackbar', (tester) async {
-        final error = AppError.storage(message: 'Test error');
+        const error = AppError(
+          code: ErrorCode.databaseTimeout,
+          message: 'Test error',
+        );
 
         await tester.pumpWidget(
           testApp(
@@ -286,7 +313,8 @@ void main() {
       });
 
       testWidgets('snackbar contains error message', (tester) async {
-        final error = AppError.storage(
+        const error = AppError(
+          code: ErrorCode.databaseTimeout,
           message: 'Technical',
           userMessage: 'User message',
         );
@@ -315,7 +343,10 @@ void main() {
       testWidgets('snackbar has action button for retryable errors', (
         tester,
       ) async {
-        final error = AppError.storage(message: 'Test error');
+        const error = AppError(
+          code: ErrorCode.networkTimeout,
+          message: 'Test error',
+        );
 
         await tester.pumpWidget(
           testApp(
@@ -345,8 +376,14 @@ void main() {
       });
 
       test('returns last handled error', () {
-        final error1 = AppError.storage(message: 'Error 1');
-        final error2 = AppError.network(message: 'Error 2');
+        const error1 = AppError(
+          code: ErrorCode.databaseTimeout,
+          message: 'Error 1',
+        );
+        const error2 = AppError(
+          code: ErrorCode.networkGeneric,
+          message: 'Error 2',
+        );
 
         ErrorHandler.handleError(error1);
         ErrorHandler.handleError(error2);
@@ -358,7 +395,10 @@ void main() {
 
     group('clearLastError', () {
       test('clears last error', () {
-        final error = AppError.storage(message: 'Test error');
+        const error = AppError(
+          code: ErrorCode.databaseTimeout,
+          message: 'Test error',
+        );
         ErrorHandler.handleError(error);
 
         ErrorHandler.clearLastError();
@@ -369,7 +409,10 @@ void main() {
 
     group('convertToAppError', () {
       test('returns AppError as-is', () {
-        final error = AppError.storage(message: 'Test');
+        const error = AppError(
+          code: ErrorCode.databaseTimeout,
+          message: 'Test',
+        );
         final result = ErrorHandler.convertToAppError(error);
 
         expect(result, same(error));
@@ -388,14 +431,14 @@ void main() {
         final result = ErrorHandler.convertToAppError(error);
 
         expect(result, isA<AppError>());
-        expect(result.type, ErrorType.validation);
+        expect(result.code, ErrorCode.validationRequired);
       });
 
       test('converts unknown error to AppError', () {
         final result = ErrorHandler.convertToAppError('String error');
 
         expect(result, isA<AppError>());
-        expect(result.type, ErrorType.unknown);
+        expect(result.code, ErrorCode.unknownError);
       });
     });
   });

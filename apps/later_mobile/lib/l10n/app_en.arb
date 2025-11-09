@@ -1,0 +1,191 @@
+{
+  "@@locale": "en",
+
+  "errorDatabaseUniqueConstraint": "A record with this value already exists.",
+  "@errorDatabaseUniqueConstraint": {
+    "description": "Error message shown when trying to create a duplicate record"
+  },
+
+  "errorDatabaseForeignKeyViolation": "Cannot perform this operation because it would break data relationships.",
+  "@errorDatabaseForeignKeyViolation": {
+    "description": "Error message for foreign key constraint violations"
+  },
+
+  "errorDatabaseNotNullViolation": "Required data is missing. Please ensure all fields are filled.",
+  "@errorDatabaseNotNullViolation": {
+    "description": "Error message for NOT NULL constraint violations"
+  },
+
+  "errorDatabasePermissionDenied": "You don't have permission to access this data.",
+  "@errorDatabasePermissionDenied": {
+    "description": "Error message for database permission errors"
+  },
+
+  "errorDatabaseTimeout": "The operation took too long. Please try again.",
+  "@errorDatabaseTimeout": {
+    "description": "Error message for database query timeouts"
+  },
+
+  "errorDatabaseGeneric": "A database error occurred. Please try again.",
+  "@errorDatabaseGeneric": {
+    "description": "Generic database error message"
+  },
+
+  "errorAuthInvalidCredentials": "Invalid email or password. Please try again.",
+  "@errorAuthInvalidCredentials": {
+    "description": "Error message for invalid login credentials"
+  },
+
+  "errorAuthUserAlreadyExists": "An account with this email already exists. Please sign in instead.",
+  "@errorAuthUserAlreadyExists": {
+    "description": "Error message when trying to sign up with existing email"
+  },
+
+  "errorAuthWeakPassword": "Password is too weak. Please use at least {minLength} characters.",
+  "@errorAuthWeakPassword": {
+    "description": "Error message for weak password",
+    "placeholders": {
+      "minLength": {
+        "type": "String",
+        "example": "8"
+      }
+    }
+  },
+
+  "errorAuthInvalidEmail": "The email address is not valid. Please check and try again.",
+  "@errorAuthInvalidEmail": {
+    "description": "Error message for invalid email format"
+  },
+
+  "errorAuthEmailNotConfirmed": "Please confirm your email address before signing in.",
+  "@errorAuthEmailNotConfirmed": {
+    "description": "Error message when email is not confirmed"
+  },
+
+  "errorAuthSessionExpired": "Your session has expired. Please sign in again.",
+  "@errorAuthSessionExpired": {
+    "description": "Error message for expired authentication session"
+  },
+
+  "errorAuthNetworkError": "Network error during authentication. Please check your connection and try again.",
+  "@errorAuthNetworkError": {
+    "description": "Error message for network errors during auth operations"
+  },
+
+  "errorAuthRateLimitExceeded": "Too many attempts. Please wait a moment and try again.",
+  "@errorAuthRateLimitExceeded": {
+    "description": "Error message when auth rate limit is exceeded"
+  },
+
+  "errorAuthGeneric": "An authentication error occurred. Please try again.",
+  "@errorAuthGeneric": {
+    "description": "Generic authentication error message"
+  },
+
+  "errorNetworkTimeout": "Connection timed out. Please check your internet connection and try again.",
+  "@errorNetworkTimeout": {
+    "description": "Error message for network timeouts"
+  },
+
+  "errorNetworkNoConnection": "No internet connection. Please check your network and try again.",
+  "@errorNetworkNoConnection": {
+    "description": "Error message when no internet connection is available"
+  },
+
+  "errorNetworkServerError": "The server encountered an error. Please try again later.",
+  "@errorNetworkServerError": {
+    "description": "Error message for server errors (5xx)"
+  },
+
+  "errorNetworkBadRequest": "Invalid request. Please check your input and try again.",
+  "@errorNetworkBadRequest": {
+    "description": "Error message for bad requests (4xx)"
+  },
+
+  "errorNetworkNotFound": "The requested resource was not found.",
+  "@errorNetworkNotFound": {
+    "description": "Error message for 404 not found"
+  },
+
+  "errorNetworkGeneric": "A network error occurred. Please try again.",
+  "@errorNetworkGeneric": {
+    "description": "Generic network error message"
+  },
+
+  "errorValidationRequired": "{fieldName} is required.",
+  "@errorValidationRequired": {
+    "description": "Error message for required field validation",
+    "placeholders": {
+      "fieldName": {
+        "type": "String",
+        "example": "Email"
+      }
+    }
+  },
+
+  "errorValidationInvalidFormat": "{fieldName} has an invalid format.",
+  "@errorValidationInvalidFormat": {
+    "description": "Error message for invalid format validation",
+    "placeholders": {
+      "fieldName": {
+        "type": "String",
+        "example": "Phone number"
+      }
+    }
+  },
+
+  "errorValidationOutOfRange": "{fieldName} must be between {min} and {max}.",
+  "@errorValidationOutOfRange": {
+    "description": "Error message for out of range validation",
+    "placeholders": {
+      "fieldName": {
+        "type": "String",
+        "example": "Age"
+      },
+      "min": {
+        "type": "String",
+        "example": "0"
+      },
+      "max": {
+        "type": "String",
+        "example": "100"
+      }
+    }
+  },
+
+  "errorValidationDuplicate": "{fieldName} already exists.",
+  "@errorValidationDuplicate": {
+    "description": "Error message for duplicate value validation",
+    "placeholders": {
+      "fieldName": {
+        "type": "String",
+        "example": "Name"
+      }
+    }
+  },
+
+  "errorSpaceNotFound": "The space you're looking for was not found.",
+  "@errorSpaceNotFound": {
+    "description": "Error message when a space is not found"
+  },
+
+  "errorNoteNotFound": "The note you're looking for was not found.",
+  "@errorNoteNotFound": {
+    "description": "Error message when a note is not found"
+  },
+
+  "errorInsufficientPermissions": "You don't have permission to perform this action.",
+  "@errorInsufficientPermissions": {
+    "description": "Error message for insufficient permissions"
+  },
+
+  "errorOperationNotAllowed": "This operation is not allowed in the current state.",
+  "@errorOperationNotAllowed": {
+    "description": "Error message for operations not allowed in current state"
+  },
+
+  "errorUnknownError": "An unexpected error occurred. Please try again.",
+  "@errorUnknownError": {
+    "description": "Generic error message for unknown errors"
+  }
+}

@@ -1,16 +1,17 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:later_mobile/core/error/app_error.dart';
+import 'package:later_mobile/core/error/error_codes.dart';
 
 void main() {
   group('AppError', () {
     group('constructor', () {
       test('creates error with message', () {
         const error = AppError(
-          type: ErrorType.storage,
+          code: ErrorCode.databaseGeneric,
           message: 'Storage error occurred',
         );
 
-        expect(error.type, ErrorType.storage);
+        expect(error.code, ErrorCode.databaseGeneric);
         expect(error.message, 'Storage error occurred');
         expect(error.technicalDetails, isNull);
         expect(error.userMessage, isNull);
@@ -19,14 +20,14 @@ void main() {
 
       test('creates error with all fields', () {
         const error = AppError(
-          type: ErrorType.network,
+          code: ErrorCode.networkTimeout,
           message: 'Network error occurred',
           technicalDetails: 'Connection timeout after 30s',
           userMessage: 'Please check your internet connection',
           actionLabel: 'Retry',
         );
 
-        expect(error.type, ErrorType.network);
+        expect(error.code, ErrorCode.networkTimeout);
         expect(error.message, 'Network error occurred');
         expect(error.technicalDetails, 'Connection timeout after 30s');
         expect(error.userMessage, 'Please check your internet connection');
@@ -34,137 +35,114 @@ void main() {
       });
     });
 
-    group('factory constructors', () {
-      test('storage creates storage error', () {
-        final error = AppError.storage(
+    group('error properties', () {
+      test('has correct code and message', () {
+        const error = AppError(
+          code: ErrorCode.databaseTimeout,
           message: 'Failed to save data',
-          details: 'Box is full',
+          technicalDetails: 'Box is full',
         );
 
-        expect(error.type, ErrorType.storage);
+        expect(error.code, ErrorCode.databaseTimeout);
         expect(error.message, 'Failed to save data');
         expect(error.technicalDetails, 'Box is full');
-        expect(error.userMessage, isNotNull);
-        expect(error.userMessage, contains('storage'));
       });
 
-      test('network creates network error', () {
-        final error = AppError.network(
+      test('network error has correct properties', () {
+        const error = AppError(
+          code: ErrorCode.networkGeneric,
           message: 'Connection failed',
-          details: 'Timeout',
+          technicalDetails: 'Timeout',
         );
 
-        expect(error.type, ErrorType.network);
+        expect(error.code, ErrorCode.networkGeneric);
         expect(error.message, 'Connection failed');
         expect(error.technicalDetails, 'Timeout');
-        expect(error.userMessage, isNotNull);
-        expect(error.userMessage, contains('connection'));
       });
 
-      test('validation creates validation error', () {
-        final error = AppError.validation(
+      test('validation error has correct properties', () {
+        const error = AppError(
+          code: ErrorCode.validationRequired,
           message: 'Invalid input',
-          details: 'Title cannot be empty',
+          technicalDetails: 'Title cannot be empty',
         );
 
-        expect(error.type, ErrorType.validation);
+        expect(error.code, ErrorCode.validationRequired);
         expect(error.message, 'Invalid input');
         expect(error.technicalDetails, 'Title cannot be empty');
-        expect(error.userMessage, isNotNull);
-      });
-
-      test('corruption creates corruption error', () {
-        final error = AppError.corruption(
-          message: 'Data corrupted',
-          details: 'Invalid format',
-        );
-
-        expect(error.type, ErrorType.corruption);
-        expect(error.message, 'Data corrupted');
-        expect(error.technicalDetails, 'Invalid format');
-        expect(error.userMessage, isNotNull);
-        expect(error.userMessage, contains('corrupted'));
-      });
-
-      test('unknown creates unknown error', () {
-        final error = AppError.unknown(
-          message: 'Something went wrong',
-          details: 'Unknown cause',
-        );
-
-        expect(error.type, ErrorType.unknown);
-        expect(error.message, 'Something went wrong');
-        expect(error.technicalDetails, 'Unknown cause');
-        expect(error.userMessage, isNotNull);
-      });
-
-      test('fromException creates error from exception', () {
-        final exception = Exception('Test exception');
-        final error = AppError.fromException(exception);
-
-        expect(error.type, ErrorType.unknown);
-        expect(error.message, contains('Test exception'));
-        expect(error.userMessage, isNotNull);
-      });
-
-      test('fromException with known storage exception', () {
-        final exception = Exception('Hive: Box is full');
-        final error = AppError.fromException(exception);
-
-        expect(error.type, ErrorType.storage);
-        expect(error.message, contains('Hive'));
       });
     });
 
     group('isRetryable', () {
       test('network errors are retryable', () {
-        final error = AppError.network(message: 'Connection failed');
+        const error = AppError(
+          code: ErrorCode.networkGeneric,
+          message: 'Connection failed',
+        );
         expect(error.isRetryable, isTrue);
       });
 
-      test('storage errors are retryable', () {
-        final error = AppError.storage(message: 'Save failed');
+      test('database timeout errors are retryable', () {
+        const error = AppError(
+          code: ErrorCode.databaseTimeout,
+          message: 'Save failed',
+        );
         expect(error.isRetryable, isTrue);
       });
 
-      test('validation errors are not retryable', () {
-        final error = AppError.validation(message: 'Invalid input');
+      test('database errors are not retryable', () {
+        const error = AppError(
+          code: ErrorCode.databaseGeneric,
+          message: 'Save failed',
+        );
         expect(error.isRetryable, isFalse);
       });
 
-      test('corruption errors are not retryable', () {
-        final error = AppError.corruption(message: 'Data corrupted');
+      test('validation errors are not retryable', () {
+        const error = AppError(
+          code: ErrorCode.validationRequired,
+          message: 'Invalid input',
+        );
         expect(error.isRetryable, isFalse);
       });
 
       test('unknown errors are not retryable', () {
-        final error = AppError.unknown(message: 'Something wrong');
+        const error = AppError(
+          code: ErrorCode.unknownError,
+          message: 'Something wrong',
+        );
         expect(error.isRetryable, isFalse);
       });
     });
 
-    group('getUserMessage', () {
+    group('getUserMessageLocalized', () {
       test('returns custom user message if provided', () {
         const error = AppError(
-          type: ErrorType.storage,
+          code: ErrorCode.databaseGeneric,
           message: 'Technical message',
           userMessage: 'Custom user message',
         );
 
-        expect(error.getUserMessage(), 'Custom user message');
+        expect(error.getUserMessageLocalized(), 'Custom user message');
       });
 
-      test('returns default message for storage error', () {
-        final error = AppError.storage(message: 'Technical');
-        final userMessage = error.getUserMessage();
+      test('returns default message for database error', () {
+        const error = AppError(
+          code: ErrorCode.databaseTimeout,
+          message: 'Technical',
+        );
+        final userMessage = error.getUserMessageLocalized();
 
         expect(userMessage, isNotNull);
         expect(userMessage, isNot(contains('Technical')));
       });
 
       test('returns default message for network error', () {
-        final error = AppError.network(message: 'Technical');
-        final userMessage = error.getUserMessage();
+        const error = AppError(
+          code: ErrorCode.networkGeneric,
+          message: 'Technical',
+        );
+        final userMessage = error.getUserMessageLocalized();
 
         expect(userMessage, isNotNull);
         expect(userMessage, contains('connection'));
@@ -174,7 +152,7 @@ void main() {
     group('getActionLabel', () {
       test('returns custom action label if provided', () {
         const error = AppError(
-          type: ErrorType.storage,
+          code: ErrorCode.databaseGeneric,
           message: 'Error',
           actionLabel: 'Custom Action',
         );
@@ -183,31 +161,37 @@ void main() {
       });
 
       test('returns Retry for retryable errors', () {
-        final error = AppError.network(message: 'Error');
+        const error = AppError(
+          code: ErrorCode.networkGeneric,
+          message: 'Error',
+        );
         expect(error.getActionLabel(), 'Retry');
       });
 
       test('returns Dismiss for non-retryable errors', () {
-        final error = AppError.validation(message: 'Error');
+        const error = AppError(
+          code: ErrorCode.validationRequired,
+          message: 'Error',
+        );
         expect(error.getActionLabel(), 'Dismiss');
       });
     });
 
     group('toString', () {
-      test('includes type and message', () {
+      test('includes code and message', () {
         const error = AppError(
-          type: ErrorType.storage,
+          code: ErrorCode.databaseGeneric,
           message: 'Storage error',
         );
 
         final str = error.toString();
-        expect(str, contains('storage'));
+        expect(str, contains('databaseGeneric'));
         expect(str, contains('Storage error'));
       });
 
       test('includes technical details if present', () {
         const error = AppError(
-          type: ErrorType.network,
+          code: ErrorCode.networkTimeout,
           message: 'Network error',
           technicalDetails: 'Timeout occurred',
         );
@@ -219,31 +203,34 @@ void main() {
 
     group('copyWith', () {
       test('copies with updated message', () {
-        const original = AppError(type: ErrorType.storage, message: 'Original');
+        const original = AppError(
+          code: ErrorCode.databaseGeneric,
+          message: 'Original',
+        );
 
         final copy = original.copyWith(message: 'Updated');
 
-        expect(copy.type, original.type);
+        expect(copy.code, original.code);
         expect(copy.message, 'Updated');
       });
 
       test('copies with updated userMessage', () {
         const original = AppError(
-          type: ErrorType.storage,
+          code: ErrorCode.databaseGeneric,
           message: 'Error',
           userMessage: 'Original user message',
         );
 
         final copy = original.copyWith(userMessage: 'Updated user message');
 
-        expect(copy.type, original.type);
+        expect(copy.code, original.code);
         expect(copy.message, original.message);
         expect(copy.userMessage, 'Updated user message');
       });
 
       test('preserves original values if not specified', () {
         const original = AppError(
-          type: ErrorType.network,
+          code: ErrorCode.networkTimeout,
           message: 'Error',
           technicalDetails: 'Details',
           userMessage: 'User message',
@@ -252,22 +239,12 @@ void main() {
 
         final copy = original.copyWith();
 
-        expect(copy.type, original.type);
+        expect(copy.code, original.code);
         expect(copy.message, original.message);
         expect(copy.technicalDetails, original.technicalDetails);
         expect(copy.userMessage, original.userMessage);
         expect(copy.actionLabel, original.actionLabel);
       });
-    });
-  });
-
-  group('ErrorType', () {
-    test('has all expected types', () {
-      expect(ErrorType.values, contains(ErrorType.storage));
-      expect(ErrorType.values, contains(ErrorType.network));
-      expect(ErrorType.values, contains(ErrorType.validation));
-      expect(ErrorType.values, contains(ErrorType.corruption));
-      expect(ErrorType.values, contains(ErrorType.unknown));
     });
   });
 }

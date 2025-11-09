@@ -88,6 +88,170 @@ dart fix --apply                # Apply automated fixes
   - `ThemeProvider` - manages light/dark theme
 - Providers handle loading states, error states, and async operations
 
+### Error Handling
+
+The app uses a **centralized error code system** with localization support. All errors flow through a type-safe `ErrorCode` enum and are automatically converted to user-friendly localized messages.
+
+**Core Components:**
+- `ErrorCode` enum (`lib/core/error/error_codes.dart`) - Type-safe error codes organized by category
+- `AppError` class (`lib/core/error/app_error.dart`) - Standard error object with code, message, and context
+- Error mappers (`lib/core/error/mappers/`) - Convert third-party exceptions to `AppError`
+- Localized messages (`lib/l10n/app_en.arb`) - User-facing error messages with i18n support
+
+**Error Categories:**
+- **Database errors**: `databaseUniqueConstraint`, `databaseTimeout`, `databasePermissionDenied`, etc.
+- **Auth errors**: `authInvalidCredentials`, `authSessionExpired`, `authWeakPassword`, etc.
+- **Network errors**: `networkTimeout`, `networkNoConnection`, `networkServerError`, etc.
+- **Validation errors**: `validationRequired`, `validationInvalidFormat`, `validationOutOfRange`, etc.
+- **Business logic errors**: `spaceNotFound`, `noteNotFound`, `insufficientPermissions`, etc.
+
+**Error Flow:**
+1. **Repository Layer**: Catch third-party exceptions (PostgrestException, AuthException) and map to AppError using error mappers
+2. **Provider Layer**: Catch AppError, log with ErrorLogger, store in error state
+3. **UI Layer**: Display localized error messages using ErrorDialog or ErrorSnackBar
+
+**How to Handle Errors in Repositories:**
+
+```dart
+import 'package:later_mobile/core/error/error.dart';
+
+class MyRepository extends BaseRepository {
+  Future<void> myOperation() async {
+    try {
+      await supabase.from('table').insert({...});
+    } on PostgrestException catch (e) {
+      // Map database errors using SupabaseErrorMapper
+      throw SupabaseErrorMapper.fromPostgrestException(e);
+    } on AuthException catch (e) {
+      // Map auth errors using SupabaseErrorMapper
+      throw SupabaseErrorMapper.fromAuthException(e);
+    } on AppError {
+      // Already an AppError - just rethrow
+      rethrow;
+    } catch (e, stackTrace) {
+      // Wrap unknown errors
+      throw AppError(
+        code: ErrorCode.unknownError,
+        message: 'Unexpected error in myOperation: $e',
+        technicalDetails: e.toString(),
+      );
+    }
+  }
+}
+```
+
+**How to Handle Errors in Providers:**
+
+```dart
+import 'package:later_mobile/core/error/error.dart';
+
+class MyProvider extends ChangeNotifier {
+  AppError? _error;
+
+  Future<void> performAction() async {
+    try {
+      _error = null;
+      notifyListeners();
+
+      await repository.myOperation();
+    } on AppError catch (e) {
+      // Log and store the error
+      ErrorLogger.logError(e, context: 'MyProvider.performAction');
+      _error = e;
+      notifyListeners();
+    } catch (e, stackTrace) {
+      // Wrap unexpected errors
+      final error = AppError(
+        code: ErrorCode.unknownError,
+        message: 'Unexpected error in performAction: $e',
+        technicalDetails: e.toString(),
+      );
+      ErrorLogger.logError(error, context: 'MyProvider.performAction');
+      _error = error;
+      notifyListeners();
+    }
+  }
+}
+```
+
+**How to Display Errors in UI:**
+
+```dart
+import 'package:later_mobile/core/error/error_handler.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
+// Show error dialog
+if (provider.error != null) {
+  ErrorHandler.showErrorDialog(
+    context,
+    provider.error!,
+    onRetry: provider.error!.isRetryable ? () => provider.retry() : null,
+  );
+}
+
+// Show error snackbar
+ErrorHandler.showErrorSnackBar(
+  context,
+  provider.error!,
+  onRetry: provider.error!.isRetryable ? () => provider.retry() : null,
+);
+
+// Get localized message directly
+final localizations = AppLocalizations.of(context);
+final message = error.getUserMessageLocalized(localizations);
+```
+
+**Validation Errors:**
+
+For input validation, use `ValidationErrorMapper`:
+
+```dart
+import 'package:later_mobile/core/error/error.dart';
+
+// Required field validation
+if (name.isEmpty) {
+  throw ValidationErrorMapper.requiredField('Name');
+}
+
+// Invalid format validation
+if (!emailRegex.hasMatch(email)) {
+  throw ValidationErrorMapper.invalidFormat('Email');
+}
+
+// Out of range validation
+if (age < 18 || age > 120) {
+  throw ValidationErrorMapper.outOfRange('Age', '18', '120');
+}
+
+// Duplicate validation
+if (existingNames.contains(name)) {
+  throw ValidationErrorMapper.duplicate('Space name');
+}
+```
+
+**Error Metadata:**
+
+Each `ErrorCode` has associated metadata:
+- `isRetryable`: Whether the operation can be retried (network/timeout errors are retryable)
+- `severity`: Error severity level (low/medium/high/critical) for logging/monitoring
+- `localizationKey`: Key for retrieving localized user message from ARB files
+
+**Important Rules:**
+1. **NEVER throw raw exceptions** - always convert to `AppError` at repository boundary
+2. **NEVER create AppError without ErrorCode** - use the enum for type safety
+3. **ALWAYS use error mappers** for third-party exceptions (Supabase, validation)
+4. **ALWAYS log errors** with `ErrorLogger.logError()` when catching in providers
+5. **NEVER show technical details to users** - use `getUserMessageLocalized()` for UI
+
+**Adding New Error Types:**
+
+When adding a new error code:
+1. Add to `ErrorCode` enum in `error_codes.dart`
+2. Add metadata logic in `ErrorCodeMetadata` extension (isRetryable, severity)
+3. Add localized message to `lib/l10n/app_en.arb` (key format: `errorYourNewCode`)
+4. Run `flutter pub get` to regenerate localization code
+5. Write unit tests for the new error code
+
 ### Design System
 
 **Atomic Design Structure:**

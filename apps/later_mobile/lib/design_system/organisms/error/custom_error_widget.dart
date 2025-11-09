@@ -4,6 +4,7 @@ import 'package:later_mobile/core/error/error_handler.dart';
 import 'package:later_mobile/core/theme/temporal_flow_theme.dart';
 import 'package:later_mobile/design_system/tokens/spacing.dart';
 import 'package:later_mobile/design_system/tokens/typography.dart';
+import 'package:later_mobile/l10n/app_localizations.dart';
 
 /// Custom error widget that displays when Flutter encounters a widget build error.
 ///
@@ -81,9 +82,9 @@ class CustomErrorWidget extends StatelessWidget {
                   ),
                   const SizedBox(height: AppSpacing.md),
 
-                  // User-friendly message
+                  // User-friendly message (localized if available)
                   Text(
-                    appError.getUserMessage(),
+                    appError.getUserMessageLocalized(AppLocalizations.of(context)),
                     style: AppTypography.bodyLarge.copyWith(
                       color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.8),
                     ),

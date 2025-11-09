@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart';
-import '../core/error/app_error.dart';
+import '../core/error/error.dart';
 import '../data/models/list_item_model.dart';
 import '../data/models/list_model.dart';
 import '../data/models/note_model.dart';
@@ -136,11 +136,7 @@ class ContentProvider extends ChangeNotifier {
 
       _error = null;
     } catch (e) {
-      if (e is AppError) {
-        _error = e;
-      } else {
-        _error = AppError.fromException(e);
-      }
+      // _error already set by _executeWithRetry, just handle state cleanup
       _todoLists = [];
       _lists = [];
       _notes = [];
@@ -178,11 +174,7 @@ class ContentProvider extends ChangeNotifier {
       _error = null;
       notifyListeners();
     } catch (e) {
-      if (e is AppError) {
-        _error = e;
-      } else {
-        _error = AppError.fromException(e);
-      }
+      // _error already set by _executeWithRetry
       notifyListeners();
       rethrow;
     }
@@ -218,11 +210,7 @@ class ContentProvider extends ChangeNotifier {
       _error = null;
       notifyListeners();
     } catch (e) {
-      if (e is AppError) {
-        _error = e;
-      } else {
-        _error = AppError.fromException(e);
-      }
+      // _error already set by _executeWithRetry
       notifyListeners();
     }
   }
@@ -250,11 +238,7 @@ class ContentProvider extends ChangeNotifier {
       _error = null;
       notifyListeners();
     } catch (e) {
-      if (e is AppError) {
-        _error = e;
-      } else {
-        _error = AppError.fromException(e);
-      }
+      // _error already set by _executeWithRetry
       notifyListeners();
     }
   }
@@ -283,11 +267,8 @@ class ContentProvider extends ChangeNotifier {
       _todoItemsCache[todoListId] = items;
       return items;
     } catch (e) {
-      if (e is AppError) {
-        rethrow;
-      } else {
-        throw AppError.fromException(e);
-      }
+      // _error already set by _executeWithRetry
+      rethrow;
     }
   }
 
@@ -327,11 +308,7 @@ class ContentProvider extends ChangeNotifier {
       _error = null;
       notifyListeners();
     } catch (e) {
-      if (e is AppError) {
-        _error = e;
-      } else {
-        _error = AppError.fromException(e);
-      }
+      // _error already set by _executeWithRetry
       notifyListeners();
     }
   }
@@ -367,11 +344,7 @@ class ContentProvider extends ChangeNotifier {
       _error = null;
       notifyListeners();
     } catch (e) {
-      if (e is AppError) {
-        _error = e;
-      } else {
-        _error = AppError.fromException(e);
-      }
+      // _error already set by _executeWithRetry
       notifyListeners();
     }
   }
@@ -407,11 +380,7 @@ class ContentProvider extends ChangeNotifier {
       _error = null;
       notifyListeners();
     } catch (e) {
-      if (e is AppError) {
-        _error = e;
-      } else {
-        _error = AppError.fromException(e);
-      }
+      // _error already set by _executeWithRetry
       notifyListeners();
     }
   }
@@ -446,11 +415,7 @@ class ContentProvider extends ChangeNotifier {
       _error = null;
       notifyListeners();
     } catch (e) {
-      if (e is AppError) {
-        _error = e;
-      } else {
-        _error = AppError.fromException(e);
-      }
+      // _error already set by _executeWithRetry
       notifyListeners();
     }
   }
@@ -484,11 +449,7 @@ class ContentProvider extends ChangeNotifier {
       _error = null;
       notifyListeners();
     } catch (e) {
-      if (e is AppError) {
-        _error = e;
-      } else {
-        _error = AppError.fromException(e);
-      }
+      // _error already set by _executeWithRetry
       notifyListeners();
       rethrow;
     }
@@ -524,11 +485,7 @@ class ContentProvider extends ChangeNotifier {
       _error = null;
       notifyListeners();
     } catch (e) {
-      if (e is AppError) {
-        _error = e;
-      } else {
-        _error = AppError.fromException(e);
-      }
+      // _error already set by _executeWithRetry
       notifyListeners();
     }
   }
@@ -553,11 +510,7 @@ class ContentProvider extends ChangeNotifier {
       _error = null;
       notifyListeners();
     } catch (e) {
-      if (e is AppError) {
-        _error = e;
-      } else {
-        _error = AppError.fromException(e);
-      }
+      // _error already set by _executeWithRetry
       notifyListeners();
     }
   }
@@ -586,11 +539,8 @@ class ContentProvider extends ChangeNotifier {
       _listItemsCache[listId] = items;
       return items;
     } catch (e) {
-      if (e is AppError) {
-        rethrow;
-      } else {
-        throw AppError.fromException(e);
-      }
+      // _error already set by _executeWithRetry
+      rethrow;
     }
   }
 
@@ -630,11 +580,7 @@ class ContentProvider extends ChangeNotifier {
       _error = null;
       notifyListeners();
     } catch (e) {
-      if (e is AppError) {
-        _error = e;
-      } else {
-        _error = AppError.fromException(e);
-      }
+      // _error already set by _executeWithRetry
       notifyListeners();
     }
   }
@@ -670,11 +616,7 @@ class ContentProvider extends ChangeNotifier {
       _error = null;
       notifyListeners();
     } catch (e) {
-      if (e is AppError) {
-        _error = e;
-      } else {
-        _error = AppError.fromException(e);
-      }
+      // _error already set by _executeWithRetry
       notifyListeners();
     }
   }
@@ -710,11 +652,7 @@ class ContentProvider extends ChangeNotifier {
       _error = null;
       notifyListeners();
     } catch (e) {
-      if (e is AppError) {
-        _error = e;
-      } else {
-        _error = AppError.fromException(e);
-      }
+      // _error already set by _executeWithRetry
       notifyListeners();
     }
   }
@@ -749,11 +687,7 @@ class ContentProvider extends ChangeNotifier {
       _error = null;
       notifyListeners();
     } catch (e) {
-      if (e is AppError) {
-        _error = e;
-      } else {
-        _error = AppError.fromException(e);
-      }
+      // _error already set by _executeWithRetry
       notifyListeners();
     }
   }
@@ -876,11 +810,7 @@ class ContentProvider extends ChangeNotifier {
 
       _error = null;
     } catch (e) {
-      if (e is AppError) {
-        _error = e;
-      } else {
-        _error = AppError.fromException(e);
-      }
+      // _error already set by _executeWithRetry
       notifyListeners();
       rethrow; // Rethrow so UI can handle the error
     }
@@ -914,11 +844,7 @@ class ContentProvider extends ChangeNotifier {
       _error = null;
       notifyListeners();
     } catch (e) {
-      if (e is AppError) {
-        _error = e;
-      } else {
-        _error = AppError.fromException(e);
-      }
+      // _error already set by _executeWithRetry
       notifyListeners();
     }
   }
@@ -956,11 +882,7 @@ class ContentProvider extends ChangeNotifier {
       _error = null;
       notifyListeners();
     } catch (e) {
-      if (e is AppError) {
-        _error = e;
-      } else {
-        _error = AppError.fromException(e);
-      }
+      // _error already set by _executeWithRetry
       notifyListeners();
     }
   }
@@ -984,11 +906,7 @@ class ContentProvider extends ChangeNotifier {
       _error = null;
       notifyListeners();
     } catch (e) {
-      if (e is AppError) {
-        _error = e;
-      } else {
-        _error = AppError.fromException(e);
-      }
+      // _error already set by _executeWithRetry
       notifyListeners();
     }
   }
@@ -1245,9 +1163,14 @@ class ContentProvider extends ChangeNotifier {
     while (attempts < _maxRetries) {
       try {
         return await operation();
-      } catch (e) {
+      } on AppError catch (e) {
+        // Repository already mapped to AppError
         attempts++;
-        lastError = AppError.fromException(e);
+        lastError = e;
+
+        // Set provider error state
+        _error = e;
+        ErrorLogger.logError(e, context: 'ContentProvider.$operationName');
 
         // Only retry if the error is retryable and we have attempts left
         if (lastError.isRetryable && attempts < _maxRetries) {
@@ -1259,11 +1182,33 @@ class ContentProvider extends ChangeNotifier {
 
         // Non-retryable error or max retries reached
         throw lastError;
+      } catch (e, stackTrace) {
+        // Unexpected error, wrap in AppError
+        attempts++;
+        lastError = AppError(
+          code: ErrorCode.unknownError,
+          message: 'Unexpected error in $operationName: ${e.toString()}',
+          technicalDetails: e.toString(),
+        );
+
+        // Set provider error state
+        _error = lastError;
+        ErrorLogger.logError(
+          lastError,
+          stackTrace: stackTrace,
+          context: 'ContentProvider.$operationName',
+        );
+
+        // Don't retry unexpected errors
+        throw lastError;
       }
     }
 
     // This should never be reached, but throw the last error just in case
     throw lastError ??
-        AppError.unknown(message: 'Unknown error in $operationName');
+        AppError(
+          code: ErrorCode.unknownError,
+          message: 'Unknown error in $operationName',
+        );
   }
 }

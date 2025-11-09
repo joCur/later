@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'app_error.dart';
+import 'error_codes.dart';
 
 /// Utility class for logging errors throughout the application.
 ///
@@ -10,7 +11,7 @@ import 'app_error.dart';
 /// Example usage:
 /// ```dart
 /// ErrorLogger.logError(
-///   AppError.storage(message: 'Failed to save'),
+///   AppError(code: ErrorCode.databaseGeneric, message: 'Failed to save'),
 ///   context: 'ItemsProvider.addItem',
 /// );
 /// ```
@@ -56,7 +57,7 @@ class ErrorLogger {
     final timestamp = DateTime.now().toIso8601String();
     final buffer = StringBuffer();
 
-    buffer.writeln('[$timestamp] ERROR: ${error.type.name}');
+    buffer.writeln('[$timestamp] ERROR: ${error.code.name}');
     buffer.writeln('Message: ${error.message}');
 
     if (context != null) {
@@ -85,7 +86,7 @@ class ErrorLogger {
     // Store in memory for retrieval (debug mode only)
     _storeLogs(
       timestamp: timestamp,
-      type: error.type.name,
+      type: error.code.name,
       message: error.message,
       context: context,
       technicalDetails: error.technicalDetails,
@@ -105,14 +106,18 @@ class ErrorLogger {
     StackTrace? stackTrace,
     String? context,
   }) {
-    final appError = AppError.fromException(exception);
+    final appError = AppError(
+      code: ErrorCode.unknownError,
+      message: exception.toString(),
+      technicalDetails: exception.toString(),
+    );
     logError(appError, stackTrace: stackTrace, context: context);
   }
 
   /// Formats an AppError into a readable string.
   static String formatError(AppError error) {
     final buffer = StringBuffer();
-    buffer.write('${error.type.name}: ${error.message}');
+    buffer.write('${error.code.name}: ${error.message}');
 
     if (error.technicalDetails != null) {
       buffer.write(' (${error.technicalDetails})');

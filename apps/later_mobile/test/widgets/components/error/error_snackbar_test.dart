@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:later_mobile/core/error/app_error.dart';
+import 'package:later_mobile/core/error/error_codes.dart';
 import 'package:later_mobile/design_system/organisms/error/error_snackbar.dart';
 import '../../../test_helpers.dart';
 
 void main() {
   group('ErrorSnackBar', () {
     testWidgets('shows snackbar with error message', (tester) async {
-      final error = AppError.storage(
+      const error = AppError(
+        code: ErrorCode.databaseTimeout,
         message: 'Storage error',
         userMessage: 'Failed to save',
       );
@@ -35,7 +37,10 @@ void main() {
     });
 
     testWidgets('shows action button for retryable errors', (tester) async {
-      final error = AppError.storage(message: 'Test'); // Retryable
+      const error = AppError(
+        code: ErrorCode.databaseTimeout,
+        message: 'Test',
+      ); // Retryable
 
       await tester.pumpWidget(
         testApp(
@@ -61,7 +66,10 @@ void main() {
     testWidgets('does not show action for non-retryable errors', (
       tester,
     ) async {
-      final error = AppError.validation(message: 'Test'); // Not retryable
+      const error = AppError(
+        code: ErrorCode.validationRequired,
+        message: 'Test',
+      ); // Not retryable
 
       await tester.pumpWidget(
         testApp(
@@ -87,7 +95,10 @@ void main() {
     });
 
     testWidgets('calls onRetry when action tapped', (tester) async {
-      final error = AppError.storage(message: 'Test');
+      const error = AppError(
+        code: ErrorCode.databaseTimeout,
+        message: 'Test',
+      );
       bool retryCalled = false;
 
       await tester.pumpWidget(
@@ -127,7 +138,10 @@ void main() {
     });
 
     testWidgets('shows error icon', (tester) async {
-      final error = AppError.storage(message: 'Test');
+      const error = AppError(
+        code: ErrorCode.databaseTimeout,
+        message: 'Test',
+      );
 
       await tester.pumpWidget(
         testApp(
@@ -153,10 +167,22 @@ void main() {
 
     testWidgets('handles different error types', (tester) async {
       final errors = [
-        AppError.storage(message: 'Storage'),
-        AppError.network(message: 'Network'),
-        AppError.validation(message: 'Validation'),
-        AppError.corruption(message: 'Corruption'),
+        const AppError(
+          code: ErrorCode.databaseTimeout,
+          message: 'Storage',
+        ),
+        const AppError(
+          code: ErrorCode.networkGeneric,
+          message: 'Network',
+        ),
+        const AppError(
+          code: ErrorCode.validationRequired,
+          message: 'Validation',
+        ),
+        const AppError(
+          code: ErrorCode.databaseGeneric,
+          message: 'Corruption',
+        ),
       ];
 
       for (final error in errors) {
@@ -188,8 +214,14 @@ void main() {
     testWidgets('dismisses previous snackbar when showing new one', (
       tester,
     ) async {
-      final error1 = AppError.storage(message: 'Error 1');
-      final error2 = AppError.network(message: 'Error 2');
+      const error1 = AppError(
+        code: ErrorCode.databaseTimeout,
+        message: 'Error 1',
+      );
+      const error2 = AppError(
+        code: ErrorCode.networkGeneric,
+        message: 'Error 2',
+      );
 
       await tester.pumpWidget(
         testApp(
@@ -219,17 +251,27 @@ void main() {
       await tester.tap(find.text('Show 1'));
       await tester.pump();
 
-      expect(find.text(error1.getUserMessage()), findsOneWidget);
+      // Check for keyword from databaseTimeout message
+      expect(
+        find.textContaining('timed out', findRichText: true),
+        findsOneWidget,
+      );
 
       await tester.tap(find.text('Show 2'));
       await tester.pump();
 
-      // Should only show the second snackbar
-      expect(find.text(error2.getUserMessage()), findsOneWidget);
+      // Should only show the second snackbar with networkGeneric keyword
+      expect(
+        find.textContaining('Network error', findRichText: true),
+        findsOneWidget,
+      );
     });
 
     testWidgets('snackbar has error background color', (tester) async {
-      final error = AppError.storage(message: 'Test');
+      const error = AppError(
+        code: ErrorCode.databaseTimeout,
+        message: 'Test',
+      );
 
       await tester.pumpWidget(
         testApp(
@@ -256,7 +298,7 @@ void main() {
 
     testWidgets('can show custom action label', (tester) async {
       const error = AppError(
-        type: ErrorType.storage,
+        code: ErrorCode.databaseTimeout, // Use retryable error code
         message: 'Test',
         actionLabel: 'Try Again',
       );
@@ -283,7 +325,8 @@ void main() {
     });
 
     testWidgets('snackbar contains user-friendly message', (tester) async {
-      final error = AppError.network(
+      const error = AppError(
+        code: ErrorCode.networkGeneric,
         message: 'Connection failed',
         userMessage: 'Please check your internet connection',
       );
@@ -315,7 +358,10 @@ void main() {
     testWidgets('action button is visible for retryable storage errors', (
       tester,
     ) async {
-      final error = AppError.storage(message: 'Storage failed');
+      const error = AppError(
+        code: ErrorCode.databaseTimeout,
+        message: 'Storage failed',
+      );
 
       await tester.pumpWidget(
         testApp(
@@ -342,7 +388,10 @@ void main() {
     testWidgets('action button is visible for retryable network errors', (
       tester,
     ) async {
-      final error = AppError.network(message: 'Network failed');
+      const error = AppError(
+        code: ErrorCode.networkGeneric,
+        message: 'Network failed',
+      );
 
       await tester.pumpWidget(
         testApp(

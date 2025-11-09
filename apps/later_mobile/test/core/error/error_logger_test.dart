@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:later_mobile/core/error/app_error.dart';
+import 'package:later_mobile/core/error/error_codes.dart';
 import 'package:later_mobile/core/error/error_logger.dart';
 
 void main() {
@@ -13,12 +14,20 @@ void main() {
       test('logs error in debug mode', () {
         // This test runs in debug mode by default
         expect(() {
-          ErrorLogger.logError(AppError.storage(message: 'Test error'));
+          ErrorLogger.logError(
+            const AppError(
+              code: ErrorCode.databaseTimeout,
+              message: 'Test error',
+            ),
+          );
         }, returnsNormally);
       });
 
       test('logs error with stack trace', () {
-        final error = AppError.storage(message: 'Test error');
+        const error = AppError(
+          code: ErrorCode.databaseTimeout,
+          message: 'Test error',
+        );
 
         expect(() {
           try {
@@ -30,7 +39,10 @@ void main() {
       });
 
       test('logs error with context', () {
-        final error = AppError.storage(message: 'Test error');
+        const error = AppError(
+          code: ErrorCode.databaseTimeout,
+          message: 'Test error',
+        );
 
         expect(() {
           ErrorLogger.logError(error, context: 'ItemsProvider.loadItems');
@@ -38,7 +50,10 @@ void main() {
       });
 
       test('logs error with additional data', () {
-        final error = AppError.storage(message: 'Test error');
+        const error = AppError(
+          code: ErrorCode.databaseTimeout,
+          message: 'Test error',
+        );
 
         expect(() {
           ErrorLogger.logError(
@@ -49,7 +64,10 @@ void main() {
       });
 
       test('does not log sensitive data', () {
-        final error = AppError.storage(message: 'Test error');
+        const error = AppError(
+          code: ErrorCode.databaseTimeout,
+          message: 'Test error',
+        );
 
         // Should not throw even with sensitive-looking data
         expect(() {
@@ -104,8 +122,12 @@ void main() {
 
       test('returns logged errors in debug mode', () {
         // Log some errors
-        ErrorLogger.logError(AppError.storage(message: 'Error 1'));
-        ErrorLogger.logError(AppError.network(message: 'Error 2'));
+        ErrorLogger.logError(
+          const AppError(code: ErrorCode.databaseTimeout, message: 'Error 1'),
+        );
+        ErrorLogger.logError(
+          const AppError(code: ErrorCode.networkGeneric, message: 'Error 2'),
+        );
 
         final logs = ErrorLogger.getRecentLogs();
         expect(logs.length, 2);
@@ -114,7 +136,9 @@ void main() {
       test('limits logs to specified count', () {
         // Log multiple errors
         for (int i = 0; i < 10; i++) {
-          ErrorLogger.logError(AppError.storage(message: 'Error $i'));
+          ErrorLogger.logError(
+            AppError(code: ErrorCode.databaseTimeout, message: 'Error $i'),
+          );
         }
 
         final logs = ErrorLogger.getRecentLogs(limit: 5);
@@ -122,9 +146,15 @@ void main() {
       });
 
       test('returns most recent logs first', () {
-        ErrorLogger.logError(AppError.storage(message: 'First'));
-        ErrorLogger.logError(AppError.network(message: 'Second'));
-        ErrorLogger.logError(AppError.validation(message: 'Third'));
+        ErrorLogger.logError(
+          const AppError(code: ErrorCode.databaseTimeout, message: 'First'),
+        );
+        ErrorLogger.logError(
+          const AppError(code: ErrorCode.networkGeneric, message: 'Second'),
+        );
+        ErrorLogger.logError(
+          const AppError(code: ErrorCode.validationRequired, message: 'Third'),
+        );
 
         final logs = ErrorLogger.getRecentLogs();
         if (logs.isNotEmpty) {
@@ -137,8 +167,12 @@ void main() {
     group('clearLogs', () {
       test('clears all logs', () {
         // Log some errors
-        ErrorLogger.logError(AppError.storage(message: 'Error 1'));
-        ErrorLogger.logError(AppError.network(message: 'Error 2'));
+        ErrorLogger.logError(
+          const AppError(code: ErrorCode.databaseTimeout, message: 'Error 1'),
+        );
+        ErrorLogger.logError(
+          const AppError(code: ErrorCode.networkGeneric, message: 'Error 2'),
+        );
 
         ErrorLogger.clearLogs();
 
@@ -150,7 +184,7 @@ void main() {
     group('formatError', () {
       test('formats error with all details', () {
         const error = AppError(
-          type: ErrorType.storage,
+          code: ErrorCode.databaseGeneric,
           message: 'Storage failed',
           technicalDetails: 'Box is full',
           userMessage: 'Please free up space',
@@ -158,27 +192,30 @@ void main() {
 
         final formatted = ErrorLogger.formatError(error);
 
-        expect(formatted, contains('storage'));
+        expect(formatted, contains('databaseGeneric'));
         expect(formatted, contains('Storage failed'));
         expect(formatted, contains('Box is full'));
       });
 
       test('formats error without technical details', () {
         const error = AppError(
-          type: ErrorType.network,
+          code: ErrorCode.networkGeneric,
           message: 'Connection failed',
         );
 
         final formatted = ErrorLogger.formatError(error);
 
-        expect(formatted, contains('network'));
+        expect(formatted, contains('networkGeneric'));
         expect(formatted, contains('Connection failed'));
       });
     });
 
     group('sanitization', () {
       test('sanitizes sensitive keys in additional data', () {
-        final error = AppError.storage(message: 'Test');
+        const error = AppError(
+          code: ErrorCode.databaseTimeout,
+          message: 'Test',
+        );
 
         // This should not throw and should filter sensitive data
         expect(() {
@@ -202,7 +239,12 @@ void main() {
         // In real production, kDebugMode would be false
 
         ErrorLogger.clearLogs();
-        ErrorLogger.logError(AppError.storage(message: 'Production error'));
+        ErrorLogger.logError(
+          const AppError(
+            code: ErrorCode.databaseTimeout,
+            message: 'Production error',
+          ),
+        );
 
         // In test mode (debug), logs should be stored
         final logs = ErrorLogger.getRecentLogs();
@@ -214,7 +256,7 @@ void main() {
     group('log entry structure', () {
       test('log entry contains required fields', () {
         ErrorLogger.logError(
-          AppError.storage(message: 'Test error'),
+          const AppError(code: ErrorCode.databaseTimeout, message: 'Test error'),
           context: 'TestContext',
         );
 
@@ -229,7 +271,7 @@ void main() {
 
       test('log entry includes context when provided', () {
         ErrorLogger.logError(
-          AppError.storage(message: 'Test error'),
+          const AppError(code: ErrorCode.databaseTimeout, message: 'Test error'),
           context: 'MyContext',
         );
 
@@ -245,7 +287,10 @@ void main() {
           throw Exception('Test');
         } catch (e, stackTrace) {
           ErrorLogger.logError(
-            AppError.storage(message: 'Test error'),
+            const AppError(
+              code: ErrorCode.databaseTimeout,
+              message: 'Test error',
+            ),
             stackTrace: stackTrace,
           );
         }

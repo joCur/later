@@ -1,53 +1,67 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:later_mobile/core/error/app_error.dart';
+import 'package:later_mobile/core/error/error_codes.dart';
 import 'package:later_mobile/design_system/organisms/error/error_dialog.dart';
 import '../../../test_helpers.dart';
 
 void main() {
   group('ErrorDialog', () {
     testWidgets('renders with error message', (tester) async {
-      final error = AppError.storage(
+      const error = AppError(
+        code: ErrorCode.databaseTimeout,
         message: 'Storage error',
         userMessage: 'Could not save your data',
       );
 
-      await tester.pumpWidget(testApp(ErrorDialog(error: error)));
+      await tester.pumpWidget(testApp(const ErrorDialog(error: error)));
 
       expect(find.byType(Dialog), findsOneWidget);
       expect(find.text('Could not save your data'), findsOneWidget);
     });
 
     testWidgets('shows error icon', (tester) async {
-      final error = AppError.storage(message: 'Test');
+      const error = AppError(
+        code: ErrorCode.databaseTimeout,
+        message: 'Test',
+      );
 
-      await tester.pumpWidget(testApp(ErrorDialog(error: error)));
+      await tester.pumpWidget(testApp(const ErrorDialog(error: error)));
 
       expect(find.byIcon(Icons.error_outline), findsOneWidget);
     });
 
     testWidgets('displays default title', (tester) async {
-      final error = AppError.storage(message: 'Test');
+      const error = AppError(
+        code: ErrorCode.databaseTimeout,
+        message: 'Test',
+      );
 
-      await tester.pumpWidget(testApp(ErrorDialog(error: error)));
+      await tester.pumpWidget(testApp(const ErrorDialog(error: error)));
 
       expect(find.text('Something Went Wrong'), findsOneWidget);
     });
 
     testWidgets('displays custom title when provided', (tester) async {
-      final error = AppError.storage(message: 'Test');
+      const error = AppError(
+        code: ErrorCode.databaseTimeout,
+        message: 'Test',
+      );
 
       await tester.pumpWidget(
-        testApp(ErrorDialog(error: error, title: 'Custom Error Title')),
+        testApp(const ErrorDialog(error: error, title: 'Custom Error Title')),
       );
 
       expect(find.text('Custom Error Title'), findsOneWidget);
     });
 
     testWidgets('shows retry button for retryable errors', (tester) async {
-      final error = AppError.storage(message: 'Test'); // Retryable
+      const error = AppError(
+        code: ErrorCode.databaseTimeout,
+        message: 'Test',
+      ); // Retryable
 
-      await tester.pumpWidget(testApp(ErrorDialog(error: error)));
+      await tester.pumpWidget(testApp(const ErrorDialog(error: error)));
 
       expect(find.text('Retry'), findsOneWidget);
     });
@@ -55,16 +69,22 @@ void main() {
     testWidgets('shows dismiss button for non-retryable errors', (
       tester,
     ) async {
-      final error = AppError.validation(message: 'Test'); // Not retryable
+      const error = AppError(
+        code: ErrorCode.validationRequired,
+        message: 'Test',
+      ); // Not retryable
 
-      await tester.pumpWidget(testApp(ErrorDialog(error: error)));
+      await tester.pumpWidget(testApp(const ErrorDialog(error: error)));
 
       expect(find.text('Dismiss'), findsOneWidget);
       expect(find.text('Retry'), findsNothing);
     });
 
     testWidgets('calls onRetry when retry button tapped', (tester) async {
-      final error = AppError.storage(message: 'Test');
+      const error = AppError(
+        code: ErrorCode.databaseTimeout,
+        message: 'Test',
+      );
       bool retryCalled = false;
 
       await tester.pumpWidget(
@@ -85,7 +105,10 @@ void main() {
     });
 
     testWidgets('closes dialog when dismiss button tapped', (tester) async {
-      final error = AppError.storage(message: 'Test');
+      const error = AppError(
+        code: ErrorCode.databaseTimeout,
+        message: 'Test',
+      );
 
       await tester.pumpWidget(
         testApp(
@@ -95,7 +118,7 @@ void main() {
                 onPressed: () {
                   showDialog<void>(
                     context: context,
-                    builder: (_) => ErrorDialog(error: error),
+                    builder: (_) => const ErrorDialog(error: error),
                   );
                 },
                 child: const Text('Show'),
@@ -117,18 +140,24 @@ void main() {
     });
 
     testWidgets('applies correct styling', (tester) async {
-      final error = AppError.storage(message: 'Test');
+      const error = AppError(
+        code: ErrorCode.databaseTimeout,
+        message: 'Test',
+      );
 
-      await tester.pumpWidget(testApp(ErrorDialog(error: error)));
+      await tester.pumpWidget(testApp(const ErrorDialog(error: error)));
 
       final dialog = tester.widget<Dialog>(find.byType(Dialog));
       expect(dialog.shape, isNotNull);
     });
 
     testWidgets('has correct max width constraint', (tester) async {
-      final error = AppError.storage(message: 'Test');
+      const error = AppError(
+        code: ErrorCode.databaseTimeout,
+        message: 'Test',
+      );
 
-      await tester.pumpWidget(testApp(ErrorDialog(error: error)));
+      await tester.pumpWidget(testApp(const ErrorDialog(error: error)));
 
       // Find the ConstrainedBox inside the Dialog
       final constrainedBoxes = find
@@ -149,9 +178,12 @@ void main() {
     });
 
     testWidgets('error icon has correct size', (tester) async {
-      final error = AppError.storage(message: 'Test');
+      const error = AppError(
+        code: ErrorCode.databaseTimeout,
+        message: 'Test',
+      );
 
-      await tester.pumpWidget(testApp(ErrorDialog(error: error)));
+      await tester.pumpWidget(testApp(const ErrorDialog(error: error)));
 
       final icon = tester.widget<Icon>(find.byIcon(Icons.error_outline));
       expect(icon.size, 48);
@@ -159,7 +191,10 @@ void main() {
     });
 
     testWidgets('dialog is dismissible by barrier tap', (tester) async {
-      final error = AppError.storage(message: 'Test');
+      const error = AppError(
+        code: ErrorCode.databaseTimeout,
+        message: 'Test',
+      );
 
       await tester.pumpWidget(
         testApp(
@@ -169,7 +204,7 @@ void main() {
                 onPressed: () {
                   showDialog<void>(
                     context: context,
-                    builder: (_) => ErrorDialog(error: error),
+                    builder: (_) => const ErrorDialog(error: error),
                   );
                 },
                 child: const Text('Show'),
@@ -194,18 +229,44 @@ void main() {
     testWidgets('different error types show appropriate messages', (
       tester,
     ) async {
-      final errors = [
-        AppError.storage(message: 'Storage'),
-        AppError.network(message: 'Network'),
-        AppError.validation(message: 'Validation'),
-        AppError.corruption(message: 'Corruption'),
+      final errorsAndKeywords = [
+        (
+          const AppError(
+            code: ErrorCode.databaseTimeout,
+            message: 'Storage',
+          ),
+          'timed out', // Check for key phrase
+        ),
+        (
+          const AppError(
+            code: ErrorCode.networkGeneric,
+            message: 'Network',
+          ),
+          'Network error', // Check for key phrase
+        ),
+        (
+          const AppError(
+            code: ErrorCode.validationRequired,
+            message: 'Validation',
+          ),
+          'required', // Check for key phrase
+        ),
+        (
+          const AppError(
+            code: ErrorCode.databaseGeneric,
+            message: 'Corruption',
+          ),
+          'database error', // Check for key phrase
+        ),
       ];
 
-      for (final error in errors) {
+      for (final (error, keyword) in errorsAndKeywords) {
         await tester.pumpWidget(testApp(ErrorDialog(error: error)));
+        await tester.pumpAndSettle();
 
         expect(find.byType(ErrorDialog), findsOneWidget);
-        expect(find.text(error.getUserMessage()), findsOneWidget);
+        // Check for keyword in the message
+        expect(find.textContaining(keyword, findRichText: true), findsOneWidget);
 
         // Clear for next iteration
         await tester.pumpWidget(Container());
@@ -215,7 +276,8 @@ void main() {
     testWidgets('handles long error messages without overflow', (
       tester,
     ) async {
-      final error = AppError.storage(
+      final error = AppError(
+        code: ErrorCode.databaseTimeout,
         message: 'Error',
         userMessage: 'A' * 500, // Very long message
       );
@@ -229,9 +291,12 @@ void main() {
 
     testWidgets('shows both Dismiss and primary action for retryable errors',
         (tester) async {
-      final error = AppError.storage(message: 'Test');
+      const error = AppError(
+        code: ErrorCode.databaseTimeout,
+        message: 'Test',
+      );
 
-      await tester.pumpWidget(testApp(ErrorDialog(error: error)));
+      await tester.pumpWidget(testApp(const ErrorDialog(error: error)));
 
       // Retryable errors show both Dismiss (ghost) and Retry (primary)
       expect(find.text('Dismiss'), findsOneWidget);
@@ -239,7 +304,10 @@ void main() {
     });
 
     testWidgets('closes dialog after retry button is tapped', (tester) async {
-      final error = AppError.storage(message: 'Test');
+      const error = AppError(
+        code: ErrorCode.databaseTimeout,
+        message: 'Test',
+      );
 
       await tester.pumpWidget(
         testApp(

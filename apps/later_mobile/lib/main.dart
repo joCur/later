@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
+import 'l10n/app_localizations.dart';
 import 'core/config/supabase_config.dart';
 import 'core/error/error_handler.dart';
 import 'core/theme/app_theme.dart';
@@ -83,6 +85,16 @@ class _LaterAppState extends State<LaterApp> {
             // Add theme animation for smooth transitions
             themeAnimationDuration: const Duration(milliseconds: 250),
             themeAnimationCurve: Curves.easeInOut,
+            // Localization support
+            localizationsDelegates: const [
+              AppLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            supportedLocales: const [
+              Locale('en'),
+            ],
             home: const AuthGate(),
           );
         },
