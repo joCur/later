@@ -245,4 +245,61 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get emptySpaceAction => 'Create';
+
+  @override
+  String get navigationHome => 'Home';
+
+  @override
+  String get navigationHomeTooltip => 'View your spaces';
+
+  @override
+  String get navigationHomeSemanticLabel => 'Home navigation';
+
+  @override
+  String get navigationSearch => 'Search';
+
+  @override
+  String get navigationSearchTooltip => 'Search items';
+
+  @override
+  String get navigationSearchSemanticLabel => 'Search navigation';
+
+  @override
+  String get navigationSettings => 'Settings';
+
+  @override
+  String get navigationSettingsTooltip => 'App settings';
+
+  @override
+  String get navigationSettingsSemanticLabel => 'Settings navigation';
+
+  @override
+  String get sidebarSpaces => 'Spaces';
+
+  @override
+  String get sidebarCollapse => 'Collapse sidebar';
+
+  @override
+  String get sidebarExpand => 'Expand sidebar';
+
+  @override
+  String get sidebarSignOut => 'Sign Out';
+
+  @override
+  String get sidebarNoSpaces => 'No spaces yet';
+
+  @override
+  String get filterAll => 'All';
+
+  @override
+  String get filterTodoLists => 'Todo Lists';
+
+  @override
+  String get filterLists => 'Lists';
+
+  @override
+  String get filterNotes => 'Notes';
+
+  @override
+  String get menuSignOut => 'Sign Out';
 }

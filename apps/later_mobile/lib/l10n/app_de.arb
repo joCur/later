@@ -373,5 +373,100 @@
   "emptySpaceAction": "Erstellen",
   "@emptySpaceAction": {
     "description": "Action button text for empty space state"
+  },
+
+  "navigationHome": "Startseite",
+  "@navigationHome": {
+    "description": "Bottom navigation label for home tab"
+  },
+
+  "navigationHomeTooltip": "Ihre Bereiche anzeigen",
+  "@navigationHomeTooltip": {
+    "description": "Tooltip for home navigation button"
+  },
+
+  "navigationHomeSemanticLabel": "Startseite-Navigation",
+  "@navigationHomeSemanticLabel": {
+    "description": "Semantic label for home navigation (screen readers)"
+  },
+
+  "navigationSearch": "Suchen",
+  "@navigationSearch": {
+    "description": "Bottom navigation label for search tab"
+  },
+
+  "navigationSearchTooltip": "Einträge suchen",
+  "@navigationSearchTooltip": {
+    "description": "Tooltip for search navigation button"
+  },
+
+  "navigationSearchSemanticLabel": "Such-Navigation",
+  "@navigationSearchSemanticLabel": {
+    "description": "Semantic label for search navigation (screen readers)"
+  },
+
+  "navigationSettings": "Einstellungen",
+  "@navigationSettings": {
+    "description": "Bottom navigation label and sidebar label for settings"
+  },
+
+  "navigationSettingsTooltip": "App-Einstellungen",
+  "@navigationSettingsTooltip": {
+    "description": "Tooltip for settings navigation button"
+  },
+
+  "navigationSettingsSemanticLabel": "Einstellungen-Navigation",
+  "@navigationSettingsSemanticLabel": {
+    "description": "Semantic label for settings navigation (screen readers)"
+  },
+
+  "sidebarSpaces": "Bereiche",
+  "@sidebarSpaces": {
+    "description": "Header text for spaces section in sidebar"
+  },
+
+  "sidebarCollapse": "Seitenleiste einklappen",
+  "@sidebarCollapse": {
+    "description": "Tooltip for collapse sidebar button"
+  },
+
+  "sidebarExpand": "Seitenleiste ausklappen",
+  "@sidebarExpand": {
+    "description": "Tooltip for expand sidebar button"
+  },
+
+  "sidebarSignOut": "Abmelden",
+  "@sidebarSignOut": {
+    "description": "Sign out button text in sidebar"
+  },
+
+  "sidebarNoSpaces": "Noch keine Bereiche",
+  "@sidebarNoSpaces": {
+    "description": "Message shown in sidebar when user has no spaces"
+  },
+
+  "filterAll": "Alle",
+  "@filterAll": {
+    "description": "Filter chip label for showing all content types"
+  },
+
+  "filterTodoLists": "Aufgabenlisten",
+  "@filterTodoLists": {
+    "description": "Filter chip label for showing only todo lists"
+  },
+
+  "filterLists": "Listen",
+  "@filterLists": {
+    "description": "Filter chip label for showing only lists"
+  },
+
+  "filterNotes": "Notizen",
+  "@filterNotes": {
+    "description": "Filter chip label for showing only notes"
+  },
+
+  "menuSignOut": "Abmelden",
+  "@menuSignOut": {
+    "description": "Sign out menu item text in app bar"
   }
 }

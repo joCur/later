@@ -493,6 +493,120 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Create'**
   String get emptySpaceAction;
+
+  /// Bottom navigation label for home tab
+  ///
+  /// In en, this message translates to:
+  /// **'Home'**
+  String get navigationHome;
+
+  /// Tooltip for home navigation button
+  ///
+  /// In en, this message translates to:
+  /// **'View your spaces'**
+  String get navigationHomeTooltip;
+
+  /// Semantic label for home navigation (screen readers)
+  ///
+  /// In en, this message translates to:
+  /// **'Home navigation'**
+  String get navigationHomeSemanticLabel;
+
+  /// Bottom navigation label for search tab
+  ///
+  /// In en, this message translates to:
+  /// **'Search'**
+  String get navigationSearch;
+
+  /// Tooltip for search navigation button
+  ///
+  /// In en, this message translates to:
+  /// **'Search items'**
+  String get navigationSearchTooltip;
+
+  /// Semantic label for search navigation (screen readers)
+  ///
+  /// In en, this message translates to:
+  /// **'Search navigation'**
+  String get navigationSearchSemanticLabel;
+
+  /// Bottom navigation label and sidebar label for settings
+  ///
+  /// In en, this message translates to:
+  /// **'Settings'**
+  String get navigationSettings;
+
+  /// Tooltip for settings navigation button
+  ///
+  /// In en, this message translates to:
+  /// **'App settings'**
+  String get navigationSettingsTooltip;
+
+  /// Semantic label for settings navigation (screen readers)
+  ///
+  /// In en, this message translates to:
+  /// **'Settings navigation'**
+  String get navigationSettingsSemanticLabel;
+
+  /// Header text for spaces section in sidebar
+  ///
+  /// In en, this message translates to:
+  /// **'Spaces'**
+  String get sidebarSpaces;
+
+  /// Tooltip for collapse sidebar button
+  ///
+  /// In en, this message translates to:
+  /// **'Collapse sidebar'**
+  String get sidebarCollapse;
+
+  /// Tooltip for expand sidebar button
+  ///
+  /// In en, this message translates to:
+  /// **'Expand sidebar'**
+  String get sidebarExpand;
+
+  /// Sign out button text in sidebar
+  ///
+  /// In en, this message translates to:
+  /// **'Sign Out'**
+  String get sidebarSignOut;
+
+  /// Message shown in sidebar when user has no spaces
+  ///
+  /// In en, this message translates to:
+  /// **'No spaces yet'**
+  String get sidebarNoSpaces;
+
+  /// Filter chip label for showing all content types
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get filterAll;
+
+  /// Filter chip label for showing only todo lists
+  ///
+  /// In en, this message translates to:
+  /// **'Todo Lists'**
+  String get filterTodoLists;
+
+  /// Filter chip label for showing only lists
+  ///
+  /// In en, this message translates to:
+  /// **'Lists'**
+  String get filterLists;
+
+  /// Filter chip label for showing only notes
+  ///
+  /// In en, this message translates to:
+  /// **'Notes'**
+  String get filterNotes;
+
+  /// Sign out menu item text in app bar
+  ///
+  /// In en, this message translates to:
+  /// **'Sign Out'**
+  String get menuSignOut;
 }
 
 class _AppLocalizationsDelegate

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:later_mobile/l10n/app_localizations.dart';
 import 'package:later_mobile/design_system/tokens/tokens.dart';
 import '../../core/theme/temporal_flow_theme.dart';
 
@@ -105,6 +106,7 @@ class _IconOnlyBottomNavState extends State<IconOnlyBottomNav>
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDarkMode = theme.brightness == Brightness.dark;
+    final l10n = AppLocalizations.of(context)!;
 
     return SafeArea(
       child: Container(
@@ -128,8 +130,8 @@ class _IconOnlyBottomNavState extends State<IconOnlyBottomNav>
               index: 0,
               icon: Icons.home_outlined,
               selectedIcon: Icons.home,
-              tooltip: 'View your spaces',
-              semanticLabel: 'Home navigation',
+              tooltip: l10n.navigationHomeTooltip,
+              semanticLabel: l10n.navigationHomeSemanticLabel,
               isDarkMode: isDarkMode,
             ),
             _buildNavItem(
@@ -137,8 +139,8 @@ class _IconOnlyBottomNavState extends State<IconOnlyBottomNav>
               index: 1,
               icon: Icons.search_outlined,
               selectedIcon: Icons.search,
-              tooltip: 'Search items',
-              semanticLabel: 'Search navigation',
+              tooltip: l10n.navigationSearchTooltip,
+              semanticLabel: l10n.navigationSearchSemanticLabel,
               isDarkMode: isDarkMode,
             ),
             _buildNavItem(
@@ -146,8 +148,8 @@ class _IconOnlyBottomNavState extends State<IconOnlyBottomNav>
               index: 2,
               icon: Icons.settings_outlined,
               selectedIcon: Icons.settings,
-              tooltip: 'App settings',
-              semanticLabel: 'Settings navigation',
+              tooltip: l10n.navigationSettingsTooltip,
+              semanticLabel: l10n.navigationSettingsSemanticLabel,
               isDarkMode: isDarkMode,
             ),
           ],

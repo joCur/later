@@ -373,5 +373,100 @@
   "emptySpaceAction": "Create",
   "@emptySpaceAction": {
     "description": "Action button text for empty space state"
+  },
+
+  "navigationHome": "Home",
+  "@navigationHome": {
+    "description": "Bottom navigation label for home tab"
+  },
+
+  "navigationHomeTooltip": "View your spaces",
+  "@navigationHomeTooltip": {
+    "description": "Tooltip for home navigation button"
+  },
+
+  "navigationHomeSemanticLabel": "Home navigation",
+  "@navigationHomeSemanticLabel": {
+    "description": "Semantic label for home navigation (screen readers)"
+  },
+
+  "navigationSearch": "Search",
+  "@navigationSearch": {
+    "description": "Bottom navigation label for search tab"
+  },
+
+  "navigationSearchTooltip": "Search items",
+  "@navigationSearchTooltip": {
+    "description": "Tooltip for search navigation button"
+  },
+
+  "navigationSearchSemanticLabel": "Search navigation",
+  "@navigationSearchSemanticLabel": {
+    "description": "Semantic label for search navigation (screen readers)"
+  },
+
+  "navigationSettings": "Settings",
+  "@navigationSettings": {
+    "description": "Bottom navigation label and sidebar label for settings"
+  },
+
+  "navigationSettingsTooltip": "App settings",
+  "@navigationSettingsTooltip": {
+    "description": "Tooltip for settings navigation button"
+  },
+
+  "navigationSettingsSemanticLabel": "Settings navigation",
+  "@navigationSettingsSemanticLabel": {
+    "description": "Semantic label for settings navigation (screen readers)"
+  },
+
+  "sidebarSpaces": "Spaces",
+  "@sidebarSpaces": {
+    "description": "Header text for spaces section in sidebar"
+  },
+
+  "sidebarCollapse": "Collapse sidebar",
+  "@sidebarCollapse": {
+    "description": "Tooltip for collapse sidebar button"
+  },
+
+  "sidebarExpand": "Expand sidebar",
+  "@sidebarExpand": {
+    "description": "Tooltip for expand sidebar button"
+  },
+
+  "sidebarSignOut": "Sign Out",
+  "@sidebarSignOut": {
+    "description": "Sign out button text in sidebar"
+  },
+
+  "sidebarNoSpaces": "No spaces yet",
+  "@sidebarNoSpaces": {
+    "description": "Message shown in sidebar when user has no spaces"
+  },
+
+  "filterAll": "All",
+  "@filterAll": {
+    "description": "Filter chip label for showing all content types"
+  },
+
+  "filterTodoLists": "Todo Lists",
+  "@filterTodoLists": {
+    "description": "Filter chip label for showing only todo lists"
+  },
+
+  "filterLists": "Lists",
+  "@filterLists": {
+    "description": "Filter chip label for showing only lists"
+  },
+
+  "filterNotes": "Notes",
+  "@filterNotes": {
+    "description": "Filter chip label for showing only notes"
+  },
+
+  "menuSignOut": "Sign Out",
+  "@menuSignOut": {
+    "description": "Sign out menu item text in app bar"
   }
 }

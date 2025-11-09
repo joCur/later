@@ -249,4 +249,61 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get emptySpaceAction => 'Erstellen';
+
+  @override
+  String get navigationHome => 'Startseite';
+
+  @override
+  String get navigationHomeTooltip => 'Ihre Bereiche anzeigen';
+
+  @override
+  String get navigationHomeSemanticLabel => 'Startseite-Navigation';
+
+  @override
+  String get navigationSearch => 'Suchen';
+
+  @override
+  String get navigationSearchTooltip => 'Einträge suchen';
+
+  @override
+  String get navigationSearchSemanticLabel => 'Such-Navigation';
+
+  @override
+  String get navigationSettings => 'Einstellungen';
+
+  @override
+  String get navigationSettingsTooltip => 'App-Einstellungen';
+
+  @override
+  String get navigationSettingsSemanticLabel => 'Einstellungen-Navigation';
+
+  @override
+  String get sidebarSpaces => 'Bereiche';
+
+  @override
+  String get sidebarCollapse => 'Seitenleiste einklappen';
+
+  @override
+  String get sidebarExpand => 'Seitenleiste ausklappen';
+
+  @override
+  String get sidebarSignOut => 'Abmelden';
+
+  @override
+  String get sidebarNoSpaces => 'Noch keine Bereiche';
+
+  @override
+  String get filterAll => 'Alle';
+
+  @override
+  String get filterTodoLists => 'Aufgabenlisten';
+
+  @override
+  String get filterLists => 'Listen';
+
+  @override
+  String get filterNotes => 'Notizen';
+
+  @override
+  String get menuSignOut => 'Abmelden';
 }
