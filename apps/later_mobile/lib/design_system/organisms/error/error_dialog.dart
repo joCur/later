@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:later_mobile/design_system/tokens/tokens.dart';
 import '../../../core/error/app_error.dart';
+import '../../../l10n/app_localizations.dart';
 import 'package:later_mobile/design_system/atoms/buttons/primary_button.dart';
 import 'package:later_mobile/design_system/atoms/buttons/ghost_button.dart';
 
@@ -10,12 +11,18 @@ import 'package:later_mobile/design_system/atoms/buttons/ghost_button.dart';
 /// This dialog follows Material 3 design guidelines and displays
 /// user-friendly error messages with appropriate actions.
 ///
+/// The dialog automatically retrieves localized error messages using
+/// AppLocalizations and displays them based on the error code.
+///
 /// Example usage:
 /// ```dart
 /// showDialog(
 ///   context: context,
 ///   builder: (_) => ErrorDialog(
-///     error: AppError.storage(message: 'Failed to save'),
+///     error: AppError(
+///       code: ErrorCode.databaseTimeout,
+///       message: 'Failed to save data',
+///     ),
 ///     onRetry: () => saveData(),
 ///   ),
 /// );
@@ -40,6 +47,8 @@ class ErrorDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context);
+
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: ConstrainedBox(
@@ -73,9 +82,9 @@ class ErrorDialog extends StatelessWidget {
                       ),
                       const SizedBox(height: 12),
 
-                      // User message
+                      // User message (localized)
                       Text(
-                        error.getUserMessage(),
+                        error.getUserMessageLocalized(localizations),
                         style: AppTypography.bodyLarge.copyWith(
                           color: Theme.of(
                             context,
