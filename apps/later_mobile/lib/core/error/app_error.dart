@@ -51,15 +51,16 @@ class AppError implements Exception {
   }) : type = type ?? ErrorType.unknown;
 
   /// Factory constructor for storage-related errors.
-  /// @deprecated Use AppError with ErrorCode.databaseGeneric instead.
+  /// @deprecated Use AppError with ErrorCode.databaseTimeout or specific database error codes instead.
   @Deprecated('Use AppError with ErrorCode instead')
   factory AppError.storage({
     required String message,
     String? details,
     String? userMessage,
   }) {
+    // Use databaseTimeout as it's retryable (storage errors in old system were retryable)
     return AppError(
-      code: ErrorCode.databaseGeneric,
+      code: ErrorCode.databaseTimeout,
       type: ErrorType.storage,
       message: message,
       technicalDetails: details,

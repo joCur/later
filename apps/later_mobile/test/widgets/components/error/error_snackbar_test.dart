@@ -257,7 +257,7 @@ void main() {
 
     testWidgets('can show custom action label', (tester) async {
       const error = AppError(
-        code: ErrorCode.databaseGeneric,
+        code: ErrorCode.databaseTimeout, // Use retryable error code
         type: ErrorType.storage,
         message: 'Test',
         actionLabel: 'Try Again',

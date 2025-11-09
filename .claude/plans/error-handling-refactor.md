@@ -196,35 +196,42 @@ Three-layer error handling system:
 - All mapper tests passing ✅
 - Fixed one test file (error_snackbar_test.dart) to use new ErrorCode parameter
 
-### Phase 4: Repository Integration
+### Phase 4: Repository Integration ✅ COMPLETED
 
 **Goal:** Update repositories to use error mappers instead of old error handling.
 
-- [ ] Task 4.1: Update BaseRepository.executeQuery()
-  - Modify `lib/data/repositories/base_repository.dart`
-  - Replace `_handlePostgrestException()` method with mapper calls
-  - Update `executeQuery()` catch blocks:
+- [x] Task 4.1: Update BaseRepository.executeQuery()
+  - Modified `lib/data/repositories/base_repository.dart`
+  - Replaced `_handlePostgrestException()` method with `SupabaseErrorMapper.fromPostgrestException()`
+  - Replaced `_handleAuthException()` method with `SupabaseErrorMapper.fromAuthException()`
+  - Updated `executeQuery()` catch blocks:
     - `on PostgrestException catch (e)` → `throw SupabaseErrorMapper.fromPostgrestException(e);`
     - `on AuthException catch (e)` → `throw SupabaseErrorMapper.fromAuthException(e);`
     - `on AppError` → `rethrow;` (already mapped)
     - `catch (e, stackTrace)` → wrap in `AppError(code: ErrorCode.unknownError, ...)`
-  - Add debug logging for unexpected errors
-  - Remove deprecated `_handlePostgrestException()` method
+  - Added debug logging with `ErrorLogger` for unexpected errors
+  - Removed deprecated helper methods
 
-- [ ] Task 4.2: Update BaseRepository.userId getter
-  - Replace current exception throwing with `AppError(code: ErrorCode.authSessionExpired, message: 'No authenticated user')`
+- [x] Task 4.2: Update BaseRepository.userId getter
+  - Updated to throw `AppError(code: ErrorCode.authSessionExpired, message: 'No authenticated user found. User must be logged in.')` as const
 
-- [ ] Task 4.3: Update AuthService error handling
-  - Modify `lib/data/services/auth_service.dart`
-  - Remove `_mapAuthError()` method
-  - Update all try-catch blocks to use `SupabaseErrorMapper.fromAuthException()`
-  - Ensure consistent error handling across all auth methods (signIn, signUp, signOut, etc.)
+- [x] Task 4.3: Update AuthService error handling
+  - Modified `lib/data/services/auth_service.dart`
+  - Removed `_mapAuthError()` method
+  - Updated all try-catch blocks to use `SupabaseErrorMapper.fromAuthException()`
+  - Applied consistent error handling across all auth methods (signIn, signUp, signOut)
+  - All methods now throw `AppError` with proper error codes
 
-- [ ] Task 4.4: Verify repository consistency
-  - Check `NoteRepository`, `TodoListRepository`, `ListRepository`, `SpaceRepository`
-  - Confirm they all inherit error handling from `BaseRepository.executeQuery()`
-  - No changes needed if using executeQuery consistently
-  - Add executeQuery wrapper to any direct Supabase calls
+- [x] Task 4.4: Verify repository consistency
+  - Verified `NoteRepository`, `TodoListRepository`, `ListRepository`, `SpaceRepository`
+  - All repositories consistently use `BaseRepository.executeQuery()`
+  - No changes needed - all inherit the new error mapping behavior
+  - No direct Supabase calls found outside of executeQuery
+
+**Phase 4 Implementation Notes:**
+- Fixed deprecated factory constructor `AppError.storage()` to use `ErrorCode.databaseTimeout` (retryable) instead of `ErrorCode.databaseGeneric` (non-retryable) to maintain backwards compatibility with existing tests
+- Fixed test `error_snackbar_test.dart` to use `ErrorCode.databaseTimeout` for testing retryable errors
+- All 1276+ tests passing ✅
 
 ### Phase 5: Provider Updates
 

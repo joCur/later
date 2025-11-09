@@ -1,5 +1,6 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../core/config/supabase_config.dart';
+import '../../core/error/error.dart';
 
 /// Base repository providing common functionality for Supabase repositories
 ///
@@ -19,7 +20,7 @@ abstract class BaseRepository {
 
   /// Get the current authenticated user's ID
   ///
-  /// Throws an exception if no user is authenticated.
+  /// Throws [AppError] with [ErrorCode.authSessionExpired] if no user is authenticated.
   ///
   /// Example:
   /// ```dart
@@ -31,7 +32,10 @@ abstract class BaseRepository {
   String get userId {
     final user = supabase.auth.currentUser;
     if (user == null) {
-      throw Exception('No authenticated user found. User must be logged in.');
+      throw const AppError(
+        code: ErrorCode.authSessionExpired,
+        message: 'No authenticated user found. User must be logged in.',
+      );
     }
     return user.id;
   }
@@ -39,7 +43,7 @@ abstract class BaseRepository {
   /// Execute a Supabase query with error handling
   ///
   /// Wraps query execution in try-catch and maps Supabase exceptions
-  /// to user-friendly error messages.
+  /// to AppError with proper error codes.
   ///
   /// Parameters:
   ///   - [query]: The async query function to execute
@@ -48,7 +52,7 @@ abstract class BaseRepository {
   ///   The result of the query
   ///
   /// Throws:
-  ///   Mapped exceptions with user-friendly error messages
+  ///   [AppError] with appropriate error code
   ///
   /// Example:
   /// ```dart
@@ -60,34 +64,26 @@ abstract class BaseRepository {
     try {
       return await query();
     } on PostgrestException catch (e) {
-      throw _handlePostgrestException(e);
+      throw SupabaseErrorMapper.fromPostgrestException(e);
     } on AuthException catch (e) {
-      throw _handleAuthException(e);
-    } catch (e) {
-      throw Exception('Database operation failed: ${e.toString()}');
+      throw SupabaseErrorMapper.fromAuthException(e);
+    } on AppError {
+      // Re-throw AppError without modification (already mapped)
+      rethrow;
+    } catch (e, stackTrace) {
+      // Wrap unexpected errors in AppError with unknownError code
+      ErrorLogger.logError(
+        AppError(
+          code: ErrorCode.unknownError,
+          message: 'Unexpected database operation error: ${e.toString()}',
+          technicalDetails: stackTrace.toString(),
+        ),
+      );
+      throw AppError(
+        code: ErrorCode.unknownError,
+        message: 'Unexpected database operation error: ${e.toString()}',
+        technicalDetails: stackTrace.toString(),
+      );
     }
-  }
-
-  /// Map Supabase Postgrest exceptions to user-friendly errors
-  Exception _handlePostgrestException(PostgrestException e) {
-    switch (e.code) {
-      case '23505': // Unique constraint violation
-        return Exception('A record with this ID already exists.');
-      case '23503': // Foreign key violation
-        return Exception('Cannot complete operation: related records exist.');
-      case '23502': // Not null violation
-        return Exception('Required field is missing.');
-      case '42501': // Insufficient privileges (RLS policy violation)
-        return Exception(
-          'Access denied. You do not have permission to access this data.',
-        );
-      default:
-        return Exception('Database error: ${e.message}');
-    }
-  }
-
-  /// Map Supabase Auth exceptions to user-friendly errors
-  Exception _handleAuthException(AuthException e) {
-    return Exception('Authentication error: ${e.message}');
   }
 }
