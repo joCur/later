@@ -94,6 +94,7 @@ class _LaterAppState extends State<LaterApp> {
             ],
             supportedLocales: const [
               Locale('en'),
+              Locale('de'),
             ],
             home: const AuthGate(),
           );

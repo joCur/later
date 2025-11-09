@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:later_mobile/l10n/app_localizations.dart';
 import 'animated_empty_state.dart';
 
 /// Empty state for spaces with no items
@@ -39,11 +40,12 @@ class EmptySpaceState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return AnimatedEmptyState(
       icon: Icons.inbox,
-      title: 'Your $spaceName is empty',
-      message: 'Start capturing your thoughts, tasks, and ideas',
-      actionLabel: 'Create',
+      title: l10n.emptySpaceTitle(spaceName),
+      message: l10n.emptySpaceMessage,
+      actionLabel: l10n.emptySpaceAction,
       onActionPressed: onActionPressed,
       enableFabPulse: enableFabPulse,
     );

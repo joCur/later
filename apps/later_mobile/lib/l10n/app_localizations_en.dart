@@ -130,4 +130,119 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get errorUnknownError =>
       'An unexpected error occurred. Please try again.';
+
+  @override
+  String get authTitleSignIn => 'Welcome Back';
+
+  @override
+  String get authTitleSignUp => 'Create Account';
+
+  @override
+  String get authLabelEmail => 'Email';
+
+  @override
+  String get authHintEmail => 'your@email.com';
+
+  @override
+  String get authLabelPassword => 'Password';
+
+  @override
+  String get authHintPassword => '••••••••';
+
+  @override
+  String get authLabelConfirmPassword => 'Confirm Password';
+
+  @override
+  String get authValidationEmailRequired => 'Please enter your email';
+
+  @override
+  String get authValidationEmailInvalid => 'Please enter a valid email';
+
+  @override
+  String get authValidationPasswordRequired => 'Please enter your password';
+
+  @override
+  String get authValidationPasswordRequiredSignUp => 'Please enter a password';
+
+  @override
+  String get authValidationPasswordMinLength =>
+      'Password must be at least 8 characters';
+
+  @override
+  String get authValidationConfirmPasswordRequired =>
+      'Please confirm your password';
+
+  @override
+  String get authValidationPasswordsDoNotMatch => 'Passwords do not match';
+
+  @override
+  String get authButtonSignIn => 'Sign In';
+
+  @override
+  String get authButtonSignUp => 'Sign Up';
+
+  @override
+  String get authLinkSignUp => 'Sign up';
+
+  @override
+  String get authLinkSignIn => 'Sign in';
+
+  @override
+  String get authTextNoAccount => 'Don\'t have an account? ';
+
+  @override
+  String get authTextHaveAccount => 'Already have an account? ';
+
+  @override
+  String get authPasswordStrengthWeak => 'Weak';
+
+  @override
+  String get authPasswordStrengthMedium => 'Medium';
+
+  @override
+  String get authPasswordStrengthStrong => 'Strong';
+
+  @override
+  String get authPasswordStrengthHelper => 'Use 8+ characters';
+
+  @override
+  String get authAccessibilityPasswordStrength => 'Password strength';
+
+  @override
+  String get emptyWelcomeTitle => 'Welcome to later';
+
+  @override
+  String get emptyWelcomeMessage =>
+      'Your peaceful place for thoughts, tasks, and everything in between';
+
+  @override
+  String get emptyWelcomeAction => 'Create your first item';
+
+  @override
+  String get emptyWelcomeSecondaryAction => 'Learn how it works';
+
+  @override
+  String get emptyNoSpacesTitle => 'Welcome to Later';
+
+  @override
+  String get emptyNoSpacesMessage =>
+      'Spaces organize your tasks, notes, and lists by context. Let\'s create your first one!';
+
+  @override
+  String get emptyNoSpacesAction => 'Create Your First Space';
+
+  @override
+  String get emptyNoSpacesSecondaryAction => 'Learn more';
+
+  @override
+  String emptySpaceTitle(String spaceName) {
+    return 'Your $spaceName is empty';
+  }
+
+  @override
+  String get emptySpaceMessage =>
+      'Start capturing your thoughts, tasks, and ideas';
+
+  @override
+  String get emptySpaceAction => 'Create';
 }

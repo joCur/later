@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:later_mobile/l10n/app_localizations.dart';
 import 'package:later_mobile/design_system/tokens/colors.dart';
 import 'package:later_mobile/design_system/tokens/spacing.dart';
 import 'package:later_mobile/design_system/tokens/typography.dart';
@@ -61,10 +62,11 @@ class PasswordStrengthIndicator extends StatelessWidget {
   }
 
   /// Get semantic label for strength value
-  String _getStrengthLabel(double strength) {
-    if (strength < 0.33) return 'Weak';
-    if (strength < 0.66) return 'Medium';
-    return 'Strong';
+  String _getStrengthLabel(BuildContext context, double strength) {
+    final l10n = AppLocalizations.of(context)!;
+    if (strength < 0.33) return l10n.authPasswordStrengthWeak;
+    if (strength < 0.66) return l10n.authPasswordStrengthMedium;
+    return l10n.authPasswordStrengthStrong;
   }
 
   /// Get color for strength value
@@ -76,8 +78,9 @@ class PasswordStrengthIndicator extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final strength = _calculateStrength(password);
-    final strengthLabel = _getStrengthLabel(strength);
+    final strengthLabel = _getStrengthLabel(context, strength);
     final strengthColor = _getStrengthColor(strength);
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
@@ -85,7 +88,7 @@ class PasswordStrengthIndicator extends StatelessWidget {
     return Padding(
       padding: padding ?? EdgeInsets.zero,
       child: Semantics(
-        label: 'Password strength',
+        label: l10n.authAccessibilityPasswordStrength,
         value: strengthLabel,
         liveRegion: true,
         child: Column(
@@ -122,7 +125,7 @@ class PasswordStrengthIndicator extends StatelessWidget {
                 // Helper text
                 if (showHelperText)
                   Text(
-                    'Use 8+ characters',
+                    l10n.authPasswordStrengthHelper,
                     style: AppTypography.caption.copyWith(
                       color: AppColors.textSecondary(context),
                     ),

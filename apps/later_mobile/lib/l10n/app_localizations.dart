@@ -5,6 +5,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/intl.dart' as intl;
 
+import 'app_localizations_de.dart';
 import 'app_localizations_en.dart';
 
 // ignore_for_file: type=lint
@@ -92,7 +93,10 @@ abstract class AppLocalizations {
       ];
 
   /// A list of this localizations delegate's supported locales.
-  static const List<Locale> supportedLocales = <Locale>[Locale('en')];
+  static const List<Locale> supportedLocales = <Locale>[
+    Locale('de'),
+    Locale('en'),
+  ];
 
   /// Error message shown when trying to create a duplicate record
   ///
@@ -273,6 +277,222 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'An unexpected error occurred. Please try again.'**
   String get errorUnknownError;
+
+  /// Title for sign in screen
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome Back'**
+  String get authTitleSignIn;
+
+  /// Title for sign up screen
+  ///
+  /// In en, this message translates to:
+  /// **'Create Account'**
+  String get authTitleSignUp;
+
+  /// Label for email input field
+  ///
+  /// In en, this message translates to:
+  /// **'Email'**
+  String get authLabelEmail;
+
+  /// Hint text for email input field
+  ///
+  /// In en, this message translates to:
+  /// **'your@email.com'**
+  String get authHintEmail;
+
+  /// Label for password input field
+  ///
+  /// In en, this message translates to:
+  /// **'Password'**
+  String get authLabelPassword;
+
+  /// Hint text for password input field
+  ///
+  /// In en, this message translates to:
+  /// **'••••••••'**
+  String get authHintPassword;
+
+  /// Label for confirm password input field
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm Password'**
+  String get authLabelConfirmPassword;
+
+  /// Validation message when email field is empty
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter your email'**
+  String get authValidationEmailRequired;
+
+  /// Validation message when email format is invalid
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a valid email'**
+  String get authValidationEmailInvalid;
+
+  /// Validation message when password field is empty on sign in
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter your password'**
+  String get authValidationPasswordRequired;
+
+  /// Validation message when password field is empty on sign up
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a password'**
+  String get authValidationPasswordRequiredSignUp;
+
+  /// Validation message when password is too short
+  ///
+  /// In en, this message translates to:
+  /// **'Password must be at least 8 characters'**
+  String get authValidationPasswordMinLength;
+
+  /// Validation message when confirm password field is empty
+  ///
+  /// In en, this message translates to:
+  /// **'Please confirm your password'**
+  String get authValidationConfirmPasswordRequired;
+
+  /// Validation message when password and confirm password do not match
+  ///
+  /// In en, this message translates to:
+  /// **'Passwords do not match'**
+  String get authValidationPasswordsDoNotMatch;
+
+  /// Sign in button text
+  ///
+  /// In en, this message translates to:
+  /// **'Sign In'**
+  String get authButtonSignIn;
+
+  /// Sign up button text
+  ///
+  /// In en, this message translates to:
+  /// **'Sign Up'**
+  String get authButtonSignUp;
+
+  /// Link text to navigate to sign up screen
+  ///
+  /// In en, this message translates to:
+  /// **'Sign up'**
+  String get authLinkSignUp;
+
+  /// Link text to navigate to sign in screen
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in'**
+  String get authLinkSignIn;
+
+  /// Text asking if user doesn't have an account
+  ///
+  /// In en, this message translates to:
+  /// **'Don\'t have an account? '**
+  String get authTextNoAccount;
+
+  /// Text asking if user already has an account
+  ///
+  /// In en, this message translates to:
+  /// **'Already have an account? '**
+  String get authTextHaveAccount;
+
+  /// Label for weak password strength
+  ///
+  /// In en, this message translates to:
+  /// **'Weak'**
+  String get authPasswordStrengthWeak;
+
+  /// Label for medium password strength
+  ///
+  /// In en, this message translates to:
+  /// **'Medium'**
+  String get authPasswordStrengthMedium;
+
+  /// Label for strong password strength
+  ///
+  /// In en, this message translates to:
+  /// **'Strong'**
+  String get authPasswordStrengthStrong;
+
+  /// Helper text for password strength requirements
+  ///
+  /// In en, this message translates to:
+  /// **'Use 8+ characters'**
+  String get authPasswordStrengthHelper;
+
+  /// Accessibility label for password strength indicator
+  ///
+  /// In en, this message translates to:
+  /// **'Password strength'**
+  String get authAccessibilityPasswordStrength;
+
+  /// Title for welcome empty state
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome to later'**
+  String get emptyWelcomeTitle;
+
+  /// Message for welcome empty state
+  ///
+  /// In en, this message translates to:
+  /// **'Your peaceful place for thoughts, tasks, and everything in between'**
+  String get emptyWelcomeMessage;
+
+  /// Action button text for welcome empty state
+  ///
+  /// In en, this message translates to:
+  /// **'Create your first item'**
+  String get emptyWelcomeAction;
+
+  /// Secondary action button text for welcome empty state
+  ///
+  /// In en, this message translates to:
+  /// **'Learn how it works'**
+  String get emptyWelcomeSecondaryAction;
+
+  /// Title for no spaces empty state
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome to Later'**
+  String get emptyNoSpacesTitle;
+
+  /// Message for no spaces empty state
+  ///
+  /// In en, this message translates to:
+  /// **'Spaces organize your tasks, notes, and lists by context. Let\'s create your first one!'**
+  String get emptyNoSpacesMessage;
+
+  /// Action button text for no spaces empty state
+  ///
+  /// In en, this message translates to:
+  /// **'Create Your First Space'**
+  String get emptyNoSpacesAction;
+
+  /// Secondary action button text for no spaces empty state
+  ///
+  /// In en, this message translates to:
+  /// **'Learn more'**
+  String get emptyNoSpacesSecondaryAction;
+
+  /// Title for empty space state with space name
+  ///
+  /// In en, this message translates to:
+  /// **'Your {spaceName} is empty'**
+  String emptySpaceTitle(String spaceName);
+
+  /// Message for empty space state
+  ///
+  /// In en, this message translates to:
+  /// **'Start capturing your thoughts, tasks, and ideas'**
+  String get emptySpaceMessage;
+
+  /// Action button text for empty space state
+  ///
+  /// In en, this message translates to:
+  /// **'Create'**
+  String get emptySpaceAction;
 }
 
 class _AppLocalizationsDelegate
@@ -286,7 +506,7 @@ class _AppLocalizationsDelegate
 
   @override
   bool isSupported(Locale locale) =>
-      <String>['en'].contains(locale.languageCode);
+      <String>['de', 'en'].contains(locale.languageCode);
 
   @override
   bool shouldReload(_AppLocalizationsDelegate old) => false;
@@ -295,6 +515,8 @@ class _AppLocalizationsDelegate
 AppLocalizations lookupAppLocalizations(Locale locale) {
   // Lookup logic when only language code is specified.
   switch (locale.languageCode) {
+    case 'de':
+      return AppLocalizationsDe();
     case 'en':
       return AppLocalizationsEn();
   }
