@@ -607,6 +607,942 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Sign Out'**
   String get menuSignOut;
+
+  /// Validation error when note title is empty
+  ///
+  /// In en, this message translates to:
+  /// **'Title cannot be empty'**
+  String get noteDetailTitleEmpty;
+
+  /// Error message when note save fails
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to save changes'**
+  String get noteDetailSaveFailed;
+
+  /// Validation error when tag input is empty
+  ///
+  /// In en, this message translates to:
+  /// **'Tag cannot be empty'**
+  String get noteDetailTagEmpty;
+
+  /// Validation error when tag exceeds maximum length
+  ///
+  /// In en, this message translates to:
+  /// **'Tag is too long (max {maxLength} characters)'**
+  String noteDetailTagTooLong(String maxLength);
+
+  /// Validation error when adding a duplicate tag
+  ///
+  /// In en, this message translates to:
+  /// **'Tag already exists'**
+  String get noteDetailTagExists;
+
+  /// Success message after adding a tag
+  ///
+  /// In en, this message translates to:
+  /// **'Tag added'**
+  String get noteDetailTagAdded;
+
+  /// Success message after removing a tag
+  ///
+  /// In en, this message translates to:
+  /// **'Tag removed'**
+  String get noteDetailTagRemoved;
+
+  /// Error message when adding tag fails
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to add tag'**
+  String get noteDetailTagAddFailed;
+
+  /// Error message when removing tag fails
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to remove tag'**
+  String get noteDetailTagRemoveFailed;
+
+  /// Title for add tag dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Add Tag'**
+  String get noteDetailAddTagTitle;
+
+  /// Label for tag name input field
+  ///
+  /// In en, this message translates to:
+  /// **'Tag Name'**
+  String get noteDetailTagNameLabel;
+
+  /// Hint text for tag name input field
+  ///
+  /// In en, this message translates to:
+  /// **'Enter tag name'**
+  String get noteDetailTagNameHint;
+
+  /// Title for delete note confirmation dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Note'**
+  String get noteDetailDeleteTitle;
+
+  /// Message for delete note confirmation dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete \"{noteTitle}\"?\n\nThis action cannot be undone.'**
+  String noteDetailDeleteMessage(String noteTitle);
+
+  /// Error message when note deletion fails
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to delete note'**
+  String get noteDetailDeleteFailed;
+
+  /// Hint text for note content input field
+  ///
+  /// In en, this message translates to:
+  /// **'Start writing your note...'**
+  String get noteDetailContentHint;
+
+  /// Hint text for note title input field
+  ///
+  /// In en, this message translates to:
+  /// **'Note title'**
+  String get noteDetailTitleHint;
+
+  /// Label for tags section
+  ///
+  /// In en, this message translates to:
+  /// **'Tags'**
+  String get noteDetailTagsLabel;
+
+  /// Message shown when note has no tags
+  ///
+  /// In en, this message translates to:
+  /// **'No tags yet. Tap + to add tags.'**
+  String get noteDetailTagsEmpty;
+
+  /// Delete menu item text in note detail screen
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Note'**
+  String get noteDetailMenuDelete;
+
+  /// Validation error when todo list name is empty
+  ///
+  /// In en, this message translates to:
+  /// **'TodoList name cannot be empty'**
+  String get todoDetailNameEmpty;
+
+  /// Error message when todo list save fails
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to save changes'**
+  String get todoDetailSaveFailed;
+
+  /// Error message when loading todo items fails
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load items'**
+  String get todoDetailLoadFailed;
+
+  /// Success message after adding a todo item
+  ///
+  /// In en, this message translates to:
+  /// **'TodoItem added'**
+  String get todoDetailItemAdded;
+
+  /// Error message when adding todo item fails
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to add item'**
+  String get todoDetailItemAddFailed;
+
+  /// Success message after updating a todo item
+  ///
+  /// In en, this message translates to:
+  /// **'TodoItem updated'**
+  String get todoDetailItemUpdated;
+
+  /// Error message when updating todo item fails
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to update item'**
+  String get todoDetailItemUpdateFailed;
+
+  /// Success message after deleting a todo item
+  ///
+  /// In en, this message translates to:
+  /// **'TodoItem deleted'**
+  String get todoDetailItemDeleted;
+
+  /// Error message when deleting todo item fails
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to delete item'**
+  String get todoDetailItemDeleteFailed;
+
+  /// Error message when toggling todo item fails
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to toggle item'**
+  String get todoDetailItemToggleFailed;
+
+  /// Error message when reordering todo items fails
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to reorder items'**
+  String get todoDetailReorderFailed;
+
+  /// Title for delete todo list confirmation dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Delete TodoList'**
+  String get todoDetailDeleteListTitle;
+
+  /// Message for delete todo list confirmation dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete \"{listName}\"?\n\nThis will delete all {itemCount} items in this list. This action cannot be undone.'**
+  String todoDetailDeleteListMessage(String listName, int itemCount);
+
+  /// Error message when deleting todo list fails
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to delete list'**
+  String get todoDetailDeleteListFailed;
+
+  /// Title for add todo item dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Add TodoItem'**
+  String get todoDetailAddItemTitle;
+
+  /// Title for edit todo item dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Edit TodoItem'**
+  String get todoDetailEditItemTitle;
+
+  /// Label for todo item title field (required)
+  ///
+  /// In en, this message translates to:
+  /// **'Title *'**
+  String get todoDetailItemTitleLabel;
+
+  /// Hint text for todo item title field
+  ///
+  /// In en, this message translates to:
+  /// **'Enter task title'**
+  String get todoDetailItemTitleHint;
+
+  /// Validation error for required todo item title
+  ///
+  /// In en, this message translates to:
+  /// **'Title is required'**
+  String get todoDetailItemTitleRequired;
+
+  /// Label for todo item description field
+  ///
+  /// In en, this message translates to:
+  /// **'Description'**
+  String get todoDetailItemDescriptionLabel;
+
+  /// Hint text for todo item description field
+  ///
+  /// In en, this message translates to:
+  /// **'Optional description'**
+  String get todoDetailItemDescriptionHint;
+
+  /// Text shown when todo item has no due date
+  ///
+  /// In en, this message translates to:
+  /// **'No due date'**
+  String get todoDetailItemDueDateNone;
+
+  /// Label for todo item priority dropdown
+  ///
+  /// In en, this message translates to:
+  /// **'Priority'**
+  String get todoDetailItemPriorityLabel;
+
+  /// High priority label
+  ///
+  /// In en, this message translates to:
+  /// **'High'**
+  String get todoDetailPriorityHigh;
+
+  /// Medium priority label
+  ///
+  /// In en, this message translates to:
+  /// **'Medium'**
+  String get todoDetailPriorityMedium;
+
+  /// Low priority label
+  ///
+  /// In en, this message translates to:
+  /// **'Low'**
+  String get todoDetailPriorityLow;
+
+  /// Progress indicator showing completed items
+  ///
+  /// In en, this message translates to:
+  /// **'{completed}/{total} completed'**
+  String todoDetailProgressCompleted(int completed, int total);
+
+  /// Empty state title for todo list with no items
+  ///
+  /// In en, this message translates to:
+  /// **'No tasks yet'**
+  String get todoDetailEmptyTitle;
+
+  /// Empty state message for todo list with no items
+  ///
+  /// In en, this message translates to:
+  /// **'Tap the + button to add your first task'**
+  String get todoDetailEmptyMessage;
+
+  /// Label for add todo item FAB
+  ///
+  /// In en, this message translates to:
+  /// **'Add Todo'**
+  String get todoDetailFabLabel;
+
+  /// Hint text for todo list name field
+  ///
+  /// In en, this message translates to:
+  /// **'TodoList name'**
+  String get todoDetailNameHint;
+
+  /// Delete menu item text in todo list detail screen
+  ///
+  /// In en, this message translates to:
+  /// **'Delete List'**
+  String get todoDetailMenuDelete;
+
+  /// Validation error when list name is empty
+  ///
+  /// In en, this message translates to:
+  /// **'List name cannot be empty'**
+  String get listDetailNameEmpty;
+
+  /// Error message when list save fails
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to save changes'**
+  String get listDetailSaveFailed;
+
+  /// Error message when loading list items fails
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load items'**
+  String get listDetailLoadFailed;
+
+  /// Success message after adding a list item
+  ///
+  /// In en, this message translates to:
+  /// **'Item added'**
+  String get listDetailItemAdded;
+
+  /// Error message when adding list item fails
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to add item'**
+  String get listDetailItemAddFailed;
+
+  /// Success message after updating a list item
+  ///
+  /// In en, this message translates to:
+  /// **'Item updated'**
+  String get listDetailItemUpdated;
+
+  /// Error message when updating list item fails
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to update item'**
+  String get listDetailItemUpdateFailed;
+
+  /// Success message after deleting a list item
+  ///
+  /// In en, this message translates to:
+  /// **'Item deleted'**
+  String get listDetailItemDeleted;
+
+  /// Error message when deleting list item fails
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to delete item'**
+  String get listDetailItemDeleteFailed;
+
+  /// Error message when toggling list item checkbox fails
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to toggle item'**
+  String get listDetailItemToggleFailed;
+
+  /// Error message when reordering list items fails
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to reorder items'**
+  String get listDetailReorderFailed;
+
+  /// Success message after changing list style
+  ///
+  /// In en, this message translates to:
+  /// **'List style updated'**
+  String get listDetailStyleUpdated;
+
+  /// Error message when changing list style fails
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to change style'**
+  String get listDetailStyleChangeFailed;
+
+  /// Success message after changing list icon
+  ///
+  /// In en, this message translates to:
+  /// **'List icon updated'**
+  String get listDetailIconUpdated;
+
+  /// Error message when changing list icon fails
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to change icon'**
+  String get listDetailIconChangeFailed;
+
+  /// Title for delete list confirmation dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Delete List'**
+  String get listDetailDeleteTitle;
+
+  /// Message for delete list confirmation dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete \"{listName}\"?\n\nThis will delete all {itemCount} items in this list. This action cannot be undone.'**
+  String listDetailDeleteMessage(String listName, int itemCount);
+
+  /// Error message when deleting list fails
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to delete list'**
+  String get listDetailDeleteFailed;
+
+  /// Title for add list item dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Add Item'**
+  String get listDetailAddItemTitle;
+
+  /// Title for edit list item dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Item'**
+  String get listDetailEditItemTitle;
+
+  /// Label for list item title field (required)
+  ///
+  /// In en, this message translates to:
+  /// **'Title *'**
+  String get listDetailItemTitleLabel;
+
+  /// Hint text for list item title field
+  ///
+  /// In en, this message translates to:
+  /// **'Enter item title'**
+  String get listDetailItemTitleHint;
+
+  /// Validation error for required list item title
+  ///
+  /// In en, this message translates to:
+  /// **'Title is required'**
+  String get listDetailItemTitleRequired;
+
+  /// Label for list item notes field
+  ///
+  /// In en, this message translates to:
+  /// **'Notes'**
+  String get listDetailItemNotesLabel;
+
+  /// Hint text for list item notes field
+  ///
+  /// In en, this message translates to:
+  /// **'Optional notes'**
+  String get listDetailItemNotesHint;
+
+  /// Title for list style selection dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Select Style'**
+  String get listDetailStyleDialogTitle;
+
+  /// Bullets list style label
+  ///
+  /// In en, this message translates to:
+  /// **'Bullets'**
+  String get listDetailStyleBullets;
+
+  /// Description for bullets list style
+  ///
+  /// In en, this message translates to:
+  /// **'Simple bullet points'**
+  String get listDetailStyleBulletsDesc;
+
+  /// Numbered list style label
+  ///
+  /// In en, this message translates to:
+  /// **'Numbered'**
+  String get listDetailStyleNumbered;
+
+  /// Description for numbered list style
+  ///
+  /// In en, this message translates to:
+  /// **'Numbered list items'**
+  String get listDetailStyleNumberedDesc;
+
+  /// Checkboxes list style label
+  ///
+  /// In en, this message translates to:
+  /// **'Checkboxes'**
+  String get listDetailStyleCheckboxes;
+
+  /// Description for checkboxes list style
+  ///
+  /// In en, this message translates to:
+  /// **'Checkable task items'**
+  String get listDetailStyleCheckboxesDesc;
+
+  /// Title for list icon selection dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Select Icon'**
+  String get listDetailIconDialogTitle;
+
+  /// Progress indicator for checkboxes style lists
+  ///
+  /// In en, this message translates to:
+  /// **'{checked}/{total} completed'**
+  String listDetailProgressCompleted(int checked, int total);
+
+  /// Empty state title for list with no items
+  ///
+  /// In en, this message translates to:
+  /// **'No items yet'**
+  String get listDetailEmptyTitle;
+
+  /// Empty state message for list with no items
+  ///
+  /// In en, this message translates to:
+  /// **'Tap the + button to add your first item'**
+  String get listDetailEmptyMessage;
+
+  /// Label for add item FAB
+  ///
+  /// In en, this message translates to:
+  /// **'Add Item'**
+  String get listDetailFabLabel;
+
+  /// Hint text for list name field
+  ///
+  /// In en, this message translates to:
+  /// **'List name'**
+  String get listDetailNameHint;
+
+  /// Change style menu item text
+  ///
+  /// In en, this message translates to:
+  /// **'Change Style'**
+  String get listDetailMenuChangeStyle;
+
+  /// Change icon menu item text
+  ///
+  /// In en, this message translates to:
+  /// **'Change Icon'**
+  String get listDetailMenuChangeIcon;
+
+  /// Delete menu item text in list detail screen
+  ///
+  /// In en, this message translates to:
+  /// **'Delete List'**
+  String get listDetailMenuDelete;
+
+  /// Title for space switcher modal
+  ///
+  /// In en, this message translates to:
+  /// **'Switch Space'**
+  String get spaceModalTitle;
+
+  /// Hint text for space search input
+  ///
+  /// In en, this message translates to:
+  /// **'Search spaces...'**
+  String get spaceModalSearchHint;
+
+  /// Message when space search returns no results
+  ///
+  /// In en, this message translates to:
+  /// **'No spaces found'**
+  String get spaceModalNoSpacesFound;
+
+  /// Message when user has no spaces
+  ///
+  /// In en, this message translates to:
+  /// **'No spaces available'**
+  String get spaceModalNoSpacesAvailable;
+
+  /// Badge text for archived spaces
+  ///
+  /// In en, this message translates to:
+  /// **'Archived'**
+  String get spaceModalArchived;
+
+  /// Toggle label for showing archived spaces
+  ///
+  /// In en, this message translates to:
+  /// **'Show Archived Spaces'**
+  String get spaceModalShowArchived;
+
+  /// Button text for creating a new space
+  ///
+  /// In en, this message translates to:
+  /// **'Create New Space'**
+  String get spaceModalCreateNew;
+
+  /// Edit menu item text in space options
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Space'**
+  String get spaceModalMenuEdit;
+
+  /// Archive menu item text in space options
+  ///
+  /// In en, this message translates to:
+  /// **'Archive Space'**
+  String get spaceModalMenuArchive;
+
+  /// Hint shown when trying to archive current space
+  ///
+  /// In en, this message translates to:
+  /// **'Switch to another space first'**
+  String get spaceModalMenuArchiveHint;
+
+  /// Hint showing item count when archiving
+  ///
+  /// In en, this message translates to:
+  /// **'This space contains {itemCount} items'**
+  String spaceModalMenuArchiveHintItems(int itemCount);
+
+  /// Restore menu item text in space options
+  ///
+  /// In en, this message translates to:
+  /// **'Restore Space'**
+  String get spaceModalMenuRestore;
+
+  /// Hint for restore space action
+  ///
+  /// In en, this message translates to:
+  /// **'Make this space active again'**
+  String get spaceModalMenuRestoreHint;
+
+  /// Cancel menu item text
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get spaceModalMenuCancel;
+
+  /// Error message when space switch fails
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to switch space'**
+  String get spaceModalSwitchFailed;
+
+  /// Error message when trying to archive current space
+  ///
+  /// In en, this message translates to:
+  /// **'Cannot archive the current space. Switch to another space first.'**
+  String get spaceModalArchiveCurrent;
+
+  /// Title for archive space confirmation dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Archive Space?'**
+  String get spaceModalArchiveConfirmTitle;
+
+  /// Message for archive space confirmation dialog
+  ///
+  /// In en, this message translates to:
+  /// **'This space contains {itemCount} items. Archiving will hide the space but keep all items. You can restore it later from archived spaces.'**
+  String spaceModalArchiveConfirmMessage(int itemCount);
+
+  /// Success message after archiving space
+  ///
+  /// In en, this message translates to:
+  /// **'{spaceName} has been archived'**
+  String spaceModalArchiveSuccess(String spaceName);
+
+  /// Error message when archiving space fails
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to archive space'**
+  String get spaceModalArchiveFailed;
+
+  /// Success message after restoring space
+  ///
+  /// In en, this message translates to:
+  /// **'{spaceName} has been restored'**
+  String spaceModalRestoreSuccess(String spaceName);
+
+  /// Error message when restoring space fails
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to restore space'**
+  String get spaceModalRestoreFailed;
+
+  /// Title prefix for create content modal
+  ///
+  /// In en, this message translates to:
+  /// **'Create'**
+  String get createModalTitle;
+
+  /// Todo List type label in create modal
+  ///
+  /// In en, this message translates to:
+  /// **'Todo List'**
+  String get createModalTypeTodoList;
+
+  /// List type label in create modal
+  ///
+  /// In en, this message translates to:
+  /// **'List'**
+  String get createModalTypeList;
+
+  /// Note type label in create modal
+  ///
+  /// In en, this message translates to:
+  /// **'Note'**
+  String get createModalTypeNote;
+
+  /// Hint text for todo list name input
+  ///
+  /// In en, this message translates to:
+  /// **'Todo list name'**
+  String get createModalTodoListNameHint;
+
+  /// Hint text for list name input
+  ///
+  /// In en, this message translates to:
+  /// **'List name'**
+  String get createModalListNameHint;
+
+  /// Hint text for note title input (desktop)
+  ///
+  /// In en, this message translates to:
+  /// **'Note title'**
+  String get createModalNoteTitleHint;
+
+  /// Hint text for note content input (desktop)
+  ///
+  /// In en, this message translates to:
+  /// **'Note content'**
+  String get createModalNoteContentHint;
+
+  /// Hint text for note smart field (mobile)
+  ///
+  /// In en, this message translates to:
+  /// **'Note title or content...\n(First line becomes title)'**
+  String get createModalNoteSmartFieldHint;
+
+  /// Label for list style selector
+  ///
+  /// In en, this message translates to:
+  /// **'List Style'**
+  String get createModalListStyleLabel;
+
+  /// Bullets style option
+  ///
+  /// In en, this message translates to:
+  /// **'Bullets'**
+  String get createModalListStyleBullets;
+
+  /// Numbered style option
+  ///
+  /// In en, this message translates to:
+  /// **'Numbered'**
+  String get createModalListStyleNumbered;
+
+  /// Checklist style option
+  ///
+  /// In en, this message translates to:
+  /// **'Checklist'**
+  String get createModalListStyleCheckboxes;
+
+  /// Simple style option
+  ///
+  /// In en, this message translates to:
+  /// **'Simple'**
+  String get createModalListStyleSimple;
+
+  /// Label for todo list description field
+  ///
+  /// In en, this message translates to:
+  /// **'Description (optional)'**
+  String get createModalTodoDescriptionLabel;
+
+  /// Hint text for todo list description field
+  ///
+  /// In en, this message translates to:
+  /// **'Add description (optional)'**
+  String get createModalTodoDescriptionHint;
+
+  /// Link text to show description field
+  ///
+  /// In en, this message translates to:
+  /// **'+ Add description (optional)'**
+  String get createModalTodoDescriptionAdd;
+
+  /// Validation error for description length
+  ///
+  /// In en, this message translates to:
+  /// **'Description too long (max 500 characters)'**
+  String get createModalTodoDescriptionTooLong;
+
+  /// Label for space selector
+  ///
+  /// In en, this message translates to:
+  /// **'Save to: '**
+  String get createModalSaveToLabel;
+
+  /// Keyboard shortcut hint for Mac
+  ///
+  /// In en, this message translates to:
+  /// **'⌘+Enter to create • Esc to close'**
+  String get createModalKeyboardShortcutMac;
+
+  /// Keyboard shortcut hint for non-Mac platforms
+  ///
+  /// In en, this message translates to:
+  /// **'Ctrl+Enter to create • Esc to close'**
+  String get createModalKeyboardShortcutOther;
+
+  /// Create button text for todo list
+  ///
+  /// In en, this message translates to:
+  /// **'Create Todo List'**
+  String get createModalButtonTodoList;
+
+  /// Create button text for list
+  ///
+  /// In en, this message translates to:
+  /// **'Create List'**
+  String get createModalButtonList;
+
+  /// Create button text for note
+  ///
+  /// In en, this message translates to:
+  /// **'Create Note'**
+  String get createModalButtonNote;
+
+  /// Generic create button text
+  ///
+  /// In en, this message translates to:
+  /// **'Create'**
+  String get createModalButtonGeneric;
+
+  /// Title for close confirmation dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Discard unsaved content?'**
+  String get createModalCloseTitle;
+
+  /// Message for close confirmation dialog
+  ///
+  /// In en, this message translates to:
+  /// **'You haven\'t created this item yet. Would you like to create it or discard your changes?'**
+  String get createModalCloseMessage;
+
+  /// Cancel button text in close confirmation
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get createModalCloseCancel;
+
+  /// Discard button text in close confirmation
+  ///
+  /// In en, this message translates to:
+  /// **'Discard'**
+  String get createModalCloseDiscard;
+
+  /// Create and close button text in close confirmation
+  ///
+  /// In en, this message translates to:
+  /// **'Create & Close'**
+  String get createModalCloseCreate;
+
+  /// Generic add button text
+  ///
+  /// In en, this message translates to:
+  /// **'Add'**
+  String get buttonAdd;
+
+  /// Generic save button text
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get buttonSave;
+
+  /// Generic cancel button text
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get buttonCancel;
+
+  /// Generic close button text
+  ///
+  /// In en, this message translates to:
+  /// **'Close'**
+  String get buttonClose;
+
+  /// Generic archive button text
+  ///
+  /// In en, this message translates to:
+  /// **'Archive'**
+  String get buttonArchive;
+
+  /// Accessibility label for close buttons
+  ///
+  /// In en, this message translates to:
+  /// **'Close'**
+  String get accessibilityCloseButton;
+
+  /// Accessibility label for collapsed description field
+  ///
+  /// In en, this message translates to:
+  /// **'Add description, collapsed'**
+  String get accessibilityAddDescription;
+
+  /// Accessibility hint for add description action
+  ///
+  /// In en, this message translates to:
+  /// **'Tap to add optional description field'**
+  String get accessibilityAddDescriptionHint;
+
+  /// Accessibility label for remove description button
+  ///
+  /// In en, this message translates to:
+  /// **'Remove description field'**
+  String get accessibilityRemoveDescription;
+
+  /// Accessibility label for create new space button
+  ///
+  /// In en, this message translates to:
+  /// **'Create new space'**
+  String get accessibilityCreateNewSpace;
+
+  /// Accessibility label for space list items
+  ///
+  /// In en, this message translates to:
+  /// **'{spaceName}, {itemCount} items'**
+  String accessibilitySpaceItemCount(String spaceName, int itemCount);
 }
 
 class _AppLocalizationsDelegate

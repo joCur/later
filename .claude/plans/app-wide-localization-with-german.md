@@ -142,40 +142,62 @@ Implement comprehensive localization across the Later Flutter app by migrating a
 **Priority:** IMPORTANT (daily user workflows)
 **Impact:** Content creation and editing interactions
 
-- [ ] Task 3.1: Add detail screen and modal strings to ARB files
-  - Add 58 new entries to `app_en.arb` (detail screens: 35, modals: 23)
-  - Add German translations to `app_de.arb`
-  - Run `flutter pub get`
+- [x] Task 3.1: Add detail screen and modal strings to ARB files
+  - ✅ Added 136 new entries to `app_en.arb` (note: 21, todo: 30, list: 35, space modal: 26, create modal: 24)
+  - ✅ Added corresponding German translations to `app_de.arb`
+  - ✅ Ran `flutter pub get` to regenerate localization code
+  - ✅ All strings include proper metadata, placeholders, and descriptions
+  - ✅ German translations account for longer text length and natural phrasing
 
-- [ ] Task 3.2: Migrate note detail screen
-  - Update `lib/widgets/screens/note_detail_screen.dart` (8 strings)
-  - Replace form labels, hints, button text, menu items
-  - Examples: 'Title', 'Content', 'Save', 'Delete', 'Archive', 'Add to favorites'
+- [x] Task 3.2: Migrate note detail screen
+  - ✅ Updated `lib/widgets/screens/note_detail_screen.dart` (21 strings)
+  - ✅ Added `AppLocalizations` import
+  - ✅ Replaced all validation messages (title empty, tag validation)
+  - ✅ Replaced all success messages (tag added/removed)
+  - ✅ Replaced all error messages (save failed, delete failed, tag operations)
+  - ✅ Replaced all UI labels (title hint, content hint, tags label, tags empty state)
+  - ✅ Replaced dialog strings (add tag dialog, delete confirmation)
+  - ✅ Replaced menu items (delete note)
+  - ✅ All localized strings use proper l10n accessor pattern
 
 - [ ] Task 3.3: Migrate todo list detail screen
-  - Update `lib/widgets/screens/todo_list_detail_screen.dart` (9 strings)
+  - Update `lib/widgets/screens/todo_list_detail_screen.dart` (30 strings)
   - Replace list name label, add item hint, menu items, completion status text
+  - Replace priority labels (High, Medium, Low)
+  - Replace progress indicators and empty states
+  - Replace validation and error messages
 
 - [ ] Task 3.4: Migrate list detail screen (most complex)
-  - Update `lib/widgets/screens/list_detail_screen.dart` (18 strings)
-  - Replace list style labels ('Simple', 'Checklist', 'Numbered', 'Bullet')
-  - Replace menu items (Edit, Delete, Archive, Share, Duplicate, Change Style)
+  - Update `lib/widgets/screens/list_detail_screen.dart` (35 strings)
+  - Replace list style labels ('Bullets', 'Numbered', 'Checkboxes')
+  - Replace list style descriptions
+  - Replace menu items (Change Style, Change Icon, Delete List)
   - Replace form labels and button text
+  - Replace validation and error messages
+  - Replace progress indicators and empty states
 
 - [ ] Task 3.5: Migrate space switcher modal
-  - Update `lib/widgets/modals/space_switcher_modal.dart` (16 strings)
-  - Replace modal title, search hint, create new space button, empty state message
-  - Replace space action menu items
+  - Update `lib/widgets/modals/space_switcher_modal.dart` (26 strings)
+  - Replace modal title, search hint, create new space button
+  - Replace empty state messages (no spaces found, no spaces available)
+  - Replace space action menu items (Edit, Archive, Restore)
+  - Replace archive/restore confirmation messages
+  - Replace success/error messages
 
 - [ ] Task 3.6: Migrate create content modal
-  - Update `lib/widgets/modals/create_content_modal.dart` (7 strings)
-  - Replace modal title, content type labels ('Note', 'Todo List', 'List')
-  - Replace quick capture hint and create button text
+  - Update `lib/widgets/modals/create_content_modal.dart` (24 strings)
+  - Replace modal title and type labels ('Todo List', 'List', 'Note')
+  - Replace input hints for all content types
+  - Replace list style labels
+  - Replace todo description labels
+  - Replace keyboard shortcuts
+  - Replace button labels and close confirmation dialog
 
 - [ ] Task 3.7: Update widget tests for Phase 3 files
   - Update detail screen tests (note, todo, list)
   - Update modal tests (space switcher, create content)
   - Test dynamic content (placeholders, item counts)
+  - Ensure all tests use localization delegates from test_helpers.dart
 
 - [ ] Task 3.8: Manual QA
   - Test CRUD operations for all content types in both languages
@@ -183,6 +205,7 @@ Implement comprehensive localization across the Later Flutter app by migrating a
   - Verify menu items work in German
   - Test list style changes with localized labels
   - Verify auto-save functionality still works
+  - Test German text doesn't cause layout overflow
   - Run full test suite and analyzer
 
 ### Phase 4: Design System + Final Polish (Week 4)

@@ -306,4 +306,525 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get menuSignOut => 'Abmelden';
+
+  @override
+  String get noteDetailTitleEmpty => 'Titel darf nicht leer sein';
+
+  @override
+  String get noteDetailSaveFailed =>
+      'Änderungen konnten nicht gespeichert werden';
+
+  @override
+  String get noteDetailTagEmpty => 'Tag darf nicht leer sein';
+
+  @override
+  String noteDetailTagTooLong(String maxLength) {
+    return 'Tag ist zu lang (max $maxLength Zeichen)';
+  }
+
+  @override
+  String get noteDetailTagExists => 'Tag existiert bereits';
+
+  @override
+  String get noteDetailTagAdded => 'Tag hinzugefügt';
+
+  @override
+  String get noteDetailTagRemoved => 'Tag entfernt';
+
+  @override
+  String get noteDetailTagAddFailed => 'Tag konnte nicht hinzugefügt werden';
+
+  @override
+  String get noteDetailTagRemoveFailed => 'Tag konnte nicht entfernt werden';
+
+  @override
+  String get noteDetailAddTagTitle => 'Tag hinzufügen';
+
+  @override
+  String get noteDetailTagNameLabel => 'Tag-Name';
+
+  @override
+  String get noteDetailTagNameHint => 'Tag-Namen eingeben';
+
+  @override
+  String get noteDetailDeleteTitle => 'Notiz löschen';
+
+  @override
+  String noteDetailDeleteMessage(String noteTitle) {
+    return 'Sind Sie sicher, dass Sie \"$noteTitle\" löschen möchten?\n\nDiese Aktion kann nicht rückgängig gemacht werden.';
+  }
+
+  @override
+  String get noteDetailDeleteFailed => 'Notiz konnte nicht gelöscht werden';
+
+  @override
+  String get noteDetailContentHint =>
+      'Beginnen Sie mit dem Schreiben Ihrer Notiz...';
+
+  @override
+  String get noteDetailTitleHint => 'Notiz-Titel';
+
+  @override
+  String get noteDetailTagsLabel => 'Tags';
+
+  @override
+  String get noteDetailTagsEmpty =>
+      'Noch keine Tags. Tippen Sie auf +, um Tags hinzuzufügen.';
+
+  @override
+  String get noteDetailMenuDelete => 'Notiz löschen';
+
+  @override
+  String get todoDetailNameEmpty =>
+      'Name der Aufgabenliste darf nicht leer sein';
+
+  @override
+  String get todoDetailSaveFailed =>
+      'Änderungen konnten nicht gespeichert werden';
+
+  @override
+  String get todoDetailLoadFailed => 'Einträge konnten nicht geladen werden';
+
+  @override
+  String get todoDetailItemAdded => 'Aufgabe hinzugefügt';
+
+  @override
+  String get todoDetailItemAddFailed =>
+      'Eintrag konnte nicht hinzugefügt werden';
+
+  @override
+  String get todoDetailItemUpdated => 'Aufgabe aktualisiert';
+
+  @override
+  String get todoDetailItemUpdateFailed =>
+      'Eintrag konnte nicht aktualisiert werden';
+
+  @override
+  String get todoDetailItemDeleted => 'Aufgabe gelöscht';
+
+  @override
+  String get todoDetailItemDeleteFailed =>
+      'Eintrag konnte nicht gelöscht werden';
+
+  @override
+  String get todoDetailItemToggleFailed =>
+      'Eintrag konnte nicht umgeschaltet werden';
+
+  @override
+  String get todoDetailReorderFailed =>
+      'Einträge konnten nicht neu angeordnet werden';
+
+  @override
+  String get todoDetailDeleteListTitle => 'Aufgabenliste löschen';
+
+  @override
+  String todoDetailDeleteListMessage(String listName, int itemCount) {
+    return 'Sind Sie sicher, dass Sie \"$listName\" löschen möchten?\n\nDadurch werden alle $itemCount Einträge in dieser Liste gelöscht. Diese Aktion kann nicht rückgängig gemacht werden.';
+  }
+
+  @override
+  String get todoDetailDeleteListFailed => 'Liste konnte nicht gelöscht werden';
+
+  @override
+  String get todoDetailAddItemTitle => 'Aufgabe hinzufügen';
+
+  @override
+  String get todoDetailEditItemTitle => 'Aufgabe bearbeiten';
+
+  @override
+  String get todoDetailItemTitleLabel => 'Titel *';
+
+  @override
+  String get todoDetailItemTitleHint => 'Aufgabentitel eingeben';
+
+  @override
+  String get todoDetailItemTitleRequired => 'Titel ist erforderlich';
+
+  @override
+  String get todoDetailItemDescriptionLabel => 'Beschreibung';
+
+  @override
+  String get todoDetailItemDescriptionHint => 'Optionale Beschreibung';
+
+  @override
+  String get todoDetailItemDueDateNone => 'Kein Fälligkeitsdatum';
+
+  @override
+  String get todoDetailItemPriorityLabel => 'Priorität';
+
+  @override
+  String get todoDetailPriorityHigh => 'Hoch';
+
+  @override
+  String get todoDetailPriorityMedium => 'Mittel';
+
+  @override
+  String get todoDetailPriorityLow => 'Niedrig';
+
+  @override
+  String todoDetailProgressCompleted(int completed, int total) {
+    return '$completed/$total abgeschlossen';
+  }
+
+  @override
+  String get todoDetailEmptyTitle => 'Noch keine Aufgaben';
+
+  @override
+  String get todoDetailEmptyMessage =>
+      'Tippen Sie auf die +-Schaltfläche, um Ihre erste Aufgabe hinzuzufügen';
+
+  @override
+  String get todoDetailFabLabel => 'Aufgabe hinzufügen';
+
+  @override
+  String get todoDetailNameHint => 'Name der Aufgabenliste';
+
+  @override
+  String get todoDetailMenuDelete => 'Liste löschen';
+
+  @override
+  String get listDetailNameEmpty => 'Listenname darf nicht leer sein';
+
+  @override
+  String get listDetailSaveFailed =>
+      'Änderungen konnten nicht gespeichert werden';
+
+  @override
+  String get listDetailLoadFailed => 'Einträge konnten nicht geladen werden';
+
+  @override
+  String get listDetailItemAdded => 'Eintrag hinzugefügt';
+
+  @override
+  String get listDetailItemAddFailed =>
+      'Eintrag konnte nicht hinzugefügt werden';
+
+  @override
+  String get listDetailItemUpdated => 'Eintrag aktualisiert';
+
+  @override
+  String get listDetailItemUpdateFailed =>
+      'Eintrag konnte nicht aktualisiert werden';
+
+  @override
+  String get listDetailItemDeleted => 'Eintrag gelöscht';
+
+  @override
+  String get listDetailItemDeleteFailed =>
+      'Eintrag konnte nicht gelöscht werden';
+
+  @override
+  String get listDetailItemToggleFailed =>
+      'Kontrollkästchen konnte nicht umgeschaltet werden';
+
+  @override
+  String get listDetailReorderFailed =>
+      'Einträge konnten nicht neu angeordnet werden';
+
+  @override
+  String get listDetailStyleUpdated => 'Listenstil aktualisiert';
+
+  @override
+  String get listDetailStyleChangeFailed => 'Stil konnte nicht geändert werden';
+
+  @override
+  String get listDetailIconUpdated => 'Listensymbol aktualisiert';
+
+  @override
+  String get listDetailIconChangeFailed =>
+      'Symbol konnte nicht geändert werden';
+
+  @override
+  String get listDetailDeleteTitle => 'Liste löschen';
+
+  @override
+  String listDetailDeleteMessage(String listName, int itemCount) {
+    return 'Sind Sie sicher, dass Sie \"$listName\" löschen möchten?\n\nDadurch werden alle $itemCount Einträge in dieser Liste gelöscht. Diese Aktion kann nicht rückgängig gemacht werden.';
+  }
+
+  @override
+  String get listDetailDeleteFailed => 'Liste konnte nicht gelöscht werden';
+
+  @override
+  String get listDetailAddItemTitle => 'Eintrag hinzufügen';
+
+  @override
+  String get listDetailEditItemTitle => 'Eintrag bearbeiten';
+
+  @override
+  String get listDetailItemTitleLabel => 'Titel *';
+
+  @override
+  String get listDetailItemTitleHint => 'Eintragstitel eingeben';
+
+  @override
+  String get listDetailItemTitleRequired => 'Titel ist erforderlich';
+
+  @override
+  String get listDetailItemNotesLabel => 'Notizen';
+
+  @override
+  String get listDetailItemNotesHint => 'Optionale Notizen';
+
+  @override
+  String get listDetailStyleDialogTitle => 'Stil auswählen';
+
+  @override
+  String get listDetailStyleBullets => 'Aufzählungszeichen';
+
+  @override
+  String get listDetailStyleBulletsDesc => 'Einfache Aufzählungspunkte';
+
+  @override
+  String get listDetailStyleNumbered => 'Nummeriert';
+
+  @override
+  String get listDetailStyleNumberedDesc => 'Nummerierte Listeneinträge';
+
+  @override
+  String get listDetailStyleCheckboxes => 'Kontrollkästchen';
+
+  @override
+  String get listDetailStyleCheckboxesDesc => 'Abhakbare Aufgabeneinträge';
+
+  @override
+  String get listDetailIconDialogTitle => 'Symbol auswählen';
+
+  @override
+  String listDetailProgressCompleted(int checked, int total) {
+    return '$checked/$total abgeschlossen';
+  }
+
+  @override
+  String get listDetailEmptyTitle => 'Noch keine Einträge';
+
+  @override
+  String get listDetailEmptyMessage =>
+      'Tippen Sie auf die +-Schaltfläche, um Ihren ersten Eintrag hinzuzufügen';
+
+  @override
+  String get listDetailFabLabel => 'Eintrag hinzufügen';
+
+  @override
+  String get listDetailNameHint => 'Listenname';
+
+  @override
+  String get listDetailMenuChangeStyle => 'Stil ändern';
+
+  @override
+  String get listDetailMenuChangeIcon => 'Symbol ändern';
+
+  @override
+  String get listDetailMenuDelete => 'Liste löschen';
+
+  @override
+  String get spaceModalTitle => 'Space wechseln';
+
+  @override
+  String get spaceModalSearchHint => 'Spaces durchsuchen...';
+
+  @override
+  String get spaceModalNoSpacesFound => 'Keine Spaces gefunden';
+
+  @override
+  String get spaceModalNoSpacesAvailable => 'Keine Spaces verfügbar';
+
+  @override
+  String get spaceModalArchived => 'Archiviert';
+
+  @override
+  String get spaceModalShowArchived => 'Archivierte Spaces anzeigen';
+
+  @override
+  String get spaceModalCreateNew => 'Neuen Space erstellen';
+
+  @override
+  String get spaceModalMenuEdit => 'Space bearbeiten';
+
+  @override
+  String get spaceModalMenuArchive => 'Space archivieren';
+
+  @override
+  String get spaceModalMenuArchiveHint =>
+      'Wechseln Sie zuerst zu einem anderen Space';
+
+  @override
+  String spaceModalMenuArchiveHintItems(int itemCount) {
+    return 'Dieser Space enthält $itemCount Einträge';
+  }
+
+  @override
+  String get spaceModalMenuRestore => 'Space wiederherstellen';
+
+  @override
+  String get spaceModalMenuRestoreHint => 'Diesen Space wieder aktivieren';
+
+  @override
+  String get spaceModalMenuCancel => 'Abbrechen';
+
+  @override
+  String get spaceModalSwitchFailed => 'Space konnte nicht gewechselt werden';
+
+  @override
+  String get spaceModalArchiveCurrent =>
+      'Der aktuelle Space kann nicht archiviert werden. Wechseln Sie zuerst zu einem anderen Space.';
+
+  @override
+  String get spaceModalArchiveConfirmTitle => 'Space archivieren?';
+
+  @override
+  String spaceModalArchiveConfirmMessage(int itemCount) {
+    return 'Dieser Space enthält $itemCount Einträge. Das Archivieren verbirgt den Space, behält aber alle Einträge bei. Sie können ihn später aus archivierten Spaces wiederherstellen.';
+  }
+
+  @override
+  String spaceModalArchiveSuccess(String spaceName) {
+    return '$spaceName wurde archiviert';
+  }
+
+  @override
+  String get spaceModalArchiveFailed => 'Space konnte nicht archiviert werden';
+
+  @override
+  String spaceModalRestoreSuccess(String spaceName) {
+    return '$spaceName wurde wiederhergestellt';
+  }
+
+  @override
+  String get spaceModalRestoreFailed =>
+      'Space konnte nicht wiederhergestellt werden';
+
+  @override
+  String get createModalTitle => 'Erstellen';
+
+  @override
+  String get createModalTypeTodoList => 'Aufgabenliste';
+
+  @override
+  String get createModalTypeList => 'Liste';
+
+  @override
+  String get createModalTypeNote => 'Notiz';
+
+  @override
+  String get createModalTodoListNameHint => 'Name der Aufgabenliste';
+
+  @override
+  String get createModalListNameHint => 'Listenname';
+
+  @override
+  String get createModalNoteTitleHint => 'Notiz-Titel';
+
+  @override
+  String get createModalNoteContentHint => 'Notiz-Inhalt';
+
+  @override
+  String get createModalNoteSmartFieldHint =>
+      'Notiz-Titel oder Inhalt...\n(Erste Zeile wird zum Titel)';
+
+  @override
+  String get createModalListStyleLabel => 'Listenstil';
+
+  @override
+  String get createModalListStyleBullets => 'Aufzählungszeichen';
+
+  @override
+  String get createModalListStyleNumbered => 'Nummeriert';
+
+  @override
+  String get createModalListStyleCheckboxes => 'Checkliste';
+
+  @override
+  String get createModalListStyleSimple => 'Einfach';
+
+  @override
+  String get createModalTodoDescriptionLabel => 'Beschreibung (optional)';
+
+  @override
+  String get createModalTodoDescriptionHint =>
+      'Beschreibung hinzufügen (optional)';
+
+  @override
+  String get createModalTodoDescriptionAdd =>
+      '+ Beschreibung hinzufügen (optional)';
+
+  @override
+  String get createModalTodoDescriptionTooLong =>
+      'Beschreibung zu lang (max. 500 Zeichen)';
+
+  @override
+  String get createModalSaveToLabel => 'Speichern in: ';
+
+  @override
+  String get createModalKeyboardShortcutMac =>
+      '⌘+Eingabe zum Erstellen • Esc zum Schließen';
+
+  @override
+  String get createModalKeyboardShortcutOther =>
+      'Strg+Eingabe zum Erstellen • Esc zum Schließen';
+
+  @override
+  String get createModalButtonTodoList => 'Aufgabenliste erstellen';
+
+  @override
+  String get createModalButtonList => 'Liste erstellen';
+
+  @override
+  String get createModalButtonNote => 'Notiz erstellen';
+
+  @override
+  String get createModalButtonGeneric => 'Erstellen';
+
+  @override
+  String get createModalCloseTitle => 'Nicht gespeicherte Inhalte verwerfen?';
+
+  @override
+  String get createModalCloseMessage =>
+      'Sie haben diesen Eintrag noch nicht erstellt. Möchten Sie ihn erstellen oder Ihre Änderungen verwerfen?';
+
+  @override
+  String get createModalCloseCancel => 'Abbrechen';
+
+  @override
+  String get createModalCloseDiscard => 'Verwerfen';
+
+  @override
+  String get createModalCloseCreate => 'Erstellen & Schließen';
+
+  @override
+  String get buttonAdd => 'Hinzufügen';
+
+  @override
+  String get buttonSave => 'Speichern';
+
+  @override
+  String get buttonCancel => 'Abbrechen';
+
+  @override
+  String get buttonClose => 'Schließen';
+
+  @override
+  String get buttonArchive => 'Archivieren';
+
+  @override
+  String get accessibilityCloseButton => 'Schließen';
+
+  @override
+  String get accessibilityAddDescription =>
+      'Beschreibung hinzufügen, eingeklappt';
+
+  @override
+  String get accessibilityAddDescriptionHint =>
+      'Tippen, um optionales Beschreibungsfeld hinzuzufügen';
+
+  @override
+  String get accessibilityRemoveDescription => 'Beschreibungsfeld entfernen';
+
+  @override
+  String get accessibilityCreateNewSpace => 'Neuen Space erstellen';
+
+  @override
+  String accessibilitySpaceItemCount(String spaceName, int itemCount) {
+    return '$spaceName, $itemCount Einträge';
+  }
 }

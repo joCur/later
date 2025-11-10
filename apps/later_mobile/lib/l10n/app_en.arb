@@ -468,5 +468,876 @@
   "menuSignOut": "Sign Out",
   "@menuSignOut": {
     "description": "Sign out menu item text in app bar"
+  },
+
+  "noteDetailTitleEmpty": "Title cannot be empty",
+  "@noteDetailTitleEmpty": {
+    "description": "Validation error when note title is empty"
+  },
+
+  "noteDetailSaveFailed": "Failed to save changes",
+  "@noteDetailSaveFailed": {
+    "description": "Error message when note save fails"
+  },
+
+  "noteDetailTagEmpty": "Tag cannot be empty",
+  "@noteDetailTagEmpty": {
+    "description": "Validation error when tag input is empty"
+  },
+
+  "noteDetailTagTooLong": "Tag is too long (max {maxLength} characters)",
+  "@noteDetailTagTooLong": {
+    "description": "Validation error when tag exceeds maximum length",
+    "placeholders": {
+      "maxLength": {
+        "type": "String",
+        "example": "50"
+      }
+    }
+  },
+
+  "noteDetailTagExists": "Tag already exists",
+  "@noteDetailTagExists": {
+    "description": "Validation error when adding a duplicate tag"
+  },
+
+  "noteDetailTagAdded": "Tag added",
+  "@noteDetailTagAdded": {
+    "description": "Success message after adding a tag"
+  },
+
+  "noteDetailTagRemoved": "Tag removed",
+  "@noteDetailTagRemoved": {
+    "description": "Success message after removing a tag"
+  },
+
+  "noteDetailTagAddFailed": "Failed to add tag",
+  "@noteDetailTagAddFailed": {
+    "description": "Error message when adding tag fails"
+  },
+
+  "noteDetailTagRemoveFailed": "Failed to remove tag",
+  "@noteDetailTagRemoveFailed": {
+    "description": "Error message when removing tag fails"
+  },
+
+  "noteDetailAddTagTitle": "Add Tag",
+  "@noteDetailAddTagTitle": {
+    "description": "Title for add tag dialog"
+  },
+
+  "noteDetailTagNameLabel": "Tag Name",
+  "@noteDetailTagNameLabel": {
+    "description": "Label for tag name input field"
+  },
+
+  "noteDetailTagNameHint": "Enter tag name",
+  "@noteDetailTagNameHint": {
+    "description": "Hint text for tag name input field"
+  },
+
+  "noteDetailDeleteTitle": "Delete Note",
+  "@noteDetailDeleteTitle": {
+    "description": "Title for delete note confirmation dialog"
+  },
+
+  "noteDetailDeleteMessage": "Are you sure you want to delete \"{noteTitle}\"?\n\nThis action cannot be undone.",
+  "@noteDetailDeleteMessage": {
+    "description": "Message for delete note confirmation dialog",
+    "placeholders": {
+      "noteTitle": {
+        "type": "String",
+        "example": "My Note"
+      }
+    }
+  },
+
+  "noteDetailDeleteFailed": "Failed to delete note",
+  "@noteDetailDeleteFailed": {
+    "description": "Error message when note deletion fails"
+  },
+
+  "noteDetailContentHint": "Start writing your note...",
+  "@noteDetailContentHint": {
+    "description": "Hint text for note content input field"
+  },
+
+  "noteDetailTitleHint": "Note title",
+  "@noteDetailTitleHint": {
+    "description": "Hint text for note title input field"
+  },
+
+  "noteDetailTagsLabel": "Tags",
+  "@noteDetailTagsLabel": {
+    "description": "Label for tags section"
+  },
+
+  "noteDetailTagsEmpty": "No tags yet. Tap + to add tags.",
+  "@noteDetailTagsEmpty": {
+    "description": "Message shown when note has no tags"
+  },
+
+  "noteDetailMenuDelete": "Delete Note",
+  "@noteDetailMenuDelete": {
+    "description": "Delete menu item text in note detail screen"
+  },
+
+  "todoDetailNameEmpty": "TodoList name cannot be empty",
+  "@todoDetailNameEmpty": {
+    "description": "Validation error when todo list name is empty"
+  },
+
+  "todoDetailSaveFailed": "Failed to save changes",
+  "@todoDetailSaveFailed": {
+    "description": "Error message when todo list save fails"
+  },
+
+  "todoDetailLoadFailed": "Failed to load items",
+  "@todoDetailLoadFailed": {
+    "description": "Error message when loading todo items fails"
+  },
+
+  "todoDetailItemAdded": "TodoItem added",
+  "@todoDetailItemAdded": {
+    "description": "Success message after adding a todo item"
+  },
+
+  "todoDetailItemAddFailed": "Failed to add item",
+  "@todoDetailItemAddFailed": {
+    "description": "Error message when adding todo item fails"
+  },
+
+  "todoDetailItemUpdated": "TodoItem updated",
+  "@todoDetailItemUpdated": {
+    "description": "Success message after updating a todo item"
+  },
+
+  "todoDetailItemUpdateFailed": "Failed to update item",
+  "@todoDetailItemUpdateFailed": {
+    "description": "Error message when updating todo item fails"
+  },
+
+  "todoDetailItemDeleted": "TodoItem deleted",
+  "@todoDetailItemDeleted": {
+    "description": "Success message after deleting a todo item"
+  },
+
+  "todoDetailItemDeleteFailed": "Failed to delete item",
+  "@todoDetailItemDeleteFailed": {
+    "description": "Error message when deleting todo item fails"
+  },
+
+  "todoDetailItemToggleFailed": "Failed to toggle item",
+  "@todoDetailItemToggleFailed": {
+    "description": "Error message when toggling todo item fails"
+  },
+
+  "todoDetailReorderFailed": "Failed to reorder items",
+  "@todoDetailReorderFailed": {
+    "description": "Error message when reordering todo items fails"
+  },
+
+  "todoDetailDeleteListTitle": "Delete TodoList",
+  "@todoDetailDeleteListTitle": {
+    "description": "Title for delete todo list confirmation dialog"
+  },
+
+  "todoDetailDeleteListMessage": "Are you sure you want to delete \"{listName}\"?\n\nThis will delete all {itemCount} items in this list. This action cannot be undone.",
+  "@todoDetailDeleteListMessage": {
+    "description": "Message for delete todo list confirmation dialog",
+    "placeholders": {
+      "listName": {
+        "type": "String",
+        "example": "My Todo List"
+      },
+      "itemCount": {
+        "type": "int",
+        "example": "5"
+      }
+    }
+  },
+
+  "todoDetailDeleteListFailed": "Failed to delete list",
+  "@todoDetailDeleteListFailed": {
+    "description": "Error message when deleting todo list fails"
+  },
+
+  "todoDetailAddItemTitle": "Add TodoItem",
+  "@todoDetailAddItemTitle": {
+    "description": "Title for add todo item dialog"
+  },
+
+  "todoDetailEditItemTitle": "Edit TodoItem",
+  "@todoDetailEditItemTitle": {
+    "description": "Title for edit todo item dialog"
+  },
+
+  "todoDetailItemTitleLabel": "Title *",
+  "@todoDetailItemTitleLabel": {
+    "description": "Label for todo item title field (required)"
+  },
+
+  "todoDetailItemTitleHint": "Enter task title",
+  "@todoDetailItemTitleHint": {
+    "description": "Hint text for todo item title field"
+  },
+
+  "todoDetailItemTitleRequired": "Title is required",
+  "@todoDetailItemTitleRequired": {
+    "description": "Validation error for required todo item title"
+  },
+
+  "todoDetailItemDescriptionLabel": "Description",
+  "@todoDetailItemDescriptionLabel": {
+    "description": "Label for todo item description field"
+  },
+
+  "todoDetailItemDescriptionHint": "Optional description",
+  "@todoDetailItemDescriptionHint": {
+    "description": "Hint text for todo item description field"
+  },
+
+  "todoDetailItemDueDateNone": "No due date",
+  "@todoDetailItemDueDateNone": {
+    "description": "Text shown when todo item has no due date"
+  },
+
+  "todoDetailItemPriorityLabel": "Priority",
+  "@todoDetailItemPriorityLabel": {
+    "description": "Label for todo item priority dropdown"
+  },
+
+  "todoDetailPriorityHigh": "High",
+  "@todoDetailPriorityHigh": {
+    "description": "High priority label"
+  },
+
+  "todoDetailPriorityMedium": "Medium",
+  "@todoDetailPriorityMedium": {
+    "description": "Medium priority label"
+  },
+
+  "todoDetailPriorityLow": "Low",
+  "@todoDetailPriorityLow": {
+    "description": "Low priority label"
+  },
+
+  "todoDetailProgressCompleted": "{completed}/{total} completed",
+  "@todoDetailProgressCompleted": {
+    "description": "Progress indicator showing completed items",
+    "placeholders": {
+      "completed": {
+        "type": "int",
+        "example": "4"
+      },
+      "total": {
+        "type": "int",
+        "example": "7"
+      }
+    }
+  },
+
+  "todoDetailEmptyTitle": "No tasks yet",
+  "@todoDetailEmptyTitle": {
+    "description": "Empty state title for todo list with no items"
+  },
+
+  "todoDetailEmptyMessage": "Tap the + button to add your first task",
+  "@todoDetailEmptyMessage": {
+    "description": "Empty state message for todo list with no items"
+  },
+
+  "todoDetailFabLabel": "Add Todo",
+  "@todoDetailFabLabel": {
+    "description": "Label for add todo item FAB"
+  },
+
+  "todoDetailNameHint": "TodoList name",
+  "@todoDetailNameHint": {
+    "description": "Hint text for todo list name field"
+  },
+
+  "todoDetailMenuDelete": "Delete List",
+  "@todoDetailMenuDelete": {
+    "description": "Delete menu item text in todo list detail screen"
+  },
+
+  "listDetailNameEmpty": "List name cannot be empty",
+  "@listDetailNameEmpty": {
+    "description": "Validation error when list name is empty"
+  },
+
+  "listDetailSaveFailed": "Failed to save changes",
+  "@listDetailSaveFailed": {
+    "description": "Error message when list save fails"
+  },
+
+  "listDetailLoadFailed": "Failed to load items",
+  "@listDetailLoadFailed": {
+    "description": "Error message when loading list items fails"
+  },
+
+  "listDetailItemAdded": "Item added",
+  "@listDetailItemAdded": {
+    "description": "Success message after adding a list item"
+  },
+
+  "listDetailItemAddFailed": "Failed to add item",
+  "@listDetailItemAddFailed": {
+    "description": "Error message when adding list item fails"
+  },
+
+  "listDetailItemUpdated": "Item updated",
+  "@listDetailItemUpdated": {
+    "description": "Success message after updating a list item"
+  },
+
+  "listDetailItemUpdateFailed": "Failed to update item",
+  "@listDetailItemUpdateFailed": {
+    "description": "Error message when updating list item fails"
+  },
+
+  "listDetailItemDeleted": "Item deleted",
+  "@listDetailItemDeleted": {
+    "description": "Success message after deleting a list item"
+  },
+
+  "listDetailItemDeleteFailed": "Failed to delete item",
+  "@listDetailItemDeleteFailed": {
+    "description": "Error message when deleting list item fails"
+  },
+
+  "listDetailItemToggleFailed": "Failed to toggle item",
+  "@listDetailItemToggleFailed": {
+    "description": "Error message when toggling list item checkbox fails"
+  },
+
+  "listDetailReorderFailed": "Failed to reorder items",
+  "@listDetailReorderFailed": {
+    "description": "Error message when reordering list items fails"
+  },
+
+  "listDetailStyleUpdated": "List style updated",
+  "@listDetailStyleUpdated": {
+    "description": "Success message after changing list style"
+  },
+
+  "listDetailStyleChangeFailed": "Failed to change style",
+  "@listDetailStyleChangeFailed": {
+    "description": "Error message when changing list style fails"
+  },
+
+  "listDetailIconUpdated": "List icon updated",
+  "@listDetailIconUpdated": {
+    "description": "Success message after changing list icon"
+  },
+
+  "listDetailIconChangeFailed": "Failed to change icon",
+  "@listDetailIconChangeFailed": {
+    "description": "Error message when changing list icon fails"
+  },
+
+  "listDetailDeleteTitle": "Delete List",
+  "@listDetailDeleteTitle": {
+    "description": "Title for delete list confirmation dialog"
+  },
+
+  "listDetailDeleteMessage": "Are you sure you want to delete \"{listName}\"?\n\nThis will delete all {itemCount} items in this list. This action cannot be undone.",
+  "@listDetailDeleteMessage": {
+    "description": "Message for delete list confirmation dialog",
+    "placeholders": {
+      "listName": {
+        "type": "String",
+        "example": "My List"
+      },
+      "itemCount": {
+        "type": "int",
+        "example": "5"
+      }
+    }
+  },
+
+  "listDetailDeleteFailed": "Failed to delete list",
+  "@listDetailDeleteFailed": {
+    "description": "Error message when deleting list fails"
+  },
+
+  "listDetailAddItemTitle": "Add Item",
+  "@listDetailAddItemTitle": {
+    "description": "Title for add list item dialog"
+  },
+
+  "listDetailEditItemTitle": "Edit Item",
+  "@listDetailEditItemTitle": {
+    "description": "Title for edit list item dialog"
+  },
+
+  "listDetailItemTitleLabel": "Title *",
+  "@listDetailItemTitleLabel": {
+    "description": "Label for list item title field (required)"
+  },
+
+  "listDetailItemTitleHint": "Enter item title",
+  "@listDetailItemTitleHint": {
+    "description": "Hint text for list item title field"
+  },
+
+  "listDetailItemTitleRequired": "Title is required",
+  "@listDetailItemTitleRequired": {
+    "description": "Validation error for required list item title"
+  },
+
+  "listDetailItemNotesLabel": "Notes",
+  "@listDetailItemNotesLabel": {
+    "description": "Label for list item notes field"
+  },
+
+  "listDetailItemNotesHint": "Optional notes",
+  "@listDetailItemNotesHint": {
+    "description": "Hint text for list item notes field"
+  },
+
+  "listDetailStyleDialogTitle": "Select Style",
+  "@listDetailStyleDialogTitle": {
+    "description": "Title for list style selection dialog"
+  },
+
+  "listDetailStyleBullets": "Bullets",
+  "@listDetailStyleBullets": {
+    "description": "Bullets list style label"
+  },
+
+  "listDetailStyleBulletsDesc": "Simple bullet points",
+  "@listDetailStyleBulletsDesc": {
+    "description": "Description for bullets list style"
+  },
+
+  "listDetailStyleNumbered": "Numbered",
+  "@listDetailStyleNumbered": {
+    "description": "Numbered list style label"
+  },
+
+  "listDetailStyleNumberedDesc": "Numbered list items",
+  "@listDetailStyleNumberedDesc": {
+    "description": "Description for numbered list style"
+  },
+
+  "listDetailStyleCheckboxes": "Checkboxes",
+  "@listDetailStyleCheckboxes": {
+    "description": "Checkboxes list style label"
+  },
+
+  "listDetailStyleCheckboxesDesc": "Checkable task items",
+  "@listDetailStyleCheckboxesDesc": {
+    "description": "Description for checkboxes list style"
+  },
+
+  "listDetailIconDialogTitle": "Select Icon",
+  "@listDetailIconDialogTitle": {
+    "description": "Title for list icon selection dialog"
+  },
+
+  "listDetailProgressCompleted": "{checked}/{total} completed",
+  "@listDetailProgressCompleted": {
+    "description": "Progress indicator for checkboxes style lists",
+    "placeholders": {
+      "checked": {
+        "type": "int",
+        "example": "3"
+      },
+      "total": {
+        "type": "int",
+        "example": "8"
+      }
+    }
+  },
+
+  "listDetailEmptyTitle": "No items yet",
+  "@listDetailEmptyTitle": {
+    "description": "Empty state title for list with no items"
+  },
+
+  "listDetailEmptyMessage": "Tap the + button to add your first item",
+  "@listDetailEmptyMessage": {
+    "description": "Empty state message for list with no items"
+  },
+
+  "listDetailFabLabel": "Add Item",
+  "@listDetailFabLabel": {
+    "description": "Label for add item FAB"
+  },
+
+  "listDetailNameHint": "List name",
+  "@listDetailNameHint": {
+    "description": "Hint text for list name field"
+  },
+
+  "listDetailMenuChangeStyle": "Change Style",
+  "@listDetailMenuChangeStyle": {
+    "description": "Change style menu item text"
+  },
+
+  "listDetailMenuChangeIcon": "Change Icon",
+  "@listDetailMenuChangeIcon": {
+    "description": "Change icon menu item text"
+  },
+
+  "listDetailMenuDelete": "Delete List",
+  "@listDetailMenuDelete": {
+    "description": "Delete menu item text in list detail screen"
+  },
+
+  "spaceModalTitle": "Switch Space",
+  "@spaceModalTitle": {
+    "description": "Title for space switcher modal"
+  },
+
+  "spaceModalSearchHint": "Search spaces...",
+  "@spaceModalSearchHint": {
+    "description": "Hint text for space search input"
+  },
+
+  "spaceModalNoSpacesFound": "No spaces found",
+  "@spaceModalNoSpacesFound": {
+    "description": "Message when space search returns no results"
+  },
+
+  "spaceModalNoSpacesAvailable": "No spaces available",
+  "@spaceModalNoSpacesAvailable": {
+    "description": "Message when user has no spaces"
+  },
+
+  "spaceModalArchived": "Archived",
+  "@spaceModalArchived": {
+    "description": "Badge label for archived spaces"
+  },
+
+  "spaceModalShowArchived": "Show Archived Spaces",
+  "@spaceModalShowArchived": {
+    "description": "Toggle label for showing archived spaces"
+  },
+
+  "spaceModalCreateNew": "Create New Space",
+  "@spaceModalCreateNew": {
+    "description": "Button text for creating a new space"
+  },
+
+  "spaceModalMenuEdit": "Edit Space",
+  "@spaceModalMenuEdit": {
+    "description": "Edit menu item text in space options"
+  },
+
+  "spaceModalMenuArchive": "Archive Space",
+  "@spaceModalMenuArchive": {
+    "description": "Archive menu item text in space options"
+  },
+
+  "spaceModalMenuArchiveHint": "Switch to another space first",
+  "@spaceModalMenuArchiveHint": {
+    "description": "Hint shown when trying to archive current space"
+  },
+
+  "spaceModalMenuArchiveHintItems": "This space contains {itemCount} items",
+  "@spaceModalMenuArchiveHintItems": {
+    "description": "Hint showing item count when archiving",
+    "placeholders": {
+      "itemCount": {
+        "type": "int",
+        "example": "12"
+      }
+    }
+  },
+
+  "spaceModalMenuRestore": "Restore Space",
+  "@spaceModalMenuRestore": {
+    "description": "Restore menu item text in space options"
+  },
+
+  "spaceModalMenuRestoreHint": "Make this space active again",
+  "@spaceModalMenuRestoreHint": {
+    "description": "Hint for restore space action"
+  },
+
+  "spaceModalMenuCancel": "Cancel",
+  "@spaceModalMenuCancel": {
+    "description": "Cancel menu item text"
+  },
+
+  "spaceModalSwitchFailed": "Failed to switch space",
+  "@spaceModalSwitchFailed": {
+    "description": "Error message when space switch fails"
+  },
+
+  "spaceModalArchiveCurrent": "Cannot archive the current space. Switch to another space first.",
+  "@spaceModalArchiveCurrent": {
+    "description": "Error message when trying to archive current space"
+  },
+
+  "spaceModalArchiveConfirmTitle": "Archive Space?",
+  "@spaceModalArchiveConfirmTitle": {
+    "description": "Title for archive space confirmation dialog"
+  },
+
+  "spaceModalArchiveConfirmMessage": "This space contains {itemCount} items. Archiving will hide the space but keep all items. You can restore it later from archived spaces.",
+  "@spaceModalArchiveConfirmMessage": {
+    "description": "Message for archive space confirmation dialog",
+    "placeholders": {
+      "itemCount": {
+        "type": "int",
+        "example": "15"
+      }
+    }
+  },
+
+  "spaceModalArchived": "Archived",
+  "@spaceModalArchived": {
+    "description": "Badge text for archived spaces"
+  },
+
+  "spaceModalArchiveSuccess": "{spaceName} has been archived",
+  "@spaceModalArchiveSuccess": {
+    "description": "Success message after archiving space",
+    "placeholders": {
+      "spaceName": {
+        "type": "String",
+        "example": "Work"
+      }
+    }
+  },
+
+  "spaceModalArchiveFailed": "Failed to archive space",
+  "@spaceModalArchiveFailed": {
+    "description": "Error message when archiving space fails"
+  },
+
+  "spaceModalRestoreSuccess": "{spaceName} has been restored",
+  "@spaceModalRestoreSuccess": {
+    "description": "Success message after restoring space",
+    "placeholders": {
+      "spaceName": {
+        "type": "String",
+        "example": "Work"
+      }
+    }
+  },
+
+  "spaceModalRestoreFailed": "Failed to restore space",
+  "@spaceModalRestoreFailed": {
+    "description": "Error message when restoring space fails"
+  },
+
+  "createModalTitle": "Create",
+  "@createModalTitle": {
+    "description": "Title prefix for create content modal"
+  },
+
+  "createModalTypeTodoList": "Todo List",
+  "@createModalTypeTodoList": {
+    "description": "Todo List type label in create modal"
+  },
+
+  "createModalTypeList": "List",
+  "@createModalTypeList": {
+    "description": "List type label in create modal"
+  },
+
+  "createModalTypeNote": "Note",
+  "@createModalTypeNote": {
+    "description": "Note type label in create modal"
+  },
+
+  "createModalTodoListNameHint": "Todo list name",
+  "@createModalTodoListNameHint": {
+    "description": "Hint text for todo list name input"
+  },
+
+  "createModalListNameHint": "List name",
+  "@createModalListNameHint": {
+    "description": "Hint text for list name input"
+  },
+
+  "createModalNoteTitleHint": "Note title",
+  "@createModalNoteTitleHint": {
+    "description": "Hint text for note title input (desktop)"
+  },
+
+  "createModalNoteContentHint": "Note content",
+  "@createModalNoteContentHint": {
+    "description": "Hint text for note content input (desktop)"
+  },
+
+  "createModalNoteSmartFieldHint": "Note title or content...\n(First line becomes title)",
+  "@createModalNoteSmartFieldHint": {
+    "description": "Hint text for note smart field (mobile)"
+  },
+
+  "createModalListStyleLabel": "List Style",
+  "@createModalListStyleLabel": {
+    "description": "Label for list style selector"
+  },
+
+  "createModalListStyleBullets": "Bullets",
+  "@createModalListStyleBullets": {
+    "description": "Bullets style option"
+  },
+
+  "createModalListStyleNumbered": "Numbered",
+  "@createModalListStyleNumbered": {
+    "description": "Numbered style option"
+  },
+
+  "createModalListStyleCheckboxes": "Checklist",
+  "@createModalListStyleCheckboxes": {
+    "description": "Checklist style option"
+  },
+
+  "createModalListStyleSimple": "Simple",
+  "@createModalListStyleSimple": {
+    "description": "Simple style option"
+  },
+
+  "createModalTodoDescriptionLabel": "Description (optional)",
+  "@createModalTodoDescriptionLabel": {
+    "description": "Label for todo list description field"
+  },
+
+  "createModalTodoDescriptionHint": "Add description (optional)",
+  "@createModalTodoDescriptionHint": {
+    "description": "Hint text for todo list description field"
+  },
+
+  "createModalTodoDescriptionAdd": "+ Add description (optional)",
+  "@createModalTodoDescriptionAdd": {
+    "description": "Link text to show description field"
+  },
+
+  "createModalTodoDescriptionTooLong": "Description too long (max 500 characters)",
+  "@createModalTodoDescriptionTooLong": {
+    "description": "Validation error for description length"
+  },
+
+  "createModalSaveToLabel": "Save to: ",
+  "@createModalSaveToLabel": {
+    "description": "Label for space selector"
+  },
+
+  "createModalKeyboardShortcutMac": "⌘+Enter to create • Esc to close",
+  "@createModalKeyboardShortcutMac": {
+    "description": "Keyboard shortcut hint for Mac"
+  },
+
+  "createModalKeyboardShortcutOther": "Ctrl+Enter to create • Esc to close",
+  "@createModalKeyboardShortcutOther": {
+    "description": "Keyboard shortcut hint for non-Mac platforms"
+  },
+
+  "createModalButtonTodoList": "Create Todo List",
+  "@createModalButtonTodoList": {
+    "description": "Create button text for todo list"
+  },
+
+  "createModalButtonList": "Create List",
+  "@createModalButtonList": {
+    "description": "Create button text for list"
+  },
+
+  "createModalButtonNote": "Create Note",
+  "@createModalButtonNote": {
+    "description": "Create button text for note"
+  },
+
+  "createModalButtonGeneric": "Create",
+  "@createModalButtonGeneric": {
+    "description": "Generic create button text"
+  },
+
+  "createModalCloseTitle": "Discard unsaved content?",
+  "@createModalCloseTitle": {
+    "description": "Title for close confirmation dialog"
+  },
+
+  "createModalCloseMessage": "You haven't created this item yet. Would you like to create it or discard your changes?",
+  "@createModalCloseMessage": {
+    "description": "Message for close confirmation dialog"
+  },
+
+  "createModalCloseCancel": "Cancel",
+  "@createModalCloseCancel": {
+    "description": "Cancel button text in close confirmation"
+  },
+
+  "createModalCloseDiscard": "Discard",
+  "@createModalCloseDiscard": {
+    "description": "Discard button text in close confirmation"
+  },
+
+  "createModalCloseCreate": "Create & Close",
+  "@createModalCloseCreate": {
+    "description": "Create and close button text in close confirmation"
+  },
+
+  "buttonAdd": "Add",
+  "@buttonAdd": {
+    "description": "Generic add button text"
+  },
+
+  "buttonSave": "Save",
+  "@buttonSave": {
+    "description": "Generic save button text"
+  },
+
+  "buttonCancel": "Cancel",
+  "@buttonCancel": {
+    "description": "Generic cancel button text"
+  },
+
+  "buttonClose": "Close",
+  "@buttonClose": {
+    "description": "Generic close button text"
+  },
+
+  "buttonArchive": "Archive",
+  "@buttonArchive": {
+    "description": "Generic archive button text"
+  },
+
+  "accessibilityCloseButton": "Close",
+  "@accessibilityCloseButton": {
+    "description": "Accessibility label for close buttons"
+  },
+
+  "accessibilityAddDescription": "Add description, collapsed",
+  "@accessibilityAddDescription": {
+    "description": "Accessibility label for collapsed description field"
+  },
+
+  "accessibilityAddDescriptionHint": "Tap to add optional description field",
+  "@accessibilityAddDescriptionHint": {
+    "description": "Accessibility hint for add description action"
+  },
+
+  "accessibilityRemoveDescription": "Remove description field",
+  "@accessibilityRemoveDescription": {
+    "description": "Accessibility label for remove description button"
+  },
+
+  "accessibilityCreateNewSpace": "Create new space",
+  "@accessibilityCreateNewSpace": {
+    "description": "Accessibility label for create new space button"
+  },
+
+  "accessibilitySpaceItemCount": "{spaceName}, {itemCount} items",
+  "@accessibilitySpaceItemCount": {
+    "description": "Accessibility label for space list items",
+    "placeholders": {
+      "spaceName": {
+        "type": "String",
+        "example": "Work"
+      },
+      "itemCount": {
+        "type": "int",
+        "example": "10"
+      }
+    }
   }
 }

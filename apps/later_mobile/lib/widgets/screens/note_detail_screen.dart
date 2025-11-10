@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:later_mobile/design_system/tokens/tokens.dart';
 import '../../data/models/note_model.dart';
 import '../../providers/content_provider.dart';
@@ -76,9 +77,11 @@ class _NoteDetailScreenState extends State<NoteDetailScreen>
   Future<void> saveChanges() async {
     if (isSaving) return;
 
+    final l10n = AppLocalizations.of(context)!;
+
     // Validate title
     if (_titleController.text.trim().isEmpty) {
-      _showSnackBar('Title cannot be empty', isError: true);
+      _showSnackBar(l10n.noteDetailTitleEmpty, isError: true);
       // Restore previous title
       _titleController.text = _currentNote.title;
       setState(() {
@@ -112,7 +115,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen>
         hasChanges = false;
       });
     } catch (e) {
-      _showSnackBar('Failed to save changes: $e', isError: true);
+      _showSnackBar('${l10n.noteDetailSaveFailed}: $e', isError: true);
     } finally {
       setState(() {
         isSaving = false;
@@ -122,24 +125,25 @@ class _NoteDetailScreenState extends State<NoteDetailScreen>
 
   /// Add a tag to the note
   Future<void> _addTag(String tag) async {
+    final l10n = AppLocalizations.of(context)!;
     final trimmedTag = tag.trim();
 
     // Validation
     if (trimmedTag.isEmpty) {
-      _showSnackBar('Tag cannot be empty', isError: true);
+      _showSnackBar(l10n.noteDetailTagEmpty, isError: true);
       return;
     }
 
     if (trimmedTag.length > _maxTagLength) {
       _showSnackBar(
-        'Tag is too long (max $_maxTagLength characters)',
+        l10n.noteDetailTagTooLong(maxLength: _maxTagLength.toString()),
         isError: true,
       );
       return;
     }
 
     if (_currentNote.tags.contains(trimmedTag)) {
-      _showSnackBar('Tag already exists', isError: true);
+      _showSnackBar(l10n.noteDetailTagExists, isError: true);
       return;
     }
 
@@ -163,9 +167,9 @@ class _NoteDetailScreenState extends State<NoteDetailScreen>
       });
 
       _tagController.clear();
-      _showSnackBar('Tag added');
+      _showSnackBar(l10n.noteDetailTagAdded);
     } catch (e) {
-      _showSnackBar('Failed to add tag: $e', isError: true);
+      _showSnackBar('${l10n.noteDetailTagAddFailed}: $e', isError: true);
     } finally {
       setState(() {
         isSaving = false;
@@ -175,6 +179,8 @@ class _NoteDetailScreenState extends State<NoteDetailScreen>
 
   /// Remove a tag from the note
   Future<void> _removeTag(String tag) async {
+    final l10n = AppLocalizations.of(context)!;
+
     try {
       setState(() {
         isSaving = true;
@@ -194,9 +200,9 @@ class _NoteDetailScreenState extends State<NoteDetailScreen>
         _currentNote = updated;
       });
 
-      _showSnackBar('Tag removed');
+      _showSnackBar(l10n.noteDetailTagRemoved);
     } catch (e) {
-      _showSnackBar('Failed to remove tag: $e', isError: true);
+      _showSnackBar('${l10n.noteDetailTagRemoveFailed}: $e', isError: true);
     } finally {
       setState(() {
         isSaving = false;
@@ -206,13 +212,14 @@ class _NoteDetailScreenState extends State<NoteDetailScreen>
 
   /// Show add tag dialog
   Future<void> _showAddTagDialog() async {
+    final l10n = AppLocalizations.of(context)!;
     _tagController.clear();
 
     return ResponsiveModal.show<void>(
       context: context,
       child: BottomSheetContainer(
-        title: 'Add Tag',
-        primaryButtonText: 'Add',
+        title: l10n.noteDetailAddTagTitle,
+        primaryButtonText: l10n.buttonAdd,
         showSecondaryButton: false,
         onPrimaryPressed: () {
           Navigator.of(context).pop();
@@ -220,8 +227,8 @@ class _NoteDetailScreenState extends State<NoteDetailScreen>
         },
         child: TextInputField(
           controller: _tagController,
-          label: 'Tag Name',
-          hintText: 'Enter tag name',
+          label: l10n.noteDetailTagNameLabel,
+          hintText: l10n.noteDetailTagNameHint,
           autofocus: true,
           textCapitalization: TextCapitalization.words,
           onSubmitted: (value) {
@@ -236,6 +243,8 @@ class _NoteDetailScreenState extends State<NoteDetailScreen>
   /// Delete the note
   /// Note: Navigation is handled in _showDeleteConfirmation(), not here
   Future<void> _deleteNote() async {
+    final l10n = AppLocalizations.of(context)!;
+
     try {
       final provider = Provider.of<ContentProvider>(context, listen: false);
 
@@ -244,18 +253,20 @@ class _NoteDetailScreenState extends State<NoteDetailScreen>
       // Navigation already handled in confirmation dialog
       // Success feedback is provided by UI update (note removed from list)
     } catch (e) {
-      if (mounted) _showSnackBar('Failed to delete note: $e', isError: true);
+      if (mounted) {
+        _showSnackBar('${l10n.noteDetailDeleteFailed}: $e', isError: true);
+      }
     }
   }
 
   /// Show delete confirmation dialog
   Future<void> _showDeleteConfirmation() async {
+    final l10n = AppLocalizations.of(context)!;
+
     final confirmed = await showDeleteConfirmationDialog(
       context: context,
-      title: 'Delete Note',
-      message:
-          'Are you sure you want to delete "${_currentNote.title}"?\n\n'
-          'This action cannot be undone.',
+      title: l10n.noteDetailDeleteTitle,
+      message: l10n.noteDetailDeleteMessage(noteTitle: _currentNote.title),
     );
 
     if (confirmed == true && mounted) {
@@ -279,6 +290,8 @@ class _NoteDetailScreenState extends State<NoteDetailScreen>
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: (didPop, result) async {
@@ -299,7 +312,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen>
               saveChanges();
             },
             gradient: AppColors.noteGradient,
-            hintText: 'Note title',
+            hintText: l10n.noteDetailTitleHint,
           ),
           actions: [
             if (isSaving)
@@ -318,13 +331,13 @@ class _NoteDetailScreenState extends State<NoteDetailScreen>
                 }
               },
               itemBuilder: (context) => [
-                const PopupMenuItem(
+                PopupMenuItem(
                   value: 'delete',
                   child: Row(
                     children: [
-                      Icon(Icons.delete, color: AppColors.error),
-                      SizedBox(width: AppSpacing.sm),
-                      Text('Delete Note'),
+                      const Icon(Icons.delete, color: AppColors.error),
+                      const SizedBox(width: AppSpacing.sm),
+                      Text(l10n.noteDetailMenuDelete),
                     ],
                   ),
                 ),
@@ -342,7 +355,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen>
                 key: const Key('note_content_field'),
                 controller: _contentController,
                 decoration: InputDecoration(
-                  hintText: 'Start writing your note...',
+                  hintText: l10n.noteDetailContentHint,
                   hintStyle: AppTypography.bodyMedium.copyWith(
                     color: AppColors.textSecondary(context),
                   ),
@@ -364,7 +377,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen>
                     Row(
                       children: [
                         Text(
-                          'Tags',
+                          l10n.noteDetailTagsLabel,
                           style: AppTypography.labelLarge.copyWith(
                             color: AppColors.textSecondary(context),
                           ),
@@ -399,7 +412,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen>
                       )
                     else
                       Text(
-                        'No tags yet. Tap + to add tags.',
+                        l10n.noteDetailTagsEmpty,
                         style: AppTypography.bodySmall.copyWith(
                           color: AppColors.textSecondary(context),
                         ),
