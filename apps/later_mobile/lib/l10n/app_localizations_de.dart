@@ -827,4 +827,91 @@ class AppLocalizationsDe extends AppLocalizations {
   String accessibilitySpaceItemCount(String spaceName, int itemCount) {
     return '$spaceName, $itemCount Einträge';
   }
+
+  @override
+  String get spaceSwitcherTitle => 'Space wechseln';
+
+  @override
+  String get spaceSwitcherSearchHint => 'Spaces durchsuchen...';
+
+  @override
+  String spaceSwitcherErrorSwitch(String error) {
+    return 'Space konnte nicht gewechselt werden: $error';
+  }
+
+  @override
+  String get spaceSwitcherEmptyNoResults => 'Keine Spaces gefunden';
+
+  @override
+  String get spaceSwitcherEmptyNoSpaces => 'Keine Spaces verfügbar';
+
+  @override
+  String spaceSwitcherItemCount(int count) {
+    return '$count Einträge';
+  }
+
+  @override
+  String get spaceSwitcherMenuEdit => 'Space bearbeiten';
+
+  @override
+  String get spaceSwitcherMenuArchive => 'Space archivieren';
+
+  @override
+  String get spaceSwitcherMenuRestore => 'Space wiederherstellen';
+
+  @override
+  String get spaceSwitcherMenuCancel => 'Abbrechen';
+
+  @override
+  String get spaceSwitcherSubtitleSwitchFirst =>
+      'Wechseln Sie zuerst zu einem anderen Space';
+
+  @override
+  String spaceSwitcherSubtitleContainsItems(int count) {
+    return 'Dieser Space enthält $count Einträge';
+  }
+
+  @override
+  String get spaceSwitcherSubtitleRestore => 'Diesen Space wieder aktivieren';
+
+  @override
+  String get spaceSwitcherDialogArchiveTitle => 'Space archivieren?';
+
+  @override
+  String spaceSwitcherDialogArchiveContent(int count) {
+    return 'Dieser Space enthält $count Einträge. Das Archivieren verbirgt den Space, behält aber alle Einträge bei. Sie können ihn später aus archivierten Spaces wiederherstellen.';
+  }
+
+  @override
+  String spaceSwitcherSuccessArchived(String name) {
+    return '$name wurde archiviert';
+  }
+
+  @override
+  String spaceSwitcherSuccessRestored(String name) {
+    return '$name wurde wiederhergestellt';
+  }
+
+  @override
+  String spaceSwitcherErrorArchive(String error) {
+    return 'Space konnte nicht archiviert werden: $error';
+  }
+
+  @override
+  String spaceSwitcherErrorRestore(String error) {
+    return 'Space konnte nicht wiederhergestellt werden: $error';
+  }
+
+  @override
+  String get spaceSwitcherErrorCannotArchiveCurrent =>
+      'Der aktuelle Space kann nicht archiviert werden. Wechseln Sie zuerst zu einem anderen Space.';
+
+  @override
+  String get spaceSwitcherBadgeArchived => 'Archiviert';
+
+  @override
+  String get spaceSwitcherToggleShowArchived => 'Archivierte Spaces anzeigen';
+
+  @override
+  String get spaceSwitcherButtonCreateNew => 'Neuen Space erstellen';
 }

@@ -1543,6 +1543,144 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{spaceName}, {itemCount} items'**
   String accessibilitySpaceItemCount(String spaceName, int itemCount);
+
+  /// Title for space switcher modal
+  ///
+  /// In en, this message translates to:
+  /// **'Switch Space'**
+  String get spaceSwitcherTitle;
+
+  /// Hint text for space search field
+  ///
+  /// In en, this message translates to:
+  /// **'Search spaces...'**
+  String get spaceSwitcherSearchHint;
+
+  /// Error message when switching spaces fails
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to switch space: {error}'**
+  String spaceSwitcherErrorSwitch(String error);
+
+  /// Empty state message when search returns no results
+  ///
+  /// In en, this message translates to:
+  /// **'No spaces found'**
+  String get spaceSwitcherEmptyNoResults;
+
+  /// Empty state message when there are no spaces
+  ///
+  /// In en, this message translates to:
+  /// **'No spaces available'**
+  String get spaceSwitcherEmptyNoSpaces;
+
+  /// Item count label in space switcher
+  ///
+  /// In en, this message translates to:
+  /// **'{count} items'**
+  String spaceSwitcherItemCount(int count);
+
+  /// Menu item to edit space
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Space'**
+  String get spaceSwitcherMenuEdit;
+
+  /// Menu item to archive space
+  ///
+  /// In en, this message translates to:
+  /// **'Archive Space'**
+  String get spaceSwitcherMenuArchive;
+
+  /// Menu item to restore archived space
+  ///
+  /// In en, this message translates to:
+  /// **'Restore Space'**
+  String get spaceSwitcherMenuRestore;
+
+  /// Menu item to cancel
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get spaceSwitcherMenuCancel;
+
+  /// Subtitle when trying to archive current space
+  ///
+  /// In en, this message translates to:
+  /// **'Switch to another space first'**
+  String get spaceSwitcherSubtitleSwitchFirst;
+
+  /// Subtitle showing item count before archiving
+  ///
+  /// In en, this message translates to:
+  /// **'This space contains {count} items'**
+  String spaceSwitcherSubtitleContainsItems(int count);
+
+  /// Subtitle for restore action
+  ///
+  /// In en, this message translates to:
+  /// **'Make this space active again'**
+  String get spaceSwitcherSubtitleRestore;
+
+  /// Title for archive confirmation dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Archive Space?'**
+  String get spaceSwitcherDialogArchiveTitle;
+
+  /// Content for archive confirmation dialog
+  ///
+  /// In en, this message translates to:
+  /// **'This space contains {count} items. Archiving will hide the space but keep all items. You can restore it later from archived spaces.'**
+  String spaceSwitcherDialogArchiveContent(int count);
+
+  /// Success message when space is archived
+  ///
+  /// In en, this message translates to:
+  /// **'{name} has been archived'**
+  String spaceSwitcherSuccessArchived(String name);
+
+  /// Success message when space is restored
+  ///
+  /// In en, this message translates to:
+  /// **'{name} has been restored'**
+  String spaceSwitcherSuccessRestored(String name);
+
+  /// Error message when archiving fails
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to archive space: {error}'**
+  String spaceSwitcherErrorArchive(String error);
+
+  /// Error message when restoring fails
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to restore space: {error}'**
+  String spaceSwitcherErrorRestore(String error);
+
+  /// Error message when trying to archive current space
+  ///
+  /// In en, this message translates to:
+  /// **'Cannot archive the current space. Switch to another space first.'**
+  String get spaceSwitcherErrorCannotArchiveCurrent;
+
+  /// Badge label for archived spaces
+  ///
+  /// In en, this message translates to:
+  /// **'Archived'**
+  String get spaceSwitcherBadgeArchived;
+
+  /// Toggle label to show archived spaces
+  ///
+  /// In en, this message translates to:
+  /// **'Show Archived Spaces'**
+  String get spaceSwitcherToggleShowArchived;
+
+  /// Button text to create new space
+  ///
+  /// In en, this message translates to:
+  /// **'Create New Space'**
+  String get spaceSwitcherButtonCreateNew;
 }
 
 class _AppLocalizationsDelegate

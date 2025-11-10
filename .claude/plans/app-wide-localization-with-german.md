@@ -198,13 +198,15 @@ Implement comprehensive localization across the Later Flutter app by migrating a
   - ✅ All localized strings use proper l10n accessor pattern
   - ✅ Methods with placeholders call as functions with parameters
 
-- [ ] Task 3.5: Migrate space switcher modal
-  - Update `lib/widgets/modals/space_switcher_modal.dart` (26 strings)
-  - Replace modal title, search hint, create new space button
-  - Replace empty state messages (no spaces found, no spaces available)
-  - Replace space action menu items (Edit, Archive, Restore)
-  - Replace archive/restore confirmation messages
-  - Replace success/error messages
+- [x] Task 3.5: Migrate space switcher modal
+  - ✅ Updated `lib/widgets/modals/space_switcher_modal.dart` (26 strings)
+  - ✅ Replaced modal title, search hint, create new space button
+  - ✅ Replaced empty state messages (no spaces found, no spaces available)
+  - ✅ Replaced space action menu items (Edit, Archive, Restore)
+  - ✅ Replaced archive/restore confirmation messages
+  - ✅ Replaced success/error messages
+  - ✅ All strings use localized l10n accessor pattern
+  - ✅ Code compiles with only 1 pre-existing warning
 
 - [ ] Task 3.6: Migrate create content modal
   - Update `lib/widgets/modals/create_content_modal.dart` (24 strings)

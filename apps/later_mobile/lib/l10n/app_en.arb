@@ -1334,5 +1334,168 @@
         "example": "10"
       }
     }
+  },
+
+  "spaceSwitcherTitle": "Switch Space",
+  "@spaceSwitcherTitle": {
+    "description": "Title for space switcher modal"
+  },
+
+  "spaceSwitcherSearchHint": "Search spaces...",
+  "@spaceSwitcherSearchHint": {
+    "description": "Hint text for space search field"
+  },
+
+  "spaceSwitcherErrorSwitch": "Failed to switch space: {error}",
+  "@spaceSwitcherErrorSwitch": {
+    "description": "Error message when switching spaces fails",
+    "placeholders": {
+      "error": {
+        "type": "String",
+        "example": "Network error"
+      }
+    }
+  },
+
+  "spaceSwitcherEmptyNoResults": "No spaces found",
+  "@spaceSwitcherEmptyNoResults": {
+    "description": "Empty state message when search returns no results"
+  },
+
+  "spaceSwitcherEmptyNoSpaces": "No spaces available",
+  "@spaceSwitcherEmptyNoSpaces": {
+    "description": "Empty state message when there are no spaces"
+  },
+
+  "spaceSwitcherItemCount": "{count} items",
+  "@spaceSwitcherItemCount": {
+    "description": "Item count label in space switcher",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "5"
+      }
+    }
+  },
+
+  "spaceSwitcherMenuEdit": "Edit Space",
+  "@spaceSwitcherMenuEdit": {
+    "description": "Menu item to edit space"
+  },
+
+  "spaceSwitcherMenuArchive": "Archive Space",
+  "@spaceSwitcherMenuArchive": {
+    "description": "Menu item to archive space"
+  },
+
+  "spaceSwitcherMenuRestore": "Restore Space",
+  "@spaceSwitcherMenuRestore": {
+    "description": "Menu item to restore archived space"
+  },
+
+  "spaceSwitcherMenuCancel": "Cancel",
+  "@spaceSwitcherMenuCancel": {
+    "description": "Menu item to cancel"
+  },
+
+  "spaceSwitcherSubtitleSwitchFirst": "Switch to another space first",
+  "@spaceSwitcherSubtitleSwitchFirst": {
+    "description": "Subtitle when trying to archive current space"
+  },
+
+  "spaceSwitcherSubtitleContainsItems": "This space contains {count} items",
+  "@spaceSwitcherSubtitleContainsItems": {
+    "description": "Subtitle showing item count before archiving",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "5"
+      }
+    }
+  },
+
+  "spaceSwitcherSubtitleRestore": "Make this space active again",
+  "@spaceSwitcherSubtitleRestore": {
+    "description": "Subtitle for restore action"
+  },
+
+  "spaceSwitcherDialogArchiveTitle": "Archive Space?",
+  "@spaceSwitcherDialogArchiveTitle": {
+    "description": "Title for archive confirmation dialog"
+  },
+
+  "spaceSwitcherDialogArchiveContent": "This space contains {count} items. Archiving will hide the space but keep all items. You can restore it later from archived spaces.",
+  "@spaceSwitcherDialogArchiveContent": {
+    "description": "Content for archive confirmation dialog",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "10"
+      }
+    }
+  },
+
+  "spaceSwitcherSuccessArchived": "{name} has been archived",
+  "@spaceSwitcherSuccessArchived": {
+    "description": "Success message when space is archived",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "Work"
+      }
+    }
+  },
+
+  "spaceSwitcherSuccessRestored": "{name} has been restored",
+  "@spaceSwitcherSuccessRestored": {
+    "description": "Success message when space is restored",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "Work"
+      }
+    }
+  },
+
+  "spaceSwitcherErrorArchive": "Failed to archive space: {error}",
+  "@spaceSwitcherErrorArchive": {
+    "description": "Error message when archiving fails",
+    "placeholders": {
+      "error": {
+        "type": "String",
+        "example": "Network error"
+      }
+    }
+  },
+
+  "spaceSwitcherErrorRestore": "Failed to restore space: {error}",
+  "@spaceSwitcherErrorRestore": {
+    "description": "Error message when restoring fails",
+    "placeholders": {
+      "error": {
+        "type": "String",
+        "example": "Network error"
+      }
+    }
+  },
+
+  "spaceSwitcherErrorCannotArchiveCurrent": "Cannot archive the current space. Switch to another space first.",
+  "@spaceSwitcherErrorCannotArchiveCurrent": {
+    "description": "Error message when trying to archive current space"
+  },
+
+  "spaceSwitcherBadgeArchived": "Archived",
+  "@spaceSwitcherBadgeArchived": {
+    "description": "Badge label for archived spaces"
+  },
+
+  "spaceSwitcherToggleShowArchived": "Show Archived Spaces",
+  "@spaceSwitcherToggleShowArchived": {
+    "description": "Toggle label to show archived spaces"
+  },
+
+  "spaceSwitcherButtonCreateNew": "Create New Space",
+  "@spaceSwitcherButtonCreateNew": {
+    "description": "Button text to create new space"
   }
 }
