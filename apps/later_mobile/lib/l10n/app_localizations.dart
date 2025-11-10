@@ -1190,7 +1190,7 @@ abstract class AppLocalizations {
   /// **'No spaces available'**
   String get spaceModalNoSpacesAvailable;
 
-  /// Badge text for archived spaces
+  /// Badge label for archived spaces
   ///
   /// In en, this message translates to:
   /// **'Archived'**

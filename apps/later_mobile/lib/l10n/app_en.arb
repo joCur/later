@@ -1089,11 +1089,6 @@
     }
   },
 
-  "spaceModalArchived": "Archived",
-  "@spaceModalArchived": {
-    "description": "Badge text for archived spaces"
-  },
-
   "spaceModalArchiveSuccess": "{spaceName} has been archived",
   "@spaceModalArchiveSuccess": {
     "description": "Success message after archiving space",

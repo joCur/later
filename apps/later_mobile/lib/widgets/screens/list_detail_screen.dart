@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
+import 'package:later_mobile/l10n/app_localizations.dart';
 import 'package:later_mobile/design_system/tokens/tokens.dart';
 import 'package:later_mobile/data/models/list_model.dart';
 import 'package:later_mobile/data/models/list_item_model.dart';
@@ -88,10 +89,11 @@ class _ListDetailScreenState extends State<ListDetailScreen>
       }
     } catch (e) {
       if (mounted) {
+        final l10n = AppLocalizations.of(context)!;
         setState(() {
           _isLoadingItems = false;
         });
-        _showSnackBar('Failed to load items: $e', isError: true);
+        _showSnackBar(l10n.listDetailLoadFailed, isError: true);
       }
     }
   }
@@ -129,9 +131,11 @@ class _ListDetailScreenState extends State<ListDetailScreen>
   Future<void> saveChanges() async {
     if (!hasChanges || isSaving) return;
 
+    final l10n = AppLocalizations.of(context)!;
+
     // Validate name
     if (_nameController.text.trim().isEmpty) {
-      _showSnackBar('List name cannot be empty', isError: true);
+      _showSnackBar(l10n.listDetailNameEmpty, isError: true);
       return;
     }
 
@@ -152,7 +156,7 @@ class _ListDetailScreenState extends State<ListDetailScreen>
         hasChanges = false;
       });
     } catch (e) {
-      _showSnackBar('Failed to save changes: $e', isError: true);
+      _showSnackBar(l10n.listDetailSaveFailed, isError: true);
     } finally {
       setState(() {
         isSaving = false;
@@ -165,6 +169,8 @@ class _ListDetailScreenState extends State<ListDetailScreen>
     final result = await _showListItemDialog();
     if (result == null || !mounted) return;
 
+    final l10n = AppLocalizations.of(context)!;
+
     try {
       final provider = Provider.of<ContentProvider>(context, listen: false);
       // Set sortOrder to be at the end of current items
@@ -176,9 +182,9 @@ class _ListDetailScreenState extends State<ListDetailScreen>
       await _loadListItems();
       await _refreshListData();
 
-      if (mounted) _showSnackBar('Item added');
+      if (mounted) _showSnackBar(l10n.listDetailItemAdded);
     } catch (e) {
-      if (mounted) _showSnackBar('Failed to add item: $e', isError: true);
+      if (mounted) _showSnackBar(l10n.listDetailItemAddFailed, isError: true);
     }
   }
 
@@ -186,6 +192,8 @@ class _ListDetailScreenState extends State<ListDetailScreen>
   Future<void> _editListItem(ListItem item) async {
     final result = await _showListItemDialog(existingItem: item);
     if (result == null || !mounted) return;
+
+    final l10n = AppLocalizations.of(context)!;
 
     try {
       final provider = Provider.of<ContentProvider>(context, listen: false);
@@ -196,15 +204,17 @@ class _ListDetailScreenState extends State<ListDetailScreen>
       await _loadListItems();
       await _refreshListData();
 
-      if (mounted) _showSnackBar('Item updated');
+      if (mounted) _showSnackBar(l10n.listDetailItemUpdated);
     } catch (e) {
-      if (mounted) _showSnackBar('Failed to update item: $e', isError: true);
+      if (mounted) _showSnackBar(l10n.listDetailItemUpdateFailed, isError: true);
     }
   }
 
   /// Perform ListItem deletion without confirmation
   /// Used by Dismissible after confirmDismiss has already shown confirmation
   Future<void> _performDeleteListItem(ListItem item) async {
+    final l10n = AppLocalizations.of(context)!;
+
     try {
       final provider = Provider.of<ContentProvider>(context, listen: false);
       await provider.deleteListItem(item.id, _currentList.id);
@@ -213,9 +223,9 @@ class _ListDetailScreenState extends State<ListDetailScreen>
       await _loadListItems();
       await _refreshListData();
 
-      if (mounted) _showSnackBar('Item deleted');
+      if (mounted) _showSnackBar(l10n.listDetailItemDeleted);
     } catch (e) {
-      if (mounted) _showSnackBar('Failed to delete item: $e', isError: true);
+      if (mounted) _showSnackBar(l10n.listDetailItemDeleteFailed, isError: true);
     }
   }
 
@@ -232,7 +242,9 @@ class _ListDetailScreenState extends State<ListDetailScreen>
       await _loadListItems();
       await _refreshListData();
     } catch (e) {
-      _showSnackBar('Failed to toggle item: $e', isError: true);
+      if (!mounted) return;
+      final l10n = AppLocalizations.of(context)!;
+      _showSnackBar(l10n.listDetailItemToggleFailed, isError: true);
     }
   }
 
@@ -267,7 +279,8 @@ class _ListDetailScreenState extends State<ListDetailScreen>
       if (!mounted) return;
 
       // Show error to user and reload items from server
-      _showSnackBar('Failed to reorder items: $e', isError: true);
+      final l10n = AppLocalizations.of(context)!;
+      _showSnackBar(l10n.listDetailReorderFailed, isError: true);
       await _loadListItems();
     }
   }
@@ -276,6 +289,8 @@ class _ListDetailScreenState extends State<ListDetailScreen>
   Future<void> _changeListStyle() async {
     final result = await _showStyleSelectionDialog();
     if (result == null || !mounted) return;
+
+    final l10n = AppLocalizations.of(context)!;
 
     try {
       final provider = Provider.of<ContentProvider>(context, listen: false);
@@ -288,9 +303,9 @@ class _ListDetailScreenState extends State<ListDetailScreen>
         });
       }
 
-      if (mounted) _showSnackBar('List style updated');
+      if (mounted) _showSnackBar(l10n.listDetailStyleUpdated);
     } catch (e) {
-      if (mounted) _showSnackBar('Failed to change style: $e', isError: true);
+      if (mounted) _showSnackBar(l10n.listDetailStyleChangeFailed, isError: true);
     }
   }
 
@@ -298,6 +313,8 @@ class _ListDetailScreenState extends State<ListDetailScreen>
   Future<void> _changeListIcon() async {
     final result = await _showIconSelectionDialog();
     if (result == null || !mounted) return;
+
+    final l10n = AppLocalizations.of(context)!;
 
     try {
       final provider = Provider.of<ContentProvider>(context, listen: false);
@@ -310,9 +327,9 @@ class _ListDetailScreenState extends State<ListDetailScreen>
         });
       }
 
-      if (mounted) _showSnackBar('List icon updated');
+      if (mounted) _showSnackBar(l10n.listDetailIconUpdated);
     } catch (e) {
-      if (mounted) _showSnackBar('Failed to change icon: $e', isError: true);
+      if (mounted) _showSnackBar(l10n.listDetailIconChangeFailed, isError: true);
     }
   }
 
@@ -327,12 +344,16 @@ class _ListDetailScreenState extends State<ListDetailScreen>
       // Navigation already handled in confirmation dialog
       // Success feedback is provided by UI update (list removed from list)
     } catch (e) {
-      if (mounted) _showSnackBar('Failed to delete list: $e', isError: true);
+      if (mounted) {
+        final l10n = AppLocalizations.of(context)!;
+        _showSnackBar(l10n.listDetailDeleteFailed, isError: true);
+      }
     }
   }
 
   /// Show ListItem edit/create dialog
   Future<ListItem?> _showListItemDialog({ListItem? existingItem}) async {
+    final l10n = AppLocalizations.of(context)!;
     final titleController = TextEditingController(
       text: existingItem?.title ?? '',
     );
@@ -343,14 +364,14 @@ class _ListDetailScreenState extends State<ListDetailScreen>
     return ResponsiveModal.show<ListItem>(
       context: context,
       child: BottomSheetContainer(
-        title: existingItem == null ? 'Add Item' : 'Edit Item',
+        title: existingItem == null ? l10n.listDetailAddItemTitle : l10n.listDetailEditItemTitle,
         primaryButtonText: existingItem == null ? 'Add' : 'Save',
         showSecondaryButton: false,
         onPrimaryPressed: () {
           if (titleController.text.trim().isEmpty) {
             ScaffoldMessenger.of(
               context,
-            ).showSnackBar(const SnackBar(content: Text('Title is required')));
+            ).showSnackBar(SnackBar(content: Text(l10n.listDetailItemTitleRequired)));
             return;
           }
 
@@ -374,8 +395,8 @@ class _ListDetailScreenState extends State<ListDetailScreen>
             // Title field
             TextInputField(
               controller: titleController,
-              label: 'Title *',
-              hintText: 'Enter item title',
+              label: l10n.listDetailItemTitleLabel,
+              hintText: l10n.listDetailItemTitleHint,
               autofocus: true,
               textCapitalization: TextCapitalization.sentences,
             ),
@@ -384,8 +405,8 @@ class _ListDetailScreenState extends State<ListDetailScreen>
             // Notes field
             TextAreaField(
               controller: notesController,
-              label: 'Notes',
-              hintText: 'Optional notes',
+              label: l10n.listDetailItemNotesLabel,
+              hintText: l10n.listDetailItemNotesHint,
               maxLines: 3,
               textCapitalization: TextCapitalization.sentences,
             ),
@@ -397,17 +418,18 @@ class _ListDetailScreenState extends State<ListDetailScreen>
 
   /// Show style selection dialog
   Future<ListStyle?> _showStyleSelectionDialog() async {
+    final l10n = AppLocalizations.of(context)!;
     return ResponsiveModal.show<ListStyle>(
       context: context,
       child: BottomSheetContainer(
-        title: 'Select Style',
+        title: l10n.listDetailStyleDialogTitle,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             ListTile(
               leading: const Icon(Icons.circle, size: 8),
-              title: const Text('Bullets'),
-              subtitle: const Text('Simple bullet points'),
+              title: Text(l10n.listDetailStyleBullets),
+              subtitle: Text(l10n.listDetailStyleBulletsDesc),
               onTap: () => Navigator.of(context).pop(ListStyle.bullets),
             ),
             ListTile(
@@ -415,14 +437,14 @@ class _ListDetailScreenState extends State<ListDetailScreen>
                 '1.',
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
-              title: const Text('Numbered'),
-              subtitle: const Text('Numbered list items'),
+              title: Text(l10n.listDetailStyleNumbered),
+              subtitle: Text(l10n.listDetailStyleNumberedDesc),
               onTap: () => Navigator.of(context).pop(ListStyle.numbered),
             ),
             ListTile(
               leading: const Icon(Icons.check_box_outline_blank),
-              title: const Text('Checkboxes'),
-              subtitle: const Text('Checkable task items'),
+              title: Text(l10n.listDetailStyleCheckboxes),
+              subtitle: Text(l10n.listDetailStyleCheckboxesDesc),
               onTap: () => Navigator.of(context).pop(ListStyle.checkboxes),
             ),
           ],
@@ -433,6 +455,7 @@ class _ListDetailScreenState extends State<ListDetailScreen>
 
   /// Show icon selection dialog
   Future<String?> _showIconSelectionDialog() async {
+    final l10n = AppLocalizations.of(context)!;
     final commonIcons = [
       '📝',
       '📋',
@@ -451,7 +474,7 @@ class _ListDetailScreenState extends State<ListDetailScreen>
     return ResponsiveModal.show<String>(
       context: context,
       child: BottomSheetContainer(
-        title: 'Select Icon',
+        title: l10n.listDetailIconDialogTitle,
         child: GridView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
@@ -485,13 +508,14 @@ class _ListDetailScreenState extends State<ListDetailScreen>
 
   /// Show delete list confirmation
   Future<void> _showDeleteListConfirmation() async {
+    final l10n = AppLocalizations.of(context)!;
     final confirmed = await showDeleteConfirmationDialog(
       context: context,
-      title: 'Delete List',
-      message:
-          'Are you sure you want to delete "${_currentList.name}"?\n\n'
-          'This will delete all ${_currentList.totalItemCount} items in this list. '
-          'This action cannot be undone.',
+      title: l10n.listDetailDeleteTitle,
+      message: l10n.listDetailDeleteMessage(
+        _currentList.name,
+        _currentList.totalItemCount,
+      ),
     );
 
     if (confirmed == true && mounted) {
@@ -515,6 +539,8 @@ class _ListDetailScreenState extends State<ListDetailScreen>
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: (didPop, result) async {
@@ -546,7 +572,7 @@ class _ListDetailScreenState extends State<ListDetailScreen>
                     saveChanges();
                   },
                   gradient: AppColors.listGradient,
-                  hintText: 'List name',
+                  hintText: l10n.listDetailNameHint,
                 ),
               ),
             ],
@@ -576,33 +602,33 @@ class _ListDetailScreenState extends State<ListDetailScreen>
                 }
               },
               itemBuilder: (context) => [
-                const PopupMenuItem(
+                PopupMenuItem(
                   value: 'changeStyle',
                   child: Row(
                     children: [
-                      Icon(Icons.format_list_bulleted),
-                      SizedBox(width: AppSpacing.sm),
-                      Text('Change Style'),
+                      const Icon(Icons.format_list_bulleted),
+                      const SizedBox(width: AppSpacing.sm),
+                      Text(l10n.listDetailMenuChangeStyle),
                     ],
                   ),
                 ),
-                const PopupMenuItem(
+                PopupMenuItem(
                   value: 'changeIcon',
                   child: Row(
                     children: [
-                      Icon(Icons.emoji_emotions),
-                      SizedBox(width: AppSpacing.sm),
-                      Text('Change Icon'),
+                      const Icon(Icons.emoji_emotions),
+                      const SizedBox(width: AppSpacing.sm),
+                      Text(l10n.listDetailMenuChangeIcon),
                     ],
                   ),
                 ),
-                const PopupMenuItem(
+                PopupMenuItem(
                   value: 'delete',
                   child: Row(
                     children: [
-                      Icon(Icons.delete, color: AppColors.error),
-                      SizedBox(width: AppSpacing.sm),
-                      Text('Delete List'),
+                      const Icon(Icons.delete, color: AppColors.error),
+                      const SizedBox(width: AppSpacing.sm),
+                      Text(l10n.listDetailMenuDelete),
                     ],
                   ),
                 ),
@@ -632,7 +658,10 @@ class _ListDetailScreenState extends State<ListDetailScreen>
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      '${_currentList.checkedItemCount}/${_currentList.totalItemCount} completed',
+                      l10n.listDetailProgressCompleted(
+                        _currentList.checkedItemCount,
+                        _currentList.totalItemCount,
+                      ),
                       style: AppTypography.bodyMedium.copyWith(
                         color: Colors.white,
                         fontWeight: FontWeight.w600,
@@ -688,7 +717,7 @@ class _ListDetailScreenState extends State<ListDetailScreen>
         ),
         floatingActionButton: ResponsiveFab(
           icon: Icons.add,
-          label: 'Add Item',
+          label: l10n.listDetailFabLabel,
           onPressed: _addListItem,
           gradient: AppColors.listGradient,
           enablePulse: _enableFabPulse,
@@ -698,10 +727,11 @@ class _ListDetailScreenState extends State<ListDetailScreen>
   }
 
   Widget _buildEmptyState() {
+    final l10n = AppLocalizations.of(context)!;
     return AnimatedEmptyState(
       icon: Icons.list_alt,
-      title: 'No items yet',
-      message: 'Tap the + button to add your first item',
+      title: l10n.listDetailEmptyTitle,
+      message: l10n.listDetailEmptyMessage,
       enableFabPulse: (enabled) {
         if (mounted) {
           setState(() {

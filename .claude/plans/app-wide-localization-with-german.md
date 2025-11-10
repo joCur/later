@@ -160,21 +160,43 @@ Implement comprehensive localization across the Later Flutter app by migrating a
   - ✅ Replaced menu items (delete note)
   - ✅ All localized strings use proper l10n accessor pattern
 
-- [ ] Task 3.3: Migrate todo list detail screen
-  - Update `lib/widgets/screens/todo_list_detail_screen.dart` (30 strings)
-  - Replace list name label, add item hint, menu items, completion status text
-  - Replace priority labels (High, Medium, Low)
-  - Replace progress indicators and empty states
-  - Replace validation and error messages
+- [x] Task 3.3: Migrate todo list detail screen
+  - ✅ Updated `lib/widgets/screens/todo_list_detail_screen.dart` (30 strings)
+  - ✅ Added `AppLocalizations` import
+  - ✅ Replaced all validation messages (name empty, title required)
+  - ✅ Replaced all success messages (item added, item updated, item deleted)
+  - ✅ Replaced all error messages (load failed, save failed, add/update/delete/toggle/reorder failed)
+  - ✅ Replaced dialog titles (Add TodoItem, Edit TodoItem)
+  - ✅ Replaced all form labels (Title, Description, Priority)
+  - ✅ Replaced all hints (Enter task title, Optional description, TodoList name)
+  - ✅ Replaced priority labels (High, Medium, Low)
+  - ✅ Replaced due date label (No due date)
+  - ✅ Replaced progress indicator text (X/Y completed - using method with int parameters)
+  - ✅ Replaced empty state (No tasks yet, Tap + button message)
+  - ✅ Replaced FAB label (Add Todo)
+  - ✅ Replaced menu item (Delete List)
+  - ✅ Replaced delete confirmation dialog title and message (with parameters)
+  - ✅ All localized strings use proper l10n accessor pattern
+  - ✅ Methods with placeholders call as functions with parameters (not replaceAll)
 
-- [ ] Task 3.4: Migrate list detail screen (most complex)
-  - Update `lib/widgets/screens/list_detail_screen.dart` (35 strings)
-  - Replace list style labels ('Bullets', 'Numbered', 'Checkboxes')
-  - Replace list style descriptions
-  - Replace menu items (Change Style, Change Icon, Delete List)
-  - Replace form labels and button text
-  - Replace validation and error messages
-  - Replace progress indicators and empty states
+- [x] Task 3.4: Migrate list detail screen (most complex)
+  - ✅ Updated `lib/widgets/screens/list_detail_screen.dart` (35 strings)
+  - ✅ Added `AppLocalizations` import
+  - ✅ Replaced all validation messages (name empty, title required)
+  - ✅ Replaced all success messages (item added, item updated, item deleted, style updated, icon updated)
+  - ✅ Replaced all error messages (load failed, save failed, add/update/delete/toggle/reorder failed, style/icon change failed)
+  - ✅ Replaced dialog titles (Add Item, Edit Item, Select Style, Select Icon)
+  - ✅ Replaced all form labels (Title, Notes)
+  - ✅ Replaced all hints (Enter item title, Optional notes, List name)
+  - ✅ Replaced list style labels (Bullets, Numbered, Checkboxes)
+  - ✅ Replaced list style descriptions (Simple bullet points, Numbered list items, Checkable task items)
+  - ✅ Replaced progress indicator text (X/Y completed - using method with int parameters)
+  - ✅ Replaced empty state (No items yet, Tap + button message)
+  - ✅ Replaced FAB label (Add Item)
+  - ✅ Replaced menu items (Change Style, Change Icon, Delete List)
+  - ✅ Replaced delete confirmation dialog title and message (with parameters)
+  - ✅ All localized strings use proper l10n accessor pattern
+  - ✅ Methods with placeholders call as functions with parameters
 
 - [ ] Task 3.5: Migrate space switcher modal
   - Update `lib/widgets/modals/space_switcher_modal.dart` (26 strings)

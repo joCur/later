@@ -1,16 +1,18 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:later_mobile/core/mixins/auto_save_mixin.dart';
+import 'package:later_mobile/design_system/atoms/inputs/text_input_field.dart';
+import 'package:later_mobile/design_system/molecules/app_bars/editable_app_bar_title.dart';
+import 'package:later_mobile/design_system/organisms/dialogs/delete_confirmation_dialog.dart';
+import 'package:later_mobile/design_system/organisms/modals/bottom_sheet_container.dart';
 import 'package:later_mobile/design_system/tokens/tokens.dart';
+import 'package:later_mobile/l10n/app_localizations.dart';
+import 'package:provider/provider.dart';
+
+import '../../core/utils/responsive_modal.dart';
 import '../../data/models/note_model.dart';
 import '../../providers/content_provider.dart';
-import 'package:later_mobile/design_system/organisms/modals/bottom_sheet_container.dart';
-import '../../core/utils/responsive_modal.dart';
-import 'package:later_mobile/design_system/atoms/inputs/text_input_field.dart';
-import 'package:later_mobile/design_system/organisms/dialogs/delete_confirmation_dialog.dart';
-import 'package:later_mobile/design_system/molecules/app_bars/editable_app_bar_title.dart';
-import 'package:later_mobile/core/mixins/auto_save_mixin.dart';
 
 /// Note Detail Screen for viewing and editing Note content
 ///
@@ -136,7 +138,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen>
 
     if (trimmedTag.length > _maxTagLength) {
       _showSnackBar(
-        l10n.noteDetailTagTooLong(maxLength: _maxTagLength.toString()),
+        l10n.noteDetailTagTooLong(_maxTagLength.toString()),
         isError: true,
       );
       return;
@@ -266,7 +268,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen>
     final confirmed = await showDeleteConfirmationDialog(
       context: context,
       title: l10n.noteDetailDeleteTitle,
-      message: l10n.noteDetailDeleteMessage(noteTitle: _currentNote.title),
+      message: l10n.noteDetailDeleteMessage(_currentNote.title),
     );
 
     if (confirmed == true && mounted) {
