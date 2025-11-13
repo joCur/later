@@ -1496,6 +1496,12 @@ abstract class AppLocalizations {
   /// **'Cancel'**
   String get buttonCancel;
 
+  /// Generic delete button text
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get buttonDelete;
+
   /// Generic close button text
   ///
   /// In en, this message translates to:
@@ -1699,6 +1705,72 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Double tap and hold to reorder'**
   String get accessibilityDragHandleHint;
+
+  /// Bottom navigation label for Home tab
+  ///
+  /// In en, this message translates to:
+  /// **'Home'**
+  String get navigationBottomHome;
+
+  /// Tooltip for Home tab in bottom navigation
+  ///
+  /// In en, this message translates to:
+  /// **'View your spaces'**
+  String get navigationBottomHomeTooltip;
+
+  /// Accessibility label for Home tab
+  ///
+  /// In en, this message translates to:
+  /// **'Home navigation'**
+  String get navigationBottomHomeSemanticLabel;
+
+  /// Bottom navigation label for Search tab
+  ///
+  /// In en, this message translates to:
+  /// **'Search'**
+  String get navigationBottomSearch;
+
+  /// Tooltip for Search tab in bottom navigation
+  ///
+  /// In en, this message translates to:
+  /// **'Search items'**
+  String get navigationBottomSearchTooltip;
+
+  /// Accessibility label for Search tab
+  ///
+  /// In en, this message translates to:
+  /// **'Search navigation'**
+  String get navigationBottomSearchSemanticLabel;
+
+  /// Bottom navigation label for Settings tab
+  ///
+  /// In en, this message translates to:
+  /// **'Settings'**
+  String get navigationBottomSettings;
+
+  /// Tooltip for Settings tab in bottom navigation
+  ///
+  /// In en, this message translates to:
+  /// **'App settings'**
+  String get navigationBottomSettingsTooltip;
+
+  /// Accessibility label for Settings tab
+  ///
+  /// In en, this message translates to:
+  /// **'Settings navigation'**
+  String get navigationBottomSettingsSemanticLabel;
+
+  /// Title for generic item delete confirmation dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Item?'**
+  String get dialogDeleteItemTitle;
+
+  /// Message for generic item delete confirmation with item name
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete \"{itemName}\"? This action cannot be undone.'**
+  String dialogDeleteItemMessage(String itemName);
 }
 
 class _AppLocalizationsDelegate

@@ -776,6 +776,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get buttonCancel => 'Cancel';
 
   @override
+  String get buttonDelete => 'Delete';
+
+  @override
   String get buttonClose => 'Close';
 
   @override
@@ -898,4 +901,39 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get accessibilityDragHandleHint => 'Double tap and hold to reorder';
+
+  @override
+  String get navigationBottomHome => 'Home';
+
+  @override
+  String get navigationBottomHomeTooltip => 'View your spaces';
+
+  @override
+  String get navigationBottomHomeSemanticLabel => 'Home navigation';
+
+  @override
+  String get navigationBottomSearch => 'Search';
+
+  @override
+  String get navigationBottomSearchTooltip => 'Search items';
+
+  @override
+  String get navigationBottomSearchSemanticLabel => 'Search navigation';
+
+  @override
+  String get navigationBottomSettings => 'Settings';
+
+  @override
+  String get navigationBottomSettingsTooltip => 'App settings';
+
+  @override
+  String get navigationBottomSettingsSemanticLabel => 'Settings navigation';
+
+  @override
+  String get dialogDeleteItemTitle => 'Delete Item?';
+
+  @override
+  String dialogDeleteItemMessage(String itemName) {
+    return 'Are you sure you want to delete \"$itemName\"? This action cannot be undone.';
+  }
 }

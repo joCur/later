@@ -339,7 +339,7 @@ class _TodoListDetailScreenState extends State<TodoListDetailScreen> {
       context: context,
       child: BottomSheetContainer(
         title: existingItem == null ? l10n.todoDetailAddItemTitle : l10n.todoDetailEditItemTitle,
-        primaryButtonText: existingItem == null ? 'Add' : 'Save',
+        primaryButtonText: existingItem == null ? l10n.buttonAdd : l10n.buttonSave,
         showSecondaryButton: false,
         onPrimaryPressed: () {
           if (titleController.text.trim().isEmpty) {

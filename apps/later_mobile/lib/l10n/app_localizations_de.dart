@@ -801,6 +801,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get buttonCancel => 'Abbrechen';
 
   @override
+  String get buttonDelete => 'Löschen';
+
+  @override
   String get buttonClose => 'Schließen';
 
   @override
@@ -925,4 +928,40 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get accessibilityDragHandleHint =>
       'Doppeltippen und halten zum Neuanordnen';
+
+  @override
+  String get navigationBottomHome => 'Startseite';
+
+  @override
+  String get navigationBottomHomeTooltip => 'Ihre Spaces anzeigen';
+
+  @override
+  String get navigationBottomHomeSemanticLabel => 'Startseite-Navigation';
+
+  @override
+  String get navigationBottomSearch => 'Suchen';
+
+  @override
+  String get navigationBottomSearchTooltip => 'Elemente suchen';
+
+  @override
+  String get navigationBottomSearchSemanticLabel => 'Such-Navigation';
+
+  @override
+  String get navigationBottomSettings => 'Einstellungen';
+
+  @override
+  String get navigationBottomSettingsTooltip => 'App-Einstellungen';
+
+  @override
+  String get navigationBottomSettingsSemanticLabel =>
+      'Einstellungen-Navigation';
+
+  @override
+  String get dialogDeleteItemTitle => 'Element löschen?';
+
+  @override
+  String dialogDeleteItemMessage(String itemName) {
+    return 'Möchten Sie \"$itemName\" wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.';
+  }
 }

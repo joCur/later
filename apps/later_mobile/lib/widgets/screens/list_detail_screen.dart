@@ -365,7 +365,7 @@ class _ListDetailScreenState extends State<ListDetailScreen>
       context: context,
       child: BottomSheetContainer(
         title: existingItem == null ? l10n.listDetailAddItemTitle : l10n.listDetailEditItemTitle,
-        primaryButtonText: existingItem == null ? 'Add' : 'Save',
+        primaryButtonText: existingItem == null ? l10n.buttonAdd : l10n.buttonSave,
         showSecondaryButton: false,
         onPrimaryPressed: () {
           if (titleController.text.trim().isEmpty) {

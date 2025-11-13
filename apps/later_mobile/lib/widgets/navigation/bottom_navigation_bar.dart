@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:later_mobile/design_system/tokens/tokens.dart';
+import 'package:later_mobile/l10n/app_localizations.dart';
 import '../../core/theme/temporal_flow_theme.dart';
 
 // Design Constants
@@ -105,6 +106,7 @@ class _AppBottomNavigationBarState extends State<AppBottomNavigationBar>
     final theme = Theme.of(context);
     final isDarkMode = theme.brightness == Brightness.dark;
     final temporalTheme = Theme.of(context).extension<TemporalFlowTheme>()!;
+    final l10n = AppLocalizations.of(context)!;
 
     return SafeArea(
       child: ClipRect(
@@ -127,9 +129,9 @@ class _AppBottomNavigationBarState extends State<AppBottomNavigationBar>
                   index: 0,
                   icon: Icons.home_outlined,
                   selectedIcon: Icons.home,
-                  label: 'Home',
-                  tooltip: 'View your spaces',
-                  semanticLabel: 'Home navigation',
+                  label: l10n.navigationBottomHome,
+                  tooltip: l10n.navigationBottomHomeTooltip,
+                  semanticLabel: l10n.navigationBottomHomeSemanticLabel,
                   isDarkMode: isDarkMode,
                 ),
                 _buildNavItem(
@@ -137,9 +139,9 @@ class _AppBottomNavigationBarState extends State<AppBottomNavigationBar>
                   index: 1,
                   icon: Icons.search_outlined,
                   selectedIcon: Icons.search,
-                  label: 'Search',
-                  tooltip: 'Search items',
-                  semanticLabel: 'Search navigation',
+                  label: l10n.navigationBottomSearch,
+                  tooltip: l10n.navigationBottomSearchTooltip,
+                  semanticLabel: l10n.navigationBottomSearchSemanticLabel,
                   isDarkMode: isDarkMode,
                 ),
                 _buildNavItem(
@@ -147,9 +149,9 @@ class _AppBottomNavigationBarState extends State<AppBottomNavigationBar>
                   index: 2,
                   icon: Icons.settings_outlined,
                   selectedIcon: Icons.settings,
-                  label: 'Settings',
-                  tooltip: 'App settings',
-                  semanticLabel: 'Settings navigation',
+                  label: l10n.navigationBottomSettings,
+                  tooltip: l10n.navigationBottomSettingsTooltip,
+                  semanticLabel: l10n.navigationBottomSettingsSemanticLabel,
                   isDarkMode: isDarkMode,
                 ),
               ],

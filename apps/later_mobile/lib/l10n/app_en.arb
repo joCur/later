@@ -1286,6 +1286,11 @@
     "description": "Generic cancel button text"
   },
 
+  "buttonDelete": "Delete",
+  "@buttonDelete": {
+    "description": "Generic delete button text"
+  },
+
   "buttonClose": "Close",
   "@buttonClose": {
     "description": "Generic close button text"
@@ -1512,5 +1517,66 @@
   "accessibilityDragHandleHint": "Double tap and hold to reorder",
   "@accessibilityDragHandleHint": {
     "description": "Accessibility hint for drag handle reordering interaction"
+  },
+
+  "navigationBottomHome": "Home",
+  "@navigationBottomHome": {
+    "description": "Bottom navigation label for Home tab"
+  },
+
+  "navigationBottomHomeTooltip": "View your spaces",
+  "@navigationBottomHomeTooltip": {
+    "description": "Tooltip for Home tab in bottom navigation"
+  },
+
+  "navigationBottomHomeSemanticLabel": "Home navigation",
+  "@navigationBottomHomeSemanticLabel": {
+    "description": "Accessibility label for Home tab"
+  },
+
+  "navigationBottomSearch": "Search",
+  "@navigationBottomSearch": {
+    "description": "Bottom navigation label for Search tab"
+  },
+
+  "navigationBottomSearchTooltip": "Search items",
+  "@navigationBottomSearchTooltip": {
+    "description": "Tooltip for Search tab in bottom navigation"
+  },
+
+  "navigationBottomSearchSemanticLabel": "Search navigation",
+  "@navigationBottomSearchSemanticLabel": {
+    "description": "Accessibility label for Search tab"
+  },
+
+  "navigationBottomSettings": "Settings",
+  "@navigationBottomSettings": {
+    "description": "Bottom navigation label for Settings tab"
+  },
+
+  "navigationBottomSettingsTooltip": "App settings",
+  "@navigationBottomSettingsTooltip": {
+    "description": "Tooltip for Settings tab in bottom navigation"
+  },
+
+  "navigationBottomSettingsSemanticLabel": "Settings navigation",
+  "@navigationBottomSettingsSemanticLabel": {
+    "description": "Accessibility label for Settings tab"
+  },
+
+  "dialogDeleteItemTitle": "Delete Item?",
+  "@dialogDeleteItemTitle": {
+    "description": "Title for generic item delete confirmation dialog"
+  },
+
+  "dialogDeleteItemMessage": "Are you sure you want to delete \"{itemName}\"? This action cannot be undone.",
+  "@dialogDeleteItemMessage": {
+    "description": "Message for generic item delete confirmation with item name",
+    "placeholders": {
+      "itemName": {
+        "type": "String",
+        "example": "My List"
+      }
+    }
   }
 }

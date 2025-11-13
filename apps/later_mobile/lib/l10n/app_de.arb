@@ -623,6 +623,7 @@
   "buttonAdd": "Hinzufügen",
   "buttonSave": "Speichern",
   "buttonCancel": "Abbrechen",
+  "buttonDelete": "Löschen",
   "buttonClose": "Schließen",
   "buttonArchive": "Archivieren",
 
@@ -659,5 +660,18 @@
 
   "searchEmptyTitle": "Keine Ergebnisse gefunden",
   "searchEmptyMessage": "Versuchen Sie andere Suchbegriffe oder überprüfen Sie die Rechtschreibung",
-  "accessibilityDragHandleHint": "Doppeltippen und halten zum Neuanordnen"
+  "accessibilityDragHandleHint": "Doppeltippen und halten zum Neuanordnen",
+
+  "navigationBottomHome": "Startseite",
+  "navigationBottomHomeTooltip": "Ihre Spaces anzeigen",
+  "navigationBottomHomeSemanticLabel": "Startseite-Navigation",
+  "navigationBottomSearch": "Suchen",
+  "navigationBottomSearchTooltip": "Elemente suchen",
+  "navigationBottomSearchSemanticLabel": "Such-Navigation",
+  "navigationBottomSettings": "Einstellungen",
+  "navigationBottomSettingsTooltip": "App-Einstellungen",
+  "navigationBottomSettingsSemanticLabel": "Einstellungen-Navigation",
+
+  "dialogDeleteItemTitle": "Element löschen?",
+  "dialogDeleteItemMessage": "Möchten Sie \"{itemName}\" wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden."
 }
