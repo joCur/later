@@ -14,6 +14,7 @@ import 'package:later_mobile/design_system/atoms/inputs/text_area_field.dart';
 import 'package:later_mobile/design_system/atoms/inputs/text_input_field.dart';
 import 'package:later_mobile/design_system/molecules/controls/segmented_control.dart';
 import 'package:later_mobile/design_system/tokens/tokens.dart';
+import 'package:later_mobile/l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 
@@ -95,27 +96,30 @@ class _CreateContentModalState extends State<CreateContentModal>
   // Check if we're creating a new item or editing an existing one
   bool get _isNewItem => _currentItemId == null;
 
-  // Type selection for content creation
-  static const List<TypeOption> _typeOptions = [
-    TypeOption(
-      label: 'Todo List',
-      icon: Icons.check_box_outlined,
-      type: ContentType.todoList,
-      color: AppColors.info,
-    ),
-    TypeOption(
-      label: 'List',
-      icon: Icons.list_alt,
-      type: ContentType.list,
-      color: AppColors.primarySolid,
-    ),
-    TypeOption(
-      label: 'Note',
-      icon: Icons.description_outlined,
-      type: ContentType.note,
-      color: AppColors.success,
-    ),
-  ];
+  // Type selection for content creation - uses localized labels
+  List<TypeOption> _getTypeOptions(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return [
+      TypeOption(
+        label: l10n.createModalTypeTodoList,
+        icon: Icons.check_box_outlined,
+        type: ContentType.todoList,
+        color: AppColors.info,
+      ),
+      TypeOption(
+        label: l10n.createModalTypeList,
+        icon: Icons.list_alt,
+        type: ContentType.list,
+        color: AppColors.primarySolid,
+      ),
+      TypeOption(
+        label: l10n.createModalTypeNote,
+        icon: Icons.description_outlined,
+        type: ContentType.note,
+        color: AppColors.success,
+      ),
+    ];
+  }
 
   ContentType? _selectedType; // User-selected type
   ListStyle _selectedListStyle = ListStyle.bullets; // Default list style
@@ -373,10 +377,11 @@ class _CreateContentModalState extends State<CreateContentModal>
     if (_selectedType == ContentType.todoList) {
       if (_descriptionController.text.length > 500) {
         if (mounted) {
+          final l10n = AppLocalizations.of(context)!;
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Description too long (max 500 characters)'),
-              duration: Duration(seconds: 2),
+            SnackBar(
+              content: Text(l10n.createModalTodoDescriptionTooLong),
+              duration: const Duration(seconds: 2),
             ),
           );
         }
@@ -472,6 +477,7 @@ class _CreateContentModalState extends State<CreateContentModal>
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final temporalTheme = Theme.of(context).extension<TemporalFlowTheme>()!;
     final surfaceColor = AppColors.surface(context);
+    final l10n = AppLocalizations.of(context)!;
 
     return showDialog<_CloseAction>(
       context: context,
@@ -507,14 +513,14 @@ class _CreateContentModalState extends State<CreateContentModal>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Discard unsaved content?',
+                  l10n.createModalCloseTitle,
                   style: AppTypography.h4.copyWith(
                     color: AppColors.text(context),
                   ),
                 ),
                 const SizedBox(height: AppSpacing.md),
                 Text(
-                  'You haven\'t created this item yet. Would you like to create it or discard your changes?',
+                  l10n.createModalCloseMessage,
                   style: AppTypography.bodyMedium.copyWith(
                     color: AppColors.textSecondary(context),
                   ),
@@ -524,19 +530,19 @@ class _CreateContentModalState extends State<CreateContentModal>
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     GhostButton(
-                      text: 'Cancel',
+                      text: l10n.createModalCloseCancel,
                       onPressed: () =>
                           Navigator.of(context).pop(_CloseAction.cancel),
                     ),
                     const SizedBox(width: AppSpacing.xs),
                     GhostButton(
-                      text: 'Discard',
+                      text: l10n.createModalCloseDiscard,
                       onPressed: () =>
                           Navigator.of(context).pop(_CloseAction.discard),
                     ),
                     const SizedBox(width: AppSpacing.xs),
                     GradientButton(
-                      label: 'Create & Close',
+                      label: l10n.createModalCloseCreate,
                       onPressed: () => Navigator.of(
                         context,
                       ).pop(_CloseAction.createAndClose),
@@ -728,6 +734,7 @@ class _CreateContentModalState extends State<CreateContentModal>
 
   Widget _buildHeader() {
     final isMobile = context.isMobile;
+    final l10n = AppLocalizations.of(context)!;
 
     return Padding(
       padding: EdgeInsets.fromLTRB(
@@ -742,7 +749,7 @@ class _CreateContentModalState extends State<CreateContentModal>
         children: [
           // "Create" text
           Text(
-            'Create ',
+            '${l10n.createModalTitle} ',
             style: AppTypography.h3.copyWith(color: AppColors.text(context)),
           ),
 
@@ -753,7 +760,7 @@ class _CreateContentModalState extends State<CreateContentModal>
 
           // Close button
           Semantics(
-            label: 'Close',
+            label: l10n.createModalCloseCancel,
             button: true,
             child: IconButton(
               key: const Key('close_button'),
@@ -773,11 +780,12 @@ class _CreateContentModalState extends State<CreateContentModal>
 
   /// Build inline type selector for the header (e.g., "Create Note")
   Widget _buildInlineTypeSelector() {
+    final typeOptions = _getTypeOptions(context);
     // Find the selected option, default to Note if none selected
-    final selectedOption = _typeOptions.firstWhere(
+    final selectedOption = typeOptions.firstWhere(
       (option) => option.type == _selectedType,
       orElse: () =>
-          _typeOptions.firstWhere((option) => option.type == ContentType.note),
+          typeOptions.firstWhere((option) => option.type == ContentType.note),
     );
 
     return PopupMenuButton<TypeOption>(
@@ -800,7 +808,7 @@ class _CreateContentModalState extends State<CreateContentModal>
         ],
       ),
       itemBuilder: (context) {
-        return _typeOptions.map((option) {
+        return typeOptions.map((option) {
           return PopupMenuItem<TypeOption>(
             value: option,
             child: Row(
@@ -831,16 +839,17 @@ class _CreateContentModalState extends State<CreateContentModal>
   }
 
   /// Get display label for a list style
-  String _getStyleLabel(ListStyle style) {
+  String _getStyleLabel(BuildContext context, ListStyle style) {
+    final l10n = AppLocalizations.of(context)!;
     switch (style) {
       case ListStyle.bullets:
-        return 'Bullets';
+        return l10n.createModalListStyleBullets;
       case ListStyle.numbered:
-        return 'Numbered';
+        return l10n.createModalListStyleNumbered;
       case ListStyle.checkboxes:
-        return 'Checklist';
+        return l10n.createModalListStyleCheckboxes;
       case ListStyle.simple:
-        return 'Simple';
+        return l10n.createModalListStyleSimple;
     }
   }
 
@@ -860,6 +869,7 @@ class _CreateContentModalState extends State<CreateContentModal>
 
   /// Build List-specific fields (style selector)
   Widget _buildListFields() {
+    final l10n = AppLocalizations.of(context)!;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
       child: Column(
@@ -867,7 +877,7 @@ class _CreateContentModalState extends State<CreateContentModal>
         children: [
           const SizedBox(height: AppSpacing.sm),
           Text(
-            'List Style',
+            l10n.createModalListStyleLabel,
             style: AppTypography.labelMedium.copyWith(
               color: AppColors.textSecondary(context),
             ),
@@ -878,7 +888,7 @@ class _CreateContentModalState extends State<CreateContentModal>
             options: ListStyle.values.map((style) {
               return SegmentedControlOption<ListStyle>(
                 value: style,
-                label: _getStyleLabel(style),
+                label: _getStyleLabel(context, style),
                 icon: _getStyleIcon(style),
               );
             }).toList(),
@@ -896,6 +906,7 @@ class _CreateContentModalState extends State<CreateContentModal>
 
   /// Build mobile smart field for Notes (first line = title pattern)
   Widget _buildNoteFieldsMobile() {
+    final l10n = AppLocalizations.of(context)!;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
       child: TextAreaField(
@@ -904,13 +915,14 @@ class _CreateContentModalState extends State<CreateContentModal>
         focusNode: _focusNode,
         autofocus: true,
         maxLines: 6,
-        hintText: 'Note title or content...\n(First line becomes title)',
+        hintText: l10n.createModalNoteSmartFieldHint,
       ),
     );
   }
 
   /// Build desktop two-field layout for Notes
   Widget _buildNoteFieldsDesktop() {
+    final l10n = AppLocalizations.of(context)!;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
       child: Column(
@@ -922,7 +934,7 @@ class _CreateContentModalState extends State<CreateContentModal>
           TextInputField(
             key: const Key('note_title_field_desktop'),
             controller: _noteTitleController,
-            hintText: 'Note title',
+            hintText: l10n.createModalNoteTitleHint,
             autofocus: true,
             textInputAction: TextInputAction.next,
             onChanged: (value) {
@@ -942,7 +954,7 @@ class _CreateContentModalState extends State<CreateContentModal>
                       TextAreaField(
                         key: const Key('note_content_field_desktop'),
                         controller: _noteContentController,
-                        hintText: 'Note content',
+                        hintText: l10n.createModalNoteContentHint,
                         maxLines: 4,
                       ),
                     ],
@@ -963,6 +975,7 @@ class _CreateContentModalState extends State<CreateContentModal>
   /// Build TodoList-specific fields (optional description)
   Widget _buildTodoListFields() {
     final temporalTheme = Theme.of(context).extension<TemporalFlowTheme>()!;
+    final l10n = AppLocalizations.of(context)!;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
@@ -978,7 +991,7 @@ class _CreateContentModalState extends State<CreateContentModal>
               // Show expandable link when collapsed
               Semantics(
                 button: true,
-                label: 'Add description, collapsed',
+                label: l10n.createModalTodoDescriptionAdd,
                 hint: 'Tap to add optional description field',
                 child: GestureDetector(
                   key: const Key('add_description_link'),
@@ -993,7 +1006,7 @@ class _CreateContentModalState extends State<CreateContentModal>
                     height: 48, // Minimum touch target
                     alignment: Alignment.centerLeft,
                     child: Text(
-                      '+ Add description (optional)',
+                      l10n.createModalTodoDescriptionAdd,
                       style: AppTypography.labelMedium.copyWith(
                         color: temporalTheme.taskColor,
                         decoration: TextDecoration.underline,
@@ -1012,7 +1025,7 @@ class _CreateContentModalState extends State<CreateContentModal>
                     children: [
                       Expanded(
                         child: Text(
-                          'Description (optional)',
+                          l10n.createModalTodoDescriptionLabel,
                           style: AppTypography.labelMedium.copyWith(
                             color: AppColors.textSecondary(context),
                           ),
@@ -1049,7 +1062,7 @@ class _CreateContentModalState extends State<CreateContentModal>
                   TextAreaField(
                     key: const Key('todolist_description_field'),
                     controller: _descriptionController,
-                    hintText: 'Add description (optional)',
+                    hintText: l10n.createModalTodoDescriptionHint,
                     maxLines: 3,
                     onChanged: (value) {
                       // Trigger rebuild for character count
@@ -1135,6 +1148,7 @@ class _CreateContentModalState extends State<CreateContentModal>
 
   Widget _buildInputField() {
     final isMobile = context.isMobile;
+    final l10n = AppLocalizations.of(context)!;
 
     // For notes, we use type-specific fields instead of the default input field
     if (_selectedType == ContentType.note) {
@@ -1145,13 +1159,13 @@ class _CreateContentModalState extends State<CreateContentModal>
     String getHintText() {
       switch (_selectedType) {
         case ContentType.todoList:
-          return 'Todo list name';
+          return l10n.createModalTodoListNameHint;
         case ContentType.list:
-          return 'List name';
+          return l10n.createModalListNameHint;
         case ContentType.note:
-          return 'Note title'; // Fallback, but note uses type-specific fields
+          return l10n.createModalNoteTitleHint; // Fallback, but note uses type-specific fields
         case null:
-          return 'Enter title...';
+          return l10n.createModalNoteTitleHint;
       }
     }
 
@@ -1171,6 +1185,7 @@ class _CreateContentModalState extends State<CreateContentModal>
 
   Widget _buildSpaceSelectorRow() {
     final isMobile = context.isMobile;
+    final l10n = AppLocalizations.of(context)!;
 
     return Padding(
       padding: EdgeInsets.fromLTRB(
@@ -1182,7 +1197,7 @@ class _CreateContentModalState extends State<CreateContentModal>
       child: Row(
         children: [
           Text(
-            'Save to: ',
+            l10n.createModalSaveToLabel,
             style: AppTypography.labelMedium.copyWith(
               color: AppColors.textSecondary(context),
             ),
@@ -1265,17 +1280,18 @@ class _CreateContentModalState extends State<CreateContentModal>
 
   Widget _buildAutoSaveIndicator() {
     final isMobile = context.isMobile;
+    final l10n = AppLocalizations.of(context)!;
 
     // Platform-aware keyboard shortcut text
     String getKeyboardShortcutText() {
       try {
         final isMacOS = Platform.isMacOS;
         return isMacOS
-            ? '⌘+Enter to create • Esc to close'
-            : 'Ctrl+Enter to create • Esc to close';
+            ? l10n.createModalKeyboardShortcutMac
+            : l10n.createModalKeyboardShortcutOther;
       } catch (e) {
         // Fallback for web or platforms without Platform API
-        return 'Ctrl+Enter to create • Esc to close';
+        return l10n.createModalKeyboardShortcutOther;
       }
     }
 
@@ -1305,20 +1321,21 @@ class _CreateContentModalState extends State<CreateContentModal>
   }
 
   Widget _buildFooter({required bool isMobile}) {
+    final l10n = AppLocalizations.of(context)!;
     // Get button text from selected type
     String buttonText;
     switch (_selectedType) {
       case ContentType.todoList:
-        buttonText = 'Create Todo List';
+        buttonText = l10n.createModalButtonTodoList;
         break;
       case ContentType.list:
-        buttonText = 'Create List';
+        buttonText = l10n.createModalButtonList;
         break;
       case ContentType.note:
-        buttonText = 'Create Note';
+        buttonText = l10n.createModalButtonNote;
         break;
       case null:
-        buttonText = 'Create';
+        buttonText = l10n.createModalButtonGeneric;
         break;
     }
 

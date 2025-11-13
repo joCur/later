@@ -251,18 +251,18 @@ void main() {
       await tester.tap(find.text('Show 1'));
       await tester.pump();
 
-      // Check for keyword from databaseTimeout message
+      // Check for keyword from databaseTimeout localized message
       expect(
-        find.textContaining('timed out', findRichText: true),
+        find.textContaining('took too long', findRichText: true),
         findsOneWidget,
       );
 
       await tester.tap(find.text('Show 2'));
       await tester.pump();
 
-      // Should only show the second snackbar with networkGeneric keyword
+      // Should only show the second snackbar with networkGeneric localized keyword
       expect(
-        find.textContaining('Network error', findRichText: true),
+        find.textContaining('network error', findRichText: true),
         findsOneWidget,
       );
     });
