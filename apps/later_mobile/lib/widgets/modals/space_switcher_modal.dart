@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:later_mobile/design_system/tokens/tokens.dart';
+import 'package:later_mobile/l10n/app_localizations.dart';
 import '../../core/theme/temporal_flow_theme.dart';
 import '../../core/utils/responsive_modal.dart';
 import '../../data/models/space_model.dart';
@@ -105,6 +106,7 @@ class _SpaceSwitcherModalState extends State<SpaceSwitcherModal> {
     final navigator = Navigator.of(context);
     final messenger = ScaffoldMessenger.of(context);
     final spacesProvider = context.read<SpacesProvider>();
+    final l10n = AppLocalizations.of(context)!;
 
     if (space.id == currentSpaceId) {
       // Already on this space, just close
@@ -127,7 +129,7 @@ class _SpaceSwitcherModalState extends State<SpaceSwitcherModal> {
       if (mounted) {
         messenger.showSnackBar(
           SnackBar(
-            content: Text('Failed to switch space: ${e.toString()}'),
+            content: Text(l10n.spaceSwitcherErrorSwitch(e.toString())),
             behavior: SnackBarBehavior.floating,
           ),
         );
@@ -197,11 +199,12 @@ class _SpaceSwitcherModalState extends State<SpaceSwitcherModal> {
   }
 
   /// Build search field
-  Widget _buildSearchField(bool isDark) {
+  Widget _buildSearchField(BuildContext context, bool isDark) {
+    final l10n = AppLocalizations.of(context)!;
     return TextInputField(
       controller: _searchController,
       focusNode: _searchFocusNode,
-      hintText: 'Search spaces...',
+      hintText: l10n.spaceSwitcherSearchHint,
       prefixIcon: Icons.search,
       suffixIcon: _searchController.text.isNotEmpty ? Icons.clear : null,
       onSuffixIconPressed: _searchController.text.isNotEmpty
@@ -308,13 +311,14 @@ class _SpaceSwitcherModalState extends State<SpaceSwitcherModal> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final isArchived = space.isArchived;
     final gradient = _getSpaceGradient(index, context);
+    final l10n = AppLocalizations.of(context)!;
 
     // Get item count for accessibility label
     final itemCount = _cachedCounts[space.id] ?? 0;
 
     // Wrap entire item in Opacity if archived
     final itemContent = Semantics(
-      label: '${space.name}, $itemCount items',
+      label: l10n.accessibilitySpaceItemCount(space.name, itemCount),
       selected: isSelected,
       button: true,
       child: InkWell(
@@ -441,7 +445,7 @@ class _SpaceSwitcherModalState extends State<SpaceSwitcherModal> {
                       borderRadius: BorderRadius.circular(AppSpacing.xs),
                     ),
                     child: Text(
-                      'Archived',
+                      l10n.spaceSwitcherBadgeArchived,
                       style: AppTypography.labelSmall.copyWith(
                         color: isDark
                             ? AppColors.neutral500
@@ -488,6 +492,7 @@ class _SpaceSwitcherModalState extends State<SpaceSwitcherModal> {
     final spacesProvider = Provider.of<SpacesProvider>(context, listen: false);
     final currentSpaceId = spacesProvider.currentSpace?.id ?? '';
     final isCurrentSpace = space.id == currentSpaceId;
+    final l10n = AppLocalizations.of(context)!;
 
     // Get item count for menu (use cached value or default to 0)
     final itemCount = _cachedCounts[space.id] ?? 0;
@@ -538,7 +543,7 @@ class _SpaceSwitcherModalState extends State<SpaceSwitcherModal> {
                         ),
                       ),
                       Text(
-                        '$itemCount items',
+                        l10n.spaceSwitcherItemCount(itemCount),
                         style: AppTypography.labelMedium.copyWith(
                           color: isDark
                               ? AppColors.neutral500
@@ -557,7 +562,7 @@ class _SpaceSwitcherModalState extends State<SpaceSwitcherModal> {
                 // Menu options
                 ListTile(
                   leading: const Icon(Icons.edit),
-                  title: const Text('Edit Space'),
+                  title: Text(l10n.spaceSwitcherMenuEdit),
                   onTap: () {
                     Navigator.of(bottomSheetContext).pop();
                     _handleEditSpace(context, space);
@@ -575,13 +580,11 @@ class _SpaceSwitcherModalState extends State<SpaceSwitcherModal> {
                 if (!space.isArchived)
                   ListTile(
                     leading: const Icon(Icons.archive),
-                    title: const Text('Archive Space'),
+                    title: Text(l10n.spaceSwitcherMenuArchive),
                     subtitle: isCurrentSpace
-                        ? const Text('Switch to another space first')
+                        ? Text(l10n.spaceSwitcherSubtitleSwitchFirst)
                         : (itemCount > 0
-                              ? Text(
-                                  'This space contains $itemCount items',
-                                )
+                              ? Text(l10n.spaceSwitcherSubtitleContainsItems(itemCount))
                               : null),
                     onTap: isCurrentSpace
                         ? null
@@ -605,8 +608,8 @@ class _SpaceSwitcherModalState extends State<SpaceSwitcherModal> {
                 else
                   ListTile(
                     leading: const Icon(Icons.unarchive),
-                    title: const Text('Restore Space'),
-                    subtitle: const Text('Make this space active again'),
+                    title: Text(l10n.spaceSwitcherMenuRestore),
+                    subtitle: Text(l10n.spaceSwitcherSubtitleRestore),
                     onTap: () {
                       Navigator.of(bottomSheetContext).pop();
                       _handleRestoreSpace(context, space);
@@ -622,7 +625,7 @@ class _SpaceSwitcherModalState extends State<SpaceSwitcherModal> {
 
                 ListTile(
                   leading: const Icon(Icons.close),
-                  title: const Text('Cancel'),
+                  title: Text(l10n.spaceSwitcherMenuCancel),
                   onTap: () => Navigator.of(bottomSheetContext).pop(),
                   iconColor: isDark
                       ? AppColors.neutral500
@@ -664,6 +667,7 @@ class _SpaceSwitcherModalState extends State<SpaceSwitcherModal> {
     final messenger = ScaffoldMessenger.of(context);
     final spacesProvider = Provider.of<SpacesProvider>(context, listen: false);
     final currentSpaceId = spacesProvider.currentSpace?.id ?? '';
+    final l10n = AppLocalizations.of(context)!;
 
     // Get item count (use cached value or default to 0)
     final itemCount = _cachedCounts[space.id] ?? 0;
@@ -671,10 +675,8 @@ class _SpaceSwitcherModalState extends State<SpaceSwitcherModal> {
     // Prevent archiving current space
     if (space.id == currentSpaceId) {
       messenger.showSnackBar(
-        const SnackBar(
-          content: Text(
-            'Cannot archive the current space. Switch to another space first.',
-          ),
+        SnackBar(
+          content: Text(l10n.spaceSwitcherErrorCannotArchiveCurrent),
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -686,21 +688,17 @@ class _SpaceSwitcherModalState extends State<SpaceSwitcherModal> {
       final confirmed = await showDialog<bool>(
         context: context,
         builder: (dialogContext) => AlertDialog(
-          title: const Text('Archive Space?'),
-          content: Text(
-            'This space contains $itemCount items. '
-            'Archiving will hide the space but keep all items. '
-            'You can restore it later from archived spaces.',
-          ),
+          title: Text(l10n.spaceSwitcherDialogArchiveTitle),
+          content: Text(l10n.spaceSwitcherDialogArchiveContent(itemCount)),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(dialogContext).pop(false),
-              child: const Text('Cancel'),
+              child: Text(l10n.buttonCancel),
             ),
             TextButton(
               onPressed: () => Navigator.of(dialogContext).pop(true),
               style: TextButton.styleFrom(foregroundColor: AppColors.error),
-              child: const Text('Archive'),
+              child: Text(l10n.buttonArchive),
             ),
           ],
         ),
@@ -725,7 +723,7 @@ class _SpaceSwitcherModalState extends State<SpaceSwitcherModal> {
       if (mounted) {
         messenger.showSnackBar(
           SnackBar(
-            content: Text('${space.name} has been archived'),
+            content: Text(l10n.spaceSwitcherSuccessArchived(space.name)),
             behavior: SnackBarBehavior.floating,
           ),
         );
@@ -734,7 +732,7 @@ class _SpaceSwitcherModalState extends State<SpaceSwitcherModal> {
       if (mounted) {
         messenger.showSnackBar(
           SnackBar(
-            content: Text('Failed to archive space: ${e.toString()}'),
+            content: Text(l10n.spaceSwitcherErrorArchive(e.toString())),
             behavior: SnackBarBehavior.floating,
           ),
         );
@@ -746,6 +744,7 @@ class _SpaceSwitcherModalState extends State<SpaceSwitcherModal> {
   Future<void> _handleRestoreSpace(BuildContext context, Space space) async {
     final messenger = ScaffoldMessenger.of(context);
     final spacesProvider = Provider.of<SpacesProvider>(context, listen: false);
+    final l10n = AppLocalizations.of(context)!;
 
     // Restore the space (update with isArchived: false)
     try {
@@ -758,7 +757,7 @@ class _SpaceSwitcherModalState extends State<SpaceSwitcherModal> {
       if (mounted) {
         messenger.showSnackBar(
           SnackBar(
-            content: Text('${space.name} has been restored'),
+            content: Text(l10n.spaceSwitcherSuccessRestored(space.name)),
             behavior: SnackBarBehavior.floating,
           ),
         );
@@ -767,7 +766,7 @@ class _SpaceSwitcherModalState extends State<SpaceSwitcherModal> {
       if (mounted) {
         messenger.showSnackBar(
           SnackBar(
-            content: Text('Failed to restore space: ${e.toString()}'),
+            content: Text(l10n.spaceSwitcherErrorRestore(e.toString())),
             behavior: SnackBarBehavior.floating,
           ),
         );
@@ -776,7 +775,8 @@ class _SpaceSwitcherModalState extends State<SpaceSwitcherModal> {
   }
 
   /// Build show archived toggle
-  Widget _buildShowArchivedToggle(bool isDark) {
+  Widget _buildShowArchivedToggle(BuildContext context, bool isDark) {
+    final l10n = AppLocalizations.of(context)!;
     return Padding(
       padding: const EdgeInsets.symmetric(
         horizontal: AppSpacing.sm,
@@ -784,7 +784,7 @@ class _SpaceSwitcherModalState extends State<SpaceSwitcherModal> {
       ),
       child: SwitchListTile(
         title: Text(
-          'Show Archived Spaces',
+          l10n.spaceSwitcherToggleShowArchived,
           style: AppTypography.bodyMedium.copyWith(
             color: AppColors.text(context),
           ),
@@ -803,8 +803,9 @@ class _SpaceSwitcherModalState extends State<SpaceSwitcherModal> {
   }
 
   /// Build create space button with gradient styling
-  Widget _buildCreateSpaceButton(bool isDark) {
+  Widget _buildCreateSpaceButton(BuildContext context, bool isDark) {
     final temporalTheme = Theme.of(context).extension<TemporalFlowTheme>()!;
+    final l10n = AppLocalizations.of(context)!;
 
     return Padding(
       padding: const EdgeInsets.symmetric(
@@ -813,7 +814,7 @@ class _SpaceSwitcherModalState extends State<SpaceSwitcherModal> {
       ),
       child: Semantics(
         button: true,
-        label: 'Create new space',
+        label: l10n.accessibilityCreateNewSpace,
         child: Container(
           decoration: BoxDecoration(
             gradient: temporalTheme.primaryGradient,
@@ -829,10 +830,11 @@ class _SpaceSwitcherModalState extends State<SpaceSwitcherModal> {
             ],
           ),
           child: PrimaryButton(
-            text: 'Create New Space',
+            text: l10n.spaceSwitcherButtonCreateNew,
             icon: Icons.add,
             onPressed: () async {
               // Show create space modal
+              final navigator = Navigator.of(context);
               final result = await ResponsiveModal.show<bool>(
                 context: context,
                 child: const CreateSpaceModal(mode: SpaceModalMode.create),
@@ -841,7 +843,7 @@ class _SpaceSwitcherModalState extends State<SpaceSwitcherModal> {
               // If space was created, close this modal and return true
               // so the HomeScreen knows to reload items
               if (result == true && mounted) {
-                Navigator.of(context).pop(true);
+                navigator.pop(true);
               }
             },
             isExpanded: true,
@@ -857,14 +859,15 @@ class _SpaceSwitcherModalState extends State<SpaceSwitcherModal> {
     String currentSpaceId,
     bool isDark,
   ) {
+    final l10n = AppLocalizations.of(context)!;
     return _filteredSpaces.isEmpty
         ? Padding(
             padding: const EdgeInsets.all(AppSpacing.md),
             child: Center(
               child: Text(
                 _searchController.text.isNotEmpty
-                    ? 'No spaces found'
-                    : 'No spaces available',
+                    ? l10n.spaceSwitcherEmptyNoResults
+                    : l10n.spaceSwitcherEmptyNoSpaces,
                 style: AppTypography.bodyMedium.copyWith(
                   color: AppColors.textSecondary(context),
                 ),
@@ -918,7 +921,7 @@ class _SpaceSwitcherModalState extends State<SpaceSwitcherModal> {
           // Search field
           Padding(
             padding: const EdgeInsets.only(bottom: AppSpacing.md),
-            child: _buildSearchField(isDark),
+            child: _buildSearchField(context, isDark),
           ),
 
           // Space list
@@ -933,7 +936,7 @@ class _SpaceSwitcherModalState extends State<SpaceSwitcherModal> {
           ),
 
           // Show archived toggle
-          _buildShowArchivedToggle(isDark),
+          _buildShowArchivedToggle(context, isDark),
 
           // Divider
           Divider(
@@ -942,7 +945,7 @@ class _SpaceSwitcherModalState extends State<SpaceSwitcherModal> {
           ),
 
           // Create space button
-          _buildCreateSpaceButton(isDark),
+          _buildCreateSpaceButton(context, isDark),
         ],
       ),
     );
@@ -950,10 +953,11 @@ class _SpaceSwitcherModalState extends State<SpaceSwitcherModal> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Consumer<SpacesProvider>(
       builder: (context, spacesProvider, child) {
         return BottomSheetContainer(
-          title: 'Switch Space',
+          title: l10n.spaceSwitcherTitle,
           showSecondaryButton: false,
           child: _buildModalContent(context, spacesProvider),
         );

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:later_mobile/l10n/app_localizations.dart';
 import 'animated_empty_state.dart';
 
 /// Welcome state for first app launch
@@ -40,15 +41,15 @@ class WelcomeState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return AnimatedEmptyState(
       icon: Icons.auto_awesome,
-      title: 'Welcome to later',
-      message:
-          'Your peaceful place for thoughts, tasks, and everything in between',
-      actionLabel: 'Create your first item',
+      title: l10n.emptyWelcomeTitle,
+      message: l10n.emptyWelcomeMessage,
+      actionLabel: l10n.emptyWelcomeAction,
       onActionPressed: onActionPressed,
       secondaryActionLabel:
-          onSecondaryPressed != null ? 'Learn how it works' : null,
+          onSecondaryPressed != null ? l10n.emptyWelcomeSecondaryAction : null,
       onSecondaryPressed: onSecondaryPressed,
       enableFabPulse: enableFabPulse,
     );

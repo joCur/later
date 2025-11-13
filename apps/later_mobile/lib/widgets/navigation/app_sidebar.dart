@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:later_mobile/l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:later_mobile/design_system/tokens/tokens.dart';
 import '../../core/theme/temporal_flow_theme.dart';
@@ -213,6 +214,8 @@ class _AppSidebarState extends State<AppSidebar> {
   }
 
   Widget _buildHeader(bool isDarkMode) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       height: 64.0,
       padding: EdgeInsets.symmetric(
@@ -225,7 +228,7 @@ class _AppSidebarState extends State<AppSidebar> {
         children: [
           if (widget.isExpanded)
             Text(
-              'Spaces',
+              l10n.sidebarSpaces,
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
@@ -235,8 +238,8 @@ class _AppSidebarState extends State<AppSidebar> {
           if (widget.onToggleExpanded != null)
             Tooltip(
               message: widget.isExpanded
-                  ? 'Collapse sidebar'
-                  : 'Expand sidebar',
+                  ? l10n.sidebarCollapse
+                  : l10n.sidebarExpand,
               child: IconButton(
                 icon: Icon(widget.isExpanded ? Icons.menu_open : Icons.menu),
                 onPressed: widget.onToggleExpanded,
@@ -249,14 +252,15 @@ class _AppSidebarState extends State<AppSidebar> {
   }
 
   Widget _buildSpacesList(SpacesProvider spacesProvider, bool isDarkMode) {
+    final l10n = AppLocalizations.of(context)!;
     final spaces = spacesProvider.spaces;
 
     if (spaces.isEmpty) {
       return Center(
         child: widget.isExpanded
-            ? const Padding(
-                padding: EdgeInsets.all(AppSpacing.sm),
-                child: Text('No spaces yet', textAlign: TextAlign.center),
+            ? Padding(
+                padding: const EdgeInsets.all(AppSpacing.sm),
+                child: Text(l10n.sidebarNoSpaces, textAlign: TextAlign.center),
               )
             : const Icon(Icons.inbox_outlined),
       );
@@ -290,6 +294,7 @@ class _AppSidebarState extends State<AppSidebar> {
   }
 
   Widget _buildFooter(bool isDarkMode, TemporalFlowTheme temporalTheme) {
+    final l10n = AppLocalizations.of(context)!;
     final authProvider = context.watch<AuthProvider>();
 
     return Column(
@@ -328,7 +333,7 @@ class _AppSidebarState extends State<AppSidebar> {
                     // Settings button
                     Expanded(
                       child: Tooltip(
-                        message: 'Settings',
+                        message: l10n.navigationSettings,
                         child: InkWell(
                           onTap: () {
                             // Navigate to settings
@@ -341,12 +346,12 @@ class _AppSidebarState extends State<AppSidebar> {
                             padding: const EdgeInsets.symmetric(
                               horizontal: AppSpacing.sm,
                             ),
-                            child: const Row(
+                            child: Row(
                               children: [
-                                Icon(Icons.settings_outlined),
-                                SizedBox(width: AppSpacing.xs),
+                                const Icon(Icons.settings_outlined),
+                                const SizedBox(width: AppSpacing.xs),
                                 Flexible(
-                                  child: Text('Settings'),
+                                  child: Text(l10n.navigationSettings),
                                 ),
                               ],
                             ),
@@ -362,7 +367,7 @@ class _AppSidebarState extends State<AppSidebar> {
                 Padding(
                   padding: const EdgeInsets.only(top: AppSpacing.xs),
                   child: Tooltip(
-                    message: 'Sign Out',
+                    message: l10n.sidebarSignOut,
                     child: InkWell(
                       onTap: () async {
                         await authProvider.signOut();
@@ -384,7 +389,7 @@ class _AppSidebarState extends State<AppSidebar> {
                             const SizedBox(width: AppSpacing.xs),
                             Flexible(
                               child: Text(
-                                'Sign Out',
+                                l10n.sidebarSignOut,
                                 style: TextStyle(
                                   color: AppColors.textSecondary(context),
                                 ),
@@ -404,7 +409,7 @@ class _AppSidebarState extends State<AppSidebar> {
           Container(
             padding: const EdgeInsets.all(AppSpacing.xs),
             child: Tooltip(
-              message: 'Settings',
+              message: l10n.navigationSettings,
               child: InkWell(
                 onTap: () {
                   // Navigate to settings
@@ -425,7 +430,7 @@ class _AppSidebarState extends State<AppSidebar> {
           Container(
             padding: const EdgeInsets.all(AppSpacing.xs),
             child: Tooltip(
-              message: 'Sign Out',
+              message: l10n.sidebarSignOut,
               child: InkWell(
                 onTap: () async {
                   await authProvider.signOut();

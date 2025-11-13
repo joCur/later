@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:later_mobile/l10n/app_localizations.dart';
 import 'animated_empty_state.dart';
 
 /// Empty state displayed when a user has no spaces created
@@ -39,14 +40,15 @@ class NoSpacesState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return AnimatedEmptyState(
       icon: Icons.folder_rounded,
-      title: 'Welcome to Later',
-      message:
-          'Spaces organize your tasks, notes, and lists by context. Let\'s create your first one!',
-      actionLabel: 'Create Your First Space',
+      title: l10n.emptyNoSpacesTitle,
+      message: l10n.emptyNoSpacesMessage,
+      actionLabel: l10n.emptyNoSpacesAction,
       onActionPressed: onActionPressed,
-      secondaryActionLabel: onSecondaryPressed != null ? 'Learn more' : null,
+      secondaryActionLabel:
+          onSecondaryPressed != null ? l10n.emptyNoSpacesSecondaryAction : null,
       onSecondaryPressed: onSecondaryPressed,
       enableFabPulse: enableFabPulse,
     );

@@ -1,0 +1,677 @@
+{
+  "@@locale": "de",
+
+  "errorDatabaseUniqueConstraint": "Ein Eintrag mit diesem Wert existiert bereits.",
+  "@errorDatabaseUniqueConstraint": {
+    "description": "Error message shown when trying to create a duplicate record"
+  },
+
+  "errorDatabaseForeignKeyViolation": "Diese Operation kann nicht durchgeführt werden, da sie Datenbeziehungen verletzen würde.",
+  "@errorDatabaseForeignKeyViolation": {
+    "description": "Error message for foreign key constraint violations"
+  },
+
+  "errorDatabaseNotNullViolation": "Erforderliche Daten fehlen. Bitte stellen Sie sicher, dass alle Felder ausgefüllt sind.",
+  "@errorDatabaseNotNullViolation": {
+    "description": "Error message for NOT NULL constraint violations"
+  },
+
+  "errorDatabasePermissionDenied": "Sie haben keine Berechtigung, auf diese Daten zuzugreifen.",
+  "@errorDatabasePermissionDenied": {
+    "description": "Error message for database permission errors"
+  },
+
+  "errorDatabaseTimeout": "Die Operation hat zu lange gedauert. Bitte versuchen Sie es erneut.",
+  "@errorDatabaseTimeout": {
+    "description": "Error message for database query timeouts"
+  },
+
+  "errorDatabaseGeneric": "Ein Datenbankfehler ist aufgetreten. Bitte versuchen Sie es erneut.",
+  "@errorDatabaseGeneric": {
+    "description": "Generic database error message"
+  },
+
+  "errorAuthInvalidCredentials": "Ungültige E-Mail oder Passwort. Bitte versuchen Sie es erneut.",
+  "@errorAuthInvalidCredentials": {
+    "description": "Error message for invalid login credentials"
+  },
+
+  "errorAuthUserAlreadyExists": "Ein Konto mit dieser E-Mail existiert bereits. Bitte melden Sie sich stattdessen an.",
+  "@errorAuthUserAlreadyExists": {
+    "description": "Error message when trying to sign up with existing email"
+  },
+
+  "errorAuthWeakPassword": "Das Passwort ist zu schwach. Bitte verwenden Sie mindestens {minLength} Zeichen.",
+  "@errorAuthWeakPassword": {
+    "description": "Error message for weak password",
+    "placeholders": {
+      "minLength": {
+        "type": "String",
+        "example": "8"
+      }
+    }
+  },
+
+  "errorAuthInvalidEmail": "Die E-Mail-Adresse ist nicht gültig. Bitte überprüfen Sie sie und versuchen Sie es erneut.",
+  "@errorAuthInvalidEmail": {
+    "description": "Error message for invalid email format"
+  },
+
+  "errorAuthEmailNotConfirmed": "Bitte bestätigen Sie Ihre E-Mail-Adresse, bevor Sie sich anmelden.",
+  "@errorAuthEmailNotConfirmed": {
+    "description": "Error message when email is not confirmed"
+  },
+
+  "errorAuthSessionExpired": "Ihre Sitzung ist abgelaufen. Bitte melden Sie sich erneut an.",
+  "@errorAuthSessionExpired": {
+    "description": "Error message for expired authentication session"
+  },
+
+  "errorAuthNetworkError": "Netzwerkfehler bei der Authentifizierung. Bitte überprüfen Sie Ihre Verbindung und versuchen Sie es erneut.",
+  "@errorAuthNetworkError": {
+    "description": "Error message for network errors during auth operations"
+  },
+
+  "errorAuthRateLimitExceeded": "Zu viele Versuche. Bitte warten Sie einen Moment und versuchen Sie es erneut.",
+  "@errorAuthRateLimitExceeded": {
+    "description": "Error message when auth rate limit is exceeded"
+  },
+
+  "errorAuthGeneric": "Ein Authentifizierungsfehler ist aufgetreten. Bitte versuchen Sie es erneut.",
+  "@errorAuthGeneric": {
+    "description": "Generic authentication error message"
+  },
+
+  "errorNetworkTimeout": "Zeitüberschreitung der Verbindung. Bitte überprüfen Sie Ihre Internetverbindung und versuchen Sie es erneut.",
+  "@errorNetworkTimeout": {
+    "description": "Error message for network timeouts"
+  },
+
+  "errorNetworkNoConnection": "Keine Internetverbindung. Bitte überprüfen Sie Ihr Netzwerk und versuchen Sie es erneut.",
+  "@errorNetworkNoConnection": {
+    "description": "Error message when no internet connection is available"
+  },
+
+  "errorNetworkServerError": "Der Server hat einen Fehler festgestellt. Bitte versuchen Sie es später erneut.",
+  "@errorNetworkServerError": {
+    "description": "Error message for server errors (5xx)"
+  },
+
+  "errorNetworkBadRequest": "Ungültige Anfrage. Bitte überprüfen Sie Ihre Eingabe und versuchen Sie es erneut.",
+  "@errorNetworkBadRequest": {
+    "description": "Error message for bad requests (4xx)"
+  },
+
+  "errorNetworkNotFound": "Die angeforderte Ressource wurde nicht gefunden.",
+  "@errorNetworkNotFound": {
+    "description": "Error message for 404 not found"
+  },
+
+  "errorNetworkGeneric": "Ein Netzwerkfehler ist aufgetreten. Bitte versuchen Sie es erneut.",
+  "@errorNetworkGeneric": {
+    "description": "Generic network error message"
+  },
+
+  "errorValidationRequired": "{fieldName} ist erforderlich.",
+  "@errorValidationRequired": {
+    "description": "Error message for required field validation",
+    "placeholders": {
+      "fieldName": {
+        "type": "String",
+        "example": "E-Mail"
+      }
+    }
+  },
+
+  "errorValidationInvalidFormat": "{fieldName} hat ein ungültiges Format.",
+  "@errorValidationInvalidFormat": {
+    "description": "Error message for invalid format validation",
+    "placeholders": {
+      "fieldName": {
+        "type": "String",
+        "example": "Telefonnummer"
+      }
+    }
+  },
+
+  "errorValidationOutOfRange": "{fieldName} muss zwischen {min} und {max} liegen.",
+  "@errorValidationOutOfRange": {
+    "description": "Error message for out of range validation",
+    "placeholders": {
+      "fieldName": {
+        "type": "String",
+        "example": "Alter"
+      },
+      "min": {
+        "type": "String",
+        "example": "0"
+      },
+      "max": {
+        "type": "String",
+        "example": "100"
+      }
+    }
+  },
+
+  "errorValidationDuplicate": "{fieldName} existiert bereits.",
+  "@errorValidationDuplicate": {
+    "description": "Error message for duplicate value validation",
+    "placeholders": {
+      "fieldName": {
+        "type": "String",
+        "example": "Name"
+      }
+    }
+  },
+
+  "errorSpaceNotFound": "Der gesuchte Bereich wurde nicht gefunden.",
+  "@errorSpaceNotFound": {
+    "description": "Error message when a space is not found"
+  },
+
+  "errorNoteNotFound": "Die gesuchte Notiz wurde nicht gefunden.",
+  "@errorNoteNotFound": {
+    "description": "Error message when a note is not found"
+  },
+
+  "errorInsufficientPermissions": "Sie haben keine Berechtigung, diese Aktion auszuführen.",
+  "@errorInsufficientPermissions": {
+    "description": "Error message for insufficient permissions"
+  },
+
+  "errorOperationNotAllowed": "Diese Operation ist im aktuellen Zustand nicht erlaubt.",
+  "@errorOperationNotAllowed": {
+    "description": "Error message for operations not allowed in current state"
+  },
+
+  "errorUnknownError": "Ein unerwarteter Fehler ist aufgetreten. Bitte versuchen Sie es erneut.",
+  "@errorUnknownError": {
+    "description": "Generic error message for unknown errors"
+  },
+
+  "authTitleSignIn": "Willkommen zurück",
+  "@authTitleSignIn": {
+    "description": "Title for sign in screen"
+  },
+
+  "authTitleSignUp": "Konto erstellen",
+  "@authTitleSignUp": {
+    "description": "Title for sign up screen"
+  },
+
+  "authLabelEmail": "E-Mail",
+  "@authLabelEmail": {
+    "description": "Label for email input field"
+  },
+
+  "authHintEmail": "deine@email.de",
+  "@authHintEmail": {
+    "description": "Hint text for email input field"
+  },
+
+  "authLabelPassword": "Passwort",
+  "@authLabelPassword": {
+    "description": "Label for password input field"
+  },
+
+  "authHintPassword": "••••••••",
+  "@authHintPassword": {
+    "description": "Hint text for password input field"
+  },
+
+  "authLabelConfirmPassword": "Passwort bestätigen",
+  "@authLabelConfirmPassword": {
+    "description": "Label for confirm password input field"
+  },
+
+  "authValidationEmailRequired": "Bitte geben Sie Ihre E-Mail ein",
+  "@authValidationEmailRequired": {
+    "description": "Validation message when email field is empty"
+  },
+
+  "authValidationEmailInvalid": "Bitte geben Sie eine gültige E-Mail ein",
+  "@authValidationEmailInvalid": {
+    "description": "Validation message when email format is invalid"
+  },
+
+  "authValidationPasswordRequired": "Bitte geben Sie Ihr Passwort ein",
+  "@authValidationPasswordRequired": {
+    "description": "Validation message when password field is empty on sign in"
+  },
+
+  "authValidationPasswordRequiredSignUp": "Bitte geben Sie ein Passwort ein",
+  "@authValidationPasswordRequiredSignUp": {
+    "description": "Validation message when password field is empty on sign up"
+  },
+
+  "authValidationPasswordMinLength": "Passwort muss mindestens 8 Zeichen lang sein",
+  "@authValidationPasswordMinLength": {
+    "description": "Validation message when password is too short"
+  },
+
+  "authValidationConfirmPasswordRequired": "Bitte bestätigen Sie Ihr Passwort",
+  "@authValidationConfirmPasswordRequired": {
+    "description": "Validation message when confirm password field is empty"
+  },
+
+  "authValidationPasswordsDoNotMatch": "Passwörter stimmen nicht überein",
+  "@authValidationPasswordsDoNotMatch": {
+    "description": "Validation message when password and confirm password do not match"
+  },
+
+  "authButtonSignIn": "Anmelden",
+  "@authButtonSignIn": {
+    "description": "Sign in button text"
+  },
+
+  "authButtonSignUp": "Registrieren",
+  "@authButtonSignUp": {
+    "description": "Sign up button text"
+  },
+
+  "authLinkSignUp": "Registrieren",
+  "@authLinkSignUp": {
+    "description": "Link text to navigate to sign up screen"
+  },
+
+  "authLinkSignIn": "Anmelden",
+  "@authLinkSignIn": {
+    "description": "Link text to navigate to sign in screen"
+  },
+
+  "authTextNoAccount": "Noch kein Konto? ",
+  "@authTextNoAccount": {
+    "description": "Text asking if user doesn't have an account"
+  },
+
+  "authTextHaveAccount": "Bereits ein Konto? ",
+  "@authTextHaveAccount": {
+    "description": "Text asking if user already has an account"
+  },
+
+  "authPasswordStrengthWeak": "Schwach",
+  "@authPasswordStrengthWeak": {
+    "description": "Label for weak password strength"
+  },
+
+  "authPasswordStrengthMedium": "Mittel",
+  "@authPasswordStrengthMedium": {
+    "description": "Label for medium password strength"
+  },
+
+  "authPasswordStrengthStrong": "Stark",
+  "@authPasswordStrengthStrong": {
+    "description": "Label for strong password strength"
+  },
+
+  "authPasswordStrengthHelper": "Mindestens 8 Zeichen",
+  "@authPasswordStrengthHelper": {
+    "description": "Helper text for password strength requirements"
+  },
+
+  "authAccessibilityPasswordStrength": "Passwortstärke",
+  "@authAccessibilityPasswordStrength": {
+    "description": "Accessibility label for password strength indicator"
+  },
+
+  "emptyWelcomeTitle": "Willkommen bei later",
+  "@emptyWelcomeTitle": {
+    "description": "Title for welcome empty state"
+  },
+
+  "emptyWelcomeMessage": "Dein friedlicher Ort für Gedanken, Aufgaben und alles dazwischen",
+  "@emptyWelcomeMessage": {
+    "description": "Message for welcome empty state"
+  },
+
+  "emptyWelcomeAction": "Erstelle dein erstes Element",
+  "@emptyWelcomeAction": {
+    "description": "Action button text for welcome empty state"
+  },
+
+  "emptyWelcomeSecondaryAction": "Erfahre, wie es funktioniert",
+  "@emptyWelcomeSecondaryAction": {
+    "description": "Secondary action button text for welcome empty state"
+  },
+
+  "emptyNoSpacesTitle": "Willkommen bei Later",
+  "@emptyNoSpacesTitle": {
+    "description": "Title for no spaces empty state"
+  },
+
+  "emptyNoSpacesMessage": "Bereiche organisieren deine Aufgaben, Notizen und Listen nach Kontext. Lass uns deinen ersten erstellen!",
+  "@emptyNoSpacesMessage": {
+    "description": "Message for no spaces empty state"
+  },
+
+  "emptyNoSpacesAction": "Erstelle deinen ersten Bereich",
+  "@emptyNoSpacesAction": {
+    "description": "Action button text for no spaces empty state"
+  },
+
+  "emptyNoSpacesSecondaryAction": "Mehr erfahren",
+  "@emptyNoSpacesSecondaryAction": {
+    "description": "Secondary action button text for no spaces empty state"
+  },
+
+  "emptySpaceTitle": "Dein {spaceName} ist leer",
+  "@emptySpaceTitle": {
+    "description": "Title for empty space state with space name",
+    "placeholders": {
+      "spaceName": {
+        "type": "String",
+        "example": "Arbeit"
+      }
+    }
+  },
+
+  "emptySpaceMessage": "Beginne, deine Gedanken, Aufgaben und Ideen festzuhalten",
+  "@emptySpaceMessage": {
+    "description": "Message for empty space state"
+  },
+
+  "emptySpaceAction": "Erstellen",
+  "@emptySpaceAction": {
+    "description": "Action button text for empty space state"
+  },
+
+  "navigationHome": "Startseite",
+  "@navigationHome": {
+    "description": "Bottom navigation label for home tab"
+  },
+
+  "navigationHomeTooltip": "Ihre Bereiche anzeigen",
+  "@navigationHomeTooltip": {
+    "description": "Tooltip for home navigation button"
+  },
+
+  "navigationHomeSemanticLabel": "Startseite-Navigation",
+  "@navigationHomeSemanticLabel": {
+    "description": "Semantic label for home navigation (screen readers)"
+  },
+
+  "navigationSearch": "Suchen",
+  "@navigationSearch": {
+    "description": "Bottom navigation label for search tab"
+  },
+
+  "navigationSearchTooltip": "Einträge suchen",
+  "@navigationSearchTooltip": {
+    "description": "Tooltip for search navigation button"
+  },
+
+  "navigationSearchSemanticLabel": "Such-Navigation",
+  "@navigationSearchSemanticLabel": {
+    "description": "Semantic label for search navigation (screen readers)"
+  },
+
+  "navigationSettings": "Einstellungen",
+  "@navigationSettings": {
+    "description": "Bottom navigation label and sidebar label for settings"
+  },
+
+  "navigationSettingsTooltip": "App-Einstellungen",
+  "@navigationSettingsTooltip": {
+    "description": "Tooltip for settings navigation button"
+  },
+
+  "navigationSettingsSemanticLabel": "Einstellungen-Navigation",
+  "@navigationSettingsSemanticLabel": {
+    "description": "Semantic label for settings navigation (screen readers)"
+  },
+
+  "sidebarSpaces": "Bereiche",
+  "@sidebarSpaces": {
+    "description": "Header text for spaces section in sidebar"
+  },
+
+  "sidebarCollapse": "Seitenleiste einklappen",
+  "@sidebarCollapse": {
+    "description": "Tooltip for collapse sidebar button"
+  },
+
+  "sidebarExpand": "Seitenleiste ausklappen",
+  "@sidebarExpand": {
+    "description": "Tooltip for expand sidebar button"
+  },
+
+  "sidebarSignOut": "Abmelden",
+  "@sidebarSignOut": {
+    "description": "Sign out button text in sidebar"
+  },
+
+  "sidebarNoSpaces": "Noch keine Bereiche",
+  "@sidebarNoSpaces": {
+    "description": "Message shown in sidebar when user has no spaces"
+  },
+
+  "filterAll": "Alle",
+  "@filterAll": {
+    "description": "Filter chip label for showing all content types"
+  },
+
+  "filterTodoLists": "Aufgabenlisten",
+  "@filterTodoLists": {
+    "description": "Filter chip label for showing only todo lists"
+  },
+
+  "filterLists": "Listen",
+  "@filterLists": {
+    "description": "Filter chip label for showing only lists"
+  },
+
+  "filterNotes": "Notizen",
+  "@filterNotes": {
+    "description": "Filter chip label for showing only notes"
+  },
+
+  "menuSignOut": "Abmelden",
+  "@menuSignOut": {
+    "description": "Sign out menu item text in app bar"
+  },
+
+  "noteDetailTitleEmpty": "Titel darf nicht leer sein",
+  "noteDetailSaveFailed": "Änderungen konnten nicht gespeichert werden",
+  "noteDetailTagEmpty": "Tag darf nicht leer sein",
+  "noteDetailTagTooLong": "Tag ist zu lang (max {maxLength} Zeichen)",
+  "noteDetailTagExists": "Tag existiert bereits",
+  "noteDetailTagAdded": "Tag hinzugefügt",
+  "noteDetailTagRemoved": "Tag entfernt",
+  "noteDetailTagAddFailed": "Tag konnte nicht hinzugefügt werden",
+  "noteDetailTagRemoveFailed": "Tag konnte nicht entfernt werden",
+  "noteDetailAddTagTitle": "Tag hinzufügen",
+  "noteDetailTagNameLabel": "Tag-Name",
+  "noteDetailTagNameHint": "Tag-Namen eingeben",
+  "noteDetailDeleteTitle": "Notiz löschen",
+  "noteDetailDeleteMessage": "Sind Sie sicher, dass Sie \"{noteTitle}\" löschen möchten?\n\nDiese Aktion kann nicht rückgängig gemacht werden.",
+  "noteDetailDeleteFailed": "Notiz konnte nicht gelöscht werden",
+  "noteDetailContentHint": "Beginnen Sie mit dem Schreiben Ihrer Notiz...",
+  "noteDetailTitleHint": "Notiz-Titel",
+  "noteDetailTagsLabel": "Tags",
+  "noteDetailTagsEmpty": "Noch keine Tags. Tippen Sie auf +, um Tags hinzuzufügen.",
+  "noteDetailMenuDelete": "Notiz löschen",
+
+  "todoDetailNameEmpty": "Name der Aufgabenliste darf nicht leer sein",
+  "todoDetailSaveFailed": "Änderungen konnten nicht gespeichert werden",
+  "todoDetailLoadFailed": "Einträge konnten nicht geladen werden",
+  "todoDetailItemAdded": "Aufgabe hinzugefügt",
+  "todoDetailItemAddFailed": "Eintrag konnte nicht hinzugefügt werden",
+  "todoDetailItemUpdated": "Aufgabe aktualisiert",
+  "todoDetailItemUpdateFailed": "Eintrag konnte nicht aktualisiert werden",
+  "todoDetailItemDeleted": "Aufgabe gelöscht",
+  "todoDetailItemDeleteFailed": "Eintrag konnte nicht gelöscht werden",
+  "todoDetailItemToggleFailed": "Eintrag konnte nicht umgeschaltet werden",
+  "todoDetailReorderFailed": "Einträge konnten nicht neu angeordnet werden",
+  "todoDetailDeleteListTitle": "Aufgabenliste löschen",
+  "todoDetailDeleteListMessage": "Sind Sie sicher, dass Sie \"{listName}\" löschen möchten?\n\nDadurch werden alle {itemCount} Einträge in dieser Liste gelöscht. Diese Aktion kann nicht rückgängig gemacht werden.",
+  "todoDetailDeleteListFailed": "Liste konnte nicht gelöscht werden",
+  "todoDetailAddItemTitle": "Aufgabe hinzufügen",
+  "todoDetailEditItemTitle": "Aufgabe bearbeiten",
+  "todoDetailItemTitleLabel": "Titel *",
+  "todoDetailItemTitleHint": "Aufgabentitel eingeben",
+  "todoDetailItemTitleRequired": "Titel ist erforderlich",
+  "todoDetailItemDescriptionLabel": "Beschreibung",
+  "todoDetailItemDescriptionHint": "Optionale Beschreibung",
+  "todoDetailItemDueDateNone": "Kein Fälligkeitsdatum",
+  "todoDetailItemPriorityLabel": "Priorität",
+  "todoDetailPriorityHigh": "Hoch",
+  "todoDetailPriorityMedium": "Mittel",
+  "todoDetailPriorityLow": "Niedrig",
+  "todoDetailProgressCompleted": "{completed}/{total} abgeschlossen",
+  "todoDetailEmptyTitle": "Noch keine Aufgaben",
+  "todoDetailEmptyMessage": "Tippen Sie auf die +-Schaltfläche, um Ihre erste Aufgabe hinzuzufügen",
+  "todoDetailFabLabel": "Aufgabe hinzufügen",
+  "todoDetailNameHint": "Name der Aufgabenliste",
+  "todoDetailMenuDelete": "Liste löschen",
+
+  "listDetailNameEmpty": "Listenname darf nicht leer sein",
+  "listDetailSaveFailed": "Änderungen konnten nicht gespeichert werden",
+  "listDetailLoadFailed": "Einträge konnten nicht geladen werden",
+  "listDetailItemAdded": "Eintrag hinzugefügt",
+  "listDetailItemAddFailed": "Eintrag konnte nicht hinzugefügt werden",
+  "listDetailItemUpdated": "Eintrag aktualisiert",
+  "listDetailItemUpdateFailed": "Eintrag konnte nicht aktualisiert werden",
+  "listDetailItemDeleted": "Eintrag gelöscht",
+  "listDetailItemDeleteFailed": "Eintrag konnte nicht gelöscht werden",
+  "listDetailItemToggleFailed": "Kontrollkästchen konnte nicht umgeschaltet werden",
+  "listDetailReorderFailed": "Einträge konnten nicht neu angeordnet werden",
+  "listDetailStyleUpdated": "Listenstil aktualisiert",
+  "listDetailStyleChangeFailed": "Stil konnte nicht geändert werden",
+  "listDetailIconUpdated": "Listensymbol aktualisiert",
+  "listDetailIconChangeFailed": "Symbol konnte nicht geändert werden",
+  "listDetailDeleteTitle": "Liste löschen",
+  "listDetailDeleteMessage": "Sind Sie sicher, dass Sie \"{listName}\" löschen möchten?\n\nDadurch werden alle {itemCount} Einträge in dieser Liste gelöscht. Diese Aktion kann nicht rückgängig gemacht werden.",
+  "listDetailDeleteFailed": "Liste konnte nicht gelöscht werden",
+  "listDetailAddItemTitle": "Eintrag hinzufügen",
+  "listDetailEditItemTitle": "Eintrag bearbeiten",
+  "listDetailItemTitleLabel": "Titel *",
+  "listDetailItemTitleHint": "Eintragstitel eingeben",
+  "listDetailItemTitleRequired": "Titel ist erforderlich",
+  "listDetailItemNotesLabel": "Notizen",
+  "listDetailItemNotesHint": "Optionale Notizen",
+  "listDetailStyleDialogTitle": "Stil auswählen",
+  "listDetailStyleBullets": "Aufzählungszeichen",
+  "listDetailStyleBulletsDesc": "Einfache Aufzählungspunkte",
+  "listDetailStyleNumbered": "Nummeriert",
+  "listDetailStyleNumberedDesc": "Nummerierte Listeneinträge",
+  "listDetailStyleCheckboxes": "Kontrollkästchen",
+  "listDetailStyleCheckboxesDesc": "Abhakbare Aufgabeneinträge",
+  "listDetailIconDialogTitle": "Symbol auswählen",
+  "listDetailProgressCompleted": "{checked}/{total} abgeschlossen",
+  "listDetailEmptyTitle": "Noch keine Einträge",
+  "listDetailEmptyMessage": "Tippen Sie auf die +-Schaltfläche, um Ihren ersten Eintrag hinzuzufügen",
+  "listDetailFabLabel": "Eintrag hinzufügen",
+  "listDetailNameHint": "Listenname",
+  "listDetailMenuChangeStyle": "Stil ändern",
+  "listDetailMenuChangeIcon": "Symbol ändern",
+  "listDetailMenuDelete": "Liste löschen",
+
+  "spaceModalTitle": "Space wechseln",
+  "spaceModalSearchHint": "Spaces durchsuchen...",
+  "spaceModalNoSpacesFound": "Keine Spaces gefunden",
+  "spaceModalNoSpacesAvailable": "Keine Spaces verfügbar",
+  "spaceModalArchived": "Archiviert",
+  "spaceModalShowArchived": "Archivierte Spaces anzeigen",
+  "spaceModalCreateNew": "Neuen Space erstellen",
+  "spaceModalMenuEdit": "Space bearbeiten",
+  "spaceModalMenuArchive": "Space archivieren",
+  "spaceModalMenuArchiveHint": "Wechseln Sie zuerst zu einem anderen Space",
+  "spaceModalMenuArchiveHintItems": "Dieser Space enthält {itemCount} Einträge",
+  "spaceModalMenuRestore": "Space wiederherstellen",
+  "spaceModalMenuRestoreHint": "Diesen Space wieder aktivieren",
+  "spaceModalMenuCancel": "Abbrechen",
+  "spaceModalSwitchFailed": "Space konnte nicht gewechselt werden",
+  "spaceModalArchiveCurrent": "Der aktuelle Space kann nicht archiviert werden. Wechseln Sie zuerst zu einem anderen Space.",
+  "spaceModalArchiveConfirmTitle": "Space archivieren?",
+  "spaceModalArchiveConfirmMessage": "Dieser Space enthält {itemCount} Einträge. Das Archivieren verbirgt den Space, behält aber alle Einträge bei. Sie können ihn später aus archivierten Spaces wiederherstellen.",
+  "spaceModalArchiveSuccess": "{spaceName} wurde archiviert",
+  "spaceModalArchiveFailed": "Space konnte nicht archiviert werden",
+  "spaceModalRestoreSuccess": "{spaceName} wurde wiederhergestellt",
+  "spaceModalRestoreFailed": "Space konnte nicht wiederhergestellt werden",
+
+  "createModalTitle": "Erstellen",
+  "createModalTypeTodoList": "Aufgabenliste",
+  "createModalTypeList": "Liste",
+  "createModalTypeNote": "Notiz",
+  "createModalTodoListNameHint": "Name der Aufgabenliste",
+  "createModalListNameHint": "Listenname",
+  "createModalNoteTitleHint": "Notiz-Titel",
+  "createModalNoteContentHint": "Notiz-Inhalt",
+  "createModalNoteSmartFieldHint": "Notiz-Titel oder Inhalt...\n(Erste Zeile wird zum Titel)",
+  "createModalListStyleLabel": "Listenstil",
+  "createModalListStyleBullets": "Aufzählungszeichen",
+  "createModalListStyleNumbered": "Nummeriert",
+  "createModalListStyleCheckboxes": "Checkliste",
+  "createModalListStyleSimple": "Einfach",
+  "createModalTodoDescriptionLabel": "Beschreibung (optional)",
+  "createModalTodoDescriptionHint": "Beschreibung hinzufügen (optional)",
+  "createModalTodoDescriptionAdd": "+ Beschreibung hinzufügen (optional)",
+  "createModalTodoDescriptionTooLong": "Beschreibung zu lang (max. 500 Zeichen)",
+  "createModalSaveToLabel": "Speichern in: ",
+  "createModalKeyboardShortcutMac": "⌘+Eingabe zum Erstellen • Esc zum Schließen",
+  "createModalKeyboardShortcutOther": "Strg+Eingabe zum Erstellen • Esc zum Schließen",
+  "createModalButtonTodoList": "Aufgabenliste erstellen",
+  "createModalButtonList": "Liste erstellen",
+  "createModalButtonNote": "Notiz erstellen",
+  "createModalButtonGeneric": "Erstellen",
+  "createModalCloseTitle": "Nicht gespeicherte Inhalte verwerfen?",
+  "createModalCloseMessage": "Sie haben diesen Eintrag noch nicht erstellt. Möchten Sie ihn erstellen oder Ihre Änderungen verwerfen?",
+  "createModalCloseCancel": "Abbrechen",
+  "createModalCloseDiscard": "Verwerfen",
+  "createModalCloseCreate": "Erstellen & Schließen",
+
+  "buttonAdd": "Hinzufügen",
+  "buttonSave": "Speichern",
+  "buttonCancel": "Abbrechen",
+  "buttonDelete": "Löschen",
+  "buttonClose": "Schließen",
+  "buttonArchive": "Archivieren",
+
+  "accessibilityCloseButton": "Schließen",
+  "accessibilityAddDescription": "Beschreibung hinzufügen, eingeklappt",
+  "accessibilityAddDescriptionHint": "Tippen, um optionales Beschreibungsfeld hinzuzufügen",
+  "accessibilityRemoveDescription": "Beschreibungsfeld entfernen",
+  "accessibilityCreateNewSpace": "Neuen Space erstellen",
+  "accessibilitySpaceItemCount": "{spaceName}, {itemCount} Einträge",
+
+  "spaceSwitcherTitle": "Space wechseln",
+  "spaceSwitcherSearchHint": "Spaces durchsuchen...",
+  "spaceSwitcherErrorSwitch": "Space konnte nicht gewechselt werden: {error}",
+  "spaceSwitcherEmptyNoResults": "Keine Spaces gefunden",
+  "spaceSwitcherEmptyNoSpaces": "Keine Spaces verfügbar",
+  "spaceSwitcherItemCount": "{count} Einträge",
+  "spaceSwitcherMenuEdit": "Space bearbeiten",
+  "spaceSwitcherMenuArchive": "Space archivieren",
+  "spaceSwitcherMenuRestore": "Space wiederherstellen",
+  "spaceSwitcherMenuCancel": "Abbrechen",
+  "spaceSwitcherSubtitleSwitchFirst": "Wechseln Sie zuerst zu einem anderen Space",
+  "spaceSwitcherSubtitleContainsItems": "Dieser Space enthält {count} Einträge",
+  "spaceSwitcherSubtitleRestore": "Diesen Space wieder aktivieren",
+  "spaceSwitcherDialogArchiveTitle": "Space archivieren?",
+  "spaceSwitcherDialogArchiveContent": "Dieser Space enthält {count} Einträge. Das Archivieren verbirgt den Space, behält aber alle Einträge bei. Sie können ihn später aus archivierten Spaces wiederherstellen.",
+  "spaceSwitcherSuccessArchived": "{name} wurde archiviert",
+  "spaceSwitcherSuccessRestored": "{name} wurde wiederhergestellt",
+  "spaceSwitcherErrorArchive": "Space konnte nicht archiviert werden: {error}",
+  "spaceSwitcherErrorRestore": "Space konnte nicht wiederhergestellt werden: {error}",
+  "spaceSwitcherErrorCannotArchiveCurrent": "Der aktuelle Space kann nicht archiviert werden. Wechseln Sie zuerst zu einem anderen Space.",
+  "spaceSwitcherBadgeArchived": "Archiviert",
+  "spaceSwitcherToggleShowArchived": "Archivierte Spaces anzeigen",
+  "spaceSwitcherButtonCreateNew": "Neuen Space erstellen",
+
+  "searchEmptyTitle": "Keine Ergebnisse gefunden",
+  "searchEmptyMessage": "Versuchen Sie andere Suchbegriffe oder überprüfen Sie die Rechtschreibung",
+  "accessibilityDragHandleHint": "Doppeltippen und halten zum Neuanordnen",
+
+  "navigationBottomHome": "Startseite",
+  "navigationBottomHomeTooltip": "Ihre Spaces anzeigen",
+  "navigationBottomHomeSemanticLabel": "Startseite-Navigation",
+  "navigationBottomSearch": "Suchen",
+  "navigationBottomSearchTooltip": "Elemente suchen",
+  "navigationBottomSearchSemanticLabel": "Such-Navigation",
+  "navigationBottomSettings": "Einstellungen",
+  "navigationBottomSettingsTooltip": "App-Einstellungen",
+  "navigationBottomSettingsSemanticLabel": "Einstellungen-Navigation",
+
+  "dialogDeleteItemTitle": "Element löschen?",
+  "dialogDeleteItemMessage": "Möchten Sie \"{itemName}\" wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden."
+}

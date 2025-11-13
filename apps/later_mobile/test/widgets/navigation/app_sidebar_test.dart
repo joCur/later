@@ -1,11 +1,13 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:later_mobile/core/theme/temporal_flow_theme.dart';
 import 'package:later_mobile/data/local/preferences_service.dart';
 import 'package:later_mobile/data/models/space_model.dart';
 import 'package:later_mobile/data/repositories/space_repository.dart';
+import 'package:later_mobile/l10n/app_localizations.dart';
 import 'package:later_mobile/providers/auth_provider.dart';
 import 'package:later_mobile/providers/spaces_provider.dart';
 import 'package:later_mobile/providers/theme_provider.dart';
@@ -122,6 +124,16 @@ void main() {
         darkTheme: ThemeData.dark().copyWith(
           extensions: [TemporalFlowTheme.dark()],
         ),
+        localizationsDelegates: const [
+          AppLocalizations.delegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        supportedLocales: const [
+          Locale('en'),
+          Locale('de'),
+        ],
         home: MultiProvider(
           providers: [
             ChangeNotifierProvider<SpacesProvider>.value(value: spacesProvider),
@@ -277,6 +289,16 @@ void main() {
               theme: ThemeData.light().copyWith(
                 extensions: [TemporalFlowTheme.light()],
               ),
+              localizationsDelegates: const [
+                AppLocalizations.delegate,
+                GlobalMaterialLocalizations.delegate,
+                GlobalWidgetsLocalizations.delegate,
+                GlobalCupertinoLocalizations.delegate,
+              ],
+              supportedLocales: const [
+                Locale('en'),
+                Locale('de'),
+              ],
               home: MultiProvider(
                 providers: [
                   ChangeNotifierProvider<SpacesProvider>.value(value: spacesProvider),
@@ -487,6 +509,16 @@ void main() {
           theme: ThemeData.dark().copyWith(
             extensions: [TemporalFlowTheme.dark()],
           ),
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [
+            Locale('en'),
+            Locale('de'),
+          ],
           home: MultiProvider(
             providers: [
               ChangeNotifierProvider<SpacesProvider>.value(value: spacesProvider),
@@ -509,6 +541,16 @@ void main() {
           theme: ThemeData.light().copyWith(
             extensions: [TemporalFlowTheme.light()],
           ),
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [
+            Locale('en'),
+            Locale('de'),
+          ],
           home: MultiProvider(
             providers: [
               ChangeNotifierProvider<SpacesProvider>.value(value: spacesProvider),
@@ -657,6 +699,16 @@ void main() {
               theme: ThemeData.light().copyWith(
                 extensions: [TemporalFlowTheme.light()],
               ),
+              localizationsDelegates: const [
+                AppLocalizations.delegate,
+                GlobalMaterialLocalizations.delegate,
+                GlobalWidgetsLocalizations.delegate,
+                GlobalCupertinoLocalizations.delegate,
+              ],
+              supportedLocales: const [
+                Locale('en'),
+                Locale('de'),
+              ],
               home: MultiProvider(
                 providers: [
                   ChangeNotifierProvider<SpacesProvider>.value(value: spacesProvider),

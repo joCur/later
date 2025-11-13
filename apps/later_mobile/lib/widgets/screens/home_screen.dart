@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:later_mobile/l10n/app_localizations.dart';
 import 'package:later_mobile/design_system/atoms/buttons/primary_button.dart';
 import 'package:later_mobile/design_system/atoms/chips/filter_chip.dart';
 import 'package:later_mobile/design_system/organisms/cards/list_card.dart';
@@ -199,6 +200,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   /// Build app bar
   PreferredSizeWidget _buildAppBar(BuildContext context, Space? currentSpace) {
+    final l10n = AppLocalizations.of(context)!;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final temporalTheme = Theme.of(context).extension<TemporalFlowTheme>()!;
 
@@ -322,13 +324,13 @@ class _HomeScreenState extends State<HomeScreen> {
             }
           },
           itemBuilder: (context) => [
-            const PopupMenuItem(
+            PopupMenuItem(
               value: 'signout',
               child: Row(
                 children: [
-                  Icon(Icons.logout),
-                  SizedBox(width: AppSpacing.sm),
-                  Text('Sign Out'),
+                  const Icon(Icons.logout),
+                  const SizedBox(width: AppSpacing.sm),
+                  Text(l10n.menuSignOut),
                 ],
               ),
             ),
@@ -340,6 +342,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   /// Build filter chips for content types
   Widget _buildFilterChips(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       padding: const EdgeInsets.symmetric(
@@ -350,7 +354,7 @@ class _HomeScreenState extends State<HomeScreen> {
         spacing: AppSpacing.xs,
         children: [
           TemporalFilterChip(
-            label: 'All',
+            label: l10n.filterAll,
             icon: Icons.grid_view,
             isSelected: _selectedFilter == ContentFilter.all,
             onSelected: () {
@@ -361,7 +365,7 @@ class _HomeScreenState extends State<HomeScreen> {
             },
           ),
           TemporalFilterChip(
-            label: 'Todo Lists',
+            label: l10n.filterTodoLists,
             icon: Icons.check_box_outlined,
             isSelected: _selectedFilter == ContentFilter.todoLists,
             onSelected: () {
@@ -372,7 +376,7 @@ class _HomeScreenState extends State<HomeScreen> {
             },
           ),
           TemporalFilterChip(
-            label: 'Lists',
+            label: l10n.filterLists,
             icon: Icons.list_alt,
             isSelected: _selectedFilter == ContentFilter.lists,
             onSelected: () {
@@ -383,7 +387,7 @@ class _HomeScreenState extends State<HomeScreen> {
             },
           ),
           TemporalFilterChip(
-            label: 'Notes',
+            label: l10n.filterNotes,
             icon: Icons.description_outlined,
             isSelected: _selectedFilter == ContentFilter.notes,
             onSelected: () {

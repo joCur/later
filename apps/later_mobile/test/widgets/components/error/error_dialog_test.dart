@@ -235,28 +235,28 @@ void main() {
             code: ErrorCode.databaseTimeout,
             message: 'Storage',
           ),
-          'timed out', // Check for key phrase
+          'took too long', // Check for localized message phrase
         ),
         (
           const AppError(
             code: ErrorCode.networkGeneric,
             message: 'Network',
           ),
-          'Network error', // Check for key phrase
+          'network error', // Check for localized message phrase
         ),
         (
           const AppError(
             code: ErrorCode.validationRequired,
             message: 'Validation',
           ),
-          'required', // Check for key phrase
+          'required', // Check for localized message phrase
         ),
         (
           const AppError(
             code: ErrorCode.databaseGeneric,
             message: 'Corruption',
           ),
-          'database error', // Check for key phrase
+          'database error', // Check for localized message phrase
         ),
       ];
 

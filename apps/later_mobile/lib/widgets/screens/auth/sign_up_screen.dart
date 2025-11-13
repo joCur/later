@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:later_mobile/design_system/design_system.dart';
+import 'package:later_mobile/l10n/app_localizations.dart';
 import 'package:later_mobile/providers/auth_provider.dart';
 import 'package:later_mobile/widgets/screens/auth/sign_in_screen.dart';
 import 'package:provider/provider.dart';
@@ -74,9 +75,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   void _navigateToSignIn() {
     Navigator.of(context).pushReplacement(
-      MaterialPageRoute<void>(
-        builder: (context) => const SignInScreen(),
-      ),
+      MaterialPageRoute<void>(builder: (context) => const SignInScreen()),
     );
   }
 
@@ -98,73 +97,78 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 padding: const EdgeInsets.all(AppSpacing.lg),
                 child: ConstrainedBox(
                   constraints: const BoxConstraints(maxWidth: 400),
-                  child: Container(
-                    padding: const EdgeInsets.all(AppSpacing.xl),
-                    decoration: BoxDecoration(
-                      color: isDark
-                          ? AppColors.neutral900.withValues(alpha: 0.7)
-                          : Colors.white.withValues(alpha: 0.7),
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(
-                        color: isDark
-                            ? Colors.white.withValues(alpha: 0.15)
-                            : Colors.white.withValues(alpha: 0.5),
-                      ),
-                    ),
-                    child: Form(
-                      key: _formKey,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                        // Logo
-                        _buildLogo(),
-                        const SizedBox(height: AppSpacing.xl),
+                  child:
+                      Container(
+                            padding: const EdgeInsets.all(AppSpacing.xl),
+                            decoration: BoxDecoration(
+                              color: isDark
+                                  ? AppColors.neutral900.withValues(alpha: 0.7)
+                                  : Colors.white.withValues(alpha: 0.7),
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(
+                                color: isDark
+                                    ? Colors.white.withValues(alpha: 0.15)
+                                    : Colors.white.withValues(alpha: 0.5),
+                              ),
+                            ),
+                            child: Form(
+                              key: _formKey,
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children: [
+                                  // Logo
+                                  _buildLogo(),
+                                  const SizedBox(height: AppSpacing.xl),
 
-                        // Welcome heading
-                        _buildHeading(),
-                        const SizedBox(height: AppSpacing.lg),
+                                  // Welcome heading
+                                  _buildHeading(),
+                                  const SizedBox(height: AppSpacing.lg),
 
-                        // Error banner
-                        if (authProvider.errorMessage != null) ...[
-                          _buildErrorBanner(authProvider.errorMessage!),
-                          const SizedBox(height: AppSpacing.md),
-                        ],
+                                  // Error banner
+                                  if (authProvider.errorMessage != null) ...[
+                                    _buildErrorBanner(
+                                      authProvider.errorMessage!,
+                                    ),
+                                    const SizedBox(height: AppSpacing.md),
+                                  ],
 
-                        // Email field
-                        _buildEmailField(authProvider.isLoading),
-                        const SizedBox(height: AppSpacing.md),
+                                  // Email field
+                                  _buildEmailField(authProvider.isLoading),
+                                  const SizedBox(height: AppSpacing.md),
 
-                        // Password field
-                        _buildPasswordField(authProvider.isLoading),
-                        const SizedBox(height: AppSpacing.xs),
+                                  // Password field
+                                  _buildPasswordField(authProvider.isLoading),
+                                  const SizedBox(height: AppSpacing.xs),
 
-                        // Password strength indicator
-                        _buildPasswordStrengthIndicator(),
-                        const SizedBox(height: AppSpacing.md),
+                                  // Password strength indicator
+                                  _buildPasswordStrengthIndicator(),
+                                  const SizedBox(height: AppSpacing.md),
 
-                        // Confirm password field
-                        _buildConfirmPasswordField(authProvider.isLoading),
-                        const SizedBox(height: AppSpacing.lg),
+                                  // Confirm password field
+                                  _buildConfirmPasswordField(
+                                    authProvider.isLoading,
+                                  ),
+                                  const SizedBox(height: AppSpacing.lg),
 
-                        // Sign up button
-                        _buildSignUpButton(authProvider),
-                        const SizedBox(height: AppSpacing.md),
+                                  // Sign up button
+                                  _buildSignUpButton(authProvider),
+                                  const SizedBox(height: AppSpacing.md),
 
-                        // Sign in link
-                        _buildSignInLink(authProvider.isLoading),
-                        ],
-                      ),
-                    ),
-                  )
-                      .animate()
-                      .slideY(
-                        begin: 0.1,
-                        end: 0,
-                        duration: 600.ms,
-                        curve: Curves.easeOutCubic,
-                      )
-                      .fadeIn(duration: 600.ms),
+                                  // Sign in link
+                                  _buildSignInLink(authProvider.isLoading),
+                                ],
+                              ),
+                            ),
+                          )
+                          .animate()
+                          .slideY(
+                            begin: 0.1,
+                            end: 0,
+                            duration: 600.ms,
+                            curve: Curves.easeOutCubic,
+                          )
+                          .fadeIn(duration: 600.ms),
                 ),
               ),
             ),
@@ -176,20 +180,20 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   Widget _buildLogo() {
     return Container(
-      width: 64,
-      height: 64,
-      decoration: const BoxDecoration(
-        shape: BoxShape.circle,
-        gradient: AppColors.primaryGradient,
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(12.0),
-        child: Image.asset(
-          'assets/icons/app-icon-monochrome.png',
-          color: Colors.white,
-        ),
-      ),
-    )
+          width: 64,
+          height: 64,
+          decoration: const BoxDecoration(
+            shape: BoxShape.circle,
+            gradient: AppColors.primaryGradient,
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(12.0),
+            child: Image.asset(
+              'assets/icons/app-icon-monochrome.png',
+              color: Colors.white,
+            ),
+          ),
+        )
         .animate(delay: 200.ms)
         .scale(
           begin: const Offset(0.8, 0.8),
@@ -201,10 +205,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
   }
 
   Widget _buildHeading() {
+    final l10n = AppLocalizations.of(context)!;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Text(
-      'Create Account',
+      l10n.authTitleSignUp,
       style: AppTypography.displayMedium.copyWith(
         fontWeight: FontWeight.bold,
         color: isDark ? Colors.white : AppColors.neutral900,
@@ -215,109 +220,107 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   Widget _buildErrorBanner(String errorMessage) {
     return Container(
-      padding: const EdgeInsets.all(AppSpacing.md),
-      decoration: BoxDecoration(
-        color: AppColors.error.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(
-          color: AppColors.error.withValues(alpha: 0.3),
-        ),
-      ),
-      child: Row(
-        children: [
-          const Icon(Icons.error_outline, color: AppColors.error, size: 20),
-          const SizedBox(width: AppSpacing.sm),
-          Expanded(
-            child: Text(
-              errorMessage,
-              style: AppTypography.bodySmall.copyWith(
-                color: AppColors.error,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
+          padding: const EdgeInsets.all(AppSpacing.md),
+          decoration: BoxDecoration(
+            color: AppColors.error.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: AppColors.error.withValues(alpha: 0.3)),
           ),
-        ],
-      ),
-    )
+          child: Row(
+            children: [
+              const Icon(Icons.error_outline, color: AppColors.error, size: 20),
+              const SizedBox(width: AppSpacing.sm),
+              Expanded(
+                child: Text(
+                  errorMessage,
+                  style: AppTypography.bodySmall.copyWith(
+                    color: AppColors.error,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        )
         .animate()
         .fadeIn(duration: 200.ms)
         .slideY(begin: -0.2, end: 0, duration: 200.ms);
   }
 
   Widget _buildEmailField(bool isLoading) {
+    final l10n = AppLocalizations.of(context)!;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return TextInputField(
-      label: 'Email',
-      hintText: 'your@email.com',
-      controller: _emailController,
-      focusNode: _emailFocusNode,
-      keyboardType: TextInputType.emailAddress,
-      textInputAction: TextInputAction.next,
-      prefixIcon: Icons.email_outlined,
-      enabled: !isLoading,
-      textColor: isDark ? Colors.white : AppColors.neutral900,
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return 'Please enter your email';
-        }
-        if (!value.contains('@')) {
-          return 'Please enter a valid email';
-        }
-        return null;
-      },
-      onSubmitted: (_) {
-        _passwordFocusNode.requestFocus();
-      },
-    )
+          label: l10n.authLabelEmail,
+          hintText: l10n.authHintEmail,
+          controller: _emailController,
+          focusNode: _emailFocusNode,
+          keyboardType: TextInputType.emailAddress,
+          textInputAction: TextInputAction.next,
+          prefixIcon: Icons.email_outlined,
+          enabled: !isLoading,
+          textColor: isDark ? Colors.white : AppColors.neutral900,
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return l10n.authValidationEmailRequired;
+            }
+            if (!value.contains('@')) {
+              return l10n.authValidationEmailInvalid;
+            }
+            return null;
+          },
+          onSubmitted: (_) {
+            _passwordFocusNode.requestFocus();
+          },
+        )
         .animate(delay: 400.ms)
         .slideY(begin: 0.05, end: 0, duration: 300.ms)
         .fadeIn(duration: 300.ms);
   }
 
   Widget _buildPasswordField(bool isLoading) {
+    final l10n = AppLocalizations.of(context)!;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return TextInputField(
-      label: 'Password',
-      hintText: '••••••••',
-      controller: _passwordController,
-      focusNode: _passwordFocusNode,
-      obscureText: _obscurePassword,
-      textInputAction: TextInputAction.next,
-      prefixIcon: Icons.lock_outlined,
-      suffixIcon: _obscurePassword
-          ? Icons.visibility_outlined
-          : Icons.visibility_off_outlined,
-      onSuffixIconPressed: () {
-        setState(() {
-          _obscurePassword = !_obscurePassword;
-        });
-      },
-      enabled: !isLoading,
-      textColor: isDark ? Colors.white : AppColors.neutral900,
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return 'Please enter a password';
-        }
-        if (value.length < 8) {
-          return 'Password must be at least 8 characters';
-        }
-        return null;
-      },
-      onSubmitted: (_) {
-        _confirmPasswordFocusNode.requestFocus();
-      },
-    )
+          label: l10n.authLabelPassword,
+          hintText: l10n.authHintPassword,
+          controller: _passwordController,
+          focusNode: _passwordFocusNode,
+          obscureText: _obscurePassword,
+          textInputAction: TextInputAction.next,
+          prefixIcon: Icons.lock_outlined,
+          suffixIcon: _obscurePassword
+              ? Icons.visibility_outlined
+              : Icons.visibility_off_outlined,
+          onSuffixIconPressed: () {
+            setState(() {
+              _obscurePassword = !_obscurePassword;
+            });
+          },
+          enabled: !isLoading,
+          textColor: isDark ? Colors.white : AppColors.neutral900,
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return l10n.authValidationPasswordRequiredSignUp;
+            }
+            if (value.length < 8) {
+              return l10n.authValidationPasswordMinLength;
+            }
+            return null;
+          },
+          onSubmitted: (_) {
+            _confirmPasswordFocusNode.requestFocus();
+          },
+        )
         .animate(delay: 500.ms)
         .slideY(begin: 0.05, end: 0, duration: 300.ms)
         .fadeIn(duration: 300.ms);
   }
 
   Widget _buildPasswordStrengthIndicator() {
-    return PasswordStrengthIndicator(
-      password: _passwordController.text,
-    )
+    return PasswordStrengthIndicator(password: _passwordController.text)
         .animate(delay: 600.ms)
         .fadeIn(duration: 300.ms)
         .scaleX(
@@ -330,56 +333,59 @@ class _SignUpScreenState extends State<SignUpScreen> {
   }
 
   Widget _buildConfirmPasswordField(bool isLoading) {
+    final l10n = AppLocalizations.of(context)!;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return TextInputField(
-      label: 'Confirm Password',
-      hintText: '••••••••',
-      controller: _confirmPasswordController,
-      focusNode: _confirmPasswordFocusNode,
-      obscureText: _obscureConfirmPassword,
-      textInputAction: TextInputAction.done,
-      prefixIcon: Icons.lock_outlined,
-      suffixIcon: _obscureConfirmPassword
-          ? Icons.visibility_outlined
-          : Icons.visibility_off_outlined,
-      onSuffixIconPressed: () {
-        setState(() {
-          _obscureConfirmPassword = !_obscureConfirmPassword;
-        });
-      },
-      enabled: !isLoading,
-      textColor: isDark ? Colors.white : AppColors.neutral900,
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return 'Please confirm your password';
-        }
-        if (value != _passwordController.text) {
-          return 'Passwords do not match';
-        }
-        return null;
-      },
-      onSubmitted: (_) {
-        _handleSignUp();
-      },
-    )
+          label: l10n.authLabelConfirmPassword,
+          hintText: l10n.authHintPassword,
+          controller: _confirmPasswordController,
+          focusNode: _confirmPasswordFocusNode,
+          obscureText: _obscureConfirmPassword,
+          textInputAction: TextInputAction.done,
+          prefixIcon: Icons.lock_outlined,
+          suffixIcon: _obscureConfirmPassword
+              ? Icons.visibility_outlined
+              : Icons.visibility_off_outlined,
+          onSuffixIconPressed: () {
+            setState(() {
+              _obscureConfirmPassword = !_obscureConfirmPassword;
+            });
+          },
+          enabled: !isLoading,
+          textColor: isDark ? Colors.white : AppColors.neutral900,
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return l10n.authValidationConfirmPasswordRequired;
+            }
+            if (value != _passwordController.text) {
+              return l10n.authValidationPasswordsDoNotMatch;
+            }
+            return null;
+          },
+          onSubmitted: (_) {
+            _handleSignUp();
+          },
+        )
         .animate(delay: 700.ms)
         .slideY(begin: 0.05, end: 0, duration: 300.ms)
         .fadeIn(duration: 300.ms);
   }
 
   Widget _buildSignUpButton(AuthProvider authProvider) {
+    final l10n = AppLocalizations.of(context)!;
     return PrimaryButton(
-      text: 'Sign Up',
-      onPressed: authProvider.isLoading ? null : _handleSignUp,
-      isLoading: authProvider.isLoading,
-    )
+          text: l10n.authButtonSignUp,
+          onPressed: authProvider.isLoading ? null : _handleSignUp,
+          isLoading: authProvider.isLoading,
+        )
         .animate(delay: 800.ms)
         .slideY(begin: 0.05, end: 0, duration: 300.ms)
         .fadeIn(duration: 300.ms);
   }
 
   Widget _buildSignInLink(bool isLoading) {
+    final l10n = AppLocalizations.of(context)!;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final textColor = isDark ? Colors.white : AppColors.neutral900;
 
@@ -388,13 +394,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
       child: RichText(
         textAlign: TextAlign.center,
         text: TextSpan(
-          text: 'Already have an account? ',
+          text: l10n.authTextHaveAccount,
           style: AppTypography.bodyMedium.copyWith(
             color: textColor.withValues(alpha: 0.7),
           ),
           children: [
             TextSpan(
-              text: 'Sign in',
+              text: l10n.authLinkSignIn,
               style: AppTypography.bodyMedium.copyWith(
                 color: textColor,
                 fontWeight: FontWeight.w600,

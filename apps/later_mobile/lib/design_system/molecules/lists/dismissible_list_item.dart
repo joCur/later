@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:later_mobile/design_system/organisms/dialogs/delete_confirmation_dialog.dart';
 import 'package:later_mobile/design_system/tokens/colors.dart';
 import 'package:later_mobile/design_system/tokens/spacing.dart';
+import 'package:later_mobile/l10n/app_localizations.dart';
 
 /// A reusable dismissible list item component that provides swipe-to-delete
 /// functionality with optional confirmation dialog.
@@ -105,12 +106,11 @@ class DismissibleListItem extends StatelessWidget {
   /// Returns a [Future] that completes with `true` if the user confirms,
   /// `false` if cancelled, or `null` if dismissed.
   Future<bool?> _showDeleteConfirmation(BuildContext context) async {
+    final l10n = AppLocalizations.of(context)!;
     return showDeleteConfirmationDialog(
       context: context,
-      title: 'Delete Item?',
-      message:
-          'Are you sure you want to delete "$itemName"? '
-          'This action cannot be undone.',
+      title: l10n.dialogDeleteItemTitle,
+      message: l10n.dialogDeleteItemMessage(itemName),
     );
   }
 

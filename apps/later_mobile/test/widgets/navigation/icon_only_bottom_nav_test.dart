@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:later_mobile/core/theme/temporal_flow_theme.dart';
+import 'package:later_mobile/l10n/app_localizations.dart';
 import 'package:later_mobile/widgets/navigation/icon_only_bottom_nav.dart';
 import 'package:later_mobile/design_system/tokens/tokens.dart';
 
@@ -18,6 +20,16 @@ void main() {
               : TemporalFlowTheme.light(),
         ],
       ),
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [
+        Locale('en'),
+        Locale('de'),
+      ],
       home: Scaffold(
         bottomNavigationBar: IconOnlyBottomNav(
           currentIndex: currentIndex,
@@ -100,6 +112,16 @@ void main() {
               TemporalFlowTheme.light(),
             ],
           ),
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [
+            Locale('en'),
+            Locale('de'),
+          ],
           home: StatefulBuilder(
             builder: (context, setState) {
               return Scaffold(
@@ -235,6 +257,16 @@ void main() {
               TemporalFlowTheme.light(),
             ],
           ),
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [
+            Locale('en'),
+            Locale('de'),
+          ],
           home: StatefulBuilder(
             builder: (context, setState) {
               return Scaffold(

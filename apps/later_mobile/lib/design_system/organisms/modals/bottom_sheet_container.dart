@@ -2,6 +2,7 @@ import 'dart:ui' show ImageFilter;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:later_mobile/design_system/tokens/tokens.dart';
+import 'package:later_mobile/l10n/app_localizations.dart';
 import '../../../core/responsive/breakpoints.dart';
 import 'package:later_mobile/design_system/atoms/buttons/primary_button.dart';
 import 'package:later_mobile/design_system/atoms/buttons/secondary_button.dart';
@@ -22,7 +23,7 @@ class BottomSheetContainer extends StatelessWidget {
     this.isPrimaryButtonEnabled = true,
     this.isPrimaryButtonLoading = false,
     this.showSecondaryButton = true,
-    this.secondaryButtonText = 'Cancel',
+    this.secondaryButtonText,
     this.onSecondaryPressed,
   });
 
@@ -34,7 +35,7 @@ class BottomSheetContainer extends StatelessWidget {
   final bool isPrimaryButtonEnabled;
   final bool isPrimaryButtonLoading;
   final bool showSecondaryButton;
-  final String secondaryButtonText;
+  final String? secondaryButtonText;
   final VoidCallback? onSecondaryPressed;
 
   @override
@@ -279,6 +280,9 @@ class BottomSheetContainer extends StatelessWidget {
     bool isDark, {
     required bool isMobile,
   }) {
+    final l10n = AppLocalizations.of(context)!;
+    final cancelText = secondaryButtonText ?? l10n.buttonCancel;
+
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -289,7 +293,7 @@ class BottomSheetContainer extends StatelessWidget {
                   children: [
                     Expanded(
                       child: SecondaryButton(
-                        text: secondaryButtonText,
+                        text: cancelText,
                         onPressed: isPrimaryButtonLoading
                             ? null
                             : (onSecondaryPressed ??

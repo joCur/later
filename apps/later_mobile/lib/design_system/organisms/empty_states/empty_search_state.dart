@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:later_mobile/l10n/app_localizations.dart';
 import 'empty_state.dart';
 
 /// Empty state for search with no results
@@ -24,10 +25,12 @@ class EmptySearchState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const EmptyState(
+    final l10n = AppLocalizations.of(context)!;
+
+    return EmptyState(
       icon: Icons.search,
-      title: 'No results found',
-      message: 'Try different keywords or check your spelling',
+      title: l10n.searchEmptyTitle,
+      message: l10n.searchEmptyMessage,
     );
   }
 }

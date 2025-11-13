@@ -1,13 +1,27 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:later_mobile/core/theme/temporal_flow_theme.dart';
+import 'package:later_mobile/l10n/app_localizations.dart';
 import 'package:later_mobile/providers/auth_provider.dart';
 import 'package:later_mobile/providers/content_provider.dart';
 import 'package:later_mobile/providers/spaces_provider.dart';
 import 'package:later_mobile/providers/theme_provider.dart';
+import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:provider/provider.dart';
 
 import 'test_helpers.mocks.dart';
+
+@GenerateNiceMocks([
+  MockSpec<AuthProvider>(),
+  MockSpec<SpacesProvider>(),
+  MockSpec<ContentProvider>(),
+  MockSpec<ThemeProvider>(),
+])
+// ignore: unused_element
+void _generateMocks() {
+  // This function exists only to trigger mock generation
+}
 
 /// Creates a MaterialApp with proper theme configuration and mock providers
 /// for widget tests.
@@ -44,6 +58,13 @@ Widget testApp(Widget child) {
       theme: ThemeData.light().copyWith(
         extensions: <ThemeExtension<dynamic>>[TemporalFlowTheme.light()],
       ),
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [Locale('en'), Locale('de')],
       home: Scaffold(body: child),
     ),
   );
@@ -84,6 +105,13 @@ Widget testAppDark(Widget child) {
       theme: ThemeData.dark().copyWith(
         extensions: <ThemeExtension<dynamic>>[TemporalFlowTheme.dark()],
       ),
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [Locale('en'), Locale('de')],
       home: Scaffold(body: child),
     ),
   );

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import 'package:uuid/uuid.dart';
+import 'package:later_mobile/l10n/app_localizations.dart';
 import 'package:later_mobile/design_system/tokens/tokens.dart';
 import '../../core/utils/responsive_modal.dart';
 import 'package:later_mobile/data/models/todo_list_model.dart';
@@ -90,10 +91,11 @@ class _TodoListDetailScreenState extends State<TodoListDetailScreen> {
       }
     } catch (e) {
       if (mounted) {
+        final l10n = AppLocalizations.of(context)!;
         setState(() {
           _isLoadingItems = false;
         });
-        _showSnackBar('Failed to load items: $e', isError: true);
+        _showSnackBar(l10n.todoDetailLoadFailed, isError: true);
       }
     }
   }
@@ -146,9 +148,11 @@ class _TodoListDetailScreenState extends State<TodoListDetailScreen> {
   Future<void> _saveChanges() async {
     if (!_hasChanges || _isSaving) return;
 
+    final l10n = AppLocalizations.of(context)!;
+
     // Validate name
     if (_nameController.text.trim().isEmpty) {
-      _showSnackBar('TodoList name cannot be empty', isError: true);
+      _showSnackBar(l10n.todoDetailNameEmpty, isError: true);
       return;
     }
 
@@ -171,7 +175,7 @@ class _TodoListDetailScreenState extends State<TodoListDetailScreen> {
         _hasChanges = false;
       });
     } catch (e) {
-      _showSnackBar('Failed to save changes: $e', isError: true);
+      _showSnackBar(l10n.todoDetailSaveFailed, isError: true);
     } finally {
       setState(() {
         _isSaving = false;
@@ -184,6 +188,8 @@ class _TodoListDetailScreenState extends State<TodoListDetailScreen> {
     final result = await _showTodoItemDialog();
     if (result == null || !mounted) return;
 
+    final l10n = AppLocalizations.of(context)!;
+
     try {
       final provider = Provider.of<ContentProvider>(context, listen: false);
       // Set sortOrder to be at the end of current items
@@ -195,9 +201,9 @@ class _TodoListDetailScreenState extends State<TodoListDetailScreen> {
       await _loadTodoItems();
       await _refreshTodoListData();
 
-      if (mounted) _showSnackBar('TodoItem added');
+      if (mounted) _showSnackBar(l10n.todoDetailItemAdded);
     } catch (e) {
-      if (mounted) _showSnackBar('Failed to add item: $e', isError: true);
+      if (mounted) _showSnackBar(l10n.todoDetailItemAddFailed, isError: true);
     }
   }
 
@@ -205,6 +211,8 @@ class _TodoListDetailScreenState extends State<TodoListDetailScreen> {
   Future<void> _editTodoItem(TodoItem item) async {
     final result = await _showTodoItemDialog(existingItem: item);
     if (result == null || !mounted) return;
+
+    final l10n = AppLocalizations.of(context)!;
 
     try {
       final provider = Provider.of<ContentProvider>(context, listen: false);
@@ -215,15 +223,17 @@ class _TodoListDetailScreenState extends State<TodoListDetailScreen> {
       await _loadTodoItems();
       await _refreshTodoListData();
 
-      if (mounted) _showSnackBar('TodoItem updated');
+      if (mounted) _showSnackBar(l10n.todoDetailItemUpdated);
     } catch (e) {
-      if (mounted) _showSnackBar('Failed to update item: $e', isError: true);
+      if (mounted) _showSnackBar(l10n.todoDetailItemUpdateFailed, isError: true);
     }
   }
 
   /// Perform the actual deletion without confirmation
   /// Used by Dismissible which handles confirmation separately
   Future<void> _performDeleteTodoItem(TodoItem item) async {
+    final l10n = AppLocalizations.of(context)!;
+
     try {
       final provider = Provider.of<ContentProvider>(context, listen: false);
       await provider.deleteTodoItem(item.id, _currentTodoList.id);
@@ -232,9 +242,9 @@ class _TodoListDetailScreenState extends State<TodoListDetailScreen> {
       await _loadTodoItems();
       await _refreshTodoListData();
 
-      if (mounted) _showSnackBar('TodoItem deleted');
+      if (mounted) _showSnackBar(l10n.todoDetailItemDeleted);
     } catch (e) {
-      if (mounted) _showSnackBar('Failed to delete item: $e', isError: true);
+      if (mounted) _showSnackBar(l10n.todoDetailItemDeleteFailed, isError: true);
     }
   }
 
@@ -251,7 +261,9 @@ class _TodoListDetailScreenState extends State<TodoListDetailScreen> {
       await _loadTodoItems();
       await _refreshTodoListData();
     } catch (e) {
-      _showSnackBar('Failed to toggle item: $e', isError: true);
+      if (!mounted) return;
+      final l10n = AppLocalizations.of(context)!;
+      _showSnackBar(l10n.todoDetailItemToggleFailed, isError: true);
     }
   }
 
@@ -286,7 +298,8 @@ class _TodoListDetailScreenState extends State<TodoListDetailScreen> {
       if (!mounted) return;
 
       // Show error to user and reload items from server
-      _showSnackBar('Failed to reorder items: $e', isError: true);
+      final l10n = AppLocalizations.of(context)!;
+      _showSnackBar(l10n.todoDetailReorderFailed, isError: true);
       await _loadTodoItems();
     }
   }
@@ -302,12 +315,16 @@ class _TodoListDetailScreenState extends State<TodoListDetailScreen> {
       // Navigation already handled in confirmation dialog
       // Success feedback is provided by UI update (todo list removed from list)
     } catch (e) {
-      if (mounted) _showSnackBar('Failed to delete list: $e', isError: true);
+      if (mounted) {
+        final l10n = AppLocalizations.of(context)!;
+        _showSnackBar(l10n.todoDetailDeleteListFailed, isError: true);
+      }
     }
   }
 
   /// Show TodoItem edit/create dialog
   Future<TodoItem?> _showTodoItemDialog({TodoItem? existingItem}) async {
+    final l10n = AppLocalizations.of(context)!;
     final titleController = TextEditingController(
       text: existingItem?.title ?? '',
     );
@@ -321,12 +338,12 @@ class _TodoListDetailScreenState extends State<TodoListDetailScreen> {
     return ResponsiveModal.show<TodoItem>(
       context: context,
       child: BottomSheetContainer(
-        title: existingItem == null ? 'Add TodoItem' : 'Edit TodoItem',
-        primaryButtonText: existingItem == null ? 'Add' : 'Save',
+        title: existingItem == null ? l10n.todoDetailAddItemTitle : l10n.todoDetailEditItemTitle,
+        primaryButtonText: existingItem == null ? l10n.buttonAdd : l10n.buttonSave,
         showSecondaryButton: false,
         onPrimaryPressed: () {
           if (titleController.text.trim().isEmpty) {
-            _showSnackBar('Title is required', isError: true);
+            _showSnackBar(l10n.todoDetailItemTitleRequired, isError: true);
             return;
           }
 
@@ -355,8 +372,8 @@ class _TodoListDetailScreenState extends State<TodoListDetailScreen> {
                 // Title field
                 TextInputField(
                   controller: titleController,
-                  label: 'Title *',
-                  hintText: 'Enter task title',
+                  label: l10n.todoDetailItemTitleLabel,
+                  hintText: l10n.todoDetailItemTitleHint,
                   autofocus: true,
                   textCapitalization: TextCapitalization.sentences,
                   onChanged: (_) {
@@ -369,8 +386,8 @@ class _TodoListDetailScreenState extends State<TodoListDetailScreen> {
                 // Description field
                 TextAreaField(
                   controller: descriptionController,
-                  label: 'Description',
-                  hintText: 'Optional description',
+                  label: l10n.todoDetailItemDescriptionLabel,
+                  hintText: l10n.todoDetailItemDescriptionHint,
                   maxLines: 3,
                   textCapitalization: TextCapitalization.sentences,
                 ),
@@ -382,7 +399,7 @@ class _TodoListDetailScreenState extends State<TodoListDetailScreen> {
                   leading: const Icon(Icons.calendar_today),
                   title: Text(
                     selectedDueDate == null
-                        ? 'No due date'
+                        ? l10n.todoDetailItemDueDateNone
                         : DateFormat.yMMMd().format(selectedDueDate!),
                   ),
                   trailing: selectedDueDate != null
@@ -414,7 +431,7 @@ class _TodoListDetailScreenState extends State<TodoListDetailScreen> {
                 // Priority dropdown
                 DropdownButtonFormField<TodoPriority>(
                   initialValue: selectedPriority,
-                  decoration: const InputDecoration(labelText: 'Priority'),
+                  decoration: InputDecoration(labelText: l10n.todoDetailItemPriorityLabel),
                   items: TodoPriority.values.map((priority) {
                     return DropdownMenuItem(
                       value: priority,
@@ -439,13 +456,14 @@ class _TodoListDetailScreenState extends State<TodoListDetailScreen> {
 
   /// Show delete list confirmation
   Future<void> _showDeleteListConfirmation() async {
+    final l10n = AppLocalizations.of(context)!;
     final confirmed = await showDeleteConfirmationDialog(
       context: context,
-      title: 'Delete TodoList',
-      message:
-          'Are you sure you want to delete "${_currentTodoList.name}"?\n\n'
-          'This will delete all ${_currentTodoList.totalItemCount} items in this list. '
-          'This action cannot be undone.',
+      title: l10n.todoDetailDeleteListTitle,
+      message: l10n.todoDetailDeleteListMessage(
+        _currentTodoList.name,
+        _currentTodoList.totalItemCount,
+      ),
     );
 
     if (confirmed == true && mounted) {
@@ -469,18 +487,21 @@ class _TodoListDetailScreenState extends State<TodoListDetailScreen> {
 
   /// Get priority label
   String _getPriorityLabel(TodoPriority priority) {
+    final l10n = AppLocalizations.of(context)!;
     switch (priority) {
       case TodoPriority.high:
-        return 'High';
+        return l10n.todoDetailPriorityHigh;
       case TodoPriority.medium:
-        return 'Medium';
+        return l10n.todoDetailPriorityMedium;
       case TodoPriority.low:
-        return 'Low';
+        return l10n.todoDetailPriorityLow;
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: (didPop, result) async {
@@ -501,7 +522,7 @@ class _TodoListDetailScreenState extends State<TodoListDetailScreen> {
               _saveChanges();
             },
             gradient: AppColors.taskGradient,
-            hintText: 'TodoList name',
+            hintText: l10n.todoDetailNameHint,
           ),
           actions: [
             if (_isSaving)
@@ -520,13 +541,13 @@ class _TodoListDetailScreenState extends State<TodoListDetailScreen> {
                 }
               },
               itemBuilder: (context) => [
-                const PopupMenuItem(
+                PopupMenuItem(
                   value: 'delete',
                   child: Row(
                     children: [
-                      Icon(Icons.delete, color: AppColors.error),
-                      SizedBox(width: AppSpacing.sm),
-                      Text('Delete List'),
+                      const Icon(Icons.delete, color: AppColors.error),
+                      const SizedBox(width: AppSpacing.sm),
+                      Text(l10n.todoDetailMenuDelete),
                     ],
                   ),
                 ),
@@ -555,7 +576,10 @@ class _TodoListDetailScreenState extends State<TodoListDetailScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    '${_currentTodoList.completedItemCount}/${_currentTodoList.totalItemCount} completed',
+                    l10n.todoDetailProgressCompleted(
+                      _currentTodoList.completedItemCount,
+                      _currentTodoList.totalItemCount,
+                    ),
                     style: AppTypography.bodyMedium.copyWith(
                       color: Colors.white,
                       fontWeight: FontWeight.w600,
@@ -609,7 +633,7 @@ class _TodoListDetailScreenState extends State<TodoListDetailScreen> {
         floatingActionButton: ResponsiveFab(
           onPressed: _addTodoItem,
           icon: Icons.add,
-          label: 'Add Todo',
+          label: l10n.todoDetailFabLabel,
           gradient: AppColors.taskGradient,
           enablePulse: _enableFabPulse,
         ),
@@ -618,10 +642,11 @@ class _TodoListDetailScreenState extends State<TodoListDetailScreen> {
   }
 
   Widget _buildEmptyState() {
+    final l10n = AppLocalizations.of(context)!;
     return AnimatedEmptyState(
       icon: Icons.check_circle_outline,
-      title: 'No tasks yet',
-      message: 'Tap the + button to add your first task',
+      title: l10n.todoDetailEmptyTitle,
+      message: l10n.todoDetailEmptyMessage,
       enableFabPulse: (enabled) {
         if (mounted) {
           setState(() {
