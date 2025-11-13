@@ -1,6 +1,7 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:later_mobile/design_system/tokens/tokens.dart';
+import 'package:later_mobile/l10n/app_localizations.dart';
 
 /// Drag handle widget for reorderable content cards
 ///
@@ -151,6 +152,8 @@ class _DragHandleWidgetState extends State<DragHandleWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     // Check if reduced motion is preferred
     final reducedMotion = AppAnimations.prefersReducedMotion(context);
 
@@ -162,7 +165,7 @@ class _DragHandleWidgetState extends State<DragHandleWidget> {
     return Semantics(
       button: true,
       label: widget.semanticLabel,
-      hint: 'Double tap and hold to reorder',
+      hint: l10n.accessibilityDragHandleHint,
       child: MouseRegion(
         onEnter: _handleMouseEnter,
         onExit: _handleMouseExit,

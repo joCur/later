@@ -1681,6 +1681,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Create New Space'**
   String get spaceSwitcherButtonCreateNew;
+
+  /// Title for empty search state when no results match query
+  ///
+  /// In en, this message translates to:
+  /// **'No results found'**
+  String get searchEmptyTitle;
+
+  /// Message for empty search state suggesting alternative search strategies
+  ///
+  /// In en, this message translates to:
+  /// **'Try different keywords or check your spelling'**
+  String get searchEmptyMessage;
+
+  /// Accessibility hint for drag handle reordering interaction
+  ///
+  /// In en, this message translates to:
+  /// **'Double tap and hold to reorder'**
+  String get accessibilityDragHandleHint;
 }
 
 class _AppLocalizationsDelegate

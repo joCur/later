@@ -1497,5 +1497,20 @@
   "spaceSwitcherButtonCreateNew": "Create New Space",
   "@spaceSwitcherButtonCreateNew": {
     "description": "Button text to create new space"
+  },
+
+  "searchEmptyTitle": "No results found",
+  "@searchEmptyTitle": {
+    "description": "Title for empty search state when no results match query"
+  },
+
+  "searchEmptyMessage": "Try different keywords or check your spelling",
+  "@searchEmptyMessage": {
+    "description": "Message for empty search state suggesting alternative search strategies"
+  },
+
+  "accessibilityDragHandleHint": "Double tap and hold to reorder",
+  "@accessibilityDragHandleHint": {
+    "description": "Accessibility hint for drag handle reordering interaction"
   }
 }

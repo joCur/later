@@ -336,6 +336,96 @@ Recently applied to note and list detail screens. When adding similar edit scree
 - Provider: `SpacesProvider.getSpaceItemCount(spaceId)` - returns `Future<int>` with retry logic
 - UI: Use `FutureBuilder` or pre-fetch counts on widget initialization
 
+### Localization
+
+The app supports **English (en) and German (de)** through Flutter's ARB-based localization system.
+
+**Files:**
+- `lib/l10n/app_en.arb` - English translations (source language)
+- `lib/l10n/app_de.arb` - German translations
+- Auto-generated: `lib/l10n/app_localizations.dart` (regenerated on `flutter pub get`)
+
+**Usage in Code:**
+```dart
+import 'package:later_mobile/l10n/app_localizations.dart';
+
+Widget build(BuildContext context) {
+  final l10n = AppLocalizations.of(context)!;
+
+  return Text(l10n.buttonSignIn);  // Simple string
+  return Text(l10n.errorAuthWeakPassword('8'));  // String with placeholder
+}
+```
+
+**Adding New Localized Strings:**
+1. Add the English string to `app_en.arb`:
+   ```json
+   "myNewString": "Hello World",
+   "@myNewString": {
+     "description": "Greeting message"
+   }
+   ```
+
+2. Add the German translation to `app_de.arb`:
+   ```json
+   "myNewString": "Hallo Welt"
+   ```
+
+3. Run `flutter pub get` to regenerate localization code
+
+4. Import and use in your widget:
+   ```dart
+   final l10n = AppLocalizations.of(context)!;
+   Text(l10n.myNewString)
+   ```
+
+**Strings with Placeholders:**
+```json
+"welcomeMessage": "Welcome, {userName}!",
+"@welcomeMessage": {
+  "description": "Welcome message with username",
+  "placeholders": {
+    "userName": {
+      "type": "String",
+      "example": "John"
+    }
+  }
+}
+```
+
+Usage: `l10n.welcomeMessage('John')`
+
+**Naming Convention:**
+- Format: `category` + `Type` + `Description`
+- Examples: `buttonSignIn`, `authLabelEmail`, `errorDatabaseTimeout`, `navigationHomeTooltip`
+- Categories: `button`, `auth`, `error`, `navigation`, `sidebar`, `filter`, `menu`, `note`, `todo`, `list`, `space`, `create`, `accessibility`, `search`
+
+**Widget Tests:**
+Always use the `testApp()` helper from `test_helpers.dart` which includes localization setup:
+```dart
+import '../test_helpers.dart';
+
+testWidgets('my test', (tester) async {
+  await tester.pumpWidget(
+    testApp(
+      MyWidget(),
+    ),
+  );
+  // Tests run with English locale by default
+});
+```
+
+**Locale Switching:**
+- App respects device language settings
+- Supported: English (default), German
+- No in-app language switcher (uses system settings)
+
+**Important Notes:**
+- ALL user-facing strings must be localized (no hardcoded strings)
+- Error messages use the centralized error handling system with localized messages
+- German strings are typically 30-40% longer than English - test layouts with German locale
+- Accessibility labels should also be localized
+
 ## Code Quality Standards
 
 ### Linting Configuration

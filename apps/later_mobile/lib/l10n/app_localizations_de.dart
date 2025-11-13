@@ -914,4 +914,15 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get spaceSwitcherButtonCreateNew => 'Neuen Space erstellen';
+
+  @override
+  String get searchEmptyTitle => 'Keine Ergebnisse gefunden';
+
+  @override
+  String get searchEmptyMessage =>
+      'Versuchen Sie andere Suchbegriffe oder überprüfen Sie die Rechtschreibung';
+
+  @override
+  String get accessibilityDragHandleHint =>
+      'Doppeltippen und halten zum Neuanordnen';
 }

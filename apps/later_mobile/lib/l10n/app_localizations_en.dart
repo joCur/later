@@ -888,4 +888,14 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get spaceSwitcherButtonCreateNew => 'Create New Space';
+
+  @override
+  String get searchEmptyTitle => 'No results found';
+
+  @override
+  String get searchEmptyMessage =>
+      'Try different keywords or check your spelling';
+
+  @override
+  String get accessibilityDragHandleHint => 'Double tap and hold to reorder';
 }

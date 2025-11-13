@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:later_mobile/design_system/atoms/drag_handle/drag_handle_widget.dart';
 import 'package:later_mobile/design_system/tokens/tokens.dart';
+import '../../../test_helpers.dart';
 
 /// Widget Test Suite: DragHandleWidget Component
 ///
@@ -29,12 +30,10 @@ void main() {
   group('DragHandleWidget Component Tests', () {
     testWidgets('Initial render shows grip dots', (WidgetTester tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: DragHandleWidget(
-              gradient: AppColors.taskGradient,
-              semanticLabel: 'Reorder item',
-            ),
+        testApp(
+          const DragHandleWidget(
+            gradient: AppColors.taskGradient,
+            semanticLabel: 'Reorder item',
           ),
         ),
       );
@@ -47,12 +46,10 @@ void main() {
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: DragHandleWidget(
-              gradient: AppColors.taskGradient,
-              semanticLabel: 'Reorder item',
-            ),
+        testApp(
+          const DragHandleWidget(
+            gradient: AppColors.taskGradient,
+            semanticLabel: 'Reorder item',
           ),
         ),
       );
@@ -64,13 +61,11 @@ void main() {
 
     testWidgets('Custom size is respected', (WidgetTester tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: DragHandleWidget(
-              gradient: AppColors.taskGradient,
-              semanticLabel: 'Reorder item',
-              size: 64.0,
-            ),
+        testApp(
+          const DragHandleWidget(
+            gradient: AppColors.taskGradient,
+            semanticLabel: 'Reorder item',
+            size: 64.0,
           ),
         ),
       );
@@ -82,12 +77,10 @@ void main() {
 
     testWidgets('Semantic label is set correctly', (WidgetTester tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: DragHandleWidget(
-              gradient: AppColors.taskGradient,
-              semanticLabel: 'Reorder Shopping List',
-            ),
+        testApp(
+          const DragHandleWidget(
+            gradient: AppColors.taskGradient,
+            semanticLabel: 'Reorder Shopping List',
           ),
         ),
       );
@@ -99,12 +92,10 @@ void main() {
 
     testWidgets('Tooltip shows semantic label', (WidgetTester tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: DragHandleWidget(
-              gradient: AppColors.taskGradient,
-              semanticLabel: 'Reorder Shopping List',
-            ),
+        testApp(
+          const DragHandleWidget(
+            gradient: AppColors.taskGradient,
+            semanticLabel: 'Reorder Shopping List',
           ),
         ),
       );
@@ -117,12 +108,10 @@ void main() {
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: DragHandleWidget(
-              gradient: AppColors.taskGradient,
-              semanticLabel: 'Reorder item',
-            ),
+        testApp(
+          const DragHandleWidget(
+            gradient: AppColors.taskGradient,
+            semanticLabel: 'Reorder item',
           ),
         ),
       );
@@ -139,12 +128,10 @@ void main() {
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: DragHandleWidget(
-              gradient: AppColors.taskGradient,
-              semanticLabel: 'Reorder item',
-            ),
+        testApp(
+          const DragHandleWidget(
+            gradient: AppColors.taskGradient,
+            semanticLabel: 'Reorder item',
           ),
         ),
       );
@@ -168,12 +155,10 @@ void main() {
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: DragHandleWidget(
-              gradient: AppColors.taskGradient,
-              semanticLabel: 'Reorder item',
-            ),
+        testApp(
+          const DragHandleWidget(
+            gradient: AppColors.taskGradient,
+            semanticLabel: 'Reorder item',
           ),
         ),
       );
@@ -186,12 +171,10 @@ void main() {
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: DragHandleWidget(
-              gradient: AppColors.taskGradient,
-              semanticLabel: 'Reorder task',
-            ),
+        testApp(
+          const DragHandleWidget(
+            gradient: AppColors.taskGradient,
+            semanticLabel: 'Reorder task',
           ),
         ),
       );
@@ -204,12 +187,10 @@ void main() {
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: DragHandleWidget(
-              gradient: AppColors.noteGradient,
-              semanticLabel: 'Reorder note',
-            ),
+        testApp(
+          const DragHandleWidget(
+            gradient: AppColors.noteGradient,
+            semanticLabel: 'Reorder note',
           ),
         ),
       );
@@ -222,12 +203,10 @@ void main() {
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: DragHandleWidget(
-              gradient: AppColors.listGradient,
-              semanticLabel: 'Reorder list',
-            ),
+        testApp(
+          const DragHandleWidget(
+            gradient: AppColors.listGradient,
+            semanticLabel: 'Reorder list',
           ),
         ),
       );
@@ -238,12 +217,10 @@ void main() {
 
     testWidgets('Default opacity is 40%', (WidgetTester tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: DragHandleWidget(
-              gradient: AppColors.taskGradient,
-              semanticLabel: 'Reorder item',
-            ),
+        testApp(
+          const DragHandleWidget(
+            gradient: AppColors.taskGradient,
+            semanticLabel: 'Reorder item',
           ),
         ),
       );
@@ -260,13 +237,11 @@ void main() {
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: Center(
-              child: DragHandleWidget(
-                gradient: AppColors.taskGradient,
-                semanticLabel: 'Reorder item',
-              ),
+        testApp(
+          const Center(
+            child: DragHandleWidget(
+              gradient: AppColors.taskGradient,
+              semanticLabel: 'Reorder item',
             ),
           ),
         ),
@@ -309,16 +284,14 @@ void main() {
       var dragStartCalled = false;
 
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: Center(
-              child: DragHandleWidget(
-                gradient: AppColors.taskGradient,
-                semanticLabel: 'Reorder item',
-                onDragStart: () {
-                  dragStartCalled = true;
-                },
-              ),
+        testApp(
+          Center(
+            child: DragHandleWidget(
+              gradient: AppColors.taskGradient,
+              semanticLabel: 'Reorder item',
+              onDragStart: () {
+                dragStartCalled = true;
+              },
             ),
           ),
         ),
@@ -339,16 +312,14 @@ void main() {
       var dragEndCalled = false;
 
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: Center(
-              child: DragHandleWidget(
-                gradient: AppColors.taskGradient,
-                semanticLabel: 'Reorder item',
-                onDragEnd: () {
-                  dragEndCalled = true;
-                },
-              ),
+        testApp(
+          Center(
+            child: DragHandleWidget(
+              gradient: AppColors.taskGradient,
+              semanticLabel: 'Reorder item',
+              onDragEnd: () {
+                dragEndCalled = true;
+              },
             ),
           ),
         ),
@@ -368,19 +339,17 @@ void main() {
       var dragEndCalled = false;
 
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: Center(
-              child: DragHandleWidget(
-                gradient: AppColors.taskGradient,
-                semanticLabel: 'Reorder item',
-                onDragStart: () {
-                  dragStartCalled = true;
-                },
-                onDragEnd: () {
-                  dragEndCalled = true;
-                },
-              ),
+        testApp(
+          Center(
+            child: DragHandleWidget(
+              gradient: AppColors.taskGradient,
+              semanticLabel: 'Reorder item',
+              onDragStart: () {
+                dragStartCalled = true;
+              },
+              onDragEnd: () {
+                dragEndCalled = true;
+              },
             ),
           ),
         ),
@@ -401,12 +370,10 @@ void main() {
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: DragHandleWidget(
-              gradient: AppColors.taskGradient,
-              semanticLabel: 'Reorder item',
-            ),
+        testApp(
+          const DragHandleWidget(
+            gradient: AppColors.taskGradient,
+            semanticLabel: 'Reorder item',
           ),
         ),
       );
@@ -424,12 +391,10 @@ void main() {
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: DragHandleWidget(
-              gradient: AppColors.taskGradient,
-              semanticLabel: 'Reorder item',
-            ),
+        testApp(
+          const DragHandleWidget(
+            gradient: AppColors.taskGradient,
+            semanticLabel: 'Reorder item',
           ),
         ),
       );
@@ -443,12 +408,10 @@ void main() {
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: DragHandleWidget(
-              gradient: AppColors.taskGradient,
-              semanticLabel: 'Reorder item',
-            ),
+        testApp(
+          const DragHandleWidget(
+            gradient: AppColors.taskGradient,
+            semanticLabel: 'Reorder item',
           ),
         ),
       );
@@ -461,12 +424,10 @@ void main() {
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: DragHandleWidget(
-              gradient: AppColors.taskGradient,
-              semanticLabel: 'Reorder item',
-            ),
+        testApp(
+          const DragHandleWidget(
+            gradient: AppColors.taskGradient,
+            semanticLabel: 'Reorder item',
           ),
         ),
       );
@@ -478,12 +439,10 @@ void main() {
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: DragHandleWidget(
-              gradient: AppColors.taskGradient,
-              semanticLabel: 'Reorder item',
-            ),
+        testApp(
+          const DragHandleWidget(
+            gradient: AppColors.taskGradient,
+            semanticLabel: 'Reorder item',
           ),
         ),
       );
@@ -505,24 +464,22 @@ void main() {
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: Column(
-              children: [
-                DragHandleWidget(
-                  gradient: AppColors.taskGradient,
-                  semanticLabel: 'Reorder first item',
-                ),
-                DragHandleWidget(
-                  gradient: AppColors.noteGradient,
-                  semanticLabel: 'Reorder second item',
-                ),
-                DragHandleWidget(
-                  gradient: AppColors.listGradient,
-                  semanticLabel: 'Reorder third item',
-                ),
-              ],
-            ),
+        testApp(
+          const Column(
+            children: [
+              DragHandleWidget(
+                gradient: AppColors.taskGradient,
+                semanticLabel: 'Reorder first item',
+              ),
+              DragHandleWidget(
+                gradient: AppColors.noteGradient,
+                semanticLabel: 'Reorder second item',
+              ),
+              DragHandleWidget(
+                gradient: AppColors.listGradient,
+                semanticLabel: 'Reorder third item',
+              ),
+            ],
           ),
         ),
       );
@@ -537,19 +494,17 @@ void main() {
       var dragEndCallCount = 0;
 
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: Center(
-              child: DragHandleWidget(
-                gradient: AppColors.taskGradient,
-                semanticLabel: 'Reorder item',
-                onDragStart: () {
-                  dragStartCallCount++;
-                },
-                onDragEnd: () {
-                  dragEndCallCount++;
-                },
-              ),
+        testApp(
+          Center(
+            child: DragHandleWidget(
+              gradient: AppColors.taskGradient,
+              semanticLabel: 'Reorder item',
+              onDragStart: () {
+                dragStartCallCount++;
+              },
+              onDragEnd: () {
+                dragEndCallCount++;
+              },
             ),
           ),
         ),
@@ -578,12 +533,10 @@ void main() {
       'Grip dots use correct spacing (6px vertical, 4px horizontal)',
       (WidgetTester tester) async {
         await tester.pumpWidget(
-          const MaterialApp(
-            home: Scaffold(
-              body: DragHandleWidget(
-                gradient: AppColors.taskGradient,
-                semanticLabel: 'Reorder item',
-              ),
+          testApp(
+            const DragHandleWidget(
+              gradient: AppColors.taskGradient,
+              semanticLabel: 'Reorder item',
             ),
           ),
         );

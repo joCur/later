@@ -655,5 +655,9 @@
   "spaceSwitcherErrorCannotArchiveCurrent": "Der aktuelle Space kann nicht archiviert werden. Wechseln Sie zuerst zu einem anderen Space.",
   "spaceSwitcherBadgeArchived": "Archiviert",
   "spaceSwitcherToggleShowArchived": "Archivierte Spaces anzeigen",
-  "spaceSwitcherButtonCreateNew": "Neuen Space erstellen"
+  "spaceSwitcherButtonCreateNew": "Neuen Space erstellen",
+
+  "searchEmptyTitle": "Keine Ergebnisse gefunden",
+  "searchEmptyMessage": "Versuchen Sie andere Suchbegriffe oder überprüfen Sie die Rechtschreibung",
+  "accessibilityDragHandleHint": "Doppeltippen und halten zum Neuanordnen"
 }
