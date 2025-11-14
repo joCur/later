@@ -640,6 +640,17 @@ Phase 3 successfully migrated the spaces feature to Riverpod 3.0 following the p
 - ✅ All 5 space-related widgets migrated to ConsumerWidget
 - ✅ 66 new tests (all passing)
 
+**Known Issues (To be fixed in Phase 8):**
+- ~69 widget tests now failing because they use Provider mocking but widgets use Riverpod
+- Affected test files:
+  - `test/widgets/modals/create_space_modal_test.dart`
+  - `test/widgets/modals/space_switcher_modal_test.dart`
+  - `test/widgets/navigation/app_sidebar_test.dart`
+  - Other widget tests that indirectly use space widgets
+- **Decision:** These will be fixed in Phase 8 when all Provider code is removed
+- **Test count:** 976 passing (up from 900+ baseline), 116 failing (up from 47 baseline)
+- **Net impact:** +66 new passing tests (service + controller tests), +69 widget test failures (expected)
+
 ---
 
 ### Phase 4: Notes Feature Migration (2 days)
@@ -1016,14 +1027,28 @@ Phase 3 successfully migrated the spaces feature to Riverpod 3.0 following the p
   - Run `flutter pub get`
   - Run `flutter analyze` (should be clean)
 
-- [ ] Task 8.2: Delete old Provider tests
+- [ ] Task 8.2: Fix widget tests broken by Riverpod migration
+  - Update widget tests that still use Provider mocking but test Riverpod widgets
+  - **Known failing tests from Phase 3:**
+    - `test/widgets/modals/create_space_modal_test.dart` (~20-30 tests)
+    - `test/widgets/modals/space_switcher_modal_test.dart` (~15-20 tests)
+    - `test/widgets/navigation/app_sidebar_test.dart` (~10-15 tests)
+    - Other widget tests that indirectly use space widgets (~20-25 tests)
+  - Convert to use `ProviderScope` with `overrides` instead of `MultiProvider`
+  - Use Riverpod's `overrideWithValue()` or `overrideWithBuild()` for mocking
+  - Pattern: Wrap test widgets in `ProviderScope(overrides: [...], child: testApp(...))`
+  - **Similar updates needed for Notes, TodoLists, Lists widget tests** (from Phases 4-6)
+  - Run `flutter test` after each file fix
+  - Goal: Zero widget test failures
+
+- [ ] Task 8.3: Delete old Provider tests
   - Delete `test/providers/` directory entirely
   - Verify all functionality is covered by new feature tests
   - Run `flutter test`
   - Run `flutter test --coverage`
   - Verify coverage is maintained or improved (target: 80%+)
 
-- [ ] Task 8.3: Optimize Riverpod usage
+- [ ] Task 8.5: Optimize Riverpod usage
   - Review all controllers for proper `.select()` usage (fine-grained reactivity)
   - Add `@riverpod(keepAlive: true)` where appropriate (repositories, services)
   - Add `autoDispose` modifiers where appropriate (feature controllers)
@@ -1032,14 +1057,14 @@ Phase 3 successfully migrated the spaces feature to Riverpod 3.0 following the p
   - Run app and verify performance hasn't regressed
   - Run `flutter analyze`
 
-- [ ] Task 8.4: Optimize test performance
+- [ ] Task 8.6: Optimize test performance
   - Identify slow tests (widget tests with full widget trees)
   - Convert to faster unit tests where possible
   - Add test groups for better organization
   - Run `flutter test` and measure total test time
   - Compare to baseline from Phase 0 (should be faster due to more unit tests)
 
-- [ ] Task 8.5: Complete ARCHITECTURE.md documentation
+- [ ] Task 8.7: Complete ARCHITECTURE.md documentation
   - Document architectural layers (Data, Domain, Application, Presentation)
   - Document feature-first organization principles
   - Document Riverpod provider patterns:
@@ -1055,7 +1080,7 @@ Phase 3 successfully migrated the spaces feature to Riverpod 3.0 following the p
   - Add architecture diagrams (text-based)
   - Add examples of each pattern
 
-- [ ] Task 8.6: Update CLAUDE.md with new architecture
+- [ ] Task 8.8: Update CLAUDE.md with new architecture
   - Update "Architecture & Key Concepts" section
   - Replace Provider patterns with Riverpod patterns
   - Update state management section
@@ -1064,7 +1089,7 @@ Phase 3 successfully migrated the spaces feature to Riverpod 3.0 following the p
   - Update code examples throughout
   - Document Riverpod-specific commands
 
-- [ ] Task 8.7: Create migration retrospective document
+- [ ] Task 8.9: Create migration retrospective document
   - Create `.claude/migration-retrospective.md`
   - Document what went well
   - Document challenges encountered
@@ -1072,7 +1097,7 @@ Phase 3 successfully migrated the spaces feature to Riverpod 3.0 following the p
   - Document time estimates vs actuals
   - Provide recommendations for future migrations
 
-- [ ] Task 8.8: Final validation and metrics
+- [ ] Task 8.10: Final validation and metrics
   - Run `flutter analyze` (must be completely clean)
   - Run `flutter test` (all tests must pass)
   - Run `flutter test --coverage` (verify ≥80% coverage)
