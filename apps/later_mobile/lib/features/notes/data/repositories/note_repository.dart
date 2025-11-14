@@ -1,5 +1,5 @@
-import '../models/note_model.dart';
-import 'base_repository.dart';
+import '../../domain/models/note.dart';
+import '../../../../data/repositories/base_repository.dart';
 
 /// Repository for managing Note entities in Supabase.
 ///

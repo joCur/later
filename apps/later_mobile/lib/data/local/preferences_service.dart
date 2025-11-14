@@ -13,10 +13,6 @@ class PreferencesService {
   // Preference keys
   static const String _lastSelectedSpaceIdKey = 'last_selected_space_id';
   static const String _themeModeKey = 'themeMode';
-  static const String _migratedToCalculatedCountsKey =
-      'migrated_to_calculated_counts_v2';
-  static const String _migratedSortOrderKey =
-      'migrated_sort_order_v1';
 
   // SharedPreferences instance
   SharedPreferences? _prefs;
@@ -85,52 +81,6 @@ class PreferencesService {
     await _prefs!.setString(_themeModeKey, themeMode);
   }
 
-  /// Check if the app has been migrated to calculated counts
-  /// Returns false if migration has not been completed
-  /// Throws StateError if not initialized
-  bool hasMigratedToCalculatedCounts() {
-    if (_prefs == null) {
-      throw StateError(
-        'PreferencesService not initialized. Call PreferencesService.initialize() first.',
-      );
-    }
-    return _prefs!.getBool(_migratedToCalculatedCountsKey) ?? false;
-  }
-
-  /// Mark the migration to calculated counts as completed
-  /// Throws StateError if not initialized
-  Future<void> setMigratedToCalculatedCounts() async {
-    if (_prefs == null) {
-      throw StateError(
-        'PreferencesService not initialized. Call PreferencesService.initialize() first.',
-      );
-    }
-    await _prefs!.setBool(_migratedToCalculatedCountsKey, true);
-  }
-
-  /// Check if the app has been migrated to use sortOrder field
-  /// Returns false if migration has not been completed
-  /// Throws StateError if not initialized
-  bool hasMigratedSortOrder() {
-    if (_prefs == null) {
-      throw StateError(
-        'PreferencesService not initialized. Call PreferencesService.initialize() first.',
-      );
-    }
-    return _prefs!.getBool(_migratedSortOrderKey) ?? false;
-  }
-
-  /// Mark the sortOrder migration as completed
-  /// Throws StateError if not initialized
-  Future<void> setMigratedSortOrder() async {
-    if (_prefs == null) {
-      throw StateError(
-        'PreferencesService not initialized. Call PreferencesService.initialize() first.',
-      );
-    }
-    await _prefs!.setBool(_migratedSortOrderKey, true);
-  }
-
   /// Check if the service has been initialized
   bool get isInitialized => _prefs != null;
 
@@ -144,9 +94,6 @@ class PreferencesService {
     return {
       'lastSelectedSpaceId': _prefs!.getString(_lastSelectedSpaceIdKey),
       'themeMode': _prefs!.getString(_themeModeKey),
-      'migratedToCalculatedCounts':
-          _prefs!.getBool(_migratedToCalculatedCountsKey),
-      'migratedSortOrder': _prefs!.getBool(_migratedSortOrderKey),
     };
   }
 

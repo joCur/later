@@ -6,7 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:later_mobile/data/models/list_model.dart';
 import 'package:later_mobile/data/models/list_style.dart';
-import 'package:later_mobile/data/models/note_model.dart';
+import 'package:later_mobile/features/notes/domain/models/note.dart';
 import 'package:later_mobile/data/models/todo_list_model.dart';
 import 'package:later_mobile/design_system/atoms/buttons/ghost_button.dart';
 import 'package:later_mobile/design_system/atoms/buttons/gradient_button.dart';
@@ -26,6 +26,7 @@ import '../../features/auth/presentation/controllers/auth_state_controller.dart'
 import '../../features/spaces/domain/models/space.dart';
 import '../../features/spaces/presentation/controllers/spaces_controller.dart';
 import '../../features/spaces/presentation/controllers/current_space_controller.dart';
+import '../../features/notes/presentation/controllers/notes_controller.dart';
 // import '../../providers/spaces_provider.dart'; // TODO: Remove after Phase 8
 import '../../providers/content_provider.dart';
 
@@ -341,7 +342,10 @@ class _CreateContentModalState extends ConsumerState<CreateContentModal>
               spaceId: targetSpaceId,
               userId: userId,
             );
-            await contentProvider.createNote(note);
+            // Create note via Riverpod controller
+            await ref
+                .read(notesControllerProvider(targetSpaceId).notifier)
+                .createNote(note);
             _currentItemId = id;
             break;
         }
@@ -349,16 +353,23 @@ class _CreateContentModalState extends ConsumerState<CreateContentModal>
         // Update existing item (only works for Notes in this simple version)
         // For TodoLists and Lists, we don't support editing in quick capture
         if (contentType == ContentType.note) {
-          final existingNotes = contentProvider.notes;
-          final existingNote = existingNotes.cast<Note?>().firstWhere(
-            (note) => note?.id == _currentItemId,
-            orElse: () => null,
+          // Get notes from Riverpod
+          final notesAsync = ref.read(notesControllerProvider(targetSpaceId));
+          final existingNote = notesAsync.when(
+            data: (notes) => notes.cast<Note?>().firstWhere(
+              (note) => note?.id == _currentItemId,
+              orElse: () => null,
+            ),
+            loading: () => null,
+            error: (error, stack) => null,
           );
 
           if (existingNote != null) {
-            await contentProvider.updateNote(
-              existingNote.copyWith(title: text),
-            );
+            await ref
+                .read(notesControllerProvider(targetSpaceId).notifier)
+                .updateNote(
+                  existingNote.copyWith(title: text),
+                );
           }
         }
       }

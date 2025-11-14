@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:later_mobile/core/mixins/auto_save_mixin.dart';
 import 'package:later_mobile/design_system/atoms/inputs/text_input_field.dart';
 import 'package:later_mobile/design_system/molecules/app_bars/editable_app_bar_title.dart';
@@ -8,11 +9,10 @@ import 'package:later_mobile/design_system/organisms/dialogs/delete_confirmation
 import 'package:later_mobile/design_system/organisms/modals/bottom_sheet_container.dart';
 import 'package:later_mobile/design_system/tokens/tokens.dart';
 import 'package:later_mobile/l10n/app_localizations.dart';
-import 'package:provider/provider.dart';
 
-import '../../core/utils/responsive_modal.dart';
-import '../../data/models/note_model.dart';
-import '../../providers/content_provider.dart';
+import '../../../../core/utils/responsive_modal.dart';
+import '../../domain/models/note.dart';
+import '../controllers/notes_controller.dart';
 
 /// Note Detail Screen for viewing and editing Note content
 ///
@@ -25,17 +25,17 @@ import '../../providers/content_provider.dart';
 /// - Loading indicator when saving
 /// - Empty state support
 /// - Error handling with SnackBar messages
-class NoteDetailScreen extends StatefulWidget {
+class NoteDetailScreen extends ConsumerStatefulWidget {
   const NoteDetailScreen({super.key, required this.note});
 
   /// Note to display and edit
   final Note note;
 
   @override
-  State<NoteDetailScreen> createState() => _NoteDetailScreenState();
+  ConsumerState<NoteDetailScreen> createState() => _NoteDetailScreenState();
 }
 
-class _NoteDetailScreenState extends State<NoteDetailScreen>
+class _NoteDetailScreenState extends ConsumerState<NoteDetailScreen>
     with AutoSaveMixin {
   // Text controllers
   late TextEditingController _titleController;
@@ -108,9 +108,10 @@ class _NoteDetailScreenState extends State<NoteDetailScreen>
         updatedAt: DateTime.now(),
       );
 
-      // Save via provider
-      final provider = Provider.of<ContentProvider>(context, listen: false);
-      await provider.updateNote(updated);
+      // Save via Riverpod controller
+      await ref
+          .read(notesControllerProvider(_currentNote.spaceId).notifier)
+          .updateNote(updated);
 
       setState(() {
         _currentNote = updated;
@@ -160,9 +161,10 @@ class _NoteDetailScreenState extends State<NoteDetailScreen>
         updatedAt: DateTime.now(),
       );
 
-      // Save via provider
-      final provider = Provider.of<ContentProvider>(context, listen: false);
-      await provider.updateNote(updated);
+      // Save via Riverpod controller
+      await ref
+          .read(notesControllerProvider(_currentNote.spaceId).notifier)
+          .updateNote(updated);
 
       setState(() {
         _currentNote = updated;
@@ -194,9 +196,10 @@ class _NoteDetailScreenState extends State<NoteDetailScreen>
         updatedAt: DateTime.now(),
       );
 
-      // Save via provider
-      final provider = Provider.of<ContentProvider>(context, listen: false);
-      await provider.updateNote(updated);
+      // Save via Riverpod controller
+      await ref
+          .read(notesControllerProvider(_currentNote.spaceId).notifier)
+          .updateNote(updated);
 
       setState(() {
         _currentNote = updated;
@@ -248,9 +251,9 @@ class _NoteDetailScreenState extends State<NoteDetailScreen>
     final l10n = AppLocalizations.of(context)!;
 
     try {
-      final provider = Provider.of<ContentProvider>(context, listen: false);
-
-      await provider.deleteNote(_currentNote.id);
+      await ref
+          .read(notesControllerProvider(_currentNote.spaceId).notifier)
+          .deleteNote(_currentNote.id);
 
       // Navigation already handled in confirmation dialog
       // Success feedback is provided by UI update (note removed from list)
