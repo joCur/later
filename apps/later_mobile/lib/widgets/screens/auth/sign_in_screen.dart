@@ -1,23 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:later_mobile/core/error/app_error.dart';
 import 'package:later_mobile/design_system/design_system.dart';
+import 'package:later_mobile/features/auth/presentation/controllers/auth_state_controller.dart';
 import 'package:later_mobile/l10n/app_localizations.dart';
-import 'package:later_mobile/providers/auth_provider.dart';
 import 'package:later_mobile/widgets/screens/auth/sign_up_screen.dart';
-import 'package:provider/provider.dart';
 
 /// Screen for signing in existing users
 ///
 /// Provides email/password sign in with validation and error handling.
 /// Links to sign up screen for new users.
-class SignInScreen extends StatefulWidget {
+class SignInScreen extends ConsumerStatefulWidget {
   const SignInScreen({super.key});
 
   @override
-  State<SignInScreen> createState() => _SignInScreenState();
+  ConsumerState<SignInScreen> createState() => _SignInScreenState();
 }
 
-class _SignInScreenState extends State<SignInScreen> {
+class _SignInScreenState extends ConsumerState<SignInScreen> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -52,14 +53,12 @@ class _SignInScreenState extends State<SignInScreen> {
       return;
     }
 
-    final authProvider = context.read<AuthProvider>();
+    await ref.read(authStateControllerProvider.notifier).signIn(
+          email: _emailController.text.trim(),
+          password: _passwordController.text,
+        );
 
-    await authProvider.signIn(
-      email: _emailController.text.trim(),
-      password: _passwordController.text,
-    );
-
-    // Error handling is done through AuthProvider.errorMessage
+    // Error handling is done through AsyncValue.error
     // The UI will show the error message automatically
   }
 
@@ -71,8 +70,23 @@ class _SignInScreenState extends State<SignInScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final authProvider = context.watch<AuthProvider>();
+    final authState = ref.watch(authStateControllerProvider);
     final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    // Extract error message from AsyncValue
+    final errorMessage = authState.when(
+      data: (_) => null,
+      loading: () => null,
+      error: (error, _) {
+        if (error is AppError) {
+          return error.message;
+        }
+        return 'An unexpected error occurred';
+      },
+    );
+
+    // Extract loading state
+    final isLoading = authState.isLoading;
 
     return Scaffold(
       body: Stack(
@@ -116,27 +130,25 @@ class _SignInScreenState extends State<SignInScreen> {
                                   const SizedBox(height: AppSpacing.lg),
 
                                   // Error banner
-                                  if (authProvider.errorMessage != null) ...[
-                                    _buildErrorBanner(
-                                      authProvider.errorMessage!,
-                                    ),
+                                  if (errorMessage != null) ...[
+                                    _buildErrorBanner(errorMessage),
                                     const SizedBox(height: AppSpacing.md),
                                   ],
 
                                   // Email field
-                                  _buildEmailField(authProvider.isLoading),
+                                  _buildEmailField(isLoading),
                                   const SizedBox(height: AppSpacing.md),
 
                                   // Password field
-                                  _buildPasswordField(authProvider.isLoading),
+                                  _buildPasswordField(isLoading),
                                   const SizedBox(height: AppSpacing.lg),
 
                                   // Sign in button
-                                  _buildSignInButton(authProvider),
+                                  _buildSignInButton(isLoading),
                                   const SizedBox(height: AppSpacing.md),
 
                                   // Sign up link
-                                  _buildSignUpLink(authProvider.isLoading),
+                                  _buildSignUpLink(isLoading),
                                 ],
                               ),
                             ),
@@ -296,12 +308,12 @@ class _SignInScreenState extends State<SignInScreen> {
         .fadeIn(duration: 300.ms);
   }
 
-  Widget _buildSignInButton(AuthProvider authProvider) {
+  Widget _buildSignInButton(bool isLoading) {
     final l10n = AppLocalizations.of(context)!;
     return PrimaryButton(
           text: l10n.authButtonSignIn,
-          onPressed: authProvider.isLoading ? null : _handleSignIn,
-          isLoading: authProvider.isLoading,
+          onPressed: isLoading ? null : _handleSignIn,
+          isLoading: isLoading,
         )
         .animate(delay: 600.ms)
         .slideY(begin: 0.05, end: 0, duration: 300.ms)

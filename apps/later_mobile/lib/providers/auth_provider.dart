@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/widgets.dart';
 import 'package:later_mobile/core/error/error.dart';
-import 'package:later_mobile/data/services/auth_service.dart';
+import 'package:later_mobile/features/auth/data/services/auth_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 /// Authentication status enum for the provider
