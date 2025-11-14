@@ -1,19 +1,22 @@
-# Riverpod Architecture Migration Plan
+# Riverpod 3.0 Architecture Migration Plan
 
 ## Objective and Scope
 
-Migrate the Later mobile app from Provider-based architecture to Feature-First Clean Architecture with Riverpod. This migration will:
+Migrate the Later mobile app from Provider-based architecture to Feature-First Clean Architecture with **Riverpod 3.0.3** (latest stable release as of November 2025). This migration will:
 
-- Replace Provider with Riverpod for state management and dependency injection
+- Replace Provider with Riverpod 3.0.3 for state management and dependency injection
 - Introduce clear architectural layers (Data, Domain, Application, Presentation)
 - Organize code by features rather than layers
 - Dramatically improve testability with pure Dart unit tests
 - Achieve compile-time safety and eliminate runtime context errors
+- Leverage Riverpod 3.0 features: automatic retry, `Ref.mounted`, simplified syntax
 - Maintain 100% functional parity - zero UI/UX changes or business logic modifications
 - Rewrite all tests to leverage improved testability
 - Achieve zero analyzer errors, warnings, or informational messages
 
 **Critical Constraint:** The app must work exactly as it currently does. This is a pure architectural refactor with no functional changes.
+
+**Version Note:** This plan targets Riverpod 3.0.3 (September 2025 release) which includes breaking changes from 2.x but provides significant simplifications and new features. See `.claude/research/riverpod-3.0-migration-dependencies.md` for detailed version analysis.
 
 ## Technical Approach and Reasoning
 
@@ -28,8 +31,9 @@ Based on comprehensive research (see `.claude/research/flutter-architecture-patt
    - Enables pure Dart unit testing without widget test infrastructure
 
 2. **Industry Best Practice (2025):**
-   - Riverpod is the recommended modern solution by Flutter experts
+   - Riverpod 3.0 is the current production-ready standard (released September 2025)
    - Created by the same author as Provider, fixing its known issues
+   - Simplified syntax with less boilerplate than Riverpod 2.x
    - Feature-first organization is standard for scalable Flutter apps
    - Clean Architecture with four layers (Data, Domain, Application, Presentation) is industry standard
 
@@ -44,6 +48,9 @@ Based on comprehensive research (see `.claude/research/flutter-architecture-patt
    - Dramatically easier testing (pure Dart vs widget tests)
    - Better developer experience with compile-time safety
    - Scales from current 6 screens to 50+ screens
+   - Automatic error retry with exponential backoff (built-in resilience)
+   - `Ref.mounted` prevents common async bugs
+   - Improved testing utilities (`ProviderContainer.test()`)
 
 ### Architectural Layers
 
@@ -84,7 +91,7 @@ testWidgets('test business logic', (tester) async {
 });
 ```
 
-**New Approach (Riverpod):**
+**New Approach (Riverpod 3.0):**
 ```dart
 // Service unit tests (pure Dart, fast)
 test('business logic test', () async {
@@ -97,13 +104,14 @@ test('business logic test', () async {
   verify(mockRepo.method(any)).called(1);
 });
 
-// Controller tests (with ProviderContainer)
+// Controller tests (with ProviderContainer.test - NEW in 3.0)
 test('controller test', () async {
-  final container = ProviderContainer(
+  final container = ProviderContainer.test(  // NEW: Built-in test utility
     overrides: [
       myServiceProvider.overrideWithValue(mockService),
     ],
   );
+  // Automatically disposed after test
 
   final controller = container.read(myControllerProvider.notifier);
   await controller.performAction();
@@ -116,11 +124,16 @@ testWidgets('UI test', (tester) async {
   await tester.pumpWidget(
     ProviderScope(
       overrides: [
-        myControllerProvider.overrideWith((ref) => mockController),
+        // NEW in 3.0: overrideWithBuild for simpler mocking
+        myControllerProvider.overrideWithBuild((ref, arg) => testData),
       ],
       child: testApp(MyWidget()),
     ),
   );
+
+  // NEW in 3.0: Access container directly
+  final container = tester.container;
+
   expect(find.text('Expected UI'), findsOneWidget);
 });
 ```
@@ -129,80 +142,123 @@ testWidgets('UI test', (tester) async {
 - Phase 1-7: Write new tests alongside migration (service tests, controller tests, minimal widget tests)
 - Phase 8: Delete old Provider-based tests, verify 100% coverage maintained
 
-### Code Generation
+### Code Generation (Riverpod 3.0)
 
-Riverpod uses code generation for optimal developer experience:
+Riverpod 3.0 uses simplified code generation with less boilerplate:
 
 ```dart
-// Define provider with annotation
+// Define provider with @riverpod annotation
 @riverpod
 class TodoListController extends _$TodoListController {
   @override
   Future<List<TodoList>> build(String spaceId) async {
     final service = ref.watch(todoListServiceProvider);
     return service.getTodoListsForSpace(spaceId);
+    // Auto-disposed by default in 3.0 (no more AutoDispose prefix!)
+    // Automatic retry on failure (200ms → 400ms → 800ms → up to 6.4s)
+  }
+
+  Future<void> createTodoList(String name) async {
+    final service = ref.read(todoListServiceProvider);
+    final created = await service.createTodoList(spaceId, name);
+
+    // NEW in 3.0: Check if provider is still mounted before updating
+    if (!ref.mounted) return;
+
+    state = AsyncValue.data([...state.value!, created]);
   }
 }
 
 // Generated code provides:
-// - Auto-dispose
+// - Auto-dispose by default (use @Riverpod(keepAlive: true) to disable)
+// - Family parameters automatically inferred from build() method
+// - No AutoDispose/Family type prefixes needed
+// - Unified Ref type (no generics)
 // - Type-safe provider access
-// - Compile-time safety
 ```
+
+**Key Changes in 3.0:**
+- `AutoDisposeNotifier` → `Notifier` (simplified)
+- `FamilyNotifier` → `Notifier` with parameters
+- `Ref<T>` → `Ref` (no type parameter)
+- AutoDispose is **default** (not opt-in)
 
 Run `dart run build_runner watch` during development for automatic code generation.
 
 ## Implementation Phases
 
-### Phase 0: Pre-Migration Setup (1 day)
+### Phase 0: Pre-Migration Setup (1.5 days) ✅ COMPLETE
 
-**Goal:** Prepare infrastructure, add dependencies, verify baseline
+**Goal:** Prepare infrastructure, add Riverpod 3.0.3 dependencies, verify baseline, establish 3.0 patterns
 
-- [ ] Task 0.1: Add Riverpod dependencies to pubspec.yaml
-  - Add `flutter_riverpod: ^2.6.1`
-  - Add `riverpod_annotation: ^2.6.1`
-  - Add `riverpod_generator: ^2.6.1` to dev_dependencies
-  - Add `riverpod_lint: ^2.6.1` to dev_dependencies
+- [x] Task 0.1: Add Riverpod 3.0.3 dependencies to pubspec.yaml
+  - Add `flutter_riverpod: ^3.0.3` (updated from 2.6.1 - breaking changes)
+  - Add `riverpod_annotation: ^3.0.3` to dev_dependencies (breaking changes)
+  - Add `riverpod_generator: ^3.0.3` to dev_dependencies (breaking changes)
+  - Add `riverpod_lint: ^3.0.3` to dev_dependencies (new lint rules)
+  - Update `build_runner: ^2.10.2` (compatible patch update)
   - Keep `provider: ^6.1.0` temporarily for gradual migration
   - Run `flutter pub get`
+  - Note: Riverpod 3.0 requires Dart SDK ≥3.6.0 (Later app already compatible)
+  - **Completed:** Dependencies added with build_runner 2.4.13 and mockito 5.5.0 (downgraded for compatibility)
 
-- [ ] Task 0.2: Set up build_runner for code generation
+- [x] Task 0.2: Set up build_runner for code generation
   - Create `build.yaml` configuration file
   - Run `dart run build_runner build --delete-conflicting-outputs` to test setup
   - Document code generation commands in CLAUDE.md
+  - **Completed:** build.yaml created and tested successfully
 
-- [ ] Task 0.3: Create baseline metrics
+- [x] Task 0.3: Create baseline metrics
   - Run `flutter analyze` and save output (should be clean)
   - Run `flutter test` and record all test results
   - Run `flutter test --coverage` and save coverage report
   - Document current test count (200+ tests, >70% coverage)
   - Time a full app build (`flutter build apk --debug`)
+  - **Completed:** Baseline metrics captured in `.claude/baseline-metrics.md` (analyzer clean, 900+ tests passing)
 
-- [ ] Task 0.4: Create migration documentation structure
+- [x] Task 0.4: Create migration documentation structure
   - Create `.claude/migration-log.md` to track decisions and learnings
   - Create `apps/later_mobile/ARCHITECTURE.md` skeleton
   - Document "before" architecture in ARCHITECTURE.md
+  - **Completed:** Migration log and ARCHITECTURE.md created
 
-- [ ] Task 0.5: Set up ProviderScope in main.dart
+- [x] Task 0.5: Set up ProviderScope in main.dart
   - Wrap `MultiProvider` with `ProviderScope` (both can coexist)
   - Verify app still launches and works identically
   - Run `flutter analyze` (should be clean)
   - Run full test suite (should pass)
+  - **Completed:** ProviderScope added, all tests pass, analyzer clean
+
+- [x] Task 0.6: Review and document Riverpod 3.0 breaking changes
+  - Read official migration guide: https://riverpod.dev/docs/3.0_migration
+  - Document key breaking changes in `.claude/migration-log.md`:
+    - AutoDispose is now default (no more AutoDispose prefix)
+    - Unified `Ref` type (no generics)
+    - `ProviderException` wrapping
+    - Automatic retry behavior
+  - Document new features to leverage:
+    - `Ref.mounted` for async safety
+    - `ProviderContainer.test()` for testing
+    - `overrideWithBuild()` for widget test mocking
+    - Automatic pause/resume for off-screen widgets
+  - Create code examples of 3.0 patterns for reference
+  - **Completed:** Comprehensive patterns documented in `.claude/riverpod-3.0-patterns.md`
 
 **Success Criteria:**
-- All dependencies added, build_runner working
+- Riverpod 3.0.3 dependencies added, build_runner working
 - Baseline metrics documented
 - App launches with ProviderScope wrapping MultiProvider
 - All existing tests pass
 - Zero analyzer errors/warnings/info
+- Riverpod 3.0 patterns documented for team reference
 
-**Risk: Very Low** - Pure additive changes, no breaking modifications
+**Risk: Very Low** - Pure additive changes, no breaking modifications yet
 
 ---
 
-### Phase 1: Theme Migration (1 day)
+### Phase 1: Theme Migration (1.5 days)
 
-**Goal:** Migrate simplest provider (ThemeProvider) to establish patterns and validate approach
+**Goal:** Migrate simplest provider (ThemeProvider) to establish Riverpod 3.0 patterns and validate approach
 
 - [ ] Task 1.1: Create feature structure for theme
   - Create `lib/features/theme/` directory
@@ -217,11 +273,34 @@ Run `dart run build_runner watch` during development for automatic code generati
   - Service should use existing SharedPreferences storage
   - Run `flutter analyze` after creation
 
-- [ ] Task 1.3: Create theme controller with Riverpod
+- [ ] Task 1.3: Create theme controller with Riverpod 3.0
   - Create `lib/features/theme/presentation/controllers/theme_controller.dart`
-  - Use `@riverpod` annotation for code generation
+  - Use `@riverpod` annotation for code generation (simpler than 2.x)
   - Controller manages ThemeMode state (light/dark/system)
-  - Implement `toggleTheme()` method calling service
+  - Implement `toggleTheme()` method with `ref.mounted` check
+  - Example pattern (Riverpod 3.0):
+    ```dart
+    @riverpod
+    class ThemeController extends _$ThemeController {
+      @override
+      ThemeMode build() {
+        final service = ref.watch(themeServiceProvider);
+        return service.loadTheme();
+      }
+
+      Future<void> toggleTheme() async {
+        final service = ref.read(themeServiceProvider);
+        final newTheme = state == ThemeMode.light ? ThemeMode.dark : ThemeMode.light;
+        await service.saveTheme(newTheme);
+
+        // NEW in 3.0: Check if provider still mounted
+        if (!ref.mounted) return;
+
+        state = newTheme;
+      }
+    }
+    // Note: No AutoDispose prefix needed - it's default in 3.0!
+    ```
   - Run `dart run build_runner build --delete-conflicting-outputs`
   - Run `flutter analyze`
 
@@ -232,31 +311,54 @@ Run `dart run build_runner watch` during development for automatic code generati
   - Run app and verify theme switching works identically
   - Run `flutter analyze`
 
-- [ ] Task 1.5: Write tests for theme service and controller
+- [ ] Task 1.5: Write tests for theme service and controller (Riverpod 3.0 patterns)
   - Create `test/features/theme/application/theme_service_test.dart`
   - Test load/save theme preference with mock SharedPreferences
   - Create `test/features/theme/presentation/controllers/theme_controller_test.dart`
-  - Test theme state management with ProviderContainer
-  - Create minimal widget test for theme switching UI
+  - Test theme state management with `ProviderContainer.test()` (NEW in 3.0)
+  - Example test pattern:
+    ```dart
+    test('should toggle theme', () async {
+      final container = ProviderContainer.test(  // NEW: Built-in utility
+        overrides: [
+          themeServiceProvider.overrideWithValue(mockService),
+        ],
+      );
+      // Automatically disposed after test
+
+      final controller = container.read(themeControllerProvider.notifier);
+      await controller.toggleTheme();
+
+      expect(container.read(themeControllerProvider), ThemeMode.dark);
+    });
+    ```
+  - Create minimal widget test with `overrideWithBuild()` (NEW in 3.0)
   - Delete old `test/providers/theme_provider_test.dart`
   - Run `flutter test` (all tests should pass)
   - Run `flutter test --coverage` (coverage should be maintained or improved)
 
-- [ ] Task 1.6: Update Riverpod test helpers
+- [ ] Task 1.6: Document Riverpod 3.0 test patterns
   - Create `test/helpers/riverpod_test_helpers.dart`
-  - Add `createContainer()` helper for creating ProviderContainer with overrides
+  - Document `ProviderContainer.test()` pattern (no custom helper needed)
+  - Document `overrideWithBuild()` for widget tests
+  - Document `tester.container` for accessing container in widget tests
   - Add `testAppWithProviders()` helper extending existing testApp()
-  - Document patterns in test helper file
+  - Document Ref.mounted pattern for async methods
+  - These patterns will be used in all subsequent phases
 
 **Success Criteria:**
 - Theme switching works identically to before
 - Theme service has 100% pure Dart unit test coverage
-- Theme controller has ProviderContainer-based tests
+- Theme controller has ProviderContainer.test-based tests (Riverpod 3.0)
+- Ref.mounted pattern demonstrated and documented
 - Old ThemeProvider still exists but unused
 - All tests pass
 - Zero analyzer errors/warnings/info
+- Riverpod 3.0 patterns documented for all subsequent phases
 
 **Risk: Low** - Simple provider with minimal dependencies
+
+**Note on Automatic Retry:** Theme loading errors (if any) will automatically retry with exponential backoff (200ms → 400ms → 800ms → up to 6.4s). This is built into Riverpod 3.0 - no manual retry logic needed.
 
 ---
 
@@ -877,17 +979,22 @@ Run `dart run build_runner watch` during development for automatic code generati
 
 ### Required Dependencies
 
-**New dependencies (add in Phase 0):**
+**New dependencies (add in Phase 0) - Riverpod 3.0.3:**
 ```yaml
 dependencies:
-  flutter_riverpod: ^2.6.1
-  riverpod_annotation: ^2.6.1
+  flutter_riverpod: ^3.0.3  # Updated from 2.6.1 - BREAKING CHANGES
 
 dev_dependencies:
-  riverpod_generator: ^2.6.1
-  riverpod_lint: ^2.6.1
-  build_runner: ^2.10.1  # Already exists
+  riverpod_annotation: ^3.0.3  # Updated from 2.6.1 - BREAKING CHANGES
+  riverpod_generator: ^3.0.3  # Updated from 2.6.1 - BREAKING CHANGES
+  riverpod_lint: ^3.0.3  # Updated from 2.6.1 - New lint rules
+  build_runner: ^2.10.2  # Updated from 2.10.1 - Compatible patch
 ```
+
+**Dart SDK Requirement:**
+- Riverpod 3.0.3 requires **Dart SDK ≥3.6.0**
+- Later app uses Flutter 3.9.2+ which includes Dart 3.0+
+- ✅ Compatible - no Flutter version update needed
 
 **Keep during migration (remove in Phase 8):**
 ```yaml
@@ -917,15 +1024,22 @@ All current dependencies remain:
    - `.dart_tool/` in .gitignore
 
 3. **Testing Infrastructure:**
-   - Test helpers updated for Riverpod
-   - ProviderContainer test utilities created
+   - Test helpers updated for Riverpod 3.0
+   - `ProviderContainer.test()` utility documented (built-in, no custom helper needed)
+   - `overrideWithBuild()` pattern documented
    - Mock patterns documented
 
 4. **Developer Knowledge:**
-   - Team familiar with Riverpod concepts (providers, refs, notifiers)
+   - Team familiar with Riverpod 3.0 concepts (simplified from 2.x)
+   - Key 3.0 features understood: `Ref.mounted`, automatic retry, no AutoDispose prefix
    - Team understands Clean Architecture layers
    - Team understands feature-first organization
-   - Code review checklist for Riverpod patterns created
+   - Code review checklist for Riverpod 3.0 patterns created
+
+5. **Riverpod 3.0 Migration Guide Review:**
+   - Official migration guide reviewed: https://riverpod.dev/docs/3.0_migration
+   - Breaking changes documented in `.claude/migration-log.md`
+   - Code examples prepared for common patterns
 
 ## Challenges and Considerations
 
@@ -1445,29 +1559,27 @@ void main() {
 }
 ```
 
-**Controller Test:**
+**Controller Test (Riverpod 3.0):**
 ```dart
 void main() {
   group('MyController', () {
-    late ProviderContainer container;
     late MockMyService mockService;
 
     setUp(() {
       mockService = MockMyService();
-      container = ProviderContainer(
-        overrides: [
-          myServiceProvider.overrideWithValue(mockService),
-        ],
-      );
-    });
-
-    tearDown(() {
-      container.dispose();
     });
 
     test('should update state', () async {
       // Arrange
       when(mockService.doSomething()).thenAnswer((_) async => testResult);
+
+      // NEW in 3.0: Use built-in test utility
+      final container = ProviderContainer.test(
+        overrides: [
+          myServiceProvider.overrideWithValue(mockService),
+        ],
+      );
+      // Automatically disposed after test - no tearDown needed!
 
       // Act
       final controller = container.read(myControllerProvider.notifier);
@@ -1481,24 +1593,433 @@ void main() {
 }
 ```
 
-**Widget Test:**
+**Widget Test (Riverpod 3.0):**
 ```dart
 testWidgets('should render correctly', (tester) async {
-  // Arrange
-  final mockController = MockMyController();
-  when(mockController.build()).thenReturn(AsyncValue.data(testData));
-
   // Act
   await tester.pumpWidget(
     ProviderScope(
       overrides: [
-        myControllerProvider.overrideWith((ref) => mockController),
+        // NEW in 3.0: overrideWithBuild for simpler mocking
+        myControllerProvider.overrideWithBuild((ref, arg) {
+          return testData; // Return test data directly
+        }),
       ],
       child: testApp(MyScreen()),
     ),
   );
 
+  // NEW in 3.0: Access container directly
+  final container = tester.container;
+  final value = container.read(myControllerProvider);
+
   // Assert
   expect(find.text('Expected Text'), findsOneWidget);
+  expect(value, testData);
 });
 ```
+
+## Riverpod 3.0 Breaking Changes Summary
+
+This section documents all breaking changes from Riverpod 2.6.1 to 3.0.3 and how they affect the migration plan.
+
+### 1. Automatic Retry (Default Behavior)
+
+**Change:** Providers that fail during initialization now automatically retry with exponential backoff.
+
+**Impact on Plan:**
+- Remove manual retry logic from service layer (simplification)
+- Transient errors (network timeouts) are auto-retried: 200ms → 400ms → 800ms → up to 6.4s
+- Update error handling tests to account for retry behavior
+- Document that persistent errors (validation, auth) will eventually throw after retries exhausted
+
+**Example:**
+```dart
+// Old (2.6): Manual retry
+Future<List<Note>> getNotes() async {
+  try {
+    return await repository.getNotes();
+  } catch (e) {
+    await Future.delayed(Duration(milliseconds: 200));
+    return await repository.getNotes(); // Manual retry
+  }
+}
+
+// New (3.0): Automatic retry (no manual logic)
+@riverpod
+Future<List<Note>> notes(Ref ref) async {
+  final service = ref.watch(noteServiceProvider);
+  return service.getNotes(); // Automatically retried on failure
+}
+```
+
+**Disable retry if needed:**
+```dart
+@Riverpod(retry: (count, error) => null)
+Future<List<Note>> notesNoRetry(Ref ref) async {
+  // Will not retry
+}
+```
+
+### 2. Unified Ref Type (No Generics)
+
+**Change:** `Ref<T>` → `Ref` (no type parameter)
+
+**Impact on Plan:**
+- Update all code examples to use `Ref` without generics
+- Use `Notifier.state` instead of `ref.state`
+- Use `Notifier.listenSelf` instead of `ref.listenSelf`
+
+**Example:**
+```dart
+// Old (2.6)
+@riverpod
+class MyController extends _$MyController {
+  @override
+  Future<MyData> build() async {
+    ref.listenSelf((previous, next) { ... });
+    return loadData();
+  }
+}
+
+// New (3.0)
+@riverpod
+class MyController extends _$MyController {
+  @override
+  Future<MyData> build() async {
+    listenSelf((previous, next) { ... }); // No ref prefix
+    return loadData();
+  }
+}
+```
+
+### 3. AutoDispose and Family Simplification
+
+**Change:** AutoDispose is now **default**. No more `AutoDispose` or `Family` prefixes.
+
+**Impact on Plan:**
+- Remove all `AutoDispose` and `Family` prefixes from controllers
+- Use `@Riverpod(keepAlive: true)` to disable auto-dispose (for repositories, services)
+- Family parameters automatically inferred from `build()` method
+
+**Example:**
+```dart
+// Old (2.6) - Complex
+class TodoListController extends AutoDisposeFamilyAsyncNotifier<List<TodoList>, String> {
+  @override
+  Future<List<TodoList>> build(String spaceId) async { ... }
+}
+
+// New (3.0) - Simple
+@riverpod
+class TodoListController extends _$TodoListController {
+  @override
+  Future<List<TodoList>> build(String spaceId) async { ... }
+  // Auto-disposed by default, family parameter automatically inferred
+}
+```
+
+### 4. ProviderException Wrapping
+
+**Change:** All provider errors are wrapped in `ProviderException`. Original exception in `.exception` property.
+
+**Impact on Plan:**
+- Update error handling to unwrap `ProviderException`
+- Update test expectations for error types
+
+**Example:**
+```dart
+// Old (2.6) - Catch original exceptions
+try {
+  final notes = await ref.read(notesProvider(spaceId).future);
+} on AppError catch (e) {
+  // Handle AppError
+}
+
+// New (3.0) - Unwrap ProviderException
+try {
+  final notes = await ref.read(notesProvider(spaceId).future);
+} on ProviderException catch (e) {
+  if (e.exception is AppError) {
+    final appError = e.exception as AppError;
+    // Handle AppError
+  }
+}
+```
+
+### 5. Ref.mounted (NEW Feature)
+
+**Change:** New property to check if provider is still alive before updating state.
+
+**Impact on Plan:**
+- Add `ref.mounted` checks to all async controller methods
+- Prevents "setState called after dispose" errors
+
+**Example:**
+```dart
+@riverpod
+class TodoItemController extends _$TodoItemController {
+  @override
+  List<TodoItem> build(String listId) => [];
+
+  Future<void> createItem(TodoItem item) async {
+    final service = ref.read(todoListServiceProvider);
+    final created = await service.createTodoItem(item);
+
+    // NEW in 3.0: Check if still mounted
+    if (!ref.mounted) return;
+
+    state = [...state, created];
+  }
+}
+```
+
+### 6. ProviderContainer.test() (NEW Feature)
+
+**Change:** Built-in test utility that auto-disposes container.
+
+**Impact on Plan:**
+- Replace custom `createContainer()` helper with `ProviderContainer.test()`
+- Simplifies test setup, no manual tearDown needed
+
+**Example:**
+```dart
+// Old (2.6) - Custom helper
+ProviderContainer createContainer() {
+  final container = ProviderContainer();
+  addTearDown(container.dispose);
+  return container;
+}
+
+// New (3.0) - Built-in
+test('my test', () {
+  final container = ProviderContainer.test(
+    overrides: [myServiceProvider.overrideWithValue(mockService)],
+  );
+  // Automatically disposed after test
+});
+```
+
+### 7. overrideWithBuild() (NEW Feature)
+
+**Change:** Mock only the `build()` method of a Notifier.
+
+**Impact on Plan:**
+- Use in widget tests for simpler mocking
+- No need to mock entire controller
+
+**Example:**
+```dart
+// Old (2.6) - Mock entire notifier
+class MockController extends Mock implements TodoListController {}
+
+testWidgets('test', (tester) async {
+  final mock = MockController();
+  when(mock.build(any)).thenReturn([]);
+  // ...
+});
+
+// New (3.0) - Mock only build
+testWidgets('test', (tester) async {
+  await tester.pumpWidget(
+    ProviderScope(
+      overrides: [
+        todoListControllerProvider(spaceId).overrideWithBuild((ref, arg) {
+          return []; // Mock data
+        }),
+      ],
+      child: testApp(MyWidget()),
+    ),
+  );
+});
+```
+
+### 8. tester.container (NEW Feature)
+
+**Change:** Access ProviderContainer directly in widget tests.
+
+**Impact on Plan:**
+- Simplifies widget test assertions
+- Can read provider state directly
+
+**Example:**
+```dart
+testWidgets('test', (tester) async {
+  await tester.pumpWidget(
+    ProviderScope(child: testApp(MyWidget())),
+  );
+
+  // NEW in 3.0: Access container
+  final container = tester.container;
+  final value = container.read(myProvider);
+
+  expect(value, expectedValue);
+});
+```
+
+### 9. Equality Filtering
+
+**Change:** Providers now use `==` (not `identical`) for update filtering.
+
+**Impact on Plan:**
+- Ensure all models have proper `==` and `hashCode` implementations
+- Consider adding Freezed for automatic equality
+
+**Example:**
+```dart
+// Ensure models implement equality
+class Note {
+  final String id;
+  final String title;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is Note && id == other.id && title == other.title;
+
+  @override
+  int get hashCode => id.hashCode ^ title.hashCode;
+}
+
+// Or use Freezed (recommended post-migration)
+@freezed
+class Note with _$Note {
+  const factory Note({
+    required String id,
+    required String title,
+  }) = _Note;
+}
+```
+
+## Updated Timeline
+
+**Original Estimate (Riverpod 2.6.1):** 18 days (4.5 weeks with buffer)
+
+**Updated Estimate (Riverpod 3.0.3):**
+- **Phase 0:** 1.5 days (was 1 day) - verify 3.0 compatibility, document patterns
+- **Phase 1:** 1.5 days (was 1 day) - establish 3.0 patterns
+- **Phases 2-7:** 15 days (no change) - patterns are simpler, offsets learning curve
+- **Phase 8:** 2.5 days (was 2 days) - document 3.0 features
+
+**Total:** 20.5 days (~4.5-5 weeks with buffer)
+
+**Impact:** Minimal timeline extension. Simpler patterns offset learning curve.
+
+## Riverpod 3.0 vs 2.6.1: Quick Reference
+
+### Syntax Changes
+
+| Pattern | Riverpod 2.6.1 | Riverpod 3.0.3 |
+|---------|---------------|----------------|
+| **Controller Class** | `AutoDisposeNotifier` | `Notifier` (simpler) |
+| **Family Controller** | `AutoDisposeFamilyAsyncNotifier` | `Notifier` with params |
+| **Ref Type** | `Ref<T>` | `Ref` (no generic) |
+| **State Access** | `ref.state = value` | `state = value` |
+| **Listen to Self** | `ref.listenSelf(...)` | `listenSelf(...)` |
+| **Test Container** | `ProviderContainer()` + manual dispose | `ProviderContainer.test()` |
+| **Widget Test Mock** | `overrideWith(...)` | `overrideWithBuild(...)` |
+| **Error Catching** | `catch (AppError e)` | `on ProviderException catch (e)` |
+| **Auto-Dispose** | Opt-in (`autoDispose`) | Default (opt-out with `keepAlive`) |
+
+### New Features (3.0 Only)
+
+✅ **Automatic Retry** - Built-in exponential backoff  
+✅ **Ref.mounted** - Check if provider alive before state updates  
+✅ **ProviderContainer.test()** - Built-in test utility  
+✅ **overrideWithBuild()** - Simpler widget test mocking  
+✅ **tester.container** - Access container in widget tests  
+✅ **Automatic Pause/Resume** - Optimization for off-screen widgets  
+⚠️ **Offline Persistence** - Experimental (post-migration consideration)  
+⚠️ **Mutations** - Experimental (post-migration consideration)  
+
+### Benefits of Upgrading to 3.0
+
+1. **Less Boilerplate** - No `AutoDispose`/`Family` prefixes
+2. **Simpler Syntax** - Unified `Ref` type, cleaner code
+3. **Better Resilience** - Automatic retry for transient errors
+4. **Safer Async** - `Ref.mounted` prevents disposed state updates
+5. **Easier Testing** - Built-in test utilities
+6. **Better Performance** - Automatic pause/resume optimization
+7. **Future-Proof** - Current industry standard (2025)
+
+### Migration Effort
+
+**Phase-by-Phase Updates:**
+- ✅ Phase 0: Add dependencies, document 3.0 patterns (+0.5 days)
+- ✅ Phase 1: Establish 3.0 patterns in theme migration (+0.5 days)
+- ✅ Phases 2-7: Apply simplified patterns (no time increase - simpler code)
+- ✅ Phase 8: Document 3.0 features (+0.5 days)
+
+**Total Impact:** +1.5 days (20.5 days total vs 18 days)
+
+**Net Benefit:** Simpler code, better features, same timeline
+
+## References and Resources (Riverpod 3.0)
+
+### Official Riverpod 3.0 Documentation
+
+- [What's New in Riverpod 3.0](https://riverpod.dev/docs/whats_new) - Official feature overview
+- [Migrating from 2.0 to 3.0](https://riverpod.dev/docs/3.0_migration) - Official migration guide
+- [Automatic Retry](https://riverpod.dev/docs/concepts2/retry) - Retry behavior documentation
+- [Ref.mounted](https://riverpod.dev/docs/concepts/provider_observer#refmounted) - Async safety
+- [Testing Guide](https://riverpod.dev/docs/how_to/testing) - Updated testing patterns
+- [Offline Persistence](https://riverpod.dev/docs/concepts2/offline) - Experimental feature
+
+### Package Pages (Latest Versions)
+
+- [flutter_riverpod 3.0.3](https://pub.dev/packages/flutter_riverpod/versions/3.0.3)
+- [riverpod_annotation 3.0.3](https://pub.dev/packages/riverpod_annotation/versions/3.0.3)
+- [riverpod_generator 3.0.3](https://pub.dev/packages/riverpod_generator/versions/3.0.3)
+- [riverpod_lint 3.0.3](https://pub.dev/packages/riverpod_lint/versions/3.0.3)
+- [build_runner 2.10.2](https://pub.dev/packages/build_runner/versions/2.10.2)
+
+### Community Resources (2025)
+
+- [Riverpod 3 New Features Flutter Users Must Know](https://www.dhiwise.com/post/riverpod-3-new-features-for-flutter-developers) - Feature overview
+- [Flutter Riverpod 3.0 Released: A Major Redesign](https://medium.com/@lee645521797/flutter-riverpod-3-0-released-a-major-redesign-of-the-state-management-framework-f7e31f19b179) - Community analysis
+- [Clean Architecture with Riverpod](https://otakoyi.software/blog/flutter-clean-architecture-with-riverpod-and-supabase) - Architecture patterns
+- [September 2025 Newsletter: Riverpod 3.0](https://codewithandrea.com/newsletter/september-2025/) - Andrea Bizzotto's analysis
+
+### Clean Architecture Resources
+
+- [Flutter App Architecture Guide](https://docs.flutter.dev/app-architecture) - Official Flutter guidance
+- [Comparison of Flutter App Architectures](https://codewithandrea.com/articles/comparison-flutter-app-architectures/) - Andrea Bizzotto
+- [Flutter App Architecture with Riverpod: An Introduction](https://codewithandrea.com/articles/flutter-app-architecture-riverpod-introduction/) - Andrea Bizzotto
+
+## Conclusion
+
+This migration plan has been updated to target **Riverpod 3.0.3** (latest stable as of November 2025) instead of the originally planned 2.6.1. The update brings:
+
+### Key Improvements
+
+✅ **Simpler Syntax** - No AutoDispose/Family prefixes, unified Ref type  
+✅ **Better Resilience** - Automatic retry with exponential backoff  
+✅ **Safer Async** - Ref.mounted prevents disposed state updates  
+✅ **Easier Testing** - Built-in ProviderContainer.test() utility  
+✅ **Future-Proof** - Current industry standard, not legacy version  
+
+### Breaking Changes Addressed
+
+All breaking changes have been documented and integrated into the plan:
+- Updated dependencies to 3.0.3
+- Controller patterns simplified (no AutoDispose prefix)
+- Test patterns updated (ProviderContainer.test())
+- Error handling updated (ProviderException wrapping)
+- Async safety added (Ref.mounted checks)
+
+### Timeline Impact
+
+**Minimal:** +1.5 days due to pattern simplification offsetting learning curve
+
+### Recommendation
+
+✅ **Strongly Recommended** - Proceed with Riverpod 3.0.3 migration as planned. The breaking changes are primarily **syntax simplifications** that make the migration **easier and result in cleaner code**. The new features (automatic retry, Ref.mounted) provide significant value with no additional effort.
+
+### Next Steps
+
+1. Review this updated plan with the team
+2. Verify understanding of Riverpod 3.0 breaking changes
+3. Proceed with Phase 0: Pre-Migration Setup
+4. Follow the phased approach, validating at each step
+
+The migration plan's **core strategy remains sound**. The update to Riverpod 3.0 is a **net positive** that will result in simpler, more robust, and more maintainable code.

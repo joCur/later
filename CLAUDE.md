@@ -54,6 +54,11 @@ supabase db reset               # Reset database and apply migrations
 flutter analyze                 # Check for issues
 dart format .                   # Format all files
 dart fix --apply                # Apply automated fixes
+
+# Riverpod code generation (for @riverpod annotated providers)
+dart run build_runner watch --delete-conflicting-outputs  # Auto-generate on file changes
+dart run build_runner build --delete-conflicting-outputs  # One-time build
+dart run build_runner clean                                # Clean generated files
 ```
 
 ## Architecture & Key Concepts

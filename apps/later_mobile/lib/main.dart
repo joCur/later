@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:provider/provider.dart' as provider;
 import 'l10n/app_localizations.dart';
 import 'core/config/supabase_config.dart';
 import 'core/error/error_handler.dart';
@@ -55,50 +56,53 @@ class LaterApp extends StatefulWidget {
 class _LaterAppState extends State<LaterApp> {
   @override
   Widget build(BuildContext context) {
-    return MultiProvider(
-      providers: [
-        ChangeNotifierProvider(
-          create: (_) => AuthProvider(),
-        ),
-        ChangeNotifierProvider(
-          create: (_) => ThemeProvider()..loadThemePreference(),
-        ),
-        ChangeNotifierProvider(
-          create: (_) => SpacesProvider(SpaceRepository()),
-        ),
-        ChangeNotifierProvider(
-          create: (_) => ContentProvider(
-            todoListRepository: TodoListRepository(),
-            listRepository: ListRepository(),
-            noteRepository: NoteRepository(),
+    // Wrap with ProviderScope for Riverpod (coexists with MultiProvider during migration)
+    return ProviderScope(
+      child: provider.MultiProvider(
+        providers: [
+          provider.ChangeNotifierProvider(
+            create: (_) => AuthProvider(),
           ),
+          provider.ChangeNotifierProvider(
+            create: (_) => ThemeProvider()..loadThemePreference(),
+          ),
+          provider.ChangeNotifierProvider(
+            create: (_) => SpacesProvider(SpaceRepository()),
+          ),
+          provider.ChangeNotifierProvider(
+            create: (_) => ContentProvider(
+              todoListRepository: TodoListRepository(),
+              listRepository: ListRepository(),
+              noteRepository: NoteRepository(),
+            ),
+          ),
+        ],
+        child: provider.Consumer<ThemeProvider>(
+          builder: (context, themeProvider, _) {
+            return MaterialApp(
+              title: 'Later',
+              debugShowCheckedModeBanner: false,
+              theme: AppTheme.lightTheme,
+              darkTheme: AppTheme.darkTheme,
+              themeMode: themeProvider.themeMode,
+              // Add theme animation for smooth transitions
+              themeAnimationDuration: const Duration(milliseconds: 250),
+              themeAnimationCurve: Curves.easeInOut,
+              // Localization support
+              localizationsDelegates: const [
+                AppLocalizations.delegate,
+                GlobalMaterialLocalizations.delegate,
+                GlobalWidgetsLocalizations.delegate,
+                GlobalCupertinoLocalizations.delegate,
+              ],
+              supportedLocales: const [
+                Locale('en'),
+                Locale('de'),
+              ],
+              home: const AuthGate(),
+            );
+          },
         ),
-      ],
-      child: Consumer<ThemeProvider>(
-        builder: (context, themeProvider, _) {
-          return MaterialApp(
-            title: 'Later',
-            debugShowCheckedModeBanner: false,
-            theme: AppTheme.lightTheme,
-            darkTheme: AppTheme.darkTheme,
-            themeMode: themeProvider.themeMode,
-            // Add theme animation for smooth transitions
-            themeAnimationDuration: const Duration(milliseconds: 250),
-            themeAnimationCurve: Curves.easeInOut,
-            // Localization support
-            localizationsDelegates: const [
-              AppLocalizations.delegate,
-              GlobalMaterialLocalizations.delegate,
-              GlobalWidgetsLocalizations.delegate,
-              GlobalCupertinoLocalizations.delegate,
-            ],
-            supportedLocales: const [
-              Locale('en'),
-              Locale('de'),
-            ],
-            home: const AuthGate(),
-          );
-        },
       ),
     );
   }
