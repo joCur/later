@@ -12,6 +12,7 @@ import 'data/repositories/list_repository.dart';
 import 'data/repositories/note_repository.dart';
 import 'data/repositories/space_repository.dart';
 import 'data/repositories/todo_list_repository.dart';
+import 'features/theme/presentation/controllers/theme_controller.dart';
 import 'providers/auth_provider.dart';
 import 'providers/content_provider.dart';
 import 'providers/spaces_provider.dart';
@@ -63,6 +64,7 @@ class _LaterAppState extends State<LaterApp> {
           provider.ChangeNotifierProvider(
             create: (_) => AuthProvider(),
           ),
+          // Keep ThemeProvider temporarily during migration (unused)
           provider.ChangeNotifierProvider(
             create: (_) => ThemeProvider()..loadThemePreference(),
           ),
@@ -77,33 +79,45 @@ class _LaterAppState extends State<LaterApp> {
             ),
           ),
         ],
-        child: provider.Consumer<ThemeProvider>(
-          builder: (context, themeProvider, _) {
-            return MaterialApp(
-              title: 'Later',
-              debugShowCheckedModeBanner: false,
-              theme: AppTheme.lightTheme,
-              darkTheme: AppTheme.darkTheme,
-              themeMode: themeProvider.themeMode,
-              // Add theme animation for smooth transitions
-              themeAnimationDuration: const Duration(milliseconds: 250),
-              themeAnimationCurve: Curves.easeInOut,
-              // Localization support
-              localizationsDelegates: const [
-                AppLocalizations.delegate,
-                GlobalMaterialLocalizations.delegate,
-                GlobalWidgetsLocalizations.delegate,
-                GlobalCupertinoLocalizations.delegate,
-              ],
-              supportedLocales: const [
-                Locale('en'),
-                Locale('de'),
-              ],
-              home: const AuthGate(),
-            );
-          },
-        ),
+        child: const _MyApp(),
       ),
+    );
+  }
+}
+
+/// Internal MaterialApp widget using Riverpod theme controller
+///
+/// Migrated from Provider to Riverpod 3.0 for theme management.
+/// Uses ConsumerWidget to watch themeControllerProvider.
+class _MyApp extends ConsumerWidget {
+  const _MyApp();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    // Watch Riverpod theme controller instead of Provider
+    final themeMode = ref.watch(themeControllerProvider);
+
+    return MaterialApp(
+      title: 'Later',
+      debugShowCheckedModeBanner: false,
+      theme: AppTheme.lightTheme,
+      darkTheme: AppTheme.darkTheme,
+      themeMode: themeMode,
+      // Add theme animation for smooth transitions
+      themeAnimationDuration: const Duration(milliseconds: 250),
+      themeAnimationCurve: Curves.easeInOut,
+      // Localization support
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [
+        Locale('en'),
+        Locale('de'),
+      ],
+      home: const AuthGate(),
     );
   }
 }
