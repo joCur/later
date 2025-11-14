@@ -3,6 +3,7 @@ import 'dart:ui' show ImageFilter;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:later_mobile/data/models/list_model.dart';
 import 'package:later_mobile/data/models/list_style.dart';
 import 'package:later_mobile/data/models/note_model.dart';
@@ -21,9 +22,12 @@ import 'package:uuid/uuid.dart';
 import '../../core/responsive/breakpoints.dart';
 import '../../core/theme/temporal_flow_theme.dart';
 import '../../core/utils/item_type_detector.dart'; // For ContentType enum
-import '../../providers/auth_provider.dart';
+import '../../features/auth/presentation/controllers/auth_state_controller.dart';
+import '../../features/spaces/domain/models/space.dart';
+import '../../features/spaces/presentation/controllers/spaces_controller.dart';
+import '../../features/spaces/presentation/controllers/current_space_controller.dart';
+// import '../../providers/spaces_provider.dart'; // TODO: Remove after Phase 8
 import '../../providers/content_provider.dart';
-import '../../providers/spaces_provider.dart';
 
 /// Type option for Create Content content type selector
 class TypeOption {
@@ -64,7 +68,7 @@ enum _CloseAction {
 /// - Keyboard shortcuts (Esc to close, Cmd/Ctrl+Enter to create)
 /// - Voice and image input buttons (placeholders)
 /// - Space selector
-class CreateContentModal extends StatefulWidget {
+class CreateContentModal extends ConsumerStatefulWidget {
   const CreateContentModal({
     super.key,
     required this.onClose,
@@ -78,10 +82,10 @@ class CreateContentModal extends StatefulWidget {
   final ContentType? initialType;
 
   @override
-  State<CreateContentModal> createState() => _CreateContentModalState();
+  ConsumerState<CreateContentModal> createState() => _CreateContentModalState();
 }
 
-class _CreateContentModalState extends State<CreateContentModal>
+class _CreateContentModalState extends ConsumerState<CreateContentModal>
     with TickerProviderStateMixin {
   final TextEditingController _textController = TextEditingController();
   final FocusNode _focusNode = FocusNode();
@@ -191,10 +195,13 @@ class _CreateContentModalState extends State<CreateContentModal>
     super.didChangeDependencies();
 
     // Initialize local space selection with current space
-    // Safe to use context.read here as BuildContext is ready
+    // Safe to use ref.read here as BuildContext is ready
     if (_selectedSpaceId == null) {
-      final spacesProvider = context.read<SpacesProvider>();
-      _selectedSpaceId = spacesProvider.currentSpace?.id;
+      _selectedSpaceId = ref.read(currentSpaceControllerProvider).when(
+        data: (currentSpace) => currentSpace?.id,
+        loading: () => null,
+        error: (error, stack) => null,
+      );
       debugPrint(
         'CreateContent: didChangeDependencies - _selectedSpaceId initialized to: $_selectedSpaceId',
       );
@@ -254,8 +261,11 @@ class _CreateContentModalState extends State<CreateContentModal>
     if (text.isEmpty) return;
 
     final contentProvider = context.read<ContentProvider>();
-    final spacesProvider = context.read<SpacesProvider>();
-    final currentSpace = spacesProvider.currentSpace;
+    final currentSpace = ref.read(currentSpaceControllerProvider).when(
+      data: (space) => space,
+      loading: () => null,
+      error: (error, stack) => null,
+    );
 
     if (currentSpace == null) {
       return;
@@ -267,16 +277,23 @@ class _CreateContentModalState extends State<CreateContentModal>
     }
 
     // Verify the selected space still exists
-    final spaceExists = spacesProvider.spaces.any(
-      (s) => s.id == _selectedSpaceId,
+    final spaces = ref.read(spacesControllerProvider).when(
+      data: (data) => data,
+      loading: () => <Space>[],
+      error: (error, stack) => <Space>[],
     );
+    final spaceExists = spaces.any((s) => s.id == _selectedSpaceId);
     final targetSpaceId = spaceExists ? _selectedSpaceId! : currentSpace.id;
 
     // Determine content type (user-selected, defaults to note if not specified)
     final contentType = _selectedType ?? ContentType.note;
 
     // Safety check: Ensure user is authenticated
-    final userId = context.read<AuthProvider>().currentUser?.id;
+    final userId = ref.read(authStateControllerProvider).when(
+      data: (user) => user?.id,
+      loading: () => null,
+      error: (error, stack) => null,
+    );
     if (userId == null) {
       return; // Exit early - user should be redirected to auth screen by AuthGate
     }
@@ -1209,71 +1226,85 @@ class _CreateContentModalState extends State<CreateContentModal>
   }
 
   Widget _buildSpaceSelector() {
-    return Consumer<SpacesProvider>(
-      builder: (context, spacesProvider, child) {
-        final currentSpace = spacesProvider.currentSpace;
-        if (currentSpace == null) return const SizedBox.shrink();
+    final currentSpace = ref.watch(currentSpaceControllerProvider).when(
+      data: (space) => space,
+      loading: () => null,
+      error: (error, stack) => null,
+    );
 
-        // Use local state to find the selected space for display
-        // If _selectedSpaceId is null, fall back to currentSpace.id
-        final selectedSpace = spacesProvider.spaces.firstWhere(
-          (s) => s.id == (_selectedSpaceId ?? currentSpace.id),
-          orElse: () => currentSpace,
-        );
+    if (currentSpace == null) return const SizedBox.shrink();
 
-        return PopupMenuButton<String>(
-          key: const Key('space_selector'),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              if (selectedSpace.icon != null)
-                Text(selectedSpace.icon!, style: const TextStyle(fontSize: 16)),
-              if (selectedSpace.icon != null)
-                const SizedBox(width: AppSpacing.xxs),
-              Text(
-                selectedSpace.name,
-                style: AppTypography.labelMedium.copyWith(
-                  color: AppColors.text(context),
-                ),
-              ),
-              const SizedBox(width: AppSpacing.xxs),
-              Icon(
-                Icons.arrow_drop_down,
-                size: 16,
-                color: AppColors.textSecondary(context),
-              ),
-            ],
+    final spaces = ref.watch(spacesControllerProvider).when(
+      data: (data) => data,
+      loading: () => <Space>[],
+      error: (error, stack) => <Space>[],
+    );
+
+    // Use local state to find the selected space for display
+    // If _selectedSpaceId is null, fall back to currentSpace.id
+    final selectedSpace = spaces.firstWhere(
+      (s) => s.id == (_selectedSpaceId ?? currentSpace.id),
+      orElse: () => currentSpace,
+    );
+
+    final String? spaceIcon = selectedSpace.icon;
+    final String spaceName = selectedSpace.name;
+
+    return PopupMenuButton<String>(
+      key: const Key('space_selector'),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (spaceIcon != null)
+            Text(spaceIcon, style: const TextStyle(fontSize: 16)),
+          if (spaceIcon != null)
+            const SizedBox(width: AppSpacing.xxs),
+          Text(
+            spaceName,
+            style: AppTypography.labelMedium.copyWith(
+              color: AppColors.text(context),
+            ),
           ),
-          itemBuilder: (context) {
-            return spacesProvider.spaces.map((space) {
-              return PopupMenuItem<String>(
-                value: space.id,
-                child: Row(
-                  children: [
-                    if (space.icon != null)
-                      Text(space.icon!, style: const TextStyle(fontSize: 20)),
-                    const SizedBox(width: AppSpacing.xs),
-                    Text(space.name),
-                  ],
-                ),
-              );
-            }).toList();
-          },
-          onSelected: (spaceId) {
-            // Update only local state, not global provider
-            debugPrint(
-              'CreateContent: Space selected in dropdown - spaceId: $spaceId',
-            );
-            if (mounted) {
-              setState(() {
-                _selectedSpaceId = spaceId;
-                debugPrint(
-                  'CreateContent: _selectedSpaceId updated to: $_selectedSpaceId',
-                );
-              });
-            }
-          },
+          const SizedBox(width: AppSpacing.xxs),
+          Icon(
+            Icons.arrow_drop_down,
+            size: 16,
+            color: AppColors.textSecondary(context),
+          ),
+        ],
+      ),
+      itemBuilder: (context) {
+        return spaces.map((space) {
+          final String spaceId = space.id;
+          final String? icon = space.icon;
+          final String name = space.name;
+
+          return PopupMenuItem<String>(
+            value: spaceId,
+            child: Row(
+              children: [
+                if (icon != null)
+                  Text(icon, style: const TextStyle(fontSize: 20)),
+                const SizedBox(width: AppSpacing.xs),
+                Text(name),
+              ],
+            ),
+          );
+        }).toList();
+      },
+      onSelected: (spaceId) {
+        // Update only local state, not global provider
+        debugPrint(
+          'CreateContent: Space selected in dropdown - spaceId: $spaceId',
         );
+        if (mounted) {
+          setState(() {
+            _selectedSpaceId = spaceId;
+            debugPrint(
+              'CreateContent: _selectedSpaceId updated to: $_selectedSpaceId',
+            );
+          });
+        }
       },
     );
   }

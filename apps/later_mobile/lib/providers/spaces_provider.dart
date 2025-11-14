@@ -2,8 +2,8 @@ import 'package:flutter/foundation.dart';
 
 import '../core/error/error.dart';
 import '../data/local/preferences_service.dart';
-import '../data/models/space_model.dart';
-import '../data/repositories/space_repository.dart';
+import '../features/spaces/domain/models/space.dart';
+import '../features/spaces/data/repositories/space_repository.dart';
 
 /// Provider for managing Space state in the application.
 ///

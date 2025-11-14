@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:later_mobile/design_system/tokens/tokens.dart';
 import 'package:later_mobile/l10n/app_localizations.dart';
 import '../../core/theme/temporal_flow_theme.dart';
 import '../../core/utils/responsive_modal.dart';
-import '../../data/models/space_model.dart';
-import '../../providers/spaces_provider.dart';
+import '../../features/spaces/domain/models/space.dart';
+import '../../features/spaces/presentation/controllers/spaces_controller.dart';
+import '../../features/spaces/presentation/controllers/current_space_controller.dart';
+// import '../../providers/spaces_provider.dart'; // TODO: Remove after Phase 8
 import 'create_space_modal.dart';
 import 'package:later_mobile/design_system/atoms/inputs/text_input_field.dart';
 import 'package:later_mobile/design_system/atoms/buttons/primary_button.dart';
@@ -26,14 +28,14 @@ import 'package:later_mobile/design_system/organisms/modals/bottom_sheet_contain
 /// - Slide-up animation (300ms with spring easing)
 /// - Keyboard navigation (arrow keys, enter, esc, 1-9 number shortcuts)
 /// - Accessibility support (semantic labels, screen reader)
-class SpaceSwitcherModal extends StatefulWidget {
+class SpaceSwitcherModal extends ConsumerStatefulWidget {
   const SpaceSwitcherModal({super.key});
 
   @override
-  State<SpaceSwitcherModal> createState() => _SpaceSwitcherModalState();
+  ConsumerState<SpaceSwitcherModal> createState() => _SpaceSwitcherModalState();
 }
 
-class _SpaceSwitcherModalState extends State<SpaceSwitcherModal> {
+class _SpaceSwitcherModalState extends ConsumerState<SpaceSwitcherModal> {
   final TextEditingController _searchController = TextEditingController();
   final FocusNode _searchFocusNode = FocusNode();
   final FocusNode _listFocusNode = FocusNode();
@@ -65,12 +67,16 @@ class _SpaceSwitcherModalState extends State<SpaceSwitcherModal> {
 
   /// Pre-fetch item counts for all spaces to prevent flicker
   Future<void> _preFetchItemCounts() async {
-    final spacesProvider = context.read<SpacesProvider>();
-    final spaces = spacesProvider.spaces;
+    final spacesAsync = ref.read(spacesControllerProvider);
+    final spaces = spacesAsync.when(
+      data: (data) => data,
+      loading: () => <Space>[],
+      error: (error, stack) => <Space>[],
+    );
 
     for (final space in spaces) {
       try {
-        final count = await spacesProvider.getSpaceItemCount(space.id);
+        final count = await ref.read(spacesControllerProvider.notifier).getSpaceItemCount(space.id);
         if (mounted) {
           setState(() {
             _cachedCounts[space.id] = count;
@@ -105,7 +111,6 @@ class _SpaceSwitcherModalState extends State<SpaceSwitcherModal> {
   Future<void> _selectSpace(Space space, String currentSpaceId) async {
     final navigator = Navigator.of(context);
     final messenger = ScaffoldMessenger.of(context);
-    final spacesProvider = context.read<SpacesProvider>();
     final l10n = AppLocalizations.of(context)!;
 
     if (space.id == currentSpaceId) {
@@ -117,7 +122,7 @@ class _SpaceSwitcherModalState extends State<SpaceSwitcherModal> {
     final startTime = DateTime.now();
 
     try {
-      await spacesProvider.switchSpace(space.id);
+      await ref.read(currentSpaceControllerProvider.notifier).switchSpace(space);
 
       final duration = DateTime.now().difference(startTime);
       debugPrint('Space switch took ${duration.inMilliseconds}ms');
@@ -250,9 +255,8 @@ class _SpaceSwitcherModalState extends State<SpaceSwitcherModal> {
     }
 
     // If not cached, use FutureBuilder
-    final spacesProvider = Provider.of<SpacesProvider>(context, listen: false);
     return FutureBuilder<int>(
-      future: spacesProvider.getSpaceItemCount(spaceId),
+      future: ref.read(spacesControllerProvider.notifier).getSpaceItemCount(spaceId),
       builder: (context, snapshot) {
         final displayText = snapshot.hasData ? '${snapshot.data}' : '...';
         return Container(
@@ -489,8 +493,11 @@ class _SpaceSwitcherModalState extends State<SpaceSwitcherModal> {
   /// Show space options menu (long-press menu)
   Future<void> _showSpaceOptionsMenu(BuildContext context, Space space) async {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final spacesProvider = Provider.of<SpacesProvider>(context, listen: false);
-    final currentSpaceId = spacesProvider.currentSpace?.id ?? '';
+    final currentSpaceId = ref.read(currentSpaceControllerProvider).when(
+      data: (currentSpace) => currentSpace?.id ?? '',
+      loading: () => '',
+      error: (error, stack) => '',
+    );
     final isCurrentSpace = space.id == currentSpaceId;
     final l10n = AppLocalizations.of(context)!;
 
@@ -665,8 +672,11 @@ class _SpaceSwitcherModalState extends State<SpaceSwitcherModal> {
   /// Handle archive space action
   Future<void> _handleArchiveSpace(BuildContext context, Space space) async {
     final messenger = ScaffoldMessenger.of(context);
-    final spacesProvider = Provider.of<SpacesProvider>(context, listen: false);
-    final currentSpaceId = spacesProvider.currentSpace?.id ?? '';
+    final currentSpaceId = ref.read(currentSpaceControllerProvider).when(
+      data: (currentSpace) => currentSpace?.id ?? '',
+      loading: () => '',
+      error: (error, stack) => '',
+    );
     final l10n = AppLocalizations.of(context)!;
 
     // Get item count (use cached value or default to 0)
@@ -713,11 +723,11 @@ class _SpaceSwitcherModalState extends State<SpaceSwitcherModal> {
         isArchived: true,
         updatedAt: DateTime.now(),
       );
-      await spacesProvider.updateSpace(archivedSpace);
+      await ref.read(spacesControllerProvider.notifier).updateSpace(archivedSpace);
 
       // Reload spaces without archived to hide the archived space
       if (!_showArchivedSpaces) {
-        await spacesProvider.loadSpaces();
+        await ref.read(spacesControllerProvider.notifier).loadSpaces();
       }
 
       if (mounted) {
@@ -743,7 +753,6 @@ class _SpaceSwitcherModalState extends State<SpaceSwitcherModal> {
   /// Handle restore space action
   Future<void> _handleRestoreSpace(BuildContext context, Space space) async {
     final messenger = ScaffoldMessenger.of(context);
-    final spacesProvider = Provider.of<SpacesProvider>(context, listen: false);
     final l10n = AppLocalizations.of(context)!;
 
     // Restore the space (update with isArchived: false)
@@ -752,7 +761,7 @@ class _SpaceSwitcherModalState extends State<SpaceSwitcherModal> {
         isArchived: false,
         updatedAt: DateTime.now(),
       );
-      await spacesProvider.updateSpace(restoredSpace);
+      await ref.read(spacesControllerProvider.notifier).updateSpace(restoredSpace);
 
       if (mounted) {
         messenger.showSnackBar(
@@ -794,8 +803,7 @@ class _SpaceSwitcherModalState extends State<SpaceSwitcherModal> {
           setState(() {
             _showArchivedSpaces = value;
           });
-          final spacesProvider = context.read<SpacesProvider>();
-          await spacesProvider.loadSpaces(includeArchived: value);
+          await ref.read(spacesControllerProvider.notifier).loadSpaces(includeArchived: value);
         },
         contentPadding: EdgeInsets.zero,
       ),
@@ -901,13 +909,19 @@ class _SpaceSwitcherModalState extends State<SpaceSwitcherModal> {
   }
 
   /// Build modal content (for BottomSheetContainer child)
-  Widget _buildModalContent(
-    BuildContext context,
-    SpacesProvider spacesProvider,
-  ) {
+  Widget _buildModalContent(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final currentSpaceId = spacesProvider.currentSpace?.id ?? '';
-    final allSpaces = spacesProvider.spaces;
+    final spacesAsync = ref.watch(spacesControllerProvider);
+    final currentSpaceId = ref.watch(currentSpaceControllerProvider).when(
+      data: (currentSpace) => currentSpace?.id ?? '',
+      loading: () => '',
+      error: (error, stack) => '',
+    );
+    final allSpaces = spacesAsync.when(
+      data: (data) => data,
+      loading: () => <Space>[],
+      error: (error, stack) => <Space>[],
+    );
     _filteredSpaces = _getFilteredSpaces(allSpaces);
 
     return Focus(
@@ -954,14 +968,10 @@ class _SpaceSwitcherModalState extends State<SpaceSwitcherModal> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    return Consumer<SpacesProvider>(
-      builder: (context, spacesProvider, child) {
-        return BottomSheetContainer(
-          title: l10n.spaceSwitcherTitle,
-          showSecondaryButton: false,
-          child: _buildModalContent(context, spacesProvider),
-        );
-      },
+    return BottomSheetContainer(
+      title: l10n.spaceSwitcherTitle,
+      showSecondaryButton: false,
+      child: _buildModalContent(context),
     );
   }
 }

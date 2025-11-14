@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:later_mobile/data/models/space_model.dart';
+import 'package:later_mobile/features/spaces/domain/models/space.dart';
 
 void main() {
   group('Space', () {

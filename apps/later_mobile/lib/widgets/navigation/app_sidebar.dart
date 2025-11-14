@@ -2,12 +2,14 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:later_mobile/l10n/app_localizations.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:later_mobile/design_system/tokens/tokens.dart';
 import '../../core/theme/temporal_flow_theme.dart';
-import '../../data/models/space_model.dart';
-import '../../providers/spaces_provider.dart';
-import '../../providers/auth_provider.dart';
+import '../../features/spaces/domain/models/space.dart';
+import '../../features/spaces/presentation/controllers/spaces_controller.dart';
+import '../../features/spaces/presentation/controllers/current_space_controller.dart';
+import '../../features/auth/presentation/controllers/auth_state_controller.dart';
+// import '../../providers/spaces_provider.dart'; // TODO: Remove after Phase 8
 import 'package:later_mobile/design_system/atoms/buttons/theme_toggle_button.dart';
 
 /// Desktop sidebar navigation component
@@ -19,7 +21,7 @@ import 'package:later_mobile/design_system/atoms/buttons/theme_toggle_button.dar
 /// - Hover states and tooltips
 /// - Expand/collapse toggle
 ///
-/// Connects to [SpacesProvider] to display and switch between spaces.
+/// Connects to [SpacesController] to display and switch between spaces.
 ///
 /// Example usage:
 /// ```dart
@@ -37,7 +39,7 @@ import 'package:later_mobile/design_system/atoms/buttons/theme_toggle_button.dar
 ///   ),
 /// )
 /// ```
-class AppSidebar extends StatefulWidget {
+class AppSidebar extends ConsumerStatefulWidget {
   /// Creates a desktop sidebar.
   ///
   /// The [isExpanded] parameter controls the sidebar width.
@@ -51,10 +53,10 @@ class AppSidebar extends StatefulWidget {
   final VoidCallback? onToggleExpanded;
 
   @override
-  State<AppSidebar> createState() => _AppSidebarState();
+  ConsumerState<AppSidebar> createState() => _AppSidebarState();
 }
 
-class _AppSidebarState extends State<AppSidebar> {
+class _AppSidebarState extends ConsumerState<AppSidebar> {
   final FocusNode _focusNode = FocusNode();
   final Map<String, int> _cachedCounts = {};
 
@@ -77,11 +79,15 @@ class _AppSidebarState extends State<AppSidebar> {
 
   /// Pre-fetch item counts for all spaces to prevent flicker
   Future<void> _preFetchItemCounts() async {
-    final spacesProvider = context.read<SpacesProvider>();
-    final spaces = spacesProvider.spaces;
+    final spacesAsync = ref.read(spacesControllerProvider);
+    final spaces = spacesAsync.when(
+      data: (data) => data,
+      loading: () => <Space>[],
+      error: (error, stack) => <Space>[],
+    );
 
     for (final space in spaces) {
-      final count = await spacesProvider.getSpaceItemCount(space.id);
+      final count = await ref.read(spacesControllerProvider.notifier).getSpaceItemCount(space.id);
       if (mounted) {
         setState(() {
           _cachedCounts[space.id] = count;
@@ -90,39 +96,49 @@ class _AppSidebarState extends State<AppSidebar> {
     }
   }
 
-  void _handleKeyEvent(KeyEvent event, SpacesProvider spacesProvider) {
+  void _handleKeyEvent(KeyEvent event) {
     if (event is! KeyDownEvent) return;
 
     // Handle number keys 1-9 for space navigation
     final key = event.logicalKey;
-    final spaces = spacesProvider.spaces;
+    final spacesAsync = ref.read(spacesControllerProvider);
+    final spaces = spacesAsync.when(
+      data: (data) => data,
+      loading: () => <Space>[],
+      error: (error, stack) => <Space>[],
+    );
+    final currentSpaceId = ref.read(currentSpaceControllerProvider).when(
+      data: (currentSpace) => currentSpace?.id,
+      loading: () => null,
+      error: (error, stack) => null,
+    );
 
     // Helper to switch space with haptic feedback
-    void switchWithHaptic(String spaceId) {
-      if (spacesProvider.currentSpace?.id != spaceId) {
+    void switchWithHaptic(Space space) {
+      if (currentSpaceId != space.id) {
         AppAnimations.selectionHaptic();
       }
-      spacesProvider.switchSpace(spaceId);
+      ref.read(currentSpaceControllerProvider.notifier).switchSpace(space);
     }
 
     if (key == LogicalKeyboardKey.digit1 && spaces.isNotEmpty) {
-      switchWithHaptic(spaces[0].id);
+      switchWithHaptic(spaces[0]);
     } else if (key == LogicalKeyboardKey.digit2 && spaces.length > 1) {
-      switchWithHaptic(spaces[1].id);
+      switchWithHaptic(spaces[1]);
     } else if (key == LogicalKeyboardKey.digit3 && spaces.length > 2) {
-      switchWithHaptic(spaces[2].id);
+      switchWithHaptic(spaces[2]);
     } else if (key == LogicalKeyboardKey.digit4 && spaces.length > 3) {
-      switchWithHaptic(spaces[3].id);
+      switchWithHaptic(spaces[3]);
     } else if (key == LogicalKeyboardKey.digit5 && spaces.length > 4) {
-      switchWithHaptic(spaces[4].id);
+      switchWithHaptic(spaces[4]);
     } else if (key == LogicalKeyboardKey.digit6 && spaces.length > 5) {
-      switchWithHaptic(spaces[5].id);
+      switchWithHaptic(spaces[5]);
     } else if (key == LogicalKeyboardKey.digit7 && spaces.length > 6) {
-      switchWithHaptic(spaces[6].id);
+      switchWithHaptic(spaces[6]);
     } else if (key == LogicalKeyboardKey.digit8 && spaces.length > 7) {
-      switchWithHaptic(spaces[7].id);
+      switchWithHaptic(spaces[7]);
     } else if (key == LogicalKeyboardKey.digit9 && spaces.length > 8) {
-      switchWithHaptic(spaces[8].id);
+      switchWithHaptic(spaces[8]);
     }
   }
 
@@ -131,12 +147,11 @@ class _AppSidebarState extends State<AppSidebar> {
     final theme = Theme.of(context);
     final isDarkMode = theme.brightness == Brightness.dark;
     final temporalTheme = Theme.of(context).extension<TemporalFlowTheme>()!;
-    final spacesProvider = context.watch<SpacesProvider>();
 
     return Focus(
       focusNode: _focusNode,
       onKeyEvent: (node, event) {
-        _handleKeyEvent(event, spacesProvider);
+        _handleKeyEvent(event);
         return KeyEventResult.handled;
       },
       child: AnimatedContainer(
@@ -201,7 +216,7 @@ class _AppSidebarState extends State<AppSidebar> {
                 const Divider(height: 1, thickness: AppSpacing.borderWidthThin),
 
                 // Spaces list
-                Expanded(child: _buildSpacesList(spacesProvider, isDarkMode)),
+                Expanded(child: _buildSpacesList(isDarkMode)),
 
                 // Footer with settings
                 _buildFooter(isDarkMode, temporalTheme),
@@ -251,51 +266,63 @@ class _AppSidebarState extends State<AppSidebar> {
     );
   }
 
-  Widget _buildSpacesList(SpacesProvider spacesProvider, bool isDarkMode) {
+  Widget _buildSpacesList(bool isDarkMode) {
     final l10n = AppLocalizations.of(context)!;
-    final spaces = spacesProvider.spaces;
+    final spacesAsync = ref.watch(spacesControllerProvider);
+    final currentSpaceId = ref.watch(currentSpaceControllerProvider).when(
+      data: (currentSpace) => currentSpace?.id,
+      loading: () => null,
+      error: (error, stack) => null,
+    );
 
-    if (spaces.isEmpty) {
-      return Center(
-        child: widget.isExpanded
-            ? Padding(
-                padding: const EdgeInsets.all(AppSpacing.sm),
-                child: Text(l10n.sidebarNoSpaces, textAlign: TextAlign.center),
-              )
-            : const Icon(Icons.inbox_outlined),
-      );
-    }
+    return spacesAsync.when(
+      data: (spaces) {
+        if (spaces.isEmpty) {
+          return Center(
+            child: widget.isExpanded
+                ? Padding(
+                    padding: const EdgeInsets.all(AppSpacing.sm),
+                    child: Text(l10n.sidebarNoSpaces, textAlign: TextAlign.center),
+                  )
+                : const Icon(Icons.inbox_outlined),
+          );
+        }
 
-    return ListView.builder(
-      padding: const EdgeInsets.symmetric(vertical: AppSpacing.xs),
-      itemCount: spaces.length,
-      itemBuilder: (context, index) {
-        final space = spaces[index];
-        final isSelected = spacesProvider.currentSpace?.id == space.id;
-        final keyboardShortcut = index < 9 ? '${index + 1}' : null;
+        return ListView.builder(
+          padding: const EdgeInsets.symmetric(vertical: AppSpacing.xs),
+          itemCount: spaces.length,
+          itemBuilder: (context, index) {
+            final space = spaces[index];
+            final isSelected = currentSpaceId == space.id;
+            final keyboardShortcut = index < 9 ? '${index + 1}' : null;
 
-        return _SpaceListItem(
-          space: space,
-          isSelected: isSelected,
-          isExpanded: widget.isExpanded,
-          isDarkMode: isDarkMode,
-          keyboardShortcut: keyboardShortcut,
-          cachedCount: _cachedCounts[space.id],
-          onTap: () {
-            // Only trigger haptic if actually changing spaces
-            if (spacesProvider.currentSpace?.id != space.id) {
-              AppAnimations.selectionHaptic();
-            }
-            spacesProvider.switchSpace(space.id);
+            return _SpaceListItem(
+              space: space,
+              isSelected: isSelected,
+              isExpanded: widget.isExpanded,
+              isDarkMode: isDarkMode,
+              keyboardShortcut: keyboardShortcut,
+              cachedCount: _cachedCounts[space.id],
+              onTap: () {
+                // Only trigger haptic if actually changing spaces
+                if (currentSpaceId != space.id) {
+                  AppAnimations.selectionHaptic();
+                }
+                ref.read(currentSpaceControllerProvider.notifier).switchSpace(space);
+              },
+            );
           },
         );
       },
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (error, stack) => Center(
+        child: Text('Error: $error', style: const TextStyle(color: AppColors.error)),
+      ),
     );
   }
 
   Widget _buildFooter(bool isDarkMode, TemporalFlowTheme temporalTheme) {
     final l10n = AppLocalizations.of(context)!;
-    final authProvider = context.watch<AuthProvider>();
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -370,7 +397,7 @@ class _AppSidebarState extends State<AppSidebar> {
                     message: l10n.sidebarSignOut,
                     child: InkWell(
                       onTap: () async {
-                        await authProvider.signOut();
+                        await ref.read(authStateControllerProvider.notifier).signOut();
                       },
                       borderRadius: const BorderRadius.all(
                         Radius.circular(AppSpacing.radiusSM),
@@ -433,7 +460,7 @@ class _AppSidebarState extends State<AppSidebar> {
               message: l10n.sidebarSignOut,
               child: InkWell(
                 onTap: () async {
-                  await authProvider.signOut();
+                  await ref.read(authStateControllerProvider.notifier).signOut();
                 },
                 borderRadius: const BorderRadius.all(
                   Radius.circular(AppSpacing.radiusSM),
@@ -458,7 +485,7 @@ class _AppSidebarState extends State<AppSidebar> {
 }
 
 /// Individual space list item with hover states and keyboard shortcuts
-class _SpaceListItem extends StatefulWidget {
+class _SpaceListItem extends ConsumerStatefulWidget {
   const _SpaceListItem({
     required this.space,
     required this.isSelected,
@@ -478,23 +505,22 @@ class _SpaceListItem extends StatefulWidget {
   final int? cachedCount;
 
   @override
-  State<_SpaceListItem> createState() => _SpaceListItemState();
+  ConsumerState<_SpaceListItem> createState() => _SpaceListItemState();
 }
 
-class _SpaceListItemState extends State<_SpaceListItem> {
+class _SpaceListItemState extends ConsumerState<_SpaceListItem> {
   bool _isHovered = false;
 
   /// Build item count widget with async loading support
-  Widget _buildItemCount(BuildContext context) {
+  Widget _buildItemCount(BuildContext context, WidgetRef ref) {
     // If we have a cached count, use it immediately
     if (widget.cachedCount != null) {
       return Text(widget.cachedCount.toString());
     }
 
     // Otherwise, load asynchronously
-    final spacesProvider = context.read<SpacesProvider>();
     return FutureBuilder<int>(
-      future: spacesProvider.getSpaceItemCount(widget.space.id),
+      future: ref.read(spacesControllerProvider.notifier).getSpaceItemCount(widget.space.id),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           return Text(snapshot.data.toString());
@@ -673,7 +699,7 @@ class _SpaceListItemState extends State<_SpaceListItem> {
                                 color: textColor,
                                 fontWeight: FontWeight.w500,
                               ),
-                              child: _buildItemCount(context),
+                              child: _buildItemCount(context, ref),
                             ),
                           ),
                       ],

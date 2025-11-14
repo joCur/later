@@ -1,5 +1,5 @@
-import '../models/space_model.dart';
-import 'base_repository.dart';
+import '../../domain/models/space.dart';
+import '../../../../data/repositories/base_repository.dart';
 
 /// Repository for managing Space entities in Supabase.
 ///

@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
 import 'package:later_mobile/design_system/tokens/tokens.dart';
-import '../../data/models/space_model.dart';
-import '../../providers/auth_provider.dart';
-import '../../providers/spaces_provider.dart';
+import '../../features/spaces/domain/models/space.dart';
+import '../../features/auth/presentation/controllers/auth_state_controller.dart';
+import '../../features/spaces/presentation/controllers/spaces_controller.dart';
+// import '../../providers/spaces_provider.dart'; // TODO: Remove after Phase 8
 import 'package:later_mobile/design_system/atoms/inputs/text_input_field.dart';
 import 'package:later_mobile/design_system/organisms/modals/bottom_sheet_container.dart';
 
@@ -28,10 +29,10 @@ enum SpaceModalMode {
 /// - Icon picker with emoji/icon options
 /// - Color picker with predefined palette
 /// - Generate unique UUID for space ID
-/// - Save to Hive via SpacesProvider
+/// - Save to Hive via SpacesController
 /// - Auto-switch to newly created space
 /// - Support for both create and edit modes
-class CreateSpaceModal extends StatefulWidget {
+class CreateSpaceModal extends ConsumerStatefulWidget {
   const CreateSpaceModal({required this.mode, this.initialSpace, super.key});
 
   /// The mode for the modal (create or edit)
@@ -41,10 +42,10 @@ class CreateSpaceModal extends StatefulWidget {
   final Space? initialSpace;
 
   @override
-  State<CreateSpaceModal> createState() => _CreateSpaceModalState();
+  ConsumerState<CreateSpaceModal> createState() => _CreateSpaceModalState();
 }
 
-class _CreateSpaceModalState extends State<CreateSpaceModal> {
+class _CreateSpaceModalState extends ConsumerState<CreateSpaceModal> {
   late final TextEditingController _nameController;
   late final FocusNode _nameFocusNode;
   String? _selectedIcon;
@@ -52,10 +53,6 @@ class _CreateSpaceModalState extends State<CreateSpaceModal> {
   String? _errorMessage;
   String? _submitErrorMessage; // Error message for submission failures
   bool _isSubmitting = false;
-
-  // Default error message for space operations
-  static const String _defaultSpaceErrorMessage =
-      'Could not create the space. Please try again.';
 
   // Curated emoji icons for spaces
   static const List<String> _iconOptions = [
@@ -167,10 +164,14 @@ class _CreateSpaceModalState extends State<CreateSpaceModal> {
     });
 
     final navigator = Navigator.of(context);
-    final spacesProvider = context.read<SpacesProvider>();
 
     // Safety check: Ensure user is authenticated
-    final userId = context.read<AuthProvider>().currentUser?.id;
+    final userAsync = ref.read(authStateControllerProvider);
+    final userId = userAsync.when(
+      data: (user) => user?.id,
+      loading: () => null as String?,
+      error: (error, stack) => null as String?,
+    );
     if (userId == null) {
       if (mounted) {
         setState(() {
@@ -196,24 +197,24 @@ class _CreateSpaceModalState extends State<CreateSpaceModal> {
       updatedAt: DateTime.now(),
     );
 
-    if (widget.mode == SpaceModalMode.edit) {
-      await spacesProvider.updateSpace(space);
-    } else {
-      await spacesProvider.addSpace(space);
-    }
+    try {
+      if (widget.mode == SpaceModalMode.edit) {
+        await ref.read(spacesControllerProvider.notifier).updateSpace(space);
+      } else {
+        await ref.read(spacesControllerProvider.notifier).createSpace(space);
+      }
 
-    // Check if operation succeeded by checking provider's error state
-    if (mounted) {
-      if (spacesProvider.error != null) {
-        // Operation failed - show user-friendly error message
+      // Operation succeeded - close modal
+      if (mounted) {
+        navigator.pop(true);
+      }
+    } catch (e) {
+      // Operation failed - show user-friendly error message
+      if (mounted) {
         setState(() {
           _isSubmitting = false;
-          _submitErrorMessage =
-              spacesProvider.error!.userMessage ?? _defaultSpaceErrorMessage;
+          _submitErrorMessage = e.toString();
         });
-      } else {
-        // Operation succeeded - close modal
-        navigator.pop(true);
       }
     }
   }

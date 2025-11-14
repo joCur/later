@@ -6,7 +6,7 @@
 import 'dart:async' as _i3;
 import 'dart:ui' as _i4;
 
-import 'package:later_mobile/data/models/space_model.dart' as _i6;
+import 'package:later_mobile/features/spaces/domain/models/space.dart' as _i6;
 import 'package:later_mobile/providers/auth_provider.dart' as _i2;
 import 'package:later_mobile/providers/spaces_provider.dart' as _i5;
 import 'package:mockito/mockito.dart' as _i1;

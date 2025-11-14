@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:later_mobile/l10n/app_localizations.dart';
 import 'package:later_mobile/design_system/atoms/buttons/primary_button.dart';
 import 'package:later_mobile/design_system/atoms/chips/filter_chip.dart';
@@ -20,10 +21,12 @@ import '../../core/utils/responsive_modal.dart';
 import 'package:later_mobile/data/models/list_model.dart';
 import 'package:later_mobile/data/models/note_model.dart';
 import 'package:later_mobile/data/models/todo_list_model.dart';
-import '../../data/models/space_model.dart';
-import '../../providers/auth_provider.dart';
+import '../../features/spaces/domain/models/space.dart';
+import '../../features/spaces/presentation/controllers/spaces_controller.dart';
+import '../../features/spaces/presentation/controllers/current_space_controller.dart';
+import '../../features/auth/presentation/controllers/auth_state_controller.dart';
+// import '../../providers/spaces_provider.dart'; // TODO: Remove after Phase 8
 import '../../providers/content_provider.dart';
-import '../../providers/spaces_provider.dart';
 import '../modals/create_content_modal.dart';
 import '../modals/create_space_modal.dart'
     show CreateSpaceModal, SpaceModalMode;
@@ -51,14 +54,14 @@ import 'todo_list_detail_screen.dart';
 /// - Responsive layout (bottom nav on mobile, sidebar on desktop)
 ///
 /// The screen adapts between mobile and desktop layouts based on screen width.
-class HomeScreen extends StatefulWidget {
+class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  ConsumerState<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends ConsumerState<HomeScreen> {
   // Navigation state
   int _selectedNavIndex = 0;
 
@@ -89,25 +92,33 @@ class _HomeScreenState extends State<HomeScreen> {
 
   /// Load spaces and content
   Future<void> _loadData() async {
-    final spacesProvider = context.read<SpacesProvider>();
     final contentProvider = context.read<ContentProvider>();
 
     // Load spaces first
-    await spacesProvider.loadSpaces();
+    await ref.read(spacesControllerProvider.notifier).loadSpaces();
 
     // Load content for current space if available
-    if (spacesProvider.currentSpace != null) {
-      await contentProvider.loadSpaceContent(spacesProvider.currentSpace!.id);
+    final currentSpace = ref.read(currentSpaceControllerProvider).when(
+      data: (space) => space,
+      loading: () => null,
+      error: (error, stack) => null,
+    );
+    if (currentSpace != null) {
+      await contentProvider.loadSpaceContent(currentSpace.id);
     }
   }
 
   /// Refresh content
   Future<void> _handleRefresh() async {
-    final spacesProvider = context.read<SpacesProvider>();
     final contentProvider = context.read<ContentProvider>();
+    final currentSpace = ref.read(currentSpaceControllerProvider).when(
+      data: (space) => space,
+      loading: () => null,
+      error: (error, stack) => null,
+    );
 
-    if (spacesProvider.currentSpace != null) {
-      await contentProvider.loadSpaceContent(spacesProvider.currentSpace!.id);
+    if (currentSpace != null) {
+      await contentProvider.loadSpaceContent(currentSpace.id);
     }
   }
 
@@ -168,16 +179,20 @@ class _HomeScreenState extends State<HomeScreen> {
     );
 
     // If a space was created, load content for the newly selected space
-    // Note: SpacesProvider.addSpace() automatically sets the new space as current
+    // Note: SpacesController.createSpace() automatically sets the new space as current
     // and updates the spaces list, so we don't need to call loadSpaces()
     if (result == true && mounted) {
-      final spacesProvider = context.read<SpacesProvider>();
       final contentProvider = context.read<ContentProvider>();
+      final currentSpace = ref.read(currentSpaceControllerProvider).when(
+        data: (space) => space,
+        loading: () => null,
+        error: (error, stack) => null,
+      );
 
       // Load content for the new current space
-      // (which was automatically set by addSpace)
-      if (spacesProvider.currentSpace != null) {
-        await contentProvider.loadSpaceContent(spacesProvider.currentSpace!.id);
+      // (which was automatically set by createSpace)
+      if (currentSpace != null) {
+        await contentProvider.loadSpaceContent(currentSpace.id);
       }
     }
   }
@@ -226,7 +241,6 @@ class _HomeScreenState extends State<HomeScreen> {
           Expanded(
             child: InkWell(
               onTap: () async {
-                final spacesProvider = context.read<SpacesProvider>();
                 final contentProvider = context.read<ContentProvider>();
 
                 final result = await ResponsiveModal.show<bool>(
@@ -238,10 +252,13 @@ class _HomeScreenState extends State<HomeScreen> {
                 if (result == true) {
                   // Space was switched, reload content and reset pagination
                   _resetPagination();
-                  if (spacesProvider.currentSpace != null) {
-                    await contentProvider.loadSpaceContent(
-                      spacesProvider.currentSpace!.id,
-                    );
+                  final currentSpace = ref.read(currentSpaceControllerProvider).when(
+                    data: (space) => space,
+                    loading: () => null,
+                    error: (error, stack) => null,
+                  );
+                  if (currentSpace != null) {
+                    await contentProvider.loadSpaceContent(currentSpace.id);
                   }
                 }
               },
@@ -317,12 +334,6 @@ class _HomeScreenState extends State<HomeScreen> {
         PopupMenuButton<String>(
           icon: Icon(Icons.more_vert, color: AppColors.textSecondary(context)),
           tooltip: 'Menu',
-          onSelected: (value) async {
-            if (value == 'signout') {
-              final authProvider = context.read<AuthProvider>();
-              await authProvider.signOut();
-            }
-          },
           itemBuilder: (context) => [
             PopupMenuItem(
               value: 'signout',
@@ -335,6 +346,11 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
           ],
+          onSelected: (value) async {
+            if (value == 'signout') {
+              await ref.read(authStateControllerProvider.notifier).signOut();
+            }
+          },
         ),
       ],
     );
@@ -407,11 +423,11 @@ class _HomeScreenState extends State<HomeScreen> {
     BuildContext context,
     List<dynamic> content,
     Space? currentSpace,
-    SpacesProvider spacesProvider,
+    List<Space> spaces,
     ContentProvider contentProvider,
   ) {
     // Check for no spaces first (new user without any spaces)
-    if (spacesProvider.spaces.isEmpty) {
+    if (spaces.isEmpty) {
       return NoSpacesState(onActionPressed: _showCreateSpaceModal);
     }
 
@@ -420,8 +436,8 @@ class _HomeScreenState extends State<HomeScreen> {
       // Check if this is a new user (welcome state)
       // Welcome state: no content AND default space is the only space
       final isNewUser =
-          spacesProvider.spaces.length == 1 &&
-          spacesProvider.spaces.first.name == 'Inbox';
+          spaces.length == 1 &&
+          spaces.first.name == 'Inbox';
 
       if (isNewUser) {
         // Show welcome state for first-time users
@@ -520,10 +536,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
   /// Build simple FAB for creating content
   /// Returns null when there are no spaces (user should create a space first)
-  Widget? _buildFAB(BuildContext context, SpacesProvider spacesProvider) {
+  Widget? _buildFAB(BuildContext context, List<Space> spaces) {
     // Don't show FAB if there are no spaces
     // The NoSpacesState has its own action button to create the first space
-    if (spacesProvider.spaces.isEmpty) {
+    if (spaces.isEmpty) {
       return null;
     }
 
@@ -609,13 +625,14 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildMobileLayout(
     BuildContext context,
     ContentProvider contentProvider,
-    SpacesProvider spacesProvider,
+    Space? currentSpace,
+    List<Space> spaces,
   ) {
     final filteredContent = _getFilteredContent(contentProvider);
     final temporalTheme = Theme.of(context).extension<TemporalFlowTheme>()!;
 
     return Scaffold(
-      appBar: _buildAppBar(context, spacesProvider.currentSpace),
+      appBar: _buildAppBar(context, currentSpace),
       body: Stack(
         children: [
           // Main content
@@ -636,8 +653,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       : _buildContentList(
                           context,
                           filteredContent,
-                          spacesProvider.currentSpace,
-                          spacesProvider,
+                          currentSpace,
+                          spaces,
                           contentProvider,
                         ),
                 ),
@@ -676,7 +693,7 @@ class _HomeScreenState extends State<HomeScreen> {
           setState(() => _selectedNavIndex = index);
         },
       ),
-      floatingActionButton: _buildFAB(context, spacesProvider),
+      floatingActionButton: _buildFAB(context, spaces),
     );
   }
 
@@ -684,7 +701,8 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildDesktopLayout(
     BuildContext context,
     ContentProvider contentProvider,
-    SpacesProvider spacesProvider,
+    Space? currentSpace,
+    List<Space> spaces,
   ) {
     final filteredContent = _getFilteredContent(contentProvider);
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -709,7 +727,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 Column(
                   children: [
                     // App bar
-                    _buildAppBar(context, spacesProvider.currentSpace),
+                    _buildAppBar(context, currentSpace),
 
                     // Filter chips
                     _buildFilterChips(context),
@@ -728,8 +746,8 @@ class _HomeScreenState extends State<HomeScreen> {
                             : _buildContentList(
                                 context,
                                 filteredContent,
-                                spacesProvider.currentSpace,
-                                spacesProvider,
+                                currentSpace,
+                                spaces,
                                 contentProvider,
                               ),
                       ),
@@ -764,7 +782,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
-      floatingActionButton: _buildFAB(context, spacesProvider),
+      floatingActionButton: _buildFAB(context, spaces),
     );
   }
 
@@ -772,14 +790,23 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     final isDesktop = context.isDesktopOrLarger;
     final contentProvider = context.watch<ContentProvider>();
-    final spacesProvider = context.watch<SpacesProvider>();
+    final currentSpace = ref.watch(currentSpaceControllerProvider).when(
+      data: (space) => space,
+      loading: () => null,
+      error: (error, stack) => null,
+    );
+    final spaces = ref.watch(spacesControllerProvider).when(
+      data: (data) => data,
+      loading: () => <Space>[],
+      error: (error, stack) => <Space>[],
+    );
 
     return Focus(
       autofocus: true,
       onKeyEvent: _handleKeyEvent,
       child: isDesktop
-          ? _buildDesktopLayout(context, contentProvider, spacesProvider)
-          : _buildMobileLayout(context, contentProvider, spacesProvider),
+          ? _buildDesktopLayout(context, contentProvider, currentSpace, spaces)
+          : _buildMobileLayout(context, contentProvider, currentSpace, spaces),
     );
   }
 }
