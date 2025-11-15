@@ -99,7 +99,7 @@ final class TodoItemsControllerProvider
 }
 
 String _$todoItemsControllerHash() =>
-    r'ecd6ba446e9d50233884dd4ed347e1104c8aaba6';
+    r'0f576e318d2a40d9a1801961abb6e215dbf22035';
 
 /// Controller for managing todo items within a todo list
 ///

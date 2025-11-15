@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:later_mobile/design_system/atoms/inputs/text_area_field.dart';
 import 'package:later_mobile/design_system/atoms/inputs/text_input_field.dart';
@@ -16,12 +17,11 @@ import 'package:later_mobile/features/todo_lists/domain/models/todo_item.dart';
 import 'package:later_mobile/features/todo_lists/domain/models/todo_list.dart';
 import 'package:later_mobile/features/todo_lists/domain/models/todo_priority.dart';
 import 'package:later_mobile/l10n/app_localizations.dart';
-import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 
-import '../../../../providers/content_provider.dart';
-import '../../core/utils/responsive_modal.dart';
-import '../../providers/content_provider.dart';
+import '../../../../core/utils/responsive_modal.dart';
+import '../controllers/todo_items_controller.dart';
+import '../controllers/todo_lists_controller.dart';
 
 /// TodoList Detail Screen for viewing and editing TodoList with TodoItems
 ///
@@ -35,17 +35,17 @@ import '../../providers/content_provider.dart';
 /// - Swipe-to-delete for TodoItems
 /// - Menu: Edit list properties, Delete list
 /// - Auto-save with debounce
-class TodoListDetailScreen extends StatefulWidget {
+class TodoListDetailScreen extends ConsumerStatefulWidget {
   const TodoListDetailScreen({super.key, required this.todoList});
 
   /// TodoList to display and edit
   final TodoList todoList;
 
   @override
-  State<TodoListDetailScreen> createState() => _TodoListDetailScreenState();
+  ConsumerState<TodoListDetailScreen> createState() => _TodoListDetailScreenState();
 }
 
-class _TodoListDetailScreenState extends State<TodoListDetailScreen> {
+class _TodoListDetailScreenState extends ConsumerState<TodoListDetailScreen> {
   // Text controllers
   late TextEditingController _nameController;
 
@@ -72,55 +72,62 @@ class _TodoListDetailScreenState extends State<TodoListDetailScreen> {
     // Listen to text changes for auto-save
     _nameController.addListener(_onNameChanged);
 
-    // Load todo items for this list
-    _loadTodoItems();
-  }
-
-  /// Load todo items from the provider
-  Future<void> _loadTodoItems() async {
-    setState(() {
-      _isLoadingItems = true;
-    });
-
-    try {
-      final provider = Provider.of<ContentProvider>(context, listen: false);
-      final items = await provider.loadTodoItemsForList(widget.todoList.id);
-
-      if (mounted) {
-        setState(() {
-          _currentItems = items;
-          _isLoadingItems = false;
+    // Listen to todo items controller changes
+    ref.listenManual(
+      todoItemsControllerProvider(widget.todoList.id),
+      (previous, next) {
+        next.whenData((items) {
+          if (mounted) {
+            setState(() {
+              _currentItems = items;
+              _isLoadingItems = false;
+            });
+          }
         });
-      }
-    } catch (e) {
-      if (mounted) {
-        final l10n = AppLocalizations.of(context)!;
-        setState(() {
-          _isLoadingItems = false;
-        });
-        _showSnackBar(l10n.todoDetailLoadFailed, isError: true);
-      }
-    }
-  }
 
-  /// Refresh the parent todo list from the provider to get updated counts
-  Future<void> _refreshTodoListData() async {
-    try {
-      final provider = Provider.of<ContentProvider>(context, listen: false);
-      final updated = provider.todoLists.firstWhere(
-        (tl) => tl.id == _currentTodoList.id,
-      );
-      if (mounted) {
-        setState(() {
-          _currentTodoList = updated;
+        // Handle loading state
+        if (next.isLoading && !next.hasValue) {
+          if (mounted) {
+            setState(() {
+              _isLoadingItems = true;
+            });
+          }
+        }
+
+        // Handle errors
+        next.whenOrNull(
+          error: (error, stackTrace) {
+            if (mounted) {
+              final l10n = AppLocalizations.of(context)!;
+              setState(() {
+                _isLoadingItems = false;
+              });
+              _showSnackBar(l10n.todoDetailLoadFailed, isError: true);
+            }
+          },
+        );
+      },
+      fireImmediately: true,
+    );
+
+    // Listen to todo lists controller to update current list
+    ref.listenManual(
+      todoListsControllerProvider(widget.todoList.spaceId),
+      (previous, next) {
+        next.whenData((lists) {
+          final updated = lists.firstWhere(
+            (tl) => tl.id == _currentTodoList.id,
+            orElse: () => _currentTodoList,
+          );
+          if (mounted && updated != _currentTodoList) {
+            setState(() {
+              _currentTodoList = updated;
+            });
+          }
         });
-      }
-    } catch (e) {
-      // Todo list might have been deleted
-      if (mounted) {
-        _showSnackBar('Failed to refresh list data: $e', isError: true);
-      }
-    }
+      },
+      fireImmediately: true,
+    );
   }
 
   @override
@@ -169,9 +176,10 @@ class _TodoListDetailScreenState extends State<TodoListDetailScreen> {
         name: _nameController.text.trim(),
       );
 
-      // Save via provider
-      final provider = Provider.of<ContentProvider>(context, listen: false);
-      await provider.updateTodoList(updated);
+      // Save via Riverpod controller
+      await ref
+          .read(todoListsControllerProvider(widget.todoList.spaceId).notifier)
+          .updateTodoList(updated);
 
       setState(() {
         _currentTodoList = updated;
@@ -194,17 +202,20 @@ class _TodoListDetailScreenState extends State<TodoListDetailScreen> {
     final l10n = AppLocalizations.of(context)!;
 
     try {
-      final provider = Provider.of<ContentProvider>(context, listen: false);
       // Set sortOrder to be at the end of current items
       final itemWithSortOrder = result.copyWith(
         sortOrder: _currentItems.length,
       );
-      // createTodoItem takes a TodoItem directly
-      await provider.createTodoItem(itemWithSortOrder);
 
-      // Reload items and refresh parent list data
-      await _loadTodoItems();
-      await _refreshTodoListData();
+      // Create item via Riverpod controller
+      await ref
+          .read(todoItemsControllerProvider(widget.todoList.id).notifier)
+          .createItem(itemWithSortOrder);
+
+      // Refresh parent list to get updated counts
+      await ref
+          .read(todoListsControllerProvider(widget.todoList.spaceId).notifier)
+          .refreshTodoList(widget.todoList.id);
 
       if (mounted) _showSnackBar(l10n.todoDetailItemAdded);
     } catch (e) {
@@ -220,18 +231,21 @@ class _TodoListDetailScreenState extends State<TodoListDetailScreen> {
     final l10n = AppLocalizations.of(context)!;
 
     try {
-      final provider = Provider.of<ContentProvider>(context, listen: false);
-      // updateTodoItem takes just a TodoItem
-      await provider.updateTodoItem(result);
+      // Update item via Riverpod controller
+      await ref
+          .read(todoItemsControllerProvider(widget.todoList.id).notifier)
+          .updateItem(result);
 
-      // Reload items and refresh parent list data
-      await _loadTodoItems();
-      await _refreshTodoListData();
+      // Refresh parent list to get updated counts
+      await ref
+          .read(todoListsControllerProvider(widget.todoList.spaceId).notifier)
+          .refreshTodoList(widget.todoList.id);
 
       if (mounted) _showSnackBar(l10n.todoDetailItemUpdated);
     } catch (e) {
-      if (mounted)
+      if (mounted) {
         _showSnackBar(l10n.todoDetailItemUpdateFailed, isError: true);
+      }
     }
   }
 
@@ -241,32 +255,36 @@ class _TodoListDetailScreenState extends State<TodoListDetailScreen> {
     final l10n = AppLocalizations.of(context)!;
 
     try {
-      final provider = Provider.of<ContentProvider>(context, listen: false);
-      await provider.deleteTodoItem(item.id, _currentTodoList.id);
+      // Delete item via Riverpod controller
+      await ref
+          .read(todoItemsControllerProvider(widget.todoList.id).notifier)
+          .deleteItem(item.id, _currentTodoList.id);
 
-      // Reload items and refresh parent list data
-      await _loadTodoItems();
-      await _refreshTodoListData();
+      // Refresh parent list to get updated counts
+      await ref
+          .read(todoListsControllerProvider(widget.todoList.spaceId).notifier)
+          .refreshTodoList(widget.todoList.id);
 
       if (mounted) _showSnackBar(l10n.todoDetailItemDeleted);
     } catch (e) {
-      if (mounted)
+      if (mounted) {
         _showSnackBar(l10n.todoDetailItemDeleteFailed, isError: true);
+      }
     }
   }
 
   /// Toggle TodoItem completion
   Future<void> _toggleTodoItem(TodoItem item) async {
     try {
-      final provider = Provider.of<ContentProvider>(context, listen: false);
+      // Toggle item via Riverpod controller
+      await ref
+          .read(todoItemsControllerProvider(widget.todoList.id).notifier)
+          .toggleItem(item.id, _currentTodoList.id);
 
-      // Toggle the item by updating it with updateTodoItem
-      final toggled = item.copyWith(isCompleted: !item.isCompleted);
-      await provider.updateTodoItem(toggled);
-
-      // Reload items and refresh parent list data
-      await _loadTodoItems();
-      await _refreshTodoListData();
+      // Refresh parent list to get updated counts
+      await ref
+          .read(todoListsControllerProvider(widget.todoList.spaceId).notifier)
+          .refreshTodoList(widget.todoList.id);
     } catch (e) {
       if (!mounted) return;
       final l10n = AppLocalizations.of(context)!;
@@ -286,28 +304,26 @@ class _TodoListDetailScreenState extends State<TodoListDetailScreen> {
     final item = reorderedItems.removeAt(oldIndex);
     reorderedItems.insert(newIndex, item);
 
-    // Update sortOrder values
-    for (int i = 0; i < reorderedItems.length; i++) {
-      reorderedItems[i] = reorderedItems[i].copyWith(sortOrder: i);
-    }
-
     setState(() {
       _currentItems = reorderedItems;
     });
 
-    // Then persist to provider in the background
+    // Then persist via Riverpod controller in the background
     try {
-      final provider = Provider.of<ContentProvider>(context, listen: false);
-      // reorderTodoItems takes (todoListId, List<TodoItem>)
-      await provider.reorderTodoItems(_currentTodoList.id, reorderedItems);
+      // Extract IDs in the new order
+      final orderedIds = reorderedItems.map((item) => item.id).toList();
+
+      // Call controller to reorder
+      await ref
+          .read(todoItemsControllerProvider(widget.todoList.id).notifier)
+          .reorderItems(orderedIds);
     } catch (e) {
       // On error, check mounted before any context usage
       if (!mounted) return;
 
-      // Show error to user and reload items from server
+      // Show error to user - controller will reload items from server
       final l10n = AppLocalizations.of(context)!;
       _showSnackBar(l10n.todoDetailReorderFailed, isError: true);
-      await _loadTodoItems();
     }
   }
 
@@ -315,9 +331,10 @@ class _TodoListDetailScreenState extends State<TodoListDetailScreen> {
   /// Note: Navigation is handled in _showDeleteListConfirmation(), not here
   Future<void> _deleteTodoList() async {
     try {
-      final provider = Provider.of<ContentProvider>(context, listen: false);
-
-      await provider.deleteTodoList(_currentTodoList.id);
+      // Delete list via Riverpod controller
+      await ref
+          .read(todoListsControllerProvider(widget.todoList.spaceId).notifier)
+          .deleteTodoList(_currentTodoList.id);
 
       // Navigation already handled in confirmation dialog
       // Success feedback is provided by UI update (todo list removed from list)

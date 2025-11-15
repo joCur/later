@@ -27,6 +27,7 @@ import '../../features/spaces/domain/models/space.dart';
 import '../../features/spaces/presentation/controllers/spaces_controller.dart';
 import '../../features/spaces/presentation/controllers/current_space_controller.dart';
 import '../../features/notes/presentation/controllers/notes_controller.dart';
+import '../../features/todo_lists/presentation/controllers/todo_lists_controller.dart';
 // import '../../providers/spaces_provider.dart'; // TODO: Remove after Phase 8
 import '../../providers/content_provider.dart';
 
@@ -315,7 +316,9 @@ class _CreateContentModalState extends ConsumerState<CreateContentModal>
               name: text,
               description: description.isEmpty ? null : description,
             );
-            await contentProvider.createTodoList(todoList);
+            await ref
+                .read(todoListsControllerProvider(targetSpaceId).notifier)
+                .createTodoList(todoList);
             _currentItemId = id;
             break;
 

@@ -26,6 +26,7 @@ import '../../features/spaces/presentation/controllers/spaces_controller.dart';
 import '../../features/spaces/presentation/controllers/current_space_controller.dart';
 import '../../features/auth/presentation/controllers/auth_state_controller.dart';
 import '../../features/notes/presentation/controllers/notes_controller.dart';
+import '../../features/todo_lists/presentation/controllers/todo_lists_controller.dart';
 // import '../../providers/spaces_provider.dart'; // TODO: Remove after Phase 8
 import '../../providers/content_provider.dart';
 import '../modals/create_content_modal.dart';
@@ -107,7 +108,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     if (currentSpace != null) {
       // Load notes via Riverpod
       ref.invalidate(notesControllerProvider(currentSpace.id));
-      // Load TodoLists and Lists via ContentProvider (not yet migrated)
+      // Load TodoLists via Riverpod
+      ref.invalidate(todoListsControllerProvider(currentSpace.id));
+      // Load Lists via ContentProvider (not yet migrated)
       await contentProvider.loadSpaceContent(currentSpace.id);
     }
   }
@@ -124,25 +127,34 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     if (currentSpace != null) {
       // Refresh notes via Riverpod
       await ref.read(notesControllerProvider(currentSpace.id).notifier).refresh();
-      // Refresh TodoLists and Lists via ContentProvider (not yet migrated)
+      // Refresh TodoLists via Riverpod
+      ref.invalidate(todoListsControllerProvider(currentSpace.id));
+      // Refresh Lists via ContentProvider (not yet migrated)
       await contentProvider.loadSpaceContent(currentSpace.id);
     }
   }
 
   /// Filter content based on selected filter
   /// Returns a paginated list of mixed content (TodoList, ListModel, Note)
-  List<dynamic> _getFilteredContent(ContentProvider contentProvider, List<Note> notes) {
-    // Get filtered content from ContentProvider (TodoLists and Lists only)
+  List<dynamic> _getFilteredContent(
+    ContentProvider contentProvider,
+    List<Note> notes,
+    List<TodoList> todoLists,
+  ) {
+    // Get filtered content from ContentProvider (Lists only)
     final providerContent = contentProvider.getFilteredContent(_selectedFilter);
 
-    // Combine with notes from Riverpod based on filter
+    // Combine with notes and todoLists from Riverpod based on filter
     List<dynamic> allContent;
     if (_selectedFilter == ContentFilter.notes) {
       // Only notes
       allContent = notes;
+    } else if (_selectedFilter == ContentFilter.todoLists) {
+      // Only TodoLists
+      allContent = todoLists;
     } else if (_selectedFilter == ContentFilter.all) {
       // All content types - combine and sort by updatedAt
-      allContent = [...providerContent, ...notes];
+      allContent = [...todoLists, ...providerContent, ...notes];
       allContent.sort((a, b) {
         final aUpdated = a is Note ? a.updatedAt :
                         a is TodoList ? a.updatedAt :
@@ -153,7 +165,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         return bUpdated.compareTo(aUpdated);
       });
     } else {
-      // TodoLists or Lists filter - only provider content
+      // Lists filter - only provider content (Lists)
       allContent = providerContent;
     }
 
@@ -221,6 +233,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       // Load content for the new current space
       // (which was automatically set by createSpace)
       if (currentSpace != null) {
+        // Load TodoLists via Riverpod
+        ref.invalidate(todoListsControllerProvider(currentSpace.id));
+        // Load Lists via ContentProvider
         await contentProvider.loadSpaceContent(currentSpace.id);
       }
     }
@@ -287,6 +302,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     error: (error, stack) => null,
                   );
                   if (currentSpace != null) {
+                    // Load TodoLists via Riverpod
+                    ref.invalidate(todoListsControllerProvider(currentSpace.id));
+                    // Load Lists via ContentProvider
                     await contentProvider.loadSpaceContent(currentSpace.id);
                   }
                 }
@@ -455,6 +473,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     List<Space> spaces,
     ContentProvider contentProvider,
     List<Note> notes,
+    List<TodoList> todoLists,
   ) {
     // Check for no spaces first (new user without any spaces)
     if (spaces.isEmpty) {
@@ -462,8 +481,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     }
 
     // Check if completely empty (no content at all)
-    // Include notes count in total
-    final totalCount = contentProvider.getTotalCount() + notes.length;
+    // Include notes and todoLists count in total
+    final totalCount = contentProvider.getTotalCount() + notes.length + todoLists.length;
     if (content.isEmpty && totalCount == 0) {
       // Check if this is a new user (welcome state)
       // Welcome state: no content AND default space is the only space
@@ -500,14 +519,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     }
 
     // Calculate if there are more items to load
-    // Combine provider content with notes for total count
+    // Combine provider content with notes and todoLists for total count
     final providerContent = contentProvider.getFilteredContent(_selectedFilter);
     final int totalItems;
     if (_selectedFilter == ContentFilter.notes) {
       totalItems = notes.length;
+    } else if (_selectedFilter == ContentFilter.todoLists) {
+      totalItems = todoLists.length;
     } else if (_selectedFilter == ContentFilter.all) {
-      totalItems = providerContent.length + notes.length;
+      totalItems = providerContent.length + notes.length + todoLists.length;
     } else {
+      // Lists filter
       totalItems = providerContent.length;
     }
     final hasMoreItems = content.length < totalItems;
@@ -669,6 +691,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     Space? currentSpace,
     List<Space> spaces,
     AsyncValue<List<Note>> notesAsync,
+    AsyncValue<List<TodoList>> todoListsAsync,
   ) {
     // Extract notes from AsyncValue, default to empty list on error/loading
     final notes = notesAsync.when(
@@ -676,7 +699,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       loading: () => <Note>[],
       error: (error, stack) => <Note>[],
     );
-    final filteredContent = _getFilteredContent(contentProvider, notes);
+    // Extract todoLists from AsyncValue, default to empty list on error/loading
+    final todoLists = todoListsAsync.when(
+      data: (data) => data,
+      loading: () => <TodoList>[],
+      error: (error, stack) => <TodoList>[],
+    );
+    final filteredContent = _getFilteredContent(contentProvider, notes, todoLists);
     final temporalTheme = Theme.of(context).extension<TemporalFlowTheme>()!;
 
     return Scaffold(
@@ -696,7 +725,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   onRefresh: _handleRefresh,
                   color: temporalTheme.primaryGradient.colors.first,
                   backgroundColor: AppColors.surface(context),
-                  child: (contentProvider.isLoading || notesAsync.isLoading)
+                  child: (contentProvider.isLoading || notesAsync.isLoading || todoListsAsync.isLoading)
                       ? const Center(child: CircularProgressIndicator())
                       : _buildContentList(
                           context,
@@ -705,6 +734,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           spaces,
                           contentProvider,
                           notes,
+                          todoLists,
                         ),
                 ),
               ),
@@ -753,6 +783,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     Space? currentSpace,
     List<Space> spaces,
     AsyncValue<List<Note>> notesAsync,
+    AsyncValue<List<TodoList>> todoListsAsync,
   ) {
     // Extract notes from AsyncValue, default to empty list on error/loading
     final notes = notesAsync.when(
@@ -760,7 +791,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       loading: () => <Note>[],
       error: (error, stack) => <Note>[],
     );
-    final filteredContent = _getFilteredContent(contentProvider, notes);
+    // Extract todoLists from AsyncValue, default to empty list on error/loading
+    final todoLists = todoListsAsync.when(
+      data: (data) => data,
+      loading: () => <TodoList>[],
+      error: (error, stack) => <TodoList>[],
+    );
+    final filteredContent = _getFilteredContent(contentProvider, notes, todoLists);
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final temporalTheme = Theme.of(context).extension<TemporalFlowTheme>()!;
 
@@ -797,7 +834,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         backgroundColor: isDark
                             ? AppColors.neutral900
                             : Colors.white,
-                        child: (contentProvider.isLoading || notesAsync.isLoading)
+                        child: (contentProvider.isLoading || notesAsync.isLoading || todoListsAsync.isLoading)
                             ? const Center(child: CircularProgressIndicator())
                             : _buildContentList(
                                 context,
@@ -806,6 +843,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                 spaces,
                                 contentProvider,
                                 notes,
+                                todoLists,
                               ),
                       ),
                     ),
@@ -863,12 +901,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         ? ref.watch(notesControllerProvider(currentSpace.id))
         : const AsyncValue<List<Note>>.data([]);
 
+    // Watch todoLists for current space (if available)
+    final todoListsAsync = currentSpace != null
+        ? ref.watch(todoListsControllerProvider(currentSpace.id))
+        : const AsyncValue<List<TodoList>>.data([]);
+
     return Focus(
       autofocus: true,
       onKeyEvent: _handleKeyEvent,
       child: isDesktop
-          ? _buildDesktopLayout(context, contentProvider, currentSpace, spaces, notesAsync)
-          : _buildMobileLayout(context, contentProvider, currentSpace, spaces, notesAsync),
+          ? _buildDesktopLayout(context, contentProvider, currentSpace, spaces, notesAsync, todoListsAsync)
+          : _buildMobileLayout(context, contentProvider, currentSpace, spaces, notesAsync, todoListsAsync),
     );
   }
 }
