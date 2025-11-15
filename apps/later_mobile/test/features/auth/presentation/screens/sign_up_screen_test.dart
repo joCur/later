@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:later_mobile/features/auth/application/auth_application_service.dart';
 import 'package:later_mobile/features/auth/application/providers.dart';
-import 'package:later_mobile/widgets/screens/auth/sign_up_screen.dart';
+import 'package:later_mobile/features/auth/presentation/screens/sign_up_screen.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';

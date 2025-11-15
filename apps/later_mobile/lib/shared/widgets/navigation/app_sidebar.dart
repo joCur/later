@@ -1,16 +1,17 @@
 import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:later_mobile/l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:later_mobile/design_system/tokens/tokens.dart';
-import '../../core/theme/temporal_flow_theme.dart';
-import '../../features/spaces/domain/models/space.dart';
-import '../../features/spaces/presentation/controllers/spaces_controller.dart';
-import '../../features/spaces/presentation/controllers/current_space_controller.dart';
-import '../../features/auth/presentation/controllers/auth_state_controller.dart';
-// import '../../providers/spaces_provider.dart'; // TODO: Remove after Phase 8
 import 'package:later_mobile/design_system/atoms/buttons/theme_toggle_button.dart';
+import 'package:later_mobile/design_system/tokens/tokens.dart';
+import 'package:later_mobile/l10n/app_localizations.dart';
+
+import 'package:later_mobile/core/theme/temporal_flow_theme.dart';
+import 'package:later_mobile/features/auth/presentation/controllers/auth_state_controller.dart';
+import 'package:later_mobile/features/spaces/domain/models/space.dart';
+import 'package:later_mobile/features/spaces/presentation/controllers/current_space_controller.dart';
+import 'package:later_mobile/features/spaces/presentation/controllers/spaces_controller.dart';
 
 /// Desktop sidebar navigation component
 ///
@@ -87,7 +88,9 @@ class _AppSidebarState extends ConsumerState<AppSidebar> {
     );
 
     for (final space in spaces) {
-      final count = await ref.read(spacesControllerProvider.notifier).getSpaceItemCount(space.id);
+      final count = await ref
+          .read(spacesControllerProvider.notifier)
+          .getSpaceItemCount(space.id);
       if (mounted) {
         setState(() {
           _cachedCounts[space.id] = count;
@@ -107,11 +110,13 @@ class _AppSidebarState extends ConsumerState<AppSidebar> {
       loading: () => <Space>[],
       error: (error, stack) => <Space>[],
     );
-    final currentSpaceId = ref.read(currentSpaceControllerProvider).when(
-      data: (currentSpace) => currentSpace?.id,
-      loading: () => null,
-      error: (error, stack) => null,
-    );
+    final currentSpaceId = ref
+        .read(currentSpaceControllerProvider)
+        .when(
+          data: (currentSpace) => currentSpace?.id,
+          loading: () => null,
+          error: (error, stack) => null,
+        );
 
     // Helper to switch space with haptic feedback
     void switchWithHaptic(Space space) {
@@ -169,8 +174,7 @@ class _AppSidebarState extends ConsumerState<AppSidebar> {
                 ),
                 child: Container(
                   decoration: BoxDecoration(
-                    color: (AppColors.surface(context))
-                        .withValues(alpha: 0.9),
+                    color: (AppColors.surface(context)).withValues(alpha: 0.9),
                     border: Border(
                       right: BorderSide(
                         color: isDarkMode
@@ -269,11 +273,13 @@ class _AppSidebarState extends ConsumerState<AppSidebar> {
   Widget _buildSpacesList(bool isDarkMode) {
     final l10n = AppLocalizations.of(context)!;
     final spacesAsync = ref.watch(spacesControllerProvider);
-    final currentSpaceId = ref.watch(currentSpaceControllerProvider).when(
-      data: (currentSpace) => currentSpace?.id,
-      loading: () => null,
-      error: (error, stack) => null,
-    );
+    final currentSpaceId = ref
+        .watch(currentSpaceControllerProvider)
+        .when(
+          data: (currentSpace) => currentSpace?.id,
+          loading: () => null,
+          error: (error, stack) => null,
+        );
 
     return spacesAsync.when(
       data: (spaces) {
@@ -282,7 +288,10 @@ class _AppSidebarState extends ConsumerState<AppSidebar> {
             child: widget.isExpanded
                 ? Padding(
                     padding: const EdgeInsets.all(AppSpacing.sm),
-                    child: Text(l10n.sidebarNoSpaces, textAlign: TextAlign.center),
+                    child: Text(
+                      l10n.sidebarNoSpaces,
+                      textAlign: TextAlign.center,
+                    ),
                   )
                 : const Icon(Icons.inbox_outlined),
           );
@@ -308,7 +317,9 @@ class _AppSidebarState extends ConsumerState<AppSidebar> {
                 if (currentSpaceId != space.id) {
                   AppAnimations.selectionHaptic();
                 }
-                ref.read(currentSpaceControllerProvider.notifier).switchSpace(space);
+                ref
+                    .read(currentSpaceControllerProvider.notifier)
+                    .switchSpace(space);
               },
             );
           },
@@ -316,7 +327,10 @@ class _AppSidebarState extends ConsumerState<AppSidebar> {
       },
       loading: () => const Center(child: CircularProgressIndicator()),
       error: (error, stack) => Center(
-        child: Text('Error: $error', style: const TextStyle(color: AppColors.error)),
+        child: Text(
+          'Error: $error',
+          style: const TextStyle(color: AppColors.error),
+        ),
       ),
     );
   }
@@ -377,9 +391,7 @@ class _AppSidebarState extends ConsumerState<AppSidebar> {
                               children: [
                                 const Icon(Icons.settings_outlined),
                                 const SizedBox(width: AppSpacing.xs),
-                                Flexible(
-                                  child: Text(l10n.navigationSettings),
-                                ),
+                                Flexible(child: Text(l10n.navigationSettings)),
                               ],
                             ),
                           ),
@@ -397,7 +409,9 @@ class _AppSidebarState extends ConsumerState<AppSidebar> {
                     message: l10n.sidebarSignOut,
                     child: InkWell(
                       onTap: () async {
-                        await ref.read(authStateControllerProvider.notifier).signOut();
+                        await ref
+                            .read(authStateControllerProvider.notifier)
+                            .signOut();
                       },
                       borderRadius: const BorderRadius.all(
                         Radius.circular(AppSpacing.radiusSM),
@@ -460,7 +474,9 @@ class _AppSidebarState extends ConsumerState<AppSidebar> {
               message: l10n.sidebarSignOut,
               child: InkWell(
                 onTap: () async {
-                  await ref.read(authStateControllerProvider.notifier).signOut();
+                  await ref
+                      .read(authStateControllerProvider.notifier)
+                      .signOut();
                 },
                 borderRadius: const BorderRadius.all(
                   Radius.circular(AppSpacing.radiusSM),
@@ -520,7 +536,9 @@ class _SpaceListItemState extends ConsumerState<_SpaceListItem> {
 
     // Otherwise, load asynchronously
     return FutureBuilder<int>(
-      future: ref.read(spacesControllerProvider.notifier).getSpaceItemCount(widget.space.id),
+      future: ref
+          .read(spacesControllerProvider.notifier)
+          .getSpaceItemCount(widget.space.id),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           return Text(snapshot.data.toString());
@@ -579,8 +597,8 @@ class _SpaceListItemState extends ConsumerState<_SpaceListItem> {
                       ? 'Press ${widget.keyboardShortcut} to switch'
                       : widget.space.name)
                 : widget.cachedCount != null
-                    ? '${widget.space.name} (${widget.cachedCount} items)'
-                    : widget.space.name,
+                ? '${widget.space.name} (${widget.cachedCount} items)'
+                : widget.space.name,
             child: InkWell(
               onTap: widget.onTap,
               borderRadius: const BorderRadius.all(
@@ -678,8 +696,7 @@ class _SpaceListItemState extends ConsumerState<_SpaceListItem> {
                           ),
 
                         // Item count badge
-                        if (widget.isExpanded &&
-                            (widget.cachedCount ?? 0) > 0)
+                        if (widget.isExpanded && (widget.cachedCount ?? 0) > 0)
                           Container(
                             padding: const EdgeInsets.symmetric(
                               horizontal: AppSpacing.xs,

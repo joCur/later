@@ -8,7 +8,7 @@ import 'core/error/error_handler.dart';
 import 'core/theme/app_theme.dart';
 import 'data/local/preferences_service.dart';
 import 'features/theme/presentation/controllers/theme_controller.dart';
-import 'widgets/auth/auth_gate.dart';
+import 'package:later_mobile/features/auth/presentation/widgets/auth_gate.dart';
 
 void main() async {
   // Ensure Flutter bindings are initialized

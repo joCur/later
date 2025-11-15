@@ -3,7 +3,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:later_mobile/core/theme/temporal_flow_theme.dart';
 import 'package:later_mobile/l10n/app_localizations.dart';
-import 'package:later_mobile/widgets/navigation/icon_only_bottom_nav.dart';
+import 'package:later_mobile/shared/widgets/navigation/icon_only_bottom_nav.dart';
 import 'package:later_mobile/design_system/tokens/tokens.dart';
 
 void main() {

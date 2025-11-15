@@ -119,6 +119,32 @@ class NotesController extends _$NotesController {
     }
   }
 
+  /// Reorders notes by updating their sortOrder values.
+  ///
+  /// Updates all notes to match the order specified in the orderedIds list.
+  /// Refreshes the state to reflect the new order.
+  ///
+  /// Parameters:
+  ///   - [orderedIds]: List of note IDs in the desired order
+  Future<void> reorderLists(List<String> orderedIds) async {
+    final service = ref.read(noteServiceProvider);
+
+    try {
+      await service.reorderNotes(spaceId, orderedIds);
+
+      // Check if still mounted
+      if (!ref.mounted) return;
+
+      // Refresh to get updated sortOrder values
+      await refresh();
+    } catch (e) {
+      // Update state with error
+      if (ref.mounted) {
+        state = AsyncValue.error(e, StackTrace.current);
+      }
+    }
+  }
+
   /// Toggles the favorite status of a note.
   ///
   /// Note: This is a placeholder for future functionality.

@@ -1,6 +1,6 @@
 import '../../data/repositories/note_repository.dart';
 import '../../domain/models/note.dart';
-import '../../../../core/error/error.dart';
+import 'package:later_mobile/core/error/error.dart';
 
 /// Application service for note business logic.
 ///
@@ -108,6 +108,46 @@ class NoteService {
       throw AppError(
         code: ErrorCode.unknownError,
         message: 'Failed to delete note: ${e.toString()}',
+        technicalDetails: e.toString(),
+      );
+    }
+  }
+
+  /// Reorders notes in a space by updating their sortOrder values.
+  ///
+  /// Updates all notes to match the order specified in the orderedIds list.
+  /// Each note's sortOrder is set to its index in the list.
+  ///
+  /// Parameters:
+  ///   - [spaceId]: The ID of the space containing the notes
+  ///   - [orderedIds]: List of note IDs in the desired order
+  ///
+  /// Throws [AppError] if the operation fails.
+  Future<void> reorderNotes(
+    String spaceId,
+    List<String> orderedIds,
+  ) async {
+    try {
+      // Load current notes
+      final notes = await _repository.getBySpace(spaceId);
+
+      // Create updated notes with new sortOrder values
+      final updatedNotes = <Note>[];
+      for (int i = 0; i < orderedIds.length; i++) {
+        final id = orderedIds[i];
+        final note = notes.firstWhere((n) => n.id == id);
+        updatedNotes.add(note.copyWith(sortOrder: i));
+      }
+
+      // Update each note with new sortOrder
+      for (final note in updatedNotes) {
+        await _repository.update(note);
+      }
+    } catch (e) {
+      if (e is AppError) rethrow;
+      throw AppError(
+        code: ErrorCode.unknownError,
+        message: 'Failed to reorder notes: ${e.toString()}',
         technicalDetails: e.toString(),
       );
     }

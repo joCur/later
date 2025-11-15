@@ -3,12 +3,11 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:later_mobile/design_system/tokens/tokens.dart';
 import 'package:later_mobile/l10n/app_localizations.dart';
-import '../../core/theme/temporal_flow_theme.dart';
-import '../../core/utils/responsive_modal.dart';
-import '../../features/spaces/domain/models/space.dart';
-import '../../features/spaces/presentation/controllers/spaces_controller.dart';
-import '../../features/spaces/presentation/controllers/current_space_controller.dart';
-// import '../../providers/spaces_provider.dart'; // TODO: Remove after Phase 8
+import 'package:later_mobile/core/theme/temporal_flow_theme.dart';
+import 'package:later_mobile/core/utils/responsive_modal.dart';
+import 'package:later_mobile/features/spaces/domain/models/space.dart';
+import 'package:later_mobile/features/spaces/presentation/controllers/spaces_controller.dart';
+import 'package:later_mobile/features/spaces/presentation/controllers/current_space_controller.dart';
 import 'create_space_modal.dart';
 import 'package:later_mobile/design_system/atoms/inputs/text_input_field.dart';
 import 'package:later_mobile/design_system/atoms/buttons/primary_button.dart';

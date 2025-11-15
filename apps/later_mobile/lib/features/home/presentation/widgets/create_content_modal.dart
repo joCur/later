@@ -4,10 +4,7 @@ import 'dart:ui' show ImageFilter;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:later_mobile/features/lists/domain/models/list_model.dart';
 import 'package:later_mobile/data/models/list_style.dart';
-import 'package:later_mobile/features/notes/domain/models/note.dart';
-import 'package:later_mobile/features/todo_lists/domain/models/todo_list.dart';
 import 'package:later_mobile/design_system/atoms/buttons/ghost_button.dart';
 import 'package:later_mobile/design_system/atoms/buttons/gradient_button.dart';
 import 'package:later_mobile/design_system/atoms/buttons/primary_button.dart';
@@ -15,21 +12,22 @@ import 'package:later_mobile/design_system/atoms/inputs/text_area_field.dart';
 import 'package:later_mobile/design_system/atoms/inputs/text_input_field.dart';
 import 'package:later_mobile/design_system/molecules/controls/segmented_control.dart';
 import 'package:later_mobile/design_system/tokens/tokens.dart';
+import 'package:later_mobile/features/lists/domain/models/list_model.dart';
+import 'package:later_mobile/features/notes/domain/models/note.dart';
+import 'package:later_mobile/features/todo_lists/domain/models/todo_list.dart';
 import 'package:later_mobile/l10n/app_localizations.dart';
 import 'package:uuid/uuid.dart';
 
-import '../../core/responsive/breakpoints.dart';
-import '../../core/theme/temporal_flow_theme.dart';
-import '../../core/utils/item_type_detector.dart'; // For ContentType enum
-import '../../features/auth/presentation/controllers/auth_state_controller.dart';
-import '../../features/spaces/domain/models/space.dart';
-import '../../features/spaces/presentation/controllers/spaces_controller.dart';
-import '../../features/spaces/presentation/controllers/current_space_controller.dart';
-import '../../features/notes/presentation/controllers/notes_controller.dart';
-import '../../features/todo_lists/presentation/controllers/todo_lists_controller.dart';
-import '../../features/lists/presentation/controllers/lists_controller.dart';
-// import '../../providers/spaces_provider.dart'; // TODO: Remove after Phase 8
-// ContentProvider removed - Lists now use Riverpod controllers
+import 'package:later_mobile/core/responsive/breakpoints.dart';
+import 'package:later_mobile/core/theme/temporal_flow_theme.dart';
+import 'package:later_mobile/core/utils/item_type_detector.dart';
+import 'package:later_mobile/features/auth/presentation/controllers/auth_state_controller.dart';
+import 'package:later_mobile/features/lists/presentation/controllers/lists_controller.dart';
+import 'package:later_mobile/features/notes/presentation/controllers/notes_controller.dart';
+import 'package:later_mobile/features/spaces/domain/models/space.dart';
+import 'package:later_mobile/features/spaces/presentation/controllers/current_space_controller.dart';
+import 'package:later_mobile/features/spaces/presentation/controllers/spaces_controller.dart';
+import 'package:later_mobile/features/todo_lists/presentation/controllers/todo_lists_controller.dart';
 
 /// Type option for Create Content content type selector
 class TypeOption {
@@ -199,11 +197,13 @@ class _CreateContentModalState extends ConsumerState<CreateContentModal>
     // Initialize local space selection with current space
     // Safe to use ref.read here as BuildContext is ready
     if (_selectedSpaceId == null) {
-      _selectedSpaceId = ref.read(currentSpaceControllerProvider).when(
-        data: (currentSpace) => currentSpace?.id,
-        loading: () => null,
-        error: (error, stack) => null,
-      );
+      _selectedSpaceId = ref
+          .read(currentSpaceControllerProvider)
+          .when(
+            data: (currentSpace) => currentSpace?.id,
+            loading: () => null,
+            error: (error, stack) => null,
+          );
       debugPrint(
         'CreateContent: didChangeDependencies - _selectedSpaceId initialized to: $_selectedSpaceId',
       );
@@ -262,11 +262,13 @@ class _CreateContentModalState extends ConsumerState<CreateContentModal>
     final text = _textController.text.trim();
     if (text.isEmpty) return;
 
-    final currentSpace = ref.read(currentSpaceControllerProvider).when(
-      data: (space) => space,
-      loading: () => null,
-      error: (error, stack) => null,
-    );
+    final currentSpace = ref
+        .read(currentSpaceControllerProvider)
+        .when(
+          data: (space) => space,
+          loading: () => null,
+          error: (error, stack) => null,
+        );
 
     if (currentSpace == null) {
       return;
@@ -278,11 +280,13 @@ class _CreateContentModalState extends ConsumerState<CreateContentModal>
     }
 
     // Verify the selected space still exists
-    final spaces = ref.read(spacesControllerProvider).when(
-      data: (data) => data,
-      loading: () => <Space>[],
-      error: (error, stack) => <Space>[],
-    );
+    final spaces = ref
+        .read(spacesControllerProvider)
+        .when(
+          data: (data) => data,
+          loading: () => <Space>[],
+          error: (error, stack) => <Space>[],
+        );
     final spaceExists = spaces.any((s) => s.id == _selectedSpaceId);
     final targetSpaceId = spaceExists ? _selectedSpaceId! : currentSpace.id;
 
@@ -290,11 +294,13 @@ class _CreateContentModalState extends ConsumerState<CreateContentModal>
     final contentType = _selectedType ?? ContentType.note;
 
     // Safety check: Ensure user is authenticated
-    final userId = ref.read(authStateControllerProvider).when(
-      data: (user) => user?.id,
-      loading: () => null,
-      error: (error, stack) => null,
-    );
+    final userId = ref
+        .read(authStateControllerProvider)
+        .when(
+          data: (user) => user?.id,
+          loading: () => null,
+          error: (error, stack) => null,
+        );
     if (userId == null) {
       return; // Exit early - user should be redirected to auth screen by AuthGate
     }
@@ -372,9 +378,7 @@ class _CreateContentModalState extends ConsumerState<CreateContentModal>
           if (existingNote != null) {
             await ref
                 .read(notesControllerProvider(targetSpaceId).notifier)
-                .updateNote(
-                  existingNote.copyWith(title: text),
-                );
+                .updateNote(existingNote.copyWith(title: text));
           }
         }
       }
@@ -1196,7 +1200,8 @@ class _CreateContentModalState extends ConsumerState<CreateContentModal>
         case ContentType.list:
           return l10n.createModalListNameHint;
         case ContentType.note:
-          return l10n.createModalNoteTitleHint; // Fallback, but note uses type-specific fields
+          return l10n
+              .createModalNoteTitleHint; // Fallback, but note uses type-specific fields
         case null:
           return l10n.createModalNoteTitleHint;
       }
@@ -1242,19 +1247,23 @@ class _CreateContentModalState extends ConsumerState<CreateContentModal>
   }
 
   Widget _buildSpaceSelector() {
-    final currentSpace = ref.watch(currentSpaceControllerProvider).when(
-      data: (space) => space,
-      loading: () => null,
-      error: (error, stack) => null,
-    );
+    final currentSpace = ref
+        .watch(currentSpaceControllerProvider)
+        .when(
+          data: (space) => space,
+          loading: () => null,
+          error: (error, stack) => null,
+        );
 
     if (currentSpace == null) return const SizedBox.shrink();
 
-    final spaces = ref.watch(spacesControllerProvider).when(
-      data: (data) => data,
-      loading: () => <Space>[],
-      error: (error, stack) => <Space>[],
-    );
+    final spaces = ref
+        .watch(spacesControllerProvider)
+        .when(
+          data: (data) => data,
+          loading: () => <Space>[],
+          error: (error, stack) => <Space>[],
+        );
 
     // Use local state to find the selected space for display
     // If _selectedSpaceId is null, fall back to currentSpace.id
@@ -1273,8 +1282,7 @@ class _CreateContentModalState extends ConsumerState<CreateContentModal>
         children: [
           if (spaceIcon != null)
             Text(spaceIcon, style: const TextStyle(fontSize: 16)),
-          if (spaceIcon != null)
-            const SizedBox(width: AppSpacing.xxs),
+          if (spaceIcon != null) const SizedBox(width: AppSpacing.xxs),
           Text(
             spaceName,
             style: AppTypography.labelMedium.copyWith(

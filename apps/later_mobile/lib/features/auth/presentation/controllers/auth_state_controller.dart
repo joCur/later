@@ -16,10 +16,10 @@ part 'auth_state_controller.g.dart';
 /// - AsyncValue.error: Authentication error occurred
 ///
 /// Riverpod 3.0 features:
-/// - Auto-disposed by default
+/// - keepAlive: true to prevent disposal and maintain auth stream subscription
 /// - Automatic retry on initialization failures
 /// - `ref.mounted` checks for async safety
-@riverpod
+@Riverpod(keepAlive: true)
 class AuthStateController extends _$AuthStateController {
   StreamSubscription<AuthState>? _authStateSubscription;
 

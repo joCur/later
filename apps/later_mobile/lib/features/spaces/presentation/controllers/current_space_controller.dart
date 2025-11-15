@@ -11,7 +11,8 @@ part 'current_space_controller.g.dart';
 /// Manages AsyncValue with current space for the active space.
 /// Persists selection to SharedPreferences.
 /// Single source of truth for current space selection.
-@riverpod
+/// keepAlive: true prevents disposal and maintains current space state.
+@Riverpod(keepAlive: true)
 class CurrentSpaceController extends _$CurrentSpaceController {
   @override
   Future<Space?> build() async {

@@ -33,10 +33,13 @@ class AuthGate extends ConsumerWidget {
           return const SignInScreen();
         }
       },
-      loading: () =>
-          const Scaffold(body: Center(child: CircularProgressIndicator())),
+      loading: () => const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      ),
       error: (error, stackTrace) => Scaffold(
-        body: Center(child: Text('Authentication error: ${error.toString()}')),
+        body: Center(
+          child: Text('Authentication error: ${error.toString()}'),
+        ),
       ),
     );
   }

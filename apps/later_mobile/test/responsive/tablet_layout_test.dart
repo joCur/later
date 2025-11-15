@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:later_mobile/core/responsive/breakpoints.dart';
 import 'package:later_mobile/core/responsive/responsive_layout.dart';
-import 'package:later_mobile/widgets/navigation/app_sidebar.dart';
-import 'package:later_mobile/widgets/navigation/icon_only_bottom_nav.dart';
+import 'package:later_mobile/shared/widgets/navigation/app_sidebar.dart';
+import 'package:later_mobile/shared/widgets/navigation/icon_only_bottom_nav.dart';
 
 import '../test_helpers.dart';
 

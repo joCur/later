@@ -10,7 +10,7 @@ import 'package:later_mobile/design_system/organisms/modals/bottom_sheet_contain
 import 'package:later_mobile/design_system/tokens/tokens.dart';
 import 'package:later_mobile/l10n/app_localizations.dart';
 
-import '../../../../core/utils/responsive_modal.dart';
+import 'package:later_mobile/core/utils/responsive_modal.dart';
 import '../../domain/models/note.dart';
 import '../controllers/notes_controller.dart';
 

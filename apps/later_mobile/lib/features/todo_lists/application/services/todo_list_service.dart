@@ -1,4 +1,4 @@
-import '../../../../core/error/error.dart';
+import 'package:later_mobile/core/error/error.dart';
 import '../../data/repositories/todo_list_repository.dart';
 import '../../domain/models/todo_item.dart';
 import '../../domain/models/todo_list.dart';

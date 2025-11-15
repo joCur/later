@@ -17,7 +17,7 @@ part of 'auth_state_controller.dart';
 /// - AsyncValue.error: Authentication error occurred
 ///
 /// Riverpod 3.0 features:
-/// - Auto-disposed by default
+/// - keepAlive: true to prevent disposal and maintain auth stream subscription
 /// - Automatic retry on initialization failures
 /// - `ref.mounted` checks for async safety
 
@@ -33,7 +33,7 @@ const authStateControllerProvider = AuthStateControllerProvider._();
 /// - AsyncValue.error: Authentication error occurred
 ///
 /// Riverpod 3.0 features:
-/// - Auto-disposed by default
+/// - keepAlive: true to prevent disposal and maintain auth stream subscription
 /// - Automatic retry on initialization failures
 /// - `ref.mounted` checks for async safety
 final class AuthStateControllerProvider
@@ -47,7 +47,7 @@ final class AuthStateControllerProvider
   /// - AsyncValue.error: Authentication error occurred
   ///
   /// Riverpod 3.0 features:
-  /// - Auto-disposed by default
+  /// - keepAlive: true to prevent disposal and maintain auth stream subscription
   /// - Automatic retry on initialization failures
   /// - `ref.mounted` checks for async safety
   const AuthStateControllerProvider._()
@@ -56,7 +56,7 @@ final class AuthStateControllerProvider
         argument: null,
         retry: null,
         name: r'authStateControllerProvider',
-        isAutoDispose: true,
+        isAutoDispose: false,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -70,7 +70,7 @@ final class AuthStateControllerProvider
 }
 
 String _$authStateControllerHash() =>
-    r'0d0aa1e3c087aa60ba97676830b1ff0743d15dca';
+    r'c9ccf21340aed2c620350b3d4af2313beacd307d';
 
 /// Controller for authentication state management
 ///
@@ -81,7 +81,7 @@ String _$authStateControllerHash() =>
 /// - AsyncValue.error: Authentication error occurred
 ///
 /// Riverpod 3.0 features:
-/// - Auto-disposed by default
+/// - keepAlive: true to prevent disposal and maintain auth stream subscription
 /// - Automatic retry on initialization failures
 /// - `ref.mounted` checks for async safety
 

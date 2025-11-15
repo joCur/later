@@ -77,7 +77,7 @@ final class ThemeControllerProvider
         argument: null,
         retry: null,
         name: r'themeControllerProvider',
-        isAutoDispose: true,
+        isAutoDispose: false,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -98,7 +98,7 @@ final class ThemeControllerProvider
   }
 }
 
-String _$themeControllerHash() => r'35cc7b0d825fb1081c93732d42db497d6c7bb924';
+String _$themeControllerHash() => r'283aa689f1952db29e964653be3c56c5a3b106fc';
 
 /// Theme controller managing application theme state with Riverpod 3.0
 ///

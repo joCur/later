@@ -10,7 +10,8 @@ part 'spaces_controller.g.dart';
 /// Manages AsyncValue with list of spaces for all spaces.
 /// Provides methods for CRUD operations on spaces.
 /// Uses SpaceService for business logic.
-@riverpod
+/// keepAlive: true prevents disposal and avoids unnecessary re-fetches.
+@Riverpod(keepAlive: true)
 class SpacesController extends _$SpacesController {
   @override
   Future<List<Space>> build() async {

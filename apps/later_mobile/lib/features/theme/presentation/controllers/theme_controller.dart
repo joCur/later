@@ -25,7 +25,7 @@ part 'theme_controller.g.dart';
 /// // Set specific mode
 /// ref.read(themeControllerProvider.notifier).setThemeMode(ThemeMode.dark);
 /// ```
-@riverpod
+@Riverpod(keepAlive: true)
 class ThemeController extends _$ThemeController {
   late ThemeService _service;
 

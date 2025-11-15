@@ -5,7 +5,7 @@ import 'package:later_mobile/core/error/app_error.dart';
 import 'package:later_mobile/design_system/design_system.dart';
 import 'package:later_mobile/features/auth/presentation/controllers/auth_state_controller.dart';
 import 'package:later_mobile/l10n/app_localizations.dart';
-import 'package:later_mobile/widgets/screens/auth/sign_in_screen.dart';
+import 'package:later_mobile/features/auth/presentation/screens/sign_in_screen.dart';
 
 /// Screen for signing up new users
 ///

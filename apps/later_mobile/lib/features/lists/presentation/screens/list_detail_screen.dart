@@ -11,7 +11,7 @@ import 'package:later_mobile/data/models/list_style.dart';
 import 'package:later_mobile/design_system/organisms/cards/list_item_card.dart';
 import 'package:later_mobile/design_system/organisms/fab/responsive_fab.dart';
 import 'package:later_mobile/design_system/organisms/modals/bottom_sheet_container.dart';
-import '../../../../core/utils/responsive_modal.dart';
+import 'package:later_mobile/core/utils/responsive_modal.dart';
 import 'package:later_mobile/design_system/atoms/inputs/text_input_field.dart';
 import 'package:later_mobile/design_system/atoms/inputs/text_area_field.dart';
 import 'package:later_mobile/design_system/organisms/dialogs/delete_confirmation_dialog.dart';

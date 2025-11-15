@@ -18,10 +18,17 @@ This is a monorepo with a single Flutter mobile app:
 │   ├── lib/
 │   │   ├── core/               # Core utilities, theme, error handling
 │   │   ├── design_system/      # Atomic Design components (atoms/molecules/organisms)
-│   │   ├── data/               # Data layer (models, repositories, local storage)
-│   │   ├── providers/          # State management (Provider pattern)
-│   │   └── widgets/            # Feature screens and modals
-│   └── test/                   # Comprehensive test suite (200+ tests, >70% coverage)
+│   │   ├── data/               # Legacy data layer (local storage, some models)
+│   │   ├── features/           # Feature-first organization (Riverpod 3.0)
+│   │   │   ├── auth/           # Authentication feature
+│   │   │   ├── theme/          # Theme management feature
+│   │   │   ├── spaces/         # Spaces feature
+│   │   │   ├── notes/          # Notes feature
+│   │   │   ├── todo_lists/     # TodoLists feature
+│   │   │   ├── lists/          # Custom lists feature
+│   │   │   └── home/           # Home screen feature
+│   │   └── widgets/            # Legacy widgets (being migrated to features)
+│   └── test/                   # Comprehensive test suite (1195+ tests, >70% coverage)
 ├── design-documentation/       # Complete design system documentation
 ├── .claude/                    # Claude Code plans and research
 ```
@@ -79,19 +86,28 @@ dart run build_runner clean                                # Clean generated fil
 - Key repositories: `NoteRepository`, `TodoListRepository`, `ListRepository`, `SpaceRepository`
 
 **Authentication:**
-- `AuthService` (`data/services/auth_service.dart`) - Handles Supabase Auth operations
-- `AuthProvider` - State management for authentication state
+- `AuthService` (`features/auth/data/services/auth_service.dart`) - Handles Supabase Auth operations
+- `AuthApplicationService` (`features/auth/application/`) - Business logic layer for authentication
+- `AuthStateController` (`features/auth/presentation/controllers/`) - Riverpod controller managing authentication state with stream subscription (keepAlive)
 - `AuthGate` widget - Routes between auth screens and main app based on auth state
 - All repositories automatically filter data by `user_id` from current auth session
 
 **State Management:**
-- **Provider** for state management (not Riverpod, not Bloc)
-- Main providers:
-  - `AuthProvider` - manages authentication state and auth operations
-  - `ContentProvider` - manages all content items (notes, todos, lists) with caching
-  - `SpacesProvider` - manages spaces and active space selection
-  - `ThemeProvider` - manages light/dark theme
-- Providers handle loading states, error states, and async operations
+- **Riverpod 3.0.3** for state management (migrated from Provider in November 2025)
+- Feature-first architecture with Clean Architecture layers (Domain, Data, Application, Presentation)
+- Main controllers (all use `@riverpod` code generation):
+  - `AuthStateController` - manages authentication state and stream subscription (keepAlive)
+  - `ThemeController` - manages light/dark theme (keepAlive)
+  - `SpacesController` - manages all spaces (keepAlive)
+  - `CurrentSpaceController` - manages currently selected space (keepAlive)
+  - `NotesController(spaceId)` - manages notes for specific space (auto-dispose family)
+  - `TodoListsController(spaceId)` - manages todo lists for specific space (auto-dispose family)
+  - `ListsController(spaceId)` - manages custom lists for specific space (auto-dispose family)
+  - `TodoItemsController(listId)` - manages items for specific todo list (auto-dispose family)
+  - `ListItemsController(listId)` - manages items for specific list (auto-dispose family)
+  - `ContentFilterController` - manages home screen filter state (auto-dispose)
+- Controllers handle loading states (AsyncValue.loading/data/error), error states, and async operations
+- Code generation: Run `dart run build_runner watch` during development
 
 ### Error Handling
 
@@ -112,8 +128,9 @@ The app uses a **centralized error code system** with localization support. All 
 
 **Error Flow:**
 1. **Repository Layer**: Catch third-party exceptions (PostgrestException, AuthException) and map to AppError using error mappers
-2. **Provider Layer**: Catch AppError, log with ErrorLogger, store in error state
-3. **UI Layer**: Display localized error messages using ErrorDialog or ErrorSnackBar
+2. **Service Layer**: Business logic catches AppError, may add context, passes to controller
+3. **Controller Layer** (Riverpod): Catch AppError, log with ErrorLogger, store in AsyncValue.error state
+4. **UI Layer**: Display localized error messages using ErrorDialog or ErrorSnackBar
 
 **How to Handle Errors in Repositories:**
 
@@ -145,25 +162,42 @@ class MyRepository extends BaseRepository {
 }
 ```
 
-**How to Handle Errors in Providers:**
+**How to Handle Errors in Controllers (Riverpod 3.0):**
 
 ```dart
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:later_mobile/core/error/error.dart';
 
-class MyProvider extends ChangeNotifier {
-  AppError? _error;
+part 'my_controller.g.dart';
+
+@riverpod
+class MyController extends _$MyController {
+  @override
+  Future<MyData> build() async {
+    // Load initial data
+    final service = ref.watch(myServiceProvider);
+    return service.loadData();
+  }
 
   Future<void> performAction() async {
-    try {
-      _error = null;
-      notifyListeners();
+    // Set loading state
+    state = const AsyncValue.loading();
 
-      await repository.myOperation();
+    try {
+      final service = ref.read(myServiceProvider);
+      final result = await service.performAction();
+
+      // Check if still mounted before updating (Riverpod 3.0 feature)
+      if (!ref.mounted) return;
+
+      // Update state with success
+      state = AsyncValue.data(result);
     } on AppError catch (e) {
-      // Log and store the error
-      ErrorLogger.logError(e, context: 'MyProvider.performAction');
-      _error = e;
-      notifyListeners();
+      // Log and store the error in AsyncValue.error
+      ErrorLogger.logError(e, context: 'MyController.performAction');
+
+      if (!ref.mounted) return;
+      state = AsyncValue.error(e, StackTrace.current);
     } catch (e, stackTrace) {
       // Wrap unexpected errors
       final error = AppError(
@@ -171,35 +205,62 @@ class MyProvider extends ChangeNotifier {
         message: 'Unexpected error in performAction: $e',
         technicalDetails: e.toString(),
       );
-      ErrorLogger.logError(error, context: 'MyProvider.performAction');
-      _error = error;
-      notifyListeners();
+      ErrorLogger.logError(error, context: 'MyController.performAction');
+
+      if (!ref.mounted) return;
+      state = AsyncValue.error(error, stackTrace);
     }
   }
 }
 ```
 
-**How to Display Errors in UI:**
+**How to Display Errors in UI (Riverpod 3.0):**
 
 ```dart
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:later_mobile/core/error/error_handler.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
-// Show error dialog
-if (provider.error != null) {
-  ErrorHandler.showErrorDialog(
-    context,
-    provider.error!,
-    onRetry: provider.error!.isRetryable ? () => provider.retry() : null,
-  );
+// In a ConsumerWidget
+class MyScreen extends ConsumerWidget {
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final asyncValue = ref.watch(myControllerProvider);
+
+    return asyncValue.when(
+      data: (data) => MyDataView(data: data),
+      loading: () => CircularProgressIndicator(),
+      error: (error, stackTrace) {
+        // error is an AppError from controller
+        final appError = error as AppError;
+
+        // Show error UI
+        return ErrorView(
+          error: appError,
+          onRetry: appError.isRetryable
+              ? () => ref.invalidate(myControllerProvider)
+              : null,
+        );
+      },
+    );
+  }
 }
 
-// Show error snackbar
-ErrorHandler.showErrorSnackBar(
-  context,
-  provider.error!,
-  onRetry: provider.error!.isRetryable ? () => provider.retry() : null,
-);
+// Or show error dialog on error
+ref.listen(myControllerProvider, (previous, next) {
+  next.whenOrNull(
+    error: (error, stackTrace) {
+      final appError = error as AppError;
+      ErrorHandler.showErrorDialog(
+        context,
+        appError,
+        onRetry: appError.isRetryable
+            ? () => ref.invalidate(myControllerProvider)
+            : null,
+      );
+    },
+  );
+});
 
 // Get localized message directly
 final localizations = AppLocalizations.of(context);

@@ -28,12 +28,12 @@ import 'package:later_mobile/features/notes/presentation/controllers/notes_contr
 import 'package:later_mobile/features/todo_lists/presentation/controllers/todo_lists_controller.dart';
 import 'package:later_mobile/features/lists/presentation/controllers/lists_controller.dart';
 import 'package:later_mobile/features/home/presentation/controllers/content_filter_controller.dart';
-import 'package:later_mobile/widgets/modals/create_content_modal.dart';
-import 'package:later_mobile/widgets/modals/create_space_modal.dart'
+import 'package:later_mobile/features/home/presentation/widgets/create_content_modal.dart';
+import 'package:later_mobile/features/spaces/presentation/widgets/create_space_modal.dart'
     show CreateSpaceModal, SpaceModalMode;
-import 'package:later_mobile/widgets/modals/space_switcher_modal.dart';
-import 'package:later_mobile/widgets/navigation/app_sidebar.dart';
-import 'package:later_mobile/widgets/navigation/icon_only_bottom_nav.dart';
+import 'package:later_mobile/features/spaces/presentation/widgets/space_switcher_modal.dart';
+import 'package:later_mobile/shared/widgets/navigation/app_sidebar.dart';
+import 'package:later_mobile/shared/widgets/navigation/icon_only_bottom_nav.dart';
 import 'package:later_mobile/features/lists/presentation/screens/list_detail_screen.dart';
 import 'package:later_mobile/features/notes/presentation/screens/note_detail_screen.dart';
 import 'package:later_mobile/features/todo_lists/presentation/screens/todo_list_detail_screen.dart';
@@ -486,9 +486,65 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       itemCount: itemCount,
       buildDefaultDragHandles: false,
       onReorder: (oldIndex, newIndex) async {
-        // Reordering temporarily disabled during Riverpod migration
-        // TODO: Implement per-controller reordering in Phase 8
-        return;
+        // Adjust newIndex if moving down (Flutter's ReorderableListView behavior)
+        if (newIndex > oldIndex) {
+          newIndex -= 1;
+        }
+
+        // Get current space ID
+        final currentSpace = ref.read(currentSpaceControllerProvider).when(
+          data: (space) => space,
+          loading: () => null,
+          error: (error, stack) => null,
+        );
+        if (currentSpace == null) return;
+
+        // Create a mutable copy of content and perform reorder
+        final reorderedContent = List<dynamic>.from(content);
+        final item = reorderedContent.removeAt(oldIndex);
+        reorderedContent.insert(newIndex, item);
+
+        // Group items by type and extract IDs in new order
+        final noteIds = <String>[];
+        final todoListIds = <String>[];
+        final listIds = <String>[];
+
+        for (final item in reorderedContent) {
+          if (item is Note) {
+            noteIds.add(item.id);
+          } else if (item is TodoList) {
+            todoListIds.add(item.id);
+          } else if (item is ListModel) {
+            listIds.add(item.id);
+          }
+        }
+
+        // Call reorder on each controller with the new IDs in order
+        final futures = <Future<void>>[];
+
+        if (noteIds.isNotEmpty) {
+          futures.add(
+            ref.read(notesControllerProvider(currentSpace.id).notifier)
+                .reorderLists(noteIds),
+          );
+        }
+
+        if (todoListIds.isNotEmpty) {
+          futures.add(
+            ref.read(todoListsControllerProvider(currentSpace.id).notifier)
+                .reorderLists(todoListIds),
+          );
+        }
+
+        if (listIds.isNotEmpty) {
+          futures.add(
+            ref.read(listsControllerProvider(currentSpace.id).notifier)
+                .reorderLists(listIds),
+          );
+        }
+
+        // Wait for all reorders to complete
+        await Future.wait(futures);
       },
       itemBuilder: (context, index) {
         // Load more button at the end

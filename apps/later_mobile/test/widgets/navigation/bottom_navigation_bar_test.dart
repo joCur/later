@@ -2,7 +2,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:later_mobile/core/theme/temporal_flow_theme.dart';
-import 'package:later_mobile/widgets/navigation/bottom_navigation_bar.dart';
+import 'package:later_mobile/shared/widgets/navigation/bottom_navigation_bar.dart';
 import 'package:later_mobile/design_system/tokens/tokens.dart';
 
 void main() {

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+// ignore: implementation_imports, depend_on_referenced_packages
 import 'package:riverpod/src/framework.dart' show Override;
 import 'package:later_mobile/core/theme/temporal_flow_theme.dart';
 import 'package:later_mobile/l10n/app_localizations.dart';

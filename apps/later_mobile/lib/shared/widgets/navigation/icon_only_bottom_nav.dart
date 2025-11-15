@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:later_mobile/l10n/app_localizations.dart';
 import 'package:later_mobile/design_system/tokens/tokens.dart';
-import '../../core/theme/temporal_flow_theme.dart';
+import 'package:later_mobile/core/theme/temporal_flow_theme.dart';
 
 // Design Constants (Phase 2 - Mobile-First Bold Redesign)
 const double _kNavBarHeight = 60.0; // Reduced from 64px

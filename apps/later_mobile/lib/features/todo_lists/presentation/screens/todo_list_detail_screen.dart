@@ -19,7 +19,7 @@ import 'package:later_mobile/features/todo_lists/domain/models/todo_priority.dar
 import 'package:later_mobile/l10n/app_localizations.dart';
 import 'package:uuid/uuid.dart';
 
-import '../../../../core/utils/responsive_modal.dart';
+import 'package:later_mobile/core/utils/responsive_modal.dart';
 import '../controllers/todo_items_controller.dart';
 import '../controllers/todo_lists_controller.dart';
 

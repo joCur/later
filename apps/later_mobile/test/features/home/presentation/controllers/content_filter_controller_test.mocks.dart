@@ -107,6 +107,15 @@ class MockNoteService extends _i1.Mock implements _i7.NoteService {
           as _i8.Future<void>);
 
   @override
+  _i8.Future<void> reorderNotes(String? spaceId, List<String>? orderedIds) =>
+      (super.noSuchMethod(
+            Invocation.method(#reorderNotes, [spaceId, orderedIds]),
+            returnValue: _i8.Future<void>.value(),
+            returnValueForMissingStub: _i8.Future<void>.value(),
+          )
+          as _i8.Future<void>);
+
+  @override
   _i8.Future<_i2.Note> toggleFavorite(String? id) =>
       (super.noSuchMethod(
             Invocation.method(#toggleFavorite, [id]),

@@ -4,15 +4,14 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:later_mobile/core/theme/app_theme.dart';
 import 'package:later_mobile/core/theme/temporal_flow_theme.dart';
 import 'package:later_mobile/data/local/preferences_service.dart';
-import 'package:later_mobile/features/theme/presentation/controllers/theme_controller.dart';
 import 'package:later_mobile/design_system/atoms/buttons/theme_toggle_button.dart';
+import 'package:later_mobile/features/theme/presentation/controllers/theme_controller.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 // Mock ThemeController for testing
 class MockThemeController extends ThemeController {
-  final ThemeMode initialMode;
-
   MockThemeController(this.initialMode);
+  final ThemeMode initialMode;
 
   @override
   ThemeMode build() {
@@ -44,7 +43,9 @@ void main() {
   Widget createTestWidget({ThemeMode initialThemeMode = ThemeMode.light}) {
     return ProviderScope(
       overrides: [
-        themeControllerProvider.overrideWith(() => MockThemeController(initialThemeMode)),
+        themeControllerProvider.overrideWith(
+          () => MockThemeController(initialThemeMode),
+        ),
       ],
       child: MaterialApp(
         theme: AppTheme.lightTheme.copyWith(
@@ -141,32 +142,44 @@ void main() {
       expect(semantics, isNotNull);
     });
 
-    testWidgets('tooltip should reflect current theme state (light mode)', (tester) async {
-      await tester.pumpWidget(createTestWidget(initialThemeMode: ThemeMode.light));
+    testWidgets('tooltip should reflect current theme state (light mode)', (
+      tester,
+    ) async {
+      await tester.pumpWidget(createTestWidget());
 
       final iconButton = tester.widget<IconButton>(find.byType(IconButton));
       // In light mode, tooltip should say "Switch to dark mode"
       expect(iconButton.tooltip, equals('Switch to dark mode'));
     });
 
-    testWidgets('tooltip should reflect current theme state (dark mode)', (tester) async {
-      await tester.pumpWidget(createTestWidget(initialThemeMode: ThemeMode.dark));
+    testWidgets('tooltip should reflect current theme state (dark mode)', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        createTestWidget(initialThemeMode: ThemeMode.dark),
+      );
 
       final iconButton = tester.widget<IconButton>(find.byType(IconButton));
       // In dark mode, tooltip should say "Switch to light mode"
       expect(iconButton.tooltip, equals('Switch to light mode'));
     });
 
-    testWidgets('icon should show dark_mode icon in light theme', (tester) async {
-      await tester.pumpWidget(createTestWidget(initialThemeMode: ThemeMode.light));
+    testWidgets('icon should show dark_mode icon in light theme', (
+      tester,
+    ) async {
+      await tester.pumpWidget(createTestWidget());
 
       // Should show dark_mode icon (moon) when in light mode
       final icon = tester.widget<Icon>(find.byType(Icon));
       expect(icon.icon, equals(Icons.dark_mode));
     });
 
-    testWidgets('icon should show light_mode icon in dark theme', (tester) async {
-      await tester.pumpWidget(createTestWidget(initialThemeMode: ThemeMode.dark));
+    testWidgets('icon should show light_mode icon in dark theme', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        createTestWidget(initialThemeMode: ThemeMode.dark),
+      );
 
       // Should show light_mode icon (sun) when in dark mode
       final icon = tester.widget<Icon>(find.byType(Icon));

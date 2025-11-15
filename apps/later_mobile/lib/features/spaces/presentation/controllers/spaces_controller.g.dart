@@ -13,6 +13,7 @@ part of 'spaces_controller.dart';
 /// Manages AsyncValue with list of spaces for all spaces.
 /// Provides methods for CRUD operations on spaces.
 /// Uses SpaceService for business logic.
+/// keepAlive: true prevents disposal and avoids unnecessary re-fetches.
 
 @ProviderFor(SpacesController)
 const spacesControllerProvider = SpacesControllerProvider._();
@@ -22,6 +23,7 @@ const spacesControllerProvider = SpacesControllerProvider._();
 /// Manages AsyncValue with list of spaces for all spaces.
 /// Provides methods for CRUD operations on spaces.
 /// Uses SpaceService for business logic.
+/// keepAlive: true prevents disposal and avoids unnecessary re-fetches.
 final class SpacesControllerProvider
     extends $AsyncNotifierProvider<SpacesController, List<Space>> {
   /// Controller for managing spaces state.
@@ -29,13 +31,14 @@ final class SpacesControllerProvider
   /// Manages AsyncValue with list of spaces for all spaces.
   /// Provides methods for CRUD operations on spaces.
   /// Uses SpaceService for business logic.
+  /// keepAlive: true prevents disposal and avoids unnecessary re-fetches.
   const SpacesControllerProvider._()
     : super(
         from: null,
         argument: null,
         retry: null,
         name: r'spacesControllerProvider',
-        isAutoDispose: true,
+        isAutoDispose: false,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -48,13 +51,14 @@ final class SpacesControllerProvider
   SpacesController create() => SpacesController();
 }
 
-String _$spacesControllerHash() => r'352628233b902cffb4d6a9315d8ba94d073fa23d';
+String _$spacesControllerHash() => r'342ff7d9898782f14206fed931237559cf957649';
 
 /// Controller for managing spaces state.
 ///
 /// Manages AsyncValue with list of spaces for all spaces.
 /// Provides methods for CRUD operations on spaces.
 /// Uses SpaceService for business logic.
+/// keepAlive: true prevents disposal and avoids unnecessary re-fetches.
 
 abstract class _$SpacesController extends $AsyncNotifier<List<Space>> {
   FutureOr<List<Space>> build();

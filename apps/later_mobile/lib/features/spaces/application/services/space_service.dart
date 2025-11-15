@@ -1,6 +1,6 @@
 import '../../data/repositories/space_repository.dart';
 import '../../domain/models/space.dart';
-import '../../../../core/error/error.dart';
+import 'package:later_mobile/core/error/error.dart';
 
 /// Application service for space business logic.
 ///

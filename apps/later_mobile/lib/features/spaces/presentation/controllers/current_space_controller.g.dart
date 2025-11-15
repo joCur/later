@@ -13,6 +13,7 @@ part of 'current_space_controller.dart';
 /// Manages AsyncValue with current space for the active space.
 /// Persists selection to SharedPreferences.
 /// Single source of truth for current space selection.
+/// keepAlive: true prevents disposal and maintains current space state.
 
 @ProviderFor(CurrentSpaceController)
 const currentSpaceControllerProvider = CurrentSpaceControllerProvider._();
@@ -22,6 +23,7 @@ const currentSpaceControllerProvider = CurrentSpaceControllerProvider._();
 /// Manages AsyncValue with current space for the active space.
 /// Persists selection to SharedPreferences.
 /// Single source of truth for current space selection.
+/// keepAlive: true prevents disposal and maintains current space state.
 final class CurrentSpaceControllerProvider
     extends $AsyncNotifierProvider<CurrentSpaceController, Space?> {
   /// Controller for managing current space selection.
@@ -29,13 +31,14 @@ final class CurrentSpaceControllerProvider
   /// Manages AsyncValue with current space for the active space.
   /// Persists selection to SharedPreferences.
   /// Single source of truth for current space selection.
+  /// keepAlive: true prevents disposal and maintains current space state.
   const CurrentSpaceControllerProvider._()
     : super(
         from: null,
         argument: null,
         retry: null,
         name: r'currentSpaceControllerProvider',
-        isAutoDispose: true,
+        isAutoDispose: false,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -49,13 +52,14 @@ final class CurrentSpaceControllerProvider
 }
 
 String _$currentSpaceControllerHash() =>
-    r'8d4db1b7d558cc959f54c8997fbf8c7e1e516264';
+    r'a9d8a0ac7f2527c67452a580a8434b10274aedd8';
 
 /// Controller for managing current space selection.
 ///
 /// Manages AsyncValue with current space for the active space.
 /// Persists selection to SharedPreferences.
 /// Single source of truth for current space selection.
+/// keepAlive: true prevents disposal and maintains current space state.
 
 abstract class _$CurrentSpaceController extends $AsyncNotifier<Space?> {
   FutureOr<Space?> build();

@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:uuid/uuid.dart';
-import 'package:later_mobile/design_system/tokens/tokens.dart';
-import '../../features/spaces/domain/models/space.dart';
-import '../../features/auth/presentation/controllers/auth_state_controller.dart';
-import '../../features/spaces/presentation/controllers/spaces_controller.dart';
-// import '../../providers/spaces_provider.dart'; // TODO: Remove after Phase 8
 import 'package:later_mobile/design_system/atoms/inputs/text_input_field.dart';
 import 'package:later_mobile/design_system/organisms/modals/bottom_sheet_container.dart';
+import 'package:later_mobile/design_system/tokens/tokens.dart';
+import 'package:uuid/uuid.dart';
+
+import 'package:later_mobile/features/auth/presentation/controllers/auth_state_controller.dart';
+import 'package:later_mobile/features/spaces/domain/models/space.dart';
+import 'package:later_mobile/features/spaces/presentation/controllers/spaces_controller.dart';
 
 /// Mode for the CreateSpaceModal
 enum SpaceModalMode {
