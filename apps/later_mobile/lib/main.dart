@@ -2,21 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:provider/provider.dart' as provider;
 import 'l10n/app_localizations.dart';
 import 'core/config/supabase_config.dart';
 import 'core/error/error_handler.dart';
 import 'core/theme/app_theme.dart';
 import 'data/local/preferences_service.dart';
-import 'features/lists/data/repositories/list_repository.dart';
-import 'features/notes/data/repositories/note_repository.dart';
-import 'features/spaces/data/repositories/space_repository.dart';
-import 'features/todo_lists/data/repositories/todo_list_repository.dart';
 import 'features/theme/presentation/controllers/theme_controller.dart';
-import 'providers/auth_provider.dart';
-import 'providers/content_provider.dart';
-import 'providers/spaces_provider.dart';
-import 'providers/theme_provider.dart';
 import 'widgets/auth/auth_gate.dart';
 
 void main() async {
@@ -57,30 +48,9 @@ class LaterApp extends StatefulWidget {
 class _LaterAppState extends State<LaterApp> {
   @override
   Widget build(BuildContext context) {
-    // Wrap with ProviderScope for Riverpod (coexists with MultiProvider during migration)
-    return ProviderScope(
-      child: provider.MultiProvider(
-        providers: [
-          provider.ChangeNotifierProvider(
-            create: (_) => AuthProvider(),
-          ),
-          // Keep ThemeProvider temporarily during migration (unused)
-          provider.ChangeNotifierProvider(
-            create: (_) => ThemeProvider()..loadThemePreference(),
-          ),
-          provider.ChangeNotifierProvider(
-            create: (_) => SpacesProvider(SpaceRepository()),
-          ),
-          provider.ChangeNotifierProvider(
-            create: (_) => ContentProvider(
-              todoListRepository: TodoListRepository(),
-              listRepository: ListRepository(),
-              noteRepository: NoteRepository(),
-            ),
-          ),
-        ],
-        child: const _MyApp(),
-      ),
+    // Wrap with ProviderScope for Riverpod 3.0
+    return const ProviderScope(
+      child: _MyApp(),
     );
   }
 }
