@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:later_mobile/core/theme/temporal_flow_theme.dart';
 import 'package:later_mobile/features/auth/application/auth_application_service.dart';
 import 'package:later_mobile/features/auth/application/providers.dart';
 import 'package:later_mobile/features/auth/presentation/screens/sign_in_screen.dart';
+import 'package:later_mobile/l10n/app_localizations.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../../../../test_helpers.dart';
 import 'sign_in_screen_test.mocks.dart';
 
 @GenerateMocks([AuthApplicationService, User, Session])
@@ -35,16 +37,40 @@ void main() {
         ),
       );
 
-      // Act
+      // Act - Don't use testApp() since SignInScreen already has Scaffold
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
             authApplicationServiceProvider.overrideWithValue(mockService),
           ],
-          child: testApp(const SignInScreen()),
+          child: MaterialApp(
+            theme: ThemeData.light().copyWith(
+              extensions: <ThemeExtension<dynamic>>[
+                TemporalFlowTheme.light(),
+              ],
+            ),
+            localizationsDelegates: const [
+              AppLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            supportedLocales: const [Locale('en'), Locale('de')],
+            home: const SignInScreen(),
+          ),
         ),
       );
-      await tester.pumpAndSettle();
+
+      // Wait for async provider initialization and all animations
+      await tester.pump(); // Initial build
+      await tester.pump(); // Provider build complete
+      await tester.pump(); // Stream subscription
+
+      // Pump multiple frames to allow animations (with durations) to progress
+      for (int i = 0; i < 10; i++) {
+        await tester.pump(const Duration(milliseconds: 100));
+      }
+      await tester.pump(); // Final frame
 
       // Assert - verify form fields exist
       expect(find.byType(TextFormField), findsNWidgets(2));
@@ -59,16 +85,40 @@ void main() {
         ),
       );
 
-      // Act
+      // Act - Don't use testApp() since SignInScreen already has Scaffold
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
             authApplicationServiceProvider.overrideWithValue(mockService),
           ],
-          child: testApp(const SignInScreen()),
+          child: MaterialApp(
+            theme: ThemeData.light().copyWith(
+              extensions: <ThemeExtension<dynamic>>[
+                TemporalFlowTheme.light(),
+              ],
+            ),
+            localizationsDelegates: const [
+              AppLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            supportedLocales: const [Locale('en'), Locale('de')],
+            home: const SignInScreen(),
+          ),
         ),
       );
-      await tester.pumpAndSettle();
+
+      // Wait for async provider initialization and all animations
+      await tester.pump(); // Initial build
+      await tester.pump(); // Provider build complete
+      await tester.pump(); // Stream subscription
+
+      // Pump multiple frames to allow animations (with durations) to progress
+      for (int i = 0; i < 10; i++) {
+        await tester.pump(const Duration(milliseconds: 100));
+      }
+      await tester.pump(); // Final frame
 
       // Assert - verify sign in button exists
       // The button text comes from localization

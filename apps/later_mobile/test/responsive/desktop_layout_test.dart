@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:later_mobile/core/responsive/breakpoints.dart';
+import 'package:later_mobile/data/local/preferences_service.dart';
 import 'package:later_mobile/shared/widgets/navigation/app_sidebar.dart';
 import 'package:later_mobile/shared/widgets/navigation/icon_only_bottom_nav.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../test_helpers.dart';
 
@@ -28,6 +30,11 @@ import '../test_helpers.dart';
 /// - Layout constraints are applied
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
+
+  setUp(() async {
+    SharedPreferences.setMockInitialValues({});
+    await PreferencesService.initialize();
+  });
 
   group('Desktop Layout Tests - 1280px (Standard HD)', () {
     const testWidth = 1280.0;

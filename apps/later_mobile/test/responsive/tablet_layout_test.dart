@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:later_mobile/core/responsive/breakpoints.dart';
 import 'package:later_mobile/core/responsive/responsive_layout.dart';
+import 'package:later_mobile/data/local/preferences_service.dart';
 import 'package:later_mobile/shared/widgets/navigation/app_sidebar.dart';
 import 'package:later_mobile/shared/widgets/navigation/icon_only_bottom_nav.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../test_helpers.dart';
 
@@ -27,6 +29,11 @@ import '../test_helpers.dart';
 /// - No overflow or layout issues
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
+
+  setUp(() async {
+    SharedPreferences.setMockInitialValues({});
+    await PreferencesService.initialize();
+  });
 
   group('Tablet Layout Tests - 768px (iPad Mini)', () {
     const testWidth = 768.0;
