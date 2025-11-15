@@ -20,7 +20,7 @@ import '../../core/utils/item_type_detector.dart';
 import '../../core/utils/responsive_modal.dart';
 import 'package:later_mobile/data/models/list_model.dart';
 import 'package:later_mobile/features/notes/domain/models/note.dart';
-import 'package:later_mobile/data/models/todo_list_model.dart';
+import 'package:later_mobile/features/todo_lists/domain/models/todo_list.dart';
 import '../../features/spaces/domain/models/space.dart';
 import '../../features/spaces/presentation/controllers/spaces_controller.dart';
 import '../../features/spaces/presentation/controllers/current_space_controller.dart';
@@ -36,7 +36,7 @@ import '../navigation/app_sidebar.dart';
 import '../navigation/icon_only_bottom_nav.dart';
 import 'list_detail_screen.dart';
 import '../../features/notes/presentation/screens/note_detail_screen.dart';
-import 'todo_list_detail_screen.dart';
+import '../../features/todo_lists/presentation/screens/todo_list_detail_screen.dart';
 
 /// Main home screen for the Later app
 ///

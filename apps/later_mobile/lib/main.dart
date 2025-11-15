@@ -11,7 +11,7 @@ import 'data/local/preferences_service.dart';
 import 'data/repositories/list_repository.dart';
 import 'features/notes/data/repositories/note_repository.dart';
 import 'features/spaces/data/repositories/space_repository.dart';
-import 'data/repositories/todo_list_repository.dart';
+import 'features/todo_lists/data/repositories/todo_list_repository.dart';
 import 'features/theme/presentation/controllers/theme_controller.dart';
 import 'providers/auth_provider.dart';
 import 'providers/content_provider.dart';

@@ -1,24 +1,27 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
-import 'package:uuid/uuid.dart';
-import 'package:later_mobile/l10n/app_localizations.dart';
-import 'package:later_mobile/design_system/tokens/tokens.dart';
-import '../../core/utils/responsive_modal.dart';
-import 'package:later_mobile/data/models/todo_list_model.dart';
-import 'package:later_mobile/data/models/todo_item_model.dart';
-import 'package:later_mobile/data/models/todo_priority.dart';
-import '../../providers/content_provider.dart';
-import 'package:later_mobile/design_system/organisms/cards/todo_item_card.dart';
-import 'package:later_mobile/design_system/organisms/fab/responsive_fab.dart';
-import 'package:later_mobile/design_system/organisms/modals/bottom_sheet_container.dart';
-import 'package:later_mobile/design_system/atoms/inputs/text_input_field.dart';
 import 'package:later_mobile/design_system/atoms/inputs/text_area_field.dart';
-import 'package:later_mobile/design_system/organisms/dialogs/delete_confirmation_dialog.dart';
+import 'package:later_mobile/design_system/atoms/inputs/text_input_field.dart';
 import 'package:later_mobile/design_system/molecules/app_bars/editable_app_bar_title.dart';
 import 'package:later_mobile/design_system/molecules/lists/dismissible_list_item.dart';
+import 'package:later_mobile/design_system/organisms/cards/todo_item_card.dart';
+import 'package:later_mobile/design_system/organisms/dialogs/delete_confirmation_dialog.dart';
 import 'package:later_mobile/design_system/organisms/empty_states/animated_empty_state.dart';
+import 'package:later_mobile/design_system/organisms/fab/responsive_fab.dart';
+import 'package:later_mobile/design_system/organisms/modals/bottom_sheet_container.dart';
+import 'package:later_mobile/design_system/tokens/tokens.dart';
+import 'package:later_mobile/features/todo_lists/domain/models/todo_item.dart';
+import 'package:later_mobile/features/todo_lists/domain/models/todo_list.dart';
+import 'package:later_mobile/features/todo_lists/domain/models/todo_priority.dart';
+import 'package:later_mobile/l10n/app_localizations.dart';
+import 'package:provider/provider.dart';
+import 'package:uuid/uuid.dart';
+
+import '../../../../providers/content_provider.dart';
+import '../../core/utils/responsive_modal.dart';
+import '../../providers/content_provider.dart';
 
 /// TodoList Detail Screen for viewing and editing TodoList with TodoItems
 ///
@@ -193,7 +196,9 @@ class _TodoListDetailScreenState extends State<TodoListDetailScreen> {
     try {
       final provider = Provider.of<ContentProvider>(context, listen: false);
       // Set sortOrder to be at the end of current items
-      final itemWithSortOrder = result.copyWith(sortOrder: _currentItems.length);
+      final itemWithSortOrder = result.copyWith(
+        sortOrder: _currentItems.length,
+      );
       // createTodoItem takes a TodoItem directly
       await provider.createTodoItem(itemWithSortOrder);
 
@@ -225,7 +230,8 @@ class _TodoListDetailScreenState extends State<TodoListDetailScreen> {
 
       if (mounted) _showSnackBar(l10n.todoDetailItemUpdated);
     } catch (e) {
-      if (mounted) _showSnackBar(l10n.todoDetailItemUpdateFailed, isError: true);
+      if (mounted)
+        _showSnackBar(l10n.todoDetailItemUpdateFailed, isError: true);
     }
   }
 
@@ -244,7 +250,8 @@ class _TodoListDetailScreenState extends State<TodoListDetailScreen> {
 
       if (mounted) _showSnackBar(l10n.todoDetailItemDeleted);
     } catch (e) {
-      if (mounted) _showSnackBar(l10n.todoDetailItemDeleteFailed, isError: true);
+      if (mounted)
+        _showSnackBar(l10n.todoDetailItemDeleteFailed, isError: true);
     }
   }
 
@@ -338,8 +345,12 @@ class _TodoListDetailScreenState extends State<TodoListDetailScreen> {
     return ResponsiveModal.show<TodoItem>(
       context: context,
       child: BottomSheetContainer(
-        title: existingItem == null ? l10n.todoDetailAddItemTitle : l10n.todoDetailEditItemTitle,
-        primaryButtonText: existingItem == null ? l10n.buttonAdd : l10n.buttonSave,
+        title: existingItem == null
+            ? l10n.todoDetailAddItemTitle
+            : l10n.todoDetailEditItemTitle,
+        primaryButtonText: existingItem == null
+            ? l10n.buttonAdd
+            : l10n.buttonSave,
         showSecondaryButton: false,
         onPrimaryPressed: () {
           if (titleController.text.trim().isEmpty) {
@@ -349,7 +360,7 @@ class _TodoListDetailScreenState extends State<TodoListDetailScreen> {
 
           final item = TodoItem(
             id: existingItem?.id ?? const Uuid().v4(),
-            todoListId: _currentTodoList.id,  // Foreign key field
+            todoListId: _currentTodoList.id, // Foreign key field
             title: titleController.text.trim(),
             description: descriptionController.text.trim().isEmpty
                 ? null
@@ -431,7 +442,9 @@ class _TodoListDetailScreenState extends State<TodoListDetailScreen> {
                 // Priority dropdown
                 DropdownButtonFormField<TodoPriority>(
                   initialValue: selectedPriority,
-                  decoration: InputDecoration(labelText: l10n.todoDetailItemPriorityLabel),
+                  decoration: InputDecoration(
+                    labelText: l10n.todoDetailItemPriorityLabel,
+                  ),
                   items: TodoPriority.values.map((priority) {
                     return DropdownMenuItem(
                       value: priority,
@@ -604,29 +617,28 @@ class _TodoListDetailScreenState extends State<TodoListDetailScreen> {
               child: _isLoadingItems
                   ? const Center(child: CircularProgressIndicator())
                   : _currentItems.isEmpty
-                      ? _buildEmptyState()
-                      : ReorderableListView.builder(
-                          padding: const EdgeInsets.all(AppSpacing.md),
-                          itemCount: _currentItems.length,
-                          onReorder: _reorderTodoItems,
-                          itemBuilder: (context, index) {
-                            final item = _currentItems[index];
-                            final itemKey = ValueKey(item.id);
-                            return DismissibleListItem(
-                              key: itemKey,
-                              itemKey: itemKey,
-                              itemName: item.title,
-                              onDelete: () => _performDeleteTodoItem(item),
-                              child: TodoItemCard(
-                                todoItem: item,
-                                index: index,
-                                onCheckboxChanged: (value) =>
-                                    _toggleTodoItem(item),
-                                onLongPress: () => _editTodoItem(item),
-                              ),
-                            );
-                          },
-                        ),
+                  ? _buildEmptyState()
+                  : ReorderableListView.builder(
+                      padding: const EdgeInsets.all(AppSpacing.md),
+                      itemCount: _currentItems.length,
+                      onReorder: _reorderTodoItems,
+                      itemBuilder: (context, index) {
+                        final item = _currentItems[index];
+                        final itemKey = ValueKey(item.id);
+                        return DismissibleListItem(
+                          key: itemKey,
+                          itemKey: itemKey,
+                          itemName: item.title,
+                          onDelete: () => _performDeleteTodoItem(item),
+                          child: TodoItemCard(
+                            todoItem: item,
+                            index: index,
+                            onCheckboxChanged: (value) => _toggleTodoItem(item),
+                            onLongPress: () => _editTodoItem(item),
+                          ),
+                        );
+                      },
+                    ),
             ),
           ],
         ),

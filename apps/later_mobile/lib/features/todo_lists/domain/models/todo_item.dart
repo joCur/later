@@ -1,4 +1,4 @@
-import 'package:later_mobile/data/models/todo_priority.dart';
+import 'todo_priority.dart';
 
 /// TodoItem model representing an individual task within a todo list
 class TodoItem {

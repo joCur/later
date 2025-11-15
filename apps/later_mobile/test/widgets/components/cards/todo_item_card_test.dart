@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:later_mobile/design_system/organisms/cards/todo_item_card.dart';
-import 'package:later_mobile/data/models/todo_item_model.dart';
-import 'package:later_mobile/data/models/todo_priority.dart';
+import 'package:later_mobile/features/todo_lists/domain/models/todo_item.dart';
+import 'package:later_mobile/features/todo_lists/domain/models/todo_priority.dart';
 import 'package:later_mobile/design_system/tokens/tokens.dart';
 import '../../../test_helpers.dart';
 

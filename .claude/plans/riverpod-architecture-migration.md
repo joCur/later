@@ -773,20 +773,22 @@ Phase 4 successfully migrated the notes feature to Riverpod 3.0 following the pa
 
 **Goal:** Migrate todo lists with nested todo items, handle complex caching logic
 
-- [ ] Task 5.1: Create todo lists feature structure
+- [x] Task 5.1: Create todo lists feature structure
   - Create `lib/features/todo_lists/` directory
   - Create subdirectories: `domain/models/`, `data/repositories/`, `application/services/`, `presentation/controllers/`, `presentation/widgets/`, `presentation/screens/`
   - Move `lib/data/models/todo_list.dart` and `todo_item.dart` to `lib/features/todo_lists/domain/models/`
   - Move `lib/data/repositories/todo_list_repository.dart` to `lib/features/todo_lists/data/repositories/`
   - Update all imports
   - Run `flutter analyze`
+  - **Completed:** Feature structure created, models and repository moved, imports updated with perl/sed, analyzer clean
 
-- [ ] Task 5.2: Create repository providers
+- [x] Task 5.2: Create repository providers
   - Create `todoListRepositoryProvider` in `lib/features/todo_lists/data/repositories/providers.dart`
   - Repository already handles both TodoList and TodoItem operations
   - Run `flutter analyze`
+  - **Completed:** Provider created with `@Riverpod(keepAlive: true)`, uses unified `Ref` type (no generics)
 
-- [ ] Task 5.3: Create todo list service (application layer)
+- [x] Task 5.3: Create todo list service (application layer)
   - Create `lib/features/todo_lists/application/services/todo_list_service.dart`
   - Extract business logic from ContentProvider for todo lists:
     - `getTodoListsForSpace(String spaceId)` - load lists, sort by sortOrder
@@ -804,16 +806,18 @@ Phase 4 successfully migrated the notes feature to Riverpod 3.0 following the pa
   - Service coordinates with TodoListRepository
   - Business logic: aggregate count calculation, sort order management
   - Run `flutter analyze`
+  - **Completed:** Service with all TodoList and TodoItem methods, validation (name/title required), analyzer clean
 
-- [ ] Task 5.4: Create todo lists controller
+- [x] Task 5.4: Create todo lists controller
   - Create `lib/features/todo_lists/presentation/controllers/todo_lists_controller.dart`
   - Use `@riverpod` annotation with family: `todoListsController(String spaceId)`
   - Controller manages AsyncValue<List<TodoList>> for space
   - Methods: `createTodoList()`, `updateTodoList()`, `deleteTodoList()`, `reorderLists()`
   - Run `dart run build_runner build --delete-conflicting-outputs`
   - Run `flutter analyze`
+  - **Completed:** Controller with family pattern (spaceId), AsyncValue state, ref.mounted checks, analyzer clean
 
-- [ ] Task 5.5: Create todo items controller (for detail screen)
+- [x] Task 5.5: Create todo items controller (for detail screen)
   - Create `lib/features/todo_lists/presentation/controllers/todo_items_controller.dart`
   - Use `@riverpod` annotation with family: `todoItemsController(String listId)`
   - Controller manages AsyncValue<List<TodoItem>> for list
@@ -821,6 +825,8 @@ Phase 4 successfully migrated the notes feature to Riverpod 3.0 following the pa
   - Controller invalidates parent list controller when counts change
   - Run `dart run build_runner build --delete-conflicting-outputs`
   - Run `flutter analyze`
+  - **Completed:** Controller with family pattern (listId), AsyncValue state, ref.mounted checks, analyzer clean
+  - **Note:** Parent list count refresh handled automatically by repository's _updateTodoListCounts method
 
 - [ ] Task 5.6: Update todo list screens and widgets
   - Move `lib/widgets/screens/todo_list_detail_screen.dart` to `lib/features/todo_lists/presentation/screens/`

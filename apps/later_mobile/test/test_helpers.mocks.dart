@@ -9,10 +9,12 @@ import 'dart:ui' as _i4;
 import 'package:flutter/material.dart' as _i14;
 import 'package:later_mobile/data/models/list_item_model.dart' as _i12;
 import 'package:later_mobile/data/models/list_model.dart' as _i9;
-import 'package:later_mobile/data/models/todo_item_model.dart' as _i11;
-import 'package:later_mobile/data/models/todo_list_model.dart' as _i8;
 import 'package:later_mobile/features/notes/domain/models/note.dart' as _i10;
 import 'package:later_mobile/features/spaces/domain/models/space.dart' as _i6;
+import 'package:later_mobile/features/todo_lists/domain/models/todo_item.dart'
+    as _i11;
+import 'package:later_mobile/features/todo_lists/domain/models/todo_list.dart'
+    as _i8;
 import 'package:later_mobile/providers/auth_provider.dart' as _i2;
 import 'package:later_mobile/providers/content_provider.dart' as _i7;
 import 'package:later_mobile/providers/spaces_provider.dart' as _i5;

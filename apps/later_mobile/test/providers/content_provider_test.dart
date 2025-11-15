@@ -4,11 +4,11 @@ import 'package:later_mobile/data/models/list_item_model.dart';
 import 'package:later_mobile/data/models/list_model.dart';
 import 'package:later_mobile/data/models/list_style.dart';
 import 'package:later_mobile/features/notes/domain/models/note.dart';
-import 'package:later_mobile/data/models/todo_item_model.dart';
-import 'package:later_mobile/data/models/todo_list_model.dart';
+import 'package:later_mobile/features/todo_lists/domain/models/todo_item.dart';
+import 'package:later_mobile/features/todo_lists/domain/models/todo_list.dart';
 import 'package:later_mobile/data/repositories/list_repository.dart';
 import 'package:later_mobile/features/notes/data/repositories/note_repository.dart';
-import 'package:later_mobile/data/repositories/todo_list_repository.dart';
+import 'package:later_mobile/features/todo_lists/data/repositories/todo_list_repository.dart';
 import 'package:later_mobile/providers/content_provider.dart';
 
 /// Mock implementation of TodoListRepository for testing

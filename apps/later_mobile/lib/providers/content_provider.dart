@@ -3,11 +3,11 @@ import '../core/error/error.dart';
 import '../data/models/list_item_model.dart';
 import '../data/models/list_model.dart';
 import '../features/notes/domain/models/note.dart';
-import '../data/models/todo_item_model.dart';
-import '../data/models/todo_list_model.dart';
+import '../features/todo_lists/domain/models/todo_item.dart';
+import '../features/todo_lists/domain/models/todo_list.dart';
 import '../data/repositories/list_repository.dart';
 import '../features/notes/data/repositories/note_repository.dart';
-import '../data/repositories/todo_list_repository.dart';
+import '../features/todo_lists/data/repositories/todo_list_repository.dart';
 
 /// Enum to filter content by type
 enum ContentFilter { all, todoLists, lists, notes }

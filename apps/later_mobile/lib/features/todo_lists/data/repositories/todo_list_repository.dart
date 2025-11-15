@@ -1,6 +1,6 @@
-import '../models/todo_item_model.dart';
-import '../models/todo_list_model.dart';
-import 'base_repository.dart';
+import '../../domain/models/todo_item.dart';
+import '../../domain/models/todo_list.dart';
+import '../../../../data/repositories/base_repository.dart';
 
 /// Repository for managing TodoList and TodoItem entities in Supabase.
 ///

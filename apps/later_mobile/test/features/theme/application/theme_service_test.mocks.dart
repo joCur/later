@@ -64,40 +64,6 @@ class MockPreferencesService extends _i1.Mock
           as _i3.Future<void>);
 
   @override
-  bool hasMigratedToCalculatedCounts() =>
-      (super.noSuchMethod(
-            Invocation.method(#hasMigratedToCalculatedCounts, []),
-            returnValue: false,
-          )
-          as bool);
-
-  @override
-  _i3.Future<void> setMigratedToCalculatedCounts() =>
-      (super.noSuchMethod(
-            Invocation.method(#setMigratedToCalculatedCounts, []),
-            returnValue: _i3.Future<void>.value(),
-            returnValueForMissingStub: _i3.Future<void>.value(),
-          )
-          as _i3.Future<void>);
-
-  @override
-  bool hasMigratedSortOrder() =>
-      (super.noSuchMethod(
-            Invocation.method(#hasMigratedSortOrder, []),
-            returnValue: false,
-          )
-          as bool);
-
-  @override
-  _i3.Future<void> setMigratedSortOrder() =>
-      (super.noSuchMethod(
-            Invocation.method(#setMigratedSortOrder, []),
-            returnValue: _i3.Future<void>.value(),
-            returnValueForMissingStub: _i3.Future<void>.value(),
-          )
-          as _i3.Future<void>);
-
-  @override
   Map<String, dynamic> getAllPreferences() =>
       (super.noSuchMethod(
             Invocation.method(#getAllPreferences, []),

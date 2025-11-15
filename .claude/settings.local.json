@@ -17,7 +17,8 @@
       "Bash(lib/widgets/**/*.dart)",
       "Bash(gh pr view:*)",
       "Bash(gh api:*)",
-      "WebFetch(domain:pub.dev)"
+      "WebFetch(domain:pub.dev)",
+      "Bash(find:*)"
     ],
     "deny": [],
     "ask": []

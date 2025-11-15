@@ -7,7 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:later_mobile/data/models/list_model.dart';
 import 'package:later_mobile/data/models/list_style.dart';
 import 'package:later_mobile/features/notes/domain/models/note.dart';
-import 'package:later_mobile/data/models/todo_list_model.dart';
+import 'package:later_mobile/features/todo_lists/domain/models/todo_list.dart';
 import 'package:later_mobile/design_system/atoms/buttons/ghost_button.dart';
 import 'package:later_mobile/design_system/atoms/buttons/gradient_button.dart';
 import 'package:later_mobile/design_system/atoms/buttons/primary_button.dart';
