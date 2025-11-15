@@ -7,8 +7,10 @@ import 'dart:async' as _i3;
 import 'dart:ui' as _i4;
 
 import 'package:flutter/material.dart' as _i14;
-import 'package:later_mobile/data/models/list_item_model.dart' as _i12;
-import 'package:later_mobile/data/models/list_model.dart' as _i9;
+import 'package:later_mobile/features/lists/domain/models/list_item_model.dart'
+    as _i12;
+import 'package:later_mobile/features/lists/domain/models/list_model.dart'
+    as _i9;
 import 'package:later_mobile/features/notes/domain/models/note.dart' as _i10;
 import 'package:later_mobile/features/spaces/domain/models/space.dart' as _i6;
 import 'package:later_mobile/features/todo_lists/domain/models/todo_item.dart'

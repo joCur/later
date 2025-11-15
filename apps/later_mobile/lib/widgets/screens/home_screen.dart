@@ -18,7 +18,7 @@ import '../../core/responsive/breakpoints.dart';
 import '../../core/theme/temporal_flow_theme.dart';
 import '../../core/utils/item_type_detector.dart';
 import '../../core/utils/responsive_modal.dart';
-import 'package:later_mobile/data/models/list_model.dart';
+import 'package:later_mobile/features/lists/domain/models/list_model.dart';
 import 'package:later_mobile/features/notes/domain/models/note.dart';
 import 'package:later_mobile/features/todo_lists/domain/models/todo_list.dart';
 import '../../features/spaces/domain/models/space.dart';
@@ -35,7 +35,7 @@ import '../modals/create_space_modal.dart'
 import '../modals/space_switcher_modal.dart';
 import '../navigation/app_sidebar.dart';
 import '../navigation/icon_only_bottom_nav.dart';
-import 'list_detail_screen.dart';
+import '../../features/lists/presentation/screens/list_detail_screen.dart';
 import '../../features/notes/presentation/screens/note_detail_screen.dart';
 import '../../features/todo_lists/presentation/screens/todo_list_detail_screen.dart';
 

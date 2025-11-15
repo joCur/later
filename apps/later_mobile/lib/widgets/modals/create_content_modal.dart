@@ -4,7 +4,7 @@ import 'dart:ui' show ImageFilter;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:later_mobile/data/models/list_model.dart';
+import 'package:later_mobile/features/lists/domain/models/list_model.dart';
 import 'package:later_mobile/data/models/list_style.dart';
 import 'package:later_mobile/features/notes/domain/models/note.dart';
 import 'package:later_mobile/features/todo_lists/domain/models/todo_list.dart';
@@ -16,7 +16,6 @@ import 'package:later_mobile/design_system/atoms/inputs/text_input_field.dart';
 import 'package:later_mobile/design_system/molecules/controls/segmented_control.dart';
 import 'package:later_mobile/design_system/tokens/tokens.dart';
 import 'package:later_mobile/l10n/app_localizations.dart';
-import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../core/responsive/breakpoints.dart';
@@ -28,8 +27,9 @@ import '../../features/spaces/presentation/controllers/spaces_controller.dart';
 import '../../features/spaces/presentation/controllers/current_space_controller.dart';
 import '../../features/notes/presentation/controllers/notes_controller.dart';
 import '../../features/todo_lists/presentation/controllers/todo_lists_controller.dart';
+import '../../features/lists/presentation/controllers/lists_controller.dart';
 // import '../../providers/spaces_provider.dart'; // TODO: Remove after Phase 8
-import '../../providers/content_provider.dart';
+// ContentProvider removed - Lists now use Riverpod controllers
 
 /// Type option for Create Content content type selector
 class TypeOption {
@@ -262,7 +262,6 @@ class _CreateContentModalState extends ConsumerState<CreateContentModal>
     final text = _textController.text.trim();
     if (text.isEmpty) return;
 
-    final contentProvider = context.read<ContentProvider>();
     final currentSpace = ref.read(currentSpaceControllerProvider).when(
       data: (space) => space,
       loading: () => null,
@@ -331,7 +330,10 @@ class _CreateContentModalState extends ConsumerState<CreateContentModal>
               name: text,
               style: _selectedListStyle,
             );
-            await contentProvider.createList(listModel);
+            // Create list via Riverpod controller
+            await ref
+                .read(listsControllerProvider(targetSpaceId).notifier)
+                .createList(listModel);
             _currentItemId = id;
             break;
 

@@ -1,11 +1,11 @@
 import 'package:flutter/foundation.dart';
 import '../core/error/error.dart';
-import '../data/models/list_item_model.dart';
-import '../data/models/list_model.dart';
+import '../features/lists/domain/models/list_item_model.dart';
+import '../features/lists/domain/models/list_model.dart';
 import '../features/notes/domain/models/note.dart';
 import '../features/todo_lists/domain/models/todo_item.dart';
 import '../features/todo_lists/domain/models/todo_list.dart';
-import '../data/repositories/list_repository.dart';
+import '../features/lists/data/repositories/list_repository.dart';
 import '../features/notes/data/repositories/note_repository.dart';
 import '../features/todo_lists/data/repositories/todo_list_repository.dart';
 

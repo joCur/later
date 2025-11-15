@@ -8,7 +8,7 @@ import 'core/config/supabase_config.dart';
 import 'core/error/error_handler.dart';
 import 'core/theme/app_theme.dart';
 import 'data/local/preferences_service.dart';
-import 'data/repositories/list_repository.dart';
+import 'features/lists/data/repositories/list_repository.dart';
 import 'features/notes/data/repositories/note_repository.dart';
 import 'features/spaces/data/repositories/space_repository.dart';
 import 'features/todo_lists/data/repositories/todo_list_repository.dart';

@@ -1,24 +1,26 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
 import 'package:later_mobile/l10n/app_localizations.dart';
 import 'package:later_mobile/design_system/tokens/tokens.dart';
-import 'package:later_mobile/data/models/list_model.dart';
-import 'package:later_mobile/data/models/list_item_model.dart';
+import 'package:later_mobile/features/lists/domain/models/list_model.dart';
+import 'package:later_mobile/features/lists/domain/models/list_item_model.dart';
 import 'package:later_mobile/data/models/list_style.dart';
-import '../../providers/content_provider.dart';
 import 'package:later_mobile/design_system/organisms/cards/list_item_card.dart';
 import 'package:later_mobile/design_system/organisms/fab/responsive_fab.dart';
 import 'package:later_mobile/design_system/organisms/modals/bottom_sheet_container.dart';
-import '../../core/utils/responsive_modal.dart';
+import '../../../../core/utils/responsive_modal.dart';
 import 'package:later_mobile/design_system/atoms/inputs/text_input_field.dart';
 import 'package:later_mobile/design_system/atoms/inputs/text_area_field.dart';
 import 'package:later_mobile/design_system/organisms/dialogs/delete_confirmation_dialog.dart';
 import 'package:later_mobile/design_system/molecules/app_bars/editable_app_bar_title.dart';
 import 'package:later_mobile/design_system/molecules/lists/dismissible_list_item.dart';
-import 'package:later_mobile/core/mixins/auto_save_mixin.dart';
 import 'package:later_mobile/design_system/organisms/empty_states/animated_empty_state.dart';
+
+import '../controllers/list_items_controller.dart';
+import '../controllers/lists_controller.dart';
 
 /// List Detail Screen for viewing and editing List with ListItems
 ///
@@ -33,18 +35,17 @@ import 'package:later_mobile/design_system/organisms/empty_states/animated_empty
 /// - Drag-and-drop reordering
 /// - Menu: Change style, Change icon, Delete list
 /// - Auto-save with debounce (500ms)
-class ListDetailScreen extends StatefulWidget {
+class ListDetailScreen extends ConsumerStatefulWidget {
   const ListDetailScreen({super.key, required this.list});
 
   /// List to display and edit
   final ListModel list;
 
   @override
-  State<ListDetailScreen> createState() => _ListDetailScreenState();
+  ConsumerState<ListDetailScreen> createState() => _ListDetailScreenState();
 }
 
-class _ListDetailScreenState extends State<ListDetailScreen>
-    with AutoSaveMixin {
+class _ListDetailScreenState extends ConsumerState<ListDetailScreen> {
   // Text controllers
   late TextEditingController _nameController;
 
@@ -52,6 +53,9 @@ class _ListDetailScreenState extends State<ListDetailScreen>
   late ListModel _currentList;
   List<ListItem> _currentItems = [];
   bool _isLoadingItems = false;
+  Timer? _debounceTimer;
+  bool _isSaving = false;
+  bool _hasChanges = false;
   bool _enableFabPulse = false;
 
   @override
@@ -65,71 +69,92 @@ class _ListDetailScreenState extends State<ListDetailScreen>
     _nameController = TextEditingController(text: widget.list.name);
 
     // Listen to text changes for auto-save
-    _nameController.addListener(() => onFieldChanged());
+    _nameController.addListener(_onNameChanged);
 
-    // Load list items for this list
-    _loadListItems();
-  }
-
-  /// Load list items from the provider
-  Future<void> _loadListItems() async {
-    setState(() {
-      _isLoadingItems = true;
-    });
-
-    try {
-      final provider = Provider.of<ContentProvider>(context, listen: false);
-      final items = await provider.loadListItemsForList(widget.list.id);
-
-      if (mounted) {
-        setState(() {
-          _currentItems = items;
-          _isLoadingItems = false;
+    // Listen to list items controller changes
+    ref.listenManual(
+      listItemsControllerProvider(widget.list.id),
+      (previous, next) {
+        next.whenData((items) {
+          if (mounted) {
+            setState(() {
+              _currentItems = items;
+              _isLoadingItems = false;
+            });
+          }
         });
-      }
-    } catch (e) {
-      if (mounted) {
-        final l10n = AppLocalizations.of(context)!;
-        setState(() {
-          _isLoadingItems = false;
-        });
-        _showSnackBar(l10n.listDetailLoadFailed, isError: true);
-      }
-    }
-  }
 
-  /// Refresh the parent list from the provider to get updated counts
-  Future<void> _refreshListData() async {
-    try {
-      final provider = Provider.of<ContentProvider>(context, listen: false);
-      final updated = provider.lists.firstWhere(
-        (l) => l.id == _currentList.id,
-      );
-      if (mounted) {
-        setState(() {
-          _currentList = updated;
-        });
-      }
-    } catch (e) {
-      if (mounted) {
-        _showSnackBar('Failed to refresh list data: $e', isError: true);
-      }
-    }
-  }
+        // Handle loading state
+        if (next.isLoading && !next.hasValue) {
+          if (mounted) {
+            setState(() {
+              _isLoadingItems = true;
+            });
+          }
+        }
 
-  @override
-  int get autoSaveDelayMs => 500;
+        // Handle errors
+        next.whenOrNull(
+          error: (error, stackTrace) {
+            if (mounted) {
+              final l10n = AppLocalizations.of(context)!;
+              setState(() {
+                _isLoadingItems = false;
+              });
+              _showSnackBar(l10n.listDetailLoadFailed, isError: true);
+            }
+          },
+        );
+      },
+      fireImmediately: true,
+    );
+
+    // Listen to lists controller to update current list
+    ref.listenManual(
+      listsControllerProvider(widget.list.spaceId),
+      (previous, next) {
+        next.whenData((lists) {
+          final updated = lists.firstWhere(
+            (l) => l.id == _currentList.id,
+            orElse: () => _currentList,
+          );
+          if (mounted && updated != _currentList) {
+            setState(() {
+              _currentList = updated;
+            });
+          }
+        });
+      },
+      fireImmediately: true,
+    );
+  }
 
   @override
   void dispose() {
+    _debounceTimer?.cancel();
+    _nameController.removeListener(_onNameChanged);
     _nameController.dispose();
     super.dispose();
   }
 
+  /// Handle name changes and trigger debounced save
+  void _onNameChanged() {
+    setState(() {
+      _hasChanges = true;
+    });
+
+    // Cancel previous timer
+    _debounceTimer?.cancel();
+
+    // Start new debounce timer (500ms)
+    _debounceTimer = Timer(const Duration(milliseconds: 500), () {
+      _saveChanges();
+    });
+  }
+
   /// Save changes to the list
-  @override
-  Future<void> saveChanges() async {
-    if (!hasChanges || isSaving) return;
+  Future<void> _saveChanges() async {
+    if (!_hasChanges || _isSaving) return;
 
     final l10n = AppLocalizations.of(context)!;
 
@@ -140,26 +165,29 @@ class _ListDetailScreenState extends State<ListDetailScreen>
     }
 
     setState(() {
-      isSaving = true;
+      _isSaving = true;
     });
 
     try {
       // Update list name
-      final updated = _currentList.copyWith(name: _nameController.text.trim());
+      final updated = _currentList.copyWith(
+        name: _nameController.text.trim(),
+      );
 
-      // Save via provider
-      final provider = Provider.of<ContentProvider>(context, listen: false);
-      await provider.updateList(updated);
+      // Save via Riverpod controller
+      await ref
+          .read(listsControllerProvider(widget.list.spaceId).notifier)
+          .updateList(updated);
 
       setState(() {
         _currentList = updated;
-        hasChanges = false;
+        _hasChanges = false;
       });
     } catch (e) {
       _showSnackBar(l10n.listDetailSaveFailed, isError: true);
     } finally {
       setState(() {
-        isSaving = false;
+        _isSaving = false;
       });
     }
   }
@@ -172,15 +200,20 @@ class _ListDetailScreenState extends State<ListDetailScreen>
     final l10n = AppLocalizations.of(context)!;
 
     try {
-      final provider = Provider.of<ContentProvider>(context, listen: false);
       // Set sortOrder to be at the end of current items
-      final itemWithSortOrder = result.copyWith(sortOrder: _currentItems.length);
-      // createListItem takes a ListItem directly
-      await provider.createListItem(itemWithSortOrder);
+      final itemWithSortOrder = result.copyWith(
+        sortOrder: _currentItems.length,
+      );
 
-      // Reload items and refresh parent list data
-      await _loadListItems();
-      await _refreshListData();
+      // Create item via Riverpod controller
+      await ref
+          .read(listItemsControllerProvider(widget.list.id).notifier)
+          .createItem(itemWithSortOrder);
+
+      // Refresh parent list to get updated counts
+      await ref
+          .read(listsControllerProvider(widget.list.spaceId).notifier)
+          .refresh();
 
       if (mounted) _showSnackBar(l10n.listDetailItemAdded);
     } catch (e) {
@@ -196,51 +229,60 @@ class _ListDetailScreenState extends State<ListDetailScreen>
     final l10n = AppLocalizations.of(context)!;
 
     try {
-      final provider = Provider.of<ContentProvider>(context, listen: false);
-      // updateListItem takes just a ListItem
-      await provider.updateListItem(result);
+      // Update item via Riverpod controller
+      await ref
+          .read(listItemsControllerProvider(widget.list.id).notifier)
+          .updateItem(result);
 
-      // Reload items and refresh parent list data
-      await _loadListItems();
-      await _refreshListData();
+      // Refresh parent list to get updated counts
+      await ref
+          .read(listsControllerProvider(widget.list.spaceId).notifier)
+          .refresh();
 
       if (mounted) _showSnackBar(l10n.listDetailItemUpdated);
     } catch (e) {
-      if (mounted) _showSnackBar(l10n.listDetailItemUpdateFailed, isError: true);
+      if (mounted) {
+        _showSnackBar(l10n.listDetailItemUpdateFailed, isError: true);
+      }
     }
   }
 
-  /// Perform ListItem deletion without confirmation
-  /// Used by Dismissible after confirmDismiss has already shown confirmation
+  /// Perform the actual deletion without confirmation
+  /// Used by Dismissible which handles confirmation separately
   Future<void> _performDeleteListItem(ListItem item) async {
     final l10n = AppLocalizations.of(context)!;
 
     try {
-      final provider = Provider.of<ContentProvider>(context, listen: false);
-      await provider.deleteListItem(item.id, _currentList.id);
+      // Delete item via Riverpod controller
+      await ref
+          .read(listItemsControllerProvider(widget.list.id).notifier)
+          .deleteItem(item.id, _currentList.id);
 
-      // Reload items and refresh parent list data
-      await _loadListItems();
-      await _refreshListData();
+      // Refresh parent list to get updated counts
+      await ref
+          .read(listsControllerProvider(widget.list.spaceId).notifier)
+          .refresh();
 
       if (mounted) _showSnackBar(l10n.listDetailItemDeleted);
     } catch (e) {
-      if (mounted) _showSnackBar(l10n.listDetailItemDeleteFailed, isError: true);
+      if (mounted) {
+        _showSnackBar(l10n.listDetailItemDeleteFailed, isError: true);
+      }
     }
   }
 
   /// Toggle ListItem checkbox
   Future<void> _toggleListItem(ListItem item) async {
     try {
-      final provider = Provider.of<ContentProvider>(context, listen: false);
+      // Toggle item via Riverpod controller
+      await ref
+          .read(listItemsControllerProvider(widget.list.id).notifier)
+          .toggleItem(item);
 
-      // Toggle the item by updating it with updateListItem
-      final toggled = item.copyWith(isChecked: !item.isChecked);
-      await provider.updateListItem(toggled);
-
-      // Reload items and refresh parent list data
-      await _loadListItems();
-      await _refreshListData();
+      // Refresh parent list to get updated counts
+      await ref
+          .read(listsControllerProvider(widget.list.spaceId).notifier)
+          .refresh();
     } catch (e) {
       if (!mounted) return;
       final l10n = AppLocalizations.of(context)!;
@@ -260,28 +302,26 @@ class _ListDetailScreenState extends State<ListDetailScreen>
     final item = reorderedItems.removeAt(oldIndex);
     reorderedItems.insert(newIndex, item);
 
-    // Update sortOrder values
-    for (int i = 0; i < reorderedItems.length; i++) {
-      reorderedItems[i] = reorderedItems[i].copyWith(sortOrder: i);
-    }
-
     setState(() {
       _currentItems = reorderedItems;
     });
 
-    // Then persist to provider in the background
+    // Then persist via Riverpod controller in the background
     try {
-      final provider = Provider.of<ContentProvider>(context, listen: false);
-      // reorderListItems takes (listId, List<ListItem>)
-      await provider.reorderListItems(_currentList.id, reorderedItems);
+      // Extract IDs in the new order
+      final orderedIds = reorderedItems.map((item) => item.id).toList();
+
+      // Call controller to reorder
+      await ref
+          .read(listItemsControllerProvider(widget.list.id).notifier)
+          .reorderItems(orderedIds);
     } catch (e) {
       // On error, check mounted before any context usage
       if (!mounted) return;
 
-      // Show error to user and reload items from server
+      // Show error to user - controller will reload items from server
       final l10n = AppLocalizations.of(context)!;
       _showSnackBar(l10n.listDetailReorderFailed, isError: true);
-      await _loadListItems();
     }
   }
 
@@ -293,9 +333,10 @@ class _ListDetailScreenState extends State<ListDetailScreen>
     final l10n = AppLocalizations.of(context)!;
 
     try {
-      final provider = Provider.of<ContentProvider>(context, listen: false);
       final updated = _currentList.copyWith(style: result);
-      await provider.updateList(updated);
+      await ref
+          .read(listsControllerProvider(widget.list.spaceId).notifier)
+          .updateList(updated);
 
       if (mounted) {
         setState(() {
@@ -317,9 +358,10 @@ class _ListDetailScreenState extends State<ListDetailScreen>
     final l10n = AppLocalizations.of(context)!;
 
     try {
-      final provider = Provider.of<ContentProvider>(context, listen: false);
       final updated = _currentList.copyWith(icon: result);
-      await provider.updateList(updated);
+      await ref
+          .read(listsControllerProvider(widget.list.spaceId).notifier)
+          .updateList(updated);
 
       if (mounted) {
         setState(() {
@@ -337,9 +379,10 @@ class _ListDetailScreenState extends State<ListDetailScreen>
   /// Note: Navigation is handled in _showDeleteListConfirmation(), not here
   Future<void> _deleteList() async {
     try {
-      final provider = Provider.of<ContentProvider>(context, listen: false);
-
-      await provider.deleteList(_currentList.id);
+      // Delete list via Riverpod controller
+      await ref
+          .read(listsControllerProvider(widget.list.spaceId).notifier)
+          .deleteList(_currentList.id);
 
       // Navigation already handled in confirmation dialog
       // Success feedback is provided by UI update (list removed from list)
@@ -546,7 +589,7 @@ class _ListDetailScreenState extends State<ListDetailScreen>
       onPopInvokedWithResult: (didPop, result) async {
         if (!didPop) {
           // Save before leaving
-          await saveChanges();
+          await _saveChanges();
           if (mounted && context.mounted) {
             Navigator.of(context).pop();
           }
@@ -569,7 +612,7 @@ class _ListDetailScreenState extends State<ListDetailScreen>
                   text: _currentList.name,
                   onChanged: (newName) {
                     _nameController.text = newName;
-                    saveChanges();
+                    _saveChanges();
                   },
                   gradient: AppColors.listGradient,
                   hintText: l10n.listDetailNameHint,
@@ -578,7 +621,7 @@ class _ListDetailScreenState extends State<ListDetailScreen>
             ],
           ),
           actions: [
-            if (isSaving)
+            if (_isSaving)
               const Padding(
                 padding: EdgeInsets.all(AppSpacing.md),
                 child: SizedBox(

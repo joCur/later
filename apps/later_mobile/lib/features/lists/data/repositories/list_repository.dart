@@ -1,6 +1,6 @@
-import '../models/list_item_model.dart';
-import '../models/list_model.dart';
-import 'base_repository.dart';
+import 'package:later_mobile/features/lists/domain/models/list_item_model.dart';
+import 'package:later_mobile/features/lists/domain/models/list_model.dart';
+import 'package:later_mobile/data/repositories/base_repository.dart';
 
 /// Repository for managing ListModel and ListItem entities in Supabase.
 ///
