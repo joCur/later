@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:later_mobile/features/auth/presentation/controllers/auth_state_controller.dart';
 import 'package:later_mobile/widgets/screens/auth/sign_in_screen.dart';
-import 'package:later_mobile/widgets/screens/home_screen.dart';
+import 'package:later_mobile/features/home/presentation/screens/home_screen.dart';
 
 /// Authentication gate that routes users based on authentication status
 ///

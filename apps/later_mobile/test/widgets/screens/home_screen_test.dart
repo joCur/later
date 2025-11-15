@@ -7,7 +7,7 @@ import 'package:later_mobile/l10n/app_localizations.dart';
 import 'package:later_mobile/providers/spaces_provider.dart';
 import 'package:later_mobile/providers/content_provider.dart';
 import 'package:later_mobile/providers/theme_provider.dart';
-import 'package:later_mobile/widgets/screens/home_screen.dart';
+import 'package:later_mobile/features/home/presentation/screens/home_screen.dart';
 import 'package:mockito/mockito.dart';
 import 'package:provider/provider.dart';
 
