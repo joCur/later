@@ -124,12 +124,104 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     }
   }
 
+  /// Calculate total count of content based on current filter
+  int _calculateTotalCount(String spaceId) {
+    final filter = ref.watch(contentFilterControllerProvider);
+    final notesAsync = ref.watch(notesControllerProvider(spaceId));
+    final todoListsAsync = ref.watch(todoListsControllerProvider(spaceId));
+    final listsAsync = ref.watch(listsControllerProvider(spaceId));
+
+    final notesCount = notesAsync.when(
+      data: (data) => data.length,
+      loading: () => 0,
+      error: (error, stack) => 0,
+    );
+
+    final todoListsCount = todoListsAsync.when(
+      data: (data) => data.length,
+      loading: () => 0,
+      error: (error, stack) => 0,
+    );
+
+    final listsCount = listsAsync.when(
+      data: (data) => data.length,
+      loading: () => 0,
+      error: (error, stack) => 0,
+    );
+
+    switch (filter) {
+      case ContentFilter.notes:
+        return notesCount;
+      case ContentFilter.todoLists:
+        return todoListsCount;
+      case ContentFilter.lists:
+        return listsCount;
+      case ContentFilter.all:
+        return notesCount + todoListsCount + listsCount;
+    }
+  }
+
   /// Get filtered content with pagination applied
   /// Returns a paginated list of mixed content (TodoList, ListModel, Note)
   List<dynamic> _getFilteredContentWithPagination(String spaceId) {
-    // Get filtered content from ContentFilterController
-    final allContent = ref.read(contentFilterControllerProvider.notifier)
-        .getFilteredContent(spaceId);
+    // Watch the filter state
+    final filter = ref.watch(contentFilterControllerProvider);
+
+    // Watch all content controllers for the space
+    final notesAsync = ref.watch(notesControllerProvider(spaceId));
+    final todoListsAsync = ref.watch(todoListsControllerProvider(spaceId));
+    final listsAsync = ref.watch(listsControllerProvider(spaceId));
+
+    // Extract data from AsyncValue, default to empty list on loading/error
+    final notes = notesAsync.when(
+      data: (data) => data,
+      loading: () => <Note>[],
+      error: (error, stack) => <Note>[],
+    );
+
+    final todoLists = todoListsAsync.when(
+      data: (data) => data,
+      loading: () => <TodoList>[],
+      error: (error, stack) => <TodoList>[],
+    );
+
+    final lists = listsAsync.when(
+      data: (data) => data,
+      loading: () => <ListModel>[],
+      error: (error, stack) => <ListModel>[],
+    );
+
+    // Filter based on current filter state
+    List<dynamic> allContent;
+
+    switch (filter) {
+      case ContentFilter.notes:
+        allContent = notes;
+      case ContentFilter.todoLists:
+        allContent = todoLists;
+      case ContentFilter.lists:
+        allContent = lists;
+      case ContentFilter.all:
+        // Combine all content types and sort by updatedAt
+        allContent = [...todoLists, ...lists, ...notes];
+        allContent.sort((a, b) {
+          final aUpdated = a is Note
+              ? a.updatedAt
+              : a is TodoList
+                  ? a.updatedAt
+                  : a is ListModel
+                      ? a.updatedAt
+                      : DateTime.now();
+          final bUpdated = b is Note
+              ? b.updatedAt
+              : b is TodoList
+                  ? b.updatedAt
+                  : b is ListModel
+                      ? b.updatedAt
+                      : DateTime.now();
+          return bUpdated.compareTo(aUpdated); // Most recent first
+        });
+    }
 
     // Apply pagination: return only the current page of items
     return allContent.take(_currentItemCount).toList();
@@ -673,11 +765,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         ? _getFilteredContentWithPagination(currentSpace.id)
         : <dynamic>[];
     final isLoading = currentSpace != null
-        ? ref.read(contentFilterControllerProvider.notifier).isLoading(currentSpace.id)
+        ? ref.watch(contentIsLoadingProvider(currentSpace.id))
         : false;
-    final totalCount = currentSpace != null
-        ? ref.read(contentFilterControllerProvider.notifier).getTotalCount(currentSpace.id)
-        : 0;
+
+    // Calculate total count based on filter
+    final totalCount = currentSpace != null ? _calculateTotalCount(currentSpace.id) : 0;
 
     return Scaffold(
       appBar: _buildAppBar(context, currentSpace),
@@ -759,11 +851,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         ? _getFilteredContentWithPagination(currentSpace.id)
         : <dynamic>[];
     final isLoading = currentSpace != null
-        ? ref.read(contentFilterControllerProvider.notifier).isLoading(currentSpace.id)
+        ? ref.watch(contentIsLoadingProvider(currentSpace.id))
         : false;
-    final totalCount = currentSpace != null
-        ? ref.read(contentFilterControllerProvider.notifier).getTotalCount(currentSpace.id)
-        : 0;
+
+    // Calculate total count based on filter
+    final totalCount = currentSpace != null ? _calculateTotalCount(currentSpace.id) : 0;
 
     return Scaffold(
       body: Row(

@@ -2,6 +2,7 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../application/providers.dart';
 import '../../domain/models/space.dart';
+import 'current_space_controller.dart';
 
 part 'spaces_controller.g.dart';
 
@@ -37,6 +38,7 @@ class SpacesController extends _$SpacesController {
   /// Creates a new space.
   ///
   /// Validates and creates the space, then refreshes the spaces list.
+  /// Automatically sets the newly created space as the current space.
   ///
   /// Parameters:
   ///   - [space]: The space to create
@@ -51,6 +53,9 @@ class SpacesController extends _$SpacesController {
 
       // Add to current state
       state = state.whenData((spaces) => [...spaces, created]);
+
+      // Set the newly created space as current
+      await ref.read(currentSpaceControllerProvider.notifier).switchSpace(created);
     } catch (e) {
       // Update state with error
       if (ref.mounted) {
