@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:later_mobile/data/models/todo_item_model.dart';
-import 'package:later_mobile/data/models/todo_list_model.dart';
-import 'package:later_mobile/data/models/todo_priority.dart';
+import 'package:later_mobile/features/todo_lists/domain/models/todo_item.dart';
+import 'package:later_mobile/features/todo_lists/domain/models/todo_list.dart';
+import 'package:later_mobile/features/todo_lists/domain/models/todo_priority.dart';
 
 void main() {
   group('TodoPriority', () {

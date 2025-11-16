@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:later_mobile/core/responsive/breakpoints.dart';
-import 'package:later_mobile/widgets/navigation/app_sidebar.dart';
-import 'package:later_mobile/widgets/navigation/icon_only_bottom_nav.dart';
+import 'package:later_mobile/shared/widgets/navigation/icon_only_bottom_nav.dart';
 
 import '../test_helpers.dart';
 
@@ -271,6 +270,7 @@ void main() {
 
     testWidgets('Sidebar appears at 1024px', (WidgetTester tester) async {
       // Test at 1023px (tablet - no sidebar)
+      // Using a simple Container with key instead of AppSidebar to avoid dependencies
       await tester.pumpWidget(
         MediaQuery(
           data: const MediaQueryData(size: Size(1023.0, 768.0)),
@@ -281,7 +281,12 @@ void main() {
                 return Scaffold(
                   body: Row(
                     children: [
-                      if (showSidebar) AppSidebar(onToggleExpanded: () {}),
+                      if (showSidebar)
+                        Container(
+                          key: const Key('mock_sidebar'),
+                          width: 240,
+                          color: Colors.grey,
+                        ),
                       const Expanded(child: Center(child: Text('Content'))),
                     ],
                   ),
@@ -293,7 +298,7 @@ void main() {
       );
 
       expect(
-        find.byType(AppSidebar),
+        find.byKey(const Key('mock_sidebar')),
         findsNothing,
         reason: 'Sidebar should not be visible at 1023px',
       );
@@ -309,7 +314,12 @@ void main() {
                 return Scaffold(
                   body: Row(
                     children: [
-                      if (showSidebar) AppSidebar(onToggleExpanded: () {}),
+                      if (showSidebar)
+                        Container(
+                          key: const Key('mock_sidebar'),
+                          width: 240,
+                          color: Colors.grey,
+                        ),
                       const Expanded(child: Center(child: Text('Content'))),
                     ],
                   ),
@@ -323,7 +333,7 @@ void main() {
       await tester.pump();
 
       expect(
-        find.byType(AppSidebar),
+        find.byKey(const Key('mock_sidebar')),
         findsOneWidget,
         reason: 'Sidebar should appear at 1024px',
       );

@@ -1,31 +1,34 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:later_mobile/core/theme/temporal_flow_theme.dart';
-import 'package:later_mobile/widgets/navigation/bottom_navigation_bar.dart';
+import 'package:later_mobile/shared/widgets/navigation/bottom_navigation_bar.dart';
 import 'package:later_mobile/design_system/tokens/tokens.dart';
+
+import '../../test_helpers.dart';
 
 void main() {
   Widget createTestWidget({
     required int currentIndex,
     required void Function(int) onDestinationSelected,
-    ThemeData? theme,
+    bool isDark = false,
   }) {
-    return MaterialApp(
-      theme: (theme ?? ThemeData.light()).copyWith(
-        extensions: <ThemeExtension<dynamic>>[
-          theme?.brightness == Brightness.dark
-              ? TemporalFlowTheme.dark()
-              : TemporalFlowTheme.light(),
-        ],
-      ),
-      home: Scaffold(
-        bottomNavigationBar: AppBottomNavigationBar(
-          currentIndex: currentIndex,
-          onDestinationSelected: onDestinationSelected,
-        ),
-      ),
-    );
+    return isDark
+        ? testAppDark(
+            Scaffold(
+              bottomNavigationBar: AppBottomNavigationBar(
+                currentIndex: currentIndex,
+                onDestinationSelected: onDestinationSelected,
+              ),
+            ),
+          )
+        : testApp(
+            Scaffold(
+              bottomNavigationBar: AppBottomNavigationBar(
+                currentIndex: currentIndex,
+                onDestinationSelected: onDestinationSelected,
+              ),
+            ),
+          );
   }
 
   group('AppBottomNavigationBar', () {
@@ -94,7 +97,7 @@ void main() {
         createTestWidget(
           currentIndex: 0,
           onDestinationSelected: (_) {},
-          theme: ThemeData.dark(),
+          isDark: true,
         ),
       );
 
@@ -145,7 +148,7 @@ void main() {
           createTestWidget(
             currentIndex: 0,
             onDestinationSelected: (_) {},
-            theme: ThemeData.dark(),
+            isDark: true,
           ),
         );
 
@@ -365,13 +368,8 @@ void main() {
 
     testWidgets('respects SafeArea for notch devices', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          theme: ThemeData.light().copyWith(
-            extensions: <ThemeExtension<dynamic>>[
-              TemporalFlowTheme.light(),
-            ],
-          ),
-          home: MediaQuery(
+        testApp(
+          MediaQuery(
             data: const MediaQueryData(
               padding: EdgeInsets.only(bottom: 34.0), // iPhone notch
             ),
@@ -400,7 +398,7 @@ void main() {
         createTestWidget(
           currentIndex: 0,
           onDestinationSelected: (_) {},
-          theme: ThemeData.dark(),
+          isDark: true,
         ),
       );
 

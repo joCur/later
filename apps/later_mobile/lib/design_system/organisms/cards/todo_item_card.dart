@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:later_mobile/design_system/tokens/tokens.dart';
-import 'package:later_mobile/data/models/todo_item_model.dart';
-import 'package:later_mobile/data/models/todo_priority.dart';
+import 'package:later_mobile/features/todo_lists/domain/models/todo_item.dart';
+import 'package:later_mobile/features/todo_lists/domain/models/todo_priority.dart';
 
 /// TodoItem card component for displaying individual tasks within a TodoList
 /// This is a SUB-ITEM card (not a main container card like TodoListCard)
