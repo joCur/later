@@ -145,51 +145,65 @@ WITH CHECK (
   - ✅ Permanent users bypass limits (ELSE true in CASE statement)
   - ⏭️ End-to-end functional testing will occur during Flutter integration (Phase 3+)
 
-### Phase 2: Permission Service & User Role System
+### Phase 2: Permission Service & User Role System ✅
 
 **Goal:** Create client-side permission service for feature gating
 
-- [ ] Task 2.1: Create UserRole enum
-  - Create file: `apps/later_mobile/lib/core/permissions/user_role.dart`
-  - Define `enum UserRole { anonymous, authenticated }`
-  - Add extension `UserRolePermissions` with permission getters:
+**Status:** COMPLETED - Permission service and user role system implemented with comprehensive tests
+
+- [x] Task 2.1: Create UserRole enum
+  - ✅ Created file: `apps/later_mobile/lib/core/permissions/user_role.dart`
+  - ✅ Defined `enum UserRole { anonymous, authenticated }`
+  - ✅ Added extension `UserRolePermissions` with permission getters:
     - `canCreateUnlimitedSpaces` → returns `this == UserRole.authenticated`
     - `canCreateUnlimitedNotes` → returns `this == UserRole.authenticated`
     - `canCreateUnlimitedTodoLists` → returns `this == UserRole.authenticated`
     - `canCreateUnlimitedLists` → returns `this == UserRole.authenticated`
-  - Add numeric limit getters for anonymous users:
+  - ✅ Added numeric limit getters for anonymous users:
     - `maxSpacesForAnonymous` → returns `1`
     - `maxNotesPerSpaceForAnonymous` → returns `20`
     - `maxTodoListsPerSpaceForAnonymous` → returns `10`
     - `maxListsPerSpaceForAnonymous` → returns `5`
 
-- [ ] Task 2.2: Create PermissionService
-  - Create file: `apps/later_mobile/lib/core/permissions/permission_service.dart`
-  - Add class `PermissionService` with constructor taking `SupabaseClient`
-  - Implement method `UserRole getCurrentUserRole()`:
-    - Get current user via `_supabase.auth.currentUser`
-    - If user is null, return `UserRole.anonymous` (fallback, shouldn't happen)
-    - If `user.isAnonymous == true`, return `UserRole.anonymous`
-    - Otherwise return `UserRole.authenticated`
-  - Add convenience method `bool isAnonymous()` → returns `getCurrentUserRole() == UserRole.anonymous`
-  - Add convenience method `bool isAuthenticated()` → returns `getCurrentUserRole() == UserRole.authenticated`
+- [x] Task 2.2: Create PermissionService
+  - ✅ Created file: `apps/later_mobile/lib/core/permissions/permission_service.dart`
+  - ✅ Added class `PermissionService` with constructor taking `SupabaseClient`
+  - ✅ Implemented method `UserRole getCurrentUserRole()`:
+    - Gets current user via `_supabase.auth.currentUser`
+    - If user is null, returns `UserRole.anonymous` (fallback)
+    - If `user.isAnonymous == true`, returns `UserRole.anonymous`
+    - Otherwise returns `UserRole.authenticated`
+  - ✅ Added convenience method `bool isAnonymous()` → returns `getCurrentUserRole() == UserRole.anonymous`
+  - ✅ Added convenience method `bool isAuthenticated()` → returns `getCurrentUserRole() == UserRole.authenticated`
 
-- [ ] Task 2.3: Create Riverpod providers for permissions
-  - In same file as PermissionService, add Riverpod providers using `@riverpod` annotation
-  - Add provider `PermissionService permissionService(PermissionServiceRef ref)`:
-    - Return `PermissionService(SupabaseConfig.client)`
-  - Add provider `UserRole currentUserRole(CurrentUserRoleRef ref)`:
-    - Watch `permissionServiceProvider`
-    - Return `service.getCurrentUserRole()`
-    - Mark with `@Riverpod(keepAlive: true)` to maintain auth state
-  - Run `dart run build_runner build --delete-conflicting-outputs`
+- [x] Task 2.3: Create Riverpod providers for permissions
+  - ✅ Added Riverpod providers using `@riverpod` annotation in permission_service.dart
+  - ✅ Added provider `PermissionService permissionService(Ref ref)`:
+    - Returns `PermissionService(SupabaseConfig.client)`
+    - Marked with `@Riverpod(keepAlive: true)` for consistent permission checks
+  - ✅ Added provider `UserRole currentUserRole(Ref ref)`:
+    - Watches `permissionServiceProvider`
+    - Returns `service.getCurrentUserRole()`
+    - Marked with `@Riverpod(keepAlive: true)` to maintain auth state
+  - ✅ Ran `dart run build_runner build --delete-conflicting-outputs`
+  - ✅ Generated `permission_service.g.dart` successfully
 
-- [ ] Task 2.4: Export permissions from barrel file
-  - Create file: `apps/later_mobile/lib/core/permissions/permissions.dart`
-  - Export all permission-related files:
+- [x] Task 2.4: Export permissions from barrel file
+  - ✅ Created file: `apps/later_mobile/lib/core/permissions/permissions.dart`
+  - ✅ Exported all permission-related files:
     - `export 'user_role.dart';`
     - `export 'permission_service.dart';`
-  - Update `apps/later_mobile/lib/core/core.dart` to export permissions module
+  - ℹ️ Note: No core/core.dart barrel file exists (not needed)
+
+- [x] Task 2.5: Write comprehensive unit tests
+  - ✅ Created file: `test/core/permissions/permission_service_test.dart`
+  - ✅ Tests for `PermissionService.getCurrentUserRole()` (3 test cases)
+  - ✅ Tests for `PermissionService.isAnonymous()` (3 test cases)
+  - ✅ Tests for `PermissionService.isAuthenticated()` (3 test cases)
+  - ✅ Tests for `UserRolePermissions` permission getters (8 test cases)
+  - ✅ Tests for `UserRolePermissions` limit getters (4 test cases)
+  - ✅ Generated mocks with `@GenerateMocks([SupabaseClient, GoTrueClient, User])`
+  - ✅ All 21 tests passing
 
 ### Phase 3: AuthService - Anonymous Sign-In Methods
 
