@@ -1,21 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'l10n/app_localizations.dart';
 import 'core/config/supabase_config.dart';
 import 'core/error/error_handler.dart';
 import 'core/theme/app_theme.dart';
 import 'data/local/preferences_service.dart';
-import 'data/repositories/list_repository.dart';
-import 'data/repositories/note_repository.dart';
-import 'data/repositories/space_repository.dart';
-import 'data/repositories/todo_list_repository.dart';
-import 'providers/auth_provider.dart';
-import 'providers/content_provider.dart';
-import 'providers/spaces_provider.dart';
-import 'providers/theme_provider.dart';
-import 'widgets/auth/auth_gate.dart';
+import 'features/theme/presentation/controllers/theme_controller.dart';
+import 'package:later_mobile/features/auth/presentation/widgets/auth_gate.dart';
 
 void main() async {
   // Ensure Flutter bindings are initialized
@@ -55,51 +48,46 @@ class LaterApp extends StatefulWidget {
 class _LaterAppState extends State<LaterApp> {
   @override
   Widget build(BuildContext context) {
-    return MultiProvider(
-      providers: [
-        ChangeNotifierProvider(
-          create: (_) => AuthProvider(),
-        ),
-        ChangeNotifierProvider(
-          create: (_) => ThemeProvider()..loadThemePreference(),
-        ),
-        ChangeNotifierProvider(
-          create: (_) => SpacesProvider(SpaceRepository()),
-        ),
-        ChangeNotifierProvider(
-          create: (_) => ContentProvider(
-            todoListRepository: TodoListRepository(),
-            listRepository: ListRepository(),
-            noteRepository: NoteRepository(),
-          ),
-        ),
+    // Wrap with ProviderScope for Riverpod 3.0
+    return const ProviderScope(
+      child: _MyApp(),
+    );
+  }
+}
+
+/// Internal MaterialApp widget using Riverpod theme controller
+///
+/// Migrated from Provider to Riverpod 3.0 for theme management.
+/// Uses ConsumerWidget to watch themeControllerProvider.
+class _MyApp extends ConsumerWidget {
+  const _MyApp();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    // Watch Riverpod theme controller instead of Provider
+    final themeMode = ref.watch(themeControllerProvider);
+
+    return MaterialApp(
+      title: 'Later',
+      debugShowCheckedModeBanner: false,
+      theme: AppTheme.lightTheme,
+      darkTheme: AppTheme.darkTheme,
+      themeMode: themeMode,
+      // Add theme animation for smooth transitions
+      themeAnimationDuration: const Duration(milliseconds: 250),
+      themeAnimationCurve: Curves.easeInOut,
+      // Localization support
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
       ],
-      child: Consumer<ThemeProvider>(
-        builder: (context, themeProvider, _) {
-          return MaterialApp(
-            title: 'Later',
-            debugShowCheckedModeBanner: false,
-            theme: AppTheme.lightTheme,
-            darkTheme: AppTheme.darkTheme,
-            themeMode: themeProvider.themeMode,
-            // Add theme animation for smooth transitions
-            themeAnimationDuration: const Duration(milliseconds: 250),
-            themeAnimationCurve: Curves.easeInOut,
-            // Localization support
-            localizationsDelegates: const [
-              AppLocalizations.delegate,
-              GlobalMaterialLocalizations.delegate,
-              GlobalWidgetsLocalizations.delegate,
-              GlobalCupertinoLocalizations.delegate,
-            ],
-            supportedLocales: const [
-              Locale('en'),
-              Locale('de'),
-            ],
-            home: const AuthGate(),
-          );
-        },
-      ),
+      supportedLocales: const [
+        Locale('en'),
+        Locale('de'),
+      ],
+      home: const AuthGate(),
     );
   }
 }

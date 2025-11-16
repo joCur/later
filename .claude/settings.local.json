@@ -16,7 +16,9 @@
       "Bash(perl -i -pe:*)",
       "Bash(lib/widgets/**/*.dart)",
       "Bash(gh pr view:*)",
-      "Bash(gh api:*)"
+      "Bash(gh api:*)",
+      "WebFetch(domain:pub.dev)",
+      "Bash(find:*)"
     ],
     "deny": [],
     "ask": []

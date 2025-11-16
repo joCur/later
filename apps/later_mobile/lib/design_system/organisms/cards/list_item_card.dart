@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:later_mobile/design_system/tokens/tokens.dart';
-import 'package:later_mobile/data/models/list_item_model.dart';
+import 'package:later_mobile/features/lists/domain/models/list_item_model.dart';
 import 'package:later_mobile/data/models/list_style.dart';
 
 /// ListItem card component for displaying individual items within a List

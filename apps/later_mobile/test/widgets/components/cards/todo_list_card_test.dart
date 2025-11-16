@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:later_mobile/data/models/todo_list_model.dart';
+import 'package:later_mobile/features/todo_lists/domain/models/todo_list.dart';
 import 'package:later_mobile/design_system/organisms/cards/todo_list_card.dart';
 import '../../../test_helpers.dart';
 

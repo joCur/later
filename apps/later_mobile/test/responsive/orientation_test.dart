@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:later_mobile/core/responsive/breakpoints.dart';
-import 'package:later_mobile/widgets/navigation/app_sidebar.dart';
-import 'package:later_mobile/widgets/navigation/icon_only_bottom_nav.dart';
+import 'package:later_mobile/data/local/preferences_service.dart';
+import 'package:later_mobile/shared/widgets/navigation/app_sidebar.dart';
+import 'package:later_mobile/shared/widgets/navigation/icon_only_bottom_nav.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../test_helpers.dart';
 
@@ -27,6 +29,11 @@ import '../test_helpers.dart';
 /// - Correct breakpoint detection in both orientations
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
+
+  setUp(() async {
+    SharedPreferences.setMockInitialValues({});
+    await PreferencesService.initialize();
+  });
 
   group('Mobile Portrait to Landscape Tests', () {
     testWidgets('iPhone 12 portrait orientation (375x812)', (

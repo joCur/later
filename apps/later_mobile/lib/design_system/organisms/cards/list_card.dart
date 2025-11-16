@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:later_mobile/design_system/tokens/tokens.dart';
-import 'package:later_mobile/data/models/list_model.dart';
+import 'package:later_mobile/features/lists/domain/models/list_model.dart';
 import 'package:later_mobile/design_system/atoms/borders/gradient_pill_border.dart';
 import 'package:later_mobile/design_system/atoms/drag_handle/drag_handle.dart';
 import 'package:later_mobile/core/theme/temporal_flow_theme.dart';

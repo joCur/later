@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:later_mobile/design_system/tokens/tokens.dart';
-import '../../../data/models/note_model.dart';
+import '../../../features/notes/domain/models/note.dart';
 import 'package:later_mobile/design_system/atoms/text/gradient_text.dart';
 import 'package:later_mobile/design_system/atoms/borders/gradient_pill_border.dart';
 import 'package:later_mobile/design_system/atoms/drag_handle/drag_handle.dart';
@@ -29,7 +30,7 @@ import 'package:later_mobile/core/theme/temporal_flow_theme.dart';
 /// - Press animations with haptic feedback
 /// - Entrance animations with staggered delay
 /// - Semantic labels for accessibility
-class NoteCard extends StatefulWidget {
+class NoteCard extends ConsumerStatefulWidget {
   const NoteCard({
     super.key,
     required this.note,
@@ -61,10 +62,10 @@ class NoteCard extends StatefulWidget {
   final int? reorderIndex;
 
   @override
-  State<NoteCard> createState() => _NoteCardState();
+  ConsumerState<NoteCard> createState() => _NoteCardState();
 }
 
-class _NoteCardState extends State<NoteCard> with TickerProviderStateMixin {
+class _NoteCardState extends ConsumerState<NoteCard> with TickerProviderStateMixin {
   bool _isPressed = false;
   bool _isDragging = false;
   late AnimationController _pressAnimationController;
