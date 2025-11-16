@@ -44,6 +44,14 @@ class MockAuthService extends _i1.Mock implements _i3.AuthService {
   }
 
   @override
+  bool get isCurrentUserAnonymous =>
+      (super.noSuchMethod(
+            Invocation.getter(#isCurrentUserAnonymous),
+            returnValue: false,
+          )
+          as bool);
+
+  @override
   _i4.Future<_i2.User> signUpWithEmail({
     required String? email,
     required String? password,
@@ -103,6 +111,38 @@ class MockAuthService extends _i1.Mock implements _i3.AuthService {
             returnValue: _i4.Stream<_i2.AuthState>.empty(),
           )
           as _i4.Stream<_i2.AuthState>);
+
+  @override
+  _i4.Future<_i2.User> signInAnonymously() =>
+      (super.noSuchMethod(
+            Invocation.method(#signInAnonymously, []),
+            returnValue: _i4.Future<_i2.User>.value(
+              _FakeUser_0(this, Invocation.method(#signInAnonymously, [])),
+            ),
+          )
+          as _i4.Future<_i2.User>);
+
+  @override
+  _i4.Future<_i2.User> upgradeAnonymousUser({
+    required String? email,
+    required String? password,
+  }) =>
+      (super.noSuchMethod(
+            Invocation.method(#upgradeAnonymousUser, [], {
+              #email: email,
+              #password: password,
+            }),
+            returnValue: _i4.Future<_i2.User>.value(
+              _FakeUser_0(
+                this,
+                Invocation.method(#upgradeAnonymousUser, [], {
+                  #email: email,
+                  #password: password,
+                }),
+              ),
+            ),
+          )
+          as _i4.Future<_i2.User>);
 }
 
 /// A class which mocks [User].

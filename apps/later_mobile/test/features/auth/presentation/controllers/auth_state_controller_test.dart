@@ -4,13 +4,15 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:later_mobile/core/error/error.dart';
 import 'package:later_mobile/features/auth/application/auth_application_service.dart';
 import 'package:later_mobile/features/auth/application/providers.dart';
+import 'package:later_mobile/features/auth/data/services/auth_service.dart';
+import 'package:later_mobile/features/auth/data/services/providers.dart';
 import 'package:later_mobile/features/auth/presentation/controllers/auth_state_controller.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-@GenerateMocks([AuthApplicationService, User, Session])
+@GenerateMocks([AuthApplicationService, AuthService, User, Session])
 import 'auth_state_controller_test.mocks.dart';
 
 void main() {
@@ -374,5 +376,297 @@ void main() {
     // because the controller's stream subscription runs asynchronously.
     // This behavior is verified through the other controller tests
     // and through integration/widget tests.
+
+    group('Anonymous Authentication', () {
+      late MockAuthService mockAuthService;
+      late MockUser mockAnonymousUser;
+
+      setUp(() {
+        mockAuthService = MockAuthService();
+        mockAnonymousUser = MockUser();
+
+        // Set up anonymous user properties
+        when(mockAnonymousUser.id).thenReturn('anon-user-1');
+        when(mockAnonymousUser.isAnonymous).thenReturn(true);
+        when(mockAnonymousUser.email).thenReturn(null);
+      });
+
+      test(
+          'should auto sign-in anonymously when no user exists on initialization',
+          () async {
+        // Arrange
+        when(mockService.checkAuthStatus()).thenReturn(null);
+        when(mockService.authStateChanges()).thenAnswer(
+          (_) => Stream<AuthState>.value(
+            const AuthState(AuthChangeEvent.signedOut, null),
+          ),
+        );
+        when(mockAuthService.signInAnonymously())
+            .thenAnswer((_) async => mockAnonymousUser);
+
+        final container = ProviderContainer(
+          overrides: [
+            authApplicationServiceProvider.overrideWithValue(mockService),
+            authServiceProvider.overrideWithValue(mockAuthService),
+          ],
+        );
+        addTearDown(container.dispose);
+
+        // Act
+        final state = await container.read(authStateControllerProvider.future);
+
+        // Assert
+        expect(state, mockAnonymousUser);
+        verify(mockService.checkAuthStatus()).called(1);
+        verify(mockAuthService.signInAnonymously()).called(1);
+      });
+
+      test('should return null if anonymous sign-in fails', () async {
+        // Arrange
+        when(mockService.checkAuthStatus()).thenReturn(null);
+        when(mockService.authStateChanges()).thenAnswer(
+          (_) => Stream<AuthState>.value(
+            const AuthState(AuthChangeEvent.signedOut, null),
+          ),
+        );
+        when(mockAuthService.signInAnonymously()).thenThrow(
+          const AppError(
+            code: ErrorCode.authGeneric,
+            message: 'Anonymous sign-in failed',
+          ),
+        );
+
+        final container = ProviderContainer(
+          overrides: [
+            authApplicationServiceProvider.overrideWithValue(mockService),
+            authServiceProvider.overrideWithValue(mockAuthService),
+          ],
+        );
+        addTearDown(container.dispose);
+
+        // Act
+        final state = await container.read(authStateControllerProvider.future);
+
+        // Assert
+        expect(state, isNull);
+        verify(mockService.checkAuthStatus()).called(1);
+        verify(mockAuthService.signInAnonymously()).called(1);
+      });
+
+      test('should not sign in anonymously if user already exists', () async {
+        // Arrange
+        when(mockService.checkAuthStatus()).thenReturn(mockUser);
+        when(mockService.authStateChanges()).thenAnswer(
+          (_) => Stream<AuthState>.value(
+            AuthState(AuthChangeEvent.signedIn, mockSession),
+          ),
+        );
+
+        final container = ProviderContainer(
+          overrides: [
+            authApplicationServiceProvider.overrideWithValue(mockService),
+            authServiceProvider.overrideWithValue(mockAuthService),
+          ],
+        );
+        addTearDown(container.dispose);
+
+        // Act
+        final state = await container.read(authStateControllerProvider.future);
+
+        // Assert
+        expect(state, mockUser);
+        verify(mockService.checkAuthStatus()).called(1);
+        verifyNever(mockAuthService.signInAnonymously());
+      });
+
+      test('should upgrade anonymous user to full account', () async {
+        // Arrange
+        final upgradedUser = MockUser();
+        when(upgradedUser.id).thenReturn('anon-user-1'); // Same ID
+        when(upgradedUser.isAnonymous).thenReturn(false);
+        when(upgradedUser.email).thenReturn('test@example.com');
+
+        when(mockService.checkAuthStatus()).thenReturn(mockAnonymousUser);
+        when(mockService.authStateChanges()).thenAnswer(
+          (_) => Stream<AuthState>.value(
+            AuthState(AuthChangeEvent.signedIn, mockSession),
+          ),
+        );
+        when(mockAuthService.signInAnonymously())
+            .thenAnswer((_) async => mockAnonymousUser);
+        when(mockAuthService.upgradeAnonymousUser(
+          email: anyNamed('email'),
+          password: anyNamed('password'),
+        )).thenAnswer((_) async => upgradedUser);
+
+        final container = ProviderContainer(
+          overrides: [
+            authApplicationServiceProvider.overrideWithValue(mockService),
+            authServiceProvider.overrideWithValue(mockAuthService),
+          ],
+        );
+        addTearDown(container.dispose);
+
+        // Wait for initial state (anonymous user)
+        await container.read(authStateControllerProvider.future);
+
+        // Act
+        final controller = container.read(authStateControllerProvider.notifier);
+        await controller.upgradeToFullAccount(
+          email: 'test@example.com',
+          password: 'password123',
+        );
+
+        // Assert
+        final finalState = container.read(authStateControllerProvider);
+        expect(finalState.hasValue, true);
+        expect(finalState.value, upgradedUser);
+        expect(finalState.hasError, false);
+        verify(mockAuthService.upgradeAnonymousUser(
+          email: 'test@example.com',
+          password: 'password123',
+        )).called(1);
+      });
+
+      test('should handle upgrade failure with error state', () async {
+        // Arrange
+        const expectedError = AppError(
+          code: ErrorCode.authUpgradeFailed,
+          message: 'Upgrade failed',
+        );
+
+        when(mockService.checkAuthStatus()).thenReturn(mockAnonymousUser);
+        when(mockService.authStateChanges()).thenAnswer(
+          (_) => Stream<AuthState>.value(
+            AuthState(AuthChangeEvent.signedIn, mockSession),
+          ),
+        );
+        when(mockAuthService.signInAnonymously())
+            .thenAnswer((_) async => mockAnonymousUser);
+        when(mockAuthService.upgradeAnonymousUser(
+          email: anyNamed('email'),
+          password: anyNamed('password'),
+        )).thenThrow(expectedError);
+
+        final container = ProviderContainer(
+          overrides: [
+            authApplicationServiceProvider.overrideWithValue(mockService),
+            authServiceProvider.overrideWithValue(mockAuthService),
+          ],
+        );
+        addTearDown(container.dispose);
+
+        // Wait for initial state (anonymous user)
+        await container.read(authStateControllerProvider.future);
+
+        // Act
+        final controller = container.read(authStateControllerProvider.notifier);
+        await controller.upgradeToFullAccount(
+          email: 'test@example.com',
+          password: 'password123',
+        );
+
+        // Assert
+        final finalState = container.read(authStateControllerProvider);
+        expect(finalState.hasError, true);
+        expect(finalState.error, expectedError);
+      });
+
+      test('isCurrentUserAnonymous should return true for anonymous users',
+          () async {
+        // Arrange
+        when(mockService.checkAuthStatus()).thenReturn(mockAnonymousUser);
+        when(mockService.authStateChanges()).thenAnswer(
+          (_) => Stream<AuthState>.value(
+            AuthState(AuthChangeEvent.signedIn, mockSession),
+          ),
+        );
+        when(mockAuthService.signInAnonymously())
+            .thenAnswer((_) async => mockAnonymousUser);
+
+        final container = ProviderContainer(
+          overrides: [
+            authApplicationServiceProvider.overrideWithValue(mockService),
+            authServiceProvider.overrideWithValue(mockAuthService),
+          ],
+        );
+        addTearDown(container.dispose);
+
+        // Wait for initial state (anonymous user)
+        await container.read(authStateControllerProvider.future);
+
+        // Act
+        final controller = container.read(authStateControllerProvider.notifier);
+        final isAnonymous = controller.isCurrentUserAnonymous;
+
+        // Assert
+        expect(isAnonymous, true);
+      });
+
+      test(
+          'isCurrentUserAnonymous should return false for authenticated users',
+          () async {
+        // Arrange
+        when(mockUser.isAnonymous).thenReturn(false);
+        when(mockService.checkAuthStatus()).thenReturn(mockUser);
+        when(mockService.authStateChanges()).thenAnswer(
+          (_) => Stream<AuthState>.value(
+            AuthState(AuthChangeEvent.signedIn, mockSession),
+          ),
+        );
+
+        final container = ProviderContainer(
+          overrides: [
+            authApplicationServiceProvider.overrideWithValue(mockService),
+            authServiceProvider.overrideWithValue(mockAuthService),
+          ],
+        );
+        addTearDown(container.dispose);
+
+        // Wait for initial state (authenticated user)
+        await container.read(authStateControllerProvider.future);
+
+        // Act
+        final controller = container.read(authStateControllerProvider.notifier);
+        final isAnonymous = controller.isCurrentUserAnonymous;
+
+        // Assert
+        expect(isAnonymous, false);
+      });
+
+      test('isCurrentUserAnonymous should return false when no user', () async {
+        // Arrange
+        when(mockService.checkAuthStatus()).thenReturn(null);
+        when(mockService.authStateChanges()).thenAnswer(
+          (_) => Stream<AuthState>.value(
+            const AuthState(AuthChangeEvent.signedOut, null),
+          ),
+        );
+        when(mockAuthService.signInAnonymously()).thenThrow(
+          const AppError(
+            code: ErrorCode.authGeneric,
+            message: 'Anonymous sign-in failed',
+          ),
+        );
+
+        final container = ProviderContainer(
+          overrides: [
+            authApplicationServiceProvider.overrideWithValue(mockService),
+            authServiceProvider.overrideWithValue(mockAuthService),
+          ],
+        );
+        addTearDown(container.dispose);
+
+        // Wait for initial state (no user)
+        await container.read(authStateControllerProvider.future);
+
+        // Act
+        final controller = container.read(authStateControllerProvider.notifier);
+        final isAnonymous = controller.isCurrentUserAnonymous;
+
+        // Assert
+        expect(isAnonymous, false);
+      });
+    });
   });
 }

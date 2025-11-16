@@ -67,7 +67,7 @@ final class PermissionServiceProvider
   }
 }
 
-String _$permissionServiceHash() => r'7f9681784aaf48ceb682adb5ce34433e320cb75d';
+String _$permissionServiceHash() => r'bbcbd006d6d26a4434291d0eff35ab927b34f362';
 
 /// Provider for the current user's role.
 ///
@@ -134,4 +134,4 @@ final class CurrentUserRoleProvider
   }
 }
 
-String _$currentUserRoleHash() => r'69397b22c73bbbf33e05d6f63f295972979ea16c';
+String _$currentUserRoleHash() => r'9eef7d10a6cd8a5a1f07cc03fcb84006ebd49c12';
