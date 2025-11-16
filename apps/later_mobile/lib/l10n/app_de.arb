@@ -82,6 +82,21 @@
     "description": "Generic authentication error message"
   },
 
+  "errorAuthAnonymousSignInFailed": "Test konnte nicht gestartet werden. Bitte versuchen Sie es erneut.",
+  "@errorAuthAnonymousSignInFailed": {
+    "description": "Error message when anonymous sign-in fails"
+  },
+
+  "errorAuthUpgradeFailed": "Konto konnte nicht erstellt werden. Bitte versuchen Sie es erneut.",
+  "@errorAuthUpgradeFailed": {
+    "description": "Error message when upgrading anonymous account to permanent fails"
+  },
+
+  "errorAuthAlreadyAuthenticated": "Sie haben bereits ein Konto.",
+  "@errorAuthAlreadyAuthenticated": {
+    "description": "Error message when trying to perform anonymous-only operation with authenticated account"
+  },
+
   "errorNetworkTimeout": "Zeitüberschreitung der Verbindung. Bitte überprüfen Sie Ihre Internetverbindung und versuchen Sie es erneut.",
   "@errorNetworkTimeout": {
     "description": "Error message for network timeouts"

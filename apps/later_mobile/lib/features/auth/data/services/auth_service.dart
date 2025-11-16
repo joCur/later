@@ -128,4 +128,111 @@ class AuthService {
   Stream<AuthState> authStateChanges() {
     return _supabase.auth.onAuthStateChange;
   }
+
+  /// Sign in anonymously
+  ///
+  /// Creates an anonymous user session allowing users to try the app
+  /// without creating a permanent account.
+  ///
+  /// Returns the [User] object with `isAnonymous = true`.
+  /// Throws [AppError] with [ErrorCode.authAnonymousSignInFailed] on failure.
+  ///
+  /// Anonymous users can later upgrade to a permanent account using
+  /// [upgradeAnonymousUser] without losing any data.
+  Future<User> signInAnonymously() async {
+    try {
+      final response = await _supabase.auth.signInAnonymously();
+
+      if (response.user == null) {
+        throw const AppError(
+          code: ErrorCode.authAnonymousSignInFailed,
+          message: 'Anonymous sign in failed. Please try again.',
+        );
+      }
+
+      return response.user!;
+    } on AuthException catch (e) {
+      throw SupabaseErrorMapper.fromAuthException(e);
+    } on AppError {
+      rethrow;
+    } catch (e, stackTrace) {
+      throw AppError(
+        code: ErrorCode.unknownError,
+        message: 'An unexpected error occurred during anonymous sign in: ${e.toString()}',
+        technicalDetails: stackTrace.toString(),
+      );
+    }
+  }
+
+  /// Upgrade an anonymous user to a permanent account
+  ///
+  /// Converts the current anonymous user session to a permanent account
+  /// by setting an email and password. All existing data is preserved
+  /// as the user ID remains unchanged.
+  ///
+  /// Returns the [User] object with `isAnonymous = false`.
+  /// Throws [AppError] on failure with one of these codes:
+  /// - [ErrorCode.authSessionExpired] - No active session
+  /// - [ErrorCode.authAlreadyAuthenticated] - User is already permanent
+  /// - [ErrorCode.authUpgradeFailed] - Upgrade operation failed
+  ///
+  /// Note: Email verification is disabled for MVP, so both email and password
+  /// are set in a single operation.
+  Future<User> upgradeAnonymousUser({
+    required String email,
+    required String password,
+  }) async {
+    try {
+      final currentUser = _supabase.auth.currentUser;
+
+      if (currentUser == null) {
+        throw const AppError(
+          code: ErrorCode.authSessionExpired,
+          message: 'No active session to upgrade.',
+        );
+      }
+
+      if (!currentUser.isAnonymous) {
+        throw const AppError(
+          code: ErrorCode.authAlreadyAuthenticated,
+          message: 'User is already authenticated.',
+        );
+      }
+
+      final response = await _supabase.auth.updateUser(
+        UserAttributes(
+          email: email,
+          password: password,
+        ),
+      );
+
+      if (response.user == null) {
+        throw const AppError(
+          code: ErrorCode.authUpgradeFailed,
+          message: 'Account upgrade failed. Please try again.',
+        );
+      }
+
+      return response.user!;
+    } on AuthException catch (e) {
+      throw SupabaseErrorMapper.fromAuthException(e);
+    } on AppError {
+      rethrow;
+    } catch (e, stackTrace) {
+      throw AppError(
+        code: ErrorCode.unknownError,
+        message: 'An unexpected error occurred during account upgrade: ${e.toString()}',
+        technicalDetails: stackTrace.toString(),
+      );
+    }
+  }
+
+  /// Check if the current user is anonymous
+  ///
+  /// Returns true if there is an active anonymous session, false otherwise.
+  /// Returns false if no user is signed in.
+  bool get isCurrentUserAnonymous {
+    final user = getCurrentUser();
+    return user?.isAnonymous ?? false;
+  }
 }

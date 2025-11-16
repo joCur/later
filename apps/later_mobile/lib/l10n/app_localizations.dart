@@ -188,6 +188,24 @@ abstract class AppLocalizations {
   /// **'An authentication error occurred. Please try again.'**
   String get errorAuthGeneric;
 
+  /// Error message when anonymous sign-in fails
+  ///
+  /// In en, this message translates to:
+  /// **'Could not start trial. Please try again.'**
+  String get errorAuthAnonymousSignInFailed;
+
+  /// Error message when upgrading anonymous account to permanent fails
+  ///
+  /// In en, this message translates to:
+  /// **'Could not create account. Please try again.'**
+  String get errorAuthUpgradeFailed;
+
+  /// Error message when trying to perform anonymous-only operation with authenticated account
+  ///
+  /// In en, this message translates to:
+  /// **'You already have an account.'**
+  String get errorAuthAlreadyAuthenticated;
+
   /// Error message for network timeouts
   ///
   /// In en, this message translates to:

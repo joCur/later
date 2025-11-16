@@ -82,6 +82,21 @@
     "description": "Generic authentication error message"
   },
 
+  "errorAuthAnonymousSignInFailed": "Could not start trial. Please try again.",
+  "@errorAuthAnonymousSignInFailed": {
+    "description": "Error message when anonymous sign-in fails"
+  },
+
+  "errorAuthUpgradeFailed": "Could not create account. Please try again.",
+  "@errorAuthUpgradeFailed": {
+    "description": "Error message when upgrading anonymous account to permanent fails"
+  },
+
+  "errorAuthAlreadyAuthenticated": "You already have an account.",
+  "@errorAuthAlreadyAuthenticated": {
+    "description": "Error message when trying to perform anonymous-only operation with authenticated account"
+  },
+
   "errorNetworkTimeout": "Connection timed out. Please check your internet connection and try again.",
   "@errorNetworkTimeout": {
     "description": "Error message for network timeouts"

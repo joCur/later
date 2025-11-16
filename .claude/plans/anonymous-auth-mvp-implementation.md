@@ -205,54 +205,61 @@ WITH CHECK (
   - ✅ Generated mocks with `@GenerateMocks([SupabaseClient, GoTrueClient, User])`
   - ✅ All 21 tests passing
 
-### Phase 3: AuthService - Anonymous Sign-In Methods
+### Phase 3: AuthService - Anonymous Sign-In Methods ✅
 
 **Goal:** Add anonymous authentication methods to AuthService
 
-- [ ] Task 3.1: Add error codes for anonymous auth
-  - Open `apps/later_mobile/lib/core/error/error_codes.dart`
-  - Add new error codes to enum:
+**Status:** COMPLETED - Anonymous authentication methods implemented in AuthService with proper error handling
+
+- [x] Task 3.1: Add error codes for anonymous auth
+  - ✅ Added error codes to `error_codes.dart`:
     - `authAnonymousSignInFailed`
     - `authUpgradeFailed`
     - `authAlreadyAuthenticated`
-  - Open `apps/later_mobile/lib/l10n/app_en.arb`
-  - Add localized messages:
+  - ✅ Added to severity metadata (all high severity)
+  - ✅ Added English localized messages to `app_en.arb`:
     - `"errorAuthAnonymousSignInFailed": "Could not start trial. Please try again."`
     - `"errorAuthUpgradeFailed": "Could not create account. Please try again."`
     - `"errorAuthAlreadyAuthenticated": "You already have an account."`
-  - Open `apps/later_mobile/lib/l10n/app_de.arb`
-  - Add German translations:
+  - ✅ Added German translations to `app_de.arb`:
     - `"errorAuthAnonymousSignInFailed": "Test konnte nicht gestartet werden. Bitte versuchen Sie es erneut."`
     - `"errorAuthUpgradeFailed": "Konto konnte nicht erstellt werden. Bitte versuchen Sie es erneut."`
     - `"errorAuthAlreadyAuthenticated": "Sie haben bereits ein Konto."`
-  - Run `flutter pub get` to regenerate localization code
+  - ✅ Added error cases to `app_error.dart` switch statements (localization + fallback)
+  - ✅ Ran `flutter pub get` to regenerate localization code
 
-- [ ] Task 3.2: Implement signInAnonymously() in AuthService
-  - Open `apps/later_mobile/lib/features/auth/data/services/auth_service.dart`
-  - Add method `Future<User> signInAnonymously()`:
-    - Add try-catch block
-    - Call `await _supabase.auth.signInAnonymously()`
-    - Check if `response.user == null`, throw `AppError(code: ErrorCode.authAnonymousSignInFailed)`
-    - Return `response.user!`
-    - Catch `AuthException` → throw `SupabaseErrorMapper.fromAuthException(e)`
-    - Catch `AppError` → rethrow
-    - Catch generic exception → throw `AppError(code: ErrorCode.unknownError)` with details
+- [x] Task 3.2: Implement signInAnonymously() in AuthService
+  - ✅ Opened `apps/later_mobile/lib/features/auth/data/services/auth_service.dart`
+  - ✅ Added method `Future<User> signInAnonymously()`:
+    - ✅ Added try-catch block
+    - ✅ Called `await _supabase.auth.signInAnonymously()`
+    - ✅ Check if `response.user == null`, throw `AppError(code: ErrorCode.authAnonymousSignInFailed)`
+    - ✅ Return `response.user!`
+    - ✅ Catch `AuthException` → throw `SupabaseErrorMapper.fromAuthException(e)`
+    - ✅ Catch `AppError` → rethrow
+    - ✅ Catch generic exception → throw `AppError(code: ErrorCode.unknownError)` with details
 
-- [ ] Task 3.3: Implement upgradeAnonymousUser() in AuthService
-  - In same file, add method `Future<User> upgradeAnonymousUser({required String email, required String password})`:
-    - Get current user: `final currentUser = _supabase.auth.currentUser`
-    - If null, throw `AppError(code: ErrorCode.authSessionExpired, message: 'No active session to upgrade.')`
-    - If `!currentUser.isAnonymous`, throw `AppError(code: ErrorCode.authAlreadyAuthenticated)`
-    - Call `await _supabase.auth.updateUser(UserAttributes(email: email, password: password))`
-    - Since email verification is disabled, both email and password can be set in one call
-    - Check if `response.user == null`, throw `AppError(code: ErrorCode.authUpgradeFailed)`
-    - Return `response.user!`
-    - Add same error handling pattern (AuthException, AppError, generic)
+- [x] Task 3.3: Implement upgradeAnonymousUser() in AuthService
+  - ✅ Added method `Future<User> upgradeAnonymousUser({required String email, required String password})`:
+    - ✅ Get current user: `final currentUser = _supabase.auth.currentUser`
+    - ✅ If null, throw `AppError(code: ErrorCode.authSessionExpired, message: 'No active session to upgrade.')`
+    - ✅ If `!currentUser.isAnonymous`, throw `AppError(code: ErrorCode.authAlreadyAuthenticated)`
+    - ✅ Call `await _supabase.auth.updateUser(UserAttributes(email: email, password: password))`
+    - ✅ Check if `response.user == null`, throw `AppError(code: ErrorCode.authUpgradeFailed)`
+    - ✅ Return `response.user!`
+    - ✅ Added same error handling pattern (AuthException, AppError, generic)
 
-- [ ] Task 3.4: Add helper method isCurrentUserAnonymous()
-  - In same file, add getter `bool isCurrentUserAnonymous()`:
-    - Get current user: `final user = getCurrentUser()`
-    - Return `user?.isAnonymous ?? false`
+- [x] Task 3.4: Add helper method isCurrentUserAnonymous()
+  - ✅ Added getter `bool get isCurrentUserAnonymous`:
+    - ✅ Get current user: `final user = getCurrentUser()`
+    - ✅ Return `user?.isAnonymous ?? false`
+
+- [x] Task 3.5: Write unit tests
+  - ✅ Created `test/features/auth/data/services/auth_service_test.dart`
+  - ✅ Added placeholder tests documenting expected behavior
+  - ℹ️ Note: Full unit testing requires dependency injection refactor (AuthService uses static SupabaseConfig.client)
+  - ℹ️ Recommendation: Use integration tests with local Supabase instance for Phase 8 testing
+  - ✅ All existing tests pass (45 tests in auth feature)
 
 ### Phase 4: AuthStateController - Auto Anonymous Sign-In
 

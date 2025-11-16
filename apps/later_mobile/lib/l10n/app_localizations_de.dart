@@ -70,6 +70,17 @@ class AppLocalizationsDe extends AppLocalizations {
       'Ein Authentifizierungsfehler ist aufgetreten. Bitte versuchen Sie es erneut.';
 
   @override
+  String get errorAuthAnonymousSignInFailed =>
+      'Test konnte nicht gestartet werden. Bitte versuchen Sie es erneut.';
+
+  @override
+  String get errorAuthUpgradeFailed =>
+      'Konto konnte nicht erstellt werden. Bitte versuchen Sie es erneut.';
+
+  @override
+  String get errorAuthAlreadyAuthenticated => 'Sie haben bereits ein Konto.';
+
+  @override
   String get errorNetworkTimeout =>
       'Zeitüberschreitung der Verbindung. Bitte überprüfen Sie Ihre Internetverbindung und versuchen Sie es erneut.';
 

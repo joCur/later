@@ -70,6 +70,17 @@ class AppLocalizationsEn extends AppLocalizations {
       'An authentication error occurred. Please try again.';
 
   @override
+  String get errorAuthAnonymousSignInFailed =>
+      'Could not start trial. Please try again.';
+
+  @override
+  String get errorAuthUpgradeFailed =>
+      'Could not create account. Please try again.';
+
+  @override
+  String get errorAuthAlreadyAuthenticated => 'You already have an account.';
+
+  @override
   String get errorNetworkTimeout =>
       'Connection timed out. Please check your internet connection and try again.';
 
