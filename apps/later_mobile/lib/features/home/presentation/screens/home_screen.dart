@@ -436,18 +436,26 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         PopupMenuButton<String>(
           icon: Icon(Icons.more_vert, color: AppColors.textSecondary(context)),
           tooltip: 'Menu',
-          itemBuilder: (context) => [
-            PopupMenuItem(
-              value: 'signout',
-              child: Row(
-                children: [
-                  const Icon(Icons.logout),
-                  const SizedBox(width: AppSpacing.sm),
-                  Text(l10n.menuSignOut),
-                ],
-              ),
-            ),
-          ],
+          itemBuilder: (context) {
+            final isAnonymous = ref
+                .read(authStateControllerProvider.notifier)
+                .isCurrentUserAnonymous;
+
+            return [
+              // Only show sign-out for authenticated (non-anonymous) users
+              if (!isAnonymous)
+                PopupMenuItem(
+                  value: 'signout',
+                  child: Row(
+                    children: [
+                      const Icon(Icons.logout),
+                      const SizedBox(width: AppSpacing.sm),
+                      Text(l10n.menuSignOut),
+                    ],
+                  ),
+                ),
+            ];
+          },
           onSelected: (value) async {
             if (value == 'signout') {
               await ref.read(authStateControllerProvider.notifier).signOut();

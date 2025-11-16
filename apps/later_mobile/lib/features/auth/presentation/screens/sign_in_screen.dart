@@ -62,6 +62,12 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
     // The UI will show the error message automatically
   }
 
+  Future<void> _handleContinueWithoutAccount() async {
+    await ref.read(authStateControllerProvider.notifier).signInAnonymously();
+    // Error handling is done through AsyncValue.error
+    // The UI will show the error message automatically
+  }
+
   void _navigateToSignUp() {
     Navigator.of(context).pushReplacement(
       MaterialPageRoute<void>(builder: (context) => const SignUpScreen()),
@@ -149,6 +155,10 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
 
                                   // Sign up link
                                   _buildSignUpLink(isLoading),
+                                  const SizedBox(height: AppSpacing.md),
+
+                                  // Continue without account button
+                                  _buildContinueWithoutAccountButton(isLoading),
                                 ],
                               ),
                             ),
@@ -348,5 +358,16 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
         ),
       ),
     ).animate(delay: 700.ms).fadeIn(duration: 300.ms);
+  }
+
+  Widget _buildContinueWithoutAccountButton(bool isLoading) {
+    final l10n = AppLocalizations.of(context)!;
+    return GhostButton(
+          text: l10n.authButtonContinueWithoutAccount,
+          onPressed: isLoading ? null : _handleContinueWithoutAccount,
+        )
+        .animate(delay: 800.ms)
+        .slideY(begin: 0.05, end: 0, duration: 300.ms)
+        .fadeIn(duration: 300.ms);
   }
 }

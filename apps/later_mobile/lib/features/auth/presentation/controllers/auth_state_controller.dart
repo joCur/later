@@ -1,10 +1,9 @@
 // ignore_for_file: depend_on_referenced_packages
 import 'dart:async';
 
-import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:later_mobile/core/error/error.dart';
 import 'package:later_mobile/features/auth/application/providers.dart';
 import 'package:later_mobile/features/auth/data/services/providers.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 part 'auth_state_controller.g.dart';
@@ -29,35 +28,7 @@ class AuthStateController extends _$AuthStateController {
   Future<User?> build() async {
     // Initialize with current auth status
     final service = ref.watch(authApplicationServiceProvider);
-    var user = service.checkAuthStatus();
-
-    // If no user exists, sign in anonymously
-    if (user == null) {
-      try {
-        user = await ref.read(authServiceProvider).signInAnonymously();
-      } on AppError catch (error, stackTrace) {
-        // If anonymous sign-in fails, log error but don't throw
-        // User can still manually sign in/sign up
-        ErrorLogger.logError(
-          error,
-          context: 'AuthStateController.build - anonymous sign-in failed',
-          stackTrace: stackTrace,
-        );
-        user = null;
-      } catch (error, stackTrace) {
-        // Handle unexpected non-AppError exceptions
-        ErrorLogger.logError(
-          AppError(
-            code: ErrorCode.unknownError,
-            message: 'Unexpected error during anonymous sign-in: $error',
-            technicalDetails: error.toString(),
-          ),
-          context: 'AuthStateController.build - anonymous sign-in failed',
-          stackTrace: stackTrace,
-        );
-        user = null;
-      }
-    }
+    final user = service.checkAuthStatus();
 
     // Listen to auth state changes
     _authStateSubscription = service.authStateChanges().listen((authState) {
@@ -79,10 +50,7 @@ class AuthStateController extends _$AuthStateController {
   ///
   /// Updates state to loading, then data or error based on result.
   /// Uses `ref.mounted` to prevent state updates after disposal.
-  Future<void> signUp({
-    required String email,
-    required String password,
-  }) async {
+  Future<void> signUp({required String email, required String password}) async {
     // Set loading state
     state = const AsyncValue.loading();
 
@@ -106,10 +74,7 @@ class AuthStateController extends _$AuthStateController {
   ///
   /// Updates state to loading, then data or error based on result.
   /// Uses `ref.mounted` to prevent state updates after disposal.
-  Future<void> signIn({
-    required String email,
-    required String password,
-  }) async {
+  Future<void> signIn({required String email, required String password}) async {
     // Set loading state
     state = const AsyncValue.loading();
 
@@ -217,5 +182,33 @@ class AuthStateController extends _$AuthStateController {
   bool get isCurrentUserAnonymous {
     final user = state.value;
     return user?.isAnonymous ?? false;
+  }
+
+  /// Sign in anonymously
+  ///
+  /// Creates a new anonymous user session. This allows users to try the app
+  /// without creating a permanent account. Anonymous users can later upgrade
+  /// to a full account while keeping their data.
+  ///
+  /// Updates state to loading, then data or error based on result.
+  /// Uses `ref.mounted` to prevent state updates after disposal.
+  Future<void> signInAnonymously() async {
+    // Set loading state
+    state = const AsyncValue.loading();
+
+    try {
+      final authService = ref.read(authServiceProvider);
+      final user = await authService.signInAnonymously();
+
+      // Check if still mounted before updating
+      if (!ref.mounted) return;
+
+      state = AsyncValue.data(user);
+    } catch (error, stackTrace) {
+      // Check if still mounted before updating
+      if (!ref.mounted) return;
+
+      state = AsyncValue.error(error, stackTrace);
+    }
   }
 }

@@ -284,6 +284,11 @@
     "description": "Sign up button text"
   },
 
+  "authButtonContinueWithoutAccount": "Ohne Konto fortfahren",
+  "@authButtonContinueWithoutAccount": {
+    "description": "Button text to skip authentication and continue as anonymous user"
+  },
+
   "authLinkSignUp": "Registrieren",
   "@authLinkSignUp": {
     "description": "Link text to navigate to sign up screen"

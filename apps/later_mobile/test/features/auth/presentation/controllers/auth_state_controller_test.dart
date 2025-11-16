@@ -392,47 +392,13 @@ void main() {
       });
 
       test(
-          'should auto sign-in anonymously when no user exists on initialization',
+          'should NOT auto sign-in anonymously when no user exists on initialization',
           () async {
         // Arrange
         when(mockService.checkAuthStatus()).thenReturn(null);
         when(mockService.authStateChanges()).thenAnswer(
           (_) => Stream<AuthState>.value(
             const AuthState(AuthChangeEvent.signedOut, null),
-          ),
-        );
-        when(mockAuthService.signInAnonymously())
-            .thenAnswer((_) async => mockAnonymousUser);
-
-        final container = ProviderContainer(
-          overrides: [
-            authApplicationServiceProvider.overrideWithValue(mockService),
-            authServiceProvider.overrideWithValue(mockAuthService),
-          ],
-        );
-        addTearDown(container.dispose);
-
-        // Act
-        final state = await container.read(authStateControllerProvider.future);
-
-        // Assert
-        expect(state, mockAnonymousUser);
-        verify(mockService.checkAuthStatus()).called(1);
-        verify(mockAuthService.signInAnonymously()).called(1);
-      });
-
-      test('should return null if anonymous sign-in fails', () async {
-        // Arrange
-        when(mockService.checkAuthStatus()).thenReturn(null);
-        when(mockService.authStateChanges()).thenAnswer(
-          (_) => Stream<AuthState>.value(
-            const AuthState(AuthChangeEvent.signedOut, null),
-          ),
-        );
-        when(mockAuthService.signInAnonymously()).thenThrow(
-          const AppError(
-            code: ErrorCode.authGeneric,
-            message: 'Anonymous sign-in failed',
           ),
         );
 
@@ -450,7 +416,7 @@ void main() {
         // Assert
         expect(state, isNull);
         verify(mockService.checkAuthStatus()).called(1);
-        verify(mockAuthService.signInAnonymously()).called(1);
+        verifyNever(mockAuthService.signInAnonymously());
       });
 
       test('should not sign in anonymously if user already exists', () async {
@@ -642,11 +608,37 @@ void main() {
             const AuthState(AuthChangeEvent.signedOut, null),
           ),
         );
-        when(mockAuthService.signInAnonymously()).thenThrow(
-          const AppError(
-            code: ErrorCode.authGeneric,
-            message: 'Anonymous sign-in failed',
+
+        final container = ProviderContainer(
+          overrides: [
+            authApplicationServiceProvider.overrideWithValue(mockService),
+            authServiceProvider.overrideWithValue(mockAuthService),
+          ],
+        );
+        addTearDown(container.dispose);
+
+        // Wait for initial state (no user, no auto sign-in)
+        await container.read(authStateControllerProvider.future);
+
+        // Act
+        final controller = container.read(authStateControllerProvider.notifier);
+        final isAnonymous = controller.isCurrentUserAnonymous;
+
+        // Assert
+        expect(isAnonymous, false);
+        verifyNever(mockAuthService.signInAnonymously());
+      });
+
+      test('should sign in anonymously when method called explicitly', () async {
+        // Arrange
+        when(mockService.checkAuthStatus()).thenReturn(null);
+        when(mockService.authStateChanges()).thenAnswer(
+          (_) => Stream<AuthState>.value(
+            const AuthState(AuthChangeEvent.signedOut, null),
           ),
+        );
+        when(mockAuthService.signInAnonymously()).thenAnswer(
+          (_) async => mockAnonymousUser,
         );
 
         final container = ProviderContainer(
@@ -660,12 +652,53 @@ void main() {
         // Wait for initial state (no user)
         await container.read(authStateControllerProvider.future);
 
-        // Act
+        // Act - explicitly sign in anonymously
         final controller = container.read(authStateControllerProvider.notifier);
-        final isAnonymous = controller.isCurrentUserAnonymous;
+        await controller.signInAnonymously();
 
         // Assert
-        expect(isAnonymous, false);
+        final finalState = container.read(authStateControllerProvider);
+        expect(finalState.hasValue, true);
+        expect(finalState.value, mockAnonymousUser);
+        expect(finalState.hasError, false);
+        // Called once explicitly (no auto sign-in)
+        verify(mockAuthService.signInAnonymously()).called(1);
+      });
+
+      test('should handle explicit anonymous sign-in failure', () async {
+        // Arrange
+        const expectedError = AppError(
+          code: ErrorCode.authAnonymousSignInFailed,
+          message: 'Could not start trial',
+        );
+
+        when(mockService.checkAuthStatus()).thenReturn(mockUser);
+        when(mockService.authStateChanges()).thenAnswer(
+          (_) => Stream<AuthState>.value(
+            AuthState(AuthChangeEvent.signedIn, mockSession),
+          ),
+        );
+        when(mockAuthService.signInAnonymously()).thenThrow(expectedError);
+
+        final container = ProviderContainer(
+          overrides: [
+            authApplicationServiceProvider.overrideWithValue(mockService),
+            authServiceProvider.overrideWithValue(mockAuthService),
+          ],
+        );
+        addTearDown(container.dispose);
+
+        // Wait for initial state
+        await container.read(authStateControllerProvider.future);
+
+        // Act
+        final controller = container.read(authStateControllerProvider.notifier);
+        await controller.signInAnonymously();
+
+        // Assert
+        final finalState = container.read(authStateControllerProvider);
+        expect(finalState.hasError, true);
+        expect(finalState.error, expectedError);
       });
     });
   });

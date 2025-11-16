@@ -392,6 +392,12 @@ abstract class AppLocalizations {
   /// **'Sign Up'**
   String get authButtonSignUp;
 
+  /// Button text to skip authentication and continue as anonymous user
+  ///
+  /// In en, this message translates to:
+  /// **'Continue without account'**
+  String get authButtonContinueWithoutAccount;
+
   /// Link text to navigate to sign up screen
   ///
   /// In en, this message translates to:

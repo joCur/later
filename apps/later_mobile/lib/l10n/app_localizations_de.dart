@@ -197,6 +197,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get authButtonSignUp => 'Registrieren';
 
   @override
+  String get authButtonContinueWithoutAccount => 'Ohne Konto fortfahren';
+
+  @override
   String get authLinkSignUp => 'Registrieren';
 
   @override
