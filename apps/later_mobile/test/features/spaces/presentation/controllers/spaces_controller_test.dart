@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:later_mobile/core/error/error.dart';
+import 'package:later_mobile/core/permissions/permission_service.dart';
+import 'package:later_mobile/core/permissions/user_role.dart';
 import 'package:later_mobile/features/spaces/application/providers.dart';
 import 'package:later_mobile/features/spaces/application/services/space_service.dart';
 import 'package:later_mobile/features/spaces/domain/models/space.dart';
@@ -190,6 +192,8 @@ void main() {
         final container = ProviderContainer.test(
           overrides: [
             spaceServiceProvider.overrideWithValue(mockService),
+            // Override user role to authenticated to bypass space limits
+            currentUserRoleProvider.overrideWithValue(UserRole.authenticated),
           ],
         );
         addTearDown(container.dispose);
@@ -222,6 +226,8 @@ void main() {
         final container = ProviderContainer.test(
           overrides: [
             spaceServiceProvider.overrideWithValue(mockService),
+            // Override user role to authenticated to bypass space limits
+            currentUserRoleProvider.overrideWithValue(UserRole.authenticated),
           ],
         );
         addTearDown(container.dispose);
@@ -231,7 +237,11 @@ void main() {
 
         // Act
         final controller = container.read(spacesControllerProvider.notifier);
-        await controller.createSpace(newSpace);
+        // Expect the error to be rethrown
+        await expectLater(
+          controller.createSpace(newSpace),
+          throwsA(expectedError),
+        );
 
         // Assert
         final finalState = container.read(spacesControllerProvider);
