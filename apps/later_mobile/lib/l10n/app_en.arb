@@ -1598,5 +1598,100 @@
         "example": "My List"
       }
     }
+  },
+
+  "authUpgradeBannerMessage": "Create an account to keep your data safe",
+  "@authUpgradeBannerMessage": {
+    "description": "Banner message prompting anonymous users to upgrade to a full account"
+  },
+
+  "authUpgradeBannerButton": "Create Account",
+  "@authUpgradeBannerButton": {
+    "description": "Button text on upgrade banner to start account creation"
+  },
+
+  "authUpgradeScreenTitle": "Create Your Account",
+  "@authUpgradeScreenTitle": {
+    "description": "Title for the account upgrade screen"
+  },
+
+  "authUpgradeScreenSubtitle": "Upgrade to unlock unlimited features",
+  "@authUpgradeScreenSubtitle": {
+    "description": "Subtitle for the account upgrade screen explaining benefits"
+  },
+
+  "authUpgradeEmailLabel": "Email",
+  "@authUpgradeEmailLabel": {
+    "description": "Label for email input field on upgrade screen"
+  },
+
+  "authUpgradePasswordLabel": "Password",
+  "@authUpgradePasswordLabel": {
+    "description": "Label for password input field on upgrade screen"
+  },
+
+  "authUpgradeConfirmPasswordLabel": "Confirm Password",
+  "@authUpgradeConfirmPasswordLabel": {
+    "description": "Label for confirm password input field on upgrade screen"
+  },
+
+  "authUpgradeSubmitButton": "Create Account",
+  "@authUpgradeSubmitButton": {
+    "description": "Submit button text on upgrade screen"
+  },
+
+  "authUpgradeCancelButton": "Maybe Later",
+  "@authUpgradeCancelButton": {
+    "description": "Cancel button text on upgrade screen"
+  },
+
+  "authUpgradeSuccessMessage": "Account created successfully!",
+  "@authUpgradeSuccessMessage": {
+    "description": "Success message shown after successful account upgrade"
+  },
+
+  "buttonDismiss": "Dismiss",
+  "@buttonDismiss": {
+    "description": "Button text for dismissing a banner or dialog"
+  },
+
+  "accessibilityWarning": "Warning",
+  "@accessibilityWarning": {
+    "description": "Accessibility label for warning icons"
+  },
+
+  "validationEmailRequired": "Email is required",
+  "@validationEmailRequired": {
+    "description": "Validation error when email field is empty"
+  },
+
+  "validationEmailInvalid": "Please enter a valid email",
+  "@validationEmailInvalid": {
+    "description": "Validation error when email format is invalid"
+  },
+
+  "validationPasswordRequired": "Password is required",
+  "@validationPasswordRequired": {
+    "description": "Validation error when password field is empty"
+  },
+
+  "validationPasswordMinLength": "Password must be at least 8 characters",
+  "@validationPasswordMinLength": {
+    "description": "Validation error when password is too short"
+  },
+
+  "validationPasswordConfirmRequired": "Please confirm your password",
+  "@validationPasswordConfirmRequired": {
+    "description": "Validation error when password confirmation field is empty"
+  },
+
+  "validationPasswordsDoNotMatch": "Passwords do not match",
+  "@validationPasswordsDoNotMatch": {
+    "description": "Validation error when password and confirmation don't match"
+  },
+
+  "errorUnexpected": "An unexpected error occurred",
+  "@errorUnexpected": {
+    "description": "Generic error message for unexpected errors"
   }
 }

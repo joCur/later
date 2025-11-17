@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:later_mobile/l10n/app_localizations.dart';
 import 'package:later_mobile/design_system/atoms/buttons/primary_button.dart';
 import 'package:later_mobile/design_system/atoms/chips/filter_chip.dart';
+import 'package:later_mobile/design_system/molecules/upgrade_prompt_banner.dart';
 import 'package:later_mobile/design_system/organisms/cards/list_card.dart';
 import 'package:later_mobile/design_system/organisms/cards/note_card.dart';
 import 'package:later_mobile/design_system/organisms/cards/todo_list_card.dart';
@@ -17,6 +19,7 @@ import 'package:later_mobile/core/responsive/breakpoints.dart';
 import 'package:later_mobile/core/theme/temporal_flow_theme.dart';
 import 'package:later_mobile/core/utils/item_type_detector.dart';
 import 'package:later_mobile/core/utils/responsive_modal.dart';
+import 'package:later_mobile/core/permissions/permissions.dart';
 import 'package:later_mobile/features/lists/domain/models/list_model.dart';
 import 'package:later_mobile/features/notes/domain/models/note.dart';
 import 'package:later_mobile/features/todo_lists/domain/models/todo_list.dart';
@@ -24,6 +27,7 @@ import 'package:later_mobile/features/spaces/domain/models/space.dart';
 import 'package:later_mobile/features/spaces/presentation/controllers/spaces_controller.dart';
 import 'package:later_mobile/features/spaces/presentation/controllers/current_space_controller.dart';
 import 'package:later_mobile/features/auth/presentation/controllers/auth_state_controller.dart';
+import 'package:later_mobile/features/auth/presentation/screens/account_upgrade_screen.dart';
 import 'package:later_mobile/features/notes/presentation/controllers/notes_controller.dart';
 import 'package:later_mobile/features/todo_lists/presentation/controllers/todo_lists_controller.dart';
 import 'package:later_mobile/features/lists/presentation/controllers/lists_controller.dart';
@@ -76,13 +80,80 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   // FAB pulse state
   bool _enableFabPulse = false;
 
+  // Upgrade banner state
+  bool _isBannerDismissed = false;
+
+  static const String _bannerDismissedKey = 'upgrade_banner_dismissed';
+  static const String _bannerDismissedAtKey = 'upgrade_banner_dismissed_at';
+  static const int _bannerRedisplayDays = 7;
+
   @override
   void initState() {
     super.initState();
-    // Load initial data
+    // Load initial data and banner state
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _loadData();
+      _loadBannerState();
     });
+  }
+
+  /// Load banner dismissal state from SharedPreferences
+  Future<void> _loadBannerState() async {
+    final prefs = await SharedPreferences.getInstance();
+    final isDismissed = prefs.getBool(_bannerDismissedKey) ?? false;
+    final dismissedAtMillis = prefs.getInt(_bannerDismissedAtKey);
+
+    if (dismissedAtMillis != null) {
+      final dismissedAt =
+          DateTime.fromMillisecondsSinceEpoch(dismissedAtMillis);
+      final daysSinceDismissed = DateTime.now().difference(dismissedAt).inDays;
+
+      // Re-show banner after 7 days
+      if (daysSinceDismissed >= _bannerRedisplayDays) {
+        setState(() {
+          _isBannerDismissed = false;
+        });
+        // Clear the dismissal from preferences
+        await prefs.remove(_bannerDismissedKey);
+        await prefs.remove(_bannerDismissedAtKey);
+      } else {
+        setState(() {
+          _isBannerDismissed = isDismissed;
+        });
+      }
+    } else {
+      setState(() {
+        _isBannerDismissed = isDismissed;
+      });
+    }
+  }
+
+  /// Dismiss the upgrade banner
+  Future<void> _dismissBanner() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_bannerDismissedKey, true);
+    await prefs.setInt(
+      _bannerDismissedAtKey,
+      DateTime.now().millisecondsSinceEpoch,
+    );
+    setState(() {
+      _isBannerDismissed = true;
+    });
+  }
+
+  /// Navigate to account upgrade screen
+  void _navigateToUpgradeScreen() {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (context) => const AccountUpgradeScreen(),
+      ),
+    );
+  }
+
+  /// Check if banner should be shown
+  bool _shouldShowBanner() {
+    final userRole = ref.watch(currentUserRoleProvider);
+    return userRole == UserRole.anonymous && !_isBannerDismissed;
   }
 
   /// Load spaces and content
@@ -273,10 +344,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       child: const CreateSpaceModal(mode: SpaceModalMode.create),
     );
 
-    // If a space was created, load content for the newly selected space
-    // Note: SpacesController.createSpace() automatically sets the new space as current
-    // and updates the spaces list, so we don't need to call loadSpaces()
+    // If a space was created, invalidate current space to trigger rebuild
     if (result == true && mounted) {
+      // Invalidate current space controller to pick up the new space
+      ref.invalidate(currentSpaceControllerProvider);
+
+      // Wait a tick for the currentSpace state to update
+      await Future<void>.delayed(const Duration(milliseconds: 50));
+
+      if (!mounted) return;
+
       final currentSpace = ref.read(currentSpaceControllerProvider).when(
         data: (space) => space,
         loading: () => null,
@@ -284,7 +361,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       );
 
       // Load content for the new current space
-      // (which was automatically set by createSpace)
       if (currentSpace != null) {
         // Load Notes via Riverpod
         ref.invalidate(notesControllerProvider(currentSpace.id));
@@ -790,6 +866,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               _buildFilterChips(context),
               const Divider(height: 1),
 
+              // Upgrade banner (for anonymous users)
+              if (_shouldShowBanner())
+                UpgradePromptBanner(
+                  onCreateAccount: _navigateToUpgradeScreen,
+                  onDismiss: _dismissBanner,
+                ),
+
               // Content list
               Expanded(
                 child: RefreshIndicator(
@@ -889,6 +972,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     // Filter chips
                     _buildFilterChips(context),
                     const Divider(height: 1),
+
+                    // Upgrade banner (for anonymous users)
+                    if (_shouldShowBanner())
+                      UpgradePromptBanner(
+                        onCreateAccount: _navigateToUpgradeScreen,
+                        onDismiss: _dismissBanner,
+                      ),
 
                     // Content list
                     Expanded(

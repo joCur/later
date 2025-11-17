@@ -950,4 +950,65 @@ class AppLocalizationsEn extends AppLocalizations {
   String dialogDeleteItemMessage(String itemName) {
     return 'Are you sure you want to delete \"$itemName\"? This action cannot be undone.';
   }
+
+  @override
+  String get authUpgradeBannerMessage =>
+      'Create an account to keep your data safe';
+
+  @override
+  String get authUpgradeBannerButton => 'Create Account';
+
+  @override
+  String get authUpgradeScreenTitle => 'Create Your Account';
+
+  @override
+  String get authUpgradeScreenSubtitle =>
+      'Upgrade to unlock unlimited features';
+
+  @override
+  String get authUpgradeEmailLabel => 'Email';
+
+  @override
+  String get authUpgradePasswordLabel => 'Password';
+
+  @override
+  String get authUpgradeConfirmPasswordLabel => 'Confirm Password';
+
+  @override
+  String get authUpgradeSubmitButton => 'Create Account';
+
+  @override
+  String get authUpgradeCancelButton => 'Maybe Later';
+
+  @override
+  String get authUpgradeSuccessMessage => 'Account created successfully!';
+
+  @override
+  String get buttonDismiss => 'Dismiss';
+
+  @override
+  String get accessibilityWarning => 'Warning';
+
+  @override
+  String get validationEmailRequired => 'Email is required';
+
+  @override
+  String get validationEmailInvalid => 'Please enter a valid email';
+
+  @override
+  String get validationPasswordRequired => 'Password is required';
+
+  @override
+  String get validationPasswordMinLength =>
+      'Password must be at least 8 characters';
+
+  @override
+  String get validationPasswordConfirmRequired =>
+      'Please confirm your password';
+
+  @override
+  String get validationPasswordsDoNotMatch => 'Passwords do not match';
+
+  @override
+  String get errorUnexpected => 'An unexpected error occurred';
 }

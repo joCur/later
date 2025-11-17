@@ -363,38 +363,42 @@ WITH CHECK (
   - Device storage corruption (rare)
   - Inactivity timeout (if configured in Supabase - default: disabled)
 
-### Phase 6: Upgrade UI - Banner & Screen
+### Phase 6: Upgrade UI - Banner & Screen ✅
 
 **Goal:** Create UI components for account upgrade flow
 
-- [ ] Task 6.1: Create upgrade banner molecule
-  - Create file: `apps/later_mobile/lib/design_system/molecules/upgrade_prompt_banner.dart`
-  - Create widget `UpgradePromptBanner extends StatelessWidget`:
+**Status:** COMPLETED - Upgrade UI banner and screen fully implemented with dismissal logic
+
+- [x] Task 6.1: Create upgrade banner molecule
+  - ✅ Created file: `apps/later_mobile/lib/design_system/molecules/upgrade_prompt_banner.dart`
+  - ✅ Created widget `UpgradePromptBanner extends StatelessWidget`:
     - Display banner with warning icon + message: "Create an account to keep your data safe"
     - Primary button: "Create Account" → navigates to AccountUpgradeScreen
     - Dismiss button (X icon) → hides banner
-    - Use `GlassCard` from design system for glassmorphism effect
-    - Use `AppColors.taskGradient` for attention-grabbing accent
-  - Add to `apps/later_mobile/lib/design_system/molecules/molecules.dart` barrel file
+    - Glassmorphism effect using `temporalTheme.glassBackground` and `glassBorder`
+    - Warning icon uses `AppColors.taskGradient` for attention-grabbing accent
+  - ✅ Added to `apps/later_mobile/lib/design_system/molecules/molecules.dart` barrel file
 
-- [ ] Task 6.2: Create AccountUpgradeScreen
-  - Create file: `apps/later_mobile/lib/features/auth/presentation/screens/account_upgrade_screen.dart`
-  - Create StatefulWidget with form fields:
+- [x] Task 6.2: Create AccountUpgradeScreen
+  - ✅ Created file: `apps/later_mobile/lib/features/auth/presentation/screens/account_upgrade_screen.dart`
+  - ✅ Created ConsumerStatefulWidget with form fields:
     - Email TextFormField with validation (required, email format)
     - Password TextFormField with validation (required, min 8 chars)
     - Confirm password TextFormField (must match password)
-  - Add PrimaryButton "Create Account":
-    - On tap, validate form
-    - If valid, call `ref.read(authStateControllerProvider.notifier).upgradeToFullAccount(email: email, password: password)`
-    - Show loading indicator during upgrade
-    - On success, show success snackbar and pop screen
-    - On error, show error dialog with localized message
-  - Add GhostButton "Maybe later" to dismiss screen
-  - Use ConsumerStatefulWidget to access Riverpod
+  - ✅ Added PrimaryButton "Create Account":
+    - Validates form on tap
+    - Calls `ref.read(authStateControllerProvider.notifier).upgradeToFullAccount(email: email, password: password)`
+    - Shows loading indicator during upgrade
+    - On success, shows success snackbar and pops screen
+    - On error, displays error banner with localized message
+  - ✅ Added GhostButton "Maybe later" to dismiss screen
+  - ✅ Used ConsumerStatefulWidget to access Riverpod
+  - ✅ Added animations (fadeIn, slideY) matching SignInScreen style
+  - ✅ Added back button for navigation
 
-- [ ] Task 6.3: Add localized strings for upgrade UI
-  - Open `apps/later_mobile/lib/l10n/app_en.arb`
-  - Add strings:
+- [x] Task 6.3: Add localized strings for upgrade UI
+  - ✅ Opened `apps/later_mobile/lib/l10n/app_en.arb`
+  - ✅ Added English strings:
     - `"authUpgradeBannerMessage": "Create an account to keep your data safe"`
     - `"authUpgradeBannerButton": "Create Account"`
     - `"authUpgradeScreenTitle": "Create Your Account"`
@@ -405,20 +409,57 @@ WITH CHECK (
     - `"authUpgradeSubmitButton": "Create Account"`
     - `"authUpgradeCancelButton": "Maybe Later"`
     - `"authUpgradeSuccessMessage": "Account created successfully!"`
-  - Open `apps/later_mobile/lib/l10n/app_de.arb`
-  - Add German translations for all strings above
-  - Run `flutter pub get`
+    - `"buttonDismiss": "Dismiss"`
+    - `"accessibilityWarning": "Warning"`
+  - ✅ Opened `apps/later_mobile/lib/l10n/app_de.arb`
+  - ✅ Added German translations for all strings above
+  - ✅ Ran `flutter pub get` to regenerate localizations
 
-- [ ] Task 6.4: Integrate banner into HomeScreen
-  - Open `apps/later_mobile/lib/features/home/presentation/screens/home_screen.dart`
-  - Add `UpgradePromptBanner` at top of screen (above content)
-  - Show banner only if `ref.watch(currentUserRoleProvider) == UserRole.anonymous`
-  - Add state management for banner dismissal (store in SharedPreferences)
-  - Re-show banner after 7 days if still anonymous
+- [x] Task 6.4: Integrate banner into HomeScreen
+  - ✅ Opened `apps/later_mobile/lib/features/home/presentation/screens/home_screen.dart`
+  - ✅ Added imports:
+    - `shared_preferences` for persistence
+    - `upgrade_prompt_banner.dart` for banner component
+    - `account_upgrade_screen.dart` for navigation
+    - `permissions.dart` for role checking
+  - ✅ Added `UpgradePromptBanner` to both mobile and desktop layouts (below filter chips, above content list)
+  - ✅ Show banner only if `ref.watch(currentUserRoleProvider) == UserRole.anonymous && !_isBannerDismissed`
+  - ✅ Implemented state management for banner dismissal:
+    - Store dismissal in SharedPreferences with timestamp
+    - Re-show banner after 7 days if still anonymous
+    - Banner state loaded in `initState()` via `_loadBannerState()`
+    - Dismissal handled via `_dismissBanner()` callback
+  - ✅ Added navigation to AccountUpgradeScreen via `_navigateToUpgradeScreen()`
+  - ✅ All code passes `flutter analyze` with no issues
+
+### Phase 6.5: Critical Bug Fixes ✅
+
+**Goal:** Fix RLS policy bugs and space auto-selection issue
+
+**Status:** COMPLETED - Critical bugs fixed for production readiness
+
+- [x] Task 6.5.1: Fix RLS policy for anonymous user limits
+  - ✅ **Bug Found**: Original policy used `auth.jwt()->>'is_anonymous'` which may not be present in JWT
+  - ✅ **Fix Applied**: Changed to query `auth.users` table directly: `(SELECT is_anonymous FROM auth.users WHERE id = auth.uid())`
+  - ✅ **Bug Found**: Cannot use `NEW.space_id` in subquery within `WITH CHECK` clause
+  - ✅ **Fix Applied**: Simplified logic using OR conditions instead of CASE
+  - ✅ Created migration: `supabase/migrations/20251116180000_fix_anonymous_user_policies.sql`
+  - ✅ Applied migration with `supabase db reset`
+  - ✅ All RLS policies now correctly enforce limits:
+    - Anonymous users limited to 1 space
+    - Anonymous users limited to 20 notes per space
+    - Anonymous users limited to 10 todo lists per space
+    - Anonymous users limited to 5 custom lists per space
+
+- [x] Task 6.5.2: Fix first space auto-selection issue
+  - ✅ **Bug Found**: Race condition where HomeScreen reads `currentSpaceControllerProvider` before `switchSpace()` completes
+  - ✅ **Fix Applied**: Added 50ms delay in `HomeScreen._showCreateSpaceModal()` to allow state propagation
+  - ✅ Code location: `apps/later_mobile/lib/features/home/presentation/screens/home_screen.dart:352`
+  - ✅ Ensures newly created space is properly selected and content providers are invalidated
 
 ### Phase 7: Feature Limit Enforcement in UI
 
-**Goal:** Add client-side checks to prevent anonymous users from exceeding limits
+**Goal:** Add client-side checks to prevent anonymous users from exceeding limits (for better UX before RLS blocks)
 
 - [ ] Task 7.1: Update SpacesController to check limits
   - Open `apps/later_mobile/lib/features/spaces/presentation/controllers/spaces_controller.dart`

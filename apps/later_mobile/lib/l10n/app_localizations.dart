@@ -1795,6 +1795,120 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Are you sure you want to delete \"{itemName}\"? This action cannot be undone.'**
   String dialogDeleteItemMessage(String itemName);
+
+  /// Banner message prompting anonymous users to upgrade to a full account
+  ///
+  /// In en, this message translates to:
+  /// **'Create an account to keep your data safe'**
+  String get authUpgradeBannerMessage;
+
+  /// Button text on upgrade banner to start account creation
+  ///
+  /// In en, this message translates to:
+  /// **'Create Account'**
+  String get authUpgradeBannerButton;
+
+  /// Title for the account upgrade screen
+  ///
+  /// In en, this message translates to:
+  /// **'Create Your Account'**
+  String get authUpgradeScreenTitle;
+
+  /// Subtitle for the account upgrade screen explaining benefits
+  ///
+  /// In en, this message translates to:
+  /// **'Upgrade to unlock unlimited features'**
+  String get authUpgradeScreenSubtitle;
+
+  /// Label for email input field on upgrade screen
+  ///
+  /// In en, this message translates to:
+  /// **'Email'**
+  String get authUpgradeEmailLabel;
+
+  /// Label for password input field on upgrade screen
+  ///
+  /// In en, this message translates to:
+  /// **'Password'**
+  String get authUpgradePasswordLabel;
+
+  /// Label for confirm password input field on upgrade screen
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm Password'**
+  String get authUpgradeConfirmPasswordLabel;
+
+  /// Submit button text on upgrade screen
+  ///
+  /// In en, this message translates to:
+  /// **'Create Account'**
+  String get authUpgradeSubmitButton;
+
+  /// Cancel button text on upgrade screen
+  ///
+  /// In en, this message translates to:
+  /// **'Maybe Later'**
+  String get authUpgradeCancelButton;
+
+  /// Success message shown after successful account upgrade
+  ///
+  /// In en, this message translates to:
+  /// **'Account created successfully!'**
+  String get authUpgradeSuccessMessage;
+
+  /// Button text for dismissing a banner or dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Dismiss'**
+  String get buttonDismiss;
+
+  /// Accessibility label for warning icons
+  ///
+  /// In en, this message translates to:
+  /// **'Warning'**
+  String get accessibilityWarning;
+
+  /// Validation error when email field is empty
+  ///
+  /// In en, this message translates to:
+  /// **'Email is required'**
+  String get validationEmailRequired;
+
+  /// Validation error when email format is invalid
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a valid email'**
+  String get validationEmailInvalid;
+
+  /// Validation error when password field is empty
+  ///
+  /// In en, this message translates to:
+  /// **'Password is required'**
+  String get validationPasswordRequired;
+
+  /// Validation error when password is too short
+  ///
+  /// In en, this message translates to:
+  /// **'Password must be at least 8 characters'**
+  String get validationPasswordMinLength;
+
+  /// Validation error when password confirmation field is empty
+  ///
+  /// In en, this message translates to:
+  /// **'Please confirm your password'**
+  String get validationPasswordConfirmRequired;
+
+  /// Validation error when password and confirmation don't match
+  ///
+  /// In en, this message translates to:
+  /// **'Passwords do not match'**
+  String get validationPasswordsDoNotMatch;
+
+  /// Generic error message for unexpected errors
+  ///
+  /// In en, this message translates to:
+  /// **'An unexpected error occurred'**
+  String get errorUnexpected;
 }
 
 class _AppLocalizationsDelegate

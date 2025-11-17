@@ -38,7 +38,7 @@ class SpacesController extends _$SpacesController {
   /// Creates a new space.
   ///
   /// Validates and creates the space, then refreshes the spaces list.
-  /// Automatically sets the newly created space as the current space.
+  /// Note: Does NOT automatically select the space - caller should handle that.
   ///
   /// Parameters:
   ///   - [space]: The space to create
@@ -53,14 +53,12 @@ class SpacesController extends _$SpacesController {
 
       // Add to current state
       state = state.whenData((spaces) => [...spaces, created]);
-
-      // Set the newly created space as current
-      await ref.read(currentSpaceControllerProvider.notifier).switchSpace(created);
-    } catch (e) {
+    } catch (e, stackTrace) {
       // Update state with error
       if (ref.mounted) {
-        state = AsyncValue.error(e, StackTrace.current);
+        state = AsyncValue.error(e, stackTrace);
       }
+      rethrow; // Make sure error propagates
     }
   }
 

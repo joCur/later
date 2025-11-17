@@ -978,4 +978,67 @@ class AppLocalizationsDe extends AppLocalizations {
   String dialogDeleteItemMessage(String itemName) {
     return 'Möchten Sie \"$itemName\" wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.';
   }
+
+  @override
+  String get authUpgradeBannerMessage =>
+      'Erstellen Sie ein Konto, um Ihre Daten zu sichern';
+
+  @override
+  String get authUpgradeBannerButton => 'Konto erstellen';
+
+  @override
+  String get authUpgradeScreenTitle => 'Erstellen Sie Ihr Konto';
+
+  @override
+  String get authUpgradeScreenSubtitle =>
+      'Upgraden Sie, um unbegrenzte Funktionen freizuschalten';
+
+  @override
+  String get authUpgradeEmailLabel => 'E-Mail';
+
+  @override
+  String get authUpgradePasswordLabel => 'Passwort';
+
+  @override
+  String get authUpgradeConfirmPasswordLabel => 'Passwort bestätigen';
+
+  @override
+  String get authUpgradeSubmitButton => 'Konto erstellen';
+
+  @override
+  String get authUpgradeCancelButton => 'Vielleicht später';
+
+  @override
+  String get authUpgradeSuccessMessage => 'Konto erfolgreich erstellt!';
+
+  @override
+  String get buttonDismiss => 'Schließen';
+
+  @override
+  String get accessibilityWarning => 'Warnung';
+
+  @override
+  String get validationEmailRequired => 'E-Mail ist erforderlich';
+
+  @override
+  String get validationEmailInvalid =>
+      'Bitte geben Sie eine gültige E-Mail ein';
+
+  @override
+  String get validationPasswordRequired => 'Passwort ist erforderlich';
+
+  @override
+  String get validationPasswordMinLength =>
+      'Passwort muss mindestens 8 Zeichen lang sein';
+
+  @override
+  String get validationPasswordConfirmRequired =>
+      'Bitte bestätigen Sie Ihr Passwort';
+
+  @override
+  String get validationPasswordsDoNotMatch =>
+      'Passwörter stimmen nicht überein';
+
+  @override
+  String get errorUnexpected => 'Ein unerwarteter Fehler ist aufgetreten';
 }
