@@ -5,13 +5,14 @@
 Implement a unified search feature for the Later app that allows users to search across all content types (notes, todo lists, lists) with advanced filtering capabilities. The search will be accessible from the app bar (replacing the current placeholder) and will be removed from the bottom navigation bar to simplify the UI. This is an MVP implementation focusing on core search functionality with full-text search powered by PostgreSQL.
 
 **Key Goals:**
-- Unified search across all content types
+- Unified search across all content types (including child items)
 - App bar integration (remove from bottom nav)
 - Full-text search with PostgreSQL GIN indexes
-- Content type filtering
+- Content type filtering (notes, todo lists, lists, todo items, list items)
 - Tag-based filtering
 - Debounced search input (300ms)
 - Space-scoped search (current space only)
+- Child item search with parent context
 
 **Out of Scope (Future Enhancements):**
 - Search history/saved searches
@@ -19,6 +20,7 @@ Implement a unified search feature for the Later app that allows users to search
 - Search suggestions/autocomplete
 - Advanced date-based filtering
 - Fuzzy search/typo tolerance
+- Per-content language detection (add language column to dynamically choose 'german'/'english' config)
 
 ## Technical Approach and Reasoning
 
@@ -38,24 +40,34 @@ Implement a unified search feature for the Later app that allows users to search
 
 ## Implementation Phases
 
-### Phase 1: Database Foundation
+### Phase 1: Database Foundation ✅ COMPLETED
 
-- [ ] Task 1.1: Add full-text search support to database
-  - Create new migration file `supabase/migrations/YYYYMMDDHHMMSS_add_search_indexes.sql`
-  - Add tsvector column `fts` to `notes` table (generated from title + content)
-  - Add tsvector column `fts` to `todo_lists` table (generated from name + description)
-  - Add tsvector column `fts` to `lists` table (generated from name)
-  - Create GIN indexes on all three `fts` columns for fast search
-  - Create GIN index on `notes.tags` for tag filtering
-  - Add composite indexes for space_id + updated_at pattern
-  - Run `supabase db reset` to apply migration
+- [x] Task 1.1: Add full-text search support to database ✅
+  - Created migration file `supabase/migrations/20251117225536_add_search_indexes.sql`
+  - Added tsvector column `fts` to `notes` table (generated from title + content with weights)
+  - Added tsvector column `fts` to `todo_lists` table (generated from name + description with weights)
+  - Added tsvector column `fts` to `lists` table (generated from name)
+  - Added tsvector column `fts` to `todo_items` table (generated from title + description with weights)
+  - Added tsvector column `fts` to `list_items` table (generated from title + notes with weights)
+  - Created GIN indexes on all five `fts` columns for fast search
+  - Created GIN index on `notes.tags` for tag filtering
+  - Created GIN index on `todo_items.tags` for tag filtering
+  - Added composite indexes for space_id + updated_at pattern
+  - Applied migration with `supabase db reset`
 
-- [ ] Task 1.2: Test full-text search in Supabase Studio
-  - Open Supabase Studio (http://localhost:54323)
-  - Run test query: `SELECT * FROM notes WHERE fts @@ to_tsquery('english', 'test')`
-  - Verify GIN indexes are being used (EXPLAIN ANALYZE)
-  - Test tag filtering: `SELECT * FROM notes WHERE tags @> ARRAY['work']`
-  - Verify performance with sample data
+- [x] Task 1.2: Test full-text search in Supabase Studio ✅
+  - Created seed file `supabase/seed.sql` with test data
+  - Created test script `test_search_queries.sh` for automated testing
+  - Tested basic full-text search: `SELECT * FROM notes WHERE fts @@ to_tsquery('german', 'shopping')` ✅
+  - Tested German stemming: `laufen` correctly matches `gelaufen` and `lief` ✅
+  - Tested JOIN query for todo_items with parent info ✅
+  - Tested JOIN query for list_items with parent info ✅
+  - Verified all 7 GIN indexes exist (idx_notes_fts, idx_todo_lists_fts, idx_lists_fts, idx_todo_items_fts, idx_list_items_fts, idx_notes_tags, idx_todo_items_tags) ✅
+  - Verified composite indexes exist (idx_notes_space_updated, idx_todo_lists_space_updated, idx_lists_space_updated) ✅
+  - Tested tag filtering on notes: `WHERE tags @> ARRAY['work']` ✅
+  - Tested tag filtering on todo_items: `WHERE tags @> ARRAY['shopping']` ✅
+  - Tested multi-table unified search with UNION ALL ✅
+  - Note: Sequential scans used for small datasets (expected behavior), GIN indexes will be used automatically for larger tables
 
 ### Phase 2: Feature Module Structure
 
@@ -75,7 +87,8 @@ Implement a unified search feature for the Later app that allows users to search
     - Add copyWith method for immutability
   - Create `domain/models/search_result.dart`:
     - Fields: id, type (ContentType enum), title, subtitle, preview, tags, updatedAt, content (dynamic)
-    - Factory constructor to map from Note/TodoList/ListModel
+    - Add parentId (String?) and parentName (String?) fields for child items
+    - Factory constructor to map from Note/TodoList/ListModel/TodoItem/ListItem
   - Create `domain/models/search_filters.dart`:
     - Fields: contentTypes (List<ContentType>?), tags (List<String>?)
     - Add copyWith method for filter updates
@@ -84,8 +97,9 @@ Implement a unified search feature for the Later app that allows users to search
 - [ ] Task 2.3: Create ContentType enum if not exists
   - Check if ContentType enum exists in codebase
   - If not, create `lib/core/enums/content_type.dart`:
-    - Enum values: note, todoList, list
+    - Enum values: note, todoList, list, todoItem, listItem
     - Add helper methods: displayName, icon
+    - Add isContainer (true for note/todoList/list, false for todoItem/listItem)
   - Update imports throughout codebase to use new enum
 
 ### Phase 3: Data Layer - Search Repository
@@ -100,7 +114,7 @@ Implement a unified search feature for the Later app that allows users to search
 - [ ] Task 3.2: Implement unified search method
   - Add `Future<List<SearchResult>> search(SearchQuery query)` method
   - Use executeQuery wrapper for error handling
-  - Call private methods: _searchNotes, _searchTodoLists, _searchLists
+  - Call private methods: _searchNotes, _searchTodoLists, _searchLists, _searchTodoItems, _searchListItems
   - Combine results into single list
   - Sort combined results by updatedAt (descending)
   - Return List<SearchResult>
@@ -109,7 +123,7 @@ Implement a unified search feature for the Later app that allows users to search
   - Build Supabase query for notes table
   - Add `.eq('user_id', userId)` filter (RLS backup)
   - Add `.eq('space_id', query.spaceId)` filter (space-scoped search)
-  - Use `.textSearch('fts', query.query, config: 'english')` for full-text search
+  - Use `.textSearch('fts', query.query, config: 'german')` for full-text search
   - Add `.contains('tags', query.tags)` if tags provided
   - Add `.order('updated_at', ascending: false)`
   - Map results to SearchResult objects (type: ContentType.note)
@@ -119,7 +133,7 @@ Implement a unified search feature for the Later app that allows users to search
   - Build Supabase query for todo_lists table
   - Add `.eq('user_id', userId)` filter (RLS backup)
   - Add `.eq('space_id', query.spaceId)` filter (space-scoped search)
-  - Use `.textSearch('fts', query.query, config: 'english')` for full-text search
+  - Use `.textSearch('fts', query.query, config: 'german')` for full-text search
   - Add `.order('updated_at', ascending: false)`
   - Map results to SearchResult objects (type: ContentType.todoList)
   - Handle errors and wrap in AppError
@@ -128,9 +142,32 @@ Implement a unified search feature for the Later app that allows users to search
   - Build Supabase query for lists table
   - Add `.eq('user_id', userId)` filter (RLS backup)
   - Add `.eq('space_id', query.spaceId)` filter (space-scoped search)
-  - Use `.textSearch('fts', query.query, config: 'english')` for full-text search
+  - Use `.textSearch('fts', query.query, config: 'german')` for full-text search
   - Add `.order('updated_at', ascending: false)`
   - Map results to SearchResult objects (type: ContentType.list)
+  - Handle errors and wrap in AppError
+
+- [ ] Task 3.6: Implement _searchTodoItems private method
+  - Build Supabase query with JOIN to todo_lists table
+  - Use `.select('*, todo_lists!inner(id, name, space_id, user_id, updated_at)')`
+  - Add `.textSearch('fts', query.query, config: 'german')` for full-text search
+  - Add `.eq('todo_lists.user_id', userId)` filter (via JOIN)
+  - Add `.eq('todo_lists.space_id', query.spaceId)` filter (space-scoped via JOIN)
+  - Add `.contains('tags', query.tags)` if tags provided
+  - Map results to SearchResult objects (type: ContentType.todoItem)
+  - Include parentId and parentName from joined todo_lists data
+  - Use parent's updated_at for sorting
+  - Handle errors and wrap in AppError
+
+- [ ] Task 3.7: Implement _searchListItems private method
+  - Build Supabase query with JOIN to lists table
+  - Use `.select('*, lists!inner(id, name, space_id, user_id, updated_at)')`
+  - Add `.textSearch('fts', query.query, config: 'german')` for full-text search
+  - Add `.eq('lists.user_id', userId)` filter (via JOIN)
+  - Add `.eq('lists.space_id', query.spaceId)` filter (space-scoped via JOIN)
+  - Map results to SearchResult objects (type: ContentType.listItem)
+  - Include parentId and parentName from joined lists data
+  - Use parent's updated_at for sorting
   - Handle errors and wrap in AppError
 
 ### Phase 4: Application Layer - Search Service
@@ -244,8 +281,26 @@ Implement a unified search feature for the Later app that allows users to search
     - ContentType.note → NoteCard(note: result.content as Note)
     - ContentType.todoList → TodoListCard(todoList: result.content as TodoList)
     - ContentType.list → ListCard(list: result.content as ListModel)
+    - ContentType.todoItem → TodoItemSearchCard with parent context
+    - ContentType.listItem → ListItemSearchCard with parent context
   - Add onTap callback to navigate to detail screen
   - Wrap in Material widget for ink splash effect
+
+- [ ] Task 6.6a: Create TodoItemSearchCard widget
+  - Create `presentation/widgets/todo_item_search_card.dart`
+  - Display TodoItem title and preview
+  - Show parent context: "in [TodoList Name]" subtitle
+  - Use task-specific styling/gradient
+  - Add checkbox indicator showing completion status
+  - Handle onTap to navigate to parent TodoListDetailScreen
+
+- [ ] Task 6.6b: Create ListItemSearchCard widget
+  - Create `presentation/widgets/list_item_search_card.dart`
+  - Display ListItem title and notes preview
+  - Show parent context: "in [List Name]" subtitle
+  - Use list-specific styling/gradient
+  - Add style indicator (bullet/numbered/checklist)
+  - Handle onTap to navigate to parent ListDetailScreen
 
 - [ ] Task 6.7: Add navigation handlers
   - In SearchResultCard, add onTap callback
@@ -253,8 +308,12 @@ Implement a unified search feature for the Later app that allows users to search
     - Note → Navigator.push to NoteDetailScreen
     - TodoList → Navigator.push to TodoListDetailScreen
     - ListModel → Navigator.push to ListDetailScreen
+    - TodoItem → Navigator.push to TodoListDetailScreen(listId: result.parentId)
+    - ListItem → Navigator.push to ListDetailScreen(listId: result.parentId)
   - Pass the original model from result.content
+  - For child items, pass parentId to navigate to parent detail screen
   - Use MaterialPageRoute for navigation
+  - Consider adding scroll-to-item functionality for child items (future enhancement)
 
 ### Phase 7: Integration with Home Screen
 
@@ -303,6 +362,11 @@ Implement a unified search feature for the Later app that allows users to search
     - `filterNotes`: "Notes"
     - `filterTodoLists`: "Tasks"
     - `filterLists`: "Lists"
+    - `filterTodoItems`: "Todo Items"
+    - `filterListItems`: "List Items"
+  - Add child item context strings:
+    - `searchResultInTodoList`: "in {todoListName}"
+    - `searchResultInList`: "in {listName}"
 
 - [ ] Task 8.2: Add German localization strings
   - Open `lib/l10n/app_de.arb`
@@ -313,7 +377,12 @@ Implement a unified search feature for the Later app that allows users to search
     - `searchEmptyMessage`: "Versuchen Sie andere Suchbegriffe oder passen Sie die Filter an"
     - `searchClearButton`: "Löschen"
     - `searchInCurrentSpace`: "In {spaceName} suchen"
-  - Add filter strings (if not exist)
+  - Add filter strings (if not exist):
+    - `filterTodoItems`: "Todo-Einträge"
+    - `filterListItems`: "Listeneinträge"
+  - Add child item context strings:
+    - `searchResultInTodoList`: "in {todoListName}"
+    - `searchResultInList`: "in {listName}"
 
 - [ ] Task 8.3: Regenerate localization code
   - Run `flutter pub get` to regenerate localization files
@@ -328,9 +397,12 @@ Implement a unified search feature for the Later app that allows users to search
   - Test search() returns correct results for notes
   - Test search() returns correct results for todo lists
   - Test search() returns correct results for lists
-  - Test search() respects space filter
-  - Test search() respects tag filter
-  - Test search() sorts by updatedAt descending
+  - Test search() returns correct results for todo items (with JOIN)
+  - Test search() returns correct results for list items (with JOIN)
+  - Test search() respects space filter (including for child items via JOIN)
+  - Test search() respects tag filter (notes and todo items)
+  - Test search() sorts by updatedAt descending (using parent updatedAt for children)
+  - Test child items include parentId and parentName in SearchResult
   - Test error handling (Supabase errors wrapped in AppError)
 
 - [ ] Task 9.2: Create unit tests for SearchService
@@ -444,6 +516,7 @@ Implement a unified search feature for the Later app that allows users to search
 - User input needs to be sanitized/escaped for tsvector queries
 - Solution: Use Supabase `.textSearch()` method which handles escaping
 - Fallback to ILIKE if full-text search fails
+- Language config: Using 'german' as default for better German stemming support
 
 **Challenge 2: Performance with Large Datasets**
 - Full-text search can be slow without proper indexes
@@ -496,3 +569,17 @@ Implement a unified search feature for the Later app that allows users to search
 - Solution: Use GENERATED ALWAYS AS to auto-populate tsvector
 - No data migration needed (computed on-the-fly)
 - Test migration with `supabase db reset`
+
+**Challenge 11: Child Item Search with JOINs**
+- Child items (todo_items, list_items) don't have direct user_id or space_id
+- Need JOIN queries to filter by parent's space_id/user_id
+- Solution: Use Supabase `.select('*, parent_table!inner(...)')` syntax
+- Inner join ensures only items with valid parents are returned
+- Access parent data via nested JSON in response
+
+**Challenge 12: Result Deduplication**
+- Searching "Shopping" might return parent TodoList + multiple TodoItems
+- Could overwhelm user with many related results
+- Solution for MVP: Show all results separately (simple)
+- Future enhancement: Group by parent with "3 matching items" badge
+- Sort intelligently: parent first, then children
