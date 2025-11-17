@@ -1041,4 +1041,26 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get errorUnexpected => 'Ein unerwarteter Fehler ist aufgetreten';
+
+  @override
+  String get authUpgradeDialogTitle => 'Upgrade erforderlich';
+
+  @override
+  String get authUpgradeDialogNotNow => 'Jetzt nicht';
+
+  @override
+  String get authUpgradeLimitSpaces =>
+      'Anonyme Benutzer sind auf 1 Space beschränkt. Erstellen Sie ein Konto, um unbegrenzte Spaces freizuschalten.';
+
+  @override
+  String get authUpgradeLimitNotes =>
+      'Anonyme Benutzer sind auf 20 Notizen pro Space beschränkt. Erstellen Sie ein Konto, um unbegrenzte Notizen freizuschalten.';
+
+  @override
+  String get authUpgradeLimitTodoLists =>
+      'Anonyme Benutzer sind auf 10 Todo-Listen pro Space beschränkt. Erstellen Sie ein Konto, um unbegrenzte Todo-Listen freizuschalten.';
+
+  @override
+  String get authUpgradeLimitLists =>
+      'Anonyme Benutzer sind auf 5 benutzerdefinierte Listen pro Space beschränkt. Erstellen Sie ein Konto, um unbegrenzte Listen freizuschalten.';
 }

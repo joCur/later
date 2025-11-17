@@ -1693,5 +1693,35 @@
   "errorUnexpected": "An unexpected error occurred",
   "@errorUnexpected": {
     "description": "Generic error message for unexpected errors"
+  },
+
+  "authUpgradeDialogTitle": "Upgrade Required",
+  "@authUpgradeDialogTitle": {
+    "description": "Title for upgrade required dialog"
+  },
+
+  "authUpgradeDialogNotNow": "Not Now",
+  "@authUpgradeDialogNotNow": {
+    "description": "Button text to dismiss upgrade dialog"
+  },
+
+  "authUpgradeLimitSpaces": "Anonymous users are limited to 1 space. Create an account to unlock unlimited spaces.",
+  "@authUpgradeLimitSpaces": {
+    "description": "Message shown when anonymous user reaches space limit"
+  },
+
+  "authUpgradeLimitNotes": "Anonymous users are limited to 20 notes per space. Create an account to unlock unlimited notes.",
+  "@authUpgradeLimitNotes": {
+    "description": "Message shown when anonymous user reaches note limit"
+  },
+
+  "authUpgradeLimitTodoLists": "Anonymous users are limited to 10 todo lists per space. Create an account to unlock unlimited todo lists.",
+  "@authUpgradeLimitTodoLists": {
+    "description": "Message shown when anonymous user reaches todo list limit"
+  },
+
+  "authUpgradeLimitLists": "Anonymous users are limited to 5 custom lists per space. Create an account to unlock unlimited lists.",
+  "@authUpgradeLimitLists": {
+    "description": "Message shown when anonymous user reaches custom list limit"
   }
 }

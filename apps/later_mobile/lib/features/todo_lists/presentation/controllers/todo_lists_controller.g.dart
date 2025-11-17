@@ -90,7 +90,7 @@ final class TodoListsControllerProvider
 }
 
 String _$todoListsControllerHash() =>
-    r'00cf84396dcb64d5c4b21ffc28d76ec2dae07f31';
+    r'341909fd06c659b6ab9ce59024af4d42e4ee0b5d';
 
 /// Controller for managing todo lists within a space
 ///

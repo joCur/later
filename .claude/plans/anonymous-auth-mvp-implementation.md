@@ -457,50 +457,102 @@ WITH CHECK (
   - ✅ Code location: `apps/later_mobile/lib/features/home/presentation/screens/home_screen.dart:352`
   - ✅ Ensures newly created space is properly selected and content providers are invalidated
 
-### Phase 7: Feature Limit Enforcement in UI
+### Phase 7: Feature Limit Enforcement in UI ✅
 
 **Goal:** Add client-side checks to prevent anonymous users from exceeding limits (for better UX before RLS blocks)
 
-- [ ] Task 7.1: Update SpacesController to check limits
-  - Open `apps/later_mobile/lib/features/spaces/presentation/controllers/spaces_controller.dart`
-  - In `createSpace()` method, before calling repository:
+**Status:** COMPLETED - Client-side limit enforcement fully implemented with upgrade dialog integration
+
+- [x] Task 7.1: Update SpacesController to check limits
+  - ✅ Opened `apps/later_mobile/lib/features/spaces/presentation/controllers/spaces_controller.dart`
+  - ✅ Added `currentUserRoleProvider` import
+  - ✅ Updated `createSpace()` method to check limits before creating:
     - Get user role: `final role = ref.read(currentUserRoleProvider)`
     - If `role == UserRole.anonymous`:
       - Get current space count from state
-      - If count >= 1, throw `AppError(code: ErrorCode.permissionFeatureRestricted, message: 'Anonymous users limited to 1 space')`
-      - Show upgrade prompt modal instead of error
+      - If count >= 1, throw `SpaceLimitReachedException()`
     - Otherwise proceed with creation
-  - Update UI to show "Upgrade to create more spaces" message when limit reached
+  - ✅ Created `SpaceLimitReachedException` class
+  - ✅ Updated `CreateSpaceModal` to catch exception and show upgrade dialog
+  - ✅ Dialog shows localized message: `l10n.authUpgradeLimitSpaces`
 
-- [ ] Task 7.2: Update NotesController to check limits
-  - Open `apps/later_mobile/lib/features/notes/presentation/controllers/notes_controller.dart`
-  - In `createNote()` method, before calling repository:
+- [x] Task 7.2: Update NotesController to check limits
+  - ✅ Opened `apps/later_mobile/lib/features/notes/presentation/controllers/notes_controller.dart`
+  - ✅ Added `currentUserRoleProvider` import
+  - ✅ Updated `createNote()` method to check limits:
     - Check user role
     - If anonymous, check if current note count for this space >= 20
-    - If at limit, show upgrade prompt instead of creating note
+    - If at limit, throw `NoteLimitReachedException()`
+  - ✅ Created `NoteLimitReachedException` class
+  - ✅ Updated `CreateContentModal` to catch exception and show upgrade dialog
+  - ✅ Dialog shows localized message: `l10n.authUpgradeLimitNotes`
 
-- [ ] Task 7.3: Update TodoListsController to check limits
-  - Open `apps/later_mobile/lib/features/todo_lists/presentation/controllers/todo_lists_controller.dart`
-  - In `createTodoList()` method:
+- [x] Task 7.3: Update TodoListsController to check limits
+  - ✅ Opened `apps/later_mobile/lib/features/todo_lists/presentation/controllers/todo_lists_controller.dart`
+  - ✅ Added `currentUserRoleProvider` import
+  - ✅ Updated `createTodoList()` method to check limits:
     - Check user role
     - If anonymous, check if current todo list count for this space >= 10
-    - If at limit, show upgrade prompt
+    - If at limit, throw `TodoListLimitReachedException()`
+  - ✅ Created `TodoListLimitReachedException` class
+  - ✅ Updated `CreateContentModal` to catch exception and show upgrade dialog
+  - ✅ Dialog shows localized message: `l10n.authUpgradeLimitTodoLists`
 
-- [ ] Task 7.4: Update ListsController to check limits
-  - Open `apps/later_mobile/lib/features/lists/presentation/controllers/lists_controller.dart`
-  - In `createList()` method:
+- [x] Task 7.4: Update ListsController to check limits
+  - ✅ Opened `apps/later_mobile/lib/features/lists/presentation/controllers/lists_controller.dart`
+  - ✅ Added `currentUserRoleProvider` import
+  - ✅ Updated `createList()` method to check limits:
     - Check user role
     - If anonymous, check if current list count for this space >= 5
-    - If at limit, show upgrade prompt
+    - If at limit, throw `ListLimitReachedException()`
+  - ✅ Created `ListLimitReachedException` class
+  - ✅ Updated `CreateContentModal` to catch exception and show upgrade dialog
+  - ✅ Dialog shows localized message: `l10n.authUpgradeLimitLists`
 
-- [ ] Task 7.5: Create reusable upgrade prompt dialog
-  - Create file: `apps/later_mobile/lib/design_system/organisms/upgrade_required_dialog.dart`
-  - Create dialog widget with:
-    - Title: "Upgrade Required"
-    - Message: customizable (e.g., "Anonymous users limited to 1 space. Create an account to unlock unlimited spaces.")
+- [x] Task 7.5: Create reusable upgrade prompt dialog
+  - ✅ Created file: `apps/later_mobile/lib/design_system/organisms/dialogs/upgrade_required_dialog.dart`
+  - ✅ Created `showUpgradeRequiredDialog()` function with:
+    - Title: "Upgrade Required" (localized: `l10n.authUpgradeDialogTitle`)
+    - Message: customizable parameter (passed from each controller)
     - Primary button: "Create Account" → navigate to AccountUpgradeScreen
     - Secondary button: "Not Now" → dismiss dialog
-  - Use this dialog in all controllers when limits are reached
+  - ✅ Exported from `organisms.dart` barrel file
+  - ✅ Added localized strings to `app_en.arb` and `app_de.arb`:
+    - `authUpgradeDialogTitle`: "Upgrade Required" / "Upgrade erforderlich"
+    - `authUpgradeDialogNotNow`: "Not Now" / "Jetzt nicht"
+    - `authUpgradeLimitSpaces`: Space limit message
+    - `authUpgradeLimitNotes`: Note limit message
+    - `authUpgradeLimitTodoLists`: Todo list limit message
+    - `authUpgradeLimitLists`: Custom list limit message
+  - ✅ Ran `flutter pub get` to regenerate localizations
+  - ✅ Dialog used in all UI layers when limits are reached
+
+**Implementation Notes:**
+- All four controllers (Spaces, Notes, TodoLists, Lists) now check anonymous user limits before calling repository
+- Custom exception classes provide type-safe error handling in UI layer
+- `CreateContentModal` handles all three content type limit exceptions (notes, todo lists, lists)
+- `CreateSpaceModal` handles space limit exception
+- Exceptions are caught immediately before closing modal, then upgrade dialog is shown
+- All limit checks happen client-side for immediate UX feedback
+- RLS policies remain as server-side enforcement layer (defense in depth)
+
+**UX Improvements (Proactive Limit Prevention):**
+- ✅ **Space Creation UI** (`SpaceSwitcherModal`):
+  - Button dynamically changes when anonymous user reaches limit (1 space)
+  - Text: "Create New Space" → "Create Account"
+  - Icon: `Icons.add` → `Icons.star`
+  - On tap: Shows upgrade dialog instead of create modal
+  - No failed creation attempt - user sees upgrade prompt immediately
+- ✅ **Content Creation UI** (Notes, TodoLists, Lists):
+  - Controller-level checks throw exceptions when limits reached
+  - `CreateContentModal._handleExplicitSave()` catches exceptions
+  - Upgrade dialog shown immediately with contextual message
+  - Modal closes automatically before showing dialog
+  - After upgrade, user can retry creation without confusion
+- ✅ **Fallback Safety**:
+  - Controller checks remain as safety net
+  - Handles edge cases (race conditions, multiple rapid taps)
+  - Consistent error handling across all content types
 
 ### Phase 8: Testing & Validation
 

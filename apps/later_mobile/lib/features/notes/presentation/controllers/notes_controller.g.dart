@@ -74,7 +74,7 @@ final class NotesControllerProvider
   }
 }
 
-String _$notesControllerHash() => r'0ba9bd8e2f9ee96818a4e14cbd250e181677f211';
+String _$notesControllerHash() => r'de5fb4f5223e93454d87a26c49a57b69d18e849b';
 
 /// Controller for managing notes state for a specific space.
 ///

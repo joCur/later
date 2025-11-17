@@ -1,5 +1,6 @@
 // ignore_for_file: depend_on_referenced_packages
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import '../../../../core/permissions/permissions.dart';
 import '../../application/providers.dart';
 import '../../domain/models/note.dart';
 
@@ -34,9 +35,27 @@ class NotesController extends _$NotesController {
   ///
   /// Validates and creates the note, then adds it to the current state.
   ///
+  /// For anonymous users, checks if they have reached their note limit (20 notes per space).
+  /// If the limit is reached, throws a [NoteLimitReachedException] which should
+  /// be handled by the caller to show an upgrade prompt.
+  ///
   /// Parameters:
   ///   - [note]: The note to create
+  ///
+  /// Throws:
+  ///   - [NoteLimitReachedException] if anonymous user has reached their limit
   Future<void> createNote(Note note) async {
+    // Check permission limit for anonymous users
+    final role = ref.read(currentUserRoleProvider);
+    if (role == UserRole.anonymous) {
+      // Get current note count from state
+      final currentNoteCount = state.whenData((notes) => notes.length).value ?? 0;
+      if (currentNoteCount >= UserRolePermissions(role).maxNotesPerSpaceForAnonymous) {
+        // Throw a custom exception that the caller should handle
+        throw NoteLimitReachedException();
+      }
+    }
+
     final service = ref.read(noteServiceProvider);
 
     try {
@@ -249,4 +268,12 @@ class NotesController extends _$NotesController {
       }
     }
   }
+}
+
+/// Exception thrown when an anonymous user reaches their note creation limit.
+///
+/// This exception should be caught by the UI layer to show an upgrade prompt dialog.
+class NoteLimitReachedException implements Exception {
+  @override
+  String toString() => 'Anonymous users are limited to 20 notes per space';
 }

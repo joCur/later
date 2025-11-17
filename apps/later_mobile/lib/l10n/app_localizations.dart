@@ -1909,6 +1909,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'An unexpected error occurred'**
   String get errorUnexpected;
+
+  /// Title for upgrade required dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Upgrade Required'**
+  String get authUpgradeDialogTitle;
+
+  /// Button text to dismiss upgrade dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Not Now'**
+  String get authUpgradeDialogNotNow;
+
+  /// Message shown when anonymous user reaches space limit
+  ///
+  /// In en, this message translates to:
+  /// **'Anonymous users are limited to 1 space. Create an account to unlock unlimited spaces.'**
+  String get authUpgradeLimitSpaces;
+
+  /// Message shown when anonymous user reaches note limit
+  ///
+  /// In en, this message translates to:
+  /// **'Anonymous users are limited to 20 notes per space. Create an account to unlock unlimited notes.'**
+  String get authUpgradeLimitNotes;
+
+  /// Message shown when anonymous user reaches todo list limit
+  ///
+  /// In en, this message translates to:
+  /// **'Anonymous users are limited to 10 todo lists per space. Create an account to unlock unlimited todo lists.'**
+  String get authUpgradeLimitTodoLists;
+
+  /// Message shown when anonymous user reaches custom list limit
+  ///
+  /// In en, this message translates to:
+  /// **'Anonymous users are limited to 5 custom lists per space. Create an account to unlock unlimited lists.'**
+  String get authUpgradeLimitLists;
 }
 
 class _AppLocalizationsDelegate

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:later_mobile/design_system/atoms/inputs/text_input_field.dart';
+import 'package:later_mobile/design_system/organisms/dialogs/upgrade_required_dialog.dart';
 import 'package:later_mobile/design_system/organisms/modals/bottom_sheet_container.dart';
 import 'package:later_mobile/design_system/tokens/tokens.dart';
+import 'package:later_mobile/l10n/app_localizations.dart';
 import 'package:uuid/uuid.dart';
 
 import 'package:later_mobile/features/auth/presentation/controllers/auth_state_controller.dart';
@@ -207,6 +209,23 @@ class _CreateSpaceModalState extends ConsumerState<CreateSpaceModal> {
       // Operation succeeded - close modal
       if (mounted) {
         navigator.pop(true);
+      }
+    } on SpaceLimitReachedException catch (_) {
+      // Anonymous user reached space limit - show upgrade dialog
+      if (mounted) {
+        setState(() {
+          _isSubmitting = false;
+        });
+
+        // Close the modal first
+        navigator.pop(false);
+
+        // Show upgrade dialog
+        final l10n = AppLocalizations.of(context)!;
+        await showUpgradeRequiredDialog(
+          context: context,
+          message: l10n.authUpgradeLimitSpaces,
+        );
       }
     } catch (e) {
       // Operation failed - show user-friendly error message

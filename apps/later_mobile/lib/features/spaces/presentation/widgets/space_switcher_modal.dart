@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:later_mobile/core/permissions/permissions.dart';
+import 'package:later_mobile/design_system/organisms/dialogs/upgrade_required_dialog.dart';
 import 'package:later_mobile/design_system/tokens/tokens.dart';
 import 'package:later_mobile/l10n/app_localizations.dart';
 import 'package:later_mobile/core/theme/temporal_flow_theme.dart';
@@ -814,6 +816,13 @@ class _SpaceSwitcherModalState extends ConsumerState<SpaceSwitcherModal> {
     final temporalTheme = Theme.of(context).extension<TemporalFlowTheme>()!;
     final l10n = AppLocalizations.of(context)!;
 
+    // Check if anonymous user has reached limit
+    final role = ref.watch(currentUserRoleProvider);
+    final spacesAsync = ref.watch(spacesControllerProvider);
+    final currentSpaceCount = spacesAsync.whenData((spaces) => spaces.length).value ?? 0;
+    final hasReachedLimit = role == UserRole.anonymous &&
+        currentSpaceCount >= UserRolePermissions(role).maxSpacesForAnonymous;
+
     return Padding(
       padding: const EdgeInsets.symmetric(
         horizontal: AppSpacing.sm,
@@ -821,7 +830,9 @@ class _SpaceSwitcherModalState extends ConsumerState<SpaceSwitcherModal> {
       ),
       child: Semantics(
         button: true,
-        label: l10n.accessibilityCreateNewSpace,
+        label: hasReachedLimit
+            ? l10n.authUpgradeBannerButton
+            : l10n.accessibilityCreateNewSpace,
         child: Container(
           decoration: BoxDecoration(
             gradient: temporalTheme.primaryGradient,
@@ -837,11 +848,23 @@ class _SpaceSwitcherModalState extends ConsumerState<SpaceSwitcherModal> {
             ],
           ),
           child: PrimaryButton(
-            text: l10n.spaceSwitcherButtonCreateNew,
-            icon: Icons.add,
+            text: hasReachedLimit
+                ? l10n.authUpgradeBannerButton
+                : l10n.spaceSwitcherButtonCreateNew,
+            icon: hasReachedLimit ? Icons.star : Icons.add,
             onPressed: () async {
-              // Show create space modal
               final navigator = Navigator.of(context);
+
+              // If user has reached limit, show upgrade dialog
+              if (hasReachedLimit) {
+                await showUpgradeRequiredDialog(
+                  context: context,
+                  message: l10n.authUpgradeLimitSpaces,
+                );
+                return;
+              }
+
+              // Otherwise, show create space modal
               final result = await ResponsiveModal.show<bool>(
                 context: context,
                 child: const CreateSpaceModal(mode: SpaceModalMode.create),
