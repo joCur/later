@@ -19,9 +19,9 @@ import 'package:later_mobile/features/todo_lists/domain/models/todo_list.dart';
 import 'package:later_mobile/l10n/app_localizations.dart';
 import 'package:uuid/uuid.dart';
 
+import 'package:later_mobile/core/enums/content_type.dart';
 import 'package:later_mobile/core/responsive/breakpoints.dart';
 import 'package:later_mobile/core/theme/temporal_flow_theme.dart';
-import 'package:later_mobile/core/utils/item_type_detector.dart';
 import 'package:later_mobile/features/auth/presentation/controllers/auth_state_controller.dart';
 import 'package:later_mobile/features/lists/presentation/controllers/lists_controller.dart';
 import 'package:later_mobile/features/notes/presentation/controllers/notes_controller.dart';
@@ -360,6 +360,11 @@ class _CreateContentModalState extends ConsumerState<CreateContentModal>
                 .createNote(note);
             _currentItemId = id;
             break;
+
+          case ContentType.todoItem:
+          case ContentType.listItem:
+            // Child items cannot be created via this modal
+            throw UnsupportedError('Cannot create child items via quick capture modal');
         }
       } else {
         // Update existing item (only works for Notes in this simple version)
@@ -1259,6 +1264,10 @@ class _CreateContentModalState extends ConsumerState<CreateContentModal>
         case ContentType.note:
           return l10n
               .createModalNoteTitleHint; // Fallback, but note uses type-specific fields
+        case ContentType.todoItem:
+        case ContentType.listItem:
+          // Child items cannot be created via this modal
+          return l10n.createModalNoteTitleHint;
         case null:
           return l10n.createModalNoteTitleHint;
       }
@@ -1445,6 +1454,11 @@ class _CreateContentModalState extends ConsumerState<CreateContentModal>
         break;
       case ContentType.note:
         buttonText = l10n.createModalButtonNote;
+        break;
+      case ContentType.todoItem:
+      case ContentType.listItem:
+        // Child items cannot be created via this modal
+        buttonText = l10n.createModalButtonGeneric;
         break;
       case null:
         buttonText = l10n.createModalButtonGeneric;
