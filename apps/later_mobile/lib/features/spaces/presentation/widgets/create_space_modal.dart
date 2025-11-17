@@ -138,12 +138,13 @@ class _CreateSpaceModalState extends ConsumerState<CreateSpaceModal> {
 
   /// Validate form and update error message
   void _validateForm() {
+    final l10n = AppLocalizations.of(context)!;
     setState(() {
       final name = _nameController.text.trim();
       if (name.isEmpty) {
-        _errorMessage = 'Name is required';
+        _errorMessage = l10n.spaceModalValidationNameRequired;
       } else if (name.length > 100) {
-        _errorMessage = 'Name must be between 1 and 100 characters';
+        _errorMessage = l10n.spaceModalValidationNameLength;
       } else {
         _errorMessage = null;
       }
@@ -176,10 +177,10 @@ class _CreateSpaceModalState extends ConsumerState<CreateSpaceModal> {
     );
     if (userId == null) {
       if (mounted) {
+        final l10n = AppLocalizations.of(context)!;
         setState(() {
           _isSubmitting = false;
-          _submitErrorMessage =
-              'You are not signed in. Please sign in and try again.';
+          _submitErrorMessage = l10n.spaceModalErrorNotSignedIn;
         });
       }
       return;
@@ -240,11 +241,12 @@ class _CreateSpaceModalState extends ConsumerState<CreateSpaceModal> {
 
   /// Build name input field
   Widget _buildNameInput(bool isDark) {
+    final l10n = AppLocalizations.of(context)!;
     return Semantics(
-      label: 'Space Name',
+      label: l10n.spaceModalLabelName,
       child: TextInputField(
-        label: 'Space Name',
-        hintText: 'Enter space name',
+        label: l10n.spaceModalLabelName,
+        hintText: l10n.spaceModalHintName,
         controller: _nameController,
         focusNode: _nameFocusNode,
         errorText: _errorMessage,
@@ -256,11 +258,12 @@ class _CreateSpaceModalState extends ConsumerState<CreateSpaceModal> {
 
   /// Build icon picker
   Widget _buildIconPicker(bool isDark) {
+    final l10n = AppLocalizations.of(context)!;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Icon',
+          l10n.spaceModalLabelIcon,
           style: AppTypography.labelLarge.copyWith(
             color: AppColors.text(context),
           ),
@@ -324,11 +327,12 @@ class _CreateSpaceModalState extends ConsumerState<CreateSpaceModal> {
 
   /// Build color picker
   Widget _buildColorPicker(bool isDark) {
+    final l10n = AppLocalizations.of(context)!;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Color',
+          l10n.spaceModalLabelColor,
           style: AppTypography.labelLarge.copyWith(
             color: AppColors.text(context),
           ),
@@ -441,13 +445,14 @@ class _CreateSpaceModalState extends ConsumerState<CreateSpaceModal> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return BottomSheetContainer(
       title: widget.mode == SpaceModalMode.create
-          ? 'Create Space'
-          : 'Edit Space',
+          ? l10n.spaceModalTitleCreate
+          : l10n.spaceModalTitleEdit,
       primaryButtonText: widget.mode == SpaceModalMode.create
-          ? 'Create'
-          : 'Save',
+          ? l10n.spaceModalButtonCreate
+          : l10n.spaceModalButtonSave,
       onPrimaryPressed: _isSubmitting ? null : _handleSubmit,
       isPrimaryButtonEnabled: !_isSubmitting && _isFormValid,
       isPrimaryButtonLoading: _isSubmitting,

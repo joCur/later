@@ -722,5 +722,17 @@
   "authUpgradeLimitSpaces": "Anonyme Benutzer sind auf 1 Space beschränkt. Erstellen Sie ein Konto, um unbegrenzte Spaces freizuschalten.",
   "authUpgradeLimitNotes": "Anonyme Benutzer sind auf 20 Notizen pro Space beschränkt. Erstellen Sie ein Konto, um unbegrenzte Notizen freizuschalten.",
   "authUpgradeLimitTodoLists": "Anonyme Benutzer sind auf 10 Todo-Listen pro Space beschränkt. Erstellen Sie ein Konto, um unbegrenzte Todo-Listen freizuschalten.",
-  "authUpgradeLimitLists": "Anonyme Benutzer sind auf 5 benutzerdefinierte Listen pro Space beschränkt. Erstellen Sie ein Konto, um unbegrenzte Listen freizuschalten."
+  "authUpgradeLimitLists": "Anonyme Benutzer sind auf 5 benutzerdefinierte Listen pro Space beschränkt. Erstellen Sie ein Konto, um unbegrenzte Listen freizuschalten.",
+
+  "spaceModalTitleCreate": "Space erstellen",
+  "spaceModalTitleEdit": "Space bearbeiten",
+  "spaceModalButtonCreate": "Erstellen",
+  "spaceModalButtonSave": "Speichern",
+  "spaceModalLabelName": "Space-Name",
+  "spaceModalHintName": "Space-Namen eingeben",
+  "spaceModalLabelIcon": "Symbol",
+  "spaceModalLabelColor": "Farbe",
+  "spaceModalValidationNameRequired": "Name ist erforderlich",
+  "spaceModalValidationNameLength": "Name muss zwischen 1 und 100 Zeichen lang sein",
+  "spaceModalErrorNotSignedIn": "Sie sind nicht angemeldet. Bitte melden Sie sich an und versuchen Sie es erneut."
 }

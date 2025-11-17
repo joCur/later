@@ -1033,4 +1033,39 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get authUpgradeLimitLists =>
       'Anonymous users are limited to 5 custom lists per space. Create an account to unlock unlimited lists.';
+
+  @override
+  String get spaceModalTitleCreate => 'Create Space';
+
+  @override
+  String get spaceModalTitleEdit => 'Edit Space';
+
+  @override
+  String get spaceModalButtonCreate => 'Create';
+
+  @override
+  String get spaceModalButtonSave => 'Save';
+
+  @override
+  String get spaceModalLabelName => 'Space Name';
+
+  @override
+  String get spaceModalHintName => 'Enter space name';
+
+  @override
+  String get spaceModalLabelIcon => 'Icon';
+
+  @override
+  String get spaceModalLabelColor => 'Color';
+
+  @override
+  String get spaceModalValidationNameRequired => 'Name is required';
+
+  @override
+  String get spaceModalValidationNameLength =>
+      'Name must be between 1 and 100 characters';
+
+  @override
+  String get spaceModalErrorNotSignedIn =>
+      'You are not signed in. Please sign in and try again.';
 }

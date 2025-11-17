@@ -1945,6 +1945,72 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Anonymous users are limited to 5 custom lists per space. Create an account to unlock unlimited lists.'**
   String get authUpgradeLimitLists;
+
+  /// Title for create space modal
+  ///
+  /// In en, this message translates to:
+  /// **'Create Space'**
+  String get spaceModalTitleCreate;
+
+  /// Title for edit space modal
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Space'**
+  String get spaceModalTitleEdit;
+
+  /// Button text to create a new space
+  ///
+  /// In en, this message translates to:
+  /// **'Create'**
+  String get spaceModalButtonCreate;
+
+  /// Button text to save space changes
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get spaceModalButtonSave;
+
+  /// Label for space name input field
+  ///
+  /// In en, this message translates to:
+  /// **'Space Name'**
+  String get spaceModalLabelName;
+
+  /// Hint text for space name input field
+  ///
+  /// In en, this message translates to:
+  /// **'Enter space name'**
+  String get spaceModalHintName;
+
+  /// Label for space icon picker section
+  ///
+  /// In en, this message translates to:
+  /// **'Icon'**
+  String get spaceModalLabelIcon;
+
+  /// Label for space color picker section
+  ///
+  /// In en, this message translates to:
+  /// **'Color'**
+  String get spaceModalLabelColor;
+
+  /// Validation error when space name is empty
+  ///
+  /// In en, this message translates to:
+  /// **'Name is required'**
+  String get spaceModalValidationNameRequired;
+
+  /// Validation error when space name is too long
+  ///
+  /// In en, this message translates to:
+  /// **'Name must be between 1 and 100 characters'**
+  String get spaceModalValidationNameLength;
+
+  /// Error message when user is not signed in while trying to create/edit space
+  ///
+  /// In en, this message translates to:
+  /// **'You are not signed in. Please sign in and try again.'**
+  String get spaceModalErrorNotSignedIn;
 }
 
 class _AppLocalizationsDelegate

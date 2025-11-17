@@ -1063,4 +1063,39 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get authUpgradeLimitLists =>
       'Anonyme Benutzer sind auf 5 benutzerdefinierte Listen pro Space beschränkt. Erstellen Sie ein Konto, um unbegrenzte Listen freizuschalten.';
+
+  @override
+  String get spaceModalTitleCreate => 'Space erstellen';
+
+  @override
+  String get spaceModalTitleEdit => 'Space bearbeiten';
+
+  @override
+  String get spaceModalButtonCreate => 'Erstellen';
+
+  @override
+  String get spaceModalButtonSave => 'Speichern';
+
+  @override
+  String get spaceModalLabelName => 'Space-Name';
+
+  @override
+  String get spaceModalHintName => 'Space-Namen eingeben';
+
+  @override
+  String get spaceModalLabelIcon => 'Symbol';
+
+  @override
+  String get spaceModalLabelColor => 'Farbe';
+
+  @override
+  String get spaceModalValidationNameRequired => 'Name ist erforderlich';
+
+  @override
+  String get spaceModalValidationNameLength =>
+      'Name muss zwischen 1 und 100 Zeichen lang sein';
+
+  @override
+  String get spaceModalErrorNotSignedIn =>
+      'Sie sind nicht angemeldet. Bitte melden Sie sich an und versuchen Sie es erneut.';
 }

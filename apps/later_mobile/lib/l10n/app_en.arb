@@ -1723,5 +1723,60 @@
   "authUpgradeLimitLists": "Anonymous users are limited to 5 custom lists per space. Create an account to unlock unlimited lists.",
   "@authUpgradeLimitLists": {
     "description": "Message shown when anonymous user reaches custom list limit"
+  },
+
+  "spaceModalTitleCreate": "Create Space",
+  "@spaceModalTitleCreate": {
+    "description": "Title for create space modal"
+  },
+
+  "spaceModalTitleEdit": "Edit Space",
+  "@spaceModalTitleEdit": {
+    "description": "Title for edit space modal"
+  },
+
+  "spaceModalButtonCreate": "Create",
+  "@spaceModalButtonCreate": {
+    "description": "Button text to create a new space"
+  },
+
+  "spaceModalButtonSave": "Save",
+  "@spaceModalButtonSave": {
+    "description": "Button text to save space changes"
+  },
+
+  "spaceModalLabelName": "Space Name",
+  "@spaceModalLabelName": {
+    "description": "Label for space name input field"
+  },
+
+  "spaceModalHintName": "Enter space name",
+  "@spaceModalHintName": {
+    "description": "Hint text for space name input field"
+  },
+
+  "spaceModalLabelIcon": "Icon",
+  "@spaceModalLabelIcon": {
+    "description": "Label for space icon picker section"
+  },
+
+  "spaceModalLabelColor": "Color",
+  "@spaceModalLabelColor": {
+    "description": "Label for space color picker section"
+  },
+
+  "spaceModalValidationNameRequired": "Name is required",
+  "@spaceModalValidationNameRequired": {
+    "description": "Validation error when space name is empty"
+  },
+
+  "spaceModalValidationNameLength": "Name must be between 1 and 100 characters",
+  "@spaceModalValidationNameLength": {
+    "description": "Validation error when space name is too long"
+  },
+
+  "spaceModalErrorNotSignedIn": "You are not signed in. Please sign in and try again.",
+  "@spaceModalErrorNotSignedIn": {
+    "description": "Error message when user is not signed in while trying to create/edit space"
   }
 }
