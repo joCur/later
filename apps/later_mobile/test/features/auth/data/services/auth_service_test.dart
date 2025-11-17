@@ -1,5 +1,30 @@
 import 'package:flutter_test/flutter_test.dart';
 
+/// AuthService Unit Testing Strategy
+///
+/// IMPORTANT: AuthService currently uses static SupabaseConfig.client,
+/// which makes traditional unit testing with mocks difficult without
+/// significant refactoring.
+///
+/// **Current Approach for Phase 8 MVP:**
+/// - Placeholder unit tests document expected behavior
+/// - Integration tests with local Supabase instance provide real validation
+/// - Controllers (AuthStateController) have full unit test coverage
+///
+/// **Integration Test Plan:**
+/// 1. Start local Supabase: `supabase start`
+/// 2. Run Flutter integration tests with real Supabase backend
+/// 3. Test anonymous sign-in, upgrade, and error scenarios
+/// 4. Verify RLS policies enforce limits correctly
+///
+/// **Future Enhancement (Post-MVP):**
+/// - Refactor AuthService to accept SupabaseClient via constructor
+/// - Replace static SupabaseConfig.client with injected dependency
+/// - Enable full unit testing with mocked SupabaseClient
+///
+/// **See Also:**
+/// - Integration test plan in Phase 8 Task 8.4 (manual testing)
+/// - Controller tests: test/features/auth/presentation/controllers/auth_state_controller_test.dart
 void main() {
   group('AuthService - Anonymous Authentication', () {
     setUp(() {
