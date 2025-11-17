@@ -93,14 +93,19 @@ class ContentFilterController extends _$ContentFilterController {
   }
 
   /// Check if any content is loading
+  /// Only returns true for initial loading state (not reloading with data)
   bool isLoading(String spaceId) {
     final notesAsync = ref.watch(notesControllerProvider(spaceId));
     final todoListsAsync = ref.watch(todoListsControllerProvider(spaceId));
     final listsAsync = ref.watch(listsControllerProvider(spaceId));
 
-    return notesAsync.isLoading ||
-        todoListsAsync.isLoading ||
-        listsAsync.isLoading;
+    // Only show loading spinner if ALL controllers are in loading state
+    // AND none have data yet (initial load)
+    final notesLoading = notesAsync.isLoading && !notesAsync.hasValue;
+    final todoListsLoading = todoListsAsync.isLoading && !todoListsAsync.hasValue;
+    final listsLoading = listsAsync.isLoading && !listsAsync.hasValue;
+
+    return notesLoading || todoListsLoading || listsLoading;
   }
 
   /// Get total count of all content (for pagination purposes)
@@ -138,4 +143,21 @@ class ContentFilterController extends _$ContentFilterController {
         return notesCount + todoListsCount + listsCount;
     }
   }
+}
+
+/// Provider for checking if content is loading for a specific space
+/// This is a separate provider so it can be watched and trigger rebuilds
+@riverpod
+bool contentIsLoading(Ref ref, String spaceId) {
+  final notesAsync = ref.watch(notesControllerProvider(spaceId));
+  final todoListsAsync = ref.watch(todoListsControllerProvider(spaceId));
+  final listsAsync = ref.watch(listsControllerProvider(spaceId));
+
+  // Only show loading spinner if controllers are in loading state
+  // AND none have data yet (initial load)
+  final notesLoading = notesAsync.isLoading && !notesAsync.hasValue;
+  final todoListsLoading = todoListsAsync.isLoading && !todoListsAsync.hasValue;
+  final listsLoading = listsAsync.isLoading && !listsAsync.hasValue;
+
+  return notesLoading || todoListsLoading || listsLoading;
 }

@@ -1,5 +1,7 @@
 // ignore_for_file: depend_on_referenced_packages
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+
+import '../../../../core/permissions/permissions.dart';
 import '../../application/providers.dart';
 import '../../domain/models/space.dart';
 
@@ -31,16 +33,37 @@ class SpacesController extends _$SpacesController {
     state = const AsyncValue.loading();
 
     final service = ref.read(spaceServiceProvider);
-    state = await AsyncValue.guard(() => service.loadSpaces(includeArchived: includeArchived));
+    state = await AsyncValue.guard(
+      () => service.loadSpaces(includeArchived: includeArchived),
+    );
   }
 
   /// Creates a new space.
   ///
   /// Validates and creates the space, then refreshes the spaces list.
+  /// Note: Does NOT automatically select the space - caller should handle that.
+  ///
+  /// For anonymous users, checks if they have reached their space limit (1 space).
+  /// If the limit is reached, throws a [SpaceLimitReachedException] which should
+  /// be handled by the caller to show an upgrade prompt.
   ///
   /// Parameters:
   ///   - [space]: The space to create
+  ///
+  /// Throws:
+  ///   - [SpaceLimitReachedException] if anonymous user has reached their limit
   Future<void> createSpace(Space space) async {
+    // Check permission limit for anonymous users
+    final role = ref.read(currentUserRoleProvider);
+    if (role == UserRole.anonymous) {
+      // Get current space count from state
+      final currentSpaceCount = state.whenData((spaces) => spaces.length).value ?? 0;
+      if (currentSpaceCount >= UserRolePermissions(role).maxSpacesForAnonymous) {
+        // Throw a custom exception that the caller should handle
+        throw SpaceLimitReachedException();
+      }
+    }
+
     final service = ref.read(spaceServiceProvider);
 
     try {
@@ -51,11 +74,12 @@ class SpacesController extends _$SpacesController {
 
       // Add to current state
       state = state.whenData((spaces) => [...spaces, created]);
-    } catch (e) {
+    } catch (e, stackTrace) {
       // Update state with error
       if (ref.mounted) {
-        state = AsyncValue.error(e, StackTrace.current);
+        state = AsyncValue.error(e, stackTrace);
       }
+      rethrow; // Make sure error propagates
     }
   }
 
@@ -111,7 +135,9 @@ class SpacesController extends _$SpacesController {
       if (!ref.mounted) return;
 
       // Remove from current state
-      state = state.whenData((spaces) => spaces.where((s) => s.id != spaceId).toList());
+      state = state.whenData(
+        (spaces) => spaces.where((s) => s.id != spaceId).toList(),
+      );
     } catch (e) {
       // Update state with error
       if (ref.mounted) {
@@ -206,4 +232,12 @@ class SpacesController extends _$SpacesController {
       return 0;
     }
   }
+}
+
+/// Exception thrown when an anonymous user reaches their space creation limit.
+///
+/// This exception should be caught by the UI layer to show an upgrade prompt dialog.
+class SpaceLimitReachedException implements Exception {
+  @override
+  String toString() => 'Anonymous users are limited to 1 space';
 }

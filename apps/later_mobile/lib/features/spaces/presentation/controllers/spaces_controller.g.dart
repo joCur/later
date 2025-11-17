@@ -51,7 +51,7 @@ final class SpacesControllerProvider
   SpacesController create() => SpacesController();
 }
 
-String _$spacesControllerHash() => r'342ff7d9898782f14206fed931237559cf957649';
+String _$spacesControllerHash() => r'9bed224dab03859547bdd44b7b654b21b7b8e625';
 
 /// Controller for managing spaces state.
 ///

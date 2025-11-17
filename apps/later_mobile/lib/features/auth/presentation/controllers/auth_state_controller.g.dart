@@ -70,7 +70,7 @@ final class AuthStateControllerProvider
 }
 
 String _$authStateControllerHash() =>
-    r'c9ccf21340aed2c620350b3d4af2313beacd307d';
+    r'ff85a7a24c69b5dbf9dfb1ca0bca6308d303213f';
 
 /// Controller for authentication state management
 ///

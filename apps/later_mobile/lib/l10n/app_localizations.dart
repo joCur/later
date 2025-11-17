@@ -188,6 +188,24 @@ abstract class AppLocalizations {
   /// **'An authentication error occurred. Please try again.'**
   String get errorAuthGeneric;
 
+  /// Error message when anonymous sign-in fails
+  ///
+  /// In en, this message translates to:
+  /// **'Could not start trial. Please try again.'**
+  String get errorAuthAnonymousSignInFailed;
+
+  /// Error message when upgrading anonymous account to permanent fails
+  ///
+  /// In en, this message translates to:
+  /// **'Could not create account. Please try again.'**
+  String get errorAuthUpgradeFailed;
+
+  /// Error message when trying to perform anonymous-only operation with authenticated account
+  ///
+  /// In en, this message translates to:
+  /// **'You already have an account.'**
+  String get errorAuthAlreadyAuthenticated;
+
   /// Error message for network timeouts
   ///
   /// In en, this message translates to:
@@ -373,6 +391,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Sign Up'**
   String get authButtonSignUp;
+
+  /// Button text to skip authentication and continue as anonymous user
+  ///
+  /// In en, this message translates to:
+  /// **'Continue without account'**
+  String get authButtonContinueWithoutAccount;
 
   /// Link text to navigate to sign up screen
   ///
@@ -1771,6 +1795,222 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Are you sure you want to delete \"{itemName}\"? This action cannot be undone.'**
   String dialogDeleteItemMessage(String itemName);
+
+  /// Banner message prompting anonymous users to upgrade to a full account
+  ///
+  /// In en, this message translates to:
+  /// **'Create an account to keep your data safe'**
+  String get authUpgradeBannerMessage;
+
+  /// Button text on upgrade banner to start account creation
+  ///
+  /// In en, this message translates to:
+  /// **'Create Account'**
+  String get authUpgradeBannerButton;
+
+  /// Title for the account upgrade screen
+  ///
+  /// In en, this message translates to:
+  /// **'Create Your Account'**
+  String get authUpgradeScreenTitle;
+
+  /// Subtitle for the account upgrade screen explaining benefits
+  ///
+  /// In en, this message translates to:
+  /// **'Upgrade to unlock unlimited features'**
+  String get authUpgradeScreenSubtitle;
+
+  /// Label for email input field on upgrade screen
+  ///
+  /// In en, this message translates to:
+  /// **'Email'**
+  String get authUpgradeEmailLabel;
+
+  /// Label for password input field on upgrade screen
+  ///
+  /// In en, this message translates to:
+  /// **'Password'**
+  String get authUpgradePasswordLabel;
+
+  /// Label for confirm password input field on upgrade screen
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm Password'**
+  String get authUpgradeConfirmPasswordLabel;
+
+  /// Submit button text on upgrade screen
+  ///
+  /// In en, this message translates to:
+  /// **'Create Account'**
+  String get authUpgradeSubmitButton;
+
+  /// Cancel button text on upgrade screen
+  ///
+  /// In en, this message translates to:
+  /// **'Maybe Later'**
+  String get authUpgradeCancelButton;
+
+  /// Success message shown after successful account upgrade
+  ///
+  /// In en, this message translates to:
+  /// **'Account created successfully!'**
+  String get authUpgradeSuccessMessage;
+
+  /// Button text for dismissing a banner or dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Dismiss'**
+  String get buttonDismiss;
+
+  /// Accessibility label for warning icons
+  ///
+  /// In en, this message translates to:
+  /// **'Warning'**
+  String get accessibilityWarning;
+
+  /// Validation error when email field is empty
+  ///
+  /// In en, this message translates to:
+  /// **'Email is required'**
+  String get validationEmailRequired;
+
+  /// Validation error when email format is invalid
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a valid email'**
+  String get validationEmailInvalid;
+
+  /// Validation error when password field is empty
+  ///
+  /// In en, this message translates to:
+  /// **'Password is required'**
+  String get validationPasswordRequired;
+
+  /// Validation error when password is too short
+  ///
+  /// In en, this message translates to:
+  /// **'Password must be at least 8 characters'**
+  String get validationPasswordMinLength;
+
+  /// Validation error when password confirmation field is empty
+  ///
+  /// In en, this message translates to:
+  /// **'Please confirm your password'**
+  String get validationPasswordConfirmRequired;
+
+  /// Validation error when password and confirmation don't match
+  ///
+  /// In en, this message translates to:
+  /// **'Passwords do not match'**
+  String get validationPasswordsDoNotMatch;
+
+  /// Generic error message for unexpected errors
+  ///
+  /// In en, this message translates to:
+  /// **'An unexpected error occurred'**
+  String get errorUnexpected;
+
+  /// Title for upgrade required dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Upgrade Required'**
+  String get authUpgradeDialogTitle;
+
+  /// Button text to dismiss upgrade dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Not Now'**
+  String get authUpgradeDialogNotNow;
+
+  /// Message shown when anonymous user reaches space limit
+  ///
+  /// In en, this message translates to:
+  /// **'Anonymous users are limited to 1 space. Create an account to unlock unlimited spaces.'**
+  String get authUpgradeLimitSpaces;
+
+  /// Message shown when anonymous user reaches note limit
+  ///
+  /// In en, this message translates to:
+  /// **'Anonymous users are limited to 20 notes per space. Create an account to unlock unlimited notes.'**
+  String get authUpgradeLimitNotes;
+
+  /// Message shown when anonymous user reaches todo list limit
+  ///
+  /// In en, this message translates to:
+  /// **'Anonymous users are limited to 10 todo lists per space. Create an account to unlock unlimited todo lists.'**
+  String get authUpgradeLimitTodoLists;
+
+  /// Message shown when anonymous user reaches custom list limit
+  ///
+  /// In en, this message translates to:
+  /// **'Anonymous users are limited to 5 custom lists per space. Create an account to unlock unlimited lists.'**
+  String get authUpgradeLimitLists;
+
+  /// Title for create space modal
+  ///
+  /// In en, this message translates to:
+  /// **'Create Space'**
+  String get spaceModalTitleCreate;
+
+  /// Title for edit space modal
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Space'**
+  String get spaceModalTitleEdit;
+
+  /// Button text to create a new space
+  ///
+  /// In en, this message translates to:
+  /// **'Create'**
+  String get spaceModalButtonCreate;
+
+  /// Button text to save space changes
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get spaceModalButtonSave;
+
+  /// Label for space name input field
+  ///
+  /// In en, this message translates to:
+  /// **'Space Name'**
+  String get spaceModalLabelName;
+
+  /// Hint text for space name input field
+  ///
+  /// In en, this message translates to:
+  /// **'Enter space name'**
+  String get spaceModalHintName;
+
+  /// Label for space icon picker section
+  ///
+  /// In en, this message translates to:
+  /// **'Icon'**
+  String get spaceModalLabelIcon;
+
+  /// Label for space color picker section
+  ///
+  /// In en, this message translates to:
+  /// **'Color'**
+  String get spaceModalLabelColor;
+
+  /// Validation error when space name is empty
+  ///
+  /// In en, this message translates to:
+  /// **'Name is required'**
+  String get spaceModalValidationNameRequired;
+
+  /// Validation error when space name is too long
+  ///
+  /// In en, this message translates to:
+  /// **'Name must be between 1 and 100 characters'**
+  String get spaceModalValidationNameLength;
+
+  /// Error message when user is not signed in while trying to create/edit space
+  ///
+  /// In en, this message translates to:
+  /// **'You are not signed in. Please sign in and try again.'**
+  String get spaceModalErrorNotSignedIn;
 }
 
 class _AppLocalizationsDelegate

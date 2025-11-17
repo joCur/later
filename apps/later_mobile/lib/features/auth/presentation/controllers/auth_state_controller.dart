@@ -1,8 +1,9 @@
 // ignore_for_file: depend_on_referenced_packages
 import 'dart:async';
 
-import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:later_mobile/features/auth/application/providers.dart';
+import 'package:later_mobile/features/auth/data/services/providers.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 part 'auth_state_controller.g.dart';
@@ -49,10 +50,7 @@ class AuthStateController extends _$AuthStateController {
   ///
   /// Updates state to loading, then data or error based on result.
   /// Uses `ref.mounted` to prevent state updates after disposal.
-  Future<void> signUp({
-    required String email,
-    required String password,
-  }) async {
+  Future<void> signUp({required String email, required String password}) async {
     // Set loading state
     state = const AsyncValue.loading();
 
@@ -76,10 +74,7 @@ class AuthStateController extends _$AuthStateController {
   ///
   /// Updates state to loading, then data or error based on result.
   /// Uses `ref.mounted` to prevent state updates after disposal.
-  Future<void> signIn({
-    required String email,
-    required String password,
-  }) async {
+  Future<void> signIn({required String email, required String password}) async {
     // Set loading state
     state = const AsyncValue.loading();
 
@@ -133,6 +128,77 @@ class AuthStateController extends _$AuthStateController {
     try {
       final service = ref.read(authApplicationServiceProvider);
       final user = service.checkAuthStatus();
+
+      // Check if still mounted before updating
+      if (!ref.mounted) return;
+
+      state = AsyncValue.data(user);
+    } catch (error, stackTrace) {
+      // Check if still mounted before updating
+      if (!ref.mounted) return;
+
+      state = AsyncValue.error(error, stackTrace);
+    }
+  }
+
+  /// Upgrade an anonymous user to a full account
+  ///
+  /// Converts the current anonymous user to a permanent account by
+  /// adding email and password credentials. The user ID remains the same,
+  /// preserving all existing data.
+  ///
+  /// Updates state to loading, then data or error based on result.
+  /// Uses `ref.mounted` to prevent state updates after disposal.
+  Future<void> upgradeToFullAccount({
+    required String email,
+    required String password,
+  }) async {
+    // Set loading state
+    state = const AsyncValue.loading();
+
+    try {
+      final authService = ref.read(authServiceProvider);
+      final user = await authService.upgradeAnonymousUser(
+        email: email,
+        password: password,
+      );
+
+      // Check if still mounted before updating
+      if (!ref.mounted) return;
+
+      state = AsyncValue.data(user);
+    } catch (error, stackTrace) {
+      // Check if still mounted before updating
+      if (!ref.mounted) return;
+
+      state = AsyncValue.error(error, stackTrace);
+    }
+  }
+
+  /// Check if the current user is anonymous
+  ///
+  /// Returns true if the current user is an anonymous user,
+  /// false if they have a permanent account or no user is signed in.
+  bool get isCurrentUserAnonymous {
+    final user = state.value;
+    return user?.isAnonymous ?? false;
+  }
+
+  /// Sign in anonymously
+  ///
+  /// Creates a new anonymous user session. This allows users to try the app
+  /// without creating a permanent account. Anonymous users can later upgrade
+  /// to a full account while keeping their data.
+  ///
+  /// Updates state to loading, then data or error based on result.
+  /// Uses `ref.mounted` to prevent state updates after disposal.
+  Future<void> signInAnonymously() async {
+    // Set loading state
+    state = const AsyncValue.loading();
+
+    try {
+      final authService = ref.read(authServiceProvider);
+      final user = await authService.signInAnonymously();
 
       // Check if still mounted before updating
       if (!ref.mounted) return;

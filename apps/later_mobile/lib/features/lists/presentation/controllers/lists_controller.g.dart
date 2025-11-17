@@ -89,7 +89,7 @@ final class ListsControllerProvider
   }
 }
 
-String _$listsControllerHash() => r'2680f283c6dd31cbf55533ec6c34f8a1a72a3d31';
+String _$listsControllerHash() => r'38406eaea07acb9560fd789150b4796847c776f8';
 
 /// Controller for managing lists within a space
 ///

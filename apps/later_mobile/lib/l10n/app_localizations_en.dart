@@ -70,6 +70,17 @@ class AppLocalizationsEn extends AppLocalizations {
       'An authentication error occurred. Please try again.';
 
   @override
+  String get errorAuthAnonymousSignInFailed =>
+      'Could not start trial. Please try again.';
+
+  @override
+  String get errorAuthUpgradeFailed =>
+      'Could not create account. Please try again.';
+
+  @override
+  String get errorAuthAlreadyAuthenticated => 'You already have an account.';
+
+  @override
   String get errorNetworkTimeout =>
       'Connection timed out. Please check your internet connection and try again.';
 
@@ -180,6 +191,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get authButtonSignUp => 'Sign Up';
+
+  @override
+  String get authButtonContinueWithoutAccount => 'Continue without account';
 
   @override
   String get authLinkSignUp => 'Sign up';
@@ -936,4 +950,122 @@ class AppLocalizationsEn extends AppLocalizations {
   String dialogDeleteItemMessage(String itemName) {
     return 'Are you sure you want to delete \"$itemName\"? This action cannot be undone.';
   }
+
+  @override
+  String get authUpgradeBannerMessage =>
+      'Create an account to keep your data safe';
+
+  @override
+  String get authUpgradeBannerButton => 'Create Account';
+
+  @override
+  String get authUpgradeScreenTitle => 'Create Your Account';
+
+  @override
+  String get authUpgradeScreenSubtitle =>
+      'Upgrade to unlock unlimited features';
+
+  @override
+  String get authUpgradeEmailLabel => 'Email';
+
+  @override
+  String get authUpgradePasswordLabel => 'Password';
+
+  @override
+  String get authUpgradeConfirmPasswordLabel => 'Confirm Password';
+
+  @override
+  String get authUpgradeSubmitButton => 'Create Account';
+
+  @override
+  String get authUpgradeCancelButton => 'Maybe Later';
+
+  @override
+  String get authUpgradeSuccessMessage => 'Account created successfully!';
+
+  @override
+  String get buttonDismiss => 'Dismiss';
+
+  @override
+  String get accessibilityWarning => 'Warning';
+
+  @override
+  String get validationEmailRequired => 'Email is required';
+
+  @override
+  String get validationEmailInvalid => 'Please enter a valid email';
+
+  @override
+  String get validationPasswordRequired => 'Password is required';
+
+  @override
+  String get validationPasswordMinLength =>
+      'Password must be at least 8 characters';
+
+  @override
+  String get validationPasswordConfirmRequired =>
+      'Please confirm your password';
+
+  @override
+  String get validationPasswordsDoNotMatch => 'Passwords do not match';
+
+  @override
+  String get errorUnexpected => 'An unexpected error occurred';
+
+  @override
+  String get authUpgradeDialogTitle => 'Upgrade Required';
+
+  @override
+  String get authUpgradeDialogNotNow => 'Not Now';
+
+  @override
+  String get authUpgradeLimitSpaces =>
+      'Anonymous users are limited to 1 space. Create an account to unlock unlimited spaces.';
+
+  @override
+  String get authUpgradeLimitNotes =>
+      'Anonymous users are limited to 20 notes per space. Create an account to unlock unlimited notes.';
+
+  @override
+  String get authUpgradeLimitTodoLists =>
+      'Anonymous users are limited to 10 todo lists per space. Create an account to unlock unlimited todo lists.';
+
+  @override
+  String get authUpgradeLimitLists =>
+      'Anonymous users are limited to 5 custom lists per space. Create an account to unlock unlimited lists.';
+
+  @override
+  String get spaceModalTitleCreate => 'Create Space';
+
+  @override
+  String get spaceModalTitleEdit => 'Edit Space';
+
+  @override
+  String get spaceModalButtonCreate => 'Create';
+
+  @override
+  String get spaceModalButtonSave => 'Save';
+
+  @override
+  String get spaceModalLabelName => 'Space Name';
+
+  @override
+  String get spaceModalHintName => 'Enter space name';
+
+  @override
+  String get spaceModalLabelIcon => 'Icon';
+
+  @override
+  String get spaceModalLabelColor => 'Color';
+
+  @override
+  String get spaceModalValidationNameRequired => 'Name is required';
+
+  @override
+  String get spaceModalValidationNameLength =>
+      'Name must be between 1 and 100 characters';
+
+  @override
+  String get spaceModalErrorNotSignedIn =>
+      'You are not signed in. Please sign in and try again.';
 }

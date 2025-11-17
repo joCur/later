@@ -58,6 +58,15 @@ enum ErrorCode {
   /// Generic authentication error
   authGeneric,
 
+  /// Anonymous sign-in failed
+  authAnonymousSignInFailed,
+
+  /// Account upgrade from anonymous to permanent failed
+  authUpgradeFailed,
+
+  /// User is already authenticated (cannot perform anonymous-only operation)
+  authAlreadyAuthenticated,
+
   // Network errors
   /// Request timeout
   networkTimeout,
@@ -190,6 +199,9 @@ extension ErrorCodeMetadata on ErrorCode {
       case ErrorCode.authSessionExpired:
       case ErrorCode.authRateLimitExceeded:
       case ErrorCode.authGeneric:
+      case ErrorCode.authAnonymousSignInFailed:
+      case ErrorCode.authUpgradeFailed:
+      case ErrorCode.authAlreadyAuthenticated:
       case ErrorCode.insufficientPermissions:
         return ErrorSeverity.high;
 

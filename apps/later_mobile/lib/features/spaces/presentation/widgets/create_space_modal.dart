@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:later_mobile/design_system/atoms/inputs/text_input_field.dart';
+import 'package:later_mobile/design_system/organisms/dialogs/upgrade_required_dialog.dart';
 import 'package:later_mobile/design_system/organisms/modals/bottom_sheet_container.dart';
 import 'package:later_mobile/design_system/tokens/tokens.dart';
+import 'package:later_mobile/l10n/app_localizations.dart';
 import 'package:uuid/uuid.dart';
 
 import 'package:later_mobile/features/auth/presentation/controllers/auth_state_controller.dart';
@@ -136,12 +138,13 @@ class _CreateSpaceModalState extends ConsumerState<CreateSpaceModal> {
 
   /// Validate form and update error message
   void _validateForm() {
+    final l10n = AppLocalizations.of(context)!;
     setState(() {
       final name = _nameController.text.trim();
       if (name.isEmpty) {
-        _errorMessage = 'Name is required';
+        _errorMessage = l10n.spaceModalValidationNameRequired;
       } else if (name.length > 100) {
-        _errorMessage = 'Name must be between 1 and 100 characters';
+        _errorMessage = l10n.spaceModalValidationNameLength;
       } else {
         _errorMessage = null;
       }
@@ -174,10 +177,10 @@ class _CreateSpaceModalState extends ConsumerState<CreateSpaceModal> {
     );
     if (userId == null) {
       if (mounted) {
+        final l10n = AppLocalizations.of(context)!;
         setState(() {
           _isSubmitting = false;
-          _submitErrorMessage =
-              'You are not signed in. Please sign in and try again.';
+          _submitErrorMessage = l10n.spaceModalErrorNotSignedIn;
         });
       }
       return;
@@ -208,6 +211,23 @@ class _CreateSpaceModalState extends ConsumerState<CreateSpaceModal> {
       if (mounted) {
         navigator.pop(true);
       }
+    } on SpaceLimitReachedException catch (_) {
+      // Anonymous user reached space limit - show upgrade dialog
+      if (mounted) {
+        setState(() {
+          _isSubmitting = false;
+        });
+
+        // Close the modal first
+        navigator.pop(false);
+
+        // Show upgrade dialog
+        final l10n = AppLocalizations.of(context)!;
+        await showUpgradeRequiredDialog(
+          context: context,
+          message: l10n.authUpgradeLimitSpaces,
+        );
+      }
     } catch (e) {
       // Operation failed - show user-friendly error message
       if (mounted) {
@@ -221,11 +241,12 @@ class _CreateSpaceModalState extends ConsumerState<CreateSpaceModal> {
 
   /// Build name input field
   Widget _buildNameInput(bool isDark) {
+    final l10n = AppLocalizations.of(context)!;
     return Semantics(
-      label: 'Space Name',
+      label: l10n.spaceModalLabelName,
       child: TextInputField(
-        label: 'Space Name',
-        hintText: 'Enter space name',
+        label: l10n.spaceModalLabelName,
+        hintText: l10n.spaceModalHintName,
         controller: _nameController,
         focusNode: _nameFocusNode,
         errorText: _errorMessage,
@@ -237,11 +258,12 @@ class _CreateSpaceModalState extends ConsumerState<CreateSpaceModal> {
 
   /// Build icon picker
   Widget _buildIconPicker(bool isDark) {
+    final l10n = AppLocalizations.of(context)!;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Icon',
+          l10n.spaceModalLabelIcon,
           style: AppTypography.labelLarge.copyWith(
             color: AppColors.text(context),
           ),
@@ -305,11 +327,12 @@ class _CreateSpaceModalState extends ConsumerState<CreateSpaceModal> {
 
   /// Build color picker
   Widget _buildColorPicker(bool isDark) {
+    final l10n = AppLocalizations.of(context)!;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Color',
+          l10n.spaceModalLabelColor,
           style: AppTypography.labelLarge.copyWith(
             color: AppColors.text(context),
           ),
@@ -422,13 +445,14 @@ class _CreateSpaceModalState extends ConsumerState<CreateSpaceModal> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return BottomSheetContainer(
       title: widget.mode == SpaceModalMode.create
-          ? 'Create Space'
-          : 'Edit Space',
+          ? l10n.spaceModalTitleCreate
+          : l10n.spaceModalTitleEdit,
       primaryButtonText: widget.mode == SpaceModalMode.create
-          ? 'Create'
-          : 'Save',
+          ? l10n.spaceModalButtonCreate
+          : l10n.spaceModalButtonSave,
       onPrimaryPressed: _isSubmitting ? null : _handleSubmit,
       isPrimaryButtonEnabled: !_isSubmitting && _isFormValid,
       isPrimaryButtonLoading: _isSubmitting,

@@ -7,8 +7,10 @@ import 'dart:async' as _i4;
 
 import 'package:later_mobile/features/auth/application/auth_application_service.dart'
     as _i3;
+import 'package:later_mobile/features/auth/data/services/auth_service.dart'
+    as _i5;
 import 'package:mockito/mockito.dart' as _i1;
-import 'package:mockito/src/dummies.dart' as _i5;
+import 'package:mockito/src/dummies.dart' as _i6;
 import 'package:supabase_flutter/supabase_flutter.dart' as _i2;
 
 // ignore_for_file: type=lint
@@ -106,6 +108,116 @@ class MockAuthApplicationService extends _i1.Mock
           as _i4.Stream<_i2.AuthState>);
 }
 
+/// A class which mocks [AuthService].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockAuthService extends _i1.Mock implements _i5.AuthService {
+  MockAuthService() {
+    _i1.throwOnMissingStub(this);
+  }
+
+  @override
+  bool get isCurrentUserAnonymous =>
+      (super.noSuchMethod(
+            Invocation.getter(#isCurrentUserAnonymous),
+            returnValue: false,
+          )
+          as bool);
+
+  @override
+  _i4.Future<_i2.User> signUpWithEmail({
+    required String? email,
+    required String? password,
+  }) =>
+      (super.noSuchMethod(
+            Invocation.method(#signUpWithEmail, [], {
+              #email: email,
+              #password: password,
+            }),
+            returnValue: _i4.Future<_i2.User>.value(
+              _FakeUser_0(
+                this,
+                Invocation.method(#signUpWithEmail, [], {
+                  #email: email,
+                  #password: password,
+                }),
+              ),
+            ),
+          )
+          as _i4.Future<_i2.User>);
+
+  @override
+  _i4.Future<_i2.User> signInWithEmail({
+    required String? email,
+    required String? password,
+  }) =>
+      (super.noSuchMethod(
+            Invocation.method(#signInWithEmail, [], {
+              #email: email,
+              #password: password,
+            }),
+            returnValue: _i4.Future<_i2.User>.value(
+              _FakeUser_0(
+                this,
+                Invocation.method(#signInWithEmail, [], {
+                  #email: email,
+                  #password: password,
+                }),
+              ),
+            ),
+          )
+          as _i4.Future<_i2.User>);
+
+  @override
+  _i4.Future<void> signOut() =>
+      (super.noSuchMethod(
+            Invocation.method(#signOut, []),
+            returnValue: _i4.Future<void>.value(),
+            returnValueForMissingStub: _i4.Future<void>.value(),
+          )
+          as _i4.Future<void>);
+
+  @override
+  _i4.Stream<_i2.AuthState> authStateChanges() =>
+      (super.noSuchMethod(
+            Invocation.method(#authStateChanges, []),
+            returnValue: _i4.Stream<_i2.AuthState>.empty(),
+          )
+          as _i4.Stream<_i2.AuthState>);
+
+  @override
+  _i4.Future<_i2.User> signInAnonymously() =>
+      (super.noSuchMethod(
+            Invocation.method(#signInAnonymously, []),
+            returnValue: _i4.Future<_i2.User>.value(
+              _FakeUser_0(this, Invocation.method(#signInAnonymously, [])),
+            ),
+          )
+          as _i4.Future<_i2.User>);
+
+  @override
+  _i4.Future<_i2.User> upgradeAnonymousUser({
+    required String? email,
+    required String? password,
+  }) =>
+      (super.noSuchMethod(
+            Invocation.method(#upgradeAnonymousUser, [], {
+              #email: email,
+              #password: password,
+            }),
+            returnValue: _i4.Future<_i2.User>.value(
+              _FakeUser_0(
+                this,
+                Invocation.method(#upgradeAnonymousUser, [], {
+                  #email: email,
+                  #password: password,
+                }),
+              ),
+            ),
+          )
+          as _i4.Future<_i2.User>);
+}
+
 /// A class which mocks [User].
 ///
 /// See the documentation for Mockito's code generation for more information.
@@ -118,7 +230,7 @@ class MockUser extends _i1.Mock implements _i2.User {
   String get id =>
       (super.noSuchMethod(
             Invocation.getter(#id),
-            returnValue: _i5.dummyValue<String>(this, Invocation.getter(#id)),
+            returnValue: _i6.dummyValue<String>(this, Invocation.getter(#id)),
           )
           as String);
 
@@ -134,7 +246,7 @@ class MockUser extends _i1.Mock implements _i2.User {
   String get aud =>
       (super.noSuchMethod(
             Invocation.getter(#aud),
-            returnValue: _i5.dummyValue<String>(this, Invocation.getter(#aud)),
+            returnValue: _i6.dummyValue<String>(this, Invocation.getter(#aud)),
           )
           as String);
 
@@ -142,7 +254,7 @@ class MockUser extends _i1.Mock implements _i2.User {
   String get createdAt =>
       (super.noSuchMethod(
             Invocation.getter(#createdAt),
-            returnValue: _i5.dummyValue<String>(
+            returnValue: _i6.dummyValue<String>(
               this,
               Invocation.getter(#createdAt),
             ),
@@ -175,7 +287,7 @@ class MockSession extends _i1.Mock implements _i2.Session {
   String get accessToken =>
       (super.noSuchMethod(
             Invocation.getter(#accessToken),
-            returnValue: _i5.dummyValue<String>(
+            returnValue: _i6.dummyValue<String>(
               this,
               Invocation.getter(#accessToken),
             ),
@@ -186,7 +298,7 @@ class MockSession extends _i1.Mock implements _i2.Session {
   String get tokenType =>
       (super.noSuchMethod(
             Invocation.getter(#tokenType),
-            returnValue: _i5.dummyValue<String>(
+            returnValue: _i6.dummyValue<String>(
               this,
               Invocation.getter(#tokenType),
             ),

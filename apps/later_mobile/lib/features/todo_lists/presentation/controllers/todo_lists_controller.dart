@@ -1,4 +1,5 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import '../../../../core/permissions/permissions.dart';
 import '../../application/providers.dart';
 import '../../domain/models/todo_list.dart';
 
@@ -27,7 +28,25 @@ class TodoListsController extends _$TodoListsController {
   }
 
   /// Creates a new todo list in the current space
+  ///
+  /// For anonymous users, checks if they have reached their todo list limit (10 per space).
+  /// If the limit is reached, throws a [TodoListLimitReachedException] which should
+  /// be handled by the caller to show an upgrade prompt.
+  ///
+  /// Throws:
+  ///   - [TodoListLimitReachedException] if anonymous user has reached their limit
   Future<void> createTodoList(TodoList todoList) async {
+    // Check permission limit for anonymous users
+    final role = ref.read(currentUserRoleProvider);
+    if (role == UserRole.anonymous) {
+      // Get current todo list count from state
+      final currentTodoListCount = state.whenData((lists) => lists.length).value ?? 0;
+      if (currentTodoListCount >= UserRolePermissions(role).maxTodoListsPerSpaceForAnonymous) {
+        // Throw a custom exception that the caller should handle
+        throw TodoListLimitReachedException();
+      }
+    }
+
     final service = ref.read(todoListServiceProvider);
 
     try {
@@ -145,4 +164,12 @@ class TodoListsController extends _$TodoListsController {
       }
     }
   }
+}
+
+/// Exception thrown when an anonymous user reaches their todo list creation limit.
+///
+/// This exception should be caught by the UI layer to show an upgrade prompt dialog.
+class TodoListLimitReachedException implements Exception {
+  @override
+  String toString() => 'Anonymous users are limited to 10 todo lists per space';
 }

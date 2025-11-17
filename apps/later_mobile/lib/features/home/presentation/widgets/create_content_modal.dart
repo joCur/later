@@ -11,6 +11,7 @@ import 'package:later_mobile/design_system/atoms/buttons/primary_button.dart';
 import 'package:later_mobile/design_system/atoms/inputs/text_area_field.dart';
 import 'package:later_mobile/design_system/atoms/inputs/text_input_field.dart';
 import 'package:later_mobile/design_system/molecules/controls/segmented_control.dart';
+import 'package:later_mobile/design_system/organisms/dialogs/upgrade_required_dialog.dart';
 import 'package:later_mobile/design_system/tokens/tokens.dart';
 import 'package:later_mobile/features/lists/domain/models/list_model.dart';
 import 'package:later_mobile/features/notes/domain/models/note.dart';
@@ -447,8 +448,64 @@ class _CreateContentModalState extends ConsumerState<CreateContentModal>
           _close();
         }
       }
+    } on NoteLimitReachedException catch (_) {
+      // Anonymous user reached note limit - show upgrade dialog
+      if (mounted) {
+        setState(() {
+          _isSaving = false;
+        });
+
+        // Close the modal first
+        _close();
+
+        // Show upgrade dialog
+        final l10n = AppLocalizations.of(context)!;
+        await showUpgradeRequiredDialog(
+          context: context,
+          message: l10n.authUpgradeLimitNotes,
+        );
+      }
+    } on TodoListLimitReachedException catch (_) {
+      // Anonymous user reached todo list limit - show upgrade dialog
+      if (mounted) {
+        setState(() {
+          _isSaving = false;
+        });
+
+        // Close the modal first
+        _close();
+
+        // Show upgrade dialog
+        final l10n = AppLocalizations.of(context)!;
+        await showUpgradeRequiredDialog(
+          context: context,
+          message: l10n.authUpgradeLimitTodoLists,
+        );
+      }
+    } on ListLimitReachedException catch (_) {
+      // Anonymous user reached list limit - show upgrade dialog
+      if (mounted) {
+        setState(() {
+          _isSaving = false;
+        });
+
+        // Close the modal first
+        _close();
+
+        // Show upgrade dialog
+        final l10n = AppLocalizations.of(context)!;
+        await showUpgradeRequiredDialog(
+          context: context,
+          message: l10n.authUpgradeLimitLists,
+        );
+      }
     } catch (e) {
       // Error already logged in _saveItem, just ensure loading state is cleared
+      if (mounted) {
+        setState(() {
+          _isSaving = false;
+        });
+      }
     }
   }
 

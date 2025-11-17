@@ -82,6 +82,21 @@
     "description": "Generic authentication error message"
   },
 
+  "errorAuthAnonymousSignInFailed": "Test konnte nicht gestartet werden. Bitte versuchen Sie es erneut.",
+  "@errorAuthAnonymousSignInFailed": {
+    "description": "Error message when anonymous sign-in fails"
+  },
+
+  "errorAuthUpgradeFailed": "Konto konnte nicht erstellt werden. Bitte versuchen Sie es erneut.",
+  "@errorAuthUpgradeFailed": {
+    "description": "Error message when upgrading anonymous account to permanent fails"
+  },
+
+  "errorAuthAlreadyAuthenticated": "Sie haben bereits ein Konto.",
+  "@errorAuthAlreadyAuthenticated": {
+    "description": "Error message when trying to perform anonymous-only operation with authenticated account"
+  },
+
   "errorNetworkTimeout": "Zeitüberschreitung der Verbindung. Bitte überprüfen Sie Ihre Internetverbindung und versuchen Sie es erneut.",
   "@errorNetworkTimeout": {
     "description": "Error message for network timeouts"
@@ -267,6 +282,11 @@
   "authButtonSignUp": "Registrieren",
   "@authButtonSignUp": {
     "description": "Sign up button text"
+  },
+
+  "authButtonContinueWithoutAccount": "Ohne Konto fortfahren",
+  "@authButtonContinueWithoutAccount": {
+    "description": "Button text to skip authentication and continue as anonymous user"
   },
 
   "authLinkSignUp": "Registrieren",
@@ -566,28 +586,28 @@
   "listDetailMenuChangeIcon": "Symbol ändern",
   "listDetailMenuDelete": "Liste löschen",
 
-  "spaceModalTitle": "Space wechseln",
-  "spaceModalSearchHint": "Spaces durchsuchen...",
-  "spaceModalNoSpacesFound": "Keine Spaces gefunden",
-  "spaceModalNoSpacesAvailable": "Keine Spaces verfügbar",
+  "spaceModalTitle": "Bereich wechseln",
+  "spaceModalSearchHint": "Bereiche durchsuchen...",
+  "spaceModalNoSpacesFound": "Keine Bereiche gefunden",
+  "spaceModalNoSpacesAvailable": "Keine Bereiche verfügbar",
   "spaceModalArchived": "Archiviert",
-  "spaceModalShowArchived": "Archivierte Spaces anzeigen",
-  "spaceModalCreateNew": "Neuen Space erstellen",
-  "spaceModalMenuEdit": "Space bearbeiten",
-  "spaceModalMenuArchive": "Space archivieren",
-  "spaceModalMenuArchiveHint": "Wechseln Sie zuerst zu einem anderen Space",
-  "spaceModalMenuArchiveHintItems": "Dieser Space enthält {itemCount} Einträge",
-  "spaceModalMenuRestore": "Space wiederherstellen",
-  "spaceModalMenuRestoreHint": "Diesen Space wieder aktivieren",
+  "spaceModalShowArchived": "Archivierte Bereiche anzeigen",
+  "spaceModalCreateNew": "Neuen Bereich erstellen",
+  "spaceModalMenuEdit": "Bereich bearbeiten",
+  "spaceModalMenuArchive": "Bereich archivieren",
+  "spaceModalMenuArchiveHint": "Wechseln Sie zuerst zu einem anderen Bereich",
+  "spaceModalMenuArchiveHintItems": "Dieser Bereich enthält {itemCount} Einträge",
+  "spaceModalMenuRestore": "Bereich wiederherstellen",
+  "spaceModalMenuRestoreHint": "Diesen Bereich wieder aktivieren",
   "spaceModalMenuCancel": "Abbrechen",
-  "spaceModalSwitchFailed": "Space konnte nicht gewechselt werden",
-  "spaceModalArchiveCurrent": "Der aktuelle Space kann nicht archiviert werden. Wechseln Sie zuerst zu einem anderen Space.",
-  "spaceModalArchiveConfirmTitle": "Space archivieren?",
-  "spaceModalArchiveConfirmMessage": "Dieser Space enthält {itemCount} Einträge. Das Archivieren verbirgt den Space, behält aber alle Einträge bei. Sie können ihn später aus archivierten Spaces wiederherstellen.",
+  "spaceModalSwitchFailed": "Bereich konnte nicht gewechselt werden",
+  "spaceModalArchiveCurrent": "Der aktuelle Bereich kann nicht archiviert werden. Wechseln Sie zuerst zu einem anderen Bereich.",
+  "spaceModalArchiveConfirmTitle": "Bereich archivieren?",
+  "spaceModalArchiveConfirmMessage": "Dieser Bereich enthält {itemCount} Einträge. Das Archivieren verbirgt den Bereich, behält aber alle Einträge bei. Sie können ihn später aus archivierten Bereichen wiederherstellen.",
   "spaceModalArchiveSuccess": "{spaceName} wurde archiviert",
-  "spaceModalArchiveFailed": "Space konnte nicht archiviert werden",
+  "spaceModalArchiveFailed": "Bereich konnte nicht archiviert werden",
   "spaceModalRestoreSuccess": "{spaceName} wurde wiederhergestellt",
-  "spaceModalRestoreFailed": "Space konnte nicht wiederhergestellt werden",
+  "spaceModalRestoreFailed": "Bereich konnte nicht wiederhergestellt werden",
 
   "createModalTitle": "Erstellen",
   "createModalTypeTodoList": "Aufgabenliste",
@@ -631,32 +651,32 @@
   "accessibilityAddDescription": "Beschreibung hinzufügen, eingeklappt",
   "accessibilityAddDescriptionHint": "Tippen, um optionales Beschreibungsfeld hinzuzufügen",
   "accessibilityRemoveDescription": "Beschreibungsfeld entfernen",
-  "accessibilityCreateNewSpace": "Neuen Space erstellen",
+  "accessibilityCreateNewSpace": "Neuen Bereich erstellen",
   "accessibilitySpaceItemCount": "{spaceName}, {itemCount} Einträge",
 
-  "spaceSwitcherTitle": "Space wechseln",
-  "spaceSwitcherSearchHint": "Spaces durchsuchen...",
-  "spaceSwitcherErrorSwitch": "Space konnte nicht gewechselt werden: {error}",
-  "spaceSwitcherEmptyNoResults": "Keine Spaces gefunden",
-  "spaceSwitcherEmptyNoSpaces": "Keine Spaces verfügbar",
+  "spaceSwitcherTitle": "Bereich wechseln",
+  "spaceSwitcherSearchHint": "Bereiche durchsuchen...",
+  "spaceSwitcherErrorSwitch": "Bereich konnte nicht gewechselt werden: {error}",
+  "spaceSwitcherEmptyNoResults": "Keine Bereiche gefunden",
+  "spaceSwitcherEmptyNoSpaces": "Keine Bereiche verfügbar",
   "spaceSwitcherItemCount": "{count} Einträge",
-  "spaceSwitcherMenuEdit": "Space bearbeiten",
-  "spaceSwitcherMenuArchive": "Space archivieren",
-  "spaceSwitcherMenuRestore": "Space wiederherstellen",
+  "spaceSwitcherMenuEdit": "Bereich bearbeiten",
+  "spaceSwitcherMenuArchive": "Bereich archivieren",
+  "spaceSwitcherMenuRestore": "Bereich wiederherstellen",
   "spaceSwitcherMenuCancel": "Abbrechen",
-  "spaceSwitcherSubtitleSwitchFirst": "Wechseln Sie zuerst zu einem anderen Space",
-  "spaceSwitcherSubtitleContainsItems": "Dieser Space enthält {count} Einträge",
-  "spaceSwitcherSubtitleRestore": "Diesen Space wieder aktivieren",
-  "spaceSwitcherDialogArchiveTitle": "Space archivieren?",
-  "spaceSwitcherDialogArchiveContent": "Dieser Space enthält {count} Einträge. Das Archivieren verbirgt den Space, behält aber alle Einträge bei. Sie können ihn später aus archivierten Spaces wiederherstellen.",
+  "spaceSwitcherSubtitleSwitchFirst": "Wechseln Sie zuerst zu einem anderen Bereich",
+  "spaceSwitcherSubtitleContainsItems": "Dieser Bereich enthält {count} Einträge",
+  "spaceSwitcherSubtitleRestore": "Diesen Bereich wieder aktivieren",
+  "spaceSwitcherDialogArchiveTitle": "Bereich archivieren?",
+  "spaceSwitcherDialogArchiveContent": "Dieser Bereich enthält {count} Einträge. Das Archivieren verbirgt den Bereich, behält aber alle Einträge bei. Sie können ihn später aus archivierten Bereichen wiederherstellen.",
   "spaceSwitcherSuccessArchived": "{name} wurde archiviert",
   "spaceSwitcherSuccessRestored": "{name} wurde wiederhergestellt",
-  "spaceSwitcherErrorArchive": "Space konnte nicht archiviert werden: {error}",
-  "spaceSwitcherErrorRestore": "Space konnte nicht wiederhergestellt werden: {error}",
-  "spaceSwitcherErrorCannotArchiveCurrent": "Der aktuelle Space kann nicht archiviert werden. Wechseln Sie zuerst zu einem anderen Space.",
+  "spaceSwitcherErrorArchive": "Bereich konnte nicht archiviert werden: {error}",
+  "spaceSwitcherErrorRestore": "Bereich konnte nicht wiederhergestellt werden: {error}",
+  "spaceSwitcherErrorCannotArchiveCurrent": "Der aktuelle Bereich kann nicht archiviert werden. Wechseln Sie zuerst zu einem anderen Bereich.",
   "spaceSwitcherBadgeArchived": "Archiviert",
-  "spaceSwitcherToggleShowArchived": "Archivierte Spaces anzeigen",
-  "spaceSwitcherButtonCreateNew": "Neuen Space erstellen",
+  "spaceSwitcherToggleShowArchived": "Archivierte Bereiche anzeigen",
+  "spaceSwitcherButtonCreateNew": "Neuen Bereich erstellen",
 
   "searchEmptyTitle": "Keine Ergebnisse gefunden",
   "searchEmptyMessage": "Versuchen Sie andere Suchbegriffe oder überprüfen Sie die Rechtschreibung",
@@ -673,5 +693,46 @@
   "navigationBottomSettingsSemanticLabel": "Einstellungen-Navigation",
 
   "dialogDeleteItemTitle": "Element löschen?",
-  "dialogDeleteItemMessage": "Möchten Sie \"{itemName}\" wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden."
+  "dialogDeleteItemMessage": "Möchten Sie \"{itemName}\" wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.",
+
+  "authUpgradeBannerMessage": "Erstellen Sie ein Konto, um Ihre Daten zu sichern",
+  "authUpgradeBannerButton": "Konto erstellen",
+  "authUpgradeScreenTitle": "Erstellen Sie Ihr Konto",
+  "authUpgradeScreenSubtitle": "Upgraden Sie, um unbegrenzte Funktionen freizuschalten",
+  "authUpgradeEmailLabel": "E-Mail",
+  "authUpgradePasswordLabel": "Passwort",
+  "authUpgradeConfirmPasswordLabel": "Passwort bestätigen",
+  "authUpgradeSubmitButton": "Konto erstellen",
+  "authUpgradeCancelButton": "Vielleicht später",
+  "authUpgradeSuccessMessage": "Konto erfolgreich erstellt!",
+
+  "buttonDismiss": "Schließen",
+  "accessibilityWarning": "Warnung",
+
+  "validationEmailRequired": "E-Mail ist erforderlich",
+  "validationEmailInvalid": "Bitte geben Sie eine gültige E-Mail ein",
+  "validationPasswordRequired": "Passwort ist erforderlich",
+  "validationPasswordMinLength": "Passwort muss mindestens 8 Zeichen lang sein",
+  "validationPasswordConfirmRequired": "Bitte bestätigen Sie Ihr Passwort",
+  "validationPasswordsDoNotMatch": "Passwörter stimmen nicht überein",
+  "errorUnexpected": "Ein unerwarteter Fehler ist aufgetreten",
+
+  "authUpgradeDialogTitle": "Upgrade erforderlich",
+  "authUpgradeDialogNotNow": "Jetzt nicht",
+  "authUpgradeLimitSpaces": "Anonyme Benutzer sind auf 1 Bereich beschränkt. Erstellen Sie ein Konto, um unbegrenzte Bereiche freizuschalten.",
+  "authUpgradeLimitNotes": "Anonyme Benutzer sind auf 20 Notizen pro Bereich beschränkt. Erstellen Sie ein Konto, um unbegrenzte Notizen freizuschalten.",
+  "authUpgradeLimitTodoLists": "Anonyme Benutzer sind auf 10 Todo-Listen pro Bereich beschränkt. Erstellen Sie ein Konto, um unbegrenzte Todo-Listen freizuschalten.",
+  "authUpgradeLimitLists": "Anonyme Benutzer sind auf 5 benutzerdefinierte Listen pro Bereich beschränkt. Erstellen Sie ein Konto, um unbegrenzte Listen freizuschalten.",
+
+  "spaceModalTitleCreate": "Bereich erstellen",
+  "spaceModalTitleEdit": "Bereich bearbeiten",
+  "spaceModalButtonCreate": "Erstellen",
+  "spaceModalButtonSave": "Speichern",
+  "spaceModalLabelName": "Bereichsname",
+  "spaceModalHintName": "Bereichsnamen eingeben",
+  "spaceModalLabelIcon": "Symbol",
+  "spaceModalLabelColor": "Farbe",
+  "spaceModalValidationNameRequired": "Name ist erforderlich",
+  "spaceModalValidationNameLength": "Name muss zwischen 1 und 100 Zeichen lang sein",
+  "spaceModalErrorNotSignedIn": "Sie sind nicht angemeldet. Bitte melden Sie sich an und versuchen Sie es erneut."
 }

@@ -1,4 +1,5 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import '../../../../core/permissions/permissions.dart';
 import '../../application/providers.dart';
 import '../../domain/models/list_model.dart';
 
@@ -27,7 +28,25 @@ class ListsController extends _$ListsController {
   }
 
   /// Creates a new list in the current space
+  ///
+  /// For anonymous users, checks if they have reached their list limit (5 per space).
+  /// If the limit is reached, throws a [ListLimitReachedException] which should
+  /// be handled by the caller to show an upgrade prompt.
+  ///
+  /// Throws:
+  ///   - [ListLimitReachedException] if anonymous user has reached their limit
   Future<void> createList(ListModel list) async {
+    // Check permission limit for anonymous users
+    final role = ref.read(currentUserRoleProvider);
+    if (role == UserRole.anonymous) {
+      // Get current list count from state
+      final currentListCount = state.whenData((lists) => lists.length).value ?? 0;
+      if (currentListCount >= UserRolePermissions(role).maxListsPerSpaceForAnonymous) {
+        // Throw a custom exception that the caller should handle
+        throw ListLimitReachedException();
+      }
+    }
+
     final service = ref.read(listServiceProvider);
 
     try {
@@ -146,4 +165,12 @@ class ListsController extends _$ListsController {
       }
     }
   }
+}
+
+/// Exception thrown when an anonymous user reaches their list creation limit.
+///
+/// This exception should be caught by the UI layer to show an upgrade prompt dialog.
+class ListLimitReachedException implements Exception {
+  @override
+  String toString() => 'Anonymous users are limited to 5 custom lists per space';
 }

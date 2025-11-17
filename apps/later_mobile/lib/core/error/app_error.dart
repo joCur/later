@@ -119,6 +119,12 @@ class AppError implements Exception {
         return localizations.errorAuthRateLimitExceeded;
       case ErrorCode.authGeneric:
         return localizations.errorAuthGeneric;
+      case ErrorCode.authAnonymousSignInFailed:
+        return localizations.errorAuthAnonymousSignInFailed;
+      case ErrorCode.authUpgradeFailed:
+        return localizations.errorAuthUpgradeFailed;
+      case ErrorCode.authAlreadyAuthenticated:
+        return localizations.errorAuthAlreadyAuthenticated;
 
       // Network errors
       case ErrorCode.networkTimeout:
@@ -212,6 +218,12 @@ class AppError implements Exception {
         return 'Too many attempts. Please try again later.';
       case ErrorCode.authGeneric:
         return 'Authentication failed. Please try again.';
+      case ErrorCode.authAnonymousSignInFailed:
+        return 'Could not start trial. Please try again.';
+      case ErrorCode.authUpgradeFailed:
+        return 'Could not create account. Please try again.';
+      case ErrorCode.authAlreadyAuthenticated:
+        return 'You already have an account.';
 
       // Network errors
       case ErrorCode.networkTimeout:

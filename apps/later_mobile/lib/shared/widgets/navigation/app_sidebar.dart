@@ -337,6 +337,9 @@ class _AppSidebarState extends ConsumerState<AppSidebar> {
 
   Widget _buildFooter(bool isDarkMode, TemporalFlowTheme temporalTheme) {
     final l10n = AppLocalizations.of(context)!;
+    final isAnonymous = ref
+        .watch(authStateControllerProvider.notifier)
+        .isCurrentUserAnonymous;
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -401,8 +404,8 @@ class _AppSidebarState extends ConsumerState<AppSidebar> {
                   ],
                 ],
               ),
-              // Sign Out button
-              if (widget.isExpanded)
+              // Sign Out button (hidden for anonymous users)
+              if (widget.isExpanded && !isAnonymous)
                 Padding(
                   padding: const EdgeInsets.only(top: AppSpacing.xs),
                   child: Tooltip(
@@ -468,32 +471,34 @@ class _AppSidebarState extends ConsumerState<AppSidebar> {
               ),
             ),
           ),
-          Container(
-            padding: const EdgeInsets.all(AppSpacing.xs),
-            child: Tooltip(
-              message: l10n.sidebarSignOut,
-              child: InkWell(
-                onTap: () async {
-                  await ref
-                      .read(authStateControllerProvider.notifier)
-                      .signOut();
-                },
-                borderRadius: const BorderRadius.all(
-                  Radius.circular(AppSpacing.radiusSM),
-                ),
-                child: Container(
-                  height: AppSpacing.minTouchTarget,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppSpacing.xs,
+          // Sign out button in collapsed mode (hidden for anonymous users)
+          if (!isAnonymous)
+            Container(
+              padding: const EdgeInsets.all(AppSpacing.xs),
+              child: Tooltip(
+                message: l10n.sidebarSignOut,
+                child: InkWell(
+                  onTap: () async {
+                    await ref
+                        .read(authStateControllerProvider.notifier)
+                        .signOut();
+                  },
+                  borderRadius: const BorderRadius.all(
+                    Radius.circular(AppSpacing.radiusSM),
                   ),
-                  child: Icon(
-                    Icons.logout,
-                    color: AppColors.textSecondary(context),
+                  child: Container(
+                    height: AppSpacing.minTouchTarget,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.xs,
+                    ),
+                    child: Icon(
+                      Icons.logout,
+                      color: AppColors.textSecondary(context),
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
         ],
       ],
     );

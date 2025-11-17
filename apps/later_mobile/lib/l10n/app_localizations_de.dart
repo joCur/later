@@ -70,6 +70,17 @@ class AppLocalizationsDe extends AppLocalizations {
       'Ein Authentifizierungsfehler ist aufgetreten. Bitte versuchen Sie es erneut.';
 
   @override
+  String get errorAuthAnonymousSignInFailed =>
+      'Test konnte nicht gestartet werden. Bitte versuchen Sie es erneut.';
+
+  @override
+  String get errorAuthUpgradeFailed =>
+      'Konto konnte nicht erstellt werden. Bitte versuchen Sie es erneut.';
+
+  @override
+  String get errorAuthAlreadyAuthenticated => 'Sie haben bereits ein Konto.';
+
+  @override
   String get errorNetworkTimeout =>
       'Zeitüberschreitung der Verbindung. Bitte überprüfen Sie Ihre Internetverbindung und versuchen Sie es erneut.';
 
@@ -184,6 +195,9 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get authButtonSignUp => 'Registrieren';
+
+  @override
+  String get authButtonContinueWithoutAccount => 'Ohne Konto fortfahren';
 
   @override
   String get authLinkSignUp => 'Registrieren';
@@ -618,63 +632,63 @@ class AppLocalizationsDe extends AppLocalizations {
   String get listDetailMenuDelete => 'Liste löschen';
 
   @override
-  String get spaceModalTitle => 'Space wechseln';
+  String get spaceModalTitle => 'Bereich wechseln';
 
   @override
-  String get spaceModalSearchHint => 'Spaces durchsuchen...';
+  String get spaceModalSearchHint => 'Bereiche durchsuchen...';
 
   @override
-  String get spaceModalNoSpacesFound => 'Keine Spaces gefunden';
+  String get spaceModalNoSpacesFound => 'Keine Bereiche gefunden';
 
   @override
-  String get spaceModalNoSpacesAvailable => 'Keine Spaces verfügbar';
+  String get spaceModalNoSpacesAvailable => 'Keine Bereiche verfügbar';
 
   @override
   String get spaceModalArchived => 'Archiviert';
 
   @override
-  String get spaceModalShowArchived => 'Archivierte Spaces anzeigen';
+  String get spaceModalShowArchived => 'Archivierte Bereiche anzeigen';
 
   @override
-  String get spaceModalCreateNew => 'Neuen Space erstellen';
+  String get spaceModalCreateNew => 'Neuen Bereich erstellen';
 
   @override
-  String get spaceModalMenuEdit => 'Space bearbeiten';
+  String get spaceModalMenuEdit => 'Bereich bearbeiten';
 
   @override
-  String get spaceModalMenuArchive => 'Space archivieren';
+  String get spaceModalMenuArchive => 'Bereich archivieren';
 
   @override
   String get spaceModalMenuArchiveHint =>
-      'Wechseln Sie zuerst zu einem anderen Space';
+      'Wechseln Sie zuerst zu einem anderen Bereich';
 
   @override
   String spaceModalMenuArchiveHintItems(int itemCount) {
-    return 'Dieser Space enthält $itemCount Einträge';
+    return 'Dieser Bereich enthält $itemCount Einträge';
   }
 
   @override
-  String get spaceModalMenuRestore => 'Space wiederherstellen';
+  String get spaceModalMenuRestore => 'Bereich wiederherstellen';
 
   @override
-  String get spaceModalMenuRestoreHint => 'Diesen Space wieder aktivieren';
+  String get spaceModalMenuRestoreHint => 'Diesen Bereich wieder aktivieren';
 
   @override
   String get spaceModalMenuCancel => 'Abbrechen';
 
   @override
-  String get spaceModalSwitchFailed => 'Space konnte nicht gewechselt werden';
+  String get spaceModalSwitchFailed => 'Bereich konnte nicht gewechselt werden';
 
   @override
   String get spaceModalArchiveCurrent =>
-      'Der aktuelle Space kann nicht archiviert werden. Wechseln Sie zuerst zu einem anderen Space.';
+      'Der aktuelle Bereich kann nicht archiviert werden. Wechseln Sie zuerst zu einem anderen Bereich.';
 
   @override
-  String get spaceModalArchiveConfirmTitle => 'Space archivieren?';
+  String get spaceModalArchiveConfirmTitle => 'Bereich archivieren?';
 
   @override
   String spaceModalArchiveConfirmMessage(int itemCount) {
-    return 'Dieser Space enthält $itemCount Einträge. Das Archivieren verbirgt den Space, behält aber alle Einträge bei. Sie können ihn später aus archivierten Spaces wiederherstellen.';
+    return 'Dieser Bereich enthält $itemCount Einträge. Das Archivieren verbirgt den Bereich, behält aber alle Einträge bei. Sie können ihn später aus archivierten Bereichen wiederherstellen.';
   }
 
   @override
@@ -683,7 +697,8 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
-  String get spaceModalArchiveFailed => 'Space konnte nicht archiviert werden';
+  String get spaceModalArchiveFailed =>
+      'Bereich konnte nicht archiviert werden';
 
   @override
   String spaceModalRestoreSuccess(String spaceName) {
@@ -692,7 +707,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get spaceModalRestoreFailed =>
-      'Space konnte nicht wiederhergestellt werden';
+      'Bereich konnte nicht wiederhergestellt werden';
 
   @override
   String get createModalTitle => 'Erstellen';
@@ -824,7 +839,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get accessibilityRemoveDescription => 'Beschreibungsfeld entfernen';
 
   @override
-  String get accessibilityCreateNewSpace => 'Neuen Space erstellen';
+  String get accessibilityCreateNewSpace => 'Neuen Bereich erstellen';
 
   @override
   String accessibilitySpaceItemCount(String spaceName, int itemCount) {
@@ -832,21 +847,21 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
-  String get spaceSwitcherTitle => 'Space wechseln';
+  String get spaceSwitcherTitle => 'Bereich wechseln';
 
   @override
-  String get spaceSwitcherSearchHint => 'Spaces durchsuchen...';
+  String get spaceSwitcherSearchHint => 'Bereiche durchsuchen...';
 
   @override
   String spaceSwitcherErrorSwitch(String error) {
-    return 'Space konnte nicht gewechselt werden: $error';
+    return 'Bereich konnte nicht gewechselt werden: $error';
   }
 
   @override
-  String get spaceSwitcherEmptyNoResults => 'Keine Spaces gefunden';
+  String get spaceSwitcherEmptyNoResults => 'Keine Bereiche gefunden';
 
   @override
-  String get spaceSwitcherEmptyNoSpaces => 'Keine Spaces verfügbar';
+  String get spaceSwitcherEmptyNoSpaces => 'Keine Bereiche verfügbar';
 
   @override
   String spaceSwitcherItemCount(int count) {
@@ -854,35 +869,35 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
-  String get spaceSwitcherMenuEdit => 'Space bearbeiten';
+  String get spaceSwitcherMenuEdit => 'Bereich bearbeiten';
 
   @override
-  String get spaceSwitcherMenuArchive => 'Space archivieren';
+  String get spaceSwitcherMenuArchive => 'Bereich archivieren';
 
   @override
-  String get spaceSwitcherMenuRestore => 'Space wiederherstellen';
+  String get spaceSwitcherMenuRestore => 'Bereich wiederherstellen';
 
   @override
   String get spaceSwitcherMenuCancel => 'Abbrechen';
 
   @override
   String get spaceSwitcherSubtitleSwitchFirst =>
-      'Wechseln Sie zuerst zu einem anderen Space';
+      'Wechseln Sie zuerst zu einem anderen Bereich';
 
   @override
   String spaceSwitcherSubtitleContainsItems(int count) {
-    return 'Dieser Space enthält $count Einträge';
+    return 'Dieser Bereich enthält $count Einträge';
   }
 
   @override
-  String get spaceSwitcherSubtitleRestore => 'Diesen Space wieder aktivieren';
+  String get spaceSwitcherSubtitleRestore => 'Diesen Bereich wieder aktivieren';
 
   @override
-  String get spaceSwitcherDialogArchiveTitle => 'Space archivieren?';
+  String get spaceSwitcherDialogArchiveTitle => 'Bereich archivieren?';
 
   @override
   String spaceSwitcherDialogArchiveContent(int count) {
-    return 'Dieser Space enthält $count Einträge. Das Archivieren verbirgt den Space, behält aber alle Einträge bei. Sie können ihn später aus archivierten Spaces wiederherstellen.';
+    return 'Dieser Bereich enthält $count Einträge. Das Archivieren verbirgt den Bereich, behält aber alle Einträge bei. Sie können ihn später aus archivierten Bereichen wiederherstellen.';
   }
 
   @override
@@ -897,26 +912,26 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String spaceSwitcherErrorArchive(String error) {
-    return 'Space konnte nicht archiviert werden: $error';
+    return 'Bereich konnte nicht archiviert werden: $error';
   }
 
   @override
   String spaceSwitcherErrorRestore(String error) {
-    return 'Space konnte nicht wiederhergestellt werden: $error';
+    return 'Bereich konnte nicht wiederhergestellt werden: $error';
   }
 
   @override
   String get spaceSwitcherErrorCannotArchiveCurrent =>
-      'Der aktuelle Space kann nicht archiviert werden. Wechseln Sie zuerst zu einem anderen Space.';
+      'Der aktuelle Bereich kann nicht archiviert werden. Wechseln Sie zuerst zu einem anderen Bereich.';
 
   @override
   String get spaceSwitcherBadgeArchived => 'Archiviert';
 
   @override
-  String get spaceSwitcherToggleShowArchived => 'Archivierte Spaces anzeigen';
+  String get spaceSwitcherToggleShowArchived => 'Archivierte Bereiche anzeigen';
 
   @override
-  String get spaceSwitcherButtonCreateNew => 'Neuen Space erstellen';
+  String get spaceSwitcherButtonCreateNew => 'Neuen Bereich erstellen';
 
   @override
   String get searchEmptyTitle => 'Keine Ergebnisse gefunden';
@@ -964,4 +979,124 @@ class AppLocalizationsDe extends AppLocalizations {
   String dialogDeleteItemMessage(String itemName) {
     return 'Möchten Sie \"$itemName\" wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.';
   }
+
+  @override
+  String get authUpgradeBannerMessage =>
+      'Erstellen Sie ein Konto, um Ihre Daten zu sichern';
+
+  @override
+  String get authUpgradeBannerButton => 'Konto erstellen';
+
+  @override
+  String get authUpgradeScreenTitle => 'Erstellen Sie Ihr Konto';
+
+  @override
+  String get authUpgradeScreenSubtitle =>
+      'Upgraden Sie, um unbegrenzte Funktionen freizuschalten';
+
+  @override
+  String get authUpgradeEmailLabel => 'E-Mail';
+
+  @override
+  String get authUpgradePasswordLabel => 'Passwort';
+
+  @override
+  String get authUpgradeConfirmPasswordLabel => 'Passwort bestätigen';
+
+  @override
+  String get authUpgradeSubmitButton => 'Konto erstellen';
+
+  @override
+  String get authUpgradeCancelButton => 'Vielleicht später';
+
+  @override
+  String get authUpgradeSuccessMessage => 'Konto erfolgreich erstellt!';
+
+  @override
+  String get buttonDismiss => 'Schließen';
+
+  @override
+  String get accessibilityWarning => 'Warnung';
+
+  @override
+  String get validationEmailRequired => 'E-Mail ist erforderlich';
+
+  @override
+  String get validationEmailInvalid =>
+      'Bitte geben Sie eine gültige E-Mail ein';
+
+  @override
+  String get validationPasswordRequired => 'Passwort ist erforderlich';
+
+  @override
+  String get validationPasswordMinLength =>
+      'Passwort muss mindestens 8 Zeichen lang sein';
+
+  @override
+  String get validationPasswordConfirmRequired =>
+      'Bitte bestätigen Sie Ihr Passwort';
+
+  @override
+  String get validationPasswordsDoNotMatch =>
+      'Passwörter stimmen nicht überein';
+
+  @override
+  String get errorUnexpected => 'Ein unerwarteter Fehler ist aufgetreten';
+
+  @override
+  String get authUpgradeDialogTitle => 'Upgrade erforderlich';
+
+  @override
+  String get authUpgradeDialogNotNow => 'Jetzt nicht';
+
+  @override
+  String get authUpgradeLimitSpaces =>
+      'Anonyme Benutzer sind auf 1 Bereich beschränkt. Erstellen Sie ein Konto, um unbegrenzte Bereiche freizuschalten.';
+
+  @override
+  String get authUpgradeLimitNotes =>
+      'Anonyme Benutzer sind auf 20 Notizen pro Bereich beschränkt. Erstellen Sie ein Konto, um unbegrenzte Notizen freizuschalten.';
+
+  @override
+  String get authUpgradeLimitTodoLists =>
+      'Anonyme Benutzer sind auf 10 Todo-Listen pro Bereich beschränkt. Erstellen Sie ein Konto, um unbegrenzte Todo-Listen freizuschalten.';
+
+  @override
+  String get authUpgradeLimitLists =>
+      'Anonyme Benutzer sind auf 5 benutzerdefinierte Listen pro Bereich beschränkt. Erstellen Sie ein Konto, um unbegrenzte Listen freizuschalten.';
+
+  @override
+  String get spaceModalTitleCreate => 'Bereich erstellen';
+
+  @override
+  String get spaceModalTitleEdit => 'Bereich bearbeiten';
+
+  @override
+  String get spaceModalButtonCreate => 'Erstellen';
+
+  @override
+  String get spaceModalButtonSave => 'Speichern';
+
+  @override
+  String get spaceModalLabelName => 'Bereichsname';
+
+  @override
+  String get spaceModalHintName => 'Bereichsnamen eingeben';
+
+  @override
+  String get spaceModalLabelIcon => 'Symbol';
+
+  @override
+  String get spaceModalLabelColor => 'Farbe';
+
+  @override
+  String get spaceModalValidationNameRequired => 'Name ist erforderlich';
+
+  @override
+  String get spaceModalValidationNameLength =>
+      'Name muss zwischen 1 und 100 Zeichen lang sein';
+
+  @override
+  String get spaceModalErrorNotSignedIn =>
+      'Sie sind nicht angemeldet. Bitte melden Sie sich an und versuchen Sie es erneut.';
 }
