@@ -71,8 +71,9 @@ String _$permissionServiceHash() => r'bbcbd006d6d26a4434291d0eff35ab927b34f362';
 
 /// Provider for the current user's role.
 ///
-/// Watches the permission service and returns the current user role.
-/// This provider is kept alive to maintain auth state consistency.
+/// Watches the auth state and returns the current user role.
+/// This provider updates automatically when the user upgrades from anonymous
+/// to authenticated or signs in/out.
 ///
 /// Returns:
 /// - [UserRole.anonymous] for anonymous (temporary) users
@@ -83,8 +84,9 @@ const currentUserRoleProvider = CurrentUserRoleProvider._();
 
 /// Provider for the current user's role.
 ///
-/// Watches the permission service and returns the current user role.
-/// This provider is kept alive to maintain auth state consistency.
+/// Watches the auth state and returns the current user role.
+/// This provider updates automatically when the user upgrades from anonymous
+/// to authenticated or signs in/out.
 ///
 /// Returns:
 /// - [UserRole.anonymous] for anonymous (temporary) users
@@ -95,8 +97,9 @@ final class CurrentUserRoleProvider
     with $Provider<UserRole> {
   /// Provider for the current user's role.
   ///
-  /// Watches the permission service and returns the current user role.
-  /// This provider is kept alive to maintain auth state consistency.
+  /// Watches the auth state and returns the current user role.
+  /// This provider updates automatically when the user upgrades from anonymous
+  /// to authenticated or signs in/out.
   ///
   /// Returns:
   /// - [UserRole.anonymous] for anonymous (temporary) users
@@ -107,7 +110,7 @@ final class CurrentUserRoleProvider
         argument: null,
         retry: null,
         name: r'currentUserRoleProvider',
-        isAutoDispose: false,
+        isAutoDispose: true,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -134,4 +137,4 @@ final class CurrentUserRoleProvider
   }
 }
 
-String _$currentUserRoleHash() => r'9eef7d10a6cd8a5a1f07cc03fcb84006ebd49c12';
+String _$currentUserRoleHash() => r'18352491572abaf7db94165790f48e08b997f7c0';

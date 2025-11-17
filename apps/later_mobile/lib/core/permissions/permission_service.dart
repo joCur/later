@@ -2,6 +2,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:later_mobile/core/config/supabase_config.dart';
 import 'package:later_mobile/core/permissions/user_role.dart';
+import 'package:later_mobile/features/auth/presentation/controllers/auth_state_controller.dart';
 
 part 'permission_service.g.dart';
 
@@ -58,14 +59,32 @@ PermissionService permissionService(Ref ref) {
 
 /// Provider for the current user's role.
 ///
-/// Watches the permission service and returns the current user role.
-/// This provider is kept alive to maintain auth state consistency.
+/// Watches the auth state and returns the current user role.
+/// This provider updates automatically when the user upgrades from anonymous
+/// to authenticated or signs in/out.
 ///
 /// Returns:
 /// - [UserRole.anonymous] for anonymous (temporary) users
 /// - [UserRole.authenticated] for permanent users
-@Riverpod(keepAlive: true)
+@riverpod
 UserRole currentUserRole(Ref ref) {
-  final service = ref.watch(permissionServiceProvider);
-  return service.getCurrentUserRole();
+  // Watch auth state to detect changes (sign in, sign out, upgrade)
+  // This is imported from auth feature in the next line
+  final authState = ref.watch(authStateControllerProvider);
+
+  // Get the user from auth state
+  final user = authState.value;
+
+  // No user found - treat as anonymous fallback
+  if (user == null) {
+    return UserRole.anonymous;
+  }
+
+  // Check if user is anonymous via isAnonymous flag
+  if (user.isAnonymous) {
+    return UserRole.anonymous;
+  }
+
+  // User is authenticated (permanent account)
+  return UserRole.authenticated;
 }

@@ -434,7 +434,7 @@ WITH CHECK (
 
 ### Phase 6.5: Critical Bug Fixes ✅
 
-**Goal:** Fix RLS policy bugs and space auto-selection issue
+**Goal:** Fix RLS policy bugs, space auto-selection issue, and permission provider reactivity
 
 **Status:** COMPLETED - Critical bugs fixed for production readiness
 
@@ -456,6 +456,16 @@ WITH CHECK (
   - ✅ **Fix Applied**: Added 50ms delay in `HomeScreen._showCreateSpaceModal()` to allow state propagation
   - ✅ Code location: `apps/later_mobile/lib/features/home/presentation/screens/home_screen.dart:352`
   - ✅ Ensures newly created space is properly selected and content providers are invalidated
+
+- [x] Task 6.5.3: Fix permission provider not updating after upgrade
+  - ✅ **Bug Found**: `currentUserRoleProvider` had `keepAlive: true` and read user directly from Supabase client
+  - ✅ **Root Cause**: Provider didn't watch auth state changes, so it kept returning `UserRole.anonymous` after upgrade until app restart
+  - ✅ **Fix Applied**: Changed provider to watch `authStateControllerProvider` and removed `keepAlive: true`
+  - ✅ **Implementation**: Provider now gets user from auth state stream (`authState.value`) instead of direct client access
+  - ✅ Code location: `apps/later_mobile/lib/core/permissions/permission_service.dart:68-89`
+  - ✅ Result: Permission provider now updates immediately when user upgrades from anonymous to authenticated
+  - ✅ All 21 permission service tests still passing
+  - ✅ No analyzer issues
 
 ### Phase 7: Feature Limit Enforcement in UI ✅
 
