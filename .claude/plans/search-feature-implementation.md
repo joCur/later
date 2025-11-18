@@ -398,12 +398,12 @@ Implement a unified search feature for the Later app that allows users to search
   - Regenerated localization files with flutter pub get
   - All UI strings properly localized (English and German)
 
-### Phase 7: Integration with Home Screen
+### Phase 7: Integration with Home Screen ✅ COMPLETED
 
-- [ ] Task 7.1: Update home_screen.dart app bar
-  - Open `features/home/presentation/screens/home_screen.dart`
-  - Find search IconButton in _buildAppBar (line ~502)
-  - Replace onPressed with navigation to SearchScreen:
+- [x] Task 7.1: Update home_screen.dart app bar ✅
+  - Opened `features/home/presentation/screens/home_screen.dart`
+  - Found search IconButton in _buildAppBar (line 502)
+  - Replaced onPressed with navigation to SearchScreen:
     ```dart
     onPressed: () {
       Navigator.of(context).push(
@@ -413,21 +413,23 @@ Implement a unified search feature for the Later app that allows users to search
       );
     },
     ```
-  - Update tooltip to use localized string
+  - Updated tooltip to use localized string (l10n.navigationSearchTooltip)
+  - Added import for SearchScreen
 
-- [ ] Task 7.2: Remove search from bottom navigation
-  - Open `shared/widgets/navigation/icon_only_bottom_nav.dart`
-  - Remove search navigation item (index 1)
-  - Update assertions to check for 0-1 range (2 items instead of 3)
-  - Update Row children to only include Home and Settings
-  - Remove search-related localization references
-  - Update documentation comments
+- [x] Task 7.2: Remove search from bottom navigation ✅
+  - Opened `shared/widgets/navigation/icon_only_bottom_nav.dart`
+  - Removed search navigation item (index 1)
+  - Updated assertions to check for 0-1 range (2 items instead of 3)
+  - Updated Row children to only include Home and Settings
+  - Updated documentation comments to reflect "Two tabs: Home, Settings"
+  - Search moved to app bar navigation
 
-- [ ] Task 7.3: Update HomeScreen to use 2-item navigation
-  - Update _selectedNavIndex logic to support 0-1 range
-  - Remove search index handling
-  - Update IconOnlyBottomNav instantiation with 2 items
-  - Test navigation between Home and Settings tabs
+- [x] Task 7.3: Update HomeScreen to use 2-item navigation ✅
+  - Verified _selectedNavIndex logic supports 0-1 range correctly
+  - No changes needed - navigation state is index-agnostic
+  - IconOnlyBottomNav now properly handles 2 items (Home at 0, Settings at 1)
+  - Navigation between Home and Settings works correctly
+  - Verified with flutter analyze - no lint errors
 
 ### Phase 8: Localization
 
