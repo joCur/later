@@ -117,73 +117,87 @@ Implement a unified search feature for the Later app that allows users to search
   - Verified all 1210+ tests pass with no breakage
   - Verified all files pass flutter analyze with no issues
 
-### Phase 3: Data Layer - Search Repository
+### Phase 3: Data Layer - Search Repository ✅ COMPLETED
 
-- [ ] Task 3.1: Create SearchRepository with base structure
-  - Create `data/repositories/search_repository.dart`
-  - Extend `BaseRepository` from core
-  - Add constructor with required dependencies
-  - Implement executeQuery wrapper for error handling
-  - Add provider in `data/repositories/providers.dart`
+- [x] Task 3.1: Create SearchRepository with base structure ✅
+  - Created `lib/features/search/data/repositories/search_repository.dart`
+  - Extended `BaseRepository` from core
+  - Added constructor with required dependencies
+  - Implemented executeQuery wrapper for error handling
+  - Added provider in `data/repositories/providers.dart`
+  - Generated provider code with build_runner
 
-- [ ] Task 3.2: Implement unified search method
-  - Add `Future<List<SearchResult>> search(SearchQuery query)` method
-  - Use executeQuery wrapper for error handling
-  - Call private methods: _searchNotes, _searchTodoLists, _searchLists, _searchTodoItems, _searchListItems
-  - Combine results into single list
-  - Sort combined results by updatedAt (descending)
-  - Return List<SearchResult>
+- [x] Task 3.2: Implement unified search method ✅
+  - Added `Future<List<SearchResult>> search(SearchQuery query)` method
+  - Used executeQuery wrapper for error handling
+  - Called private methods: _searchNotes, _searchTodoLists, _searchLists, _searchTodoItems, _searchListItems
+  - Combined results into single list
+  - Sorted combined results by updatedAt (descending)
+  - Returns List<SearchResult>
 
-- [ ] Task 3.3: Implement _searchNotes private method
-  - Build Supabase query for notes table
-  - Add `.eq('user_id', userId)` filter (RLS backup)
-  - Add `.eq('space_id', query.spaceId)` filter (space-scoped search)
-  - Use `.textSearch('fts', query.query, config: 'german')` for full-text search
-  - Add `.contains('tags', query.tags)` if tags provided
-  - Add `.order('updated_at', ascending: false)`
-  - Map results to SearchResult objects (type: ContentType.note)
-  - Handle errors and wrap in AppError
+- [x] Task 3.3: Implement _searchNotes private method ✅
+  - Built Supabase query for notes table
+  - Added `.eq('user_id', userId)` filter (RLS backup)
+  - Added `.eq('space_id', query.spaceId)` filter (space-scoped search)
+  - Used `.textSearch('fts', query.query, config: 'german')` for full-text search
+  - Added `.contains('tags', query.tags)` if tags provided (must be applied before textSearch)
+  - Added `.order('updated_at', ascending: false)`
+  - Mapped results to SearchResult objects (type: ContentType.note)
+  - Errors handled and wrapped in AppError via BaseRepository.executeQuery
 
-- [ ] Task 3.4: Implement _searchTodoLists private method
-  - Build Supabase query for todo_lists table
-  - Add `.eq('user_id', userId)` filter (RLS backup)
-  - Add `.eq('space_id', query.spaceId)` filter (space-scoped search)
-  - Use `.textSearch('fts', query.query, config: 'german')` for full-text search
-  - Add `.order('updated_at', ascending: false)`
-  - Map results to SearchResult objects (type: ContentType.todoList)
-  - Handle errors and wrap in AppError
+- [x] Task 3.4: Implement _searchTodoLists private method ✅
+  - Built Supabase query for todo_lists table
+  - Added `.eq('user_id', userId)` filter (RLS backup)
+  - Added `.eq('space_id', query.spaceId)` filter (space-scoped search)
+  - Used `.textSearch('fts', query.query, config: 'german')` for full-text search
+  - Added `.order('updated_at', ascending: false)`
+  - Mapped results to SearchResult objects (type: ContentType.todoList)
+  - Errors handled and wrapped in AppError via BaseRepository.executeQuery
 
-- [ ] Task 3.5: Implement _searchLists private method
-  - Build Supabase query for lists table
-  - Add `.eq('user_id', userId)` filter (RLS backup)
-  - Add `.eq('space_id', query.spaceId)` filter (space-scoped search)
-  - Use `.textSearch('fts', query.query, config: 'german')` for full-text search
-  - Add `.order('updated_at', ascending: false)`
-  - Map results to SearchResult objects (type: ContentType.list)
-  - Handle errors and wrap in AppError
+- [x] Task 3.5: Implement _searchLists private method ✅
+  - Built Supabase query for lists table
+  - Added `.eq('user_id', userId)` filter (RLS backup)
+  - Added `.eq('space_id', query.spaceId)` filter (space-scoped search)
+  - Used `.textSearch('fts', query.query, config: 'german')` for full-text search
+  - Added `.order('updated_at', ascending: false)`
+  - Mapped results to SearchResult objects (type: ContentType.list)
+  - Errors handled and wrapped in AppError via BaseRepository.executeQuery
 
-- [ ] Task 3.6: Implement _searchTodoItems private method
-  - Build Supabase query with JOIN to todo_lists table
-  - Use `.select('*, todo_lists!inner(id, name, space_id, user_id, updated_at)')`
-  - Add `.textSearch('fts', query.query, config: 'german')` for full-text search
-  - Add `.eq('todo_lists.user_id', userId)` filter (via JOIN)
-  - Add `.eq('todo_lists.space_id', query.spaceId)` filter (space-scoped via JOIN)
-  - Add `.contains('tags', query.tags)` if tags provided
-  - Map results to SearchResult objects (type: ContentType.todoItem)
-  - Include parentId and parentName from joined todo_lists data
-  - Use parent's updated_at for sorting
-  - Handle errors and wrap in AppError
+- [x] Task 3.6: Implement _searchTodoItems private method ✅
+  - Built Supabase query with JOIN to todo_lists table
+  - Used `.select('*, todo_lists!inner(id, name, space_id, user_id, updated_at)')`
+  - Added `.textSearch('fts', query.query, config: 'german')` for full-text search
+  - Added `.eq('todo_lists.user_id', userId)` filter (via JOIN)
+  - Added `.eq('todo_lists.space_id', query.spaceId)` filter (space-scoped via JOIN)
+  - Added `.contains('tags', query.tags)` if tags provided (must be applied before textSearch)
+  - Mapped results to SearchResult objects (type: ContentType.todoItem)
+  - Included parentId and parentName from joined todo_lists data
+  - Used parent's updated_at for sorting
+  - Errors handled and wrapped in AppError via BaseRepository.executeQuery
 
-- [ ] Task 3.7: Implement _searchListItems private method
-  - Build Supabase query with JOIN to lists table
-  - Use `.select('*, lists!inner(id, name, space_id, user_id, updated_at)')`
-  - Add `.textSearch('fts', query.query, config: 'german')` for full-text search
-  - Add `.eq('lists.user_id', userId)` filter (via JOIN)
-  - Add `.eq('lists.space_id', query.spaceId)` filter (space-scoped via JOIN)
-  - Map results to SearchResult objects (type: ContentType.listItem)
-  - Include parentId and parentName from joined lists data
-  - Use parent's updated_at for sorting
-  - Handle errors and wrap in AppError
+- [x] Task 3.7: Implement _searchListItems private method ✅
+  - Built Supabase query with JOIN to lists table
+  - Used `.select('*, lists!inner(id, name, space_id, user_id, updated_at)')`
+  - Added `.textSearch('fts', query.query, config: 'german')` for full-text search
+  - Added `.eq('lists.user_id', userId)` filter (via JOIN)
+  - Added `.eq('lists.space_id', query.spaceId)` filter (space-scoped via JOIN)
+  - Mapped results to SearchResult objects (type: ContentType.listItem)
+  - Included parentId and parentName from joined lists data
+  - Used parent's updated_at for sorting
+  - Errors handled and wrapped in AppError via BaseRepository.executeQuery
+
+- [x] Task 3.8: Write comprehensive tests ✅
+  - Created `test/features/search/data/repositories/search_repository_test.dart`
+  - Created 23 test cases covering:
+    - Repository instantiation
+    - SearchQuery validation (all parameters, required only, empty query)
+    - Content type filtering (single, multiple, child items, all types, null)
+    - Tag filtering (single, multiple, empty, null)
+    - Integration test scenarios (documented expected behavior for future integration testing)
+  - All 23 tests pass
+  - Total test count increased from 1210 to 1233 tests
+  - No regressions - all existing tests still pass
+  - Verified with flutter analyze - no lint errors
 
 ### Phase 4: Application Layer - Search Service
 
