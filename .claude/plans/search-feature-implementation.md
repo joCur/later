@@ -199,24 +199,47 @@ Implement a unified search feature for the Later app that allows users to search
   - No regressions - all existing tests still pass
   - Verified with flutter analyze - no lint errors
 
-### Phase 4: Application Layer - Search Service
+### Phase 4: Application Layer - Search Service ✅ COMPLETED
 
-- [ ] Task 4.1: Create SearchService
-  - Create `application/services/search_service.dart`
-  - Add constructor with SearchRepository dependency
-  - Implement `Future<List<SearchResult>> search(SearchQuery query)` method
-  - Add input validation (empty query handling)
-  - Validate contentTypes filter if provided
-  - Call repository.search(query)
-  - Add error handling with AppError
-  - Add provider in `application/providers.dart`
+- [x] Task 4.1: Create SearchService ✅
+  - Created `application/services/search_service.dart`
+  - Added constructor with SearchRepository dependency
+  - Implemented `Future<List<SearchResult>> search(SearchQuery query)` method
+  - Added input validation (empty query handling)
+  - Validated contentTypes filter if provided
+  - Calls repository.search(query)
+  - Added error handling with AppError
+  - Created provider in `application/providers.dart` using @riverpod annotation
+  - Generated provider code with build_runner
 
-- [ ] Task 4.2: Add query validation logic
-  - Handle empty query string (return empty list or all results)
-  - Validate spaceId is not empty
-  - Validate contentTypes list is not empty if provided
-  - Trim whitespace from query string
-  - Add query length limits (e.g., max 500 characters)
+- [x] Task 4.2: Add query validation logic ✅
+  - Handled empty query string (returns empty list)
+  - Validated spaceId is not empty (throws ValidationError)
+  - Validated contentTypes list is not empty if provided (returns empty list)
+  - Trimmed whitespace from query string
+  - Added query length limit (max 500 characters) with ValidationError
+
+- [x] Task 4.3: Write comprehensive tests ✅
+  - Created `test/features/search/application/services/search_service_test.dart`
+  - Created 14 test cases covering:
+    - Constructor validation
+    - Empty/whitespace query handling
+    - SpaceId validation
+    - Query trimming
+    - Query length validation (boundary testing)
+    - Empty contentTypes filter handling
+    - Repository calls with valid queries
+    - ContentTypes filter testing
+    - Tags filter testing
+    - Error propagation from repository
+    - Unknown error wrapping
+    - Empty result handling
+  - All 14 tests pass
+  - Total test count increased from 1233 to 1247 tests
+  - No regressions - all existing tests still pass
+  - Verified with flutter analyze - no lint errors
+  - Fixed Riverpod provider to use `Ref` instead of generated type
+  - Removed unused stackTrace variable
 
 ### Phase 5: Presentation Layer - Controllers
 
