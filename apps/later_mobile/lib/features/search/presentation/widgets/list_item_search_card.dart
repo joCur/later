@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:later_mobile/design_system/tokens/tokens.dart';
 import 'package:later_mobile/features/lists/domain/models/list_item_model.dart';
+import 'package:later_mobile/l10n/app_localizations.dart';
 
 /// Search result card for ListItem child items.
 ///
@@ -65,6 +66,7 @@ class _ListItemSearchCardState extends State<ListItemSearchCard> {
 
   /// Build parent context subtitle
   Widget _buildParentContext(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -76,7 +78,7 @@ class _ListItemSearchCardState extends State<ListItemSearchCard> {
         const SizedBox(width: 4),
         Flexible(
           child: Text(
-            'in ${widget.parentName}',
+            l10n.searchResultInList(widget.parentName),
             style: AppTypography.caption.copyWith(
               color: AppColors.textSecondary(context),
             ),

@@ -947,6 +947,30 @@ class AppLocalizationsDe extends AppLocalizations {
   String get searchClearButton => 'Löschen';
 
   @override
+  String get searchScreenTitle => 'Suchen';
+
+  @override
+  String searchInCurrentSpace(String spaceName) {
+    return 'In $spaceName suchen';
+  }
+
+  @override
+  String get filterTodoItems => 'Todo-Einträge';
+
+  @override
+  String get filterListItems => 'Listeneinträge';
+
+  @override
+  String searchResultInTodoList(String todoListName) {
+    return 'in $todoListName';
+  }
+
+  @override
+  String searchResultInList(String listName) {
+    return 'in $listName';
+  }
+
+  @override
   String get accessibilityDragHandleHint =>
       'Doppeltippen und halten zum Neuanordnen';
 

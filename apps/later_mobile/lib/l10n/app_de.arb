@@ -682,6 +682,16 @@
   "searchEmptyMessage": "Versuchen Sie andere Suchbegriffe oder überprüfen Sie die Rechtschreibung",
   "searchBarHint": "Notizen, Aufgaben, Listen durchsuchen...",
   "searchClearButton": "Löschen",
+
+  "searchScreenTitle": "Suchen",
+  "searchInCurrentSpace": "In {spaceName} suchen",
+
+  "filterTodoItems": "Todo-Einträge",
+  "filterListItems": "Listeneinträge",
+
+  "searchResultInTodoList": "in {todoListName}",
+  "searchResultInList": "in {listName}",
+
   "accessibilityDragHandleHint": "Doppeltippen und halten zum Neuanordnen",
 
   "navigationBottomHome": "Startseite",

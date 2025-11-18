@@ -66,4 +66,4 @@ final class SearchRepositoryProvider
   }
 }
 
-String _$searchRepositoryHash() => r'69ba007e2cdfabae50bc992c9369525b0d256b61';
+String _$searchRepositoryHash() => r'd3bb84482bea69709020b0618499aa760253b5cb';

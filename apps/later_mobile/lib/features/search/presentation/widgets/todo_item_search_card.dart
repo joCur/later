@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:later_mobile/design_system/tokens/tokens.dart';
 import 'package:later_mobile/features/todo_lists/domain/models/todo_item.dart';
 import 'package:later_mobile/features/todo_lists/domain/models/todo_priority.dart';
+import 'package:later_mobile/l10n/app_localizations.dart';
 
 /// Search result card for TodoItem child items.
 ///
@@ -91,6 +92,7 @@ class _TodoItemSearchCardState extends State<TodoItemSearchCard> {
 
   /// Build parent context subtitle
   Widget _buildParentContext(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -102,7 +104,7 @@ class _TodoItemSearchCardState extends State<TodoItemSearchCard> {
         const SizedBox(width: 4),
         Flexible(
           child: Text(
-            'in ${widget.parentName}',
+            l10n.searchResultInTodoList(widget.parentName),
             style: AppTypography.caption.copyWith(
               color: AppColors.textSecondary(context),
             ),

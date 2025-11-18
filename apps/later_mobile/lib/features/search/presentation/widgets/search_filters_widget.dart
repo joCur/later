@@ -78,7 +78,7 @@ class SearchFiltersWidget extends ConsumerWidget {
 
           // Todo Items filter
           TemporalFilterChip(
-            label: 'Todo Items',
+            label: l10n.filterTodoItems,
             isSelected: !isAllSelected &&
                 filters.contentTypes!.contains(ContentType.todoItem),
             onSelected: () {
@@ -88,7 +88,7 @@ class SearchFiltersWidget extends ConsumerWidget {
 
           // List Items filter
           TemporalFilterChip(
-            label: 'List Items',
+            label: l10n.filterListItems,
             isSelected: !isAllSelected &&
                 filters.contentTypes!.contains(ContentType.listItem),
             onSelected: () {
