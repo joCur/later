@@ -241,46 +241,71 @@ Implement a unified search feature for the Later app that allows users to search
   - Fixed Riverpod provider to use `Ref` instead of generated type
   - Removed unused stackTrace variable
 
-### Phase 5: Presentation Layer - Controllers
+### Phase 5: Presentation Layer - Controllers ✅ COMPLETED
 
-- [ ] Task 5.1: Create SearchController with debouncing
-  - Create `presentation/controllers/search_controller.dart`
-  - Use `@riverpod` annotation (auto-dispose by default)
-  - Add Timer field for debouncing (_debounceTimer)
-  - Implement build() method returning `Future<List<SearchResult>>`
+- [x] Task 5.1: Create SearchController with debouncing ✅
+  - Created `presentation/controllers/search_controller.dart`
+  - Used `@riverpod` annotation (auto-dispose by default)
+  - Added Timer field for debouncing (_debounceTimer)
+  - Implemented build() method returning `Future<List<SearchResult>>`
   - Initial state: empty list
-  - Generate code: `dart run build_runner build --delete-conflicting-outputs`
+  - Generated code with `dart run build_runner build --delete-conflicting-outputs`
 
-- [ ] Task 5.2: Implement search method with debouncing
-  - Add `void search(SearchQuery query)` method
-  - Cancel previous timer if exists (_debounceTimer?.cancel())
-  - Set state to AsyncValue.loading() immediately (UI feedback)
-  - Create new Timer with 300ms duration
-  - In timer callback: call searchService.search(query)
-  - Check ref.mounted before updating state (Riverpod 3.0 best practice)
-  - Update state with AsyncValue.data(results) on success
-  - Catch AppError and store in AsyncValue.error state
-  - Log errors with ErrorLogger.logError()
+- [x] Task 5.2: Implement search method with debouncing ✅
+  - Added `void search(SearchQuery query)` method
+  - Cancels previous timer if exists (_debounceTimer?.cancel())
+  - Sets state to AsyncValue.loading() immediately (UI feedback)
+  - Creates new Timer with 300ms duration
+  - In timer callback: calls searchService.search(query)
+  - Checks ref.mounted before updating state (Riverpod 3.0 best practice)
+  - Updates state with AsyncValue.data(results) on success
+  - Catches AppError and stores in AsyncValue.error state
+  - Logs errors with ErrorLogger.logError()
 
-- [ ] Task 5.3: Implement clear method
-  - Add `void clear()` method
-  - Cancel debounce timer if running
-  - Set state to AsyncValue.data([])
-  - Reset to empty results
+- [x] Task 5.3: Implement clear method ✅
+  - Added `void clear()` method
+  - Cancels debounce timer if running
+  - Checks ref.mounted before updating
+  - Sets state to AsyncValue.data([])
+  - Resets to empty results
 
-- [ ] Task 5.4: Add dispose override
-  - Override dispose() method
-  - Cancel debounce timer to prevent memory leaks
-  - Call super.dispose()
+- [x] Task 5.4: Add dispose method ✅
+  - Added dispose() method (not override, no super.dispose() needed in Riverpod 3.0)
+  - Cancels debounce timer to prevent memory leaks
 
-- [ ] Task 5.5: Create SearchFiltersController
-  - Create `presentation/controllers/search_filters_controller.dart`
-  - Use `@riverpod` annotation (auto-dispose)
-  - Implement build() returning SearchFilters (initial: all types, no tags)
-  - Add `void setContentTypes(List<ContentType>? types)` method
-  - Add `void setTags(List<String>? tags)` method
-  - Add `void reset()` method to clear all filters
-  - Generate code: `dart run build_runner build --delete-conflicting-outputs`
+- [x] Task 5.5: Create SearchFiltersController ✅
+  - Created `presentation/controllers/search_filters_controller.dart`
+  - Used `@riverpod` annotation (auto-dispose)
+  - Implemented build() returning SearchFilters (initial: all types, no tags)
+  - Added `void setContentTypes(List<ContentType>? types)` method
+  - Added `void setTags(List<String>? tags)` method
+  - Added `void reset()` method to clear all filters
+  - Generated code with `dart run build_runner build --delete-conflicting-outputs`
+
+- [x] Task 5.6: Write comprehensive tests ✅
+  - Created `test/features/search/presentation/controllers/search_controller_test.dart`
+  - Created 10 test cases for SearchController covering:
+    - Initial state (empty list)
+    - Loading state on search
+    - Debouncing behavior (300ms delay, cancellation)
+    - Success state with results
+    - Error handling (AppError and unknown errors)
+    - Clear functionality
+    - Dispose cleanup
+    - ref.mounted checks
+  - Created `test/features/search/presentation/controllers/search_filters_controller_test.dart`
+  - Created 16 test cases for SearchFiltersController covering:
+    - Initial state (no filters)
+    - Setting/clearing contentTypes filter
+    - Setting/clearing tags filter
+    - Reset functionality
+    - hasActiveFilters getter
+    - Multiple updates
+    - Independent filter management
+  - All 26 tests pass
+  - Total test count increased from 1253 to 1279 tests
+  - No regressions - all existing tests still pass
+  - Verified with flutter analyze - no lint errors
 
 ### Phase 6: Presentation Layer - UI Components
 
