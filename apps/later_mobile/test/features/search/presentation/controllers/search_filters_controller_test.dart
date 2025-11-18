@@ -1,8 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:later_mobile/core/enums/content_type.dart';
-import 'package:later_mobile/features/search/domain/models/models.dart';
 import 'package:later_mobile/features/search/presentation/controllers/search_filters_controller.dart';
-import 'package:riverpod/riverpod.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 void main() {
   late ProviderContainer container;
@@ -25,19 +24,24 @@ void main() {
     });
 
     test('setContentTypes() updates contentTypes filter', () {
-      final controller =
-          container.read(searchFiltersControllerProvider.notifier);
+      final controller = container.read(
+        searchFiltersControllerProvider.notifier,
+      );
 
       controller.setContentTypes([ContentType.note, ContentType.todoList]);
 
       final filters = container.read(searchFiltersControllerProvider);
-      expect(filters.contentTypes, equals([ContentType.note, ContentType.todoList]));
+      expect(
+        filters.contentTypes,
+        equals([ContentType.note, ContentType.todoList]),
+      );
       expect(filters.hasActiveFilters, true);
     });
 
     test('setContentTypes() with null clears contentTypes filter', () {
-      final controller =
-          container.read(searchFiltersControllerProvider.notifier);
+      final controller = container.read(
+        searchFiltersControllerProvider.notifier,
+      );
 
       // First set some types
       controller.setContentTypes([ContentType.note]);
@@ -55,8 +59,9 @@ void main() {
     });
 
     test('setContentTypes() with empty list is treated as no filter', () {
-      final controller =
-          container.read(searchFiltersControllerProvider.notifier);
+      final controller = container.read(
+        searchFiltersControllerProvider.notifier,
+      );
 
       controller.setContentTypes([]);
 
@@ -66,8 +71,9 @@ void main() {
     });
 
     test('setTags() updates tags filter', () {
-      final controller =
-          container.read(searchFiltersControllerProvider.notifier);
+      final controller = container.read(
+        searchFiltersControllerProvider.notifier,
+      );
 
       controller.setTags(['work', 'urgent']);
 
@@ -77,8 +83,9 @@ void main() {
     });
 
     test('setTags() with null clears tags filter', () {
-      final controller =
-          container.read(searchFiltersControllerProvider.notifier);
+      final controller = container.read(
+        searchFiltersControllerProvider.notifier,
+      );
 
       // First set some tags
       controller.setTags(['work']);
@@ -96,8 +103,9 @@ void main() {
     });
 
     test('setTags() with empty list is treated as no filter', () {
-      final controller =
-          container.read(searchFiltersControllerProvider.notifier);
+      final controller = container.read(
+        searchFiltersControllerProvider.notifier,
+      );
 
       controller.setTags([]);
 
@@ -107,8 +115,9 @@ void main() {
     });
 
     test('reset() clears all filters', () {
-      final controller =
-          container.read(searchFiltersControllerProvider.notifier);
+      final controller = container.read(
+        searchFiltersControllerProvider.notifier,
+      );
 
       // Set multiple filters
       controller.setContentTypes([ContentType.note]);
@@ -129,8 +138,9 @@ void main() {
     });
 
     test('hasActiveFilters returns true when contentTypes is set', () {
-      final controller =
-          container.read(searchFiltersControllerProvider.notifier);
+      final controller = container.read(
+        searchFiltersControllerProvider.notifier,
+      );
 
       controller.setContentTypes([ContentType.note]);
 
@@ -139,8 +149,9 @@ void main() {
     });
 
     test('hasActiveFilters returns true when tags is set', () {
-      final controller =
-          container.read(searchFiltersControllerProvider.notifier);
+      final controller = container.read(
+        searchFiltersControllerProvider.notifier,
+      );
 
       controller.setTags(['work']);
 
@@ -149,8 +160,9 @@ void main() {
     });
 
     test('hasActiveFilters returns true when both filters are set', () {
-      final controller =
-          container.read(searchFiltersControllerProvider.notifier);
+      final controller = container.read(
+        searchFiltersControllerProvider.notifier,
+      );
 
       controller.setContentTypes([ContentType.note]);
       controller.setTags(['work']);
@@ -165,8 +177,9 @@ void main() {
     });
 
     test('hasActiveFilters returns false when filters are empty lists', () {
-      final controller =
-          container.read(searchFiltersControllerProvider.notifier);
+      final controller = container.read(
+        searchFiltersControllerProvider.notifier,
+      );
 
       controller.setContentTypes([]);
       controller.setTags([]);
@@ -176,8 +189,9 @@ void main() {
     });
 
     test('multiple setContentTypes() calls update state correctly', () {
-      final controller =
-          container.read(searchFiltersControllerProvider.notifier);
+      final controller = container.read(
+        searchFiltersControllerProvider.notifier,
+      );
 
       // First call
       controller.setContentTypes([ContentType.note]);
@@ -194,8 +208,9 @@ void main() {
     });
 
     test('multiple setTags() calls update state correctly', () {
-      final controller =
-          container.read(searchFiltersControllerProvider.notifier);
+      final controller = container.read(
+        searchFiltersControllerProvider.notifier,
+      );
 
       // First call
       controller.setTags(['work']);
@@ -209,8 +224,9 @@ void main() {
     });
 
     test('contentTypes and tags filters are independent', () {
-      final controller =
-          container.read(searchFiltersControllerProvider.notifier);
+      final controller = container.read(
+        searchFiltersControllerProvider.notifier,
+      );
 
       // Set contentTypes
       controller.setContentTypes([ContentType.note]);

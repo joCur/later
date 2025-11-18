@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:later_mobile/core/error/error.dart';
-import 'package:later_mobile/core/error/error_logger.dart';
 import 'package:later_mobile/features/search/application/providers.dart';
 import 'package:later_mobile/features/search/domain/models/models.dart';
 

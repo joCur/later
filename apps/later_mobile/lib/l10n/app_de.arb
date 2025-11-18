@@ -570,7 +570,7 @@
   "listDetailItemNotesLabel": "Notizen",
   "listDetailItemNotesHint": "Optionale Notizen",
   "listDetailStyleDialogTitle": "Stil auswählen",
-  "listDetailStyleBullets": "Aufzählungszeichen",
+  "listDetailStyleBullets": "Aufzählung",
   "listDetailStyleBulletsDesc": "Einfache Aufzählungspunkte",
   "listDetailStyleNumbered": "Nummeriert",
   "listDetailStyleNumberedDesc": "Nummerierte Listeneinträge",
@@ -680,6 +680,8 @@
 
   "searchEmptyTitle": "Keine Ergebnisse gefunden",
   "searchEmptyMessage": "Versuchen Sie andere Suchbegriffe oder überprüfen Sie die Rechtschreibung",
+  "searchBarHint": "Notizen, Aufgaben, Listen durchsuchen...",
+  "searchClearButton": "Löschen",
   "accessibilityDragHandleHint": "Doppeltippen und halten zum Neuanordnen",
 
   "navigationBottomHome": "Startseite",

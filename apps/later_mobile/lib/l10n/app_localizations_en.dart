@@ -914,6 +914,12 @@ class AppLocalizationsEn extends AppLocalizations {
       'Try different keywords or check your spelling';
 
   @override
+  String get searchBarHint => 'Search notes, tasks, lists...';
+
+  @override
+  String get searchClearButton => 'Clear';
+
+  @override
   String get accessibilityDragHandleHint => 'Double tap and hold to reorder';
 
   @override

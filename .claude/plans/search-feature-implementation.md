@@ -307,90 +307,96 @@ Implement a unified search feature for the Later app that allows users to search
   - No regressions - all existing tests still pass
   - Verified with flutter analyze - no lint errors
 
-### Phase 6: Presentation Layer - UI Components
+### Phase 6: Presentation Layer - UI Components ✅ COMPLETED
 
-- [ ] Task 6.1: Create SearchScreen
-  - Create `presentation/screens/search_screen.dart`
-  - Extend ConsumerStatefulWidget
-  - Add TextEditingController for search input (_searchController)
-  - Add optional initialQuery parameter
-  - Implement initState to trigger search if initialQuery provided
-  - Implement dispose to clean up TextEditingController
+- [x] Task 6.1: Create SearchScreen ✅
+  - Created `presentation/screens/search_screen.dart`
+  - Extended ConsumerStatefulWidget
+  - Added TextEditingController for search input (_searchController)
+  - Added optional initialQuery parameter
+  - Implemented initState to trigger search if initialQuery provided
+  - Implemented dispose to clean up TextEditingController
 
-- [ ] Task 6.2: Build SearchScreen Scaffold
-  - Create Scaffold with AppBar
+- [x] Task 6.2: Build SearchScreen Scaffold ✅
+  - Created Scaffold with AppBar
   - AppBar title: TextField for search input (autofocus: true)
-  - TextField decoration: hintText with localized string
-  - Add clear button (IconButton with X icon) in TextField suffix
-  - TextField onChanged: call _performSearch method
+  - TextField decoration: hintText with localized string (searchBarHint)
+  - Added clear button (IconButton with X icon) in TextField suffix
+  - TextField onChanged: calls _performSearch method
   - Set body to Column with filters and results
 
-- [ ] Task 6.3: Implement _performSearch helper
-  - Get current space from currentSpaceControllerProvider
-  - Get current filters from searchFiltersControllerProvider
-  - Build SearchQuery with: query, spaceId, contentTypes, tags
-  - Call ref.read(searchControllerProvider.notifier).search(query)
+- [x] Task 6.3: Implement _performSearch helper ✅
+  - Gets current space from currentSpaceControllerProvider using .when()
+  - Gets current filters from searchFiltersControllerProvider
+  - Builds SearchQuery with: query, spaceId, contentTypes, tags
+  - Calls ref.read(searchControllerProvider.notifier).search(query)
 
-- [ ] Task 6.4: Build search results view
-  - Watch searchControllerProvider in build method
-  - Use AsyncValue.when() to handle loading/data/error states
+- [x] Task 6.4: Build search results view ✅
+  - Watches searchControllerProvider in build method
+  - Uses AsyncValue.when() to handle loading/data/error states
   - Loading state: Center with CircularProgressIndicator
-  - Error state: ErrorView widget with retry button
-  - Data state: Check if results.isEmpty
-    - If empty: Show EmptySearchState from design system
-    - If not empty: Show ListView.builder with SearchResultCard widgets
+  - Error state: EmptyState widget with error icon and retry button
+  - Data state: Checks if results.isEmpty
+    - If empty: Shows EmptyState with "No results found"
+    - If not empty: Shows ListView.builder with SearchResultCard widgets
 
-- [ ] Task 6.5: Create SearchFiltersWidget
-  - Create `presentation/widgets/search_filters_widget.dart`
-  - Extend ConsumerWidget
-  - Watch searchFiltersControllerProvider
-  - Build Wrap with horizontal filter chips
-  - Add TemporalFilterChip for "All", "Notes", "Tasks", "Lists"
+- [x] Task 6.5: Create SearchFiltersWidget ✅
+  - Created `presentation/widgets/search_filters_widget.dart`
+  - Extended ConsumerWidget
+  - Watches searchFiltersControllerProvider
+  - Built SingleChildScrollView with Wrap for horizontal filter chips
+  - Added TemporalFilterChip for "All", "Notes", "Tasks", "Lists", "Todo Items", "List Items"
   - Each chip: onSelected callback updates searchFiltersControllerProvider
-  - Use localized strings for labels
-  - Add padding and spacing (8px between chips)
+  - Uses localized strings for labels (filterAll, filterNotes, filterTodoLists, filterLists)
+  - Added padding and spacing (8px between chips)
 
-- [ ] Task 6.6: Create SearchResultCard
-  - Create `presentation/widgets/search_result_card.dart`
-  - Extend StatelessWidget
-  - Accept SearchResult parameter
-  - Use switch on result.type to render appropriate card:
+- [x] Task 6.6: Create SearchResultCard ✅
+  - Created `presentation/widgets/search_result_card.dart`
+  - Extended StatelessWidget
+  - Accepts SearchResult parameter
+  - Uses switch on result.type to render appropriate card:
     - ContentType.note → NoteCard(note: result.content as Note)
     - ContentType.todoList → TodoListCard(todoList: result.content as TodoList)
     - ContentType.list → ListCard(list: result.content as ListModel)
     - ContentType.todoItem → TodoItemSearchCard with parent context
     - ContentType.listItem → ListItemSearchCard with parent context
-  - Add onTap callback to navigate to detail screen
-  - Wrap in Material widget for ink splash effect
+  - Added onTap callbacks to navigate to detail screens
 
-- [ ] Task 6.6a: Create TodoItemSearchCard widget
-  - Create `presentation/widgets/todo_item_search_card.dart`
-  - Display TodoItem title and preview
-  - Show parent context: "in [TodoList Name]" subtitle
-  - Use task-specific styling/gradient
-  - Add checkbox indicator showing completion status
-  - Handle onTap to navigate to parent TodoListDetailScreen
+- [x] Task 6.6a: Create TodoItemSearchCard widget ✅
+  - Created `presentation/widgets/todo_item_search_card.dart`
+  - Displays TodoItem title and metadata (due date, priority)
+  - Shows parent context: "in [TodoList Name]" subtitle
+  - Uses task-specific styling/gradient (red-orange task gradient)
+  - Added checkbox indicator showing completion status
+  - Handles onTap to navigate to parent TodoListDetailScreen
+  - Strikethrough and opacity for completed items
 
-- [ ] Task 6.6b: Create ListItemSearchCard widget
-  - Create `presentation/widgets/list_item_search_card.dart`
-  - Display ListItem title and notes preview
-  - Show parent context: "in [List Name]" subtitle
-  - Use list-specific styling/gradient
-  - Add style indicator (bullet/numbered/checklist)
-  - Handle onTap to navigate to parent ListDetailScreen
+- [x] Task 6.6b: Create ListItemSearchCard widget ✅
+  - Created `presentation/widgets/list_item_search_card.dart`
+  - Displays ListItem title and notes preview
+  - Shows parent context: "in [List Name]" subtitle
+  - Uses list-specific styling/gradient (violet list gradient)
+  - Added style indicator (bullet point icon)
+  - Handles onTap to navigate to parent ListDetailScreen
 
-- [ ] Task 6.7: Add navigation handlers
-  - In SearchResultCard, add onTap callback
+- [x] Task 6.7: Add navigation handlers ✅
+  - In SearchResultCard, added onTap callbacks for all content types
   - Navigate based on content type:
     - Note → Navigator.push to NoteDetailScreen
     - TodoList → Navigator.push to TodoListDetailScreen
     - ListModel → Navigator.push to ListDetailScreen
-    - TodoItem → Navigator.push to TodoListDetailScreen(listId: result.parentId)
-    - ListItem → Navigator.push to ListDetailScreen(listId: result.parentId)
-  - Pass the original model from result.content
-  - For child items, pass parentId to navigate to parent detail screen
-  - Use MaterialPageRoute for navigation
-  - Consider adding scroll-to-item functionality for child items (future enhancement)
+    - TodoItem → Navigator.push to TodoListDetailScreen(minimal TodoList with parentId)
+    - ListItem → Navigator.push to ListDetailScreen(minimal ListModel with parentId)
+  - Passes the original model from result.content
+  - For child items, creates minimal parent models with parentId to enable navigation
+  - Uses MaterialPageRoute for navigation
+  - Future enhancement: Consider adding scroll-to-item functionality for child items
+
+- [x] Task 6.8: Add localization strings ✅
+  - Added searchBarHint to app_en.arb and app_de.arb
+  - Added searchClearButton to app_en.arb and app_de.arb
+  - Regenerated localization files with flutter pub get
+  - All UI strings properly localized (English and German)
 
 ### Phase 7: Integration with Home Screen
 

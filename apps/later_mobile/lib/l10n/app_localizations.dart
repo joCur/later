@@ -1724,6 +1724,18 @@ abstract class AppLocalizations {
   /// **'Try different keywords or check your spelling'**
   String get searchEmptyMessage;
 
+  /// Hint text for search bar input field
+  ///
+  /// In en, this message translates to:
+  /// **'Search notes, tasks, lists...'**
+  String get searchBarHint;
+
+  /// Tooltip for clear search button
+  ///
+  /// In en, this message translates to:
+  /// **'Clear'**
+  String get searchClearButton;
+
   /// Accessibility hint for drag handle reordering interaction
   ///
   /// In en, this message translates to:

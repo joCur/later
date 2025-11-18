@@ -1534,6 +1534,16 @@
     "description": "Message for empty search state suggesting alternative search strategies"
   },
 
+  "searchBarHint": "Search notes, tasks, lists...",
+  "@searchBarHint": {
+    "description": "Hint text for search bar input field"
+  },
+
+  "searchClearButton": "Clear",
+  "@searchClearButton": {
+    "description": "Tooltip for clear search button"
+  },
+
   "accessibilityDragHandleHint": "Double tap and hold to reorder",
   "@accessibilityDragHandleHint": {
     "description": "Accessibility hint for drag handle reordering interaction"

@@ -584,7 +584,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get listDetailStyleDialogTitle => 'Stil auswählen';
 
   @override
-  String get listDetailStyleBullets => 'Aufzählungszeichen';
+  String get listDetailStyleBullets => 'Aufzählung';
 
   @override
   String get listDetailStyleBulletsDesc => 'Einfache Aufzählungspunkte';
@@ -939,6 +939,12 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get searchEmptyMessage =>
       'Versuchen Sie andere Suchbegriffe oder überprüfen Sie die Rechtschreibung';
+
+  @override
+  String get searchBarHint => 'Notizen, Aufgaben, Listen durchsuchen...';
+
+  @override
+  String get searchClearButton => 'Löschen';
 
   @override
   String get accessibilityDragHandleHint =>

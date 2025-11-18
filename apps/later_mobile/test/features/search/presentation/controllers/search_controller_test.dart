@@ -1,13 +1,13 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:later_mobile/core/enums/content_type.dart';
 import 'package:later_mobile/core/error/error.dart';
+import 'package:later_mobile/features/search/application/providers.dart';
+import 'package:later_mobile/features/search/application/services/search_service.dart';
 import 'package:later_mobile/features/search/domain/models/models.dart';
 import 'package:later_mobile/features/search/presentation/controllers/search_controller.dart';
-import 'package:later_mobile/features/search/application/services/search_service.dart';
-import 'package:later_mobile/features/search/application/providers.dart';
-import 'package:mockito/mockito.dart';
 import 'package:mockito/annotations.dart';
-import 'package:riverpod/riverpod.dart';
+import 'package:mockito/mockito.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 @GenerateNiceMocks([MockSpec<SearchService>()])
 import 'search_controller_test.mocks.dart';
@@ -19,9 +19,7 @@ void main() {
   setUp(() {
     mockSearchService = MockSearchService();
     container = ProviderContainer(
-      overrides: [
-        searchServiceProvider.overrideWithValue(mockSearchService),
-      ],
+      overrides: [searchServiceProvider.overrideWithValue(mockSearchService)],
     );
   });
 
@@ -38,22 +36,20 @@ void main() {
     });
 
     test('search() sets loading state immediately', () async {
-      final query = SearchQuery(
-        query: 'test',
-        spaceId: 'space-1',
-      );
+      final query = SearchQuery(query: 'test', spaceId: 'space-1');
 
-      when(mockSearchService.search(any))
-          .thenAnswer((_) async => Future.delayed(
-                const Duration(milliseconds: 500),
-                () => <SearchResult>[],
-              ));
+      when(mockSearchService.search(any)).thenAnswer(
+        (_) async => Future.delayed(
+          const Duration(milliseconds: 500),
+          () => <SearchResult>[],
+        ),
+      );
 
       final controller = container.read(searchControllerProvider.notifier);
       controller.search(query);
 
       // Should be in loading state immediately
-      await Future.delayed(Duration.zero);
+      await Future<void>.delayed(Duration.zero);
       final state = container.read(searchControllerProvider);
       expect(state.isLoading, true);
     });
@@ -64,12 +60,15 @@ void main() {
       final query3 = SearchQuery(query: 'test3', spaceId: 'space-1');
 
       // Mock each query separately
-      when(mockSearchService.search(query1))
-          .thenAnswer((_) async => <SearchResult>[]);
-      when(mockSearchService.search(query2))
-          .thenAnswer((_) async => <SearchResult>[]);
-      when(mockSearchService.search(query3))
-          .thenAnswer((_) async => <SearchResult>[]);
+      when(
+        mockSearchService.search(query1),
+      ).thenAnswer((_) async => <SearchResult>[]);
+      when(
+        mockSearchService.search(query2),
+      ).thenAnswer((_) async => <SearchResult>[]);
+      when(
+        mockSearchService.search(query3),
+      ).thenAnswer((_) async => <SearchResult>[]);
 
       // Keep provider alive by listening
       final subscription = container.listen(
@@ -84,13 +83,13 @@ void main() {
 
       // Call search three times rapidly
       controller.search(query1);
-      await Future.delayed(const Duration(milliseconds: 100));
+      await Future<void>.delayed(const Duration(milliseconds: 100));
       controller.search(query2);
-      await Future.delayed(const Duration(milliseconds: 100));
+      await Future<void>.delayed(const Duration(milliseconds: 100));
       controller.search(query3);
 
       // Wait for debounce to complete
-      await Future.delayed(const Duration(milliseconds: 400));
+      await Future<void>.delayed(const Duration(milliseconds: 400));
 
       // Should only call service once with the last query
       verify(mockSearchService.search(query3)).called(1);
@@ -111,7 +110,6 @@ void main() {
           id: '1',
           type: ContentType.note,
           title: 'Test Note',
-          subtitle: null,
           preview: 'Test content',
           tags: [],
           updatedAt: DateTime.now(),
@@ -123,27 +121,24 @@ void main() {
 
       // Listen to state changes
       List<SearchResult>? capturedResults;
-      container.listen(
-        searchControllerProvider,
-        (previous, next) {
-          if (next.hasValue && next.value!.isNotEmpty) {
-            capturedResults = next.value;
-          }
-        },
-      );
+      container.listen(searchControllerProvider, (previous, next) {
+        if (next.hasValue && next.value!.isNotEmpty) {
+          capturedResults = next.value;
+        }
+      });
 
       final controller = container.read(searchControllerProvider.notifier);
       controller.search(query);
 
       // Wait for debounce and search to complete
-      await Future.delayed(const Duration(milliseconds: 400));
+      await Future<void>.delayed(const Duration(milliseconds: 400));
 
       expect(capturedResults, equals(results));
     });
 
     test('search() handles AppError correctly', () async {
       final query = SearchQuery(query: 'test', spaceId: 'space-1');
-      final error = AppError(
+      const error = AppError(
         code: ErrorCode.databaseTimeout,
         message: 'Database timeout',
       );
@@ -155,20 +150,17 @@ void main() {
       // Listen to state changes
       var hasError = false;
       Object? capturedError;
-      container.listen(
-        searchControllerProvider,
-        (previous, next) {
-          if (next.hasError) {
-            hasError = true;
-            capturedError = next.error;
-          }
-        },
-      );
+      container.listen(searchControllerProvider, (previous, next) {
+        if (next.hasError) {
+          hasError = true;
+          capturedError = next.error;
+        }
+      });
 
       controller.search(query);
 
       // Wait for debounce and search to complete
-      await Future.delayed(const Duration(milliseconds: 400));
+      await Future<void>.delayed(const Duration(milliseconds: 400));
 
       expect(hasError, true);
       expect(capturedError, equals(error));
@@ -185,20 +177,17 @@ void main() {
       // Listen to state changes
       var hasError = false;
       AppError? capturedError;
-      container.listen(
-        searchControllerProvider,
-        (previous, next) {
-          if (next.hasError) {
-            hasError = true;
-            capturedError = next.error as AppError;
-          }
-        },
-      );
+      container.listen(searchControllerProvider, (previous, next) {
+        if (next.hasError) {
+          hasError = true;
+          capturedError = next.error as AppError;
+        }
+      });
 
       controller.search(query);
 
       // Wait for debounce and search to complete
-      await Future.delayed(const Duration(milliseconds: 400));
+      await Future<void>.delayed(const Duration(milliseconds: 400));
 
       expect(hasError, true);
       expect(capturedError, isA<AppError>());
@@ -212,7 +201,6 @@ void main() {
           id: '1',
           type: ContentType.note,
           title: 'Test Note',
-          subtitle: null,
           preview: 'Test content',
           tags: [],
           updatedAt: DateTime.now(),
@@ -226,18 +214,15 @@ void main() {
 
       // Listen to state changes
       List<SearchResult>? capturedResults;
-      container.listen(
-        searchControllerProvider,
-        (previous, next) {
-          if (next.hasValue) {
-            capturedResults = next.value;
-          }
-        },
-      );
+      container.listen(searchControllerProvider, (previous, next) {
+        if (next.hasValue) {
+          capturedResults = next.value;
+        }
+      });
 
       // First, perform a search to get results
       controller.search(query);
-      await Future.delayed(const Duration(milliseconds: 400));
+      await Future<void>.delayed(const Duration(milliseconds: 400));
 
       // Verify we have results
       expect(capturedResults, equals(results));
@@ -252,8 +237,9 @@ void main() {
     test('clear() cancels pending debounced search', () async {
       final query = SearchQuery(query: 'test', spaceId: 'space-1');
 
-      when(mockSearchService.search(any))
-          .thenAnswer((_) async => <SearchResult>[]);
+      when(
+        mockSearchService.search(any),
+      ).thenAnswer((_) async => <SearchResult>[]);
 
       final controller = container.read(searchControllerProvider.notifier);
 
@@ -261,11 +247,11 @@ void main() {
       controller.search(query);
 
       // Clear immediately (before debounce timer fires)
-      await Future.delayed(const Duration(milliseconds: 100));
+      await Future<void>.delayed(const Duration(milliseconds: 100));
       controller.clear();
 
       // Wait past the debounce time
-      await Future.delayed(const Duration(milliseconds: 400));
+      await Future<void>.delayed(const Duration(milliseconds: 400));
 
       // Service should never be called since we cleared before timer fired
       verifyNever(mockSearchService.search(any));
@@ -274,8 +260,9 @@ void main() {
     test('dispose() cancels debounce timer to prevent memory leaks', () async {
       final query = SearchQuery(query: 'test', spaceId: 'space-1');
 
-      when(mockSearchService.search(any))
-          .thenAnswer((_) async => <SearchResult>[]);
+      when(
+        mockSearchService.search(any),
+      ).thenAnswer((_) async => <SearchResult>[]);
 
       final controller = container.read(searchControllerProvider.notifier);
 
@@ -283,11 +270,11 @@ void main() {
       controller.search(query);
 
       // Dispose the container immediately
-      await Future.delayed(const Duration(milliseconds: 100));
+      await Future<void>.delayed(const Duration(milliseconds: 100));
       container.dispose();
 
       // Wait past the debounce time
-      await Future.delayed(const Duration(milliseconds: 400));
+      await Future<void>.delayed(const Duration(milliseconds: 400));
 
       // Service should never be called since we disposed before timer fired
       verifyNever(mockSearchService.search(any));
@@ -300,7 +287,6 @@ void main() {
           id: '1',
           type: ContentType.note,
           title: 'Test Note',
-          subtitle: null,
           preview: 'Test content',
           tags: [],
           updatedAt: DateTime.now(),
@@ -310,21 +296,19 @@ void main() {
 
       // Simulate a slow search
       when(mockSearchService.search(query)).thenAnswer(
-        (_) async => Future.delayed(
-          const Duration(milliseconds: 200),
-          () => results,
-        ),
+        (_) async =>
+            Future.delayed(const Duration(milliseconds: 200), () => results),
       );
 
       final controller = container.read(searchControllerProvider.notifier);
       controller.search(query);
 
       // Dispose immediately after search starts (before it completes)
-      await Future.delayed(const Duration(milliseconds: 350));
+      await Future<void>.delayed(const Duration(milliseconds: 350));
       container.dispose();
 
       // Wait for search to complete
-      await Future.delayed(const Duration(milliseconds: 200));
+      await Future<void>.delayed(const Duration(milliseconds: 200));
 
       // Test passes if no exception is thrown
       // (ref.mounted check prevents updating disposed provider)
