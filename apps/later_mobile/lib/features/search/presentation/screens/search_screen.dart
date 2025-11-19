@@ -115,21 +115,26 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
       },
       child: Scaffold(
       appBar: AppBar(
-        title: TextField(
-          controller: _searchController,
-          autofocus: true,
-          decoration: InputDecoration(
-            hintText: l10n.searchBarHint,
-            border: InputBorder.none,
-            suffixIcon: _searchController.text.isNotEmpty
-                ? IconButton(
-                    icon: const Icon(Icons.clear),
-                    onPressed: _clearSearch,
-                    tooltip: l10n.searchClearButton,
-                  )
-                : null,
-          ),
-          onChanged: _performSearch,
+        title: ValueListenableBuilder<TextEditingValue>(
+          valueListenable: _searchController,
+          builder: (context, value, child) {
+            return TextField(
+              controller: _searchController,
+              autofocus: true,
+              decoration: InputDecoration(
+                hintText: l10n.searchBarHint,
+                border: InputBorder.none,
+                suffixIcon: value.text.isNotEmpty
+                    ? IconButton(
+                        icon: const Icon(Icons.clear),
+                        onPressed: _clearSearch,
+                        tooltip: l10n.searchClearButton,
+                      )
+                    : null,
+              ),
+              onChanged: _performSearch,
+            );
+          },
         ),
       ),
       body: Column(

@@ -210,23 +210,29 @@ class _TodoItemSearchCardState extends State<TodoItemSearchCard> {
 
               // Content
               Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    // Title
-                    _buildTitle(context),
-                    const SizedBox(height: 4),
+                child: Builder(
+                  builder: (context) {
+                    final metadata = _buildMetadata(context);
 
-                    // Parent context
-                    _buildParentContext(context),
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        // Title
+                        _buildTitle(context),
+                        const SizedBox(height: 4),
 
-                    // Metadata (due date, priority)
-                    if (_buildMetadata(context) != null) ...[
-                      const SizedBox(height: 4),
-                      _buildMetadata(context)!,
-                    ],
-                  ],
+                        // Parent context
+                        _buildParentContext(context),
+
+                        // Metadata (due date, priority)
+                        if (metadata != null) ...[
+                          const SizedBox(height: 4),
+                          metadata,
+                        ],
+                      ],
+                    );
+                  },
                 ),
               ),
             ],
