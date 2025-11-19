@@ -44,6 +44,15 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
         _performSearch(_searchController.text);
       });
     }
+
+    // Listen to filter changes and re-run search
+    // This allows filters to work by triggering a new search when changed
+    ref.listenManual(searchFiltersControllerProvider, (previous, next) {
+      // Only trigger search if we have a non-empty query
+      if (_searchController.text.isNotEmpty) {
+        _performSearch(_searchController.text);
+      }
+    });
   }
 
   @override

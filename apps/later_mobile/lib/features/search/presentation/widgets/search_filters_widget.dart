@@ -50,9 +50,14 @@ class SearchFiltersWidget extends ConsumerWidget {
           TemporalFilterChip(
             label: l10n.filterNotes,
             isSelected: !isAllSelected &&
-                filters.contentTypes!.contains(ContentType.note),
+                (filters.contentTypes?.contains(ContentType.note) ?? false),
             onSelected: () {
-              _toggleContentType(ref, ContentType.note, isAllSelected ? false : !filters.contentTypes!.contains(ContentType.note));
+              _toggleContentType(
+                ref,
+                ContentType.note,
+                !(!isAllSelected &&
+                    (filters.contentTypes?.contains(ContentType.note) ?? false)),
+              );
             },
           ),
 
@@ -60,9 +65,15 @@ class SearchFiltersWidget extends ConsumerWidget {
           TemporalFilterChip(
             label: l10n.filterTodoLists,
             isSelected: !isAllSelected &&
-                filters.contentTypes!.contains(ContentType.todoList),
+                (filters.contentTypes?.contains(ContentType.todoList) ?? false),
             onSelected: () {
-              _toggleContentType(ref, ContentType.todoList, isAllSelected ? false : !filters.contentTypes!.contains(ContentType.todoList));
+              _toggleContentType(
+                ref,
+                ContentType.todoList,
+                !(!isAllSelected &&
+                    (filters.contentTypes?.contains(ContentType.todoList) ??
+                        false)),
+              );
             },
           ),
 
@@ -70,9 +81,14 @@ class SearchFiltersWidget extends ConsumerWidget {
           TemporalFilterChip(
             label: l10n.filterLists,
             isSelected: !isAllSelected &&
-                filters.contentTypes!.contains(ContentType.list),
+                (filters.contentTypes?.contains(ContentType.list) ?? false),
             onSelected: () {
-              _toggleContentType(ref, ContentType.list, isAllSelected ? false : !filters.contentTypes!.contains(ContentType.list));
+              _toggleContentType(
+                ref,
+                ContentType.list,
+                !(!isAllSelected &&
+                    (filters.contentTypes?.contains(ContentType.list) ?? false)),
+              );
             },
           ),
 
@@ -80,9 +96,15 @@ class SearchFiltersWidget extends ConsumerWidget {
           TemporalFilterChip(
             label: l10n.filterTodoItems,
             isSelected: !isAllSelected &&
-                filters.contentTypes!.contains(ContentType.todoItem),
+                (filters.contentTypes?.contains(ContentType.todoItem) ?? false),
             onSelected: () {
-              _toggleContentType(ref, ContentType.todoItem, isAllSelected ? false : !filters.contentTypes!.contains(ContentType.todoItem));
+              _toggleContentType(
+                ref,
+                ContentType.todoItem,
+                !(!isAllSelected &&
+                    (filters.contentTypes?.contains(ContentType.todoItem) ??
+                        false)),
+              );
             },
           ),
 
@@ -90,9 +112,15 @@ class SearchFiltersWidget extends ConsumerWidget {
           TemporalFilterChip(
             label: l10n.filterListItems,
             isSelected: !isAllSelected &&
-                filters.contentTypes!.contains(ContentType.listItem),
+                (filters.contentTypes?.contains(ContentType.listItem) ?? false),
             onSelected: () {
-              _toggleContentType(ref, ContentType.listItem, isAllSelected ? false : !filters.contentTypes!.contains(ContentType.listItem));
+              _toggleContentType(
+                ref,
+                ContentType.listItem,
+                !(!isAllSelected &&
+                    (filters.contentTypes?.contains(ContentType.listItem) ??
+                        false)),
+              );
             },
           ),
         ],
