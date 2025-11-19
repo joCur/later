@@ -24,8 +24,20 @@ class SearchQuery {
   /// If null, search across all content types
   final List<ContentType>? contentTypes;
 
-  /// Optional filter for tags
-  /// If provided, only return results that have ALL of these tags
+  /// Optional filter for tags (uses AND logic)
+  ///
+  /// If provided, only return results that have ALL of these tags.
+  /// This uses AND logic, meaning a result must contain every tag in this list
+  /// to be included in the results.
+  ///
+  /// Examples:
+  /// - `['work', 'urgent']` → Returns only items with BOTH 'work' AND 'urgent' tags
+  /// - `['personal']` → Returns only items with the 'personal' tag
+  /// - `null` or `[]` → No tag filtering applied
+  ///
+  /// Note: Tag filtering only applies to content types that support tags
+  /// (currently notes and todo items). Other content types are not affected
+  /// by this filter.
   final List<String>? tags;
 
   /// Maximum number of results to return per content type (default: 50)

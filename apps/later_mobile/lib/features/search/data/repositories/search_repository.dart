@@ -96,7 +96,7 @@ class SearchRepository extends BaseRepository {
         .eq('user_id', userId)
         .eq('space_id', query.spaceId);
 
-    // Add tag filter if provided
+    // Add tag filter if provided (AND logic: result must contain ALL tags)
     if (query.tags != null && query.tags!.isNotEmpty) {
       queryBuilder = queryBuilder.contains('tags', query.tags!);
     }
@@ -168,7 +168,7 @@ class SearchRepository extends BaseRepository {
         .eq('todo_lists.user_id', userId)
         .eq('todo_lists.space_id', query.spaceId);
 
-    // Add tag filter if provided
+    // Add tag filter if provided (AND logic: result must contain ALL tags)
     if (query.tags != null && query.tags!.isNotEmpty) {
       queryBuilder = queryBuilder.contains('tags', query.tags!);
     }

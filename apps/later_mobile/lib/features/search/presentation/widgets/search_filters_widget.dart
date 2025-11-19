@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:later_mobile/core/enums/content_type.dart';
 import 'package:later_mobile/design_system/design_system.dart';
+import 'package:later_mobile/features/search/domain/models/search_filters.dart';
 import 'package:later_mobile/features/search/presentation/controllers/search_filters_controller.dart';
 import 'package:later_mobile/l10n/app_localizations.dart';
 
@@ -16,6 +17,14 @@ import 'package:later_mobile/l10n/app_localizations.dart';
 /// - List Items only
 class SearchFiltersWidget extends ConsumerWidget {
   const SearchFiltersWidget({super.key});
+
+  /// Helper method to check if a specific content type is selected
+  bool _isTypeSelected(SearchFilters filters, ContentType type) {
+    if (filters.contentTypes == null || filters.contentTypes!.isEmpty) {
+      return false;
+    }
+    return filters.contentTypes!.contains(type);
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -49,14 +58,12 @@ class SearchFiltersWidget extends ConsumerWidget {
           // Notes filter
           TemporalFilterChip(
             label: l10n.filterNotes,
-            isSelected: !isAllSelected &&
-                (filters.contentTypes?.contains(ContentType.note) ?? false),
+            isSelected: _isTypeSelected(filters, ContentType.note),
             onSelected: () {
               _toggleContentType(
                 ref,
                 ContentType.note,
-                !(!isAllSelected &&
-                    (filters.contentTypes?.contains(ContentType.note) ?? false)),
+                !_isTypeSelected(filters, ContentType.note),
               );
             },
           ),
@@ -64,15 +71,12 @@ class SearchFiltersWidget extends ConsumerWidget {
           // Tasks (TodoLists) filter
           TemporalFilterChip(
             label: l10n.filterTodoLists,
-            isSelected: !isAllSelected &&
-                (filters.contentTypes?.contains(ContentType.todoList) ?? false),
+            isSelected: _isTypeSelected(filters, ContentType.todoList),
             onSelected: () {
               _toggleContentType(
                 ref,
                 ContentType.todoList,
-                !(!isAllSelected &&
-                    (filters.contentTypes?.contains(ContentType.todoList) ??
-                        false)),
+                !_isTypeSelected(filters, ContentType.todoList),
               );
             },
           ),
@@ -80,14 +84,12 @@ class SearchFiltersWidget extends ConsumerWidget {
           // Lists filter
           TemporalFilterChip(
             label: l10n.filterLists,
-            isSelected: !isAllSelected &&
-                (filters.contentTypes?.contains(ContentType.list) ?? false),
+            isSelected: _isTypeSelected(filters, ContentType.list),
             onSelected: () {
               _toggleContentType(
                 ref,
                 ContentType.list,
-                !(!isAllSelected &&
-                    (filters.contentTypes?.contains(ContentType.list) ?? false)),
+                !_isTypeSelected(filters, ContentType.list),
               );
             },
           ),
@@ -95,15 +97,12 @@ class SearchFiltersWidget extends ConsumerWidget {
           // Todo Items filter
           TemporalFilterChip(
             label: l10n.filterTodoItems,
-            isSelected: !isAllSelected &&
-                (filters.contentTypes?.contains(ContentType.todoItem) ?? false),
+            isSelected: _isTypeSelected(filters, ContentType.todoItem),
             onSelected: () {
               _toggleContentType(
                 ref,
                 ContentType.todoItem,
-                !(!isAllSelected &&
-                    (filters.contentTypes?.contains(ContentType.todoItem) ??
-                        false)),
+                !_isTypeSelected(filters, ContentType.todoItem),
               );
             },
           ),
@@ -111,15 +110,12 @@ class SearchFiltersWidget extends ConsumerWidget {
           // List Items filter
           TemporalFilterChip(
             label: l10n.filterListItems,
-            isSelected: !isAllSelected &&
-                (filters.contentTypes?.contains(ContentType.listItem) ?? false),
+            isSelected: _isTypeSelected(filters, ContentType.listItem),
             onSelected: () {
               _toggleContentType(
                 ref,
                 ContentType.listItem,
-                !(!isAllSelected &&
-                    (filters.contentTypes?.contains(ContentType.listItem) ??
-                        false)),
+                !_isTypeSelected(filters, ContentType.listItem),
               );
             },
           ),
