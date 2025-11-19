@@ -107,6 +107,9 @@ class TodoList {
   }
 
   /// Convert to JSON for Supabase compatibility
+  ///
+  /// Note: totalItemCount and completedItemCount are computed values from child items
+  /// and should not be written to the database.
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -114,8 +117,6 @@ class TodoList {
       'user_id': userId,
       'name': name,
       'description': description,
-      'total_item_count': totalItemCount,
-      'completed_item_count': completedItemCount,
       'created_at': createdAt.toIso8601String(),
       'updated_at': updatedAt.toIso8601String(),
       'sort_order': sortOrder,

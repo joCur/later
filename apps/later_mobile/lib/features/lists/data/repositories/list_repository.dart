@@ -1,6 +1,6 @@
+import 'package:later_mobile/data/repositories/base_repository.dart';
 import 'package:later_mobile/features/lists/domain/models/list_item_model.dart';
 import 'package:later_mobile/features/lists/domain/models/list_model.dart';
-import 'package:later_mobile/data/repositories/base_repository.dart';
 
 /// Repository for managing ListModel and ListItem entities in Supabase.
 ///
@@ -230,9 +230,6 @@ class ListRepository extends BaseRepository {
           .select()
           .single();
 
-      // Update parent list counts
-      await _updateListCounts(listItem.listId);
-
       return ListItem.fromJson(response);
     });
   }
@@ -249,14 +246,6 @@ class ListRepository extends BaseRepository {
   ///   The updated list item
   Future<ListItem> updateListItem(ListItem listItem) async {
     return executeQuery(() async {
-      // Get the old item to check if checked status changed
-      final oldItemResponse = await supabase
-          .from('list_items')
-          .select()
-          .eq('id', listItem.id)
-          .single();
-      final oldItem = ListItem.fromJson(oldItemResponse);
-
       final data = listItem.toJson();
 
       final response = await supabase
@@ -265,11 +254,6 @@ class ListRepository extends BaseRepository {
           .eq('id', listItem.id)
           .select()
           .single();
-
-      // Update parent list counts if checked status changed
-      if (oldItem.isChecked != listItem.isChecked) {
-        await _updateListCounts(listItem.listId);
-      }
 
       return ListItem.fromJson(response);
     });
@@ -286,9 +270,6 @@ class ListRepository extends BaseRepository {
   Future<void> deleteListItem(String id, String listId) async {
     return executeQuery(() async {
       await supabase.from('list_items').delete().eq('id', id);
-
-      // Update parent list counts
-      await _updateListCounts(listId);
     });
   }
 
@@ -306,24 +287,5 @@ class ListRepository extends BaseRepository {
       // Use upsert to update multiple records at once
       await supabase.from('list_items').upsert(updates);
     });
-  }
-
-  /// Private helper to update a list's aggregate counts.
-  ///
-  /// Fetches all items for the list and recalculates totalItemCount and checkedItemCount.
-  Future<void> _updateListCounts(String listId) async {
-    final items = await getListItemsByListId(listId);
-    final totalCount = items.length;
-    final checkedCount = items.where((item) => item.isChecked).length;
-
-    await supabase
-        .from('lists')
-        .update({
-          'total_item_count': totalCount,
-          'checked_item_count': checkedCount,
-          'updated_at': DateTime.now().toIso8601String(),
-        })
-        .eq('id', listId)
-        .eq('user_id', userId);
   }
 }

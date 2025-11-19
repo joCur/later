@@ -57,7 +57,7 @@ void main() {
       expect(container.constraints?.minHeight, 60.0);
     });
 
-    testWidgets('renders three icon buttons (Home, Search, Settings)', (
+    testWidgets('renders two icon buttons (Home, Settings)', (
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(
@@ -67,10 +67,11 @@ void main() {
         ),
       );
 
-      // Find icons - home is active (filled), others are outlined
+      // Find icons - home is active (filled), settings is outlined
       expect(find.byIcon(Icons.home), findsOneWidget);
-      expect(find.byIcon(Icons.search_outlined), findsOneWidget);
       expect(find.byIcon(Icons.settings_outlined), findsOneWidget);
+      // Search has been moved to app bar, no longer in bottom nav
+      expect(find.byIcon(Icons.search_outlined), findsNothing);
     });
 
     testWidgets('shows gradient underline for active tab', (
@@ -137,19 +138,12 @@ void main() {
         ),
       );
 
-      // Tap search icon (middle button)
-      await tester.tap(find.byIcon(Icons.search_outlined));
-      await tester.pumpAndSettle();
-
-      // Verify selection changed
-      expect(selectedIndex, 1);
-
-      // Tap settings icon (last button)
+      // Tap settings icon (second button, index 1)
       await tester.tap(find.byIcon(Icons.settings_outlined));
       await tester.pumpAndSettle();
 
-      // Verify selection changed again
-      expect(selectedIndex, 2);
+      // Verify selection changed to settings (index 1)
+      expect(selectedIndex, 1);
     });
 
     testWidgets('active tab shows filled icon', (WidgetTester tester) async {
@@ -164,8 +158,7 @@ void main() {
       expect(find.byIcon(Icons.home), findsOneWidget);
       expect(find.byIcon(Icons.home_outlined), findsNothing);
 
-      // Search and Settings are inactive, should show outlined icons
-      expect(find.byIcon(Icons.search_outlined), findsOneWidget);
+      // Settings is inactive, should show outlined icon
       expect(find.byIcon(Icons.settings_outlined), findsOneWidget);
     });
 
@@ -180,13 +173,13 @@ void main() {
 
       await tester.pumpAndSettle();
 
-      // Find the search icon (inactive)
-      final searchIcon = tester.widget<Icon>(
-        find.byIcon(Icons.search_outlined),
+      // Find the settings icon (inactive)
+      final settingsIcon = tester.widget<Icon>(
+        find.byIcon(Icons.settings_outlined),
       );
 
       // Verify it's gray (neutral600 for light mode)
-      expect(searchIcon.color, AppColors.neutral600);
+      expect(settingsIcon.color, AppColors.neutral600);
     });
 
     testWidgets('active tab shows white icon', (WidgetTester tester) async {
@@ -209,7 +202,7 @@ void main() {
     testWidgets('respects dark mode', (WidgetTester tester) async {
       await tester.pumpWidget(
         createTestWidget(
-          currentIndex: 1, // Search is active
+          currentIndex: 1, // Settings is active
           onDestinationSelected: (_) {},
           theme: ThemeData.dark(),
         ),
@@ -241,8 +234,8 @@ void main() {
             widget.height == AppSpacing.minTouchTarget;
       });
 
-      // Should have exactly 3 touch targets
-      expect(touchTargets, findsNWidgets(3));
+      // Should have exactly 2 touch targets (Home and Settings)
+      expect(touchTargets, findsNWidgets(2));
     });
 
     testWidgets('underline animates when selection changes', (
@@ -284,8 +277,8 @@ void main() {
 
       await tester.pumpAndSettle();
 
-      // Tap search button to change selection
-      await tester.tap(find.byIcon(Icons.search_outlined));
+      // Tap settings button to change selection
+      await tester.tap(find.byIcon(Icons.settings_outlined));
 
       // Pump with duration to capture animation
       await tester.pump();
@@ -323,8 +316,8 @@ void main() {
           .toList();
 
       expect(labels, contains('Home navigation (selected)'));
-      expect(labels, contains('Search navigation'));
       expect(labels, contains('Settings navigation'));
+      // Search has been moved to app bar, no longer in bottom nav
     });
 
     testWidgets('shows tooltips on long press', (WidgetTester tester) async {
@@ -335,12 +328,12 @@ void main() {
         ),
       );
 
-      // Long press on search button
-      await tester.longPress(find.byIcon(Icons.search_outlined));
+      // Long press on settings button
+      await tester.longPress(find.byIcon(Icons.settings_outlined));
       await tester.pumpAndSettle();
 
-      // Verify tooltip appears
-      expect(find.text('Search items'), findsOneWidget);
+      // Verify tooltip appears (using localized string)
+      expect(find.text('App settings'), findsOneWidget);
     });
 
     testWidgets('gradient underline has correct dimensions', (

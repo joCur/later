@@ -13,6 +13,8 @@ import 'package:later_mobile/core/enums/content_type.dart';
 /// Provides search functionality across notes, todo lists, lists, todo items,
 /// and list items using PostgreSQL full-text search with GIN indexes.
 ///
+/// Supports pagination with configurable limit and offset parameters.
+///
 /// Usage:
 /// ```dart
 /// final repo = SearchRepository();
@@ -20,6 +22,8 @@ import 'package:later_mobile/core/enums/content_type.dart';
 ///   query: 'shopping',
 ///   spaceId: 'space-1',
 ///   contentTypes: [ContentType.note, ContentType.todoList],
+///   limit: 50,
+///   offset: 0,
 /// );
 /// final results = await repo.search(query);
 /// ```
@@ -80,9 +84,9 @@ class SearchRepository extends BaseRepository {
     });
   }
 
-  /// Search notes using full-text search
+  /// Search notes using ILIKE for substring matching
   ///
-  /// Searches the notes table using the fts tsvector column with German stemming.
+  /// Searches both title and content fields using case-insensitive substring matching.
   /// Filters by user_id, space_id, and optionally tags.
   Future<List<SearchResult>> _searchNotes(SearchQuery query) async {
     // Build base query
@@ -92,15 +96,17 @@ class SearchRepository extends BaseRepository {
         .eq('user_id', userId)
         .eq('space_id', query.spaceId);
 
-    // Add tag filter if provided (must be before textSearch)
+    // Add tag filter if provided (AND logic: result must contain ALL tags)
     if (query.tags != null && query.tags!.isNotEmpty) {
       queryBuilder = queryBuilder.contains('tags', query.tags!);
     }
 
-    // Add full-text search and ordering
+    // Search in both title and content using OR
+    // Note: We need to use .or() to search multiple fields
     final response = await queryBuilder
-        .textSearch('fts', query.query, config: 'german')
-        .order('updated_at', ascending: false);
+        .or('title.ilike.%${query.query}%,content.ilike.%${query.query}%')
+        .order('updated_at', ascending: false)
+        .range(query.offset, query.offset + query.limit - 1);
 
     return (response as List<dynamic>)
         .map((json) => Note.fromJson(json as Map<String, dynamic>))
@@ -108,9 +114,9 @@ class SearchRepository extends BaseRepository {
         .toList();
   }
 
-  /// Search todo lists using full-text search
+  /// Search todo lists using ILIKE for substring matching
   ///
-  /// Searches the todo_lists table using the fts tsvector column with German stemming.
+  /// Searches both name and description fields using case-insensitive substring matching.
   /// Filters by user_id and space_id.
   Future<List<SearchResult>> _searchTodoLists(SearchQuery query) async {
     final response = await supabase
@@ -118,8 +124,9 @@ class SearchRepository extends BaseRepository {
         .select()
         .eq('user_id', userId)
         .eq('space_id', query.spaceId)
-        .textSearch('fts', query.query, config: 'german')
-        .order('updated_at', ascending: false);
+        .or('name.ilike.%${query.query}%,description.ilike.%${query.query}%')
+        .order('updated_at', ascending: false)
+        .range(query.offset, query.offset + query.limit - 1);
 
     return (response as List<dynamic>)
         .map((json) => TodoList.fromJson(json as Map<String, dynamic>))
@@ -127,9 +134,10 @@ class SearchRepository extends BaseRepository {
         .toList();
   }
 
-  /// Search lists using full-text search
+  /// Search lists using ILIKE for substring matching
   ///
-  /// Searches the lists table using the fts tsvector column with German stemming.
+  /// Searches the lists table using ILIKE for case-insensitive substring matching.
+  /// This allows "ein" to match "Einkaufsliste" and "kauf" to match "Einkaufsliste".
   /// Filters by user_id and space_id.
   Future<List<SearchResult>> _searchLists(SearchQuery query) async {
     final response = await supabase
@@ -137,8 +145,9 @@ class SearchRepository extends BaseRepository {
         .select()
         .eq('user_id', userId)
         .eq('space_id', query.spaceId)
-        .textSearch('fts', query.query, config: 'german')
-        .order('updated_at', ascending: false);
+        .ilike('name', '%${query.query}%')
+        .order('updated_at', ascending: false)
+        .range(query.offset, query.offset + query.limit - 1);
 
     return (response as List<dynamic>)
         .map((json) => ListModel.fromJson(json as Map<String, dynamic>))
@@ -146,11 +155,11 @@ class SearchRepository extends BaseRepository {
         .toList();
   }
 
-  /// Search todo items using full-text search with JOIN to parent todo_lists
+  /// Search todo items using ILIKE for substring matching with JOIN to parent todo_lists
   ///
-  /// Searches the todo_items table with an INNER JOIN to todo_lists to filter
-  /// by space_id and user_id via the parent relationship. Returns results with
-  /// parent context (parent name and ID) for display.
+  /// Searches both title and description fields using case-insensitive substring matching.
+  /// Uses INNER JOIN to filter by space_id and user_id via the parent relationship.
+  /// Returns results with parent context (parent name and ID) for display.
   Future<List<SearchResult>> _searchTodoItems(SearchQuery query) async {
     // Build base query with JOIN
     var queryBuilder = supabase
@@ -159,13 +168,15 @@ class SearchRepository extends BaseRepository {
         .eq('todo_lists.user_id', userId)
         .eq('todo_lists.space_id', query.spaceId);
 
-    // Add tag filter if provided (must be before textSearch)
+    // Add tag filter if provided (AND logic: result must contain ALL tags)
     if (query.tags != null && query.tags!.isNotEmpty) {
       queryBuilder = queryBuilder.contains('tags', query.tags!);
     }
 
-    // Add full-text search
-    final response = await queryBuilder.textSearch('fts', query.query, config: 'german');
+    // Search in both title and description using OR
+    final response = await queryBuilder
+        .or('title.ilike.%${query.query}%,description.ilike.%${query.query}%')
+        .range(query.offset, query.offset + query.limit - 1);
 
     return (response as List<dynamic>).map((json) {
       final itemJson = Map<String, dynamic>.from(json as Map<String, dynamic>);
@@ -185,18 +196,19 @@ class SearchRepository extends BaseRepository {
     }).toList();
   }
 
-  /// Search list items using full-text search with JOIN to parent lists
+  /// Search list items using ILIKE for substring matching with JOIN to parent lists
   ///
-  /// Searches the list_items table with an INNER JOIN to lists to filter
-  /// by space_id and user_id via the parent relationship. Returns results with
-  /// parent context (parent name and ID) for display.
+  /// Searches both title and notes fields using case-insensitive substring matching.
+  /// Uses INNER JOIN to filter by space_id and user_id via the parent relationship.
+  /// Returns results with parent context (parent name and ID) for display.
   Future<List<SearchResult>> _searchListItems(SearchQuery query) async {
     final response = await supabase
         .from('list_items')
         .select('*, lists!inner(id, name, space_id, user_id, updated_at)')
         .eq('lists.user_id', userId)
         .eq('lists.space_id', query.spaceId)
-        .textSearch('fts', query.query, config: 'german');
+        .or('title.ilike.%${query.query}%,notes.ilike.%${query.query}%')
+        .range(query.offset, query.offset + query.limit - 1);
 
     return (response as List<dynamic>).map((json) {
       final itemJson = Map<String, dynamic>.from(json as Map<String, dynamic>);

@@ -98,14 +98,38 @@ class SearchResultCard extends StatelessWidget {
       onTap: () {
         // Navigate to parent TodoList detail screen
         if (result.parentId != null) {
-          // We need to fetch the parent TodoList to navigate
-          // For now, we'll create a minimal TodoList instance with just the ID
-          // The detail screen will load the full data
+          // TODO: TECHNICAL DEBT - Refactor navigation to use IDs instead of incomplete models
+          //
+          // PROBLEM: We're creating an incomplete TodoList model with placeholder data
+          // (empty spaceId, userId, fake dates) just to satisfy the TodoListDetailScreen
+          // constructor. This is fragile and violates proper data integrity.
+          //
+          // BETTER APPROACH: Refactor TodoListDetailScreen to accept an ID:
+          //   TodoListDetailScreen({required String todoListId})
+          //
+          // Then the detail screen loads its own data from the repository using the ID.
+          // This ensures:
+          //   - Data integrity (no incomplete/placeholder data)
+          //   - Single source of truth (repository)
+          //   - Consistent pattern across all detail screens
+          //
+          // SCOPE: This refactoring affects:
+          //   - TodoListDetailScreen constructor and initialization
+          //   - ListDetailScreen constructor and initialization
+          //   - Home screen navigation (primary navigation path)
+          //   - All places that navigate to detail screens (3-4 locations)
+          //   - Comprehensive testing of navigation flows
+          //
+          // This is a larger architectural change beyond the search feature scope.
+          // Tracked in PR #25 discussion: https://github.com/joCur/later/pull/25#discussion_r2543092754
+          //
+          // For now, we create a minimal model. The detail screen re-fetches full data
+          // on mount anyway, so this works functionally but isn't architecturally clean.
           final parentTodoList = TodoList(
             id: result.parentId!,
             name: result.parentName ?? 'Unknown List',
-            spaceId: '', // Will be loaded in detail screen
-            userId: '', // Will be loaded in detail screen
+            spaceId: '', // Placeholder - will be loaded in detail screen
+            userId: '', // Placeholder - will be loaded in detail screen
             createdAt: DateTime.now(),
             updatedAt: DateTime.now(),
           );
@@ -131,14 +155,38 @@ class SearchResultCard extends StatelessWidget {
       onTap: () {
         // Navigate to parent List detail screen
         if (result.parentId != null) {
-          // We need to fetch the parent List to navigate
-          // For now, we'll create a minimal ListModel instance with just the ID
-          // The detail screen will load the full data
+          // TODO: TECHNICAL DEBT - Refactor navigation to use IDs instead of incomplete models
+          //
+          // PROBLEM: We're creating an incomplete ListModel with placeholder data
+          // (empty spaceId, userId, fake dates) just to satisfy the ListDetailScreen
+          // constructor. This is fragile and violates proper data integrity.
+          //
+          // BETTER APPROACH: Refactor ListDetailScreen to accept an ID:
+          //   ListDetailScreen({required String listId})
+          //
+          // Then the detail screen loads its own data from the repository using the ID.
+          // This ensures:
+          //   - Data integrity (no incomplete/placeholder data)
+          //   - Single source of truth (repository)
+          //   - Consistent pattern across all detail screens
+          //
+          // SCOPE: This refactoring affects:
+          //   - TodoListDetailScreen constructor and initialization
+          //   - ListDetailScreen constructor and initialization
+          //   - Home screen navigation (primary navigation path)
+          //   - All places that navigate to detail screens (3-4 locations)
+          //   - Comprehensive testing of navigation flows
+          //
+          // This is a larger architectural change beyond the search feature scope.
+          // Tracked in PR #25 discussion: https://github.com/joCur/later/pull/25#discussion_r2543092754
+          //
+          // For now, we create a minimal model. The detail screen re-fetches full data
+          // on mount anyway, so this works functionally but isn't architecturally clean.
           final parentList = ListModel(
             id: result.parentId!,
             name: result.parentName ?? 'Unknown List',
-            spaceId: '', // Will be loaded in detail screen
-            userId: '', // Will be loaded in detail screen
+            spaceId: '', // Placeholder - will be loaded in detail screen
+            userId: '', // Placeholder - will be loaded in detail screen
             createdAt: DateTime.now(),
             updatedAt: DateTime.now(),
           );

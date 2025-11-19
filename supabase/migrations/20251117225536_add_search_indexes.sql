@@ -1,6 +1,17 @@
 -- Add Full-Text Search Support
 -- Adds tsvector columns and GIN indexes for fast full-text search across all content types
 -- Uses German text search configuration for proper stemming (e.g., "laufen" matches "läuft", "lief")
+<<<<<<< HEAD
+=======
+--
+-- NOTE: This migration uses 'german' language configuration for all full-text search indexes.
+-- To support additional languages in the future:
+--   1. Add a language column to relevant tables (e.g., user preferences or per-document language)
+--   2. Create separate tsvector columns for each supported language
+--   3. Update search queries to target the appropriate language-specific column
+--   4. Consider using 'simple' configuration for language-agnostic substring matching
+-- For MVP, German configuration provides good results for the target user base.
+>>>>>>> feature/search-implementation
 
 -- Add tsvector column to notes table (generated from title + content)
 ALTER TABLE notes

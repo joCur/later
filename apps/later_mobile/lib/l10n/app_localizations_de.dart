@@ -741,7 +741,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get createModalListStyleLabel => 'Listenstil';
 
   @override
-  String get createModalListStyleBullets => 'Aufzählungszeichen';
+  String get createModalListStyleBullets => 'Aufzählung';
 
   @override
   String get createModalListStyleNumbered => 'Nummeriert';

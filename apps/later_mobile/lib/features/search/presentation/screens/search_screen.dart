@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:later_mobile/design_system/design_system.dart';
 import 'package:later_mobile/features/search/domain/models/models.dart';
@@ -17,6 +18,7 @@ import 'package:later_mobile/l10n/app_localizations.dart';
 /// - Real-time search results
 /// - Empty state handling
 /// - Error state handling
+/// - Keyboard shortcuts: Escape to clear search
 class SearchScreen extends ConsumerStatefulWidget {
   const SearchScreen({
     super.key,
@@ -44,6 +46,15 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
         _performSearch(_searchController.text);
       });
     }
+
+    // Listen to filter changes and re-run search
+    // This allows filters to work by triggering a new search when changed
+    ref.listenManual(searchFiltersControllerProvider, (previous, next) {
+      // Only trigger search if we have a non-empty query
+      if (_searchController.text.isNotEmpty) {
+        _performSearch(_searchController.text);
+      }
+    });
   }
 
   @override
@@ -92,23 +103,38 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     final l10n = AppLocalizations.of(context)!;
     final searchState = ref.watch(searchControllerProvider);
 
-    return Scaffold(
+    return Focus(
+      onKeyEvent: (node, event) {
+        // Handle Escape key to clear search
+        if (event is KeyDownEvent &&
+            event.logicalKey == LogicalKeyboardKey.escape) {
+          _clearSearch();
+          return KeyEventResult.handled;
+        }
+        return KeyEventResult.ignored;
+      },
+      child: Scaffold(
       appBar: AppBar(
-        title: TextField(
-          controller: _searchController,
-          autofocus: true,
-          decoration: InputDecoration(
-            hintText: l10n.searchBarHint,
-            border: InputBorder.none,
-            suffixIcon: _searchController.text.isNotEmpty
-                ? IconButton(
-                    icon: const Icon(Icons.clear),
-                    onPressed: _clearSearch,
-                    tooltip: l10n.searchClearButton,
-                  )
-                : null,
-          ),
-          onChanged: _performSearch,
+        title: ValueListenableBuilder<TextEditingValue>(
+          valueListenable: _searchController,
+          builder: (context, value, child) {
+            return TextField(
+              controller: _searchController,
+              autofocus: true,
+              decoration: InputDecoration(
+                hintText: l10n.searchBarHint,
+                border: InputBorder.none,
+                suffixIcon: value.text.isNotEmpty
+                    ? IconButton(
+                        icon: const Icon(Icons.clear),
+                        onPressed: _clearSearch,
+                        tooltip: l10n.searchClearButton,
+                      )
+                    : null,
+              ),
+              onChanged: _performSearch,
+            );
+          },
         ),
       ),
       body: Column(
@@ -162,6 +188,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
             ),
           ),
         ],
+      ),
       ),
     );
   }

@@ -400,7 +400,7 @@ class SearchRepository extends BaseRepository {
       queryBuilder = queryBuilder.textSearch(
         'fts',  // Full-text search column (tsvector)
         query.query,
-        config: 'english',
+        config: 'german',  // Using German config for better stemming (e.g., "laufen" matches "läuft", "lief")
       );
     }
 
@@ -710,19 +710,20 @@ Future<List<Note>> advancedSearch({
 -- Migration: Add full-text search support
 
 -- 1. Add tsvector columns for full-text search
+-- Using 'german' config for better German language support (stemming, stop words)
 ALTER TABLE notes ADD COLUMN fts tsvector
   GENERATED ALWAYS AS (
-    to_tsvector('english', coalesce(title, '') || ' ' || coalesce(content, ''))
+    to_tsvector('german', coalesce(title, '') || ' ' || coalesce(content, ''))
   ) STORED;
 
 ALTER TABLE todo_lists ADD COLUMN fts tsvector
   GENERATED ALWAYS AS (
-    to_tsvector('english', coalesce(name, '') || ' ' || coalesce(description, ''))
+    to_tsvector('german', coalesce(name, '') || ' ' || coalesce(description, ''))
   ) STORED;
 
 ALTER TABLE lists ADD COLUMN fts tsvector
   GENERATED ALWAYS AS (
-    to_tsvector('english', name)
+    to_tsvector('german', name)
   ) STORED;
 
 -- 2. Create GIN indexes for full-text search (massively improves search performance)
@@ -773,7 +774,7 @@ CREATE INDEX idx_lists_space_updated ON lists(space_id, updated_at DESC);
 ```sql
 -- Full-text search across notes (Supabase API)
 SELECT * FROM notes
-WHERE fts @@ to_tsquery('english', 'flutter & mobile')
+WHERE fts @@ to_tsquery('german', 'flutter & mobile')
   AND user_id = 'user-123'
 ORDER BY updated_at DESC;
 
@@ -784,20 +785,20 @@ WHERE tags @> ARRAY['work', 'urgent']  -- Contains all tags
 
 -- Combined search + tag filter
 SELECT * FROM notes
-WHERE fts @@ to_tsquery('english', 'meeting')
+WHERE fts @@ to_tsquery('german', 'meeting')
   AND tags && ARRAY['work']  -- Overlaps with tags
   AND space_id = 'space-456'
   AND user_id = 'user-123';
 
 -- Search across all content types (union query)
 SELECT id, 'note' as type, title, updated_at FROM notes
-  WHERE fts @@ to_tsquery('english', 'project')
+  WHERE fts @@ to_tsquery('german', 'project')
 UNION ALL
 SELECT id, 'todo_list' as type, name as title, updated_at FROM todo_lists
-  WHERE fts @@ to_tsquery('english', 'project')
+  WHERE fts @@ to_tsquery('german', 'project')
 UNION ALL
 SELECT id, 'list' as type, name as title, updated_at FROM lists
-  WHERE fts @@ to_tsquery('english', 'project')
+  WHERE fts @@ to_tsquery('german', 'project')
 ORDER BY updated_at DESC;
 ```
 
@@ -1166,7 +1167,7 @@ void main() {
    .or('title.ilike.%$query%,content.ilike.%$query%')
 
    // ✅ Fast (uses GIN index)
-   .textSearch('fts', query, config: 'english')
+   .textSearch('fts', query, config: 'german')
    ```
 
 2. **Limit Result Count**:
@@ -1374,7 +1375,7 @@ If rapid iteration is needed:
 final results = await supabase
   .from('notes')
   .select()
-  .textSearch('fts', query, config: 'english')
+  .textSearch('fts', query, config: 'german')
   .contains('tags', ['work'])
   .eq('user_id', userId);
 ```
@@ -1739,6 +1740,7 @@ Based on comprehensive analysis of the Later app architecture and industry best 
 11. **Search Suggestions** - Autocomplete based on content
 12. **Fuzzy Search** - Handle typos and similar words
 13. **AI-Powered Search** - Natural language queries ("tasks due this week")
+14. **Language Detection** - Add language column to tables, dynamically choose search config ('german'/'english')
 
 **Recommended Implementation Order:**
 1. **Week 1-2**: Database indexes + SearchRepository + Basic SearchScreen
@@ -1747,3 +1749,5 @@ Based on comprehensive analysis of the Later app architecture and industry best 
 4. **Week 4+**: Performance optimization + UX refinements + Documentation
 
 This roadmap positions Later as a competitive productivity app with robust search capabilities while maintaining clean architecture and leveraging existing infrastructure (Supabase, Riverpod 3.0, design system). The feature-first approach ensures the search feature is maintainable, testable, and scalable for future enhancements.
+
+**Language Configuration Note:** The implementation uses PostgreSQL's `'german'` text search configuration for better German language support (stemming, stop words). This is suitable since most content will be in German. A future enhancement could add a language column to tables to dynamically choose between 'german' and 'english' configurations based on content language.

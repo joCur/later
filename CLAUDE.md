@@ -55,7 +55,8 @@ flutter test --coverage         # Generate coverage report
 supabase start                  # Start local Supabase dev server
 supabase stop                   # Stop local dev server
 supabase status                 # Check running services and credentials
-supabase db reset               # Reset database and apply migrations
+supabase db migrate             # Applies all new migrations to the database
+supabase db reset               # Reset database, should never be used to apply new migrations
 
 # Code analysis and formatting
 flutter analyze                 # Check for issues
@@ -735,7 +736,7 @@ flutter run             # Run the app
 
 **Database Migrations:**
 - Migrations are in `supabase/migrations/`
-- Apply migrations: `supabase db reset`
+- Apply migrations: `supabase db migrate`
 - Create new migration: `supabase migration new migration_name`
 
 ## Documentation References

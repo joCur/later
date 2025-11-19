@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:later_mobile/core/enums/content_type.dart';
 import 'package:later_mobile/design_system/design_system.dart';
+import 'package:later_mobile/features/search/domain/models/search_filters.dart';
 import 'package:later_mobile/features/search/presentation/controllers/search_filters_controller.dart';
 import 'package:later_mobile/l10n/app_localizations.dart';
 
@@ -16,6 +17,14 @@ import 'package:later_mobile/l10n/app_localizations.dart';
 /// - List Items only
 class SearchFiltersWidget extends ConsumerWidget {
   const SearchFiltersWidget({super.key});
+
+  /// Helper method to check if a specific content type is selected
+  bool _isTypeSelected(SearchFilters filters, ContentType type) {
+    if (filters.contentTypes == null || filters.contentTypes!.isEmpty) {
+      return false;
+    }
+    return filters.contentTypes!.contains(type);
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -49,50 +58,65 @@ class SearchFiltersWidget extends ConsumerWidget {
           // Notes filter
           TemporalFilterChip(
             label: l10n.filterNotes,
-            isSelected: !isAllSelected &&
-                filters.contentTypes!.contains(ContentType.note),
+            isSelected: _isTypeSelected(filters, ContentType.note),
             onSelected: () {
-              _toggleContentType(ref, ContentType.note, isAllSelected ? false : !filters.contentTypes!.contains(ContentType.note));
+              _toggleContentType(
+                ref,
+                ContentType.note,
+                !_isTypeSelected(filters, ContentType.note),
+              );
             },
           ),
 
           // Tasks (TodoLists) filter
           TemporalFilterChip(
             label: l10n.filterTodoLists,
-            isSelected: !isAllSelected &&
-                filters.contentTypes!.contains(ContentType.todoList),
+            isSelected: _isTypeSelected(filters, ContentType.todoList),
             onSelected: () {
-              _toggleContentType(ref, ContentType.todoList, isAllSelected ? false : !filters.contentTypes!.contains(ContentType.todoList));
+              _toggleContentType(
+                ref,
+                ContentType.todoList,
+                !_isTypeSelected(filters, ContentType.todoList),
+              );
             },
           ),
 
           // Lists filter
           TemporalFilterChip(
             label: l10n.filterLists,
-            isSelected: !isAllSelected &&
-                filters.contentTypes!.contains(ContentType.list),
+            isSelected: _isTypeSelected(filters, ContentType.list),
             onSelected: () {
-              _toggleContentType(ref, ContentType.list, isAllSelected ? false : !filters.contentTypes!.contains(ContentType.list));
+              _toggleContentType(
+                ref,
+                ContentType.list,
+                !_isTypeSelected(filters, ContentType.list),
+              );
             },
           ),
 
           // Todo Items filter
           TemporalFilterChip(
             label: l10n.filterTodoItems,
-            isSelected: !isAllSelected &&
-                filters.contentTypes!.contains(ContentType.todoItem),
+            isSelected: _isTypeSelected(filters, ContentType.todoItem),
             onSelected: () {
-              _toggleContentType(ref, ContentType.todoItem, isAllSelected ? false : !filters.contentTypes!.contains(ContentType.todoItem));
+              _toggleContentType(
+                ref,
+                ContentType.todoItem,
+                !_isTypeSelected(filters, ContentType.todoItem),
+              );
             },
           ),
 
           // List Items filter
           TemporalFilterChip(
             label: l10n.filterListItems,
-            isSelected: !isAllSelected &&
-                filters.contentTypes!.contains(ContentType.listItem),
+            isSelected: _isTypeSelected(filters, ContentType.listItem),
             onSelected: () {
-              _toggleContentType(ref, ContentType.listItem, isAllSelected ? false : !filters.contentTypes!.contains(ContentType.listItem));
+              _toggleContentType(
+                ref,
+                ContentType.listItem,
+                !_isTypeSelected(filters, ContentType.listItem),
+              );
             },
           ),
         ],

@@ -23,6 +23,11 @@ class SearchController extends _$SearchController {
 
   @override
   Future<List<SearchResult>> build() async {
+    // Register cleanup callback to prevent memory leaks
+    ref.onDispose(() {
+      _debounceTimer?.cancel();
+    });
+
     // Initial state: empty list
     return [];
   }
@@ -89,10 +94,5 @@ class SearchController extends _$SearchController {
 
     // Reset to empty results
     state = const AsyncValue.data([]);
-  }
-
-  /// Cancels the debounce timer to prevent memory leaks
-  void dispose() {
-    _debounceTimer?.cancel();
   }
 }
