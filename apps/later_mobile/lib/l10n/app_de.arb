@@ -619,7 +619,7 @@
   "createModalNoteContentHint": "Notiz-Inhalt",
   "createModalNoteSmartFieldHint": "Notiz-Titel oder Inhalt...\n(Erste Zeile wird zum Titel)",
   "createModalListStyleLabel": "Listenstil",
-  "createModalListStyleBullets": "Aufzählungszeichen",
+  "createModalListStyleBullets": "Aufzählung",
   "createModalListStyleNumbered": "Nummeriert",
   "createModalListStyleCheckboxes": "Checkliste",
   "createModalListStyleSimple": "Einfach",
