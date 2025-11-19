@@ -584,7 +584,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get listDetailStyleDialogTitle => 'Stil auswählen';
 
   @override
-  String get listDetailStyleBullets => 'Aufzählungszeichen';
+  String get listDetailStyleBullets => 'Aufzählung';
 
   @override
   String get listDetailStyleBulletsDesc => 'Einfache Aufzählungspunkte';
@@ -939,6 +939,36 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get searchEmptyMessage =>
       'Versuchen Sie andere Suchbegriffe oder überprüfen Sie die Rechtschreibung';
+
+  @override
+  String get searchBarHint => 'Notizen, Aufgaben, Listen durchsuchen...';
+
+  @override
+  String get searchClearButton => 'Löschen';
+
+  @override
+  String get searchScreenTitle => 'Suchen';
+
+  @override
+  String searchInCurrentSpace(String spaceName) {
+    return 'In $spaceName suchen';
+  }
+
+  @override
+  String get filterTodoItems => 'Todo-Einträge';
+
+  @override
+  String get filterListItems => 'Listeneinträge';
+
+  @override
+  String searchResultInTodoList(String todoListName) {
+    return 'in $todoListName';
+  }
+
+  @override
+  String searchResultInList(String listName) {
+    return 'in $listName';
+  }
 
   @override
   String get accessibilityDragHandleHint =>

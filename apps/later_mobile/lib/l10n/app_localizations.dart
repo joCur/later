@@ -1724,6 +1724,54 @@ abstract class AppLocalizations {
   /// **'Try different keywords or check your spelling'**
   String get searchEmptyMessage;
 
+  /// Hint text for search bar input field
+  ///
+  /// In en, this message translates to:
+  /// **'Search notes, tasks, lists...'**
+  String get searchBarHint;
+
+  /// Tooltip for clear search button
+  ///
+  /// In en, this message translates to:
+  /// **'Clear'**
+  String get searchClearButton;
+
+  /// Title for search screen
+  ///
+  /// In en, this message translates to:
+  /// **'Search'**
+  String get searchScreenTitle;
+
+  /// Search scope indicator showing current space name
+  ///
+  /// In en, this message translates to:
+  /// **'Search in {spaceName}'**
+  String searchInCurrentSpace(String spaceName);
+
+  /// Filter chip label for showing only todo items (child items)
+  ///
+  /// In en, this message translates to:
+  /// **'Todo Items'**
+  String get filterTodoItems;
+
+  /// Filter chip label for showing only list items (child items)
+  ///
+  /// In en, this message translates to:
+  /// **'List Items'**
+  String get filterListItems;
+
+  /// Context label showing parent todo list name for todo items
+  ///
+  /// In en, this message translates to:
+  /// **'in {todoListName}'**
+  String searchResultInTodoList(String todoListName);
+
+  /// Context label showing parent list name for list items
+  ///
+  /// In en, this message translates to:
+  /// **'in {listName}'**
+  String searchResultInList(String listName);
+
   /// Accessibility hint for drag handle reordering interaction
   ///
   /// In en, this message translates to:

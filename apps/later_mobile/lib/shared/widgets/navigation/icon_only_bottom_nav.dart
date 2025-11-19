@@ -22,7 +22,7 @@ const double _kTouchTargetSize = 48.0; // WCAG AA compliant
 /// - Active icons: white with gradient underline
 ///
 /// Features:
-/// - Three tabs: Home, Search, Settings
+/// - Two tabs: Home, Settings
 /// - Smooth underline animation (200ms, ease-out curve)
 /// - Haptic feedback on tap
 /// - Semantic labels for screen readers
@@ -43,15 +43,15 @@ const double _kTouchTargetSize = 48.0; // WCAG AA compliant
 class IconOnlyBottomNav extends StatefulWidget {
   /// Creates an icon-only bottom navigation bar.
   ///
-  /// The [currentIndex] parameter must not be null and must be between 0 and 2.
+  /// The [currentIndex] parameter must not be null and must be between 0 and 1.
   /// The [onDestinationSelected] callback is called when the user taps a destination.
   const IconOnlyBottomNav({
     super.key,
     required this.currentIndex,
     required this.onDestinationSelected,
   }) : assert(
-         currentIndex >= 0 && currentIndex < 3,
-         'currentIndex must be between 0 and 2',
+         currentIndex >= 0 && currentIndex < 2,
+         'currentIndex must be between 0 and 1',
        );
 
   /// The index of the currently selected destination.
@@ -137,15 +137,6 @@ class _IconOnlyBottomNavState extends State<IconOnlyBottomNav>
             _buildNavItem(
               context: context,
               index: 1,
-              icon: Icons.search_outlined,
-              selectedIcon: Icons.search,
-              tooltip: l10n.navigationSearchTooltip,
-              semanticLabel: l10n.navigationSearchSemanticLabel,
-              isDarkMode: isDarkMode,
-            ),
-            _buildNavItem(
-              context: context,
-              index: 2,
               icon: Icons.settings_outlined,
               selectedIcon: Icons.settings,
               tooltip: l10n.navigationSettingsTooltip,

@@ -914,6 +914,36 @@ class AppLocalizationsEn extends AppLocalizations {
       'Try different keywords or check your spelling';
 
   @override
+  String get searchBarHint => 'Search notes, tasks, lists...';
+
+  @override
+  String get searchClearButton => 'Clear';
+
+  @override
+  String get searchScreenTitle => 'Search';
+
+  @override
+  String searchInCurrentSpace(String spaceName) {
+    return 'Search in $spaceName';
+  }
+
+  @override
+  String get filterTodoItems => 'Todo Items';
+
+  @override
+  String get filterListItems => 'List Items';
+
+  @override
+  String searchResultInTodoList(String todoListName) {
+    return 'in $todoListName';
+  }
+
+  @override
+  String searchResultInList(String listName) {
+    return 'in $listName';
+  }
+
+  @override
   String get accessibilityDragHandleHint => 'Double tap and hold to reorder';
 
   @override

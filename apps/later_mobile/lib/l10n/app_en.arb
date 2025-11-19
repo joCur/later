@@ -1534,6 +1534,64 @@
     "description": "Message for empty search state suggesting alternative search strategies"
   },
 
+  "searchBarHint": "Search notes, tasks, lists...",
+  "@searchBarHint": {
+    "description": "Hint text for search bar input field"
+  },
+
+  "searchClearButton": "Clear",
+  "@searchClearButton": {
+    "description": "Tooltip for clear search button"
+  },
+
+  "searchScreenTitle": "Search",
+  "@searchScreenTitle": {
+    "description": "Title for search screen"
+  },
+
+  "searchInCurrentSpace": "Search in {spaceName}",
+  "@searchInCurrentSpace": {
+    "description": "Search scope indicator showing current space name",
+    "placeholders": {
+      "spaceName": {
+        "type": "String",
+        "example": "Work"
+      }
+    }
+  },
+
+  "filterTodoItems": "Todo Items",
+  "@filterTodoItems": {
+    "description": "Filter chip label for showing only todo items (child items)"
+  },
+
+  "filterListItems": "List Items",
+  "@filterListItems": {
+    "description": "Filter chip label for showing only list items (child items)"
+  },
+
+  "searchResultInTodoList": "in {todoListName}",
+  "@searchResultInTodoList": {
+    "description": "Context label showing parent todo list name for todo items",
+    "placeholders": {
+      "todoListName": {
+        "type": "String",
+        "example": "Shopping List"
+      }
+    }
+  },
+
+  "searchResultInList": "in {listName}",
+  "@searchResultInList": {
+    "description": "Context label showing parent list name for list items",
+    "placeholders": {
+      "listName": {
+        "type": "String",
+        "example": "Reading List"
+      }
+    }
+  },
+
   "accessibilityDragHandleHint": "Double tap and hold to reorder",
   "@accessibilityDragHandleHint": {
     "description": "Accessibility hint for drag handle reordering interaction"

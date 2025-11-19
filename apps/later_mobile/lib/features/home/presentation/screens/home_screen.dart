@@ -15,9 +15,9 @@ import 'package:later_mobile/design_system/organisms/empty_states/welcome_state.
 import 'package:later_mobile/design_system/organisms/fab/responsive_fab.dart';
 import 'package:later_mobile/design_system/tokens/tokens.dart';
 
+import 'package:later_mobile/core/enums/content_type.dart';
 import 'package:later_mobile/core/responsive/breakpoints.dart';
 import 'package:later_mobile/core/theme/temporal_flow_theme.dart';
-import 'package:later_mobile/core/utils/item_type_detector.dart';
 import 'package:later_mobile/core/utils/responsive_modal.dart';
 import 'package:later_mobile/core/permissions/permissions.dart';
 import 'package:later_mobile/features/lists/domain/models/list_model.dart';
@@ -41,6 +41,7 @@ import 'package:later_mobile/shared/widgets/navigation/icon_only_bottom_nav.dart
 import 'package:later_mobile/features/lists/presentation/screens/list_detail_screen.dart';
 import 'package:later_mobile/features/notes/presentation/screens/note_detail_screen.dart';
 import 'package:later_mobile/features/todo_lists/presentation/screens/todo_list_detail_screen.dart';
+import 'package:later_mobile/features/search/presentation/screens/search_screen.dart';
 
 /// Main home screen for the Later app
 ///
@@ -502,9 +503,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         IconButton(
           icon: const Icon(Icons.search),
           onPressed: () {
-            debugPrint('Search tapped');
+            Navigator.of(context).push(
+              MaterialPageRoute<void>(
+                builder: (context) => const SearchScreen(),
+              ),
+            );
           },
-          tooltip: 'Search',
+          tooltip: l10n.navigationSearchTooltip,
           color: AppColors.textSecondary(context),
         ),
 
