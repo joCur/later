@@ -623,8 +623,9 @@ void main() {
         expect(json['user_id'], 'user-1');
         expect(json['name'], 'Work');
         expect(json['description'], 'Work tasks');
-        expect(json['total_item_count'], 20);
-        expect(json['completed_item_count'], 8);
+        // Count fields are computed aggregates and should NOT be serialized
+        expect(json.containsKey('total_item_count'), false);
+        expect(json.containsKey('completed_item_count'), false);
         expect(json['created_at'], createdAt.toIso8601String());
         expect(json['updated_at'], updatedAt.toIso8601String());
         expect(json['sort_order'], 2);
@@ -645,8 +646,9 @@ void main() {
         expect(json['user_id'], 'user-2');
         expect(json['name'], 'Simple');
         expect(json['description'], isNull);
-        expect(json['total_item_count'], 0);
-        expect(json['completed_item_count'], 0);
+        // Count fields are computed aggregates and should NOT be serialized
+        expect(json.containsKey('total_item_count'), false);
+        expect(json.containsKey('completed_item_count'), false);
         expect(json['sort_order'], 0);
       });
     });
@@ -866,8 +868,9 @@ void main() {
         expect(deserialized.userId, original.userId);
         expect(deserialized.name, original.name);
         expect(deserialized.description, original.description);
-        expect(deserialized.totalItemCount, original.totalItemCount);
-        expect(deserialized.completedItemCount, original.completedItemCount);
+        // Count fields are NOT serialized, so they default to 0 after deserialization
+        expect(deserialized.totalItemCount, 0);
+        expect(deserialized.completedItemCount, 0);
         expect(deserialized.createdAt, original.createdAt);
         expect(deserialized.updatedAt, original.updatedAt);
         expect(deserialized.sortOrder, original.sortOrder);
