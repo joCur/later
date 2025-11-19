@@ -119,6 +119,9 @@ class ListModel {
   }
 
   /// Convert to JSON for Supabase compatibility
+  ///
+  /// Note: totalItemCount and checkedItemCount are computed values from child items
+  /// and should not be written to the database.
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -127,8 +130,6 @@ class ListModel {
       'name': name,
       'icon': icon,
       'style': style.toJson(),
-      'total_item_count': totalItemCount,
-      'checked_item_count': checkedItemCount,
       'created_at': createdAt.toIso8601String(),
       'updated_at': updatedAt.toIso8601String(),
       'sort_order': sortOrder,

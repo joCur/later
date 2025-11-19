@@ -240,16 +240,12 @@ class TodoListRepository extends BaseRepository {
           .select()
           .single();
 
-      // Update parent todo list counts
-      await _updateTodoListCounts(todoItem.todoListId);
-
       return TodoItem.fromJson(response);
     });
   }
 
   /// Updates an existing todo item in Supabase.
   ///
-  /// If the completion status changes, updates the parent todo list's counts.
   /// RLS policies ensure users can only update items from their own todo lists.
   ///
   /// Parameters:
@@ -259,14 +255,6 @@ class TodoListRepository extends BaseRepository {
   ///   The updated todo item
   Future<TodoItem> updateTodoItem(TodoItem todoItem) async {
     return executeQuery(() async {
-      // Get the old item to check if completion status changed
-      final oldItemResponse = await supabase
-          .from('todo_items')
-          .select()
-          .eq('id', todoItem.id)
-          .single();
-      final oldItem = TodoItem.fromJson(oldItemResponse);
-
       final data = todoItem.toJson();
 
       final response = await supabase
@@ -276,18 +264,12 @@ class TodoListRepository extends BaseRepository {
           .select()
           .single();
 
-      // Update parent todo list counts if completion status changed
-      if (oldItem.isCompleted != todoItem.isCompleted) {
-        await _updateTodoListCounts(todoItem.todoListId);
-      }
-
       return TodoItem.fromJson(response);
     });
   }
 
   /// Deletes a todo item from Supabase.
   ///
-  /// After deleting the item, updates the parent todo list's aggregate counts.
   /// RLS policies ensure users can only delete items from their own todo lists.
   ///
   /// Parameters:
@@ -296,9 +278,6 @@ class TodoListRepository extends BaseRepository {
   Future<void> deleteTodoItem(String id, String todoListId) async {
     return executeQuery(() async {
       await supabase.from('todo_items').delete().eq('id', id);
-
-      // Update parent todo list counts
-      await _updateTodoListCounts(todoListId);
     });
   }
 
@@ -316,24 +295,5 @@ class TodoListRepository extends BaseRepository {
       // Use upsert to update multiple records at once
       await supabase.from('todo_items').upsert(updates);
     });
-  }
-
-  /// Private helper to update a todo list's aggregate counts.
-  ///
-  /// Fetches all items for the list and recalculates totalItemCount and completedItemCount.
-  Future<void> _updateTodoListCounts(String todoListId) async {
-    final items = await getTodoItemsByListId(todoListId);
-    final totalCount = items.length;
-    final completedCount = items.where((item) => item.isCompleted).length;
-
-    await supabase
-        .from('todo_lists')
-        .update({
-          'total_item_count': totalCount,
-          'completed_item_count': completedCount,
-          'updated_at': DateTime.now().toIso8601String(),
-        })
-        .eq('id', todoListId)
-        .eq('user_id', userId);
   }
 }
