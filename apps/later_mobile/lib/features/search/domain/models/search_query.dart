@@ -10,6 +10,8 @@ class SearchQuery {
     required this.spaceId,
     this.contentTypes,
     this.tags,
+    this.limit = 50,
+    this.offset = 0,
   });
 
   /// The search query string entered by the user
@@ -26,24 +28,34 @@ class SearchQuery {
   /// If provided, only return results that have ALL of these tags
   final List<String>? tags;
 
+  /// Maximum number of results to return per content type (default: 50)
+  final int limit;
+
+  /// Number of results to skip per content type (default: 0)
+  final int offset;
+
   /// Create a copy of this search query with updated fields
   SearchQuery copyWith({
     String? query,
     String? spaceId,
     List<ContentType>? contentTypes,
     List<String>? tags,
+    int? limit,
+    int? offset,
   }) {
     return SearchQuery(
       query: query ?? this.query,
       spaceId: spaceId ?? this.spaceId,
       contentTypes: contentTypes ?? this.contentTypes,
       tags: tags ?? this.tags,
+      limit: limit ?? this.limit,
+      offset: offset ?? this.offset,
     );
   }
 
   @override
   String toString() {
-    return 'SearchQuery(query: $query, spaceId: $spaceId, contentTypes: $contentTypes, tags: $tags)';
+    return 'SearchQuery(query: $query, spaceId: $spaceId, contentTypes: $contentTypes, tags: $tags, limit: $limit, offset: $offset)';
   }
 
   @override
@@ -54,7 +66,9 @@ class SearchQuery {
         other.query == query &&
         other.spaceId == spaceId &&
         _listEquals(other.contentTypes, contentTypes) &&
-        _listEquals(other.tags, tags);
+        _listEquals(other.tags, tags) &&
+        other.limit == limit &&
+        other.offset == offset;
   }
 
   @override
@@ -62,7 +76,9 @@ class SearchQuery {
     return query.hashCode ^
         spaceId.hashCode ^
         contentTypes.hashCode ^
-        tags.hashCode;
+        tags.hashCode ^
+        limit.hashCode ^
+        offset.hashCode;
   }
 
   /// Helper method to compare lists

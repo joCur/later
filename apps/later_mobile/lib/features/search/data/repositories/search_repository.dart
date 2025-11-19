@@ -13,6 +13,8 @@ import 'package:later_mobile/core/enums/content_type.dart';
 /// Provides search functionality across notes, todo lists, lists, todo items,
 /// and list items using PostgreSQL full-text search with GIN indexes.
 ///
+/// Supports pagination with configurable limit and offset parameters.
+///
 /// Usage:
 /// ```dart
 /// final repo = SearchRepository();
@@ -20,6 +22,8 @@ import 'package:later_mobile/core/enums/content_type.dart';
 ///   query: 'shopping',
 ///   spaceId: 'space-1',
 ///   contentTypes: [ContentType.note, ContentType.todoList],
+///   limit: 50,
+///   offset: 0,
 /// );
 /// final results = await repo.search(query);
 /// ```
@@ -101,7 +105,8 @@ class SearchRepository extends BaseRepository {
     // Note: We need to use .or() to search multiple fields
     final response = await queryBuilder
         .or('title.ilike.%${query.query}%,content.ilike.%${query.query}%')
-        .order('updated_at', ascending: false);
+        .order('updated_at', ascending: false)
+        .range(query.offset, query.offset + query.limit - 1);
 
     return (response as List<dynamic>)
         .map((json) => Note.fromJson(json as Map<String, dynamic>))
@@ -120,7 +125,8 @@ class SearchRepository extends BaseRepository {
         .eq('user_id', userId)
         .eq('space_id', query.spaceId)
         .or('name.ilike.%${query.query}%,description.ilike.%${query.query}%')
-        .order('updated_at', ascending: false);
+        .order('updated_at', ascending: false)
+        .range(query.offset, query.offset + query.limit - 1);
 
     return (response as List<dynamic>)
         .map((json) => TodoList.fromJson(json as Map<String, dynamic>))
@@ -140,7 +146,8 @@ class SearchRepository extends BaseRepository {
         .eq('user_id', userId)
         .eq('space_id', query.spaceId)
         .ilike('name', '%${query.query}%')
-        .order('updated_at', ascending: false);
+        .order('updated_at', ascending: false)
+        .range(query.offset, query.offset + query.limit - 1);
 
     return (response as List<dynamic>)
         .map((json) => ListModel.fromJson(json as Map<String, dynamic>))
@@ -168,7 +175,8 @@ class SearchRepository extends BaseRepository {
 
     // Search in both title and description using OR
     final response = await queryBuilder
-        .or('title.ilike.%${query.query}%,description.ilike.%${query.query}%');
+        .or('title.ilike.%${query.query}%,description.ilike.%${query.query}%')
+        .range(query.offset, query.offset + query.limit - 1);
 
     return (response as List<dynamic>).map((json) {
       final itemJson = Map<String, dynamic>.from(json as Map<String, dynamic>);
@@ -199,7 +207,8 @@ class SearchRepository extends BaseRepository {
         .select('*, lists!inner(id, name, space_id, user_id, updated_at)')
         .eq('lists.user_id', userId)
         .eq('lists.space_id', query.spaceId)
-        .or('title.ilike.%${query.query}%,notes.ilike.%${query.query}%');
+        .or('title.ilike.%${query.query}%,notes.ilike.%${query.query}%')
+        .range(query.offset, query.offset + query.limit - 1);
 
     return (response as List<dynamic>).map((json) {
       final itemJson = Map<String, dynamic>.from(json as Map<String, dynamic>);

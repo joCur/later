@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:later_mobile/design_system/design_system.dart';
 import 'package:later_mobile/features/search/domain/models/models.dart';
@@ -17,6 +18,7 @@ import 'package:later_mobile/l10n/app_localizations.dart';
 /// - Real-time search results
 /// - Empty state handling
 /// - Error state handling
+/// - Keyboard shortcuts: Escape to clear search
 class SearchScreen extends ConsumerStatefulWidget {
   const SearchScreen({
     super.key,
@@ -101,7 +103,17 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     final l10n = AppLocalizations.of(context)!;
     final searchState = ref.watch(searchControllerProvider);
 
-    return Scaffold(
+    return Focus(
+      onKeyEvent: (node, event) {
+        // Handle Escape key to clear search
+        if (event is KeyDownEvent &&
+            event.logicalKey == LogicalKeyboardKey.escape) {
+          _clearSearch();
+          return KeyEventResult.handled;
+        }
+        return KeyEventResult.ignored;
+      },
+      child: Scaffold(
       appBar: AppBar(
         title: TextField(
           controller: _searchController,
@@ -171,6 +183,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
             ),
           ),
         ],
+      ),
       ),
     );
   }
