@@ -352,7 +352,7 @@ Implement a complete CI/CD pipeline for the Later Flutter mobile app that:
 
 **Important Note**: This project uses **squash merging** for pull requests. This means individual commit messages in feature branches don't matter for versioning - only the **PR title** (which becomes the squash commit message) triggers version bumps. This simplifies the workflow significantly.
 
-- [ ] Task 4.1: Create initial git tag for version baseline
+- [x] Task 4.1: Create initial git tag for version baseline
   - Ensure you're on `main` branch and it's up to date:
     ```bash
     git checkout main
@@ -383,7 +383,7 @@ Implement a complete CI/CD pipeline for the Later Flutter mobile app that:
     - This ensures the PR title becomes the commit message on main (critical for semantic versioning)
   - Click **"Save changes"** at the bottom
 
-- [ ] Task 4.3: Document PR title guidelines for team
+- [x] Task 4.3: Document PR title guidelines for team
   - Create `.github/CONTRIBUTING.md` with PR title format guidelines:
     ```bash
     mkdir -p .github
@@ -469,7 +469,7 @@ Implement a complete CI/CD pipeline for the Later Flutter mobile app that:
     git push origin feat/ci-cd-play-store-automation
     ```
 
-- [ ] Task 4.4: (Optional) Create PR template with title reminder
+- [x] Task 4.4: (Optional) Create PR template with title reminder
   - Create `.github/pull_request_template.md` to remind developers about PR title format:
     ```bash
     cd .github
