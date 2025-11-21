@@ -372,7 +372,7 @@ Implement a complete CI/CD pipeline for the Later Flutter mobile app that:
     ```
     (Should show `v1.0.0`)
 
-- [ ] Task 4.2: Configure GitHub repository for squash merge
+- [x] Task 4.2: Configure GitHub repository for squash merge
   - Navigate to your GitHub repository settings: https://github.com/[YOUR-USERNAME]/later/settings
   - Scroll to **"Pull Requests"** section
   - **Enable** "Allow squash merging" checkbox (if not already enabled)
