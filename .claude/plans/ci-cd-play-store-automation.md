@@ -350,6 +350,8 @@ Implement a complete CI/CD pipeline for the Later Flutter mobile app that:
 
 **Prerequisites**: Git repository with commit history
 
+**Important Note**: This project uses **squash merging** for pull requests. This means individual commit messages in feature branches don't matter for versioning - only the **PR title** (which becomes the squash commit message) triggers version bumps. This simplifies the workflow significantly.
+
 - [ ] Task 4.1: Create initial git tag for version baseline
   - Ensure you're on `main` branch and it's up to date:
     ```bash
@@ -370,8 +372,19 @@ Implement a complete CI/CD pipeline for the Later Flutter mobile app that:
     ```
     (Should show `v1.0.0`)
 
-- [ ] Task 4.2: Document Conventional Commits guidelines for team
-  - Create `.github/CONTRIBUTING.md` with commit message format guidelines:
+- [ ] Task 4.2: Configure GitHub repository for squash merge
+  - Navigate to your GitHub repository settings: https://github.com/[YOUR-USERNAME]/later/settings
+  - Scroll to **"Pull Requests"** section
+  - **Enable** "Allow squash merging" checkbox (if not already enabled)
+  - **Disable** "Allow merge commits" (optional, but recommended to enforce squash merge)
+  - **Disable** "Allow rebase merging" (optional, but recommended to enforce squash merge)
+  - Under **"Allow squash merging"**, select:
+    - Default commit message: **"Pull request title"**
+    - This ensures the PR title becomes the commit message on main (critical for semantic versioning)
+  - Click **"Save changes"** at the bottom
+
+- [ ] Task 4.3: Document PR title guidelines for team
+  - Create `.github/CONTRIBUTING.md` with PR title format guidelines:
     ```bash
     mkdir -p .github
     ```
@@ -379,18 +392,20 @@ Implement a complete CI/CD pipeline for the Later Flutter mobile app that:
     ```markdown
     # Contributing to Later
 
-    ## Commit Message Guidelines
+    ## Pull Request Guidelines
 
-    We follow [Conventional Commits](https://www.conventionalcommits.org/) for automated semantic versioning.
+    We use **squash merging** for all pull requests and follow [Conventional Commits](https://www.conventionalcommits.org/) for automated semantic versioning.
 
-    ### Format
+    ### Important: PR Title Format
+
+    **Your PR title determines the version bump** - it becomes the commit message on `main` after squash merge.
+
+    Individual commits in your feature branch can use any format - only the PR title matters.
+
+    ### PR Title Format
 
     ```
     <type>(<scope>): <description>
-
-    [optional body]
-
-    [optional footer]
     ```
 
     ### Types
@@ -407,116 +422,103 @@ Implement a complete CI/CD pipeline for the Later Flutter mobile app that:
 
     ### Breaking Changes
 
-    To trigger a MAJOR version bump (e.g., 1.0.0 → 2.0.0):
+    To trigger a MAJOR version bump (e.g., 1.0.0 → 2.0.0), add `!` after the type:
 
     ```
     feat!: change API endpoint structure
-
-    BREAKING CHANGE: The API endpoint /api/v1/items is now /api/v2/items
     ```
+
+    Or include `BREAKING CHANGE:` in the PR description.
 
     ### Examples
 
-    Good commit messages:
+    **Good PR titles:**
     - `feat(notes): add full-text search for notes`
     - `fix(auth): resolve session timeout issue`
     - `docs: update installation instructions`
     - `refactor(ui): simplify button component structure`
     - `test(models): add tests for TodoList serialization`
+    - `feat!: migrate to new authentication system` (MAJOR bump)
 
-    Bad commit messages:
-    - `update stuff` (no type, unclear description)
-    - `Fix bug` (capitalized, not specific enough)
+    **Bad PR titles:**
+    - `Update stuff` (no type, unclear description)
+    - `Fix bug` (not lowercase, not specific enough)
     - `feat:add feature` (missing space after colon)
-    - `added new search feature` (wrong tense, no type)
+    - `Added new search feature` (wrong tense, no type)
 
     ### Version Mapping
 
-    - `feat:` commits → Bump MINOR version (1.0.0 → 1.1.0)
-    - `fix:` commits → Bump PATCH version (1.0.0 → 1.0.1)
+    - `feat:` in PR title → Bump MINOR version (1.0.0 → 1.1.0)
+    - `fix:` in PR title → Bump PATCH version (1.0.0 → 1.0.1)
     - `feat!:` or `BREAKING CHANGE:` → Bump MAJOR version (1.0.0 → 2.0.0)
     - Other types (`docs:`, `chore:`, etc.) → No version bump
+
+    ### Workflow
+
+    1. Create feature branch with any commit style you prefer
+    2. Open PR with conventional commit format in **title**
+    3. PR checks run automatically (build, test, analyze)
+    4. After approval, merge with **squash merge**
+    5. PR title becomes commit on `main`
+    6. Deployment workflow automatically calculates version and publishes to Play Store
     ```
   - Commit the guidelines:
     ```bash
     git add .github/CONTRIBUTING.md
-    git commit -m "docs: add Conventional Commits guidelines for semantic versioning"
-    git push origin main
+    git commit -m "docs: add PR title guidelines for semantic versioning with squash merge"
+    git push origin feat/ci-cd-play-store-automation
     ```
 
-- [ ] Task 4.3: (Optional) Set up commit message linting locally
-  - This step adds git hooks to validate commit messages before they're pushed (prevents invalid commits from breaking version calculation)
-  - Navigate to Flutter app directory:
+- [ ] Task 4.4: (Optional) Create PR template with title reminder
+  - Create `.github/pull_request_template.md` to remind developers about PR title format:
     ```bash
-    cd apps/later_mobile
+    cd .github
     ```
-  - Add Dart commit linting packages to dev dependencies:
-    ```bash
-    dart pub add --dev commitlint_cli
-    dart pub add --dev husky
-    dart pub get
-    ```
-  - Initialize Husky git hooks:
-    ```bash
-    dart run husky install
-    ```
-  - Create commit message hook:
-    ```bash
-    dart run husky add .husky/commit-msg 'dart run commitlint_cli --edit $1'
-    ```
-  - Create `commitlint.yaml` at repository root (not inside `apps/later_mobile`, but at `/Users/jonascurth/later/commitlint.yaml`):
-    ```bash
-    cd /Users/jonascurth/later
-    ```
-  - Create file with these validation rules:
-    ```yaml
-    include: package:commitlint_cli/commitlint.yaml
+  - Create the file with this content:
+    ```markdown
+    ## Description
+    <!-- Describe your changes in detail -->
 
-    rules:
-      # Enforce type is one of the allowed values
-      type-enum:
-        - error
-        - always
-        - [feat, fix, docs, style, refactor, test, chore, perf, ci]
+    ## Type of Change
+    <!-- Check the one that applies -->
+    - [ ] `feat`: New feature (MINOR version bump)
+    - [ ] `fix`: Bug fix (PATCH version bump)
+    - [ ] `docs`: Documentation only
+    - [ ] `style`: Code style/formatting
+    - [ ] `refactor`: Code refactoring
+    - [ ] `test`: Adding/updating tests
+    - [ ] `chore`: Maintenance tasks
+    - [ ] `perf`: Performance improvement
+    - [ ] `ci`: CI/CD changes
 
-      # Type must be lowercase
-      type-case:
-        - error
-        - always
-        - lower-case
+    ## Breaking Changes
+    - [ ] This PR includes breaking changes (add `!` to PR title for MAJOR version bump)
 
-      # Subject cannot be empty
-      subject-empty:
-        - error
-        - never
-
-      # Subject cannot end with period
-      subject-full-stop:
-        - error
-        - never
-        - '.'
-
-      # Header (type + subject) max length
-      header-max-length:
-        - warning
-        - always
-        - 72
+    ## PR Title Format Reminder
+    **Important**: Your PR title must follow Conventional Commits format:
     ```
-  - Test the linting locally:
+    <type>(<scope>): <description>
+    ```
+
+    Example: `feat(notes): add full-text search`
+
+    The PR title becomes the commit message after squash merge and determines the version bump.
+
+    ## Testing
+    <!-- Describe how you tested these changes -->
+
+    ## Checklist
+    - [ ] Code follows project style guidelines
+    - [ ] Tests pass locally
+    - [ ] PR title follows conventional commit format
+    - [ ] Documentation updated (if needed)
+    ```
+  - Commit the PR template:
     ```bash
-    # This should fail with validation error:
-    git commit --allow-empty -m "bad message"
-
-    # This should succeed:
-    git commit --allow-empty -m "test: verify commit linting"
+    git add .github/pull_request_template.md
+    git commit -m "docs: add PR template with conventional commit reminder"
+    git push origin feat/ci-cd-play-store-automation
     ```
-  - Commit the linting setup:
-    ```bash
-    git add apps/later_mobile/pubspec.yaml apps/later_mobile/pubspec.lock commitlint.yaml .husky/
-    git commit -m "ci: add commit message linting with commitlint and husky"
-    git push origin main
-    ```
-  - **Note**: If this optional step is too restrictive for your team, you can skip it and rely on PR reviews to catch invalid commit messages
 
 ### Phase 5: GitHub Actions Workflow Implementation
 
@@ -901,7 +903,7 @@ Implement a complete CI/CD pipeline for the Later Flutter mobile app that:
   - Launch the app and verify it works (test login, create space, create note, etc.)
   - Verify Supabase connection works (data syncs to cloud)
 
-- [ ] Task 6.4: Test CI/CD pipeline with a new feature commit
+- [ ] Task 6.4: Test CI/CD pipeline with a pull request
   - Create a test branch:
     ```bash
     git checkout -b test/ci-cd-pipeline
@@ -912,35 +914,38 @@ Implement a complete CI/CD pipeline for the Later Flutter mobile app that:
     echo "# Test CI/CD pipeline" >> pubspec.yaml
     git add pubspec.yaml
     ```
-  - Commit with a `feat:` prefix to trigger MINOR version bump:
+  - Commit with any message (individual commits don't matter with squash merge):
     ```bash
-    git commit -m "feat(ci): test automated deployment pipeline
-
-    This commit tests the complete CI/CD pipeline including:
-    - Semantic version calculation from conventional commits
-    - Automated AAB build with Supabase env vars
-    - Play Store internal testing deployment"
+    git commit -m "test pipeline automation"
     git push origin test/ci-cd-pipeline
     ```
   - Create pull request on GitHub:
     - Navigate to repository: https://github.com/[YOUR-USERNAME]/later
     - Click "Compare & pull request" for the pushed branch
-    - Title: "Test: CI/CD Pipeline Automation"
-    - Description: "Testing the automated deployment pipeline setup"
+    - **IMPORTANT: Set PR title with conventional commit format** (this becomes the squash commit):
+      - Title: `feat(ci): test automated deployment pipeline`
+    - Description:
+      ```
+      Testing the complete CI/CD pipeline including:
+      - Semantic version calculation from PR title
+      - Automated AAB build with Supabase env vars
+      - Play Store internal testing deployment
+      ```
     - Click "Create pull request"
   - Verify PR checks run successfully:
     - Go to **Checks** tab in the PR
     - Wait for "PR Checks - Build and Test" workflow to complete
     - Verify all steps succeed (green checkmarks)
     - If failures occur, review logs and fix issues
-  - Merge the PR:
-    - Click "Merge pull request"
-    - Click "Confirm merge"
+  - Merge the PR with squash merge:
+    - Click "Squash and merge" button (NOT "Merge pull request")
+    - Verify the commit message shows: `feat(ci): test automated deployment pipeline`
+    - Click "Confirm squash and merge"
   - Monitor deployment workflow:
     - Go to **Actions** tab
     - Click on "Deploy to Play Store Internal Testing" workflow run
     - Watch the steps execute:
-      - Version calculation (should show 1.1.0 since v1.0.0 + feat commit)
+      - Version calculation (should show 1.1.0 since v1.0.0 + feat: in PR title)
       - pubspec.yaml update
       - Build
       - Upload to Play Store
@@ -998,14 +1003,15 @@ Implement a complete CI/CD pipeline for the Later Flutter mobile app that:
   - Rotate service account keys every 90 days
 - **Monitoring**: Set calendar reminder to verify keystore backup exists and is accessible quarterly
 
-**Challenge 4: Conventional Commits Adoption**
-- **Issue**: Team members may not be familiar with Conventional Commits format. Invalid commit messages break semantic versioning.
+**Challenge 4: PR Title Format Enforcement**
+- **Issue**: Team members may forget to use Conventional Commits format in PR titles. Invalid PR titles break semantic versioning.
 - **Mitigation**:
-  - Comprehensive documentation in `.github/CONTRIBUTING.md` (Phase 4 Task 4.2)
-  - Optional commit linting with Husky (Phase 4 Task 4.3) blocks invalid commits locally
-  - PR template can include commit format reminder
+  - Configure GitHub to use squash merge only (Phase 4 Task 4.2) - simplifies workflow
+  - Comprehensive documentation in `.github/CONTRIBUTING.md` (Phase 4 Task 4.3) explains PR title importance
+  - Optional PR template (Phase 4 Task 4.4) reminds developers of format requirements
   - Version calculation falls back to `patch` bump if no matching commits (via `noVersionBumpBehavior` in workflow)
-- **Training**: Share CONTRIBUTING.md with team before enabling automation. Review commit message format in PR reviews.
+  - Individual commits in feature branches can use any format - only PR title matters
+- **Training**: Share CONTRIBUTING.md with team before enabling automation. Review PR titles in code reviews before merging.
 
 **Challenge 5: Supabase Environment Variables Management**
 - **Issue**: Hardcoded Supabase credentials in code are security risk. CI/CD must inject credentials without exposing them in logs.
