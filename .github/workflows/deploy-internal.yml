@@ -71,6 +71,13 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
+      - name: Create dummy .env file for tests
+        run: |
+          cat > .env << EOF
+          SUPABASE_URL=dummy
+          SUPABASE_ANON_KEY=dummy
+          EOF
+
       - name: Run tests
         run: flutter test
 
