@@ -372,6 +372,55 @@ void main() {
       verify(mockService.checkAuthStatus()).called(2); // Initial + initialize
     });
 
+    test('resetToUnauthenticated sets state to unauthenticated', () async {
+      // Arrange - start with error state
+      const expectedError = AppError(
+        code: ErrorCode.authInvalidCredentials,
+        message: 'Invalid credentials',
+      );
+      when(mockService.checkAuthStatus()).thenReturn(null);
+      when(mockService.authStateChanges()).thenAnswer(
+        (_) => Stream<AuthState>.value(
+          const AuthState(AuthChangeEvent.signedOut, null),
+        ),
+      );
+      when(mockService.signIn(
+        email: anyNamed('email'),
+        password: anyNamed('password'),
+      )).thenThrow(expectedError);
+
+      final container = ProviderContainer(
+        overrides: [
+          authApplicationServiceProvider.overrideWithValue(mockService),
+        ],
+      );
+      addTearDown(container.dispose);
+
+      // Wait for initial state
+      await container.read(authStateControllerProvider.future);
+
+      // Trigger error state
+      final controller = container.read(authStateControllerProvider.notifier);
+      await controller.signIn(
+        email: 'test@example.com',
+        password: 'wrongpassword',
+      );
+
+      // Verify error state exists
+      var currentState = container.read(authStateControllerProvider);
+      expect(currentState.hasError, true);
+
+      // Act - reset to unauthenticated
+      controller.resetToUnauthenticated();
+
+      // Assert - state should be data(null) with no error
+      currentState = container.read(authStateControllerProvider);
+      expect(currentState.hasValue, true);
+      expect(currentState.value, isNull);
+      expect(currentState.hasError, false);
+      expect(currentState.isLoading, false);
+    });
+
     // Note: Testing auth state stream updates is complex in unit tests
     // because the controller's stream subscription runs asynchronously.
     // This behavior is verified through the other controller tests

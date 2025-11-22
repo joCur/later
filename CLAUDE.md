@@ -93,6 +93,17 @@ dart run build_runner clean                                # Clean generated fil
 - `AuthGate` widget - Routes between auth screens and main app based on auth state
 - All repositories automatically filter data by `user_id` from current auth session
 
+**Authentication Error Handling Pattern:**
+- Auth screens (SignInScreen, SignUpScreen) use `ref.listen` to intercept error states inline
+- When auth operations fail:
+  1. Error is caught in `ref.listen` callback
+  2. Error is displayed inline via `ErrorHandler.showErrorSnackBar()`
+  3. `AuthStateController.resetToUnauthenticated()` is called to reset state to `AsyncValue.data(null)`
+  4. User stays on auth screen (no navigation to error page)
+- This pattern prevents `AuthGate` from showing error screen for expected auth failures
+- Unexpected/system errors still fall through to `AuthGate` error screen as fallback
+- Example implementation in SignInScreen:76-121
+
 **State Management:**
 - **Riverpod 3.0.3** for state management (migrated from Provider in November 2025)
 - Feature-first architecture with Clean Architecture layers (Domain, Data, Application, Presentation)
