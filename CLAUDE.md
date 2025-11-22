@@ -493,6 +493,99 @@ testWidgets('my test', (tester) async {
 - German strings are typically 30-40% longer than English - test layouts with German locale
 - Accessibility labels should also be localized
 
+## Contributing and Pull Request Guidelines
+
+This project uses **automated semantic versioning** with CI/CD deployment to Google Play Store. Understanding the PR workflow is critical for all contributions.
+
+### Pull Request Workflow
+
+**Important**: This project uses **squash merging** for all pull requests. Only the PR title matters for versioning - individual commit messages in feature branches can use any format.
+
+**PR Title Format (Required):**
+```
+<type>(<scope>): <description>
+```
+
+**Examples:**
+- `feat(notes): add full-text search for notes` → MINOR version bump (1.0.0 → 1.1.0)
+- `fix(auth): resolve session timeout issue` → PATCH version bump (1.0.0 → 1.0.1)
+- `feat!: migrate to new authentication system` → MAJOR version bump (1.0.0 → 2.0.0)
+- `docs: update installation instructions` → No version bump
+
+**Commit Types:**
+- `feat`: New feature (MINOR bump)
+- `fix`: Bug fix (PATCH bump)
+- `docs`: Documentation only (no bump)
+- `style`: Code formatting (no bump)
+- `refactor`: Code refactoring (no bump)
+- `test`: Adding/updating tests (no bump)
+- `chore`: Maintenance tasks (no bump)
+- `perf`: Performance improvements (no bump)
+- `ci`: CI/CD changes (no bump)
+
+**Breaking Changes:**
+Add `!` after type for MAJOR version bump: `feat!: breaking change description`
+
+**Complete Guidelines:**
+See `.github/CONTRIBUTING.md` for comprehensive PR title guidelines and examples.
+
+**PR Template:**
+The repository includes a PR template (`.github/pull_request_template.md`) that automatically reminds contributors of:
+- Conventional commit format requirements
+- Type of change checklist
+- Breaking change identification
+- Testing requirements
+
+### CI/CD Automation
+
+**PR Checks (runs on every PR):**
+- Flutter analyze (code quality)
+- Flutter test (all tests must pass)
+- Build APK (validation only, not deployed)
+
+**Deployment (runs on merge to main):**
+- Calculates semantic version from PR title (after squash merge)
+- Updates `pubspec.yaml` automatically
+- Runs tests again as safety check
+- Builds signed AAB with Supabase environment variables
+- Deploys to Google Play Store Internal Testing
+- Creates git tag (e.g., `v1.1.0`)
+- Creates GitHub Release with version notes
+
+**Version Calculation:**
+- Uses `ietf-tools/semver-action` to parse commit messages
+- Follows Conventional Commits specification
+- Build number is GitHub run number (always incrementing)
+- Format: `MAJOR.MINOR.PATCH+BUILD_NUMBER` (e.g., `1.2.3+42`)
+
+**Important Notes for Contributors:**
+1. **ALWAYS use conventional commit format in PR titles** - this is not optional
+2. Individual commits in your feature branch can use any format you prefer
+3. PR title becomes the squash commit message on `main`
+4. Invalid PR titles won't break the build but will cause incorrect versioning
+5. All tests must pass before merge is allowed
+6. After merge, deployment to Play Store is automatic
+
+### Working on this Project
+
+**Feature Development:**
+1. Create feature branch: `git checkout -b feat/my-feature`
+2. Make changes with any commit style you prefer
+3. Push branch and create PR with **conventional commit format in title**
+4. Wait for PR checks to pass (build + test)
+5. Get approval from maintainer
+6. Merge with **squash merge** (enforced in GitHub settings)
+7. Deployment workflow runs automatically
+
+**Bug Fixes:**
+1. Create fix branch: `git checkout -b fix/issue-description`
+2. Fix the bug and add tests
+3. Create PR with title: `fix(scope): description of fix`
+4. Merge triggers PATCH version bump (e.g., 1.0.0 → 1.0.1)
+
+**Documentation Updates:**
+Use `docs:` prefix in PR title - no version bump will occur.
+
 ## Code Quality Standards
 
 ### Linting Configuration
@@ -741,6 +834,9 @@ flutter run             # Run the app
 
 ## Documentation References
 
+- **Contributing Guidelines**: `.github/CONTRIBUTING.md` - PR title format and semantic versioning
+- **PR Template**: `.github/pull_request_template.md` - Conventional commit reminder
+- **CI/CD Plan**: `.claude/plans/ci-cd-play-store-automation.md` - Complete CI/CD implementation plan
 - **Design System**: `design-documentation/design-system/`
 - **Style Guide**: `design-documentation/design-system/style-guide.md`
 - **Implementation Guide**: `design-documentation/IMPLEMENTATION-GUIDE.md`
