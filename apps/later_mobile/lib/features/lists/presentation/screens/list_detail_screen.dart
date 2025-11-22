@@ -118,7 +118,7 @@ class _ListDetailScreenState extends ConsumerState<ListDetailScreen> {
             (l) => l.id == _currentList.id,
             orElse: () => _currentList,
           );
-          if (mounted && updated != _currentList) {
+          if (mounted) {
             setState(() {
               _currentList = updated;
             });
@@ -584,6 +584,24 @@ class _ListDetailScreenState extends ConsumerState<ListDetailScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
 
+    // Watch item controller for live count calculation
+    final itemsAsyncValue = ref.watch(listItemsControllerProvider(widget.list.id));
+
+    // Calculate counts from items for live updates
+    final int? calculatedTotalCount = itemsAsyncValue.whenOrNull(
+      data: (items) => items.length,
+    );
+    final int? calculatedCheckedCount = itemsAsyncValue.whenOrNull(
+      data: (items) => items.where((item) => item.isChecked).length,
+    );
+    final double? calculatedProgress = itemsAsyncValue.whenOrNull(
+      data: (items) {
+        if (items.isEmpty) return 0.0;
+        final checkedCount = items.where((item) => item.isChecked).length;
+        return checkedCount / items.length;
+      },
+    );
+
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: (didPop, result) async {
@@ -702,8 +720,8 @@ class _ListDetailScreenState extends ConsumerState<ListDetailScreen> {
                   children: [
                     Text(
                       l10n.listDetailProgressCompleted(
-                        _currentList.checkedItemCount,
-                        _currentList.totalItemCount,
+                        calculatedCheckedCount ?? _currentList.checkedItemCount,
+                        calculatedTotalCount ?? _currentList.totalItemCount,
                       ),
                       style: AppTypography.bodyMedium.copyWith(
                         color: Colors.white,
@@ -712,7 +730,7 @@ class _ListDetailScreenState extends ConsumerState<ListDetailScreen> {
                     ),
                     const SizedBox(height: AppSpacing.sm),
                     LinearProgressIndicator(
-                      value: _currentList.progress,
+                      value: calculatedProgress ?? _currentList.progress,
                       backgroundColor: Colors.white.withValues(alpha: 0.3),
                       valueColor: const AlwaysStoppedAnimation<Color>(
                         Colors.white,
