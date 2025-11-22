@@ -48,12 +48,12 @@ class AuthStateController extends _$AuthStateController {
 
   /// Sign up a new user with email and password
   ///
-  /// Updates state to loading, then data or error based on result.
+  /// Does NOT update state during operation - auth operation state is managed locally in UI.
+  /// Only updates state on success (authenticated user).
+  /// Throws error on failure for UI to handle inline.
+  ///
   /// Uses `ref.mounted` to prevent state updates after disposal.
   Future<void> signUp({required String email, required String password}) async {
-    // Set loading state
-    state = const AsyncValue.loading();
-
     try {
       final service = ref.read(authApplicationServiceProvider);
       final user = await service.signUp(email: email, password: password);
@@ -61,23 +61,22 @@ class AuthStateController extends _$AuthStateController {
       // Check if still mounted before updating
       if (!ref.mounted) return;
 
+      // Only update state on SUCCESS - user is now authenticated
       state = AsyncValue.data(user);
-    } catch (error, stackTrace) {
-      // Check if still mounted before updating
-      if (!ref.mounted) return;
-
-      state = AsyncValue.error(error, stackTrace);
+    } catch (error) {
+      // Don't update state on error - just rethrow for UI to handle
+      rethrow;
     }
   }
 
   /// Sign in an existing user with email and password
   ///
-  /// Updates state to loading, then data or error based on result.
+  /// Does NOT update state during operation - auth operation state is managed locally in UI.
+  /// Only updates state on success (authenticated user).
+  /// Throws error on failure for UI to handle inline.
+  ///
   /// Uses `ref.mounted` to prevent state updates after disposal.
   Future<void> signIn({required String email, required String password}) async {
-    // Set loading state
-    state = const AsyncValue.loading();
-
     try {
       final service = ref.read(authApplicationServiceProvider);
       final user = await service.signIn(email: email, password: password);
@@ -85,12 +84,11 @@ class AuthStateController extends _$AuthStateController {
       // Check if still mounted before updating
       if (!ref.mounted) return;
 
+      // Only update state on SUCCESS - user is now authenticated
       state = AsyncValue.data(user);
-    } catch (error, stackTrace) {
-      // Check if still mounted before updating
-      if (!ref.mounted) return;
-
-      state = AsyncValue.error(error, stackTrace);
+    } catch (error) {
+      // Don't update state on error - just rethrow for UI to handle
+      rethrow;
     }
   }
 
@@ -139,15 +137,6 @@ class AuthStateController extends _$AuthStateController {
 
       state = AsyncValue.error(error, stackTrace);
     }
-  }
-
-  /// Reset authentication state to unauthenticated
-  ///
-  /// Sets the state to AsyncValue.data(null) to indicate no authenticated user.
-  /// Used to clear error states after displaying inline errors to prevent
-  /// AuthGate from showing the error screen.
-  void resetToUnauthenticated() {
-    state = const AsyncValue.data(null);
   }
 
   /// Upgrade an anonymous user to a full account
@@ -199,12 +188,12 @@ class AuthStateController extends _$AuthStateController {
   /// without creating a permanent account. Anonymous users can later upgrade
   /// to a full account while keeping their data.
   ///
-  /// Updates state to loading, then data or error based on result.
+  /// Does NOT update state during operation - auth operation state is managed locally in UI.
+  /// Only updates state on success (authenticated user).
+  /// Throws error on failure for UI to handle inline.
+  ///
   /// Uses `ref.mounted` to prevent state updates after disposal.
   Future<void> signInAnonymously() async {
-    // Set loading state
-    state = const AsyncValue.loading();
-
     try {
       final authService = ref.read(authServiceProvider);
       final user = await authService.signInAnonymously();
@@ -212,12 +201,11 @@ class AuthStateController extends _$AuthStateController {
       // Check if still mounted before updating
       if (!ref.mounted) return;
 
+      // Only update state on SUCCESS - user is now authenticated
       state = AsyncValue.data(user);
-    } catch (error, stackTrace) {
-      // Check if still mounted before updating
-      if (!ref.mounted) return;
-
-      state = AsyncValue.error(error, stackTrace);
+    } catch (error) {
+      // Don't update state on error - just rethrow for UI to handle
+      rethrow;
     }
   }
 }

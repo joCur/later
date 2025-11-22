@@ -29,6 +29,8 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
   bool _isFormValid = false;
   bool _isEmailValid = false;
   bool _isPasswordValid = false;
+  bool _isSigningIn = false; // Local loading state for sign-in operation
+  bool _isSigningInAnonymously = false; // Local loading state for anonymous sign-in
 
   @override
   void initState() {
@@ -76,19 +78,38 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
       return;
     }
 
-    await ref.read(authStateControllerProvider.notifier).signIn(
-          email: _emailController.text.trim(),
-          password: _passwordController.text,
-        );
+    setState(() => _isSigningIn = true);
 
-    // Error handling is done through AsyncValue.error
-    // The UI will show the error message automatically
+    try {
+      await ref.read(authStateControllerProvider.notifier).signIn(
+            email: _emailController.text.trim(),
+            password: _passwordController.text,
+          );
+    } catch (error) {
+      // Catch error and display inline
+      if (mounted) {
+        setState(() => _isSigningIn = false);
+        if (error is AppError) {
+          ErrorHandler.showErrorSnackBar(context, error);
+        }
+      }
+    }
   }
 
   Future<void> _handleContinueWithoutAccount() async {
-    await ref.read(authStateControllerProvider.notifier).signInAnonymously();
-    // Error handling is done through AsyncValue.error
-    // The UI will show the error message automatically
+    setState(() => _isSigningInAnonymously = true);
+
+    try {
+      await ref.read(authStateControllerProvider.notifier).signInAnonymously();
+    } catch (error) {
+      // Catch error and display inline
+      if (mounted) {
+        setState(() => _isSigningInAnonymously = false);
+        if (error is AppError) {
+          ErrorHandler.showErrorSnackBar(context, error);
+        }
+      }
+    }
   }
 
   void _navigateToSignUp() {
@@ -99,29 +120,10 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final authState = ref.watch(authStateControllerProvider);
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    // Listen for auth errors and display inline
-    ref.listen(authStateControllerProvider, (previous, next) {
-      next.whenOrNull(
-        error: (error, stackTrace) {
-          // Show error inline
-          final appError = error as AppError;
-          ErrorHandler.showErrorSnackBar(context, appError);
-
-          // Reset auth state to prevent AuthGate showing error screen
-          Future.microtask(() {
-            if (mounted) {
-              ref.read(authStateControllerProvider.notifier).resetToUnauthenticated();
-            }
-          });
-        },
-      );
-    });
-
-    // Extract loading state
-    final isLoading = authState.isLoading;
+    // Use local loading state for auth operations
+    final isLoading = _isSigningIn || _isSigningInAnonymously;
 
     return Scaffold(
       body: Stack(

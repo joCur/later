@@ -33,6 +33,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
   bool _isEmailValid = false;
   bool _isPasswordValid = false;
   bool _isConfirmPasswordValid = false;
+  bool _isSigningUp = false; // Local loading state for sign-up operation
 
   @override
   void initState() {
@@ -93,13 +94,22 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
       return;
     }
 
-    await ref.read(authStateControllerProvider.notifier).signUp(
-          email: _emailController.text.trim(),
-          password: _passwordController.text,
-        );
+    setState(() => _isSigningUp = true);
 
-    // Error handling is done through AsyncValue.error
-    // The UI will show the error message automatically
+    try {
+      await ref.read(authStateControllerProvider.notifier).signUp(
+            email: _emailController.text.trim(),
+            password: _passwordController.text,
+          );
+    } catch (error) {
+      // Catch error and display inline
+      if (mounted) {
+        setState(() => _isSigningUp = false);
+        if (error is AppError) {
+          ErrorHandler.showErrorSnackBar(context, error);
+        }
+      }
+    }
   }
 
   void _navigateToSignIn() {
@@ -110,29 +120,10 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final authState = ref.watch(authStateControllerProvider);
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    // Listen for auth errors and display inline
-    ref.listen(authStateControllerProvider, (previous, next) {
-      next.whenOrNull(
-        error: (error, stackTrace) {
-          // Show error inline
-          final appError = error as AppError;
-          ErrorHandler.showErrorSnackBar(context, appError);
-
-          // Reset auth state to prevent AuthGate showing error screen
-          Future.microtask(() {
-            if (mounted) {
-              ref.read(authStateControllerProvider.notifier).resetToUnauthenticated();
-            }
-          });
-        },
-      );
-    });
-
-    // Extract loading state
-    final isLoading = authState.isLoading;
+    // Use local loading state for sign-up operation
+    final isLoading = _isSigningUp;
 
     return Scaffold(
       body: Stack(

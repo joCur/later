@@ -81,7 +81,7 @@ void main() {
       verify(mockService.checkAuthStatus()).called(1);
     });
 
-    test('should update state to loading then data on successful sign up',
+    test('should update state to authenticated on successful sign up',
         () async {
       // Arrange
       when(mockService.checkAuthStatus()).thenReturn(null);
@@ -107,28 +107,20 @@ void main() {
 
       // Act
       final controller = container.read(authStateControllerProvider.notifier);
-      final future = controller.signUp(
+      await controller.signUp(
         email: 'test@example.com',
         password: 'password123',
       );
 
-      // Verify loading state (Riverpod 3.0 preserves previous value in loading state)
-      expect(
-        container.read(authStateControllerProvider).isLoading,
-        true,
-      );
-
-      // Wait for completion
-      await future;
-
-      // Assert - final state should have user
+      // Assert - state should be updated to authenticated user
       final finalState = container.read(authStateControllerProvider);
       expect(finalState.hasValue, true);
       expect(finalState.value, mockUser);
       expect(finalState.hasError, false);
+      expect(finalState.isLoading, false);
     });
 
-    test('should update state to loading then error on failed sign up',
+    test('should throw error without changing state on failed sign up',
         () async {
       // Arrange
       const expectedError = AppError(
@@ -156,22 +148,28 @@ void main() {
       // Wait for initial state
       await container.read(authStateControllerProvider.future);
 
-      // Act
+      // Act & Assert - expect error to be thrown
       final controller = container.read(authStateControllerProvider.notifier);
-      await controller.signUp(
-        email: 'test@example.com',
-        password: 'password123',
+      expect(
+        () => controller.signUp(
+          email: 'test@example.com',
+          password: 'password123',
+        ),
+        throwsA(expectedError),
       );
 
-      // Assert
+      // Wait for async operation to complete
+      await Future<void>.delayed(const Duration(milliseconds: 100));
+
+      // Assert - state should remain unchanged (still unauthenticated)
       final finalState = container.read(authStateControllerProvider);
-      expect(finalState.hasError, true);
-      expect(finalState.error, expectedError);
-      // In Riverpod 3.0, error state can still have a value (previous value)
-      // We just check that error is present
+      expect(finalState.hasValue, true);
+      expect(finalState.value, isNull); // Still unauthenticated
+      expect(finalState.hasError, false); // No error in state
+      expect(finalState.isLoading, false); // Not loading
     });
 
-    test('should update state to loading then data on successful sign in',
+    test('should update state to authenticated on successful sign in',
         () async {
       // Arrange
       when(mockService.checkAuthStatus()).thenReturn(null);
@@ -197,28 +195,20 @@ void main() {
 
       // Act
       final controller = container.read(authStateControllerProvider.notifier);
-      final future = controller.signIn(
+      await controller.signIn(
         email: 'test@example.com',
         password: 'password123',
       );
 
-      // Verify loading state (Riverpod 3.0 preserves previous value in loading state)
-      expect(
-        container.read(authStateControllerProvider).isLoading,
-        true,
-      );
-
-      // Wait for completion
-      await future;
-
-      // Assert - final state should have user
+      // Assert - state should be updated to authenticated user
       final finalState = container.read(authStateControllerProvider);
       expect(finalState.hasValue, true);
       expect(finalState.value, mockUser);
       expect(finalState.hasError, false);
+      expect(finalState.isLoading, false);
     });
 
-    test('should update state to loading then error on failed sign in',
+    test('should throw error without changing state on failed sign in',
         () async {
       // Arrange
       const expectedError = AppError(
@@ -246,19 +236,25 @@ void main() {
       // Wait for initial state
       await container.read(authStateControllerProvider.future);
 
-      // Act
+      // Act & Assert - expect error to be thrown
       final controller = container.read(authStateControllerProvider.notifier);
-      await controller.signIn(
-        email: 'test@example.com',
-        password: 'password123',
+      expect(
+        () => controller.signIn(
+          email: 'test@example.com',
+          password: 'password123',
+        ),
+        throwsA(expectedError),
       );
 
-      // Assert
+      // Wait for async operation to complete
+      await Future<void>.delayed(const Duration(milliseconds: 100));
+
+      // Assert - state should remain unchanged (still unauthenticated)
       final finalState = container.read(authStateControllerProvider);
-      expect(finalState.hasError, true);
-      expect(finalState.error, expectedError);
-      // In Riverpod 3.0, error state can still have a value (previous value)
-      // We just check that error is present
+      expect(finalState.hasValue, true);
+      expect(finalState.value, isNull); // Still unauthenticated
+      expect(finalState.hasError, false); // No error in state
+      expect(finalState.isLoading, false); // Not loading
     });
 
     test('should update state to loading then data(null) on successful sign out',
@@ -370,55 +366,6 @@ void main() {
       expect(finalState.hasValue, true);
       expect(finalState.value, mockUser);
       verify(mockService.checkAuthStatus()).called(2); // Initial + initialize
-    });
-
-    test('resetToUnauthenticated sets state to unauthenticated', () async {
-      // Arrange - start with error state
-      const expectedError = AppError(
-        code: ErrorCode.authInvalidCredentials,
-        message: 'Invalid credentials',
-      );
-      when(mockService.checkAuthStatus()).thenReturn(null);
-      when(mockService.authStateChanges()).thenAnswer(
-        (_) => Stream<AuthState>.value(
-          const AuthState(AuthChangeEvent.signedOut, null),
-        ),
-      );
-      when(mockService.signIn(
-        email: anyNamed('email'),
-        password: anyNamed('password'),
-      )).thenThrow(expectedError);
-
-      final container = ProviderContainer(
-        overrides: [
-          authApplicationServiceProvider.overrideWithValue(mockService),
-        ],
-      );
-      addTearDown(container.dispose);
-
-      // Wait for initial state
-      await container.read(authStateControllerProvider.future);
-
-      // Trigger error state
-      final controller = container.read(authStateControllerProvider.notifier);
-      await controller.signIn(
-        email: 'test@example.com',
-        password: 'wrongpassword',
-      );
-
-      // Verify error state exists
-      var currentState = container.read(authStateControllerProvider);
-      expect(currentState.hasError, true);
-
-      // Act - reset to unauthenticated
-      controller.resetToUnauthenticated();
-
-      // Assert - state should be data(null) with no error
-      currentState = container.read(authStateControllerProvider);
-      expect(currentState.hasValue, true);
-      expect(currentState.value, isNull);
-      expect(currentState.hasError, false);
-      expect(currentState.isLoading, false);
     });
 
     // Note: Testing auth state stream updates is complex in unit tests
@@ -714,7 +661,7 @@ void main() {
         verify(mockAuthService.signInAnonymously()).called(1);
       });
 
-      test('should handle explicit anonymous sign-in failure', () async {
+      test('should throw error without changing state on anonymous sign-in failure', () async {
         // Arrange
         const expectedError = AppError(
           code: ErrorCode.authAnonymousSignInFailed,
@@ -740,14 +687,22 @@ void main() {
         // Wait for initial state
         await container.read(authStateControllerProvider.future);
 
-        // Act
+        // Act & Assert - expect error to be thrown
         final controller = container.read(authStateControllerProvider.notifier);
-        await controller.signInAnonymously();
+        expect(
+          () => controller.signInAnonymously(),
+          throwsA(expectedError),
+        );
 
-        // Assert
+        // Wait for async operation to complete
+        await Future<void>.delayed(const Duration(milliseconds: 100));
+
+        // Assert - state should remain unchanged (still authenticated as mockUser)
         final finalState = container.read(authStateControllerProvider);
-        expect(finalState.hasError, true);
-        expect(finalState.error, expectedError);
+        expect(finalState.hasValue, true);
+        expect(finalState.value, mockUser); // Still authenticated
+        expect(finalState.hasError, false); // No error in state
+        expect(finalState.isLoading, false); // Not loading
       });
     });
   });
