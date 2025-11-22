@@ -882,7 +882,7 @@ Implement a complete CI/CD pipeline for the Later Flutter mobile app that:
     rm android/key.properties
     ```
 
-- [ ] Task 6.2: Upload first release to Play Console manually
+- [x] Task 6.2: Upload first release to Play Console manually
   - Go to https://play.google.com/console
   - Navigate to your app → **Testing** → **Internal testing**
   - Click **Create new release** (or edit draft release from Phase 1 Task 1.4)
@@ -899,7 +899,7 @@ Implement a complete CI/CD pipeline for the Later Flutter mobile app that:
   - Confirm the rollout
   - Wait for release to be published (usually instant for internal testing)
 
-- [ ] Task 6.3: Verify first release is live
+- [x] Task 6.3: Verify first release is live
   - Go to **Testing** → **Internal testing** → **Releases** tab
   - Verify release shows as "Available" status
   - Copy the **opt-in URL** from the Testers tab
@@ -911,7 +911,7 @@ Implement a complete CI/CD pipeline for the Later Flutter mobile app that:
   - Launch the app and verify it works (test login, create space, create note, etc.)
   - Verify Supabase connection works (data syncs to cloud)
 
-- [ ] Task 6.4: Test CI/CD pipeline with a pull request
+- [x] Task 6.4: Test CI/CD pipeline with a pull request
   - Create a test branch:
     ```bash
     git checkout -b test/ci-cd-pipeline

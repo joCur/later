@@ -119,7 +119,7 @@ class _TodoListDetailScreenState extends ConsumerState<TodoListDetailScreen> {
             (tl) => tl.id == _currentTodoList.id,
             orElse: () => _currentTodoList,
           );
-          if (mounted && updated != _currentTodoList) {
+          if (mounted) {
             setState(() {
               _currentTodoList = updated;
             });
@@ -532,6 +532,24 @@ class _TodoListDetailScreenState extends ConsumerState<TodoListDetailScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
 
+    // Watch item controller for live count calculation
+    final itemsAsyncValue = ref.watch(todoItemsControllerProvider(widget.todoList.id));
+
+    // Calculate counts from items for immediate UI updates
+    int? calculatedTotalCount;
+    int? calculatedCompletedCount;
+    double? calculatedProgress;
+
+    itemsAsyncValue.whenOrNull(
+      data: (items) {
+        calculatedTotalCount = items.length;
+        calculatedCompletedCount = items.where((item) => item.isCompleted).length;
+        calculatedProgress = calculatedTotalCount! > 0
+            ? calculatedCompletedCount! / calculatedTotalCount!
+            : 0.0;
+      },
+    );
+
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: (didPop, result) async {
@@ -607,8 +625,8 @@ class _TodoListDetailScreenState extends ConsumerState<TodoListDetailScreen> {
                 children: [
                   Text(
                     l10n.todoDetailProgressCompleted(
-                      _currentTodoList.completedItemCount,
-                      _currentTodoList.totalItemCount,
+                      calculatedCompletedCount ?? _currentTodoList.completedItemCount,
+                      calculatedTotalCount ?? _currentTodoList.totalItemCount,
                     ),
                     style: AppTypography.bodyMedium.copyWith(
                       color: Colors.white,
@@ -617,7 +635,7 @@ class _TodoListDetailScreenState extends ConsumerState<TodoListDetailScreen> {
                   ),
                   const SizedBox(height: AppSpacing.sm),
                   LinearProgressIndicator(
-                    value: _currentTodoList.progress,
+                    value: calculatedProgress ?? _currentTodoList.progress,
                     backgroundColor: Colors.white.withValues(alpha: 0.3),
                     valueColor: const AlwaysStoppedAnimation<Color>(
                       Colors.white,
