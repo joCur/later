@@ -9,6 +9,18 @@ import 'package:later_mobile/features/home/presentation/screens/home_screen.dart
 /// - Shows loading indicator while checking auth status
 /// - Routes to HomeScreen if authenticated
 /// - Routes to SignInScreen if not authenticated
+/// - Shows error screen as fallback for unexpected/system errors
+///
+/// Note: Auth operation errors (sign in/sign up failures) are handled inline
+/// via ref.listen in the auth screens and won't reach this error state.
+/// This error screen is only shown for unexpected errors during initialization.
+///
+/// TODO: Future improvement - migrate to go_router for declarative routing
+/// The current error screen creates a dead-end UX with no recovery options.
+/// With go_router, we can use redirect guards to gracefully fallback to
+/// SignInScreen instead of showing an error screen. This also enables deep
+/// linking, web navigation, and better route protection.
+/// See: .claude/research/auth-routing-error-handling-best-practices.md
 ///
 /// Usage:
 /// ```dart

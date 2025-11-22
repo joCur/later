@@ -141,6 +141,15 @@ class AuthStateController extends _$AuthStateController {
     }
   }
 
+  /// Reset authentication state to unauthenticated
+  ///
+  /// Sets the state to AsyncValue.data(null) to indicate no authenticated user.
+  /// Used to clear error states after displaying inline errors to prevent
+  /// AuthGate from showing the error screen.
+  void resetToUnauthenticated() {
+    state = const AsyncValue.data(null);
+  }
+
   /// Upgrade an anonymous user to a full account
   ///
   /// Converts the current anonymous user to a permanent account by

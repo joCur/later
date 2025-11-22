@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:later_mobile/core/error/app_error.dart';
+import 'package:later_mobile/core/error/error_handler.dart';
 import 'package:later_mobile/design_system/design_system.dart';
 import 'package:later_mobile/features/auth/presentation/controllers/auth_state_controller.dart';
 import 'package:later_mobile/l10n/app_localizations.dart';
@@ -79,17 +80,23 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
     final authState = ref.watch(authStateControllerProvider);
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    // Extract error message from AsyncValue
-    final errorMessage = authState.when(
-      data: (_) => null,
-      loading: () => null,
-      error: (error, _) {
-        if (error is AppError) {
-          return error.message;
-        }
-        return 'An unexpected error occurred';
-      },
-    );
+    // Listen for auth errors and display inline
+    ref.listen(authStateControllerProvider, (previous, next) {
+      next.whenOrNull(
+        error: (error, stackTrace) {
+          // Show error inline
+          final appError = error as AppError;
+          ErrorHandler.showErrorSnackBar(context, appError);
+
+          // Reset auth state to prevent AuthGate showing error screen
+          Future.microtask(() {
+            if (mounted) {
+              ref.read(authStateControllerProvider.notifier).resetToUnauthenticated();
+            }
+          });
+        },
+      );
+    });
 
     // Extract loading state
     final isLoading = authState.isLoading;
@@ -134,12 +141,6 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                                   // Welcome heading
                                   _buildHeading(),
                                   const SizedBox(height: AppSpacing.lg),
-
-                                  // Error banner
-                                  if (errorMessage != null) ...[
-                                    _buildErrorBanner(errorMessage),
-                                    const SizedBox(height: AppSpacing.md),
-                                  ],
 
                                   // Email field
                                   _buildEmailField(isLoading),
@@ -218,35 +219,6 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
       ),
       textAlign: TextAlign.center,
     ).animate(delay: 300.ms).fadeIn(duration: 400.ms);
-  }
-
-  Widget _buildErrorBanner(String errorMessage) {
-    return Container(
-          padding: const EdgeInsets.all(AppSpacing.md),
-          decoration: BoxDecoration(
-            color: AppColors.error.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: AppColors.error.withValues(alpha: 0.3)),
-          ),
-          child: Row(
-            children: [
-              const Icon(Icons.error_outline, color: AppColors.error, size: 20),
-              const SizedBox(width: AppSpacing.sm),
-              Expanded(
-                child: Text(
-                  errorMessage,
-                  style: AppTypography.bodySmall.copyWith(
-                    color: AppColors.error,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        )
-        .animate()
-        .fadeIn(duration: 200.ms)
-        .slideY(begin: -0.2, end: 0, duration: 200.ms);
   }
 
   Widget _buildEmailField(bool isLoading) {
