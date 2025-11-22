@@ -29,6 +29,10 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
   final _confirmPasswordFocusNode = FocusNode();
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
+  bool _isFormValid = false;
+  bool _isEmailValid = false;
+  bool _isPasswordValid = false;
+  bool _isConfirmPasswordValid = false;
 
   @override
   void initState() {
@@ -57,6 +61,31 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
     _passwordFocusNode.dispose();
     _confirmPasswordFocusNode.dispose();
     super.dispose();
+  }
+
+  void _updateFormValidity() {
+    // Manual validation since TextInputField doesn't connect to Form
+    final email = _emailController.text.trim();
+    final password = _passwordController.text;
+    final confirmPassword = _confirmPasswordController.text;
+
+    final emailValid = email.isNotEmpty && email.contains('@');
+    final passwordValid = password.isNotEmpty && password.length >= 8;
+    final confirmPasswordValid = password == confirmPassword && confirmPassword.isNotEmpty;
+
+    final isValid = emailValid && passwordValid && confirmPasswordValid;
+
+    if (_isFormValid != isValid ||
+        _isEmailValid != emailValid ||
+        _isPasswordValid != passwordValid ||
+        _isConfirmPasswordValid != confirmPasswordValid) {
+      setState(() {
+        _isFormValid = isValid;
+        _isEmailValid = emailValid;
+        _isPasswordValid = passwordValid;
+        _isConfirmPasswordValid = confirmPasswordValid;
+      });
+    }
   }
 
   Future<void> _handleSignUp() async {
@@ -134,6 +163,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                             ),
                             child: Form(
                               key: _formKey,
+                              autovalidateMode: AutovalidateMode.onUserInteraction,
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -241,8 +271,12 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
           keyboardType: TextInputType.emailAddress,
           textInputAction: TextInputAction.next,
           prefixIcon: Icons.email_outlined,
+          suffixIcon: _emailController.text.isNotEmpty && _isEmailValid
+              ? Icons.check_circle
+              : null,
           enabled: !isLoading,
           textColor: isDark ? Colors.white : AppColors.neutral900,
+          onChanged: (_) => _updateFormValidity(),
           validator: (value) {
             if (value == null || value.isEmpty) {
               return l10n.authValidationEmailRequired;
@@ -283,6 +317,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
           },
           enabled: !isLoading,
           textColor: isDark ? Colors.white : AppColors.neutral900,
+          onChanged: (_) => _updateFormValidity(),
           validator: (value) {
             if (value == null || value.isEmpty) {
               return l10n.authValidationPasswordRequiredSignUp;
@@ -336,6 +371,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
           },
           enabled: !isLoading,
           textColor: isDark ? Colors.white : AppColors.neutral900,
+          onChanged: (_) => _updateFormValidity(),
           validator: (value) {
             if (value == null || value.isEmpty) {
               return l10n.authValidationConfirmPasswordRequired;
@@ -358,7 +394,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
     final l10n = AppLocalizations.of(context)!;
     return PrimaryButton(
           text: l10n.authButtonSignUp,
-          onPressed: isLoading ? null : _handleSignUp,
+          onPressed: (_isFormValid && !isLoading) ? _handleSignUp : null,
           isLoading: isLoading,
         )
         .animate(delay: 800.ms)

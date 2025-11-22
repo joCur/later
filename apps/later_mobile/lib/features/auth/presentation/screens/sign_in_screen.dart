@@ -26,6 +26,9 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
   final _emailFocusNode = FocusNode();
   final _passwordFocusNode = FocusNode();
   bool _obscurePassword = true;
+  bool _isFormValid = false;
+  bool _isEmailValid = false;
+  bool _isPasswordValid = false;
 
   @override
   void initState() {
@@ -47,6 +50,25 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
     _emailFocusNode.dispose();
     _passwordFocusNode.dispose();
     super.dispose();
+  }
+
+  void _updateFormValidity() {
+    // Manual validation since TextInputField doesn't connect to Form
+    final email = _emailController.text.trim();
+    final password = _passwordController.text;
+
+    final emailValid = email.isNotEmpty && email.contains('@');
+    final passwordValid = password.isNotEmpty;
+
+    final isValid = emailValid && passwordValid;
+
+    if (_isFormValid != isValid || _isEmailValid != emailValid || _isPasswordValid != passwordValid) {
+      setState(() {
+        _isFormValid = isValid;
+        _isEmailValid = emailValid;
+        _isPasswordValid = passwordValid;
+      });
+    }
   }
 
   Future<void> _handleSignIn() async {
@@ -130,6 +152,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                             ),
                             child: Form(
                               key: _formKey,
+                              autovalidateMode: AutovalidateMode.onUserInteraction,
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -233,8 +256,12 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
           keyboardType: TextInputType.emailAddress,
           textInputAction: TextInputAction.next,
           prefixIcon: Icons.email_outlined,
+          suffixIcon: _emailController.text.isNotEmpty && _isEmailValid
+              ? Icons.check_circle
+              : null,
           enabled: !isLoading,
           textColor: isDark ? Colors.white : AppColors.neutral900,
+          onChanged: (_) => _updateFormValidity(),
           validator: (value) {
             if (value == null || value.isEmpty) {
               return l10n.authValidationEmailRequired;
@@ -275,6 +302,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
           },
           enabled: !isLoading,
           textColor: isDark ? Colors.white : AppColors.neutral900,
+          onChanged: (_) => _updateFormValidity(),
           validator: (value) {
             if (value == null || value.isEmpty) {
               return l10n.authValidationPasswordRequired;
@@ -294,7 +322,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
     final l10n = AppLocalizations.of(context)!;
     return PrimaryButton(
           text: l10n.authButtonSignIn,
-          onPressed: isLoading ? null : _handleSignIn,
+          onPressed: (_isFormValid && !isLoading) ? _handleSignIn : null,
           isLoading: isLoading,
         )
         .animate(delay: 600.ms)
