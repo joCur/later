@@ -32,18 +32,22 @@ void main() {
       when(mockService.getNotesForSpace(any)).thenAnswer((_) async => []);
     });
 
-    Widget createWidget(Note note) {
+    Widget createWidget(String noteId, {Note? customNote}) {
+      final note = customNote ?? testNote;
       return testApp(
         ProviderScope(
-          overrides: [noteServiceProvider.overrideWithValue(mockService)],
-          child: NoteDetailScreen(note: note),
+          overrides: [
+            noteServiceProvider.overrideWithValue(mockService),
+            noteByIdProvider(noteId).overrideWith((ref) async => note),
+          ],
+          child: NoteDetailScreen(noteId: noteId),
         ),
       );
     }
 
     testWidgets('should render note title and content', (tester) async {
       // Arrange
-      await tester.pumpWidget(createWidget(testNote));
+      await tester.pumpWidget(createWidget(testNote.id));
       await tester.pumpAndSettle();
 
       // Assert - find title and content
@@ -53,7 +57,7 @@ void main() {
 
     testWidgets('should render tags as chips', (tester) async {
       // Arrange
-      await tester.pumpWidget(createWidget(testNote));
+      await tester.pumpWidget(createWidget(testNote.id));
       await tester.pumpAndSettle();
 
       // Assert - find tag chips
@@ -64,7 +68,7 @@ void main() {
     testWidgets('should render empty content gracefully', (tester) async {
       // Arrange
       final emptyNote = testNote.copyWith();
-      await tester.pumpWidget(createWidget(emptyNote));
+      await tester.pumpWidget(createWidget(emptyNote.id, customNote: emptyNote));
       await tester.pumpAndSettle();
 
       // Assert - should render without errors
@@ -76,7 +80,7 @@ void main() {
     testWidgets('should render note without tags', (tester) async {
       // Arrange
       final noteWithoutTags = testNote.copyWith(tags: []);
-      await tester.pumpWidget(createWidget(noteWithoutTags));
+      await tester.pumpWidget(createWidget(noteWithoutTags.id, customNote: noteWithoutTags));
       await tester.pumpAndSettle();
 
       // Assert - should render without errors
@@ -87,7 +91,7 @@ void main() {
 
     testWidgets('should display editable title field', (tester) async {
       // Arrange
-      await tester.pumpWidget(createWidget(testNote));
+      await tester.pumpWidget(createWidget(testNote.id));
       await tester.pumpAndSettle();
 
       // Assert - title should be in an editable field
@@ -97,7 +101,7 @@ void main() {
 
     testWidgets('should display editable content field', (tester) async {
       // Arrange
-      await tester.pumpWidget(createWidget(testNote));
+      await tester.pumpWidget(createWidget(testNote.id));
       await tester.pumpAndSettle();
 
       // Assert - content should be in a text field
@@ -113,7 +117,7 @@ void main() {
             Future.delayed(const Duration(milliseconds: 100), () => testNote),
       );
 
-      await tester.pumpWidget(createWidget(testNote));
+      await tester.pumpWidget(createWidget(testNote.id));
       await tester.pumpAndSettle();
 
       // Act - trigger a save by changing title
@@ -134,7 +138,7 @@ void main() {
       // Arrange
       when(mockService.updateNote(any)).thenThrow(Exception('Update failed'));
 
-      await tester.pumpWidget(createWidget(testNote));
+      await tester.pumpWidget(createWidget(testNote.id));
       await tester.pumpAndSettle();
 
       // Act - trigger a save by changing title
@@ -153,7 +157,7 @@ void main() {
 
     testWidgets('should display app bar with note title', (tester) async {
       // Arrange
-      await tester.pumpWidget(createWidget(testNote));
+      await tester.pumpWidget(createWidget(testNote.id));
       await tester.pumpAndSettle();
 
       // Assert - app bar should be present
@@ -162,7 +166,7 @@ void main() {
 
     testWidgets('should have menu button in app bar', (tester) async {
       // Arrange
-      await tester.pumpWidget(createWidget(testNote));
+      await tester.pumpWidget(createWidget(testNote.id));
       await tester.pumpAndSettle();
 
       // Assert - should find overflow menu button
@@ -171,7 +175,7 @@ void main() {
 
     testWidgets('should allow editing title', (tester) async {
       // Arrange
-      await tester.pumpWidget(createWidget(testNote));
+      await tester.pumpWidget(createWidget(testNote.id));
       await tester.pumpAndSettle();
 
       // Act - find and edit title field
@@ -188,7 +192,7 @@ void main() {
 
     testWidgets('should allow editing content', (tester) async {
       // Arrange
-      await tester.pumpWidget(createWidget(testNote));
+      await tester.pumpWidget(createWidget(testNote.id));
       await tester.pumpAndSettle();
 
       // Act - find content field (should be second TextField)
@@ -216,7 +220,7 @@ void main() {
       final longTitleNote = testNote.copyWith(
         title: 'This is a very long note title that should wrap properly',
       );
-      await tester.pumpWidget(createWidget(longTitleNote));
+      await tester.pumpWidget(createWidget(longTitleNote.id, customNote: longTitleNote));
       await tester.pumpAndSettle();
 
       // Assert - should render without overflow errors
@@ -230,7 +234,7 @@ void main() {
       // Arrange
       final longContent = 'This is a very long note content. ' * 50;
       final longContentNote = testNote.copyWith(content: longContent);
-      await tester.pumpWidget(createWidget(longContentNote));
+      await tester.pumpWidget(createWidget(longContentNote.id, customNote: longContentNote));
       await tester.pumpAndSettle();
 
       // Assert - should render without overflow errors
@@ -242,7 +246,7 @@ void main() {
       final manyTagsNote = testNote.copyWith(
         tags: List.generate(10, (i) => 'tag$i'),
       );
-      await tester.pumpWidget(createWidget(manyTagsNote));
+      await tester.pumpWidget(createWidget(manyTagsNote.id, customNote: manyTagsNote));
       await tester.pumpAndSettle();
 
       // Assert - should render without overflow errors

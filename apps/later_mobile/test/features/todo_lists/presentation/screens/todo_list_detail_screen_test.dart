@@ -62,11 +62,15 @@ void main() {
       );
     });
 
-    Widget createWidget(TodoList todoList) {
+    Widget createWidget(String todoListId, {TodoList? customList}) {
       return testApp(
-        TodoListDetailScreen(todoList: todoList),
+        TodoListDetailScreen(todoListId: todoListId),
         overrides: [
           todoListServiceProvider.overrideWithValue(mockService),
+          // Mock the todoListByIdProvider to return the test todo list or custom list
+          todoListByIdProvider(todoListId).overrideWith(
+            (ref) async => customList ?? testTodoList,
+          ),
         ],
       );
     }
@@ -74,7 +78,7 @@ void main() {
     testWidgets('should display correct counter values on initial load',
         (tester) async {
       // Arrange - testItems has 1 completed, 3 total
-      await tester.pumpWidget(createWidget(testTodoList));
+      await tester.pumpWidget(createWidget(testTodoList.id));
       await tester.pumpAndSettle();
 
       // Assert - counter should show "1/3 completed"
@@ -85,7 +89,7 @@ void main() {
     testWidgets('should calculate counts from items list when loaded',
         (tester) async {
       // Arrange
-      await tester.pumpWidget(createWidget(testTodoList));
+      await tester.pumpWidget(createWidget(testTodoList.id));
       await tester.pumpAndSettle();
 
       // Act - find progress indicator widget
@@ -117,7 +121,7 @@ void main() {
         (_) async => updatedItems,
       );
 
-      await tester.pumpWidget(createWidget(testTodoList));
+      await tester.pumpWidget(createWidget(testTodoList.id));
       await tester.pumpAndSettle();
 
       // Verify initial state (1 completed)
@@ -161,7 +165,7 @@ void main() {
         return callCount == 1 ? initialItems : updatedItems;
       });
 
-      await tester.pumpWidget(createWidget(testTodoList));
+      await tester.pumpWidget(createWidget(testTodoList.id));
       await tester.pumpAndSettle();
 
       // Verify initial progress (1/3 = 0.333)
@@ -192,7 +196,7 @@ void main() {
         },
       );
 
-      await tester.pumpWidget(createWidget(testTodoList));
+      await tester.pumpWidget(createWidget(testTodoList.id));
 
       // Assert - should show loading indicator initially
       expect(find.byType(CircularProgressIndicator), findsOneWidget);
@@ -215,7 +219,7 @@ void main() {
         ),
       );
 
-      await tester.pumpWidget(createWidget(testTodoList));
+      await tester.pumpWidget(createWidget(testTodoList.id));
       await tester.pump(const Duration(milliseconds: 100));
 
       // Assert - should show model counts (from testTodoList)
@@ -239,7 +243,7 @@ void main() {
         (_) async => allCompletedItems,
       );
 
-      await tester.pumpWidget(createWidget(testTodoList));
+      await tester.pumpWidget(createWidget(testTodoList.id));
       await tester.pumpAndSettle();
 
       // Assert - should show 3/3 completed
@@ -264,7 +268,7 @@ void main() {
         (_) async => noneCompletedItems,
       );
 
-      await tester.pumpWidget(createWidget(testTodoList));
+      await tester.pumpWidget(createWidget(testTodoList.id));
       await tester.pumpAndSettle();
 
       // Assert - should show 0/3 completed
@@ -308,7 +312,7 @@ void main() {
         }
       });
 
-      await tester.pumpWidget(createWidget(testTodoList));
+      await tester.pumpWidget(createWidget(testTodoList.id));
       await tester.pumpAndSettle();
 
       // Verify initial state (1 completed)
@@ -348,7 +352,7 @@ void main() {
         return testItems;
       });
 
-      await tester.pumpWidget(createWidget(testTodoList));
+      await tester.pumpWidget(createWidget(testTodoList.id));
       await tester.pump();
 
       // Assert - Should initially show model counts (1/3)
@@ -382,7 +386,7 @@ void main() {
         completedItemCount: 0,
       );
 
-      await tester.pumpWidget(createWidget(singleItemList));
+      await tester.pumpWidget(createWidget(singleItemList.id, customList: singleItemList));
       await tester.pumpAndSettle();
 
       // Assert - should show 0/1 completed
@@ -417,7 +421,7 @@ void main() {
         completedItemCount: 5,
       );
 
-      await tester.pumpWidget(createWidget(manyItemsList));
+      await tester.pumpWidget(createWidget(manyItemsList.id, customList: manyItemsList));
       await tester.pumpAndSettle();
 
       // Assert - should show 5/10 completed

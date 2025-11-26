@@ -8,7 +8,7 @@ import 'core/error/error_handler.dart';
 import 'core/theme/app_theme.dart';
 import 'data/local/preferences_service.dart';
 import 'features/theme/presentation/controllers/theme_controller.dart';
-import 'package:later_mobile/features/auth/presentation/widgets/auth_gate.dart';
+import 'core/routing/app_router.dart';
 
 void main() async {
   // Ensure Flutter bindings are initialized
@@ -66,8 +66,11 @@ class _MyApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     // Watch Riverpod theme controller instead of Provider
     final themeMode = ref.watch(themeControllerProvider);
+    // Watch router provider for go_router-based navigation
+    final router = ref.watch(routerProvider);
 
-    return MaterialApp(
+    return MaterialApp.router(
+      routerConfig: router,
       title: 'Later',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
@@ -87,7 +90,6 @@ class _MyApp extends ConsumerWidget {
         Locale('en'),
         Locale('de'),
       ],
-      home: const AuthGate(),
     );
   }
 }

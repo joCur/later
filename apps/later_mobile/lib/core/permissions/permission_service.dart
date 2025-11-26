@@ -2,7 +2,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:later_mobile/core/config/supabase_config.dart';
 import 'package:later_mobile/core/permissions/user_role.dart';
-import 'package:later_mobile/features/auth/presentation/controllers/auth_state_controller.dart';
+import 'package:later_mobile/features/auth/application/providers.dart';
 
 part 'permission_service.g.dart';
 
@@ -68,12 +68,11 @@ PermissionService permissionService(Ref ref) {
 /// - [UserRole.authenticated] for permanent users
 @riverpod
 UserRole currentUserRole(Ref ref) {
-  // Watch auth state to detect changes (sign in, sign out, upgrade)
-  // This is imported from auth feature in the next line
-  final authState = ref.watch(authStateControllerProvider);
+  // Watch auth stream to detect changes (sign in, sign out, upgrade)
+  final authStreamValue = ref.watch(authStreamProvider);
 
-  // Get the user from auth state
-  final user = authState.value;
+  // Get the user from auth stream (AsyncValue wraps the stream automatically)
+  final user = authStreamValue.value;
 
   // No user found - treat as anonymous fallback
   if (user == null) {

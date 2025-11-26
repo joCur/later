@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:later_mobile/core/routing/routes.dart';
 import 'package:later_mobile/design_system/atoms/buttons/ghost_button.dart';
 import 'package:later_mobile/design_system/atoms/buttons/primary_button.dart';
-import 'package:later_mobile/features/auth/presentation/screens/account_upgrade_screen.dart';
 import 'package:later_mobile/l10n/app_localizations.dart';
 
 /// Shows an upgrade required dialog for anonymous users who have reached a feature limit.
@@ -43,11 +44,7 @@ Future<void> showUpgradeRequiredDialog({
               // Close the dialog
               Navigator.of(context).pop();
               // Navigate to the upgrade screen
-              Navigator.of(context).push(
-                MaterialPageRoute<void>(
-                  builder: (context) => const AccountUpgradeScreen(),
-                ),
-              );
+              context.push(kRouteAccountUpgrade);
             },
           ),
         ],

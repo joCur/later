@@ -602,6 +602,56 @@
     "description": "Delete menu item text in note detail screen"
   },
 
+  "noteDetailLoadingTitle": "Loading Note",
+  "@noteDetailLoadingTitle": {
+    "description": "Title shown while loading note data"
+  },
+
+  "noteDetailErrorTitle": "Error",
+  "@noteDetailErrorTitle": {
+    "description": "Title shown when note fails to load"
+  },
+
+  "noteDetailErrorMessage": "Failed to load note",
+  "@noteDetailErrorMessage": {
+    "description": "Message shown when note fails to load"
+  },
+
+  "noteDetailNotFoundTitle": "Note Not Found",
+  "@noteDetailNotFoundTitle": {
+    "description": "Title shown when note doesn't exist"
+  },
+
+  "noteDetailNotFoundMessage": "This note could not be found. It may have been deleted.",
+  "@noteDetailNotFoundMessage": {
+    "description": "Message shown when note doesn't exist"
+  },
+
+  "todoListDetailLoadingTitle": "Loading TodoList",
+  "@todoListDetailLoadingTitle": {
+    "description": "Title shown while loading todo list"
+  },
+
+  "todoListDetailErrorTitle": "Error",
+  "@todoListDetailErrorTitle": {
+    "description": "Title shown when error occurs loading todo list"
+  },
+
+  "todoListDetailErrorMessage": "Failed to load todo list",
+  "@todoListDetailErrorMessage": {
+    "description": "Message shown when error occurs loading todo list"
+  },
+
+  "todoListDetailNotFoundTitle": "TodoList Not Found",
+  "@todoListDetailNotFoundTitle": {
+    "description": "Title shown when todo list doesn't exist"
+  },
+
+  "todoListDetailNotFoundMessage": "This todo list could not be found. It may have been deleted.",
+  "@todoListDetailNotFoundMessage": {
+    "description": "Message shown when todo list doesn't exist"
+  },
+
   "todoDetailNameEmpty": "TodoList name cannot be empty",
   "@todoDetailNameEmpty": {
     "description": "Validation error when todo list name is empty"
@@ -1007,6 +1057,31 @@
     "description": "Delete menu item text in list detail screen"
   },
 
+  "listDetailLoadingTitle": "Loading List",
+  "@listDetailLoadingTitle": {
+    "description": "Title shown while loading list data"
+  },
+
+  "listDetailErrorTitle": "Error",
+  "@listDetailErrorTitle": {
+    "description": "Title shown when list fails to load"
+  },
+
+  "listDetailErrorMessage": "Failed to load list",
+  "@listDetailErrorMessage": {
+    "description": "Message shown when list fails to load"
+  },
+
+  "listDetailNotFoundTitle": "List Not Found",
+  "@listDetailNotFoundTitle": {
+    "description": "Title shown when list doesn't exist"
+  },
+
+  "listDetailNotFoundMessage": "This list could not be found. It may have been deleted.",
+  "@listDetailNotFoundMessage": {
+    "description": "Message shown when list doesn't exist"
+  },
+
   "spaceModalTitle": "Switch Space",
   "@spaceModalTitle": {
     "description": "Title for space switcher modal"
@@ -1319,6 +1394,11 @@
   "buttonArchive": "Archive",
   "@buttonArchive": {
     "description": "Generic archive button text"
+  },
+
+  "buttonGoBack": "Go Back",
+  "@buttonGoBack": {
+    "description": "Generic go back button text"
   },
 
   "accessibilityCloseButton": "Close",

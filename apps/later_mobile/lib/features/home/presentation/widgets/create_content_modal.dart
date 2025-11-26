@@ -22,7 +22,7 @@ import 'package:uuid/uuid.dart';
 import 'package:later_mobile/core/enums/content_type.dart';
 import 'package:later_mobile/core/responsive/breakpoints.dart';
 import 'package:later_mobile/core/theme/temporal_flow_theme.dart';
-import 'package:later_mobile/features/auth/presentation/controllers/auth_state_controller.dart';
+import 'package:later_mobile/features/auth/application/providers.dart';
 import 'package:later_mobile/features/lists/presentation/controllers/lists_controller.dart';
 import 'package:later_mobile/features/notes/presentation/controllers/notes_controller.dart';
 import 'package:later_mobile/features/spaces/domain/models/space.dart';
@@ -295,15 +295,14 @@ class _CreateContentModalState extends ConsumerState<CreateContentModal>
     final contentType = _selectedType ?? ContentType.note;
 
     // Safety check: Ensure user is authenticated
-    final userId = ref
-        .read(authStateControllerProvider)
-        .when(
-          data: (user) => user?.id,
-          loading: () => null,
-          error: (error, stack) => null,
-        );
+    final userAsync = ref.read(authStreamProvider);
+    final userId = userAsync.when(
+      data: (user) => user?.id,
+      loading: () => null,
+      error: (error, stack) => null,
+    );
     if (userId == null) {
-      return; // Exit early - user should be redirected to auth screen by AuthGate
+      return; // Exit early - user should be redirected to auth screen by router
     }
 
     try {

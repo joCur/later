@@ -62,3 +62,106 @@ final class ListServiceProvider
 }
 
 String _$listServiceHash() => r'4476e84eb59db3311cd7a1a91e9bbfcb6adf30ad';
+
+/// Provider for fetching a single list by ID.
+///
+/// This is a family provider that takes a listId parameter.
+/// Returns `AsyncValue<ListModel?>` - null if list not found.
+/// Auto-disposes when no longer watched.
+
+@ProviderFor(listById)
+const listByIdProvider = ListByIdFamily._();
+
+/// Provider for fetching a single list by ID.
+///
+/// This is a family provider that takes a listId parameter.
+/// Returns `AsyncValue<ListModel?>` - null if list not found.
+/// Auto-disposes when no longer watched.
+
+final class ListByIdProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<ListModel?>,
+          ListModel?,
+          FutureOr<ListModel?>
+        >
+    with $FutureModifier<ListModel?>, $FutureProvider<ListModel?> {
+  /// Provider for fetching a single list by ID.
+  ///
+  /// This is a family provider that takes a listId parameter.
+  /// Returns `AsyncValue<ListModel?>` - null if list not found.
+  /// Auto-disposes when no longer watched.
+  const ListByIdProvider._({
+    required ListByIdFamily super.from,
+    required String super.argument,
+  }) : super(
+         retry: null,
+         name: r'listByIdProvider',
+         isAutoDispose: true,
+         dependencies: null,
+         $allTransitiveDependencies: null,
+       );
+
+  @override
+  String debugGetCreateSourceHash() => _$listByIdHash();
+
+  @override
+  String toString() {
+    return r'listByIdProvider'
+        ''
+        '($argument)';
+  }
+
+  @$internal
+  @override
+  $FutureProviderElement<ListModel?> $createElement($ProviderPointer pointer) =>
+      $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<ListModel?> create(Ref ref) {
+    final argument = this.argument as String;
+    return listById(ref, argument);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is ListByIdProvider && other.argument == argument;
+  }
+
+  @override
+  int get hashCode {
+    return argument.hashCode;
+  }
+}
+
+String _$listByIdHash() => r'7c35ca03727d4809521f189dd556cda143e48ba6';
+
+/// Provider for fetching a single list by ID.
+///
+/// This is a family provider that takes a listId parameter.
+/// Returns `AsyncValue<ListModel?>` - null if list not found.
+/// Auto-disposes when no longer watched.
+
+final class ListByIdFamily extends $Family
+    with $FunctionalFamilyOverride<FutureOr<ListModel?>, String> {
+  const ListByIdFamily._()
+    : super(
+        retry: null,
+        name: r'listByIdProvider',
+        dependencies: null,
+        $allTransitiveDependencies: null,
+        isAutoDispose: true,
+      );
+
+  /// Provider for fetching a single list by ID.
+  ///
+  /// This is a family provider that takes a listId parameter.
+  /// Returns `AsyncValue<ListModel?>` - null if list not found.
+  /// Auto-disposes when no longer watched.
+
+  ListByIdProvider call(String listId) =>
+      ListByIdProvider._(argument: listId, from: this);
+
+  @override
+  String toString() => r'listByIdProvider';
+}

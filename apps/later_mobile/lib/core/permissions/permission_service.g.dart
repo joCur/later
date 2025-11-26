@@ -137,4 +137,4 @@ final class CurrentUserRoleProvider
   }
 }
 
-String _$currentUserRoleHash() => r'18352491572abaf7db94165790f48e08b997f7c0';
+String _$currentUserRoleHash() => r'81d3608f60953e9eb05d552393b839d4e460b2ac';

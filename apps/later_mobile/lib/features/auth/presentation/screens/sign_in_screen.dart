@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:later_mobile/core/error/app_error.dart';
+import 'package:later_mobile/core/error/error_handler.dart';
+import 'package:later_mobile/core/routing/routes.dart';
 import 'package:later_mobile/design_system/design_system.dart';
-import 'package:later_mobile/features/auth/presentation/controllers/auth_state_controller.dart';
+import 'package:later_mobile/features/auth/presentation/controllers/auth_controller.dart';
 import 'package:later_mobile/l10n/app_localizations.dart';
-import 'package:later_mobile/features/auth/presentation/screens/sign_up_screen.dart';
 
 /// Screen for signing in existing users
 ///
@@ -25,6 +27,11 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
   final _emailFocusNode = FocusNode();
   final _passwordFocusNode = FocusNode();
   bool _obscurePassword = true;
+  bool _isFormValid = false;
+  bool _isEmailValid = false;
+  bool _isPasswordValid = false;
+  bool _isSigningIn = false; // Local loading state for sign-in operation
+  bool _isSigningInAnonymously = false; // Local loading state for anonymous sign-in
 
   @override
   void initState() {
@@ -48,51 +55,74 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
     super.dispose();
   }
 
+  void _updateFormValidity() {
+    // Manual validation since TextInputField doesn't connect to Form
+    final email = _emailController.text.trim();
+    final password = _passwordController.text;
+
+    final emailValid = email.isNotEmpty && email.contains('@');
+    final passwordValid = password.isNotEmpty;
+
+    final isValid = emailValid && passwordValid;
+
+    if (_isFormValid != isValid || _isEmailValid != emailValid || _isPasswordValid != passwordValid) {
+      setState(() {
+        _isFormValid = isValid;
+        _isEmailValid = emailValid;
+        _isPasswordValid = passwordValid;
+      });
+    }
+  }
+
   Future<void> _handleSignIn() async {
     if (!_formKey.currentState!.validate()) {
       return;
     }
 
-    await ref.read(authStateControllerProvider.notifier).signIn(
-          email: _emailController.text.trim(),
-          password: _passwordController.text,
-        );
+    setState(() => _isSigningIn = true);
 
-    // Error handling is done through AsyncValue.error
-    // The UI will show the error message automatically
+    try {
+      await ref.read(authControllerProvider.notifier).signIn(
+            email: _emailController.text.trim(),
+            password: _passwordController.text,
+          );
+    } catch (error) {
+      // Catch error and display inline
+      if (mounted) {
+        setState(() => _isSigningIn = false);
+        if (error is AppError) {
+          ErrorHandler.showErrorSnackBar(context, error);
+        }
+      }
+    }
   }
 
   Future<void> _handleContinueWithoutAccount() async {
-    await ref.read(authStateControllerProvider.notifier).signInAnonymously();
-    // Error handling is done through AsyncValue.error
-    // The UI will show the error message automatically
+    setState(() => _isSigningInAnonymously = true);
+
+    try {
+      await ref.read(authControllerProvider.notifier).signInAnonymously();
+    } catch (error) {
+      // Catch error and display inline
+      if (mounted) {
+        setState(() => _isSigningInAnonymously = false);
+        if (error is AppError) {
+          ErrorHandler.showErrorSnackBar(context, error);
+        }
+      }
+    }
   }
 
   void _navigateToSignUp() {
-    Navigator.of(context).pushReplacement(
-      MaterialPageRoute<void>(builder: (context) => const SignUpScreen()),
-    );
+    context.go(kRouteSignUp);
   }
 
   @override
   Widget build(BuildContext context) {
-    final authState = ref.watch(authStateControllerProvider);
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    // Extract error message from AsyncValue
-    final errorMessage = authState.when(
-      data: (_) => null,
-      loading: () => null,
-      error: (error, _) {
-        if (error is AppError) {
-          return error.message;
-        }
-        return 'An unexpected error occurred';
-      },
-    );
-
-    // Extract loading state
-    final isLoading = authState.isLoading;
+    // Use local loading state for auth operations
+    final isLoading = _isSigningIn || _isSigningInAnonymously;
 
     return Scaffold(
       body: Stack(
@@ -123,6 +153,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                             ),
                             child: Form(
                               key: _formKey,
+                              autovalidateMode: AutovalidateMode.onUserInteraction,
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -134,12 +165,6 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                                   // Welcome heading
                                   _buildHeading(),
                                   const SizedBox(height: AppSpacing.lg),
-
-                                  // Error banner
-                                  if (errorMessage != null) ...[
-                                    _buildErrorBanner(errorMessage),
-                                    const SizedBox(height: AppSpacing.md),
-                                  ],
 
                                   // Email field
                                   _buildEmailField(isLoading),
@@ -220,35 +245,6 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
     ).animate(delay: 300.ms).fadeIn(duration: 400.ms);
   }
 
-  Widget _buildErrorBanner(String errorMessage) {
-    return Container(
-          padding: const EdgeInsets.all(AppSpacing.md),
-          decoration: BoxDecoration(
-            color: AppColors.error.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: AppColors.error.withValues(alpha: 0.3)),
-          ),
-          child: Row(
-            children: [
-              const Icon(Icons.error_outline, color: AppColors.error, size: 20),
-              const SizedBox(width: AppSpacing.sm),
-              Expanded(
-                child: Text(
-                  errorMessage,
-                  style: AppTypography.bodySmall.copyWith(
-                    color: AppColors.error,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        )
-        .animate()
-        .fadeIn(duration: 200.ms)
-        .slideY(begin: -0.2, end: 0, duration: 200.ms);
-  }
-
   Widget _buildEmailField(bool isLoading) {
     final l10n = AppLocalizations.of(context)!;
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -261,8 +257,12 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
           keyboardType: TextInputType.emailAddress,
           textInputAction: TextInputAction.next,
           prefixIcon: Icons.email_outlined,
+          suffixIcon: _emailController.text.isNotEmpty && _isEmailValid
+              ? Icons.check_circle
+              : null,
           enabled: !isLoading,
           textColor: isDark ? Colors.white : AppColors.neutral900,
+          onChanged: (_) => _updateFormValidity(),
           validator: (value) {
             if (value == null || value.isEmpty) {
               return l10n.authValidationEmailRequired;
@@ -303,6 +303,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
           },
           enabled: !isLoading,
           textColor: isDark ? Colors.white : AppColors.neutral900,
+          onChanged: (_) => _updateFormValidity(),
           validator: (value) {
             if (value == null || value.isEmpty) {
               return l10n.authValidationPasswordRequired;
@@ -322,7 +323,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
     final l10n = AppLocalizations.of(context)!;
     return PrimaryButton(
           text: l10n.authButtonSignIn,
-          onPressed: isLoading ? null : _handleSignIn,
+          onPressed: (_isFormValid && !isLoading) ? _handleSignIn : null,
           isLoading: isLoading,
         )
         .animate(delay: 600.ms)

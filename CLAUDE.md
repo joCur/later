@@ -89,15 +89,27 @@ dart run build_runner clean                                # Clean generated fil
 **Authentication:**
 - `AuthService` (`features/auth/data/services/auth_service.dart`) - Handles Supabase Auth operations
 - `AuthApplicationService` (`features/auth/application/`) - Business logic layer for authentication
-- `AuthStateController` (`features/auth/presentation/controllers/`) - Riverpod controller managing authentication state with stream subscription (keepAlive)
-- `AuthGate` widget - Routes between auth screens and main app based on auth state
+- `authStreamProvider` (`features/auth/application/providers.dart`) - Stream-based provider exposing current user (Stream<User?>)
+- `AuthController` (`features/auth/presentation/controllers/`) - Stateless controller for auth operations (sign-in, sign-up, sign-out)
 - All repositories automatically filter data by `user_id` from current auth session
+- Authentication routing handled by go_router redirect guards (see Routing section below)
+
+**Authentication Error Handling Pattern:**
+- Auth screens (SignInScreen, SignUpScreen) use `ref.listen` to intercept error states inline
+- When auth operations fail:
+  1. Error is caught in `ref.listen` callback
+  2. Error is displayed inline via `ErrorHandler.showErrorSnackBar()`
+  3. User stays on auth screen (no navigation to error page)
+- Controllers throw errors which are caught by UI components for inline display
+- This pattern provides better UX than full-page error screens for auth failures
+- Example implementation in SignInScreen:76-121
 
 **State Management:**
 - **Riverpod 3.0.3** for state management (migrated from Provider in November 2025)
 - Feature-first architecture with Clean Architecture layers (Domain, Data, Application, Presentation)
 - Main controllers (all use `@riverpod` code generation):
-  - `AuthStateController` - manages authentication state and stream subscription (keepAlive)
+  - `authStreamProvider` - provides stream of current user (keepAlive)
+  - `AuthController` - handles auth operations (stateless, auto-dispose)
   - `ThemeController` - manages light/dark theme (keepAlive)
   - `SpacesController` - manages all spaces (keepAlive)
   - `CurrentSpaceController` - manages currently selected space (keepAlive)
@@ -109,6 +121,68 @@ dart run build_runner clean                                # Clean generated fil
   - `ContentFilterController` - manages home screen filter state (auto-dispose)
 - Controllers handle loading states (AsyncValue.loading/data/error), error states, and async operations
 - Code generation: Run `dart run build_runner watch` during development
+
+### Routing
+
+The app uses **go_router** for declarative, authentication-aware navigation.
+
+**Router Structure:**
+```
+lib/core/routing/
+├── app_router.dart           # Router provider + route configuration
+├── app_router.g.dart         # Generated Riverpod code
+├── routes.dart               # Route path constants
+└── go_router_refresh_stream.dart  # Stream-to-ChangeNotifier adapter
+```
+
+**Route Constants:**
+All route paths are defined as constants in `lib/core/routing/routes.dart`:
+- `kRouteHome` → `/` (HomeScreen)
+- `kRouteSignIn` → `/auth/sign-in` (SignInScreen)
+- `kRouteSignUp` → `/auth/sign-up` (SignUpScreen)
+- `kRouteAccountUpgrade` → `/auth/account-upgrade` (AccountUpgradeScreen)
+- `kRouteSearch` → `/search` (SearchScreen)
+- Note detail: `/notes/:id` (NoteDetailScreen with noteId parameter)
+- Todo detail: `/todos/:id` (TodoListDetailScreen with todoListId parameter)
+- List detail: `/lists/:id` (ListDetailScreen with listId parameter)
+
+**Authentication Guards:**
+The router uses a top-level `redirect` callback that automatically:
+- Redirects unauthenticated users to `/auth/sign-in` when accessing protected routes
+- Redirects authenticated users to `/` when accessing auth routes
+- Reacts to auth state changes via `GoRouterRefreshStream` wrapper around `authStreamProvider`
+
+**Navigation Patterns:**
+```dart
+// Navigate to new route (push onto stack)
+context.push('/notes/${note.id}');
+context.push(kRouteSearch);
+
+// Replace current route (no back navigation)
+context.go(kRouteSignIn);
+
+// Go back
+context.pop();
+
+// No need to manually check auth state - router handles it automatically
+```
+
+**Detail Screen Data Loading:**
+Detail screens receive ID parameters from routes and fetch data via Riverpod providers:
+```dart
+class NoteDetailScreen extends ConsumerWidget {
+  final String noteId;
+
+  // Router passes noteId from path parameter /notes/:id
+  // Screen fetches full Note object via provider
+}
+```
+
+**Adding New Routes:**
+1. Add route constant to `lib/core/routing/routes.dart`
+2. Add route definition to `routerProvider` in `lib/core/routing/app_router.dart`
+3. Use `context.push()` or `context.go()` for navigation
+4. Detail screens should accept ID parameters and fetch data via providers
 
 ### Error Handling
 
@@ -655,9 +729,11 @@ testWidgets('my widget test', (tester) async {
 3. Create repository in `lib/data/repositories/` extending `BaseRepository`
 4. Add to `ContentProvider` if needed with proper caching
 5. Create card component in `design_system/molecules/`
-6. Add detail screen in `widgets/screens/`
-7. Update QuickCapture modal for type detection
-8. Add RLS policies to secure data access by user_id
+6. Add detail screen in `widgets/screens/` (should accept ID parameter, not full object)
+7. Add route constant to `lib/core/routing/routes.dart`
+8. Add route definition to `lib/core/routing/app_router.dart` with path parameter (e.g., `/mytype/:id`)
+9. Update QuickCapture modal for type detection
+10. Add RLS policies to secure data access by user_id
 
 ### Creating Reusable Components
 

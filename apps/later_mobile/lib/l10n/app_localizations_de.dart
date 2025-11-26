@@ -389,6 +389,39 @@ class AppLocalizationsDe extends AppLocalizations {
   String get noteDetailMenuDelete => 'Notiz löschen';
 
   @override
+  String get noteDetailLoadingTitle => 'Notiz wird geladen';
+
+  @override
+  String get noteDetailErrorTitle => 'Fehler';
+
+  @override
+  String get noteDetailErrorMessage => 'Notiz konnte nicht geladen werden';
+
+  @override
+  String get noteDetailNotFoundTitle => 'Notiz nicht gefunden';
+
+  @override
+  String get noteDetailNotFoundMessage =>
+      'Diese Notiz konnte nicht gefunden werden. Sie wurde möglicherweise gelöscht.';
+
+  @override
+  String get todoListDetailLoadingTitle => 'Aufgabenliste wird geladen';
+
+  @override
+  String get todoListDetailErrorTitle => 'Fehler';
+
+  @override
+  String get todoListDetailErrorMessage =>
+      'Aufgabenliste konnte nicht geladen werden';
+
+  @override
+  String get todoListDetailNotFoundTitle => 'Aufgabenliste nicht gefunden';
+
+  @override
+  String get todoListDetailNotFoundMessage =>
+      'Diese Aufgabenliste konnte nicht gefunden werden. Sie wurde möglicherweise gelöscht.';
+
+  @override
   String get todoDetailNameEmpty =>
       'Name der Aufgabenliste darf nicht leer sein';
 
@@ -632,6 +665,22 @@ class AppLocalizationsDe extends AppLocalizations {
   String get listDetailMenuDelete => 'Liste löschen';
 
   @override
+  String get listDetailLoadingTitle => 'Liste wird geladen';
+
+  @override
+  String get listDetailErrorTitle => 'Fehler';
+
+  @override
+  String get listDetailErrorMessage => 'Liste konnte nicht geladen werden';
+
+  @override
+  String get listDetailNotFoundTitle => 'Liste nicht gefunden';
+
+  @override
+  String get listDetailNotFoundMessage =>
+      'Diese Liste konnte nicht gefunden werden. Sie wurde möglicherweise gelöscht.';
+
+  @override
   String get spaceModalTitle => 'Bereich wechseln';
 
   @override
@@ -823,6 +872,9 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get buttonArchive => 'Archivieren';
+
+  @override
+  String get buttonGoBack => 'Zurück';
 
   @override
   String get accessibilityCloseButton => 'Schließen';

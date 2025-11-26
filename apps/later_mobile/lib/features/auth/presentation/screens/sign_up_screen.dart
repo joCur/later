@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:later_mobile/core/error/app_error.dart';
+import 'package:later_mobile/core/error/error_handler.dart';
+import 'package:later_mobile/core/routing/routes.dart';
 import 'package:later_mobile/design_system/design_system.dart';
-import 'package:later_mobile/features/auth/presentation/controllers/auth_state_controller.dart';
+import 'package:later_mobile/features/auth/presentation/controllers/auth_controller.dart';
 import 'package:later_mobile/l10n/app_localizations.dart';
-import 'package:later_mobile/features/auth/presentation/screens/sign_in_screen.dart';
 
 /// Screen for signing up new users
 ///
@@ -28,6 +30,11 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
   final _confirmPasswordFocusNode = FocusNode();
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
+  bool _isFormValid = false;
+  bool _isEmailValid = false;
+  bool _isPasswordValid = false;
+  bool _isConfirmPasswordValid = false;
+  bool _isSigningUp = false; // Local loading state for sign-up operation
 
   @override
   void initState() {
@@ -58,45 +65,64 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
     super.dispose();
   }
 
+  void _updateFormValidity() {
+    // Manual validation since TextInputField doesn't connect to Form
+    final email = _emailController.text.trim();
+    final password = _passwordController.text;
+    final confirmPassword = _confirmPasswordController.text;
+
+    final emailValid = email.isNotEmpty && email.contains('@');
+    final passwordValid = password.isNotEmpty && password.length >= 8;
+    final confirmPasswordValid = password == confirmPassword && confirmPassword.isNotEmpty;
+
+    final isValid = emailValid && passwordValid && confirmPasswordValid;
+
+    if (_isFormValid != isValid ||
+        _isEmailValid != emailValid ||
+        _isPasswordValid != passwordValid ||
+        _isConfirmPasswordValid != confirmPasswordValid) {
+      setState(() {
+        _isFormValid = isValid;
+        _isEmailValid = emailValid;
+        _isPasswordValid = passwordValid;
+        _isConfirmPasswordValid = confirmPasswordValid;
+      });
+    }
+  }
+
   Future<void> _handleSignUp() async {
     if (!_formKey.currentState!.validate()) {
       return;
     }
 
-    await ref.read(authStateControllerProvider.notifier).signUp(
-          email: _emailController.text.trim(),
-          password: _passwordController.text,
-        );
+    setState(() => _isSigningUp = true);
 
-    // Error handling is done through AsyncValue.error
-    // The UI will show the error message automatically
+    try {
+      await ref.read(authControllerProvider.notifier).signUp(
+            email: _emailController.text.trim(),
+            password: _passwordController.text,
+          );
+    } catch (error) {
+      // Catch error and display inline
+      if (mounted) {
+        setState(() => _isSigningUp = false);
+        if (error is AppError) {
+          ErrorHandler.showErrorSnackBar(context, error);
+        }
+      }
+    }
   }
 
   void _navigateToSignIn() {
-    Navigator.of(context).pushReplacement(
-      MaterialPageRoute<void>(builder: (context) => const SignInScreen()),
-    );
+    context.go(kRouteSignIn);
   }
 
   @override
   Widget build(BuildContext context) {
-    final authState = ref.watch(authStateControllerProvider);
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    // Extract error message from AsyncValue
-    final errorMessage = authState.when(
-      data: (_) => null,
-      loading: () => null,
-      error: (error, _) {
-        if (error is AppError) {
-          return error.message;
-        }
-        return 'An unexpected error occurred';
-      },
-    );
-
-    // Extract loading state
-    final isLoading = authState.isLoading;
+    // Use local loading state for sign-up operation
+    final isLoading = _isSigningUp;
 
     return Scaffold(
       body: Stack(
@@ -127,6 +153,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                             ),
                             child: Form(
                               key: _formKey,
+                              autovalidateMode: AutovalidateMode.onUserInteraction,
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -138,12 +165,6 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                                   // Welcome heading
                                   _buildHeading(),
                                   const SizedBox(height: AppSpacing.lg),
-
-                                  // Error banner
-                                  if (errorMessage != null) ...[
-                                    _buildErrorBanner(errorMessage),
-                                    const SizedBox(height: AppSpacing.md),
-                                  ],
 
                                   // Email field
                                   _buildEmailField(isLoading),
@@ -228,35 +249,6 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
     ).animate(delay: 300.ms).fadeIn(duration: 400.ms);
   }
 
-  Widget _buildErrorBanner(String errorMessage) {
-    return Container(
-          padding: const EdgeInsets.all(AppSpacing.md),
-          decoration: BoxDecoration(
-            color: AppColors.error.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: AppColors.error.withValues(alpha: 0.3)),
-          ),
-          child: Row(
-            children: [
-              const Icon(Icons.error_outline, color: AppColors.error, size: 20),
-              const SizedBox(width: AppSpacing.sm),
-              Expanded(
-                child: Text(
-                  errorMessage,
-                  style: AppTypography.bodySmall.copyWith(
-                    color: AppColors.error,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        )
-        .animate()
-        .fadeIn(duration: 200.ms)
-        .slideY(begin: -0.2, end: 0, duration: 200.ms);
-  }
-
   Widget _buildEmailField(bool isLoading) {
     final l10n = AppLocalizations.of(context)!;
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -269,8 +261,12 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
           keyboardType: TextInputType.emailAddress,
           textInputAction: TextInputAction.next,
           prefixIcon: Icons.email_outlined,
+          suffixIcon: _emailController.text.isNotEmpty && _isEmailValid
+              ? Icons.check_circle
+              : null,
           enabled: !isLoading,
           textColor: isDark ? Colors.white : AppColors.neutral900,
+          onChanged: (_) => _updateFormValidity(),
           validator: (value) {
             if (value == null || value.isEmpty) {
               return l10n.authValidationEmailRequired;
@@ -311,6 +307,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
           },
           enabled: !isLoading,
           textColor: isDark ? Colors.white : AppColors.neutral900,
+          onChanged: (_) => _updateFormValidity(),
           validator: (value) {
             if (value == null || value.isEmpty) {
               return l10n.authValidationPasswordRequiredSignUp;
@@ -364,6 +361,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
           },
           enabled: !isLoading,
           textColor: isDark ? Colors.white : AppColors.neutral900,
+          onChanged: (_) => _updateFormValidity(),
           validator: (value) {
             if (value == null || value.isEmpty) {
               return l10n.authValidationConfirmPasswordRequired;
@@ -386,7 +384,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
     final l10n = AppLocalizations.of(context)!;
     return PrimaryButton(
           text: l10n.authButtonSignUp,
-          onPressed: isLoading ? null : _handleSignUp,
+          onPressed: (_isFormValid && !isLoading) ? _handleSignUp : null,
           isLoading: isLoading,
         )
         .animate(delay: 800.ms)
