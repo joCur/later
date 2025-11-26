@@ -66,7 +66,7 @@ String _$noteServiceHash() => r'8a5a9889b10513fa310808f21f4a4a26e251cac8';
 /// Provider for fetching a single note by ID.
 ///
 /// This is a family provider that takes a noteId parameter.
-/// Returns AsyncValue<Note?> - null if note not found.
+/// Returns `AsyncValue<Note?>` - null if note not found.
 /// Auto-disposes when no longer watched.
 
 @ProviderFor(noteById)
@@ -75,7 +75,7 @@ const noteByIdProvider = NoteByIdFamily._();
 /// Provider for fetching a single note by ID.
 ///
 /// This is a family provider that takes a noteId parameter.
-/// Returns AsyncValue<Note?> - null if note not found.
+/// Returns `AsyncValue<Note?>` - null if note not found.
 /// Auto-disposes when no longer watched.
 
 final class NoteByIdProvider
@@ -84,7 +84,7 @@ final class NoteByIdProvider
   /// Provider for fetching a single note by ID.
   ///
   /// This is a family provider that takes a noteId parameter.
-  /// Returns AsyncValue<Note?> - null if note not found.
+  /// Returns `AsyncValue<Note?>` - null if note not found.
   /// Auto-disposes when no longer watched.
   const NoteByIdProvider._({
     required NoteByIdFamily super.from,
@@ -134,7 +134,7 @@ String _$noteByIdHash() => r'10767b8fd489f3f1495c78af92b87dac472bafe5';
 /// Provider for fetching a single note by ID.
 ///
 /// This is a family provider that takes a noteId parameter.
-/// Returns AsyncValue<Note?> - null if note not found.
+/// Returns `AsyncValue<Note?>` - null if note not found.
 /// Auto-disposes when no longer watched.
 
 final class NoteByIdFamily extends $Family
@@ -151,7 +151,7 @@ final class NoteByIdFamily extends $Family
   /// Provider for fetching a single note by ID.
   ///
   /// This is a family provider that takes a noteId parameter.
-  /// Returns AsyncValue<Note?> - null if note not found.
+  /// Returns `AsyncValue<Note?>` - null if note not found.
   /// Auto-disposes when no longer watched.
 
   NoteByIdProvider call(String noteId) =>

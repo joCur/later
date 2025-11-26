@@ -302,7 +302,7 @@ class _CreateContentModalState extends ConsumerState<CreateContentModal>
       error: (error, stack) => null,
     );
     if (userId == null) {
-      return; // Exit early - user should be redirected to auth screen by AuthGate
+      return; // Exit early - user should be redirected to auth screen by router
     }
 
     try {

@@ -66,7 +66,7 @@ String _$listServiceHash() => r'4476e84eb59db3311cd7a1a91e9bbfcb6adf30ad';
 /// Provider for fetching a single list by ID.
 ///
 /// This is a family provider that takes a listId parameter.
-/// Returns AsyncValue<ListModel?> - null if list not found.
+/// Returns `AsyncValue<ListModel?>` - null if list not found.
 /// Auto-disposes when no longer watched.
 
 @ProviderFor(listById)
@@ -75,7 +75,7 @@ const listByIdProvider = ListByIdFamily._();
 /// Provider for fetching a single list by ID.
 ///
 /// This is a family provider that takes a listId parameter.
-/// Returns AsyncValue<ListModel?> - null if list not found.
+/// Returns `AsyncValue<ListModel?>` - null if list not found.
 /// Auto-disposes when no longer watched.
 
 final class ListByIdProvider
@@ -89,7 +89,7 @@ final class ListByIdProvider
   /// Provider for fetching a single list by ID.
   ///
   /// This is a family provider that takes a listId parameter.
-  /// Returns AsyncValue<ListModel?> - null if list not found.
+  /// Returns `AsyncValue<ListModel?>` - null if list not found.
   /// Auto-disposes when no longer watched.
   const ListByIdProvider._({
     required ListByIdFamily super.from,
@@ -139,7 +139,7 @@ String _$listByIdHash() => r'7c35ca03727d4809521f189dd556cda143e48ba6';
 /// Provider for fetching a single list by ID.
 ///
 /// This is a family provider that takes a listId parameter.
-/// Returns AsyncValue<ListModel?> - null if list not found.
+/// Returns `AsyncValue<ListModel?>` - null if list not found.
 /// Auto-disposes when no longer watched.
 
 final class ListByIdFamily extends $Family
@@ -156,7 +156,7 @@ final class ListByIdFamily extends $Family
   /// Provider for fetching a single list by ID.
   ///
   /// This is a family provider that takes a listId parameter.
-  /// Returns AsyncValue<ListModel?> - null if list not found.
+  /// Returns `AsyncValue<ListModel?>` - null if list not found.
   /// Auto-disposes when no longer watched.
 
   ListByIdProvider call(String listId) =>
