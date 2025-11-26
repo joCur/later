@@ -234,32 +234,34 @@ lib/core/routing/
   - ✅ Ran `flutter pub get` - clean dependency resolution
   - ✅ No barrel export files needed updating
 
-### Phase 4: Replace Imperative Navigation (~4-5 hours)
+### Phase 4: Replace Imperative Navigation (~4-5 hours) ✅ COMPLETED
 
 **Goal:** Replace all 13 Navigator calls across 5 files with go_router navigation, and update detail screens to accept ID parameters.
 
-- [ ] Task 4.1: Update SignInScreen navigation
+**Status:** ✅ **COMPLETED** - All tasks finished successfully. All 13 Navigator calls replaced with go_router navigation. All detail screens now fetch data by ID via providers. Technical debt from SearchResultCard resolved. Tests updated and passing. Flutter analyze shows no errors.
+
+- [x] Task 4.1: Update SignInScreen navigation
   - Import `package:go_router/go_router.dart` and route constants
   - Replace `_navigateToSignUp()` method implementation:
     - Change `Navigator.of(context).pushReplacement(...)` to `context.go(kRouteSignUp)`
   - Remove MaterialPageRoute and SignUpScreen widget import (still imported for types elsewhere)
   - Test that sign-in → sign-up navigation works with new routing
 
-- [ ] Task 4.2: Update SignUpScreen navigation
+- [x] Task 4.2: Update SignUpScreen navigation
   - Import `package:go_router/go_router.dart` and route constants
   - Replace `_navigateToSignIn()` method implementation:
     - Change `Navigator.of(context).pushReplacement(...)` to `context.go(kRouteSignIn)`
   - Remove MaterialPageRoute and SignInScreen widget import (still imported for types elsewhere)
   - Test that sign-up → sign-in navigation works with new routing
 
-- [ ] Task 4.3: Verify authentication flow triggers navigation
+- [x] Task 4.3: Verify authentication flow triggers navigation
   - After successful sign-in, AuthStateController updates auth state
   - Router's refreshListenable triggers redirect evaluation
   - Redirect guard sees authenticated user and redirects to `/`
   - User automatically navigates to HomeScreen without manual navigation call
   - Same flow for sign-up and anonymous sign-in
 
-- [ ] Task 4.4: Update HomeScreen navigation (5 calls)
+- [x] Task 4.4: Update HomeScreen navigation (5 calls)
   - Import `package:go_router/go_router.dart` and route constants
   - Replace navigation to NoteDetailScreen: `context.push('/notes/${note.id}')`
   - Replace navigation to TodoListDetailScreen: `context.push('/todos/${todoList.id}')`
@@ -268,7 +270,7 @@ lib/core/routing/
   - Replace navigation to AccountUpgradeScreen: `context.push(kRouteAccountUpgrade)`
   - Remove MaterialPageRoute imports
 
-- [ ] Task 4.5: Update SearchResultCard navigation (5 calls)
+- [x] Task 4.5: Update SearchResultCard navigation (5 calls)
   - Import `package:go_router/go_router.dart` and route constants
   - Replace navigation to NoteDetailScreen: `context.push('/notes/${note.id}')`
   - Replace navigation to TodoListDetailScreen: `context.push('/todos/${todoList.id}')`
@@ -277,13 +279,13 @@ lib/core/routing/
   - Handle parent List navigation: `context.push('/lists/${parentList.id}')`
   - Remove MaterialPageRoute imports
 
-- [ ] Task 4.6: Update UpgradeRequiredDialog navigation (1 call)
+- [x] Task 4.6: Update UpgradeRequiredDialog navigation (1 call)
   - Import `package:go_router/go_router.dart` and route constants
   - Keep `Navigator.pop()` for closing dialog (standard practice)
   - Replace navigation to AccountUpgradeScreen: `context.push(kRouteAccountUpgrade)`
   - Remove MaterialPageRoute import
 
-- [ ] Task 4.7: Update detail screens to accept ID parameters
+- [x] Task 4.7: Update detail screens to accept ID parameters
   - Update NoteDetailScreen constructor to accept `String noteId` instead of `Note note`
   - Update TodoListDetailScreen constructor to accept `String todoListId` instead of `TodoList todoList`
   - Update ListDetailScreen constructor to accept `String listId` instead of `ListModel list`

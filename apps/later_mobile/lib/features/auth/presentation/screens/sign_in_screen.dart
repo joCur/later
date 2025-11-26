@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:later_mobile/core/error/app_error.dart';
 import 'package:later_mobile/core/error/error_handler.dart';
+import 'package:later_mobile/core/routing/routes.dart';
 import 'package:later_mobile/design_system/design_system.dart';
 import 'package:later_mobile/features/auth/presentation/controllers/auth_controller.dart';
 import 'package:later_mobile/l10n/app_localizations.dart';
-import 'package:later_mobile/features/auth/presentation/screens/sign_up_screen.dart';
 
 /// Screen for signing in existing users
 ///
@@ -113,9 +114,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
   }
 
   void _navigateToSignUp() {
-    Navigator.of(context).pushReplacement(
-      MaterialPageRoute<void>(builder: (context) => const SignUpScreen()),
-    );
+    context.go(kRouteSignUp);
   }
 
   @override

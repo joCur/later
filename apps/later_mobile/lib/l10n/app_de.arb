@@ -510,6 +510,17 @@
   "noteDetailTagsLabel": "Tags",
   "noteDetailTagsEmpty": "Noch keine Tags. Tippen Sie auf +, um Tags hinzuzufügen.",
   "noteDetailMenuDelete": "Notiz löschen",
+  "noteDetailLoadingTitle": "Notiz wird geladen",
+  "noteDetailErrorTitle": "Fehler",
+  "noteDetailErrorMessage": "Notiz konnte nicht geladen werden",
+  "noteDetailNotFoundTitle": "Notiz nicht gefunden",
+  "noteDetailNotFoundMessage": "Diese Notiz konnte nicht gefunden werden. Sie wurde möglicherweise gelöscht.",
+
+  "todoListDetailLoadingTitle": "Aufgabenliste wird geladen",
+  "todoListDetailErrorTitle": "Fehler",
+  "todoListDetailErrorMessage": "Aufgabenliste konnte nicht geladen werden",
+  "todoListDetailNotFoundTitle": "Aufgabenliste nicht gefunden",
+  "todoListDetailNotFoundMessage": "Diese Aufgabenliste konnte nicht gefunden werden. Sie wurde möglicherweise gelöscht.",
 
   "todoDetailNameEmpty": "Name der Aufgabenliste darf nicht leer sein",
   "todoDetailSaveFailed": "Änderungen konnten nicht gespeichert werden",
@@ -585,6 +596,11 @@
   "listDetailMenuChangeStyle": "Stil ändern",
   "listDetailMenuChangeIcon": "Symbol ändern",
   "listDetailMenuDelete": "Liste löschen",
+  "listDetailLoadingTitle": "Liste wird geladen",
+  "listDetailErrorTitle": "Fehler",
+  "listDetailErrorMessage": "Liste konnte nicht geladen werden",
+  "listDetailNotFoundTitle": "Liste nicht gefunden",
+  "listDetailNotFoundMessage": "Diese Liste konnte nicht gefunden werden. Sie wurde möglicherweise gelöscht.",
 
   "spaceModalTitle": "Bereich wechseln",
   "spaceModalSearchHint": "Bereiche durchsuchen...",
@@ -646,6 +662,7 @@
   "buttonDelete": "Löschen",
   "buttonClose": "Schließen",
   "buttonArchive": "Archivieren",
+  "buttonGoBack": "Zurück",
 
   "accessibilityCloseButton": "Schließen",
   "accessibilityAddDescription": "Beschreibung hinzufügen, eingeklappt",

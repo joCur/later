@@ -1,10 +1,3 @@
-/// Route path constants for the application
-///
-/// Defines all route paths used throughout the app. Using constants
-/// ensures type safety and prevents typos in route navigation.
-///
-/// These routes are used with go_router for declarative navigation.
-
 // Home route
 const String kRouteHome = '/';
 

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:later_mobile/core/routing/routes.dart';
 import 'package:later_mobile/l10n/app_localizations.dart';
 import 'package:later_mobile/design_system/atoms/buttons/primary_button.dart';
 import 'package:later_mobile/design_system/atoms/chips/filter_chip.dart';
@@ -27,7 +29,6 @@ import 'package:later_mobile/features/spaces/domain/models/space.dart';
 import 'package:later_mobile/features/spaces/presentation/controllers/spaces_controller.dart';
 import 'package:later_mobile/features/spaces/presentation/controllers/current_space_controller.dart';
 import 'package:later_mobile/features/auth/presentation/controllers/auth_controller.dart';
-import 'package:later_mobile/features/auth/presentation/screens/account_upgrade_screen.dart';
 import 'package:later_mobile/features/auth/application/providers.dart';
 import 'package:later_mobile/features/notes/presentation/controllers/notes_controller.dart';
 import 'package:later_mobile/features/todo_lists/presentation/controllers/todo_lists_controller.dart';
@@ -39,10 +40,6 @@ import 'package:later_mobile/features/spaces/presentation/widgets/create_space_m
 import 'package:later_mobile/features/spaces/presentation/widgets/space_switcher_modal.dart';
 import 'package:later_mobile/shared/widgets/navigation/app_sidebar.dart';
 import 'package:later_mobile/shared/widgets/navigation/icon_only_bottom_nav.dart';
-import 'package:later_mobile/features/lists/presentation/screens/list_detail_screen.dart';
-import 'package:later_mobile/features/notes/presentation/screens/note_detail_screen.dart';
-import 'package:later_mobile/features/todo_lists/presentation/screens/todo_list_detail_screen.dart';
-import 'package:later_mobile/features/search/presentation/screens/search_screen.dart';
 
 /// Main home screen for the Later app
 ///
@@ -145,11 +142,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   /// Navigate to account upgrade screen
   void _navigateToUpgradeScreen() {
-    Navigator.of(context).push(
-      MaterialPageRoute<void>(
-        builder: (context) => const AccountUpgradeScreen(),
-      ),
-    );
+    context.push(kRouteAccountUpgrade);
   }
 
   /// Check if banner should be shown
@@ -504,11 +497,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         IconButton(
           icon: const Icon(Icons.search),
           onPressed: () {
-            Navigator.of(context).push(
-              MaterialPageRoute<void>(
-                builder: (context) => const SearchScreen(),
-              ),
-            );
+            context.push(kRouteSearch);
           },
           tooltip: l10n.navigationSearchTooltip,
           color: AppColors.textSecondary(context),
@@ -787,11 +776,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         reorderIndex: index,
         // index omitted (null) to disable entrance animation for reorderable items
         onTap: () {
-          Navigator.of(context).push(
-            MaterialPageRoute<void>(
-              builder: (context) => TodoListDetailScreen(todoList: item),
-            ),
-          );
+          context.push(buildTodoListDetailRoute(item.id));
         },
       );
     } else if (item is ListModel) {
@@ -801,11 +786,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         reorderIndex: index,
         // index omitted (null) to disable entrance animation for reorderable items
         onTap: () {
-          Navigator.of(context).push(
-            MaterialPageRoute<void>(
-              builder: (context) => ListDetailScreen(list: item),
-            ),
-          );
+          context.push(buildListDetailRoute(item.id));
         },
       );
     } else if (item is Note) {
@@ -815,11 +796,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         reorderIndex: index,
         // index omitted (null) to disable entrance animation for reorderable items
         onTap: () {
-          Navigator.of(context).push(
-            MaterialPageRoute<void>(
-              builder: (context) => NoteDetailScreen(note: item),
-            ),
-          );
+          context.push(buildNoteDetailRoute(item.id));
         },
       );
     } else {

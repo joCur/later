@@ -63,3 +63,111 @@ final class TodoListServiceProvider
 }
 
 String _$todoListServiceHash() => r'cdefab21c481ceb258a682e7a23375c752c99563';
+
+/// Provider for fetching a single TodoList by ID
+///
+/// This is a family provider that creates a separate provider instance
+/// for each todoListId. Auto-disposes when no longer watched.
+///
+/// Returns null if the todo list is not found or user doesn't have access.
+
+@ProviderFor(todoListById)
+const todoListByIdProvider = TodoListByIdFamily._();
+
+/// Provider for fetching a single TodoList by ID
+///
+/// This is a family provider that creates a separate provider instance
+/// for each todoListId. Auto-disposes when no longer watched.
+///
+/// Returns null if the todo list is not found or user doesn't have access.
+
+final class TodoListByIdProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<TodoList?>,
+          TodoList?,
+          FutureOr<TodoList?>
+        >
+    with $FutureModifier<TodoList?>, $FutureProvider<TodoList?> {
+  /// Provider for fetching a single TodoList by ID
+  ///
+  /// This is a family provider that creates a separate provider instance
+  /// for each todoListId. Auto-disposes when no longer watched.
+  ///
+  /// Returns null if the todo list is not found or user doesn't have access.
+  const TodoListByIdProvider._({
+    required TodoListByIdFamily super.from,
+    required String super.argument,
+  }) : super(
+         retry: null,
+         name: r'todoListByIdProvider',
+         isAutoDispose: true,
+         dependencies: null,
+         $allTransitiveDependencies: null,
+       );
+
+  @override
+  String debugGetCreateSourceHash() => _$todoListByIdHash();
+
+  @override
+  String toString() {
+    return r'todoListByIdProvider'
+        ''
+        '($argument)';
+  }
+
+  @$internal
+  @override
+  $FutureProviderElement<TodoList?> $createElement($ProviderPointer pointer) =>
+      $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<TodoList?> create(Ref ref) {
+    final argument = this.argument as String;
+    return todoListById(ref, argument);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is TodoListByIdProvider && other.argument == argument;
+  }
+
+  @override
+  int get hashCode {
+    return argument.hashCode;
+  }
+}
+
+String _$todoListByIdHash() => r'f96c6c36c6a2edd8443833785106447e3f3ac225';
+
+/// Provider for fetching a single TodoList by ID
+///
+/// This is a family provider that creates a separate provider instance
+/// for each todoListId. Auto-disposes when no longer watched.
+///
+/// Returns null if the todo list is not found or user doesn't have access.
+
+final class TodoListByIdFamily extends $Family
+    with $FunctionalFamilyOverride<FutureOr<TodoList?>, String> {
+  const TodoListByIdFamily._()
+    : super(
+        retry: null,
+        name: r'todoListByIdProvider',
+        dependencies: null,
+        $allTransitiveDependencies: null,
+        isAutoDispose: true,
+      );
+
+  /// Provider for fetching a single TodoList by ID
+  ///
+  /// This is a family provider that creates a separate provider instance
+  /// for each todoListId. Auto-disposes when no longer watched.
+  ///
+  /// Returns null if the todo list is not found or user doesn't have access.
+
+  TodoListByIdProvider call(String todoListId) =>
+      TodoListByIdProvider._(argument: todoListId, from: this);
+
+  @override
+  String toString() => r'todoListByIdProvider';
+}

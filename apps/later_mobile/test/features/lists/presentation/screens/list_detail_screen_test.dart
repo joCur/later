@@ -64,11 +64,13 @@ void main() {
       );
     });
 
-    Widget createWidget(ListModel list) {
+    Widget createWidget(String listId, {ListModel? customList}) {
+      final list = customList ?? testList;
       return testApp(
-        ListDetailScreen(list: list),
+        ListDetailScreen(listId: listId),
         overrides: [
           listServiceProvider.overrideWithValue(mockService),
+          listByIdProvider(listId).overrideWith((ref) async => list),
         ],
       );
     }
@@ -76,7 +78,7 @@ void main() {
     testWidgets('should display correct counter values on initial load for checklist',
         (tester) async {
       // Arrange - testItems has 1 checked, 3 total
-      await tester.pumpWidget(createWidget(testList));
+      await tester.pumpWidget(createWidget(testList.id));
       await tester.pumpAndSettle();
 
       // Assert - counter should show "1/3 completed"
@@ -87,7 +89,7 @@ void main() {
     testWidgets('should calculate counts from items list when loaded',
         (tester) async {
       // Arrange
-      await tester.pumpWidget(createWidget(testList));
+      await tester.pumpWidget(createWidget(testList.id));
       await tester.pumpAndSettle();
 
       // Act - find progress indicator widget
@@ -120,7 +122,7 @@ void main() {
         (_) async => updatedItems,
       );
 
-      await tester.pumpWidget(createWidget(testList));
+      await tester.pumpWidget(createWidget(testList.id));
       await tester.pumpAndSettle();
 
       // Verify initial state (1 checked)
@@ -164,7 +166,7 @@ void main() {
         return callCount == 1 ? initialItems : updatedItems;
       });
 
-      await tester.pumpWidget(createWidget(testList));
+      await tester.pumpWidget(createWidget(testList.id));
       await tester.pumpAndSettle();
 
       // Verify initial progress (1/3 = 0.333)
@@ -196,7 +198,7 @@ void main() {
         (_) async => [bulletList],
       );
 
-      await tester.pumpWidget(createWidget(bulletList));
+      await tester.pumpWidget(createWidget(bulletList.id, customList: bulletList));
       await tester.pumpAndSettle();
 
       // Assert - no progress indicator for bullet style
@@ -214,7 +216,7 @@ void main() {
         (_) async => [numberedList],
       );
 
-      await tester.pumpWidget(createWidget(numberedList));
+      await tester.pumpWidget(createWidget(numberedList.id, customList: numberedList));
       await tester.pumpAndSettle();
 
       // Assert - no progress indicator for numbered style
@@ -231,7 +233,7 @@ void main() {
         },
       );
 
-      await tester.pumpWidget(createWidget(testList));
+      await tester.pumpWidget(createWidget(testList.id));
 
       // Assert - should show loading indicator initially
       expect(find.byType(CircularProgressIndicator), findsOneWidget);
@@ -254,7 +256,7 @@ void main() {
         ),
       );
 
-      await tester.pumpWidget(createWidget(testList));
+      await tester.pumpWidget(createWidget(testList.id));
       await tester.pump(const Duration(milliseconds: 100));
 
       // Assert - should show model counts (from testList)
@@ -278,7 +280,7 @@ void main() {
         (_) async => allCheckedItems,
       );
 
-      await tester.pumpWidget(createWidget(testList));
+      await tester.pumpWidget(createWidget(testList.id));
       await tester.pumpAndSettle();
 
       // Assert - should show 3/3 completed
@@ -303,7 +305,7 @@ void main() {
         (_) async => noneCheckedItems,
       );
 
-      await tester.pumpWidget(createWidget(testList));
+      await tester.pumpWidget(createWidget(testList.id));
       await tester.pumpAndSettle();
 
       // Assert - should show 0/3 completed
@@ -347,7 +349,7 @@ void main() {
         }
       });
 
-      await tester.pumpWidget(createWidget(testList));
+      await tester.pumpWidget(createWidget(testList.id));
       await tester.pumpAndSettle();
 
       // Verify initial state (1 checked)
@@ -387,7 +389,7 @@ void main() {
         return testItems;
       });
 
-      await tester.pumpWidget(createWidget(testList));
+      await tester.pumpWidget(createWidget(testList.id));
       await tester.pump();
 
       // Assert - Should initially show model counts (1/3)
@@ -421,7 +423,7 @@ void main() {
         checkedItemCount: 0,
       );
 
-      await tester.pumpWidget(createWidget(singleItemList));
+      await tester.pumpWidget(createWidget(singleItemList.id, customList: singleItemList));
       await tester.pumpAndSettle();
 
       // Assert - should show 0/1 completed
@@ -456,7 +458,7 @@ void main() {
         checkedItemCount: 5,
       );
 
-      await tester.pumpWidget(createWidget(manyItemsList));
+      await tester.pumpWidget(createWidget(manyItemsList.id, customList: manyItemsList));
       await tester.pumpAndSettle();
 
       // Assert - should show 5/10 completed
@@ -481,7 +483,7 @@ void main() {
         (_) async => [bulletList],
       );
 
-      await tester.pumpWidget(createWidget(bulletList));
+      await tester.pumpWidget(createWidget(bulletList.id, customList: bulletList));
       await tester.pumpAndSettle();
 
       // Assert - should not show checkboxes for bullet style
@@ -491,7 +493,7 @@ void main() {
     testWidgets('should display icon in app bar when list has icon',
         (tester) async {
       // Arrange
-      await tester.pumpWidget(createWidget(testList));
+      await tester.pumpWidget(createWidget(testList.id));
       await tester.pumpAndSettle();
 
       // Assert - should show icon
@@ -509,7 +511,7 @@ void main() {
         (_) async => [bulletList],
       );
 
-      await tester.pumpWidget(createWidget(bulletList));
+      await tester.pumpWidget(createWidget(bulletList.id, customList: bulletList));
       await tester.pumpAndSettle();
 
       // Assert - should not find progress section
@@ -554,7 +556,7 @@ void main() {
         (_) async => actualItems,
       );
 
-      await tester.pumpWidget(createWidget(outdatedList));
+      await tester.pumpWidget(createWidget(outdatedList.id, customList: outdatedList));
       await tester.pumpAndSettle();
 
       // Assert - should show actual counts (3/3), not model counts (2/5)

@@ -752,6 +752,66 @@ abstract class AppLocalizations {
   /// **'Delete Note'**
   String get noteDetailMenuDelete;
 
+  /// Title shown while loading note data
+  ///
+  /// In en, this message translates to:
+  /// **'Loading Note'**
+  String get noteDetailLoadingTitle;
+
+  /// Title shown when note fails to load
+  ///
+  /// In en, this message translates to:
+  /// **'Error'**
+  String get noteDetailErrorTitle;
+
+  /// Message shown when note fails to load
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load note'**
+  String get noteDetailErrorMessage;
+
+  /// Title shown when note doesn't exist
+  ///
+  /// In en, this message translates to:
+  /// **'Note Not Found'**
+  String get noteDetailNotFoundTitle;
+
+  /// Message shown when note doesn't exist
+  ///
+  /// In en, this message translates to:
+  /// **'This note could not be found. It may have been deleted.'**
+  String get noteDetailNotFoundMessage;
+
+  /// Title shown while loading todo list
+  ///
+  /// In en, this message translates to:
+  /// **'Loading TodoList'**
+  String get todoListDetailLoadingTitle;
+
+  /// Title shown when error occurs loading todo list
+  ///
+  /// In en, this message translates to:
+  /// **'Error'**
+  String get todoListDetailErrorTitle;
+
+  /// Message shown when error occurs loading todo list
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load todo list'**
+  String get todoListDetailErrorMessage;
+
+  /// Title shown when todo list doesn't exist
+  ///
+  /// In en, this message translates to:
+  /// **'TodoList Not Found'**
+  String get todoListDetailNotFoundTitle;
+
+  /// Message shown when todo list doesn't exist
+  ///
+  /// In en, this message translates to:
+  /// **'This todo list could not be found. It may have been deleted.'**
+  String get todoListDetailNotFoundMessage;
+
   /// Validation error when todo list name is empty
   ///
   /// In en, this message translates to:
@@ -1190,6 +1250,36 @@ abstract class AppLocalizations {
   /// **'Delete List'**
   String get listDetailMenuDelete;
 
+  /// Title shown while loading list data
+  ///
+  /// In en, this message translates to:
+  /// **'Loading List'**
+  String get listDetailLoadingTitle;
+
+  /// Title shown when list fails to load
+  ///
+  /// In en, this message translates to:
+  /// **'Error'**
+  String get listDetailErrorTitle;
+
+  /// Message shown when list fails to load
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load list'**
+  String get listDetailErrorMessage;
+
+  /// Title shown when list doesn't exist
+  ///
+  /// In en, this message translates to:
+  /// **'List Not Found'**
+  String get listDetailNotFoundTitle;
+
+  /// Message shown when list doesn't exist
+  ///
+  /// In en, this message translates to:
+  /// **'This list could not be found. It may have been deleted.'**
+  String get listDetailNotFoundMessage;
+
   /// Title for space switcher modal
   ///
   /// In en, this message translates to:
@@ -1537,6 +1627,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Archive'**
   String get buttonArchive;
+
+  /// Generic go back button text
+  ///
+  /// In en, this message translates to:
+  /// **'Go Back'**
+  String get buttonGoBack;
 
   /// Accessibility label for close buttons
   ///

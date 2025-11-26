@@ -11,6 +11,7 @@ import 'package:later_mobile/design_system/tokens/tokens.dart';
 import 'package:later_mobile/l10n/app_localizations.dart';
 
 import 'package:later_mobile/core/utils/responsive_modal.dart';
+import '../../application/providers.dart';
 import '../../domain/models/note.dart';
 import '../controllers/notes_controller.dart';
 
@@ -25,11 +26,14 @@ import '../controllers/notes_controller.dart';
 /// - Loading indicator when saving
 /// - Empty state support
 /// - Error handling with SnackBar messages
+///
+/// The screen now fetches note data by ID using the noteByIdProvider.
+/// This enables deep linking and ensures data is always fresh from the source.
 class NoteDetailScreen extends ConsumerStatefulWidget {
-  const NoteDetailScreen({super.key, required this.note});
+  const NoteDetailScreen({super.key, required this.noteId});
 
-  /// Note to display and edit
-  final Note note;
+  /// ID of the note to display and edit
+  final String noteId;
 
   @override
   ConsumerState<NoteDetailScreen> createState() => _NoteDetailScreenState();
@@ -37,12 +41,12 @@ class NoteDetailScreen extends ConsumerStatefulWidget {
 
 class _NoteDetailScreenState extends ConsumerState<NoteDetailScreen>
     with AutoSaveMixin {
-  // Text controllers
-  late TextEditingController _titleController;
-  late TextEditingController _contentController;
+  // Text controllers (nullable until note loads)
+  TextEditingController? _titleController;
+  TextEditingController? _contentController;
 
-  // Local state
-  late Note _currentNote;
+  // Local state (nullable until note loads)
+  Note? _currentNote;
 
   // Tag management
   final TextEditingController _tagController = TextEditingController();
@@ -50,26 +54,34 @@ class _NoteDetailScreenState extends ConsumerState<NoteDetailScreen>
   // Constants
   static const int _maxTagLength = 50;
 
+  // Track if controllers have been initialized
+  bool _controllersInitialized = false;
+
+  /// Initialize text controllers when note data is available
+  void _initializeControllers(Note note) {
+    if (_controllersInitialized) return;
+
+    _currentNote = note;
+    _titleController = TextEditingController(text: note.title);
+    _contentController = TextEditingController(text: note.content ?? '');
+
+    // Listen to text changes for auto-save
+    _titleController!.addListener(() => onFieldChanged());
+    _contentController!.addListener(() => onFieldChanged());
+
+    _controllersInitialized = true;
+  }
+
   @override
   void initState() {
     super.initState();
-
-    // Initialize current note
-    _currentNote = widget.note;
-
-    // Initialize text controllers
-    _titleController = TextEditingController(text: widget.note.title);
-    _contentController = TextEditingController(text: widget.note.content ?? '');
-
-    // Listen to text changes for auto-save
-    _titleController.addListener(() => onFieldChanged());
-    _contentController.addListener(() => onFieldChanged());
+    // Controllers will be initialized in build when data loads
   }
 
   @override
   void dispose() {
-    _titleController.dispose();
-    _contentController.dispose();
+    _titleController?.dispose();
+    _contentController?.dispose();
     _tagController.dispose();
     super.dispose();
   }
@@ -77,15 +89,20 @@ class _NoteDetailScreenState extends ConsumerState<NoteDetailScreen>
   /// Save changes to the note
   @override
   Future<void> saveChanges() async {
-    if (isSaving) return;
+    if (isSaving || _currentNote == null || _titleController == null || _contentController == null) {
+      return;
+    }
 
     final l10n = AppLocalizations.of(context)!;
+    final currentNote = _currentNote!;
+    final titleController = _titleController!;
+    final contentController = _contentController!;
 
     // Validate title
-    if (_titleController.text.trim().isEmpty) {
+    if (titleController.text.trim().isEmpty) {
       _showSnackBar(l10n.noteDetailTitleEmpty, isError: true);
       // Restore previous title
-      _titleController.text = _currentNote.title;
+      titleController.text = currentNote.title;
       setState(() {
         hasChanges = false;
       });
@@ -100,17 +117,17 @@ class _NoteDetailScreenState extends ConsumerState<NoteDetailScreen>
 
     try {
       // Update note
-      final updated = _currentNote.copyWith(
-        title: _titleController.text.trim(),
-        content: _contentController.text.trim().isEmpty
+      final updated = currentNote.copyWith(
+        title: titleController.text.trim(),
+        content: contentController.text.trim().isEmpty
             ? null
-            : _contentController.text.trim(),
+            : contentController.text.trim(),
         updatedAt: DateTime.now(),
       );
 
       // Save via Riverpod controller
       await ref
-          .read(notesControllerProvider(_currentNote.spaceId).notifier)
+          .read(notesControllerProvider(currentNote.spaceId).notifier)
           .updateNote(updated);
 
       setState(() {
@@ -128,7 +145,10 @@ class _NoteDetailScreenState extends ConsumerState<NoteDetailScreen>
 
   /// Add a tag to the note
   Future<void> _addTag(String tag) async {
+    if (_currentNote == null) return;
+
     final l10n = AppLocalizations.of(context)!;
+    final currentNote = _currentNote!;
     final trimmedTag = tag.trim();
 
     // Validation
@@ -145,7 +165,7 @@ class _NoteDetailScreenState extends ConsumerState<NoteDetailScreen>
       return;
     }
 
-    if (_currentNote.tags.contains(trimmedTag)) {
+    if (currentNote.tags.contains(trimmedTag)) {
       _showSnackBar(l10n.noteDetailTagExists, isError: true);
       return;
     }
@@ -156,14 +176,14 @@ class _NoteDetailScreenState extends ConsumerState<NoteDetailScreen>
       });
 
       // Add tag to note
-      final updated = _currentNote.copyWith(
-        tags: [..._currentNote.tags, trimmedTag],
+      final updated = currentNote.copyWith(
+        tags: [...currentNote.tags, trimmedTag],
         updatedAt: DateTime.now(),
       );
 
       // Save via Riverpod controller
       await ref
-          .read(notesControllerProvider(_currentNote.spaceId).notifier)
+          .read(notesControllerProvider(currentNote.spaceId).notifier)
           .updateNote(updated);
 
       setState(() {
@@ -183,7 +203,10 @@ class _NoteDetailScreenState extends ConsumerState<NoteDetailScreen>
 
   /// Remove a tag from the note
   Future<void> _removeTag(String tag) async {
+    if (_currentNote == null) return;
+
     final l10n = AppLocalizations.of(context)!;
+    final currentNote = _currentNote!;
 
     try {
       setState(() {
@@ -191,14 +214,14 @@ class _NoteDetailScreenState extends ConsumerState<NoteDetailScreen>
       });
 
       // Remove tag from note
-      final updated = _currentNote.copyWith(
-        tags: _currentNote.tags.where((t) => t != tag).toList(),
+      final updated = currentNote.copyWith(
+        tags: currentNote.tags.where((t) => t != tag).toList(),
         updatedAt: DateTime.now(),
       );
 
       // Save via Riverpod controller
       await ref
-          .read(notesControllerProvider(_currentNote.spaceId).notifier)
+          .read(notesControllerProvider(currentNote.spaceId).notifier)
           .updateNote(updated);
 
       setState(() {
@@ -248,12 +271,15 @@ class _NoteDetailScreenState extends ConsumerState<NoteDetailScreen>
   /// Delete the note
   /// Note: Navigation is handled in _showDeleteConfirmation(), not here
   Future<void> _deleteNote() async {
+    if (_currentNote == null) return;
+
     final l10n = AppLocalizations.of(context)!;
+    final currentNote = _currentNote!;
 
     try {
       await ref
-          .read(notesControllerProvider(_currentNote.spaceId).notifier)
-          .deleteNote(_currentNote.id);
+          .read(notesControllerProvider(currentNote.spaceId).notifier)
+          .deleteNote(currentNote.id);
 
       // Navigation already handled in confirmation dialog
       // Success feedback is provided by UI update (note removed from list)
@@ -266,12 +292,15 @@ class _NoteDetailScreenState extends ConsumerState<NoteDetailScreen>
 
   /// Show delete confirmation dialog
   Future<void> _showDeleteConfirmation() async {
+    if (_currentNote == null) return;
+
     final l10n = AppLocalizations.of(context)!;
+    final currentNote = _currentNote!;
 
     final confirmed = await showDeleteConfirmationDialog(
       context: context,
       title: l10n.noteDetailDeleteTitle,
-      message: l10n.noteDetailDeleteMessage(_currentNote.title),
+      message: l10n.noteDetailDeleteMessage(currentNote.title),
     );
 
     if (confirmed == true && mounted) {
@@ -296,138 +325,233 @@ class _NoteDetailScreenState extends ConsumerState<NoteDetailScreen>
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final noteAsync = ref.watch(noteByIdProvider(widget.noteId));
 
-    return PopScope(
-      canPop: false,
-      onPopInvokedWithResult: (didPop, result) async {
-        if (!didPop) {
-          // Save before leaving
-          await saveChanges();
-          if (mounted && context.mounted) {
-            Navigator.of(context).pop();
-          }
-        }
-      },
-      child: Scaffold(
+    return noteAsync.when(
+      loading: () => Scaffold(
         appBar: AppBar(
-          title: EditableAppBarTitle(
-            text: _currentNote.title,
-            onChanged: (newTitle) {
-              _titleController.text = newTitle;
-              saveChanges();
-            },
-            gradient: AppColors.noteGradient,
-            hintText: l10n.noteDetailTitleHint,
-          ),
-          actions: [
-            if (isSaving)
-              const Padding(
-                padding: EdgeInsets.all(AppSpacing.md),
-                child: SizedBox(
-                  width: 20,
-                  height: 20,
-                  child: CircularProgressIndicator(strokeWidth: 2),
+          title: Text(l10n.noteDetailLoadingTitle),
+        ),
+        body: const Center(
+          child: CircularProgressIndicator(),
+        ),
+      ),
+      error: (error, stack) => Scaffold(
+        appBar: AppBar(
+          title: Text(l10n.noteDetailErrorTitle),
+        ),
+        body: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(AppSpacing.md),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(
+                  Icons.error_outline,
+                  size: 64,
+                  color: AppColors.error,
                 ),
-              ),
-            PopupMenuButton<String>(
-              onSelected: (value) {
-                if (value == 'delete') {
-                  _showDeleteConfirmation();
-                }
-              },
-              itemBuilder: (context) => [
-                PopupMenuItem(
-                  value: 'delete',
-                  child: Row(
-                    children: [
-                      const Icon(Icons.delete, color: AppColors.error),
-                      const SizedBox(width: AppSpacing.sm),
-                      Text(l10n.noteDetailMenuDelete),
-                    ],
+                const SizedBox(height: AppSpacing.md),
+                Text(
+                  l10n.noteDetailErrorMessage,
+                  textAlign: TextAlign.center,
+                  style: AppTypography.bodyLarge,
+                ),
+                const SizedBox(height: AppSpacing.xs),
+                Text(
+                  error.toString(),
+                  textAlign: TextAlign.center,
+                  style: AppTypography.bodySmall.copyWith(
+                    color: AppColors.textSecondary(context),
                   ),
+                ),
+                const SizedBox(height: AppSpacing.lg),
+                ElevatedButton.icon(
+                  onPressed: () => Navigator.of(context).pop(),
+                  icon: const Icon(Icons.arrow_back),
+                  label: Text(l10n.buttonGoBack),
                 ),
               ],
             ),
-          ],
-        ),
-        body: SingleChildScrollView(
-          padding: const EdgeInsets.all(AppSpacing.md),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Content TextField
-              TextField(
-                key: const Key('note_content_field'),
-                controller: _contentController,
-                decoration: InputDecoration(
-                  hintText: l10n.noteDetailContentHint,
-                  hintStyle: AppTypography.bodyMedium.copyWith(
-                    color: AppColors.textSecondary(context),
-                  ),
-                  border: InputBorder.none,
-                ),
-                style: AppTypography.bodyMedium,
-                maxLines: null, // Auto-expanding
-                keyboardType: TextInputType.multiline,
-                textCapitalization: TextCapitalization.sentences,
-              ),
-
-              const SizedBox(height: AppSpacing.xl),
-
-              // Tags section
-              if (_currentNote.tags.isNotEmpty || true)
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Text(
-                          l10n.noteDetailTagsLabel,
-                          style: AppTypography.labelLarge.copyWith(
-                            color: AppColors.textSecondary(context),
-                          ),
-                        ),
-                        const SizedBox(width: AppSpacing.xs),
-                        IconButton(
-                          icon: const Icon(Icons.add, size: 20),
-                          onPressed: _showAddTagDialog,
-                          padding: EdgeInsets.zero,
-                          constraints: const BoxConstraints(),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: AppSpacing.sm),
-
-                    // Tag chips
-                    if (_currentNote.tags.isNotEmpty)
-                      Wrap(
-                        spacing: AppSpacing.xs,
-                        runSpacing: AppSpacing.xs,
-                        children: _currentNote.tags.map((tag) {
-                          return Chip(
-                            label: Text(tag),
-                            labelStyle: AppTypography.bodySmall,
-                            deleteIcon: const Icon(Icons.close, size: 16),
-                            onDeleted: () => _removeTag(tag),
-                            backgroundColor: AppColors.noteLight.withValues(
-                              alpha: 0.3,
-                            ),
-                          );
-                        }).toList(),
-                      )
-                    else
-                      Text(
-                        l10n.noteDetailTagsEmpty,
-                        style: AppTypography.bodySmall.copyWith(
-                          color: AppColors.textSecondary(context),
-                        ),
-                      ),
-                  ],
-                ),
-            ],
           ),
         ),
       ),
+      data: (note) {
+        if (note == null) {
+          // Note not found
+          return Scaffold(
+            appBar: AppBar(
+              title: Text(l10n.noteDetailNotFoundTitle),
+            ),
+            body: Center(
+              child: Padding(
+                padding: const EdgeInsets.all(AppSpacing.md),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.note_outlined,
+                      size: 64,
+                      color: AppColors.textSecondary(context),
+                    ),
+                    const SizedBox(height: AppSpacing.md),
+                    Text(
+                      l10n.noteDetailNotFoundMessage,
+                      textAlign: TextAlign.center,
+                      style: AppTypography.bodyLarge,
+                    ),
+                    const SizedBox(height: AppSpacing.lg),
+                    ElevatedButton.icon(
+                      onPressed: () => Navigator.of(context).pop(),
+                      icon: const Icon(Icons.arrow_back),
+                      label: Text(l10n.buttonGoBack),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        }
+
+        // Initialize controllers with loaded data
+        _initializeControllers(note);
+
+        // Build the main UI
+        return PopScope(
+          canPop: false,
+          onPopInvokedWithResult: (didPop, result) async {
+            if (!didPop) {
+              // Save before leaving
+              await saveChanges();
+              if (mounted && context.mounted) {
+                Navigator.of(context).pop();
+              }
+            }
+          },
+          child: Scaffold(
+            appBar: AppBar(
+              title: EditableAppBarTitle(
+                text: _currentNote?.title ?? '',
+                onChanged: (newTitle) {
+                  if (_titleController != null) {
+                    _titleController!.text = newTitle;
+                    saveChanges();
+                  }
+                },
+                gradient: AppColors.noteGradient,
+                hintText: l10n.noteDetailTitleHint,
+              ),
+              actions: [
+                if (isSaving)
+                  const Padding(
+                    padding: EdgeInsets.all(AppSpacing.md),
+                    child: SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    ),
+                  ),
+                PopupMenuButton<String>(
+                  onSelected: (value) {
+                    if (value == 'delete') {
+                      _showDeleteConfirmation();
+                    }
+                  },
+                  itemBuilder: (context) => [
+                    PopupMenuItem(
+                      value: 'delete',
+                      child: Row(
+                        children: [
+                          const Icon(Icons.delete, color: AppColors.error),
+                          const SizedBox(width: AppSpacing.sm),
+                          Text(l10n.noteDetailMenuDelete),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            body: SingleChildScrollView(
+              padding: const EdgeInsets.all(AppSpacing.md),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Content TextField
+                  TextField(
+                    key: const Key('note_content_field'),
+                    controller: _contentController,
+                    decoration: InputDecoration(
+                      hintText: l10n.noteDetailContentHint,
+                      hintStyle: AppTypography.bodyMedium.copyWith(
+                        color: AppColors.textSecondary(context),
+                      ),
+                      border: InputBorder.none,
+                    ),
+                    style: AppTypography.bodyMedium,
+                    maxLines: null, // Auto-expanding
+                    keyboardType: TextInputType.multiline,
+                    textCapitalization: TextCapitalization.sentences,
+                  ),
+
+                  const SizedBox(height: AppSpacing.xl),
+
+                  // Tags section
+                  if (_currentNote?.tags.isNotEmpty == true || true)
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Text(
+                              l10n.noteDetailTagsLabel,
+                              style: AppTypography.labelLarge.copyWith(
+                                color: AppColors.textSecondary(context),
+                              ),
+                            ),
+                            const SizedBox(width: AppSpacing.xs),
+                            IconButton(
+                              icon: const Icon(Icons.add, size: 20),
+                              onPressed: _showAddTagDialog,
+                              padding: EdgeInsets.zero,
+                              constraints: const BoxConstraints(),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: AppSpacing.sm),
+
+                        // Tag chips
+                        if (_currentNote?.tags.isNotEmpty == true)
+                          Wrap(
+                            spacing: AppSpacing.xs,
+                            runSpacing: AppSpacing.xs,
+                            children: _currentNote!.tags.map((tag) {
+                              return Chip(
+                                label: Text(tag),
+                                labelStyle: AppTypography.bodySmall,
+                                deleteIcon: const Icon(Icons.close, size: 16),
+                                onDeleted: () => _removeTag(tag),
+                                backgroundColor: AppColors.noteLight.withValues(
+                                  alpha: 0.3,
+                                ),
+                              );
+                            }).toList(),
+                          )
+                        else
+                          Text(
+                            l10n.noteDetailTagsEmpty,
+                            style: AppTypography.bodySmall.copyWith(
+                              color: AppColors.textSecondary(context),
+                            ),
+                          ),
+                      ],
+                    ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 }

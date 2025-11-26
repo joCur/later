@@ -19,6 +19,7 @@ import 'package:later_mobile/design_system/molecules/app_bars/editable_app_bar_t
 import 'package:later_mobile/design_system/molecules/lists/dismissible_list_item.dart';
 import 'package:later_mobile/design_system/organisms/empty_states/animated_empty_state.dart';
 
+import '../../application/providers.dart';
 import '../controllers/list_items_controller.dart';
 import '../controllers/lists_controller.dart';
 
@@ -35,22 +36,25 @@ import '../controllers/lists_controller.dart';
 /// - Drag-and-drop reordering
 /// - Menu: Change style, Change icon, Delete list
 /// - Auto-save with debounce (500ms)
+///
+/// The screen now fetches list data by ID using the listByIdProvider.
+/// This enables deep linking and ensures data is always fresh from the source.
 class ListDetailScreen extends ConsumerStatefulWidget {
-  const ListDetailScreen({super.key, required this.list});
+  const ListDetailScreen({super.key, required this.listId});
 
-  /// List to display and edit
-  final ListModel list;
+  /// ID of the list to display and edit
+  final String listId;
 
   @override
   ConsumerState<ListDetailScreen> createState() => _ListDetailScreenState();
 }
 
 class _ListDetailScreenState extends ConsumerState<ListDetailScreen> {
-  // Text controllers
-  late TextEditingController _nameController;
+  // Text controllers (nullable until list loads)
+  TextEditingController? _nameController;
 
-  // Local state
-  late ListModel _currentList;
+  // Local state (nullable until list loads)
+  ListModel? _currentList;
   List<ListItem> _currentItems = [];
   bool _isLoadingItems = false;
   Timer? _debounceTimer;
@@ -58,22 +62,22 @@ class _ListDetailScreenState extends ConsumerState<ListDetailScreen> {
   bool _hasChanges = false;
   bool _enableFabPulse = false;
 
-  @override
-  void initState() {
-    super.initState();
+  // Track if controllers have been initialized
+  bool _controllersInitialized = false;
 
-    // Initialize current list
-    _currentList = widget.list;
+  /// Initialize text controllers when list data is available
+  void _initializeControllers(ListModel list) {
+    if (_controllersInitialized) return;
 
-    // Initialize text controllers
-    _nameController = TextEditingController(text: widget.list.name);
+    _currentList = list;
+    _nameController = TextEditingController(text: list.name);
 
     // Listen to text changes for auto-save
-    _nameController.addListener(_onNameChanged);
+    _nameController!.addListener(_onNameChanged);
 
     // Listen to list items controller changes
     ref.listenManual(
-      listItemsControllerProvider(widget.list.id),
+      listItemsControllerProvider(list.id),
       (previous, next) {
         next.whenData((items) {
           if (mounted) {
@@ -111,12 +115,12 @@ class _ListDetailScreenState extends ConsumerState<ListDetailScreen> {
 
     // Listen to lists controller to update current list
     ref.listenManual(
-      listsControllerProvider(widget.list.spaceId),
+      listsControllerProvider(list.spaceId),
       (previous, next) {
         next.whenData((lists) {
           final updated = lists.firstWhere(
-            (l) => l.id == _currentList.id,
-            orElse: () => _currentList,
+            (l) => l.id == _currentList!.id,
+            orElse: () => _currentList!,
           );
           if (mounted) {
             setState(() {
@@ -127,13 +131,21 @@ class _ListDetailScreenState extends ConsumerState<ListDetailScreen> {
       },
       fireImmediately: true,
     );
+
+    _controllersInitialized = true;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    // Controllers will be initialized in build when data loads
   }
 
   @override
   void dispose() {
     _debounceTimer?.cancel();
-    _nameController.removeListener(_onNameChanged);
-    _nameController.dispose();
+    _nameController?.removeListener(_onNameChanged);
+    _nameController?.dispose();
     super.dispose();
   }
 
@@ -154,13 +166,22 @@ class _ListDetailScreenState extends ConsumerState<ListDetailScreen> {
 
   /// Save changes to the list
   Future<void> _saveChanges() async {
-    if (!_hasChanges || _isSaving) return;
+    if (!_hasChanges || _isSaving || _currentList == null || _nameController == null) {
+      return;
+    }
 
     final l10n = AppLocalizations.of(context)!;
+    final currentList = _currentList!;
+    final nameController = _nameController!;
 
     // Validate name
-    if (_nameController.text.trim().isEmpty) {
+    if (nameController.text.trim().isEmpty) {
       _showSnackBar(l10n.listDetailNameEmpty, isError: true);
+      // Restore previous name
+      nameController.text = currentList.name;
+      setState(() {
+        _hasChanges = false;
+      });
       return;
     }
 
@@ -170,13 +191,13 @@ class _ListDetailScreenState extends ConsumerState<ListDetailScreen> {
 
     try {
       // Update list name
-      final updated = _currentList.copyWith(
-        name: _nameController.text.trim(),
+      final updated = currentList.copyWith(
+        name: nameController.text.trim(),
       );
 
       // Save via Riverpod controller
       await ref
-          .read(listsControllerProvider(widget.list.spaceId).notifier)
+          .read(listsControllerProvider(currentList.spaceId).notifier)
           .updateList(updated);
 
       setState(() {
@@ -194,10 +215,13 @@ class _ListDetailScreenState extends ConsumerState<ListDetailScreen> {
 
   /// Add a new ListItem
   Future<void> _addListItem() async {
+    if (_currentList == null) return;
+
     final result = await _showListItemDialog();
     if (result == null || !mounted) return;
 
     final l10n = AppLocalizations.of(context)!;
+    final currentList = _currentList!;
 
     try {
       // Set sortOrder to be at the end of current items
@@ -207,12 +231,12 @@ class _ListDetailScreenState extends ConsumerState<ListDetailScreen> {
 
       // Create item via Riverpod controller
       await ref
-          .read(listItemsControllerProvider(widget.list.id).notifier)
+          .read(listItemsControllerProvider(currentList.id).notifier)
           .createItem(itemWithSortOrder);
 
       // Refresh parent list to get updated counts
       await ref
-          .read(listsControllerProvider(widget.list.spaceId).notifier)
+          .read(listsControllerProvider(currentList.spaceId).notifier)
           .refresh();
 
       if (mounted) _showSnackBar(l10n.listDetailItemAdded);
@@ -223,20 +247,23 @@ class _ListDetailScreenState extends ConsumerState<ListDetailScreen> {
 
   /// Edit a ListItem
   Future<void> _editListItem(ListItem item) async {
+    if (_currentList == null) return;
+
     final result = await _showListItemDialog(existingItem: item);
     if (result == null || !mounted) return;
 
     final l10n = AppLocalizations.of(context)!;
+    final currentList = _currentList!;
 
     try {
       // Update item via Riverpod controller
       await ref
-          .read(listItemsControllerProvider(widget.list.id).notifier)
+          .read(listItemsControllerProvider(currentList.id).notifier)
           .updateItem(result);
 
       // Refresh parent list to get updated counts
       await ref
-          .read(listsControllerProvider(widget.list.spaceId).notifier)
+          .read(listsControllerProvider(currentList.spaceId).notifier)
           .refresh();
 
       if (mounted) _showSnackBar(l10n.listDetailItemUpdated);
@@ -250,17 +277,20 @@ class _ListDetailScreenState extends ConsumerState<ListDetailScreen> {
   /// Perform the actual deletion without confirmation
   /// Used by Dismissible which handles confirmation separately
   Future<void> _performDeleteListItem(ListItem item) async {
+    if (_currentList == null) return;
+
     final l10n = AppLocalizations.of(context)!;
+    final currentList = _currentList!;
 
     try {
       // Delete item via Riverpod controller
       await ref
-          .read(listItemsControllerProvider(widget.list.id).notifier)
-          .deleteItem(item.id, _currentList.id);
+          .read(listItemsControllerProvider(currentList.id).notifier)
+          .deleteItem(item.id, currentList.id);
 
       // Refresh parent list to get updated counts
       await ref
-          .read(listsControllerProvider(widget.list.spaceId).notifier)
+          .read(listsControllerProvider(currentList.spaceId).notifier)
           .refresh();
 
       if (mounted) _showSnackBar(l10n.listDetailItemDeleted);
@@ -273,15 +303,19 @@ class _ListDetailScreenState extends ConsumerState<ListDetailScreen> {
 
   /// Toggle ListItem checkbox
   Future<void> _toggleListItem(ListItem item) async {
+    if (_currentList == null) return;
+
+    final currentList = _currentList!;
+
     try {
       // Toggle item via Riverpod controller
       await ref
-          .read(listItemsControllerProvider(widget.list.id).notifier)
+          .read(listItemsControllerProvider(currentList.id).notifier)
           .toggleItem(item);
 
       // Refresh parent list to get updated counts
       await ref
-          .read(listsControllerProvider(widget.list.spaceId).notifier)
+          .read(listsControllerProvider(currentList.spaceId).notifier)
           .refresh();
     } catch (e) {
       if (!mounted) return;
@@ -292,6 +326,8 @@ class _ListDetailScreenState extends ConsumerState<ListDetailScreen> {
 
   /// Reorder ListItems with optimistic UI update
   Future<void> _reorderListItems(int oldIndex, int newIndex) async {
+    if (_currentList == null) return;
+
     // Adjust newIndex when moving item down (Flutter's ReorderableListView pattern)
     if (newIndex > oldIndex) {
       newIndex -= 1;
@@ -306,6 +342,8 @@ class _ListDetailScreenState extends ConsumerState<ListDetailScreen> {
       _currentItems = reorderedItems;
     });
 
+    final currentList = _currentList!;
+
     // Then persist via Riverpod controller in the background
     try {
       // Extract IDs in the new order
@@ -313,7 +351,7 @@ class _ListDetailScreenState extends ConsumerState<ListDetailScreen> {
 
       // Call controller to reorder
       await ref
-          .read(listItemsControllerProvider(widget.list.id).notifier)
+          .read(listItemsControllerProvider(currentList.id).notifier)
           .reorderItems(orderedIds);
     } catch (e) {
       // On error, check mounted before any context usage
@@ -327,15 +365,18 @@ class _ListDetailScreenState extends ConsumerState<ListDetailScreen> {
 
   /// Change list style
   Future<void> _changeListStyle() async {
+    if (_currentList == null) return;
+
     final result = await _showStyleSelectionDialog();
     if (result == null || !mounted) return;
 
     final l10n = AppLocalizations.of(context)!;
+    final currentList = _currentList!;
 
     try {
-      final updated = _currentList.copyWith(style: result);
+      final updated = currentList.copyWith(style: result);
       await ref
-          .read(listsControllerProvider(widget.list.spaceId).notifier)
+          .read(listsControllerProvider(currentList.spaceId).notifier)
           .updateList(updated);
 
       if (mounted) {
@@ -352,15 +393,18 @@ class _ListDetailScreenState extends ConsumerState<ListDetailScreen> {
 
   /// Change list icon
   Future<void> _changeListIcon() async {
+    if (_currentList == null) return;
+
     final result = await _showIconSelectionDialog();
     if (result == null || !mounted) return;
 
     final l10n = AppLocalizations.of(context)!;
+    final currentList = _currentList!;
 
     try {
-      final updated = _currentList.copyWith(icon: result);
+      final updated = currentList.copyWith(icon: result);
       await ref
-          .read(listsControllerProvider(widget.list.spaceId).notifier)
+          .read(listsControllerProvider(currentList.spaceId).notifier)
           .updateList(updated);
 
       if (mounted) {
@@ -378,11 +422,15 @@ class _ListDetailScreenState extends ConsumerState<ListDetailScreen> {
   /// Delete the entire List
   /// Note: Navigation is handled in _showDeleteListConfirmation(), not here
   Future<void> _deleteList() async {
+    if (_currentList == null) return;
+
+    final currentList = _currentList!;
+
     try {
       // Delete list via Riverpod controller
       await ref
-          .read(listsControllerProvider(widget.list.spaceId).notifier)
-          .deleteList(_currentList.id);
+          .read(listsControllerProvider(currentList.spaceId).notifier)
+          .deleteList(currentList.id);
 
       // Navigation already handled in confirmation dialog
       // Success feedback is provided by UI update (list removed from list)
@@ -396,7 +444,10 @@ class _ListDetailScreenState extends ConsumerState<ListDetailScreen> {
 
   /// Show ListItem edit/create dialog
   Future<ListItem?> _showListItemDialog({ListItem? existingItem}) async {
+    if (_currentList == null) return null;
+
     final l10n = AppLocalizations.of(context)!;
+    final currentList = _currentList!;
     final titleController = TextEditingController(
       text: existingItem?.title ?? '',
     );
@@ -420,7 +471,7 @@ class _ListDetailScreenState extends ConsumerState<ListDetailScreen> {
 
           final item = ListItem(
             id: existingItem?.id ?? const Uuid().v4(),
-            listId: _currentList.id,  // Foreign key field
+            listId: currentList.id,  // Foreign key field
             title: titleController.text.trim(),
             notes: notesController.text.trim().isEmpty
                 ? null
@@ -551,13 +602,16 @@ class _ListDetailScreenState extends ConsumerState<ListDetailScreen> {
 
   /// Show delete list confirmation
   Future<void> _showDeleteListConfirmation() async {
+    if (_currentList == null) return;
+
     final l10n = AppLocalizations.of(context)!;
+    final currentList = _currentList!;
     final confirmed = await showDeleteConfirmationDialog(
       context: context,
       title: l10n.listDetailDeleteTitle,
       message: l10n.listDetailDeleteMessage(
-        _currentList.name,
-        _currentList.totalItemCount,
+        currentList.name,
+        currentList.totalItemCount,
       ),
     );
 
@@ -583,9 +637,99 @@ class _ListDetailScreenState extends ConsumerState<ListDetailScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final listAsync = ref.watch(listByIdProvider(widget.listId));
 
-    // Watch item controller for live count calculation
-    final itemsAsyncValue = ref.watch(listItemsControllerProvider(widget.list.id));
+    return listAsync.when(
+      loading: () => Scaffold(
+        appBar: AppBar(
+          title: Text(l10n.listDetailLoadingTitle),
+        ),
+        body: const Center(
+          child: CircularProgressIndicator(),
+        ),
+      ),
+      error: (error, stack) => Scaffold(
+        appBar: AppBar(
+          title: Text(l10n.listDetailErrorTitle),
+        ),
+        body: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(AppSpacing.md),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(
+                  Icons.error_outline,
+                  size: 64,
+                  color: AppColors.error,
+                ),
+                const SizedBox(height: AppSpacing.md),
+                Text(
+                  l10n.listDetailErrorMessage,
+                  textAlign: TextAlign.center,
+                  style: AppTypography.bodyLarge,
+                ),
+                const SizedBox(height: AppSpacing.xs),
+                Text(
+                  error.toString(),
+                  textAlign: TextAlign.center,
+                  style: AppTypography.bodySmall.copyWith(
+                    color: AppColors.textSecondary(context),
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.lg),
+                ElevatedButton.icon(
+                  onPressed: () => Navigator.of(context).pop(),
+                  icon: const Icon(Icons.arrow_back),
+                  label: Text(l10n.buttonGoBack),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+      data: (list) {
+        if (list == null) {
+          // List not found
+          return Scaffold(
+            appBar: AppBar(
+              title: Text(l10n.listDetailNotFoundTitle),
+            ),
+            body: Center(
+              child: Padding(
+                padding: const EdgeInsets.all(AppSpacing.md),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.list_alt_outlined,
+                      size: 64,
+                      color: AppColors.textSecondary(context),
+                    ),
+                    const SizedBox(height: AppSpacing.md),
+                    Text(
+                      l10n.listDetailNotFoundMessage,
+                      textAlign: TextAlign.center,
+                      style: AppTypography.bodyLarge,
+                    ),
+                    const SizedBox(height: AppSpacing.lg),
+                    ElevatedButton.icon(
+                      onPressed: () => Navigator.of(context).pop(),
+                      icon: const Icon(Icons.arrow_back),
+                      label: Text(l10n.buttonGoBack),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        }
+
+        // Initialize controllers with the loaded list
+        _initializeControllers(list);
+
+        // Watch item controller for live count calculation
+        final itemsAsyncValue = ref.watch(listItemsControllerProvider(list.id));
 
     // Calculate counts from items for live updates
     final int? calculatedTotalCount = itemsAsyncValue.whenOrNull(
@@ -619,17 +763,17 @@ class _ListDetailScreenState extends ConsumerState<ListDetailScreen> {
             mainAxisSize: MainAxisSize.min,
             children: [
               // Icon (if available)
-              if (_currentList.icon != null) ...[
-                Text(_currentList.icon!, style: const TextStyle(fontSize: 24)),
+              if (list.icon != null) ...[
+                Text(list.icon!, style: const TextStyle(fontSize: 24)),
                 const SizedBox(width: AppSpacing.sm),
               ],
 
               // Editable name
               Flexible(
                 child: EditableAppBarTitle(
-                  text: _currentList.name,
+                  text: list.name,
                   onChanged: (newName) {
-                    _nameController.text = newName;
+                    _nameController!.text = newName;
                     _saveChanges();
                   },
                   gradient: AppColors.listGradient,
@@ -700,7 +844,7 @@ class _ListDetailScreenState extends ConsumerState<ListDetailScreen> {
         body: Column(
           children: [
             // Progress section (only for checkboxes style)
-            if (_currentList.style == ListStyle.checkboxes)
+            if (list.style == ListStyle.checkboxes)
               Container(
                 padding: const EdgeInsets.all(AppSpacing.md),
                 decoration: BoxDecoration(
@@ -720,8 +864,8 @@ class _ListDetailScreenState extends ConsumerState<ListDetailScreen> {
                   children: [
                     Text(
                       l10n.listDetailProgressCompleted(
-                        calculatedCheckedCount ?? _currentList.checkedItemCount,
-                        calculatedTotalCount ?? _currentList.totalItemCount,
+                        calculatedCheckedCount ?? list.checkedItemCount,
+                        calculatedTotalCount ?? list.totalItemCount,
                       ),
                       style: AppTypography.bodyMedium.copyWith(
                         color: Colors.white,
@@ -730,7 +874,7 @@ class _ListDetailScreenState extends ConsumerState<ListDetailScreen> {
                     ),
                     const SizedBox(height: AppSpacing.sm),
                     LinearProgressIndicator(
-                      value: calculatedProgress ?? _currentList.progress,
+                      value: calculatedProgress ?? list.progress,
                       backgroundColor: Colors.white.withValues(alpha: 0.3),
                       valueColor: const AlwaysStoppedAnimation<Color>(
                         Colors.white,
@@ -762,10 +906,10 @@ class _ListDetailScreenState extends ConsumerState<ListDetailScreen> {
                               onDelete: () => _performDeleteListItem(item),
                               child: ListItemCard(
                                 listItem: item,
-                                listStyle: _currentList.style,
+                                listStyle: list.style,
                                 itemIndex: index,
                                 onCheckboxChanged:
-                                    _currentList.style == ListStyle.checkboxes
+                                    list.style == ListStyle.checkboxes
                                     ? (value) => _toggleListItem(item)
                                     : null,
                                 onLongPress: () => _editListItem(item),
@@ -784,6 +928,8 @@ class _ListDetailScreenState extends ConsumerState<ListDetailScreen> {
           enablePulse: _enableFabPulse,
         ),
       ),
+    );
+      },
     );
   }
 

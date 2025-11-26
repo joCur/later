@@ -20,6 +20,7 @@ import 'package:later_mobile/l10n/app_localizations.dart';
 import 'package:uuid/uuid.dart';
 
 import 'package:later_mobile/core/utils/responsive_modal.dart';
+import '../../application/providers.dart';
 import '../controllers/todo_items_controller.dart';
 import '../controllers/todo_lists_controller.dart';
 
@@ -35,22 +36,25 @@ import '../controllers/todo_lists_controller.dart';
 /// - Swipe-to-delete for TodoItems
 /// - Menu: Edit list properties, Delete list
 /// - Auto-save with debounce
+///
+/// The screen now fetches todo list data by ID using the todoListByIdProvider.
+/// This enables deep linking and ensures data is always fresh from the source.
 class TodoListDetailScreen extends ConsumerStatefulWidget {
-  const TodoListDetailScreen({super.key, required this.todoList});
+  const TodoListDetailScreen({super.key, required this.todoListId});
 
-  /// TodoList to display and edit
-  final TodoList todoList;
+  /// ID of the todo list to display and edit
+  final String todoListId;
 
   @override
   ConsumerState<TodoListDetailScreen> createState() => _TodoListDetailScreenState();
 }
 
 class _TodoListDetailScreenState extends ConsumerState<TodoListDetailScreen> {
-  // Text controllers
-  late TextEditingController _nameController;
+  // Text controllers (nullable until todo list loads)
+  TextEditingController? _nameController;
 
-  // Local state
-  late TodoList _currentTodoList;
+  // Local state (nullable until todo list loads)
+  TodoList? _currentTodoList;
   List<TodoItem> _currentItems = [];
   bool _isLoadingItems = false;
   Timer? _debounceTimer;
@@ -59,22 +63,30 @@ class _TodoListDetailScreenState extends ConsumerState<TodoListDetailScreen> {
   bool _hasChanges = false;
   bool _enableFabPulse = false;
 
+  // Track if controllers have been initialized
+  bool _controllersInitialized = false;
+
+  /// Initialize text controllers when todo list data is available
+  void _initializeControllers(TodoList todoList) {
+    if (_controllersInitialized) return;
+
+    _currentTodoList = todoList;
+    _nameController = TextEditingController(text: todoList.name);
+
+    // Listen to text changes for auto-save
+    _nameController!.addListener(_onNameChanged);
+
+    _controllersInitialized = true;
+  }
+
   @override
   void initState() {
     super.initState();
-
-    // Initialize current todo list
-    _currentTodoList = widget.todoList;
-
-    // Initialize text controllers
-    _nameController = TextEditingController(text: widget.todoList.name);
-
-    // Listen to text changes for auto-save
-    _nameController.addListener(_onNameChanged);
+    // Controllers will be initialized in build when data loads
 
     // Listen to todo items controller changes
     ref.listenManual(
-      todoItemsControllerProvider(widget.todoList.id),
+      todoItemsControllerProvider(widget.todoListId),
       (previous, next) {
         next.whenData((items) {
           if (mounted) {
@@ -109,33 +121,14 @@ class _TodoListDetailScreenState extends ConsumerState<TodoListDetailScreen> {
       },
       fireImmediately: true,
     );
-
-    // Listen to todo lists controller to update current list
-    ref.listenManual(
-      todoListsControllerProvider(widget.todoList.spaceId),
-      (previous, next) {
-        next.whenData((lists) {
-          final updated = lists.firstWhere(
-            (tl) => tl.id == _currentTodoList.id,
-            orElse: () => _currentTodoList,
-          );
-          if (mounted) {
-            setState(() {
-              _currentTodoList = updated;
-            });
-          }
-        });
-      },
-      fireImmediately: true,
-    );
   }
 
   @override
   void dispose() {
     _debounceTimer?.cancel();
     _deletionTimer?.cancel();
-    _nameController.removeListener(_onNameChanged);
-    _nameController.dispose();
+    _nameController?.removeListener(_onNameChanged);
+    _nameController?.dispose();
     super.dispose();
   }
 
@@ -156,13 +149,22 @@ class _TodoListDetailScreenState extends ConsumerState<TodoListDetailScreen> {
 
   /// Save changes to the todo list
   Future<void> _saveChanges() async {
-    if (!_hasChanges || _isSaving) return;
+    if (!_hasChanges || _isSaving || _currentTodoList == null || _nameController == null) {
+      return;
+    }
 
     final l10n = AppLocalizations.of(context)!;
+    final currentTodoList = _currentTodoList!;
+    final nameController = _nameController!;
 
     // Validate name
-    if (_nameController.text.trim().isEmpty) {
+    if (nameController.text.trim().isEmpty) {
       _showSnackBar(l10n.todoDetailNameEmpty, isError: true);
+      // Restore previous name
+      nameController.text = currentTodoList.name;
+      setState(() {
+        _hasChanges = false;
+      });
       return;
     }
 
@@ -172,13 +174,13 @@ class _TodoListDetailScreenState extends ConsumerState<TodoListDetailScreen> {
 
     try {
       // Update todo list name
-      final updated = _currentTodoList.copyWith(
-        name: _nameController.text.trim(),
+      final updated = currentTodoList.copyWith(
+        name: nameController.text.trim(),
       );
 
       // Save via Riverpod controller
       await ref
-          .read(todoListsControllerProvider(widget.todoList.spaceId).notifier)
+          .read(todoListsControllerProvider(currentTodoList.spaceId).notifier)
           .updateTodoList(updated);
 
       setState(() {
@@ -196,10 +198,13 @@ class _TodoListDetailScreenState extends ConsumerState<TodoListDetailScreen> {
 
   /// Add a new TodoItem
   Future<void> _addTodoItem() async {
+    if (_currentTodoList == null) return;
+
     final result = await _showTodoItemDialog();
     if (result == null || !mounted) return;
 
     final l10n = AppLocalizations.of(context)!;
+    final currentTodoList = _currentTodoList!;
 
     try {
       // Set sortOrder to be at the end of current items
@@ -209,13 +214,13 @@ class _TodoListDetailScreenState extends ConsumerState<TodoListDetailScreen> {
 
       // Create item via Riverpod controller
       await ref
-          .read(todoItemsControllerProvider(widget.todoList.id).notifier)
+          .read(todoItemsControllerProvider(widget.todoListId).notifier)
           .createItem(itemWithSortOrder);
 
       // Refresh parent list to get updated counts
       await ref
-          .read(todoListsControllerProvider(widget.todoList.spaceId).notifier)
-          .refreshTodoList(widget.todoList.id);
+          .read(todoListsControllerProvider(currentTodoList.spaceId).notifier)
+          .refreshTodoList(widget.todoListId);
 
       if (mounted) _showSnackBar(l10n.todoDetailItemAdded);
     } catch (e) {
@@ -225,21 +230,24 @@ class _TodoListDetailScreenState extends ConsumerState<TodoListDetailScreen> {
 
   /// Edit a TodoItem
   Future<void> _editTodoItem(TodoItem item) async {
+    if (_currentTodoList == null) return;
+
     final result = await _showTodoItemDialog(existingItem: item);
     if (result == null || !mounted) return;
 
     final l10n = AppLocalizations.of(context)!;
+    final currentTodoList = _currentTodoList!;
 
     try {
       // Update item via Riverpod controller
       await ref
-          .read(todoItemsControllerProvider(widget.todoList.id).notifier)
+          .read(todoItemsControllerProvider(widget.todoListId).notifier)
           .updateItem(result);
 
       // Refresh parent list to get updated counts
       await ref
-          .read(todoListsControllerProvider(widget.todoList.spaceId).notifier)
-          .refreshTodoList(widget.todoList.id);
+          .read(todoListsControllerProvider(currentTodoList.spaceId).notifier)
+          .refreshTodoList(widget.todoListId);
 
       if (mounted) _showSnackBar(l10n.todoDetailItemUpdated);
     } catch (e) {
@@ -252,18 +260,21 @@ class _TodoListDetailScreenState extends ConsumerState<TodoListDetailScreen> {
   /// Perform the actual deletion without confirmation
   /// Used by Dismissible which handles confirmation separately
   Future<void> _performDeleteTodoItem(TodoItem item) async {
+    if (_currentTodoList == null) return;
+
     final l10n = AppLocalizations.of(context)!;
+    final currentTodoList = _currentTodoList!;
 
     try {
       // Delete item via Riverpod controller
       await ref
-          .read(todoItemsControllerProvider(widget.todoList.id).notifier)
-          .deleteItem(item.id, _currentTodoList.id);
+          .read(todoItemsControllerProvider(widget.todoListId).notifier)
+          .deleteItem(item.id, currentTodoList.id);
 
       // Refresh parent list to get updated counts
       await ref
-          .read(todoListsControllerProvider(widget.todoList.spaceId).notifier)
-          .refreshTodoList(widget.todoList.id);
+          .read(todoListsControllerProvider(currentTodoList.spaceId).notifier)
+          .refreshTodoList(widget.todoListId);
 
       if (mounted) _showSnackBar(l10n.todoDetailItemDeleted);
     } catch (e) {
@@ -275,16 +286,20 @@ class _TodoListDetailScreenState extends ConsumerState<TodoListDetailScreen> {
 
   /// Toggle TodoItem completion
   Future<void> _toggleTodoItem(TodoItem item) async {
+    if (_currentTodoList == null) return;
+
+    final currentTodoList = _currentTodoList!;
+
     try {
       // Toggle item via Riverpod controller
       await ref
-          .read(todoItemsControllerProvider(widget.todoList.id).notifier)
-          .toggleItem(item.id, _currentTodoList.id);
+          .read(todoItemsControllerProvider(widget.todoListId).notifier)
+          .toggleItem(item.id, currentTodoList.id);
 
       // Refresh parent list to get updated counts
       await ref
-          .read(todoListsControllerProvider(widget.todoList.spaceId).notifier)
-          .refreshTodoList(widget.todoList.id);
+          .read(todoListsControllerProvider(currentTodoList.spaceId).notifier)
+          .refreshTodoList(widget.todoListId);
     } catch (e) {
       if (!mounted) return;
       final l10n = AppLocalizations.of(context)!;
@@ -315,7 +330,7 @@ class _TodoListDetailScreenState extends ConsumerState<TodoListDetailScreen> {
 
       // Call controller to reorder
       await ref
-          .read(todoItemsControllerProvider(widget.todoList.id).notifier)
+          .read(todoItemsControllerProvider(widget.todoListId).notifier)
           .reorderItems(orderedIds);
     } catch (e) {
       // On error, check mounted before any context usage
@@ -330,11 +345,15 @@ class _TodoListDetailScreenState extends ConsumerState<TodoListDetailScreen> {
   /// Delete the entire TodoList
   /// Note: Navigation is handled in _showDeleteListConfirmation(), not here
   Future<void> _deleteTodoList() async {
+    if (_currentTodoList == null) return;
+
+    final currentTodoList = _currentTodoList!;
+
     try {
       // Delete list via Riverpod controller
       await ref
-          .read(todoListsControllerProvider(widget.todoList.spaceId).notifier)
-          .deleteTodoList(_currentTodoList.id);
+          .read(todoListsControllerProvider(currentTodoList.spaceId).notifier)
+          .deleteTodoList(currentTodoList.id);
 
       // Navigation already handled in confirmation dialog
       // Success feedback is provided by UI update (todo list removed from list)
@@ -348,7 +367,10 @@ class _TodoListDetailScreenState extends ConsumerState<TodoListDetailScreen> {
 
   /// Show TodoItem edit/create dialog
   Future<TodoItem?> _showTodoItemDialog({TodoItem? existingItem}) async {
+    if (_currentTodoList == null) return null;
+
     final l10n = AppLocalizations.of(context)!;
+    final currentTodoList = _currentTodoList!;
     final titleController = TextEditingController(
       text: existingItem?.title ?? '',
     );
@@ -377,7 +399,7 @@ class _TodoListDetailScreenState extends ConsumerState<TodoListDetailScreen> {
 
           final item = TodoItem(
             id: existingItem?.id ?? const Uuid().v4(),
-            todoListId: _currentTodoList.id, // Foreign key field
+            todoListId: currentTodoList.id, // Foreign key field
             title: titleController.text.trim(),
             description: descriptionController.text.trim().isEmpty
                 ? null
@@ -486,13 +508,16 @@ class _TodoListDetailScreenState extends ConsumerState<TodoListDetailScreen> {
 
   /// Show delete list confirmation
   Future<void> _showDeleteListConfirmation() async {
+    if (_currentTodoList == null) return;
+
     final l10n = AppLocalizations.of(context)!;
+    final currentTodoList = _currentTodoList!;
     final confirmed = await showDeleteConfirmationDialog(
       context: context,
       title: l10n.todoDetailDeleteListTitle,
       message: l10n.todoDetailDeleteListMessage(
-        _currentTodoList.name,
-        _currentTodoList.totalItemCount,
+        currentTodoList.name,
+        currentTodoList.totalItemCount,
       ),
     );
 
@@ -531,26 +556,117 @@ class _TodoListDetailScreenState extends ConsumerState<TodoListDetailScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final todoListAsync = ref.watch(todoListByIdProvider(widget.todoListId));
 
-    // Watch item controller for live count calculation
-    final itemsAsyncValue = ref.watch(todoItemsControllerProvider(widget.todoList.id));
+    return todoListAsync.when(
+      loading: () => Scaffold(
+        appBar: AppBar(
+          title: Text(l10n.todoListDetailLoadingTitle),
+        ),
+        body: const Center(
+          child: CircularProgressIndicator(),
+        ),
+      ),
+      error: (error, stack) => Scaffold(
+        appBar: AppBar(
+          title: Text(l10n.todoListDetailErrorTitle),
+        ),
+        body: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(AppSpacing.md),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(
+                  Icons.error_outline,
+                  size: 64,
+                  color: AppColors.error,
+                ),
+                const SizedBox(height: AppSpacing.md),
+                Text(
+                  l10n.todoListDetailErrorMessage,
+                  textAlign: TextAlign.center,
+                  style: AppTypography.bodyLarge,
+                ),
+                const SizedBox(height: AppSpacing.xs),
+                Text(
+                  error.toString(),
+                  textAlign: TextAlign.center,
+                  style: AppTypography.bodySmall.copyWith(
+                    color: AppColors.textSecondary(context),
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.lg),
+                ElevatedButton.icon(
+                  onPressed: () => Navigator.of(context).pop(),
+                  icon: const Icon(Icons.arrow_back),
+                  label: Text(l10n.buttonGoBack),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+      data: (todoList) {
+        if (todoList == null) {
+          // TodoList not found
+          return Scaffold(
+            appBar: AppBar(
+              title: Text(l10n.todoListDetailNotFoundTitle),
+            ),
+            body: Center(
+              child: Padding(
+                padding: const EdgeInsets.all(AppSpacing.md),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.checklist_outlined,
+                      size: 64,
+                      color: AppColors.textSecondary(context),
+                    ),
+                    const SizedBox(height: AppSpacing.md),
+                    Text(
+                      l10n.todoListDetailNotFoundMessage,
+                      textAlign: TextAlign.center,
+                      style: AppTypography.bodyLarge,
+                    ),
+                    const SizedBox(height: AppSpacing.lg),
+                    ElevatedButton.icon(
+                      onPressed: () => Navigator.of(context).pop(),
+                      icon: const Icon(Icons.arrow_back),
+                      label: Text(l10n.buttonGoBack),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        }
 
-    // Calculate counts from items for immediate UI updates
-    int? calculatedTotalCount;
-    int? calculatedCompletedCount;
-    double? calculatedProgress;
+        // Initialize controllers with loaded data
+        _initializeControllers(todoList);
 
-    itemsAsyncValue.whenOrNull(
-      data: (items) {
-        calculatedTotalCount = items.length;
-        calculatedCompletedCount = items.where((item) => item.isCompleted).length;
-        calculatedProgress = calculatedTotalCount! > 0
-            ? calculatedCompletedCount! / calculatedTotalCount!
-            : 0.0;
-      },
-    );
+        // Watch item controller for live count calculation
+        final itemsAsyncValue = ref.watch(todoItemsControllerProvider(widget.todoListId));
 
-    return PopScope(
+        // Calculate counts from items for immediate UI updates
+        int? calculatedTotalCount;
+        int? calculatedCompletedCount;
+        double? calculatedProgress;
+
+        itemsAsyncValue.whenOrNull(
+          data: (items) {
+            calculatedTotalCount = items.length;
+            calculatedCompletedCount = items.where((item) => item.isCompleted).length;
+            calculatedProgress = calculatedTotalCount! > 0
+                ? calculatedCompletedCount! / calculatedTotalCount!
+                : 0.0;
+          },
+        );
+
+        // Build the main UI
+        return PopScope(
       canPop: false,
       onPopInvokedWithResult: (didPop, result) async {
         if (!didPop) {
@@ -564,10 +680,12 @@ class _TodoListDetailScreenState extends ConsumerState<TodoListDetailScreen> {
       child: Scaffold(
         appBar: AppBar(
           title: EditableAppBarTitle(
-            text: _currentTodoList.name,
+            text: _currentTodoList?.name ?? '',
             onChanged: (newName) {
-              _nameController.text = newName;
-              _saveChanges();
+              if (_nameController != null) {
+                _nameController!.text = newName;
+                _saveChanges();
+              }
             },
             gradient: AppColors.taskGradient,
             hintText: l10n.todoDetailNameHint,
@@ -625,8 +743,8 @@ class _TodoListDetailScreenState extends ConsumerState<TodoListDetailScreen> {
                 children: [
                   Text(
                     l10n.todoDetailProgressCompleted(
-                      calculatedCompletedCount ?? _currentTodoList.completedItemCount,
-                      calculatedTotalCount ?? _currentTodoList.totalItemCount,
+                      calculatedCompletedCount ?? _currentTodoList?.completedItemCount ?? 0,
+                      calculatedTotalCount ?? _currentTodoList?.totalItemCount ?? 0,
                     ),
                     style: AppTypography.bodyMedium.copyWith(
                       color: Colors.white,
@@ -635,7 +753,7 @@ class _TodoListDetailScreenState extends ConsumerState<TodoListDetailScreen> {
                   ),
                   const SizedBox(height: AppSpacing.sm),
                   LinearProgressIndicator(
-                    value: calculatedProgress ?? _currentTodoList.progress,
+                    value: calculatedProgress ?? _currentTodoList?.progress ?? 0.0,
                     backgroundColor: Colors.white.withValues(alpha: 0.3),
                     valueColor: const AlwaysStoppedAnimation<Color>(
                       Colors.white,
@@ -685,6 +803,8 @@ class _TodoListDetailScreenState extends ConsumerState<TodoListDetailScreen> {
           enablePulse: _enableFabPulse,
         ),
       ),
+        );
+      },
     );
   }
 

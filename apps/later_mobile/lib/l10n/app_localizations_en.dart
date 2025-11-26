@@ -382,6 +382,38 @@ class AppLocalizationsEn extends AppLocalizations {
   String get noteDetailMenuDelete => 'Delete Note';
 
   @override
+  String get noteDetailLoadingTitle => 'Loading Note';
+
+  @override
+  String get noteDetailErrorTitle => 'Error';
+
+  @override
+  String get noteDetailErrorMessage => 'Failed to load note';
+
+  @override
+  String get noteDetailNotFoundTitle => 'Note Not Found';
+
+  @override
+  String get noteDetailNotFoundMessage =>
+      'This note could not be found. It may have been deleted.';
+
+  @override
+  String get todoListDetailLoadingTitle => 'Loading TodoList';
+
+  @override
+  String get todoListDetailErrorTitle => 'Error';
+
+  @override
+  String get todoListDetailErrorMessage => 'Failed to load todo list';
+
+  @override
+  String get todoListDetailNotFoundTitle => 'TodoList Not Found';
+
+  @override
+  String get todoListDetailNotFoundMessage =>
+      'This todo list could not be found. It may have been deleted.';
+
+  @override
   String get todoDetailNameEmpty => 'TodoList name cannot be empty';
 
   @override
@@ -611,6 +643,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get listDetailMenuDelete => 'Delete List';
 
   @override
+  String get listDetailLoadingTitle => 'Loading List';
+
+  @override
+  String get listDetailErrorTitle => 'Error';
+
+  @override
+  String get listDetailErrorMessage => 'Failed to load list';
+
+  @override
+  String get listDetailNotFoundTitle => 'List Not Found';
+
+  @override
+  String get listDetailNotFoundMessage =>
+      'This list could not be found. It may have been deleted.';
+
+  @override
   String get spaceModalTitle => 'Switch Space';
 
   @override
@@ -797,6 +845,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get buttonArchive => 'Archive';
+
+  @override
+  String get buttonGoBack => 'Go Back';
 
   @override
   String get accessibilityCloseButton => 'Close';
