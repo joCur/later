@@ -731,40 +731,22 @@ class _ListDetailScreenState extends ConsumerState<ListDetailScreen> {
         // Watch item controller for live count calculation
         final itemsAsyncValue = ref.watch(listItemsControllerProvider(list.id));
 
-    // Calculate counts from items for live updates
-    final int? calculatedTotalCount = itemsAsyncValue.whenOrNull(
-      data: (items) => items.length,
-    );
-    final int? calculatedCheckedCount = itemsAsyncValue.whenOrNull(
-      data: (items) => items.where((item) => item.isChecked).length,
-    );
-    final double? calculatedProgress = itemsAsyncValue.whenOrNull(
-      data: (items) {
-        if (items.isEmpty) return 0.0;
-        final checkedCount = items.where((item) => item.isChecked).length;
-        return checkedCount / items.length;
-      },
-    );
+        // Calculate counts from items for live updates
+        final int? calculatedTotalCount = itemsAsyncValue.whenOrNull(
+          data: (items) => items.length,
+        );
+        final int? calculatedCheckedCount = itemsAsyncValue.whenOrNull(
+          data: (items) => items.where((item) => item.isChecked).length,
+        );
+        final double? calculatedProgress = itemsAsyncValue.whenOrNull(
+          data: (items) {
+            if (items.isEmpty) return 0.0;
+            final checkedCount = items.where((item) => item.isChecked).length;
+            return checkedCount / items.length;
+          },
+        );
 
-    // Watch item controller for live count calculation
-    final itemsAsyncValue = ref.watch(listItemsControllerProvider(widget.list.id));
-
-    // Calculate counts from items for live updates
-    final int? calculatedTotalCount = itemsAsyncValue.whenOrNull(
-      data: (items) => items.length,
-    );
-    final int? calculatedCheckedCount = itemsAsyncValue.whenOrNull(
-      data: (items) => items.where((item) => item.isChecked).length,
-    );
-    final double? calculatedProgress = itemsAsyncValue.whenOrNull(
-      data: (items) {
-        if (items.isEmpty) return 0.0;
-        final checkedCount = items.where((item) => item.isChecked).length;
-        return checkedCount / items.length;
-      },
-    );
-
-    return PopScope(
+        return PopScope(
       canPop: false,
       onPopInvokedWithResult: (didPop, result) async {
         if (!didPop) {
