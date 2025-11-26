@@ -4,6 +4,11 @@ import 'package:later_mobile/features/auth/application/providers.dart';
 import 'package:later_mobile/features/auth/presentation/screens/sign_in_screen.dart';
 import 'package:later_mobile/features/home/presentation/screens/home_screen.dart';
 
+/// DEPRECATED: This widget is no longer used and will be removed in Phase 5.
+///
+/// Replaced by go_router authentication-aware redirect guards (Phase 3).
+/// See: .claude/plans/go-router-migration.md
+///
 /// Authentication gate that routes users based on authentication status
 ///
 /// - Shows loading indicator while initializing auth stream

@@ -206,27 +206,33 @@ lib/core/routing/
   - ✅ If stream is slow, user sees sign-in form briefly (acceptable UX)
   - ⏭️ Full app startup testing will occur in Phase 3 when router is integrated
 
-### Phase 3: Main App Integration (~30 minutes)
+### Phase 3: Main App Integration (~30 minutes) ✅ COMPLETED
 
 **Goal:** Replace MaterialApp with MaterialApp.router and remove AuthGate widget.
 
-- [ ] Task 3.1: Update main.dart to use MaterialApp.router
-  - In `_MyApp` widget, watch `routerProvider`: `final router = ref.watch(routerProvider)`
-  - Replace `MaterialApp(home: AuthGate())` with `MaterialApp.router(routerConfig: router)`
-  - Keep all existing properties (title, theme, darkTheme, themeMode, localization)
-  - Keep themeAnimationDuration and themeAnimationCurve
-  - Remove `home` property entirely
+**Status:** ✅ **COMPLETED** - All tasks finished successfully. App now uses MaterialApp.router with go_router. AuthGate deprecated and marked for removal in Phase 5. Router is integrated and will automatically handle authentication-aware navigation.
 
-- [ ] Task 3.2: Verify AuthGate is no longer used
-  - Search codebase for `AuthGate` imports and usage
-  - Confirm only reference is in `auth_gate.dart` file itself
-  - Keep the file for now (will be deleted in Phase 5 after testing)
-  - Add comment in AuthGate file noting it's deprecated and will be removed
+**Known Issues (Expected):**
+- Flutter analyze shows 6 errors in app_router.dart for detail screen constructors (NoteDetailScreen, TodoListDetailScreen, ListDetailScreen) expecting full objects instead of IDs. This is expected and documented in Phase 2 notes - will be resolved in Phase 4 Task 4.7 when detail screens are refactored to accept ID parameters.
 
-- [ ] Task 3.3: Update pubspec.yaml and imports
-  - Verify go_router is in dependencies list
-  - Run `flutter pub get` to ensure clean dependency resolution
-  - Update any barrel export files if needed
+- [x] Task 3.1: Update main.dart to use MaterialApp.router
+  - ✅ Added `final router = ref.watch(routerProvider)` in `_MyApp` widget
+  - ✅ Replaced `MaterialApp(home: AuthGate())` with `MaterialApp.router(routerConfig: router)`
+  - ✅ Kept all existing properties (title, theme, darkTheme, themeMode, localization)
+  - ✅ Kept themeAnimationDuration and themeAnimationCurve
+  - ✅ Removed `home` property entirely
+  - ✅ Updated import from AuthGate to app_router
+
+- [x] Task 3.2: Verify AuthGate is no longer used
+  - ✅ Searched codebase for `AuthGate` imports and usage
+  - ✅ Confirmed only references are in `auth_gate.dart` file itself and one comment in create_content_modal.dart
+  - ✅ File kept for Phase 5 deletion after full testing
+  - ✅ Added prominent deprecation comment in AuthGate file noting it's deprecated and will be removed
+
+- [x] Task 3.3: Update pubspec.yaml and imports
+  - ✅ Verified go_router: ^14.6.2 is in dependencies list (line 20)
+  - ✅ Ran `flutter pub get` - clean dependency resolution
+  - ✅ No barrel export files needed updating
 
 ### Phase 4: Replace Imperative Navigation (~4-5 hours)
 
