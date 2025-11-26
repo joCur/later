@@ -743,8 +743,8 @@ class _TodoListDetailScreenState extends ConsumerState<TodoListDetailScreen> {
                 children: [
                   Text(
                     l10n.todoDetailProgressCompleted(
-                      calculatedCompletedCount ?? _currentTodoList?.completedItemCount ?? 0,
-                      calculatedTotalCount ?? _currentTodoList?.totalItemCount ?? 0,
+                      calculatedCompletedCount ?? todoList.completedItemCount,
+                      calculatedTotalCount ?? todoList.totalItemCount,
                     ),
                     style: AppTypography.bodyMedium.copyWith(
                       color: Colors.white,
@@ -753,7 +753,7 @@ class _TodoListDetailScreenState extends ConsumerState<TodoListDetailScreen> {
                   ),
                   const SizedBox(height: AppSpacing.sm),
                   LinearProgressIndicator(
-                    value: calculatedProgress ?? _currentTodoList?.progress ?? 0.0,
+                    value: calculatedProgress ?? todoList.progress,
                     backgroundColor: Colors.white.withValues(alpha: 0.3),
                     valueColor: const AlwaysStoppedAnimation<Color>(
                       Colors.white,
