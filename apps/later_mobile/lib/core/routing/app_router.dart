@@ -94,25 +94,16 @@ GoRouter router(Ref ref) {
       // the auth stream emits new values (via refreshListenable).
       //
       // Redirect Logic:
-      // 1. Check if auth stream has initialized (hasValue)
-      // 2. Extract user from stream (User? = null means unauthenticated)
+      // 1. Get current user synchronously (no waiting for stream)
+      // 2. Extract user (User? = null means unauthenticated)
       // 3. Redirect unauthenticated users to sign-in (except if already on auth routes)
       // 4. Redirect authenticated users away from auth routes to home
       // 5. Return null if no redirect needed (stay on current route)
 
-      // Read current auth state from stream provider
-      final authValue = ref.read(authStreamProvider);
-
-      // If stream hasn't emitted yet, stay on current route
-      if (!authValue.hasValue) {
-        if (kDebugMode) {
-          print('[Router] Auth stream not ready, staying on: ${state.matchedLocation}');
-        }
-        return null;
-      }
-
-      // Extract user from stream (null = unauthenticated)
-      final user = authValue.value;
+      // Get current auth state synchronously
+      // We use checkAuthStatus() instead of the stream because the stream
+      // only emits on *changes*, not immediately on subscription
+      final user = authService.checkAuthStatus();
       final isAuthenticated = user != null;
 
       // Detect if current route is an auth route
