@@ -12,12 +12,14 @@ part of 'app_router.dart';
 ///
 /// Provides a GoRouter instance with:
 /// - Initial location: /auth/sign-in (before auth check completes)
-/// - Empty routes list (to be filled in Phase 2)
-/// - Placeholder redirect callback (to be implemented in Phase 2)
+/// - Unauthenticated routes: sign-in, sign-up, account-upgrade
+/// - Authenticated routes: home, notes, todos, lists, search
+/// - Authentication-aware redirect logic with stream-based auth state
+/// - Automatic route refresh when auth state changes
 /// - Error builder that falls back to SignInScreen
 ///
 /// This is kept alive to maintain router state throughout app lifetime.
-/// Auth integration will be added in Phase 2.
+/// The router watches the auth stream and rebuilds routes when auth state changes.
 
 @ProviderFor(router)
 const routerProvider = RouterProvider._();
@@ -26,12 +28,14 @@ const routerProvider = RouterProvider._();
 ///
 /// Provides a GoRouter instance with:
 /// - Initial location: /auth/sign-in (before auth check completes)
-/// - Empty routes list (to be filled in Phase 2)
-/// - Placeholder redirect callback (to be implemented in Phase 2)
+/// - Unauthenticated routes: sign-in, sign-up, account-upgrade
+/// - Authenticated routes: home, notes, todos, lists, search
+/// - Authentication-aware redirect logic with stream-based auth state
+/// - Automatic route refresh when auth state changes
 /// - Error builder that falls back to SignInScreen
 ///
 /// This is kept alive to maintain router state throughout app lifetime.
-/// Auth integration will be added in Phase 2.
+/// The router watches the auth stream and rebuilds routes when auth state changes.
 
 final class RouterProvider
     extends $FunctionalProvider<GoRouter, GoRouter, GoRouter>
@@ -40,12 +44,14 @@ final class RouterProvider
   ///
   /// Provides a GoRouter instance with:
   /// - Initial location: /auth/sign-in (before auth check completes)
-  /// - Empty routes list (to be filled in Phase 2)
-  /// - Placeholder redirect callback (to be implemented in Phase 2)
+  /// - Unauthenticated routes: sign-in, sign-up, account-upgrade
+  /// - Authenticated routes: home, notes, todos, lists, search
+  /// - Authentication-aware redirect logic with stream-based auth state
+  /// - Automatic route refresh when auth state changes
   /// - Error builder that falls back to SignInScreen
   ///
   /// This is kept alive to maintain router state throughout app lifetime.
-  /// Auth integration will be added in Phase 2.
+  /// The router watches the auth stream and rebuilds routes when auth state changes.
   const RouterProvider._()
     : super(
         from: null,
@@ -79,4 +85,4 @@ final class RouterProvider
   }
 }
 
-String _$routerHash() => r'49c8c77d0a0ac8fae3ce971be6b5c5d66f3b914a';
+String _$routerHash() => r'a6ab85f698edfcb3b381c78bd54b52a060ceff9a';
