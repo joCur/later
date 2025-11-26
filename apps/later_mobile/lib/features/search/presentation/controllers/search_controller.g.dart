@@ -60,7 +60,7 @@ final class SearchControllerProvider
   SearchController create() => SearchController();
 }
 
-String _$searchControllerHash() => r'ba1d617ebb1df172e8b54847cfbb3148f58c4b8f';
+String _$searchControllerHash() => r'fdc341a0739cf16d9542d42644c3f9233a6b9f6e';
 
 /// Controller for managing search state with debouncing
 ///

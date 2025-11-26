@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:later_mobile/core/error/app_error.dart';
+import 'package:later_mobile/core/error/error_handler.dart';
 import 'package:later_mobile/design_system/design_system.dart';
-import 'package:later_mobile/features/auth/presentation/controllers/auth_state_controller.dart';
+import 'package:later_mobile/features/auth/presentation/controllers/auth_controller.dart';
 import 'package:later_mobile/l10n/app_localizations.dart';
 
 /// Screen for upgrading anonymous users to full accounts
@@ -28,6 +29,7 @@ class _AccountUpgradeScreenState extends ConsumerState<AccountUpgradeScreen> {
   final _confirmPasswordFocusNode = FocusNode();
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
+  bool _isUpgrading = false; // Local loading state
 
   @override
   void initState() {
@@ -58,8 +60,10 @@ class _AccountUpgradeScreenState extends ConsumerState<AccountUpgradeScreen> {
       return;
     }
 
+    setState(() => _isUpgrading = true);
+
     try {
-      await ref.read(authStateControllerProvider.notifier).upgradeToFullAccount(
+      await ref.read(authControllerProvider.notifier).upgradeToFullAccount(
             email: _emailController.text.trim(),
             password: _passwordController.text,
           );
@@ -82,9 +86,14 @@ class _AccountUpgradeScreenState extends ConsumerState<AccountUpgradeScreen> {
           Navigator.of(context).pop();
         }
       });
-    } catch (e) {
-      // Error is handled through AsyncValue.error
-      // The UI will show the error message automatically
+    } catch (error) {
+      // Catch error and display inline
+      if (mounted) {
+        setState(() => _isUpgrading = false);
+        if (error is AppError) {
+          ErrorHandler.showErrorSnackBar(context, error);
+        }
+      }
     }
   }
 
@@ -130,23 +139,10 @@ class _AccountUpgradeScreenState extends ConsumerState<AccountUpgradeScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final authState = ref.watch(authStateControllerProvider);
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    // Extract error message from AsyncValue
-    final errorMessage = authState.when(
-      data: (_) => null,
-      loading: () => null,
-      error: (error, _) {
-        if (error is AppError) {
-          return error.message;
-        }
-        return l10n.errorUnexpected;
-      },
-    );
-
-    // Extract loading state
-    final isLoading = authState.isLoading;
+    // Use local loading state
+    final isLoading = _isUpgrading;
 
     return Scaffold(
       body: Stack(
@@ -191,12 +187,6 @@ class _AccountUpgradeScreenState extends ConsumerState<AccountUpgradeScreen> {
                           // Subtitle
                           _buildSubtitle(l10n),
                           const SizedBox(height: AppSpacing.lg),
-
-                          // Error banner
-                          if (errorMessage != null) ...[
-                            _buildErrorBanner(errorMessage),
-                            const SizedBox(height: AppSpacing.md),
-                          ],
 
                           // Email field
                           _buildEmailField(l10n, isLoading),
@@ -272,31 +262,6 @@ class _AccountUpgradeScreenState extends ConsumerState<AccountUpgradeScreen> {
         .animate()
         .fadeIn(delay: 300.ms, duration: 600.ms)
         .slideY(begin: 0.05, end: 0, curve: Curves.easeOut);
-  }
-
-  Widget _buildErrorBanner(String message) {
-    return Container(
-      padding: const EdgeInsets.all(AppSpacing.md),
-      decoration: BoxDecoration(
-        color: Colors.red.shade50,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.red.shade200),
-      ),
-      child: Row(
-        children: [
-          Icon(Icons.error_outline, color: Colors.red.shade700),
-          const SizedBox(width: AppSpacing.sm),
-          Expanded(
-            child: Text(
-              message,
-              style: AppTypography.bodySmall.copyWith(
-                color: Colors.red.shade700,
-              ),
-            ),
-          ),
-        ],
-      ),
-    ).animate().shake(duration: 300.ms);
   }
 
   Widget _buildEmailField(AppLocalizations l10n, bool isLoading) {

@@ -8,7 +8,8 @@ import 'package:later_mobile/design_system/tokens/tokens.dart';
 import 'package:later_mobile/l10n/app_localizations.dart';
 
 import 'package:later_mobile/core/theme/temporal_flow_theme.dart';
-import 'package:later_mobile/features/auth/presentation/controllers/auth_state_controller.dart';
+import 'package:later_mobile/features/auth/application/providers.dart';
+import 'package:later_mobile/features/auth/presentation/controllers/auth_controller.dart';
 import 'package:later_mobile/features/spaces/domain/models/space.dart';
 import 'package:later_mobile/features/spaces/presentation/controllers/current_space_controller.dart';
 import 'package:later_mobile/features/spaces/presentation/controllers/spaces_controller.dart';
@@ -337,9 +338,12 @@ class _AppSidebarState extends ConsumerState<AppSidebar> {
 
   Widget _buildFooter(bool isDarkMode, TemporalFlowTheme temporalTheme) {
     final l10n = AppLocalizations.of(context)!;
-    final isAnonymous = ref
-        .watch(authStateControllerProvider.notifier)
-        .isCurrentUserAnonymous;
+    final userAsync = ref.watch(authStreamProvider);
+    final isAnonymous = userAsync.when(
+      data: (user) => user?.isAnonymous ?? true,
+      loading: () => true,
+      error: (error, stack) => true,
+    );
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -413,7 +417,7 @@ class _AppSidebarState extends ConsumerState<AppSidebar> {
                     child: InkWell(
                       onTap: () async {
                         await ref
-                            .read(authStateControllerProvider.notifier)
+                            .read(authControllerProvider.notifier)
                             .signOut();
                       },
                       borderRadius: const BorderRadius.all(
@@ -480,7 +484,7 @@ class _AppSidebarState extends ConsumerState<AppSidebar> {
                 child: InkWell(
                   onTap: () async {
                     await ref
-                        .read(authStateControllerProvider.notifier)
+                        .read(authControllerProvider.notifier)
                         .signOut();
                   },
                   borderRadius: const BorderRadius.all(

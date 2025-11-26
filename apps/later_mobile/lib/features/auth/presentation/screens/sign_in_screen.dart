@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:later_mobile/core/error/app_error.dart';
 import 'package:later_mobile/core/error/error_handler.dart';
 import 'package:later_mobile/design_system/design_system.dart';
-import 'package:later_mobile/features/auth/presentation/controllers/auth_state_controller.dart';
+import 'package:later_mobile/features/auth/presentation/controllers/auth_controller.dart';
 import 'package:later_mobile/l10n/app_localizations.dart';
 import 'package:later_mobile/features/auth/presentation/screens/sign_up_screen.dart';
 
@@ -81,7 +81,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
     setState(() => _isSigningIn = true);
 
     try {
-      await ref.read(authStateControllerProvider.notifier).signIn(
+      await ref.read(authControllerProvider.notifier).signIn(
             email: _emailController.text.trim(),
             password: _passwordController.text,
           );
@@ -100,7 +100,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
     setState(() => _isSigningInAnonymously = true);
 
     try {
-      await ref.read(authStateControllerProvider.notifier).signInAnonymously();
+      await ref.read(authControllerProvider.notifier).signInAnonymously();
     } catch (error) {
       // Catch error and display inline
       if (mounted) {

@@ -7,7 +7,7 @@ import 'package:later_mobile/design_system/tokens/tokens.dart';
 import 'package:later_mobile/l10n/app_localizations.dart';
 import 'package:uuid/uuid.dart';
 
-import 'package:later_mobile/features/auth/presentation/controllers/auth_state_controller.dart';
+import 'package:later_mobile/features/auth/application/providers.dart';
 import 'package:later_mobile/features/spaces/domain/models/space.dart';
 import 'package:later_mobile/features/spaces/presentation/controllers/spaces_controller.dart';
 
@@ -169,7 +169,7 @@ class _CreateSpaceModalState extends ConsumerState<CreateSpaceModal> {
     final navigator = Navigator.of(context);
 
     // Safety check: Ensure user is authenticated
-    final userAsync = ref.read(authStateControllerProvider);
+    final userAsync = ref.read(authStreamProvider);
     final userId = userAsync.when(
       data: (user) => user?.id,
       loading: () => null as String?,

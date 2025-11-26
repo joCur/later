@@ -26,8 +26,9 @@ import 'package:later_mobile/features/todo_lists/domain/models/todo_list.dart';
 import 'package:later_mobile/features/spaces/domain/models/space.dart';
 import 'package:later_mobile/features/spaces/presentation/controllers/spaces_controller.dart';
 import 'package:later_mobile/features/spaces/presentation/controllers/current_space_controller.dart';
-import 'package:later_mobile/features/auth/presentation/controllers/auth_state_controller.dart';
+import 'package:later_mobile/features/auth/presentation/controllers/auth_controller.dart';
 import 'package:later_mobile/features/auth/presentation/screens/account_upgrade_screen.dart';
+import 'package:later_mobile/features/auth/application/providers.dart';
 import 'package:later_mobile/features/notes/presentation/controllers/notes_controller.dart';
 import 'package:later_mobile/features/todo_lists/presentation/controllers/todo_lists_controller.dart';
 import 'package:later_mobile/features/lists/presentation/controllers/lists_controller.dart';
@@ -518,9 +519,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           icon: Icon(Icons.more_vert, color: AppColors.textSecondary(context)),
           tooltip: 'Menu',
           itemBuilder: (context) {
-            final isAnonymous = ref
-                .read(authStateControllerProvider.notifier)
-                .isCurrentUserAnonymous;
+            final userAsync = ref.read(authStreamProvider);
+            final user = userAsync.value;
+            final isAnonymous = user?.isAnonymous ?? true;
 
             return [
               // Only show sign-out for authenticated (non-anonymous) users
@@ -539,7 +540,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           },
           onSelected: (value) async {
             if (value == 'signout') {
-              await ref.read(authStateControllerProvider.notifier).signOut();
+              await ref.read(authControllerProvider.notifier).signOut();
             }
           },
         ),

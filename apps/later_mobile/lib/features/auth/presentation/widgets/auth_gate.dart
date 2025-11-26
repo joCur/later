@@ -1,26 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:later_mobile/features/auth/presentation/controllers/auth_state_controller.dart';
+import 'package:later_mobile/features/auth/application/providers.dart';
 import 'package:later_mobile/features/auth/presentation/screens/sign_in_screen.dart';
 import 'package:later_mobile/features/home/presentation/screens/home_screen.dart';
 
 /// Authentication gate that routes users based on authentication status
 ///
-/// - Shows loading indicator while checking auth status
+/// - Shows loading indicator while initializing auth stream
 /// - Routes to HomeScreen if authenticated
 /// - Routes to SignInScreen if not authenticated
-/// - Shows error screen as fallback for unexpected/system errors
+/// - Shows error screen as fallback for stream errors
 ///
-/// Note: Auth operation errors (sign in/sign up failures) are handled inline
-/// via ref.listen in the auth screens and won't reach this error state.
-/// This error screen is only shown for unexpected errors during initialization.
+/// Note: This is a temporary implementation during go_router migration.
+/// Loading state now represents stream initialization, not auth check.
+/// Auth stream emits immediately with current user state from Supabase.
 ///
-/// TODO: Future improvement - migrate to go_router for declarative routing
-/// The current error screen creates a dead-end UX with no recovery options.
-/// With go_router, we can use redirect guards to gracefully fallback to
-/// SignInScreen instead of showing an error screen. This also enables deep
-/// linking, web navigation, and better route protection.
-/// See: .claude/research/auth-routing-error-handling-best-practices.md
+/// This widget will be deleted after go_router migration is complete.
+/// See: .claude/plans/go-router-migration.md
 ///
 /// Usage:
 /// ```dart
@@ -33,9 +29,9 @@ class AuthGate extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final authState = ref.watch(authStateControllerProvider);
+    final authStreamValue = ref.watch(authStreamProvider);
 
-    return authState.when(
+    return authStreamValue.when(
       data: (user) {
         if (user != null) {
           // User is authenticated - show app
